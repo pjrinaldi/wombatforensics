@@ -9,6 +9,7 @@
 #include "wombatfunctions.h"
 #include "ui_imageviewer.h"
 #include "ui_imagewindow.h"
+#include "videoviewer.h"
 
 namespace Ui
 {
@@ -56,6 +57,7 @@ signals:
 private:
     Ui::ImageViewer* ui;
     ImageWindow* imagedialog;
+    VideoViewer* videowindow;
 protected:
     void closeEvent(QCloseEvent* event);
 };

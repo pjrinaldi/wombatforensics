@@ -145,12 +145,7 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
     imagedialog->setModal(false);
     imagedialog->setAttribute(Qt::WA_DeleteOnClose);
     imagedialog->setWindowTitle(item->text() + " Image Viewer");
-    qDebug() << "imgpath;" << QString(wombatvariable.tmpmntpath + "thumbs/" + item->text() + ".jpg");
     QImage iconimage(QString(wombatvariable.tmpmntpath + "thumbs/" + item->text() + ".jpg"));
-    //qDebug() << "iconwidth:" << iconimage.width();
-    //qDebug() << "thumbsize:" << thumbsize << "vidsize:" << thumbsize * ((100/vidcount)+1);
-    //qDebug() << "list item iconsize:" << item->iconSize;//<< "thumbnail size?:" << item->icon()->
-    // THIS WILL BE A PROBLEM WHEN I CLICK ON A VIDEO
     if(iconimage.width() == thumbsize)
     {
         imagedialog->GetImage(item->text());
@@ -158,7 +153,16 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
     }
     else if(iconimage.width() > thumbsize)
     {
-        qDebug() << "launch video viewer...";
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(item->text().split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        if(indexlist.count() > 0)
+        {
+            videowindow = new VideoViewer();
+            videowindow->setAttribute(Qt::WA_DeleteOnClose);
+            videowindow->setWindowIcon(QIcon(":/vid"));
+            videowindow->setWindowTitle(item->text() + "Video Viewer");
+            videowindow->setWindowTitle(indexlist.first().sibling(indexlist.first().row(), 11).data().toString() + " Video Viewer");
+            videowindow->ShowVideo(indexlist.first());
+        }
     }
     ui->label->setText("");
 }
