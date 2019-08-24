@@ -123,7 +123,6 @@ ImageViewer::~ImageViewer()
 void ImageViewer::LoadThumbnails()
 {
     ui->listWidget->clear();
-    // THIS MIGHT BE A PROBLEM WHEN THE VIDEO THUMBNAILS ARE LARGER...
     ui->listWidget->setIconSize(QSize(thumbsize * (100 / vidcount), thumbsize+20));
     QByteArray ba;
     ba.clear();
@@ -146,9 +145,21 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
     imagedialog->setModal(false);
     imagedialog->setAttribute(Qt::WA_DeleteOnClose);
     imagedialog->setWindowTitle(item->text() + " Image Viewer");
+    qDebug() << "imgpath;" << QString(wombatvariable.tmpmntpath + "thumbs/" + item->text() + ".jpg");
+    QImage iconimage(QString(wombatvariable.tmpmntpath + "thumbs/" + item->text() + ".jpg"));
+    //qDebug() << "iconwidth:" << iconimage.width();
+    //qDebug() << "thumbsize:" << thumbsize << "vidsize:" << thumbsize * ((100/vidcount)+1);
+    //qDebug() << "list item iconsize:" << item->iconSize;//<< "thumbnail size?:" << item->icon()->
     // THIS WILL BE A PROBLEM WHEN I CLICK ON A VIDEO
-    imagedialog->GetImage(item->text());
-    imagedialog->show();
+    if(iconimage.width() == thumbsize)
+    {
+        imagedialog->GetImage(item->text());
+        imagedialog->show();
+    }
+    else if(iconimage.width() > thumbsize)
+    {
+        qDebug() << "launch video viewer...";
+    }
     ui->label->setText("");
 }
 
