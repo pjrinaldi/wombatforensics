@@ -60,6 +60,15 @@ void DigStatus::UpdateDigState(int digstateid, int digstatecount)
         vidthumbpercent = ((float)vidthumbcount/(float)vidthumbtotal) * 100.0;
         ui->vidthumblabel->setText("Generating Video Thumbnail: " + QString::number(vidthumbcount) + " of " + QString::number(vidthumbtotal) + " " + QString::number((int)vidthumbpercent) + "%");
     }
+    else if(digstateid == 5) // img and vid thumbnail
+    {
+        if(digstatecount == -1)
+            imgthumbcount = imgthumbtotal;
+        else
+            imgthumbcount = digstatecount;
+        imgthumbpercent = ((float)imgthumbcount/(float)imgthumbtotal) * 100.0;
+        ui->imgthumblabel->setText("Generating IMG & VID  Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
+    }
 }
 
 void DigStatus::SetInitialDigState(int digstateid, int digtotal)
@@ -107,12 +116,27 @@ void DigStatus::SetInitialDigState(int digstateid, int digtotal)
         ui->vidthumbbutton->setVisible(true);
         ui->vidthumblabel->setText("Generating Video thumbnail: " + QString::number(vidthumbcount) + " of " + QString::number(vidthumbtotal) + " " + QString::number((int)vidthumbpercent) + "%");
     }
+    else if(digstateid == 5) // img vid thumbnail
+    {
+        digstate = 5;
+        imgthumbcount = 0;
+        imgthumbtotal = digtotal;
+        if(imgthumbtotal != 0)
+            imgthumbpercent = ((float)imgthumbcount/(float)imgthumbtotal) * 100.0;
+        else
+            imgthumbtotal = 0;
+        ui->imgthumblabel->setVisible(true);
+        ui->imgthumbbutton->setVisible(true);
+        ui->imgthumblabel->setText("Generating IMG & VID  Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
+    }
 }
 
 void DigStatus::CancelImgThumb()
 {
     ui->imgthumblabel->setText("<s>" + ui->imgthumblabel->text() + "</s>");
     emit CancelImgThumbThread();
+    if(digstate == 5)
+        emit CancelVidThumbThread();
 }
 
 void DigStatus::CancelHash()
