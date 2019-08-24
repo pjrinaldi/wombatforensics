@@ -7,7 +7,6 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "tskcpp.h"
-#include <Magick++.h>
 
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);

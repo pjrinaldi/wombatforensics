@@ -1,4 +1,5 @@
 #include "wombatfunctions.h"
+#include <Magick++.h>
 
 // Copyright 2015 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -1599,7 +1600,7 @@ void GenerateVidThumbnails(QString thumbid)
                     thmbimages.push_back(image);
                 }
                 qDebug() << "thmbimages:" << thmbimages.size();
-                QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ",jpg";
+                QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
                 Magick::Montage montageopts;
                 Magick::Color color("rgba(0,0,0,0)");
                 montageopts.geometry(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize) + "+1+1").toStdString());

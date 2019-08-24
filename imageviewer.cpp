@@ -123,7 +123,8 @@ ImageViewer::~ImageViewer()
 void ImageViewer::LoadThumbnails()
 {
     ui->listWidget->clear();
-    ui->listWidget->setIconSize(QSize(thumbsize, thumbsize+20));
+    // THIS MIGHT BE A PROBLEM WHEN THE VIDEO THUMBNAILS ARE LARGER...
+    ui->listWidget->setIconSize(QSize(thumbsize * (100 / vidcount), thumbsize+20));
     QByteArray ba;
     ba.clear();
     QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
@@ -145,6 +146,7 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
     imagedialog->setModal(false);
     imagedialog->setAttribute(Qt::WA_DeleteOnClose);
     imagedialog->setWindowTitle(item->text() + " Image Viewer");
+    // THIS WILL BE A PROBLEM WHEN I CLICK ON A VIDEO
     imagedialog->GetImage(item->text());
     imagedialog->show();
     ui->label->setText("");
