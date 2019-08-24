@@ -1579,7 +1579,7 @@ void GenerateVidThumbnails(QString thumbid)
                     QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
                     ba.clear();
                     ba.append(fullpath);
-                    imageshash.insert(filestr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
+                    imageshash.insert(thumbid, QString(ba.toBase64()));
                     // implement libffmpegthumbnailer...
                     ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
                     videothumbnailer.setThumbnailSize(thumbsize);
@@ -1796,7 +1796,7 @@ void GenerateThumbnails(QString thumbid)
                 QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
                 ba.clear();
                 ba.append(fullpath);
-                imageshash.insert(filestr.split(",", QString::SkipEmptyParts).at(12), QString(ba.toBase64()));
+                imageshash.insert(thumbid, QString(ba.toBase64()));
                 QImage fileimage;
                 QImage thumbimage;
                 QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
