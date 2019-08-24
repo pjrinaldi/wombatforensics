@@ -665,6 +665,11 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     tmparray = QByteArray::fromRawData(magicbuffer, 1024);
     QMimeDatabase mimedb;
     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+    if(!mimetype.name().contains("application/octet-stream") && mimetype.name().contains("application"))
+    {
+        qDebug() << mimetype.name() << "mimetype aliases:" << mimetype.aliases();
+        qDebug() << mimetype.name() << "mimetype parents:" << mimetype.parentMimeTypes();
+    }
     //delete[] magicbuffer;
     //free(magicbuffer);
     outstring += mimetype.name() + ",0,e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f";
@@ -896,6 +901,11 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 tmparray = QByteArray::fromRawData(magicbuffer, 1024);
                 QMimeDatabase mimedb;
                 QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                if(!mimetype.name().contains("application/octet-stream") && mimetype.name().contains("application/"))
+                {
+                    qDebug() << mimetype.name() << "mimetype aliases:" << mimetype.aliases();
+                    qDebug() << mimetype.name() << "mimetype parents:" << mimetype.parentMimeTypes();
+                }
                 //free(magicbuffer);
                 //delete[] magicbuffer;
                 QFile hshfile;
