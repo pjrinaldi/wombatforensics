@@ -98,7 +98,7 @@ void ImageWindow::GetImage(QString objectid)
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)
 {
     ui->setupUi(this);
-    setWindowTitle("Thumbnail Viewer");
+    setWindowTitle("Image and Video Thumbnail Viewer");
     connect(ui->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(OpenImageWindow(QListWidgetItem*)));
     connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(HighlightTreeViewItem(QListWidgetItem*)));
     this->hide();
