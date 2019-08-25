@@ -668,7 +668,8 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     if(!mimetype.name().contains("application/octet-stream") && mimetype.name().contains("application"))
     {
         qDebug() << mimetype.name() << "mimetype aliases:" << mimetype.aliases();
-        qDebug() << mimetype.name() << "mimetype parents:" << mimetype.parentMimeTypes();
+        //qDebug() << mimetype.name() << "mimetype parents:" << mimetype.parentMimeTypes();
+        qDebug() << mimetype.name() << "miemtype:comment:" << mimetype.comment();
     }
     //delete[] magicbuffer;
     //free(magicbuffer);
@@ -904,7 +905,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 if(!mimetype.name().contains("application/octet-stream") && mimetype.name().contains("application/"))
                 {
                     qDebug() << mimetype.name() << "mimetype aliases:" << mimetype.aliases();
-                    qDebug() << mimetype.name() << "mimetype parents:" << mimetype.parentMimeTypes();
+                    //qDebug() << mimetype.name() << "mimetype parents:" << mimetype.parentMimeTypes();
+                    qDebug() << mimetype.name() << "mimetype comment:" << mimetype.comment();
                 }
                 //free(magicbuffer);
                 //delete[] magicbuffer;

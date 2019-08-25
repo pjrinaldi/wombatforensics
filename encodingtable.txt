@@ -1,0 +1,46 @@
+DOCUMENT, VIDEO, IMAGE, ARCHIVE, APPLICATION, FONT, AUDIO, TEXT, SPREADSHEET, PRESENTATION,
+EXECUTABLE, 
+IF GENERIC ICON NAME IS "APPLICATION-X-GENERIC" THEN ICONNAME().SPLIT("VND.") THEN CATEGORY FROM THERE... IF MAIL -> EMAIL, ETC...
+---------------||||--------------------
+Generic Icon Name/Comment
+---------------||||---------------------
+x-office-document/ATK inset // if x-office-document then OFFICE DOCUMENT
+video-x-generic/Annodex exchange format // if video-x-generic then VIDEO
+image-x-generic/DICOM image // if image-x-generic then IMAGE
+application-x-generic/GNUnet search file // if application-x-generic then APPLICATION
+package-x-generic/Gzip Archive // if package-x-generic then ARCHIVE
+package-x-generic/Tar Archive
+package-x-generic/CPIO Archive
+font-x-generic/Linux PSF console font (gzip compressed) // if font-x-generic then FONT
+x-office-document/TeX DVI document
+x-office-document/PDF document
+x-office-document/PostScript Document
+image-x-generic/compressed SVG image
+image-x-generic/EPS image
+image-x-generic/Adobe Illustrator document
+package-x-generic/Macintosh BinHex encoded file
+video-x-generic/MXF video
+x-office-document/ODA document
+video-x-generic/Ogg Multimedia file
+audio-x-generic/Ogg Audio // if audio-x-generic then AUDIO
+audio-x-generic/Ogg Flac Audio
+audio-x-generic/Opus audio
+audio-x-generic/Ogg Speex audio
+audio-x-generic/Ogg Vorbis Audio
+video-x-generic/Ogg Video
+video-x-generic/OGM video
+video-x-generic/Ogg Theora video
+x-office-document/PDF document
+x-office-document/WWF document
+text-x-generic/PKCS#10 certcation request // if text-x-generic then TEXT
+x-office-spreadsheet/Lotus 1-2-3 spreadsheet // if x-office-spreadsheet then SPREADSHEET
+applixation-x-generic/ASF video // !!!!!!!!!!!!!!!!!!!!!!!! (iconname vnd.ms-asf)
+x-office-document/CHM document // !!!!!!!!!!!!!!!!!!!!!!!!!
+x-office-presentation/Powerpoint add-in // if x-office-presentation then PRESENTATION
+application-x-generic/Microsoft Word Document // !!!!!!!!!!!!!!!!!!!!!!!!!! (iconname vnd.ms-word)
+application-x-executable/Super NES ROM // if application-x-exectuable then EXECUTABLE
+application-x-generic/OpenDocument Master Document Template // !!!!!!!!!!!!!!!!!!!!!! (iconname vnd.oasis.opendocument...)
+application-x-generic/Palm OS database // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! (alias x-palm-databse) (iconname vnd.palm)
+application-x-generic/SQLite3 database // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! (alias x-sqlite3)
+application-x-generic/Squashfs Filesystem // !!!!!!!!!!!!!!!!!!!!!!!!!!!! (iconname application-vnd.squashfs)
+x-content-x-generic/Video CD // !!!!!!!!! (iconname x-contnet-video-vcd)
