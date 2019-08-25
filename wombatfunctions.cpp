@@ -665,15 +665,18 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     tmparray = QByteArray::fromRawData(magicbuffer, 1024);
     QMimeDatabase mimedb;
     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+    QString mimestr = GenerateCategorySignature(mimetype);
+    /*
     if(!mimetype.name().contains("application/octet-stream") && mimetype.name().contains("application"))
     {
         qDebug() << mimetype.name() << "mimetype aliases:" << mimetype.aliases();
         //qDebug() << mimetype.name() << "mimetype parents:" << mimetype.parentMimeTypes();
         qDebug() << mimetype.name() << "miemtype:comment:" << mimetype.comment();
     }
+    */
     //delete[] magicbuffer;
     //free(magicbuffer);
-    outstring += mimetype.name() + ",0,e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f";
+    outstring += mimestr + ",0,e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f";
     if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
         outstring += "*" + QString::number(orphancount);
     else
@@ -705,7 +708,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
     */
     outstring += ",0";
     treeout << "0";
-    treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1);
+    treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1);
     treeout << "0"; // empty bookmark value
     // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
     if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
@@ -822,19 +825,20 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                         QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                         QMimeDatabase adsmimedb;
                         QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
+                        QString mimestr = GenerateCategorySignature(adsmimetype);
                         delete[] fbuf;
                         QFile adsfile(aevar->partitionpath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
                         adsfile.open(QIODevice::Append | QIODevice::Text);
                         QTextStream adsout(&adsfile);
                         adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
-                        adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (qint64)fsattr->size + 16 << "," << adsmimetype.name() << "," << QString::number(fsattr->id) << ",e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0,0,0";
+                        adsout << adsba.toBase64() << "," << tmpfile->name->type << "," << tmpfile->meta->addr << "," << ba2.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (qint64)fsattr->size + 16 << "," << mimestr << "," << QString::number(fsattr->id) << ",e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr) << ",0,0,0";
                         adsout.flush();
                         if(adsfile.isOpen())
                             adsfile.close();
                         else
                             qDebug() << "ads file failed to open.";
                         treeout.clear();
-                        treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << "0" << QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                        treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString("e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                         nodedata.clear();
                         for(int i=0;  i < 12; i++)
                             nodedata << treeout.at(i);
@@ -902,12 +906,15 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 tmparray = QByteArray::fromRawData(magicbuffer, 1024);
                 QMimeDatabase mimedb;
                 QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                QString mimestr = GenerateCategorySignature(mimetype);
+                /*
                 if(!mimetype.name().contains("application/octet-stream") && mimetype.name().contains("application/"))
                 {
                     qDebug() << mimetype.name() << "mimetype aliases:" << mimetype.aliases();
                     //qDebug() << mimetype.name() << "mimetype parents:" << mimetype.parentMimeTypes();
                     qDebug() << mimetype.name() << "mimetype comment:" << mimetype.comment();
                 }
+                */
                 //free(magicbuffer);
                 //delete[] magicbuffer;
                 QFile hshfile;
@@ -942,7 +949,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     treeout << "0";
                 // ADD THE HASH VALUE FROM THE FILE TO TREEOUT
                 //treeout << "0";
-                treeout << mimetype.name().split("/").at(0) << mimetype.name().split("/").at(1); // category << signature
+                treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // category << signature
                 if(tmpfilestr.split(",").count() >= 16)
                     treeout << tmpfilestr.split(",").at(15); // bookmark value
                 else
@@ -1048,6 +1055,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                     QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                                     QMimeDatabase adsmimedb;
                                     QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
+                                    QString mimestr = GenerateCategorySignature(adsmimetype);
                                     delete[] fbuf;
                                     adsba.append(QString(tmpfile->name->name) + QString(":") + QString(fsattr->name));
                                     treeout.clear();
@@ -1070,7 +1078,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                                     else
                                         hshstr = "0";
 
-                                    treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << hshstr << adsmimetype.name().split("/").at(0) << adsmimetype.name().split("/").at(1) << tmpfilestr.split(",").at(15) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                                    treeout << adsba.toBase64() << ba2.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << hshstr << mimestr.split("/").at(0) << mimestr.split("/").at(1) << tmpfilestr.split(",").at(15) << QString("e" + QString::number(((AddEvidenceVariable*)tmpptr)->evidcnt) + "-v" + QString::number(((AddEvidenceVariable*)tmpptr)->volcnt) + "-p" + QString::number(((AddEvidenceVariable*)tmpptr)->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(tmpfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                                     nodedata.clear();
                                     for(int i=0;  i < 12; i++)
                                         nodedata << treeout.at(i);
@@ -3766,4 +3774,40 @@ QString ConvertGmtHours(int gmtvar)
 
     return tmpstring;
 
+}
+
+QString GenerateCategorySignature(const QMimeType mimetype)
+{
+    QString geniconstr = mimetype.genericIconName();
+    //QString iconstr = mimetype.iconName();
+    QString mimesignature = mimetype.comment();
+    QString mimecategory = "";
+    if(geniconstr.contains("document")) // Document
+        mimecategory = "Document";
+    else if(geniconstr.contains("video")) // Video
+        mimecategory = "Video";
+    else if(geniconstr.contains("image")) // Image
+        mimecategory = "Image";
+    else if(geniconstr.contains("package")) // Archive
+        mimecategory = "Archive";
+    else if(geniconstr.contains("font")) // Font
+        mimecategory = "Font";
+    else if(geniconstr.contains("text")) // Text
+        mimecategory = "Text";
+    else if(geniconstr.contains("audio")) // Audio
+        mimecategory = "Audio";
+    else if(geniconstr.contains("spreadsheet")) // Office Spreadsheet
+        mimecategory = "Spreadsheet";
+    else if(geniconstr.contains("presentation")) // Office Presentation
+        mimecategory = "Presentation";
+    else if(geniconstr.contains("multipart")) // MultiPart
+        mimecategory = "MultiPart";
+    else if(geniconstr.contains("inode")) // Inode
+        mimecategory = "Inode";
+    else if(geniconstr.contains("application-x")) // Try iconName() database, java, document, text, image, executable, certificate, bytecode, library, Data, Trash, zerosize, 
+        mimecategory = "???";
+    else if(geniconstr.contains("x-content-x-generic")) // 
+        mimecategory = "???";
+
+    return QString(mimecategory + "/" + mimesignature);
 }

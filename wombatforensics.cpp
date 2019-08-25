@@ -846,7 +846,7 @@ void WombatForensics::InitializeAppStructure()
     QString tmppath = QDir::tempPath();
     tmppath += "/wombatforensics/";
     QString homepath = QDir::homePath();
-    homepath += "/.wombatforensics/";
+    homepath += ".local/share/wombatforensics/";
     wombatvariable.tmpfilepath = tmppath + "tmpfiles/";
     wombatvariable.tmpmntpath = homepath + "mntpt/";
     wombatvariable.imgdatapath = tmppath + "datamnt/";
@@ -1946,7 +1946,7 @@ void WombatForensics::CloseCurrentCase()
     QDir cdir = QDir(wombatvariable.tmpmntpath);
     cdir.removeRecursively();
     QString homepath = QDir::homePath();
-    homepath += "/.wombatforensics/";
+    homepath += "/.local/share/wombatforensics/";
     wombatvariable.tmpmntpath = homepath + "mntpt/";
 }
 
@@ -2701,10 +2701,9 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     #endif
     QString offstr = buffer;
     QByteArray tmparray = ui->hexview->selectionToByteArray();
-    //if(clength > 512)
-    //    tmparray.truncate(512);
     QMimeDatabase mimedb;
     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+    QString mimestr = GenerateCategorySignature(mimetype);
     QByteArray ba;
     ba.clear();
     ba.append(ctitle);
@@ -2720,7 +2719,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
         QByteArray hasharray = QByteArray::fromRawData(tmparray, clength);
         curhash = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
     }
-    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimetype.name() + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," +  ctag + "," + QString::number(coffset);
+    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimestr + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," +  ctag + "," + QString::number(coffset);
     //qDebug() << "carvedstring:" << carvedstring;
     // Add CARVED STAT FILE
     QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".stat");

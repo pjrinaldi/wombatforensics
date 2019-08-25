@@ -58,5 +58,6 @@ void InitializeEvidenceStructure(QString evidstring);
 int SegmentDigits(int);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
 void PopulateCarvedFiles(QString cfile);
+QString GenerateCategorySignature(const QMimeType mimetype);
 
 #endif // wombatfunctions.h
