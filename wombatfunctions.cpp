@@ -3779,7 +3779,6 @@ QString ConvertGmtHours(int gmtvar)
 QString GenerateCategorySignature(const QMimeType mimetype)
 {
     QString geniconstr = mimetype.genericIconName();
-    //QString iconstr = mimetype.iconName();
     QString mimesignature = mimetype.comment();
     QString mimecategory = "";
     if(geniconstr.contains("document")) // Document
@@ -3793,7 +3792,10 @@ QString GenerateCategorySignature(const QMimeType mimetype)
     else if(geniconstr.contains("font")) // Font
         mimecategory = "Font";
     else if(geniconstr.contains("text")) // Text
-        mimecategory = "Text";
+        if(mimesignature.contains("email") || mimesignature.contains("mail") || mimesignature.contains("reference to remote file"))
+            mimecategory = "Email";
+        else
+            mimecategory = "Text";
     else if(geniconstr.contains("audio")) // Audio
         mimecategory = "Audio";
     else if(geniconstr.contains("spreadsheet")) // Office Spreadsheet
@@ -3804,10 +3806,52 @@ QString GenerateCategorySignature(const QMimeType mimetype)
         mimecategory = "MultiPart";
     else if(geniconstr.contains("inode")) // Inode
         mimecategory = "Inode";
+    else if(geniconstr.contains("model")) // Binary
+        mimecategory = "Binary";
     else if(geniconstr.contains("application-x")) // Try iconName() database, java, document, text, image, executable, certificate, bytecode, library, Data, Trash, zerosize, 
-        mimecategory = "???";
-    else if(geniconstr.contains("x-content-x-generic")) // 
-        mimecategory = "???";
+    {
+       if(mimesignature.contains("certificate") || mimesignature.contains("private key") || mimesignature.contains("keystore")) 
+            mimecategory = "Certificate";
+       else if(mimesignature.contains("Metafile") || mimesignature.contains("profile"))
+            mimecategory = "Metafile";
+       else if(mimesignature.contains("video"))
+           mimecategory = "Video";
+       else if(mimesignature.contains("TNEF message") || mimesignature.contains("email"))
+           mimecategory = "Email";
+       else if(mimesignature.contains("Microsoft Word Document") || mimesignature.contains("OpenDocument Master Document Template") || mimesignature.contains("MIF"))
+           mimecategory = "Document";
+       else if(mimesignature.contains("ROM") || mimesignature.contains("Atari") || mimesignature.contains("Thomson"))
+           mimecategory = "ROM";
+       else if(mimesignature.contains("database") || mimesignature.contains("Database") || mimesignature.contains("SQL"))
+           mimecategory = "Database";
+       else if(mimesignature.contains("filesystem") || mimesignature.contains("disk image") || mimesignature.contains("AppImage") || mimesignature.contains("WiiWare"))
+           mimecategory = "Disk Image";
+       else if(mimesignature.contains("executable") || mimesignature.contains("Windows Intaller") || mimesignature.contains("library"))
+           mimecategory = "Executable";
+       else if(mimesignature.contains("Internet shortcut") || mimesignature.contains("backup file") || mimesignature.contains("VBScript") || mimesignature.contains("RDF") || mimesignature.contains("Streaming playlist") || mimesignature.contains("cache file") || mimesignature.contains("Remmina") || mimesignature.contains("GML") || mimesignature.contains("GPX") || mimesignature.contains("MathML") || mimesignature.contains("Metalink") || mimesignature.contains("XML") || mimesignature.contains("RDF") || mimesignature.contains("KML") || mimesignature.contains("FictionBook") || mimesignature.contains("NewzBin"))
+           mimecategory = "Text";
+       else if(mimesignature.contains("Windows animated cursor"))
+           mimecategory = "Image";
+       else if(mimesignature.contains("SPSS") || mimesignature.contains("MHTML"))
+           mimecategory = "Archive";
+       else if(mimesignature.contains("empty"))
+           mimecategory = "Empty File";
+       else
+           mimecategory = "Binary";
+    }
+    else if(geniconstr.contains("x-content-x-generic")) 
+        if(mimesignature.contains("audio"))
+            mimecategory = "Audio";
+        else if(mimesignature.contains("blank"))
+            mimecategory = "Disk Image";
+        else if(mimesignature.contains("e-book"))
+            mimecategory = "Document";
+        else if(mimesignature.contains("photos") || mimesignature.contains("Picture"))
+            mimecategory = "Image";
+        else if(mimesignature.contains("software"))
+            mimecategory = "Executable";
+        else if(mimesignature.contains("video") || mimesignature.contains("Video"))
+            mimecategory = "Video";
 
     return QString(mimecategory + "/" + mimesignature);
 }

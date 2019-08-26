@@ -846,7 +846,7 @@ void WombatForensics::InitializeAppStructure()
     QString tmppath = QDir::tempPath();
     tmppath += "/wombatforensics/";
     QString homepath = QDir::homePath();
-    homepath += ".local/share/wombatforensics/";
+    homepath += "/.local/share/wombatforensics/";
     wombatvariable.tmpfilepath = tmppath + "tmpfiles/";
     wombatvariable.tmpmntpath = homepath + "mntpt/";
     wombatvariable.imgdatapath = tmppath + "datamnt/";
