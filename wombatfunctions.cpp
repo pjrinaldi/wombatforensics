@@ -1537,8 +1537,6 @@ void GenerateVidThumbnails(QString thumbid)
                                     imgbuf = new char[fsattr->size];
                                     imglen = tsk_fs_attr_read(fsattr, 0, imgbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                                 }
-                                else
-                                    qDebug() << "empty attr, do nothing...";
                             }
                         }
                     }
@@ -1551,8 +1549,6 @@ void GenerateVidThumbnails(QString thumbid)
                     imgbuf = new char[readfileinfo->meta->size];
                     imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
                 }
-                else
-                    qDebug() << "empty file, do nothing...";
             }
         }
         QDir dir;
@@ -1568,8 +1564,6 @@ void GenerateVidThumbnails(QString thumbid)
                 tmpfile.close();
             }
         }
-        else
-            qDebug() << "video file is zero, don't write it out";
         delete[] imgbuf;
         tsk_fs_file_close(readfileinfo);
         tsk_fs_close(readfsinfo);
@@ -1588,7 +1582,7 @@ void GenerateVidThumbnails(QString thumbid)
         {
             QString filemime = filestr.split(",").at(10);
             QString filecat = filemime.split("/").first();
-            if(filecat.contains("video"))
+            if(filecat.contains("Video"))
             {
                 if(imglen > 0)
                 {
@@ -1771,8 +1765,6 @@ void GenerateThumbnails(QString thumbid)
                                     imgbuf = new char[fsattr->size];
                                     imglen = tsk_fs_attr_read(fsattr, 0, imgbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                                 }
-                                else
-                                    qDebug() << "empty attr, do nothing...";
                             }
                         }
                     }
@@ -1786,8 +1778,6 @@ void GenerateThumbnails(QString thumbid)
                     //imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
                     imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
                 }
-                else
-                    qDebug() << "empty file, do nothing...";
             }
         }
         tsk_fs_file_close(readfileinfo);
@@ -1807,7 +1797,7 @@ void GenerateThumbnails(QString thumbid)
         {
             QString filemime = filestr.split(",").at(10);
             QString filecat = filemime.split("/").first();
-            if(filecat.contains("image"))
+            if(filecat.contains("Image"))
             {
                 QByteArray ba;
                 QByteArray ba2;
@@ -3852,6 +3842,8 @@ QString GenerateCategorySignature(const QMimeType mimetype)
             mimecategory = "Executable";
         else if(mimesignature.contains("video") || mimesignature.contains("Video"))
             mimecategory = "Video";
+    if(mimesignature.contains("unknown"))
+        mimesignature = "Unknown";
 
     return QString(mimecategory + "/" + mimesignature);
 }
