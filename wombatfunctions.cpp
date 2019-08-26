@@ -1662,7 +1662,7 @@ void GenerateVidThumbnails(QString thumbid)
             }
         }
         digimgthumbcount++;
-        isignals->DigUpd(0, digimgthumbcount);
+        isignals->DigUpd(4, digimgthumbcount);
     }
 }
 

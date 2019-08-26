@@ -2097,6 +2097,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     //LogMessage("Digging Deeper into Evidence");
     for(int i = 0; i < digoptions.count(); i++)
     {
+        qDebug() << "current digoption:" << digoptions.at(i);
         if(dtype == 0) // selected
         {
             TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
@@ -2104,7 +2105,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         }
         else
             digfilelist = GetFileLists(dtype);
-        //qDebug() << digfilelist;
+        qDebug() << "digfilelist count:" << digfilelist;
         digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {
@@ -2408,7 +2409,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 
 void WombatForensics::FinishVideos()
 {
-    digstatusdialog->UpdateDigState(0, -1);
+    digstatusdialog->UpdateDigState(4, -1);
     StatusUpdate("Thumbnail Generation Finished");
     qInfo() << "Video Thumbnail Generation Finished";
     QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);

@@ -63,7 +63,7 @@ void DigStatus::UpdateDigState(int digstateid, int digstatecount)
     else if(digstateid == 5) // img and vid thumbnail
     {
         if(digstatecount == -1)
-            imgthumbcount = imgthumbtotal;
+            imgthumbcount = imgthumbtotal * 2;
         else
             imgthumbcount = digstatecount;
         imgthumbpercent = ((float)imgthumbcount/(float)imgthumbtotal) * 100.0;
@@ -120,14 +120,14 @@ void DigStatus::SetInitialDigState(int digstateid, int digtotal)
     {
         digstate = 5;
         imgthumbcount = 0;
-        imgthumbtotal = digtotal;
+        imgthumbtotal = digtotal * 2;
         if(imgthumbtotal != 0)
             imgthumbpercent = ((float)imgthumbcount/(float)imgthumbtotal) * 100.0;
         else
             imgthumbtotal = 0;
         ui->imgthumblabel->setVisible(true);
         ui->imgthumbbutton->setVisible(true);
-        ui->imgthumblabel->setText("Generating IMG & VID  Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
+        ui->imgthumblabel->setText("Generating IMG & VID Thumbnail: " + QString::number(imgthumbcount) + " of " + QString::number(imgthumbtotal) + " " + QString::number((int)imgthumbpercent) + "%");
     }
 }
 
