@@ -877,6 +877,12 @@ void WombatForensics::InitializeAppStructure()
     }
     else
         ReadSettings();
+    if(!FileExists(QString(homepath + "xchomp").toStdString()))
+    {
+        QFile::copy(":/xchomp", homepath + "xchomp");
+        QFile chompfile(homepath + "xchomp");
+        chompfile.setPermissions(QFileDevice::ExeOwner);
+    }
     viewmanage = new ViewerManager(this);
     settingsdialog = new SettingsDialog(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
@@ -2316,7 +2322,7 @@ void WombatForensics::on_actionSaveState_triggered()
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     SaveState();
-    //qInfo() << "Current State Saved.";
+    qInfo() << "Current State Saved.";
     QApplication::restoreOverrideCursor();
 }
 
@@ -2881,10 +2887,12 @@ void WombatForensics::UpdateSelectedState(QString id)
 void WombatForensics::AutoSaveState()
 {
     // change display text
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     StatusUpdate("Saving State Started");
     SaveState();
     qInfo() << "Current State Auto Saved.";
     StatusUpdate("Evidence ready");
+    QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::SetHexOffset()
@@ -2903,5 +2911,8 @@ void WombatForensics::LaunchChomp()
     // need to install xchomp when i install the app to /usr/local/bin...
     // set the high score file where it needs to be.
     // call process or whatever to launch it...
-    qDebug() << "Launch Chomp here...";
+    QString xchompstr = QDir::homePath();
+    xchompstr += "/.local/share/wombatforensics/xchomp";
+    QProcess* process = new QProcess(this);
+    process->startDetached(xchompstr, QStringList());
 }

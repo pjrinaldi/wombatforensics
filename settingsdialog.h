@@ -25,6 +25,8 @@ public:
 private slots:
     void CancelChanges();
     void SaveChanges();
+    void GetCaseFolder();
+    void GetReportFolder();
 
 signals:
     void HideSettingsWindow();

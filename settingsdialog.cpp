@@ -8,6 +8,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Se
     ui->setupUi(this);
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(CancelChanges()));
     connect(ui->savebutton, SIGNAL(clicked()), this, SLOT(SaveChanges()));
+    connect(ui->casepathbutton, SIGNAL(clicked()), this, SLOT(GetCaseFolder()));
+    connect(ui->reportpathbutton, SIGNAL(clicked()), this, SLOT(GetReportFolder()));
     LoadSettings();
     this->hide();
 }
@@ -76,4 +78,24 @@ void SettingsDialog::LoadSettings()
         else if(tmplist.at(i).split(":").at(0) == "autosave")
             ui->autosavespinbox->setValue(tmplist.at(i).split(":").at(1).toInt());
     }
+}
+
+void SettingsDialog::GetCaseFolder()
+{
+    QString startdir = QDir::homePath();
+    if(!ui->casepathlineedit->text().isEmpty())
+        startdir = ui->casepathlineedit->text();
+    QString casepathfolder = QFileDialog::getExistingDirectory(this, tr("Choose Case Path Directory"), startdir, QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks); 
+    if(casepathfolder.compare("") != 0)
+        ui->casepathlineedit->setText(casepathfolder);
+}
+
+void SettingsDialog::GetReportFolder()
+{
+    QString startdir = QDir::homePath();
+    if(!ui->reportpathlineedit->text().isEmpty())
+        startdir = ui->reportpathlineedit->text();
+    QString reportpathfolder = QFileDialog::getExistingDirectory(this, tr("Choose Report Path Directory"), startdir, QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks); 
+    if(reportpathfolder.compare("") != 0)
+        ui->reportpathlineedit->setText(reportpathfolder);
 }
