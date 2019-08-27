@@ -10,14 +10,11 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Se
     connect(ui->savebutton, SIGNAL(clicked()), this, SLOT(SaveChanges()));
     connect(ui->casepathbutton, SIGNAL(clicked()), this, SLOT(GetCaseFolder()));
     connect(ui->reportpathbutton, SIGNAL(clicked()), this, SLOT(GetReportFolder()));
-    //connect(ui->timezonecombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(GetReportZone(int)));
     zoneids.clear();
     zoneids = QTimeZone::availableTimeZoneIds();
     foreach(QByteArray id, zoneids)
         ui->timezonecombobox->addItem(id);
     LoadSettings();
-    //qDebug() << "zoneid:" << reporttimezone;
-    //ui->timezonecombobox->setCurrentIndex(reporttimezone);
     this->hide();
 }
 
