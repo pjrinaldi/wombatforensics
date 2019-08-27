@@ -811,6 +811,8 @@ void WombatForensics::ReadSettings()
             vidcount = tmplist.at(i).split(":").at(1).toInt();
         else if(tmplist.at(i).split(":").at(0) == "autosave")
             autosave = tmplist.at(i).split(":").at(1).toInt();
+        else if(tmplist.at(i).split(":").at(0) == "timezone")
+            reporttimezone = QByteArray::fromStdString(QString(tmplist.at(i).split(":").at(1)).toStdString());
         //else if(tmplist.at(i).split(":").at(0) == "save")
         // etc...
     }

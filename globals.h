@@ -31,6 +31,7 @@ extern int ecount; // evidence count variable
 extern int thumbsize; // thumbnail size settings variable
 extern int vidcount; // number of video thumbnails to generate
 extern int autosave; // minutes between automatically saving current state
+extern QByteArray reporttimezone; // selected timezone to format the report in...
 extern int mftrecordsize; // contains the size of an mft record, usually always 1024
 extern int hashsum; // type of hash used: either md5, sha1, sha256
 extern int idcol; // contains the position for the ID column

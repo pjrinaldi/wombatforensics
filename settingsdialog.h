@@ -27,11 +27,13 @@ private slots:
     void SaveChanges();
     void GetCaseFolder();
     void GetReportFolder();
+    //void GetReportZone(int zoneid);
 
 signals:
     void HideSettingsWindow();
 private:
     Ui::SettingsDialog* ui;
+    QList<QByteArray> zoneids;
 protected:
 };
 

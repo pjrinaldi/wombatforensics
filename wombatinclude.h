@@ -55,6 +55,7 @@
 #include <QTextStream>
 #include <QThread>
 #include <QThreadPool>
+#include <QTimeZone>
 #include <QTreeWidgetItem>
 #include <QVector>
 #include <QtConcurrent>
