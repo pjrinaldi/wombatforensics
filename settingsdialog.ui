@@ -185,7 +185,7 @@
    <item row="4" column="0">
     <widget class="QLabel" name="timezonelabel">
      <property name="text">
-      <string>Report Time Zone:</string>
+      <string>Reporting Time Zone:</string>
      </property>
     </widget>
    </item>

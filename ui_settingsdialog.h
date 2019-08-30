@@ -202,7 +202,7 @@ public:
         autosavespinbox->setSuffix(QCoreApplication::translate("SettingsDialog", " minutes", nullptr));
         videospinbox->setSuffix(QCoreApplication::translate("SettingsDialog", " %", nullptr));
         videolabel->setText(QCoreApplication::translate("SettingsDialog", "Generate Video Thumbnail Every:", nullptr));
-        timezonelabel->setText(QCoreApplication::translate("SettingsDialog", "Report Time Zone:", nullptr));
+        timezonelabel->setText(QCoreApplication::translate("SettingsDialog", "Reporting Time Zone:", nullptr));
         reportpathlineedit->setPlaceholderText(QCoreApplication::translate("SettingsDialog", "User's Home Directory", nullptr));
         casepathlineedit->setPlaceholderText(QCoreApplication::translate("SettingsDialog", "User's Home Directory", nullptr));
         savebutton->setText(QCoreApplication::translate("SettingsDialog", "Save", nullptr));
