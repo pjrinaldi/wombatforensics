@@ -502,25 +502,11 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
                 tmpstr += ",";
         }
         // QTimeZone Test... !!!!!!
-        //
-        /*
-        QList<QByteArray> zoneids = QTimeZone::availableTimeZoneIds();
-        foreach(QByteArray id, zoneids)
-        {
-            if(id.contains(reporttimezone))
-                qDebug() << "found timezone:" << id;
-        }
-        */
-        //qDebug() << "reporttimezone:" << reporttimezone;
-        //qDebug() << "is tz available:" << QTimeZone::isTimeZoneIdAvailable(reporttimezone);
         QTimeZone tmpzone = QTimeZone(reporttimezone);
-        //qDebug() << "is tmpzone valid:" << tmpzone.isValid();
-        //qDebug() << "unixtime value:" << tmplist.at(6).toInt();
         QDateTime crdt = QDateTime::fromSecsSinceEpoch(tmplist.at(6).toInt(), tmpzone);
         qDebug() << "original displayed time UTC:" << curindex.sibling(curindex.row(), 3).data().toString();
         qDebug() << "selected time zone time:" << crdt.toString("MM/dd/yyyy hh:mm:ss AP");
-        //qDebug() << "selected time zone time:" << crdt.toString("yyyy-MM-dd hh:mm:ss AP");
-        //qDebug() << "tmpstr after:" << tmpstr;
+        // APPLY ABOVE CODE TO THE BELOW CODE TO PUSH PREVIEW DATA WITH CORRECT TIMEZONE
         filefile.open(QIODevice::WriteOnly | QIODevice::Text);
         if(filefile.isOpen())
             filefile.write(tmpstr.toStdString().c_str());
