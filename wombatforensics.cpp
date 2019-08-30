@@ -503,9 +503,9 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         }
         // QTimeZone Test... !!!!!!
         QTimeZone tmpzone = QTimeZone(reporttimezone);
-        QDateTime crdt = QDateTime::fromSecsSinceEpoch(tmplist.at(6).toInt(), tmpzone);
-        qDebug() << "original displayed time UTC:" << curindex.sibling(curindex.row(), 3).data().toString();
-        qDebug() << "selected time zone time:" << crdt.toString("MM/dd/yyyy hh:mm:ss AP");
+        //QDateTime crdt = QDateTime::fromSecsSinceEpoch(tmplist.at(6).toInt(), tmpzone);
+        //qDebug() << "original displayed time UTC:" << curindex.sibling(curindex.row(), 3).data().toString();
+        //qDebug() << "selected time zone time:" << crdt.toString("MM/dd/yyyy hh:mm:ss AP");
         // APPLY ABOVE CODE TO THE BELOW CODE TO PUSH PREVIEW DATA WITH CORRECT TIMEZONE
         filefile.open(QIODevice::WriteOnly | QIODevice::Text);
         if(filefile.isOpen())
@@ -516,6 +516,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
         filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
+        /*
         if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
             filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + curindex.sibling(curindex.row(), 3).data().toString() + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
@@ -524,6 +525,15 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
             filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + curindex.sibling(curindex.row(), 5).data().toString() + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
             filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>" + curindex.sibling(curindex.row(), 6).data().toString() + "</td></tr>";
+            */
+        if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(tmplist.at(6).toInt(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
+            filestr += "<tr class='even'><td class='pvalue'>Accessed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(tmplist.at(4).toInt(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 5).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(tmplist.at(7).toInt(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
+            filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(tmplist.at(5).toInt(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 7).data().toString().isEmpty())
         {
             filestr += "<tr class='odd'><td class='pvalue'>";
@@ -981,9 +991,11 @@ void WombatForensics::InitializePreviewReport()
     previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(previewfile.isOpen())
     {
+        QTimeZone itz = QTimeZone(reporttimezone);
         previewfile.write(initialhtml.toStdString().c_str());
         QString initialstr = "";
-        initialstr = "<div id='infotitle'><h1>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></h1></div><br/><br/>\n";
+        initialstr = "<div id='infotitle'><h1>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></h1></div>\n";
+        initialstr += "<div id='tz'><h4>Report Time Zone:&nbsp;" + reporttimezone + "</h4><div><br/>\n";
         initialstr += "<div id='toc'><h2>Contents</h2>";
         initialstr += "<div id='elinks'>";
         initialstr += "<!--firstelink-->";
