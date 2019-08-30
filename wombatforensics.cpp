@@ -2748,8 +2748,8 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     nodedata << "0";
     nodedata << "0";
     nodedata << curhash;
-    nodedata << mimetype.name().split("/").first();
-    nodedata << mimetype.name().split("/").last();
+    nodedata << mimestr.split("/").first();
+    nodedata << mimestr.split("/").last();
     nodedata << ctag;
     nodedata << QString(enumber + "-c" + QString::number(carvedcount));
     //qDebug() << "nodedata:" << nodedata;
@@ -2774,8 +2774,8 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
             filestr += "SHA256";
         filestr += " Hash:</td><td class='property'>" + curhash + "</td></tr>";
     }
-    filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + mimetype.name().split("/").first() + "</td></tr>";
-    filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + mimetype.name().split("/").last() + "</td></tr>";
+    filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + mimestr.split("/").first() + "</td></tr>";
+    filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + mimestr.split("/").last() + "</td></tr>";
     filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + QString(enumber + "-c" + QString::number(carvedcount)) + "</td></tr>";
     filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
     filestr += "</table></td>";
