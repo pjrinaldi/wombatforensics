@@ -48,7 +48,7 @@ void SettingsDialog::SaveChanges()
     out << "reportpath:" << ba2.toBase64() << ",";
     out << "video:" << QString::number(ui->videospinbox->value()) << ",";
     out << "autosave:" << QString::number(ui->autosavespinbox->value()) << ",";
-    out << "timezone:" << QByteArray::number(ui->timezonecombobox->currentIndex());
+    out << "timezone:" << QByteArray::fromStdString(QString(ui->timezonecombobox->currentText()).toStdString());
     settingsfile.close();
     this->hide();
 }
@@ -85,7 +85,7 @@ void SettingsDialog::LoadSettings()
         else if(tmplist.at(i).split(":").at(0) == "timezone")
         {
             QByteArray tmparray = QByteArray::fromStdString(QString(tmplist.at(i).split(":").at(1)).toStdString());
-            ui->timezonecombobox->setCurrentIndex(tmparray.toInt());
+            ui->timezonecombobox->setCurrentText(tmparray);
         }
     }
 }

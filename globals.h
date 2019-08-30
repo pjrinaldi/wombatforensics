@@ -439,8 +439,11 @@ public:
             {
                 if(itemnode->Data(index.column()).toString().compare("0") == 0)
                     return "";
-                else
+                else // surely i can qt this up....
                 {
+                    QDateTime tmpdt = QDateTime::fromSecsSinceEpoch(itemnode->Data(index.column()).toInt(), QTimeZone::utc());
+                    QString tmpstr = tmpdt.toString("MM/dd/yyyy hh:mm:ss AP");
+                    /*
                     char* ibuffer = new char[128];
                     time_t tmptime = itemnode->Data(index.column()).toInt();
                     if(tmptime <= 0)
@@ -452,6 +455,7 @@ public:
                     }
                     QString tmpstr = QString(ibuffer);
                     delete[] ibuffer;
+                    */
                     return tmpstr;
                 }
             }

@@ -501,6 +501,25 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
             if(i < tmplist.count() - 1)
                 tmpstr += ",";
         }
+        // QTimeZone Test... !!!!!!
+        //
+        /*
+        QList<QByteArray> zoneids = QTimeZone::availableTimeZoneIds();
+        foreach(QByteArray id, zoneids)
+        {
+            if(id.contains(reporttimezone))
+                qDebug() << "found timezone:" << id;
+        }
+        */
+        //qDebug() << "reporttimezone:" << reporttimezone;
+        //qDebug() << "is tz available:" << QTimeZone::isTimeZoneIdAvailable(reporttimezone);
+        QTimeZone tmpzone = QTimeZone(reporttimezone);
+        //qDebug() << "is tmpzone valid:" << tmpzone.isValid();
+        //qDebug() << "unixtime value:" << tmplist.at(6).toInt();
+        QDateTime crdt = QDateTime::fromSecsSinceEpoch(tmplist.at(6).toInt(), tmpzone);
+        qDebug() << "original displayed time UTC:" << curindex.sibling(curindex.row(), 3).data().toString();
+        qDebug() << "selected time zone time:" << crdt.toString("MM/dd/yyyy hh:mm:ss AP");
+        //qDebug() << "selected time zone time:" << crdt.toString("yyyy-MM-dd hh:mm:ss AP");
         //qDebug() << "tmpstr after:" << tmpstr;
         filefile.open(QIODevice::WriteOnly | QIODevice::Text);
         if(filefile.isOpen())
