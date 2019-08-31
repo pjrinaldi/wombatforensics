@@ -809,7 +809,7 @@ void WombatForensics::ReadSettings()
             ba.append(tmplist.at(i).split(":").at(1));
             casepath = QByteArray::fromBase64(ba);
         }
-        else if(tmplist.at(i).split(":").at(1) == "reportpath")
+        else if(tmplist.at(i).split(":").at(0) == "reportpath")
         {
             QByteArray ba;
             ba.append(tmplist.at(i).split(":").at(1));
@@ -2057,8 +2057,16 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
     }
     else if(filelisttype == 2) // all listed
         return listeditems;
+    else if(filelisttype == 3) // Generate list for Publish Report
+    {
+        QRegExp rx(".*?(\n))");
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, rx, -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchRegExp));
+        qDebug() << "ilist count:" << indexlist.count();
+        foreach(QModelIndex index, indexlist)
+            tmplist.append(index.sibling(index.row(), 11).data().toString());
+        return tmplist;
+    }
     return tmplist;
-
 }
 
 void WombatForensics::ExportEvidence()
@@ -2816,16 +2824,24 @@ void WombatForensics::CarveFile()
 
 void WombatForensics::PublishResults()
 {
-    // 1. check if a report dir exists...
-    // 2. ask to delete it.
-    // 3. delete it.
-    // 4. make report directory with thumbs dir and files dir.
-    // 5. copy previewreport.html to the report directory and rename it to index.html
-    // 6. find tagged id's from previewreport.html...
-    // 7. generate list of tagged id's for exporting
-    // 8. call export function for tag list and place them in reportpath + "/files/"
-    // 8. call cp to copy thumbnails from ./mntpt/thumbs/id.jpg to reportpath + "/thumbs/id.jpg"
-    // 9. execute default browser call... xdg-open ./path to /index.html
+    qDebug() << "reportpath:" << reportpath;
+    // 1. generate unique report directory.
+    QDir pdir;
+    QString currentreportpath = reportpath + "/" + QDateTime::currentDateTimeUtc().toString("yyyy-mm-dd-HH-mm-ss") + "/";
+    qDebug() << "new report:" << currentreportpath;
+    pdir.mkpath(currentreportpath);
+    // 2. make report directory with thumbs dir and files dir.
+    pdir.mkpath(currentreportpath + "thumbs/");
+    pdir.mkpath(currentreportpath + "files/");
+    // 3. copy previewreport.html to the report directory and rename it to index.html
+    QFile::copy(wombatvariable.tmpmntpath + "previewreport.html", currentreportpath + "index.html");
+    // 4. find tagged id's from previewreport.html...
+    // 5. generate list of tagged id's for exporting
+    QStringList idlist = GetFileLists(3);
+    qDebug() << "idlist:" << idlist;
+    // 6. call export function for tag list and place them in reportpath + "/files/"
+    // 7. call cp to copy thumbnails from ./mntpt/thumbs/id.jpg to reportpath + "/thumbs/id.jpg"
+    // 8. execute default browser call... xdg-open ./path to /index.html
     //
     // QFILE COPY / REMOVE CODE
     //f (QFile::exists("/path/copy-of-file"))
@@ -2835,7 +2851,7 @@ void WombatForensics::PublishResults()
     //
     //    QFile::copy("/path/file", "/path/copy-of-file");..
     //
-    qDebug() << "publish results";
+    //qDebug() << "publish results";
 }
 
 void WombatForensics::SaveState()
