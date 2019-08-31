@@ -1630,13 +1630,15 @@ void GenerateVidThumbnails(QString thumbid)
                         thmbimages.push_back(image);
                     }
                     //qDebug() << "thmbimages:" << thmbimages.size();
-                    QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
+                    //QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
+                    QString thumbout = genthmbpath + "thumbs/" + thumbid + ".jpg";
                     Magick::Montage montageopts;
                     Magick::Color color("rgba(0,0,0,0)");
                     montageopts.geometry(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize) + "+1+1").toStdString());
                     montageopts.tile(QString(QString::number(tlist.count()) + "x1").toStdString());
                     montageopts.backgroundColor(color);
-                    montageopts.fileName(QString(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg").toStdString());
+                    //montageopts.fileName(QString(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg").toStdString());
+                    montageopts.fileName(QString(genthmbpath + "thumbs/" + thumbid + ".jpg").toStdString());
                     Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
                     if(montage.size() == 1)
                     {
@@ -1651,7 +1653,8 @@ void GenerateVidThumbnails(QString thumbid)
                 }
                 else // video was 0 length
                 {
-                    QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
+                    QString thumbout = genthmbpath + "thumbs/" + thumbid + ".jpg";
+                    //QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
                     QImage fileimage;
                     QImage thumbimage;
                     QImageWriter writer(thumbout);
@@ -1809,7 +1812,8 @@ void GenerateThumbnails(QString thumbid)
                 imageshash.insert(thumbid, QString(ba.toBase64()));
                 QImage fileimage;
                 QImage thumbimage;
-                QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
+                QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".jpg");
+                //QImageWriter writer(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg");
                 if(imglen > 0)
                 {
                     bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
@@ -3846,4 +3850,11 @@ QString GenerateCategorySignature(const QMimeType mimetype)
         mimesignature = "Unknown";
 
     return QString(mimecategory + "/" + mimesignature);
+}
+
+void TransferThumbnails(QString thumbid)
+{
+    // open stat file with id..
+    // then get the full id with -a* value
+    // then do qfile::copy( with the full id...
 }

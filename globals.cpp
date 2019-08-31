@@ -43,6 +43,7 @@ QStringList newevidence;
 QString casepath = QDir::homePath(); // case path settings variable
 QString reportpath = QDir::homePath(); // report path settings variable
 QString exportpath = "";
+QString genthmbpath = "";
 bool originalpath = true;
 QString hexstring = "";
 QHash<QString, bool> checkhash;

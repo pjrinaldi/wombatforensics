@@ -43,6 +43,7 @@ extern QStringList existingevidence; // contains the list of existing evidence
 extern QStringList newevidence; // contains the list of new evidence items
 extern QString exportpath; // path to export files to
 extern bool originalpath; // whether to include original file path or not
+extern QString genthmbpath; // global path to place thumbs for each operationgal call of generate thumbnails (mntpt/thumbs or rep/thmb)
 extern QString casepath; // case path settings variable
 extern QString reportpath; // report path settings variable
 extern QString hexstring; // tmp hex file filename with path

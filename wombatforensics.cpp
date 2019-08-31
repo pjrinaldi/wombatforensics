@@ -2059,9 +2059,7 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
         return listeditems;
     else if(filelisttype == 3) // Generate list for Publish Report
     {
-        QRegExp rx(".+");
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, rx, -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchRegExp | Qt::MatchContains));
-        qDebug() << "ilist count:" << indexlist.count();
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant(tr("*[A-Za-z0-9]*")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchWildcard));
         foreach(QModelIndex index, indexlist)
             tmplist.append(index.sibling(index.row(), 11).data().toString());
         return tmplist;
@@ -2135,6 +2133,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {
+            genthmbpath = wombatvariable.tmpmntpath;
             if(digoptions.at(i) == 0 || digoptions.at(i) == 5)
             {
                 thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
@@ -2414,13 +2413,16 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
         if(tdir.isEmpty())
         {
-            int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all thumbnails now?\r\n\r\nNote: This can take a while and will show the Image Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
+            int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all IMG & VID thumbnails now?\r\n\r\nNote: This can take a while and will show the Thumbnail Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
+                genthmbpath = wombatvariable.tmpmntpath;
                 StatusUpdate("Generating Thumbnails...");
                 digstatusdialog->SetInitialDigState(0, filesfound);
                 thumbfuture = QtConcurrent::map(listeditems, GenerateThumbnails); // Process All thumbnails
                 thumbwatcher.setFuture(thumbfuture);
+                videofuture = QtConcurrent::map(listeditems, GenerateVidThumbnails); // Process all Vid Thumbnails
+                videowatcher.setFuture(videofuture);
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
@@ -2438,13 +2440,16 @@ void WombatForensics::FinishVideos()
     digstatusdialog->UpdateDigState(4, -1);
     StatusUpdate("Thumbnail Generation Finished");
     qInfo() << "Video Thumbnail Generation Finished";
-    QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
-    thashsavewatcher.setFuture(tmpfuture);
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    imagewindow->LoadThumbnails();
-    QApplication::restoreOverrideCursor();
-    if((digoptions.isEmpty() || digoptions.contains(4) || digoptions.contains(5)) && thumbwatcher.isFinished())
-        imagewindow->show();
+    if(genthmbpath.contains("mntpt"))
+    {
+        QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
+        thashsavewatcher.setFuture(tmpfuture);
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        imagewindow->LoadThumbnails();
+        QApplication::restoreOverrideCursor();
+        if((digoptions.isEmpty() || digoptions.contains(4) || digoptions.contains(5)) && thumbwatcher.isFinished())
+            imagewindow->show();
+    }
 }
 
 void WombatForensics::FinishThumbs()
@@ -2452,14 +2457,17 @@ void WombatForensics::FinishThumbs()
     digstatusdialog->UpdateDigState(0, -1);
     StatusUpdate("Thumbnail generation finished.");
     qInfo() << "Thumbnail generation finished";
-    QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
-    thashsavewatcher.setFuture(tmpfuture);
     //LogMessage("Thumbnail generation finished.");
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    imagewindow->LoadThumbnails(); // GUI Intensive
-    QApplication::restoreOverrideCursor();
-    if((digoptions.isEmpty() || digoptions.contains(0) || digoptions.contains(5)) && videowatcher.isFinished())
-        imagewindow->show();
+    if(genthmbpath.contains("mntpt"))
+    {
+        QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
+        thashsavewatcher.setFuture(tmpfuture);
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        imagewindow->LoadThumbnails(); // GUI Intensive
+        QApplication::restoreOverrideCursor();
+        if((digoptions.isEmpty() || digoptions.contains(0) || digoptions.contains(5)) && videowatcher.isFinished())
+            imagewindow->show();
+    }
     qInfo() << "Digging Complete";
     qInfo() << "Evidence Ready";
     //LogMessage("Digging Complete");
@@ -2839,7 +2847,28 @@ void WombatForensics::PublishResults()
     // 5. generate list of tagged id's for exporting
     QStringList idlist = GetFileLists(3);
     qDebug() << "idlist:" << idlist;
+    /*
+    foreach(QString id, idlist)
+    {
+        if(QFile::exists(wombatvariable.tmpmntpath + "thumbs/" + id + ".jpg"))
+            QFile::copy(wombatvariable.tmpmntpath + "thumbs/" + id + ".jpg", currentreportpath + "thumbs/" + id + ".jpg");
+    }
+    */
     // 6. call export function for tag list and place them in reportpath + "/files/"
+    ExportFiles(3, false, currentreportpath + "files/");
+    if(!imageshash.isEmpty())
+    {
+        QtConcurrent::map(idlist, TransferThumbnails); // copy thumbnails
+        //TransferThumbnails(idlist);
+    }
+    else
+    {
+        genthmbpath = currentreportpath;
+        thumbfuture = QtConcurrent::map(idlist, GenerateThumbnails); // Process Thumbnails
+        thumbwatcher.setFuture(thumbfuture);
+        videofuture = QtConcurrent::map(idlist, GenerateVidThumbnails);
+        videowatcher.setFuture(videofuture);
+    }
     // 7. call cp to copy thumbnails from ./mntpt/thumbs/id.jpg to reportpath + "/thumbs/id.jpg"
     // 8. execute default browser call... xdg-open ./path to /index.html
     //
