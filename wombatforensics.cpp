@@ -2060,7 +2060,7 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
     else if(filelisttype == 3) // Generate list for Publish Report
     {
         QRegExp rx(".+");
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, rx, -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchRegExp));
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, rx, -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchRegExp | Qt::MatchContains));
         qDebug() << "ilist count:" << indexlist.count();
         foreach(QModelIndex index, indexlist)
             tmplist.append(index.sibling(index.row(), 11).data().toString());
