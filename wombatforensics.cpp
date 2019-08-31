@@ -539,7 +539,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
         if(curindex.sibling(curindex.row(), 8).data().toString().contains("Image") || curindex.sibling(curindex.row(), 8).data().toString().contains("Video"))
-            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'><img src='./thumbs/" + tmplist.at(12) + ".jpg'/></a></td></tr>";
+            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'><img src='./thumbs/" + tmplist.at(12) + ".jpg'/></a></td></tr>";
         else
             filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent('\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'>Link</a></td></tr>";
         filestr += "</table></td>";
@@ -2816,6 +2816,25 @@ void WombatForensics::CarveFile()
 
 void WombatForensics::PublishResults()
 {
+    // 1. check if a report dir exists...
+    // 2. ask to delete it.
+    // 3. delete it.
+    // 4. make report directory with thumbs dir and files dir.
+    // 5. copy previewreport.html to the report directory and rename it to index.html
+    // 6. find tagged id's from previewreport.html...
+    // 7. generate list of tagged id's for exporting
+    // 8. call export function for tag list and place them in reportpath + "/files/"
+    // 8. call cp to copy thumbnails from ./mntpt/thumbs/id.jpg to reportpath + "/thumbs/id.jpg"
+    // 9. execute default browser call... xdg-open ./path to /index.html
+    //
+    // QFILE COPY / REMOVE CODE
+    //f (QFile::exists("/path/copy-of-file"))
+    //{
+    //    QFile::remove("/path/copy-of-file");
+    //    }
+    //
+    //    QFile::copy("/path/file", "/path/copy-of-file");..
+    //
     qDebug() << "publish results";
 }
 
