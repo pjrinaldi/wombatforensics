@@ -2061,7 +2061,7 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
     {
         QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant(tr("*[A-Za-z0-9]*")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchWildcard));
         foreach(QModelIndex index, indexlist)
-            tmplist.append(index.sibling(index.row(), 11).data().toString());
+            tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
         return tmplist;
     }
     return tmplist;
@@ -2832,11 +2832,11 @@ void WombatForensics::CarveFile()
 
 void WombatForensics::PublishResults()
 {
-    qDebug() << "reportpath:" << reportpath;
+    //qDebug() << "reportpath:" << reportpath;
     // 1. generate unique report directory.
     QDir pdir;
     QString currentreportpath = reportpath + "/" + QDateTime::currentDateTimeUtc().toString("yyyy-mm-dd-HH-mm-ss") + "/";
-    qDebug() << "new report:" << currentreportpath;
+    //qDebug() << "new report:" << currentreportpath;
     pdir.mkpath(currentreportpath);
     // 2. make report directory with thumbs dir and files dir.
     pdir.mkpath(currentreportpath + "thumbs/");
@@ -2845,8 +2845,7 @@ void WombatForensics::PublishResults()
     QFile::copy(wombatvariable.tmpmntpath + "previewreport.html", currentreportpath + "index.html");
     // 4. find tagged id's from previewreport.html...
     // 5. generate list of tagged id's for exporting
-    QStringList idlist = GetFileLists(3);
-    qDebug() << "idlist:" << idlist;
+    QStringList curidlist = GetFileLists(3);
     /*
     foreach(QString id, idlist)
     {
@@ -2855,18 +2854,29 @@ void WombatForensics::PublishResults()
     }
     */
     // 6. call export function for tag list and place them in reportpath + "/files/"
-    ExportFiles(3, false, currentreportpath + "files/");
+    //ExportFiles(3, false, currentreportpath + "files/");
+    // HAVE TO CREATE MY OWN EXPORT SINCE IT DUMPS THE FILENAME AND NOT THE ID...
+    //foreach(QString id, curidlist)
+        //ProcessExport(id);
+    //QFuture<void> tmpfuture = QtConcurrent::map(curidlist, ProcessExport);
+    //exportwatcher.setFuture(tmpfuture);
     if(!imageshash.isEmpty())
     {
-        QtConcurrent::map(idlist, TransferThumbnails); // copy thumbnails
+        foreach(QString id, curidlist)
+        {
+            TransferThumbnails(id, currentreportpath);
+            TransferFiles(id, currentreportpath);
+        }
+            //qDebug() << "id-i:" << id;
+        //QtConcurrent::map(curidlist, TransferThumbnails); // copy thumbnails
         //TransferThumbnails(idlist);
     }
     else
     {
         genthmbpath = currentreportpath;
-        thumbfuture = QtConcurrent::map(idlist, GenerateThumbnails); // Process Thumbnails
+        thumbfuture = QtConcurrent::map(curidlist, GenerateThumbnails); // Process Thumbnails
         thumbwatcher.setFuture(thumbfuture);
-        videofuture = QtConcurrent::map(idlist, GenerateVidThumbnails);
+        videofuture = QtConcurrent::map(curidlist, GenerateVidThumbnails);
         videowatcher.setFuture(videofuture);
     }
     // 7. call cp to copy thumbnails from ./mntpt/thumbs/id.jpg to reportpath + "/thumbs/id.jpg"

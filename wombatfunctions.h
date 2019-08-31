@@ -59,6 +59,7 @@ int SegmentDigits(int);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
 void PopulateCarvedFiles(QString cfile);
 QString GenerateCategorySignature(const QMimeType mimetype);
-void TransferThumbnails(QString thumbid);
+void TransferThumbnails(QString thumbid, QString reppath);
+void TransferFiles(QString thumbid, QString reppath);
 
 #endif // wombatfunctions.h

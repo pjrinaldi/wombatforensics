@@ -1172,6 +1172,7 @@ void ProcessExport(QString objectid)
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     if(readfileinfo->meta != NULL)
     {
+        qDebug() << fstring << "export file size:" << readfileinfo->meta->size;
         char imgbuf[readfileinfo->meta->size];
         //char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
         //char* imgbuf = new char[readfileinfo->meta->size];
@@ -3852,9 +3853,148 @@ QString GenerateCategorySignature(const QMimeType mimetype)
     return QString(mimecategory + "/" + mimesignature);
 }
 
-void TransferThumbnails(QString thumbid)
+void TransferThumbnails(QString thumbid, QString reppath)
 {
     // open stat file with id..
     // then get the full id with -a* value
     // then do qfile::copy( with the full id...
+    QString tmpstr = "";
+    QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+    if(fstring.contains(":") == true)
+        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split(".e").first();
+    QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
+    QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+    QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
+    filefile.open(QIODevice::ReadOnly);
+    tmpstr = filefile.readLine();
+    if(filefile.isOpen())
+    {
+        filefile.close();
+    }
+    //qDebug() << "full id:" << tmpstr.split(",", QString::SkipEmptyParts).at(12);
+    if(QFile::exists(wombatvariable.tmpmntpath + "thumbs/" + tmpstr.split(",", QString::SkipEmptyParts).at(12) + ".jpg"))
+        QFile::copy(wombatvariable.tmpmntpath + "thumbs/" + tmpstr.split(",", QString::SkipEmptyParts).at(12) + ".jpg", reppath + "thumbs/" + tmpstr.split(",",QString::SkipEmptyParts).at(12) + ".jpg");
+}
+
+void TransferFiles(QString thumbid, QString reppath)
+{
+    qDebug() << thumbid << ":" << reppath;
+    /*
+     *
+    TSK_IMG_INFO* readimginfo;
+    TSK_FS_INFO* readfsinfo;
+    TSK_FS_FILE* readfileinfo;
+    QString tmpstr = "";
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    std::vector<std::string> pathvector;
+    const TSK_TCHAR** imagepartspath;
+    pathvector.clear();
+    QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+    if(fstring.contains(":") == true)
+        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    //qint64 curaddress = objectid.split("-f").at(1).toLongLong();
+    qint64 curaddress = objectid.split("-f").at(1).split("-a").at(0).split(":").at(0).toLongLong(); 
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split(".e").first();
+    QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
+    evidfile.open(QIODevice::ReadOnly);
+    tmpstr = evidfile.readLine();
+    int partcount = tmpstr.split(",").at(3).split("|").size();
+    if(evidfile.isOpen())
+        evidfile.close();
+    for(int i=0; i < partcount; i++)
+        pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
+    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+    for(uint i=0; i < pathvector.size(); i++)
+        imagepartspath[i] = pathvector[i].c_str();
+    readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(readimginfo == NULL)
+    {
+        qDebug() << tsk_error_get_errstr();
+        //LogMessage("Image opening error");
+    }
+    free(imagepartspath);
+    tmpstr = "";
+    QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
+    partfile.open(QIODevice::ReadOnly);
+    tmpstr = partfile.readLine();
+    if(partfile.isOpen())
+        partfile.close();
+    readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
+    if(readfileinfo->meta != NULL)
+    {
+        qDebug() << fstring << "export file size:" << readfileinfo->meta->size;
+        char imgbuf[readfileinfo->meta->size];
+        //char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
+        //char* imgbuf = new char[readfileinfo->meta->size];
+        ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
+        QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+        QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
+        filefile.open(QIODevice::ReadOnly);
+        tmpstr = filefile.readLine();
+        if(filefile.isOpen())
+        {
+            filefile.close();
+        }
+        QString tmppath = "";
+        QByteArray ba;
+        QByteArray ba2;
+        ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
+        ba2.append(tmpstr.split(",", QString::SkipEmptyParts).at(3));
+        QString tmpname = QByteArray::fromBase64(ba);
+        if(originalpath == true)
+            tmppath = exportpath + QByteArray::fromBase64(ba2);
+        else
+            tmppath = exportpath + "/";
+        if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
+        {
+            QDir dir;
+            bool tmpdir = dir.mkpath(QString(tmppath + tmpname));
+            //QDir dir;
+            //dir.mkpath(wombatvariable.tmpfilepath);
+            //bool tmpdir = (new QDir())->mkpath(QString(tmppath + tmpname));
+            if(!tmpdir)
+            {
+                qWarning() << "Creation of export directory tree for file:" << tmppath << "failed";
+                //LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
+                errorcount++;
+            }
+        }
+        else
+        {
+            QDir dir;
+            bool tmpdir = dir.mkpath(QDir::cleanPath(tmppath));
+            //bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(tmppath));
+            if(tmpdir == true)
+            {
+                QFile tmpfile(tmppath + tmpname);
+                if(tmpfile.open(QIODevice::WriteOnly))
+                {
+                    QDataStream outbuffer(&tmpfile);
+                    outbuffer.writeRawData(imgbuf, imglen);
+                    if(tmpfile.isOpen())
+                        tmpfile.close();
+                }
+            }
+        }
+        //delete[] imgbuf;
+        //free(imgbuf);
+    }
+    tsk_fs_file_close(readfileinfo);
+    tsk_fs_close(readfsinfo);
+    tsk_img_close(readimginfo);
+
+     *
+     */ 
 }
