@@ -516,16 +516,6 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
         filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
-        /*
-        if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + curindex.sibling(curindex.row(), 3).data().toString() + "</td></tr>";
-        if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
-            filestr += "<tr class='even'><td class='pvalue'>Accessed:</td><td class='property'>" + curindex.sibling(curindex.row(), 4).data().toString() + "</td></tr>";
-        if(!curindex.sibling(curindex.row(), 5).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + curindex.sibling(curindex.row(), 5).data().toString() + "</td></tr>";
-        if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
-            filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>" + curindex.sibling(curindex.row(), 6).data().toString() + "</td></tr>";
-            */
         if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
             filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(tmplist.at(6).toInt(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
@@ -548,7 +538,10 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), 8).data().toString() + "</td></tr>";
         filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
-        filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
+        if(curindex.sibling(curindex.row(), 8).data().toString().contains("Image") || curindex.sibling(curindex.row(), 8).data().toString().contains("Video"))
+            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'><img src='./files/'/></a></td></tr>";
+        else
+            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
         filestr += "</table></td>";
         RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
         //RemoveFileItem(tagname, curindex.sibling(curindex.row(), 11).data().toString());
