@@ -4,7 +4,7 @@ Wombat Forensics is a new Forensic Analysis tool built entirely in C and C++. Th
 
 Current Features
 -----------------
-* Tagging - Youc can Tag (bookmark) files by simply right clicking on a file and selecting the tag to apply.
+* Tagging - You can Tag (bookmark) files by simply right clicking on a file and selecting the tag to apply.
 * Report Preview - This feature generates the report in a preview window as you add evidence or tag files to different sections. If thumbnailing has been done, then thumbnails will display properly in the preview report.
 Publish Report - Publish a report and export/link files to the HTML Report. Places the report in the reporting directory set by the user from the settings dialog and in a unique sub folder based on date/time.
 * Manual Carving - You can manually carve sections from the hex and tag them to your report.
