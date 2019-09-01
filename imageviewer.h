@@ -31,8 +31,8 @@ private slots:
 
 private:
     Ui::ImageWindow* ui;
-    TskObject tskobj;
-    TskObject* tskptr;
+    //TskObject tskobj;
+    //TskObject* tskptr;
 protected:
     void mousePressEvent(QMouseEvent* event);
 };

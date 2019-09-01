@@ -141,6 +141,7 @@ void VideoViewer::GetVideo(const QModelIndex &index)
         filebuf->open(QIODevice::ReadOnly);
         vplayer->setMedia(QMediaContent(), filebuf);
     }
+    delete[] ibuffer;
 }
 
 void VideoViewer::ShowVideo(const QModelIndex &index)

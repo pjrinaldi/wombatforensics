@@ -180,11 +180,11 @@ void TextViewer::GetTextContent(const QModelIndex &index)
         }
         decodedstring = QString(tbuffer);
         delete[] tbuffer;
-        tsk_fs_file_close(tskptr->readfileinfo);
-        tsk_fs_close(tskptr->readfsinfo);
-        tsk_img_close(tskptr->readimginfo);
         //UpdateEncoding(0);
     }
+    tsk_fs_file_close(tskptr->readfileinfo);
+    tsk_fs_close(tskptr->readfsinfo);
+    tsk_img_close(tskptr->readimginfo);
 }
 
 void TextViewer::UpdateEncoding(int unused)
