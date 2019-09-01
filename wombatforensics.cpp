@@ -3026,6 +3026,14 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
     QTimeZone oldtz = QTimeZone(tzsplit.toUtf8());
     newprevstr = pretzsplit + "Report Time Zone:&nbsp;" + newtimezone + "</h4>";
     QString posttzsplit = prevstring.split("Report Time Zone&nbsp;").last().split("</h4>").last();
+    // REPLACE CREATED DATE TIME VALUES
+    int i = 0;
+    while((i = posttzsplit.indexOf("<td class='pvalue'>Accessed:</td><td class='property'>", i)) != -1)
+    {
+        QString curdate = posttzsplit.mid(i+54, 22);
+        qDebug() << "curdate:" << curdate;
+        i++;
+    }
     /*
      *
      * QString str = "";
