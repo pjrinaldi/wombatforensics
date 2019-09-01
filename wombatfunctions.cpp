@@ -3921,45 +3921,57 @@ void TransferFiles(QString thumbid, QString reppath)
     }
     free(imagepartspath);
     tmpstr = "";
+    QStringList partlist;
+    partlist.clear();
     QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
     partfile.open(QIODevice::ReadOnly);
     tmpstr = partfile.readLine();
     if(partfile.isOpen())
         partfile.close();
-    readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+    partlist = tmpstr.split(",");
+    readfsinfo = tsk_fs_open_img(readimginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
-    if(readfileinfo->meta != NULL)
+    QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
+    QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+    QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
+    filefile.open(QIODevice::ReadOnly);
+    tmpstr = filefile.readLine();
+    if(filefile.isOpen())
+        filefile.close();
+    if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
     {
-        //qDebug() << fstring << "export file size:" << readfileinfo->meta->size;
+        if(thumbid.split("-").at(3).split(":").count() > 1) // IF ADS
+        {
+            if(readfileinfo->meta != NULL)
+            {
+                imgbuf = new char[tmpstr.split(",").at(8).toULongLong()];
+                imglen = tsk_fs_file_read_type(readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, thumbid.split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+                if(imglen == -1)
+                    qDebug() << tsk_error_get_errstr();
+            }
+        }
+        else // IF NOT ADS
+        {
+            if(readfileinfo->meta != NULL)
+            {
+                imgbuf = new char[readfileinfo->meta->size];
+                imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+            }
+        }
+    }
+    else // OTHER FILE SYSTEM
+    {
         imgbuf = new char[readfileinfo->meta->size];
         imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
-        QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
-        QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
-        QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
-        filefile.open(QIODevice::ReadOnly);
-        tmpstr = filefile.readLine();
-        if(filefile.isOpen())
-        {
-            filefile.close();
-        }
+    }
+    if(readfileinfo->meta != NULL)
+    {
         QString tmppath = reppath + "files/";
         QString tmpname = tmpstr.split(",", QString::SkipEmptyParts).at(12);
-        //QByteArray ba;
-        //QByteArray ba2;
-        //ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
-        //ba2.append(tmpstr.split(",", QString::SkipEmptyParts).at(3));
-        //QString tmpname = QByteArray::fromBase64(ba);
-        //if(originalpath == true)
-        //    tmppath = exportpath + QByteArray::fromBase64(ba2);
-        //else
-        //    tmppath = exportpath + "/";
         if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
         {
             QDir dir;
             bool tmpdir = dir.mkpath(QString(tmppath + tmpname));
-            //QDir dir;
-            //dir.mkpath(wombatvariable.tmpfilepath);
-            //bool tmpdir = (new QDir())->mkpath(QString(tmppath + tmpname));
             if(!tmpdir)
             {
                 qWarning() << "Creation of export directory tree for file:" << tmppath << "failed";
@@ -3971,7 +3983,6 @@ void TransferFiles(QString thumbid, QString reppath)
         {
             QDir dir;
             bool tmpdir = dir.mkpath(QDir::cleanPath(tmppath));
-            //bool tmpdir = (new QDir())->mkpath(QDir::cleanPath(tmppath));
             if(tmpdir == true)
             {
                 QFile tmpfile(tmppath + tmpname);
@@ -3984,8 +3995,8 @@ void TransferFiles(QString thumbid, QString reppath)
                 }
             }
         }
-        delete[] imgbuf;
     }
+    delete[] imgbuf;
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);

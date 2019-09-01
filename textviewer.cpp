@@ -125,7 +125,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
         tmpfilename = fstring.mid(1).split(":").at(0) + QString("-") + fstring.mid(1).split(":").at(1);
     else
         tmpfilename = fstring.mid(1);
-    qDebug() << "f value:" << tmpfilename;
+    //qDebug() << "f value:" << tmpfilename;
     if(tmpfilename.contains("-"))
         tskptr->readfileinfo = tsk_fs_file_open_meta(tskptr->readfsinfo, NULL, tmpfilename.split("-").at(0).toInt());
     else
@@ -150,7 +150,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
         filefile.close();
         QStringList filelist;
         filelist = tmpstr.split(",");
-        char* tbuffer;
+        char* tbuffer = new char[0];
         ssize_t textlen = 0;
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES
         {
