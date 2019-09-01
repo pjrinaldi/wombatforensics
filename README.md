@@ -4,7 +4,9 @@ Wombat Forensics is a new Forensic Analysis tool built entirely in C and C++. Th
 
 Current Features
 -----------------
-* Report Preview - This feature generates the report in a preview window as you add evidence or tag files to different sections.
+* Tagging - Youc can Tag (bookmark) files by simply right clicking on a file and selecting the tag to apply.
+* Report Preview - This feature generates the report in a preview window as you add evidence or tag files to different sections. If thumbnailing has been done, then thumbnails will display properly in the preview report.
+Publish Report - Publish a report and export/link files to the HTML Report. Places the report in the reporting directory set by the user from the settings dialog and in a unique sub folder based on date/time.
 * Manual Carving - You can manually carve sections from the hex and tag them to your report.
 * Image/Video Thumbnailing Viewer is a separate window, and once loaded has no lag when scrolling. You can go as fast as you want.
 * If running a large ingest or just need a break, you can launch xchomp (pacman clone).
@@ -12,6 +14,7 @@ Current Features
 * Filtering will gray out non-matches, rather than hide the files in case you still want to look at them.
 * You can have multiple "File Properties", "File Hex", "Viewer Windows", etc. open for different files to compare their values.
 * File signature analysis is done at ingest.
+* Hashing files when "Digging Deeper" (cause Wombat's dig). (MD5, SHA1, or SHA256).
 
 Current Viewers
 --
@@ -36,7 +39,7 @@ Wombat Forensics is user oriented in its design. You can select an item or check
 
 I find it a waste of real estate to have a treeview in one frame and a table listing in another frame. Therefore I have combined the file structure treeview and the file information table into one view. The columns autoresize when data is loaded or when parents are expanded, ensuring the data can be read in the column without having to resize the columns manually.
 
-I run timezone data in UTC for all features. I always prefer to work in UTC and then will have an option to automatically convert to a preferred timezone when generating the report.
+I run timezone data in UTC for all features. I always prefer to work in UTC and then there is an option to automatically convert to a preferred timezone when generating the report. This timezone selection is in the settings dialog. If you change the timezone, the preview report will update the dates and times accordingly, as well as the timezone listed in the report. It will not update an already generated "Published Report", you will have to generate a new report to show the new timezone.
 
 Closed source tools are a black box. Wombat Forensics is open source and integrates open source libraries such as the sleuthkit and libewf, enabling an examiner to review code to find out how the tool yields results and verify that the results are what they should be.
 
