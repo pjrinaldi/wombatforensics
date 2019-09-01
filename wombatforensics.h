@@ -206,6 +206,7 @@ private slots:
     void TagSection(QString ctitle, QString ctag);
     void FinishCarve(void);
     void LaunchChomp(void);
+    void UpdateTimeZone(QString newtz);
 
 protected:
     void closeEvent(QCloseEvent* event);

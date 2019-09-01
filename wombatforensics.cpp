@@ -899,6 +899,7 @@ void WombatForensics::InitializeAppStructure()
     settingsdialog->setWindowIcon(QIcon(":/bar/settings"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
     connect(settingsdialog, SIGNAL(HideSettingsWindow()), this, SLOT(HideSettingsWindow()), Qt::DirectConnection);
+    connect(settingsdialog, SIGNAL(UpdateTZ(QString)), this, SLOT(UpdateTimeZone(QString)), Qt::DirectConnection);
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
@@ -2832,6 +2833,8 @@ void WombatForensics::CarveFile()
 
 void WombatForensics::PublishResults()
 {
+    StatusUpdate("Publishing Analysis Results...");
+    qInfo() << "Publishing Analysis Results...";
     //qDebug() << "reportpath:" << reportpath;
     // 1. generate unique report directory.
     QDir pdir;
@@ -2862,11 +2865,13 @@ void WombatForensics::PublishResults()
     //exportwatcher.setFuture(tmpfuture);
     if(!imageshash.isEmpty())
     {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         foreach(QString id, curidlist)
         {
             TransferThumbnails(id, currentreportpath);
             TransferFiles(id, currentreportpath);
         }
+        QApplication::restoreOverrideCursor();
             //qDebug() << "id-i:" << id;
         //QtConcurrent::map(curidlist, TransferThumbnails); // copy thumbnails
         //TransferThumbnails(idlist);
@@ -2890,6 +2895,8 @@ void WombatForensics::PublishResults()
     //
     //    QFile::copy("/path/file", "/path/copy-of-file");..
     //
+    StatusUpdate("Ready");
+    qInfo() << "Publishing Analysis Results Finished";
     //qDebug() << "publish results";
 }
 
@@ -3001,4 +3008,22 @@ void WombatForensics::LaunchChomp()
     xchompstr += "/.local/share/wombatforensics/xchomp";
     QProcess* process = new QProcess(this);
     process->startDetached(xchompstr, QStringList());
+}
+void WombatForensics::UpdateTimeZone(QString newtimezone)
+{
+    QTimeZone newtz = QTimeZone(newtimezone.toUtf8());
+    QString prevstring = "";
+    QString newprevstr = "";
+    QFile prevfile(wombatvariable.tmpmntpath + "previewreport.html");
+    if(!prevfile.isOpen())
+        prevfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(prevfile.isOpen())
+       prevstring = prevfile.readAll(); 
+    prevfile.close();
+    QString pretzsplit = prevstring.split("Report Time Zone:&nbsp;").first();
+    QString tzsplit = prevstring.split("Report Time Zone:&nbsp;").last().split("</h4>").first();
+    qDebug() << "tzsplit:" << tzsplit;
+    QTimeZone oldtz = QTimeZone(tzsplit.toUtf8());
+    newprevstr = pretzsplit + "Report Time Zone:&nbsp;" + newtimezone + "</h4>";
+    QString posttzsplit = prevstring.split("Report Time Zone&nbsp;").last().split("</h4>").last();
 }

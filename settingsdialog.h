@@ -27,10 +27,11 @@ private slots:
     void SaveChanges();
     void GetCaseFolder();
     void GetReportFolder();
-    //void GetReportZone(int zoneid);
+    void UpdateTimeZone(QString newtimezone);
 
 signals:
     void HideSettingsWindow();
+    void UpdateTZ(QString newtz);
 private:
     Ui::SettingsDialog* ui;
     QList<QByteArray> zoneids;

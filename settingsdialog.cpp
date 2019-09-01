@@ -15,6 +15,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Se
     foreach(QByteArray id, zoneids)
         ui->timezonecombobox->addItem(id);
     LoadSettings();
+    connect(ui->timezonecombobox, SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTimeZone(QString)));
     this->hide();
 }
 
@@ -110,8 +111,7 @@ void SettingsDialog::GetReportFolder()
         ui->reportpathlineedit->setText(reportpathfolder);
 }
 
-/*
-void SettingsDialog::GetReportZone(int zoneid)
+void SettingsDialog::UpdateTimeZone(QString newtimezone)
 {
+    emit UpdateTZ(newtimezone);
 }
-*/
