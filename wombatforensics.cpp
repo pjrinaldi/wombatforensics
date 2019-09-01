@@ -2831,34 +2831,13 @@ void WombatForensics::PublishResults()
 {
     StatusUpdate("Publishing Analysis Results...");
     qInfo() << "Publishing Analysis Results...";
-    //qDebug() << "reportpath:" << reportpath;
-    // 1. generate unique report directory.
     QDir pdir;
     QString currentreportpath = reportpath + "/" + QDateTime::currentDateTimeUtc().toString("yyyy-mm-dd-HH-mm-ss") + "/";
-    //qDebug() << "new report:" << currentreportpath;
     pdir.mkpath(currentreportpath);
-    // 2. make report directory with thumbs dir and files dir.
     pdir.mkpath(currentreportpath + "thumbs/");
     pdir.mkpath(currentreportpath + "files/");
-    // 3. copy previewreport.html to the report directory and rename it to index.html
     QFile::copy(wombatvariable.tmpmntpath + "previewreport.html", currentreportpath + "index.html");
-    // 4. find tagged id's from previewreport.html...
-    // 5. generate list of tagged id's for exporting
     QStringList curidlist = GetFileLists(3);
-    /*
-    foreach(QString id, idlist)
-    {
-        if(QFile::exists(wombatvariable.tmpmntpath + "thumbs/" + id + ".jpg"))
-            QFile::copy(wombatvariable.tmpmntpath + "thumbs/" + id + ".jpg", currentreportpath + "thumbs/" + id + ".jpg");
-    }
-    */
-    // 6. call export function for tag list and place them in reportpath + "/files/"
-    //ExportFiles(3, false, currentreportpath + "files/");
-    // HAVE TO CREATE MY OWN EXPORT SINCE IT DUMPS THE FILENAME AND NOT THE ID...
-    //foreach(QString id, curidlist)
-        //ProcessExport(id);
-    //QFuture<void> tmpfuture = QtConcurrent::map(curidlist, ProcessExport);
-    //exportwatcher.setFuture(tmpfuture);
     if(!imageshash.isEmpty())
     {
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -2868,9 +2847,6 @@ void WombatForensics::PublishResults()
             TransferFiles(id, currentreportpath);
         }
         QApplication::restoreOverrideCursor();
-            //qDebug() << "id-i:" << id;
-        //QtConcurrent::map(curidlist, TransferThumbnails); // copy thumbnails
-        //TransferThumbnails(idlist);
     }
     else
     {
@@ -2880,20 +2856,8 @@ void WombatForensics::PublishResults()
         videofuture = QtConcurrent::map(curidlist, GenerateVidThumbnails);
         videowatcher.setFuture(videofuture);
     }
-    // 7. call cp to copy thumbnails from ./mntpt/thumbs/id.jpg to reportpath + "/thumbs/id.jpg"
-    // 8. execute default browser call... xdg-open ./path to /index.html
-    //
-    // QFILE COPY / REMOVE CODE
-    //f (QFile::exists("/path/copy-of-file"))
-    //{
-    //    QFile::remove("/path/copy-of-file");
-    //    }
-    //
-    //    QFile::copy("/path/file", "/path/copy-of-file");..
-    //
     StatusUpdate("Ready");
     qInfo() << "Publishing Analysis Results Finished";
-    //qDebug() << "publish results";
 }
 
 void WombatForensics::SaveState()

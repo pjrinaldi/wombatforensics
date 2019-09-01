@@ -1968,7 +1968,7 @@ void PopulateTreeModel(QString evidstring)
                 partitionpath = volumepath + "p0/";
                 addevidvar.partitionpath = partitionpath;
                 nodedata.clear();
-                nodedata << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
+                nodedata << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
                 mutex.unlock();
@@ -2089,7 +2089,7 @@ void InitializeEvidenceStructure(QString evidname)
     //{
     //    if(i > 0 && i < wombatvariable.itemcount - 2)
     //        out << "|";
-        out << QString::fromStdString(fullpathvector[0]);
+    out << QString::fromStdString(fullpathvector[0]);
     //}
     out << "," << 1 << ",e" + QString::number(evidcnt) << ",0";
     //out << "," << wombatvariable.itemcount << ",e" + QString::number(evidcnt);
@@ -2144,7 +2144,6 @@ void InitializeEvidenceStructure(QString evidname)
     reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString::number(readimginfo->size) + " bytes</td></tr>";
     reportstring += "<tr class='even vtop'><td>Sector Size:</td><td>" + QString::number(readimginfo->sector_size) + " bytes</td></tr>";
     reportstring += "<tr class='odd vtop'><td>Volume (V" + QString::number(volcnt) + "):</td><td>" + volname + "</td></tr>";
-    //reportstring = "<div id='e" + QString::number(evidcnt) + "'><div>Evidence Item (E" + QString::number(evidcnt) + "):" + evidname + "</div><br/<br/><div><span>Image Size: </span><span>" + QString::number(readimginfo->size) + "</span></div><br/><div><span>Sector Size: </span><span>" + QString::number(readimginfo->sector_size) + "</span></div><br/><div><span>Volume (V" + QString::number(volcnt) + "): </span><span>" + volname + "</span></div><br/>";
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
     mutex.unlock();
     if(readvsinfo != NULL)
@@ -2174,7 +2173,6 @@ void InitializeEvidenceStructure(QString evidname)
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), -1, 0);
             mutex.unlock();
             reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>NON RECOGNIZED FS</td></tr>";
-            //reportstring += "<div><span>Partition (P0): </span><span>NON-RECOGNIZED FS</span></div><br/>";
         }
         else
         {
@@ -2197,7 +2195,6 @@ void InitializeEvidenceStructure(QString evidname)
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
             mutex.unlock();
             reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>" + QString(GetFileSystemLabel(readfsinfo)) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</td></tr>";
-            //reportstring += "<div><span>Partition (P0): </span><span>" + QString(GetFileSystemLabel(readfsinfo)) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</span></div><br/>";
             WriteFileSystemProperties(readfsinfo, partitionpath);
             uint8_t walkreturn;
             int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
