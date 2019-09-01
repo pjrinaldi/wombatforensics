@@ -15,6 +15,7 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Se
     foreach(QByteArray id, zoneids)
         ui->timezonecombobox->addItem(id);
     LoadSettings();
+    newtz = "";
     connect(ui->timezonecombobox, SIGNAL(currentTextChanged(QString)), this, SLOT(UpdateTimeZone(QString)));
     this->hide();
 }
@@ -51,6 +52,8 @@ void SettingsDialog::SaveChanges()
     out << "autosave:" << QString::number(ui->autosavespinbox->value()) << ",";
     out << "timezone:" << QByteArray::fromStdString(QString(ui->timezonecombobox->currentText()).toStdString());
     settingsfile.close();
+    if(!newtz.isEmpty())
+        emit UpdateTZ(newtz);
     this->hide();
 }
 void SettingsDialog::CancelChanges()
@@ -113,5 +116,6 @@ void SettingsDialog::GetReportFolder()
 
 void SettingsDialog::UpdateTimeZone(QString newtimezone)
 {
-    emit UpdateTZ(newtimezone);
+    newtz = newtimezone;
+    //emit UpdateTZ(newtimezone);
 }

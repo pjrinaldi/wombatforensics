@@ -35,6 +35,7 @@ signals:
 private:
     Ui::SettingsDialog* ui;
     QList<QByteArray> zoneids;
+    QString newtz = "";
 protected:
 };
 

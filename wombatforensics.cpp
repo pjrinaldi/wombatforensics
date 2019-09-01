@@ -501,11 +501,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
             if(i < tmplist.count() - 1)
                 tmpstr += ",";
         }
-        // QTimeZone Test... !!!!!!
         QTimeZone tmpzone = QTimeZone(reporttimezone);
-        //QDateTime crdt = QDateTime::fromSecsSinceEpoch(tmplist.at(6).toInt(), tmpzone);
-        //qDebug() << "original displayed time UTC:" << curindex.sibling(curindex.row(), 3).data().toString();
-        //qDebug() << "selected time zone time:" << crdt.toString("MM/dd/yyyy hh:mm:ss AP");
         // APPLY ABOVE CODE TO THE BELOW CODE TO PUSH PREVIEW DATA WITH CORRECT TIMEZONE
         filefile.open(QIODevice::WriteOnly | QIODevice::Text);
         if(filefile.isOpen())
@@ -3009,6 +3005,7 @@ void WombatForensics::LaunchChomp()
     QProcess* process = new QProcess(this);
     process->startDetached(xchompstr, QStringList());
 }
+
 void WombatForensics::UpdateTimeZone(QString newtimezone)
 {
     QTimeZone newtz = QTimeZone(newtimezone.toUtf8());
@@ -3022,30 +3019,76 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
     prevfile.close();
     QString pretzsplit = prevstring.split("Report Time Zone:&nbsp;").first();
     QString tzsplit = prevstring.split("Report Time Zone:&nbsp;").last().split("</h4>").first();
-    qDebug() << "tzsplit:" << tzsplit;
     QTimeZone oldtz = QTimeZone(tzsplit.toUtf8());
-    newprevstr = pretzsplit + "Report Time Zone:&nbsp;" + newtimezone + "</h4>";
-    QString posttzsplit = prevstring.split("Report Time Zone&nbsp;").last().split("</h4>").last();
-    // REPLACE CREATED DATE TIME VALUES
-    int i = 0;
-    while((i = posttzsplit.indexOf("<td class='pvalue'>Accessed:</td><td class='property'>", i)) != -1)
+    //qDebug() << "oldtz:" << oldtz.id() << "newtz:" << newtz.id();
+    if(oldtz != newtz)
     {
-        QString curdate = posttzsplit.mid(i+54, 22);
-        qDebug() << "curdate:" << curdate;
-        i++;
+        StatusUpdate("Updating Preview Report to New TimeZone...");
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        newprevstr = pretzsplit + "Report Time Zone:&nbsp;" + newtimezone + "</h4>";
+        QString posttzsplit = prevstring.split("Report Time Zone&nbsp;").last().split("</h4>").last();
+        // REPLACE CREATED DATE TIME VALUES
+        int i = 0;
+        while((i = posttzsplit.indexOf("<td class='pvalue'>Accessed:</td><td class='property'>", i)) != -1)
+        {
+            QString curdate = posttzsplit.mid(i+54, 22);
+            QDateTime olddatetime;
+            olddatetime = QDateTime::fromString(curdate, "MM/dd/yyyy hh:mm:ss AP");
+            int oldoffset = oldtz.offsetFromUtc(olddatetime);
+            QDateTime utcdatetime = olddatetime.addSecs(-oldoffset); // does opposite of what offset should be (sends local to utc)
+            int newoffset = newtz.offsetFromUtc(utcdatetime);
+            QDateTime newdatetime = utcdatetime.addSecs(newoffset); // does what it should and sends utc to new tz
+            posttzsplit.replace(i+54, 22, newdatetime.toString("MM/dd/yyyy hh:mm:ss AP"));
+            i++;
+        }
+        i = 0;
+        while((i = posttzsplit.indexOf("<td class='pvalue'>Modified:</td><td class='property'>", i)) != -1)
+        {
+            QString curdate = posttzsplit.mid(i+54, 22);
+            QDateTime olddatetime;
+            olddatetime = QDateTime::fromString(curdate, "MM/dd/yyyy hh:mm:ss AP");
+            int oldoffset = oldtz.offsetFromUtc(olddatetime);
+            QDateTime utcdatetime = olddatetime.addSecs(-oldoffset); // does opposite of what offset should be (sends local to utc)
+            int newoffset = newtz.offsetFromUtc(utcdatetime);
+            QDateTime newdatetime = utcdatetime.addSecs(newoffset); // does what it should and sends utc to new tz
+            posttzsplit.replace(i+54, 22, newdatetime.toString("MM/dd/yyyy hh:mm:ss AP"));
+            i++;
+        }
+        i = 0;
+        while((i = posttzsplit.indexOf("<td class='pvalue'>Changed:</td><td class='property'>", i)) != -1)
+        {
+            QString curdate = posttzsplit.mid(i+53, 22);
+            QDateTime olddatetime;
+            olddatetime = QDateTime::fromString(curdate, "MM/dd/yyyy hh:mm:ss AP");
+            int oldoffset = oldtz.offsetFromUtc(olddatetime);
+            QDateTime utcdatetime = olddatetime.addSecs(-oldoffset); // does opposite of what offset should be (sends local to utc)
+            int newoffset = newtz.offsetFromUtc(utcdatetime);
+            QDateTime newdatetime = utcdatetime.addSecs(newoffset); // does what it should and sends utc to new tz
+            posttzsplit.replace(i+53, 22, newdatetime.toString("MM/dd/yyyy hh:mm:ss AP"));
+            i++;
+        }
+        i = 0;
+        while((i = posttzsplit.indexOf("<td class='pvalue'>Created:</td><td class='property'>", i)) != -1)
+        {
+            QString curdate = posttzsplit.mid(i+53, 22);
+            QDateTime olddatetime;
+            olddatetime = QDateTime::fromString(curdate, "MM/dd/yyyy hh:mm:ss AP");
+            int oldoffset = oldtz.offsetFromUtc(olddatetime);
+            QDateTime utcdatetime = olddatetime.addSecs(-oldoffset); // does opposite of what offset should be (sends local to utc)
+            int newoffset = newtz.offsetFromUtc(utcdatetime);
+            QDateTime newdatetime = utcdatetime.addSecs(newoffset); // does what it should and sends utc to new tz
+            posttzsplit.replace(i+53, 22, newdatetime.toString("MM/dd/yyyy hh:mm:ss AP"));
+            i++;
+        }
+        newprevstr += posttzsplit;
+        //qDebug() << "newhtml:" << newprevstr;
+        if(!prevfile.isOpen())
+            prevfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(prevfile.isOpen())
+           prevfile.write(newprevstr.toStdString().c_str()); 
+        prevfile.close();
+        QApplication::restoreOverrideCursor();
+        StatusUpdate("Ready");
+        isignals->ReloadPreview();
     }
-    /*
-     *
-     * QString str = "";
-     * int j = 0;
-     * while((j = str.indexOf("Created:</><>", j)) != -1)
-     * {
-     * QString curdate = str.mid(j + standard value, known length);
-     * QDateTime olddatetime = QDateTime::fromString(curdate, oldtz);
-     * QDateTime newdatetime = QDateTime(olddatetime, newtz); 
-     * str.replace(j + standard value, known length, newdatetime.toString()
-     * qDebug() << "found <b> tag at index position" << j;
-     * j++
-     * }
-     */ 
 }
