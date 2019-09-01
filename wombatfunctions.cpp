@@ -1129,6 +1129,8 @@ void ProcessExport(QString objectid)
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
+    char* imgbuf = new char[0];
+    ssize_t imglen = 0;
     QString tmpstr = "";
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     std::vector<std::string> pathvector;
@@ -1172,11 +1174,8 @@ void ProcessExport(QString objectid)
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     if(readfileinfo->meta != NULL)
     {
-        qDebug() << fstring << "export file size:" << readfileinfo->meta->size;
-        char imgbuf[readfileinfo->meta->size];
-        //char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
-        //char* imgbuf = new char[readfileinfo->meta->size];
-        ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        imgbuf = new char[readfileinfo->meta->size];
+        imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
         QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
         QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
@@ -1227,8 +1226,7 @@ void ProcessExport(QString objectid)
                 }
             }
         }
-        //delete[] imgbuf;
-        //free(imgbuf);
+        delete[] imgbuf;
     }
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
@@ -3884,7 +3882,8 @@ void TransferThumbnails(QString thumbid, QString reppath)
 
 void TransferFiles(QString thumbid, QString reppath)
 {
-    qDebug() << thumbid << ":" << reppath;
+    char* imgbuf = new char[0];
+    ssize_t imglen = 0;
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
@@ -3931,11 +3930,9 @@ void TransferFiles(QString thumbid, QString reppath)
     readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
     if(readfileinfo->meta != NULL)
     {
-        qDebug() << fstring << "export file size:" << readfileinfo->meta->size;
-        char imgbuf[readfileinfo->meta->size];
-        //char* imgbuf = reinterpret_cast<char*>(malloc(readfileinfo->meta->size));
-        //char* imgbuf = new char[readfileinfo->meta->size];
-        qint64 imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        //qDebug() << fstring << "export file size:" << readfileinfo->meta->size;
+        imgbuf = new char[readfileinfo->meta->size];
+        imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
         QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
         QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
@@ -3946,7 +3943,7 @@ void TransferFiles(QString thumbid, QString reppath)
             filefile.close();
         }
         QString tmppath = reppath + "files/";
-        QString tmpname = tmpstr.split(",", QString::SkipEmptyParts).at(11);
+        QString tmpname = tmpstr.split(",", QString::SkipEmptyParts).at(12);
         //QByteArray ba;
         //QByteArray ba2;
         //ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
@@ -3987,8 +3984,7 @@ void TransferFiles(QString thumbid, QString reppath)
                 }
             }
         }
-        //delete[] imgbuf;
-        //free(imgbuf);
+        delete[] imgbuf;
     }
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
