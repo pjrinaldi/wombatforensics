@@ -655,10 +655,8 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
         outstring += "0,0,0,0,0," + QString::number(tmpfile->name->meta_addr) + ",";
         treeout << "0" << "0" << "0" << "0" << "0";
     }
-
-    //char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
-    char magicbuffer[1024];
-    //char* magicbuffer = new char[1024];
+    char* magicbuffer = new char[0];
+    magicbuffer = new char[1024];
     QByteArray tmparray("intro");
     tmparray.clear();
     tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
@@ -674,8 +672,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
         qDebug() << mimetype.name() << "miemtype:comment:" << mimetype.comment();
     }
     */
-    //delete[] magicbuffer;
-    //free(magicbuffer);
+    delete[] magicbuffer;
     outstring += mimestr + ",0,e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f";
     if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
         outstring += "*" + QString::number(orphancount);
@@ -786,6 +783,8 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
 
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
+        char* startoffset = new char[0];
+        char* type = new char[0];
         QByteArray adsba;
         qint64 adssize = 0;
         TSK_OFF_T curmftentrystart = 0;
@@ -801,7 +800,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
             curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
         else
             curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
-        char startoffset[2];
+        startoffset = new char[2];
         tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
         uint16_t teststart = startoffset[1] * 256 + startoffset[0];
         adssize = (qint64)teststart;
@@ -809,7 +808,7 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
         cnt = tsk_fs_file_attr_getsize(tmpfile);
         for(i = 0; i < cnt; i++)
         {
-            char type[512];
+            type = new char[512];
             const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
             adssize += 24;
             adssize += (qint64)fsattr->size;
@@ -853,6 +852,8 @@ void BuildStatFile(TSK_FS_FILE* tmpfile, const char* tmppath, AddEvidenceVariabl
                 }
             }
         }
+        delete[] type;
+        delete[] startoffset;
     }
 }
 
@@ -896,10 +897,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                 {
                     treeout << "0" << "0" << "0" << "0" << "0";
                 }
-                char magicbuffer[1024];
-                //char* magicbuffer = new char[1024];
-                //char* magicbuffer = reinterpret_cast<char*>(malloc(1024));
-                //char* fbuf = new char[fsattr->size];
+                char* magicbuffer = new char[0];
+                magicbuffer = new char[1024];
                 QByteArray tmparray;
                 tmparray.clear();
                 tsk_fs_file_read(tmpfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
@@ -915,8 +914,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     qDebug() << mimetype.name() << "mimetype comment:" << mimetype.comment();
                 }
                 */
-                //free(magicbuffer);
-                //delete[] magicbuffer;
+                delete[] magicbuffer;
                 QFile hshfile;
                 if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
                     hshfile.setFileName(partitionpath + "f" + QString::number(orphancount) + ".a" + QString::number(tmpfile->name->par_addr) + ".stat");
@@ -1031,7 +1029,9 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                         curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * tmpfile->meta->addr + 20;
                     else
                         curmftentrystart = tsk_getu16(tmpfile->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(tmpfile->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
-                    char startoffset[2];
+                    char* startoffset = new char[0];
+                    startoffset = new char[2];
+                    char* type = new char[0];
                     tsk_fs_read(tmpfile->fs_info, curmftentrystart, startoffset, 2);
                     uint16_t teststart = startoffset[1] * 256 + startoffset[0];
                     adssize = (qint64)teststart;
@@ -1039,7 +1039,7 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                     cnt = tsk_fs_file_attr_getsize(tmpfile);
                     for(i = 0; i < cnt; i++)
                     {
-                        char type[512];
+                        type = new char[512];
                         const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(tmpfile, i);
                         adssize += 24;
                         adssize += (qint64)fsattr->size;
@@ -1092,6 +1092,8 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
                             }
                         }
                     }
+                    delete[] type;
+                    delete[] startoffset;
                 }
             }
             return TSK_WALK_CONT;
@@ -1341,7 +1343,9 @@ void GenerateHash(QString itemid)
                     curmftentrystart = tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(readfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * readfileinfo->meta->addr + 20;
                 else
                     curmftentrystart = tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(readfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
-                char startoffset[2];
+                char* startoffset = new char[0];
+                startoffset = new char[2];
+                char* type = new char[0];
                 tsk_fs_read(readfileinfo->fs_info, curmftentrystart, startoffset, 2);
                 uint16_t teststart = startoffset[1] * 256 + startoffset[0];
                 adssize = (qint64)teststart;
@@ -1349,7 +1353,7 @@ void GenerateHash(QString itemid)
                 cnt = tsk_fs_file_attr_getsize(readfileinfo);
                 for(i = 0; i < cnt; i++)
                 {
-                    char type[512];
+                    type = new char[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(readfileinfo, i);
                     adssize += 24;
                     adssize += (qint64)fsattr->size;
@@ -1365,6 +1369,8 @@ void GenerateHash(QString itemid)
                         }
                     }
                 }
+                delete[] type;
+                delete[] startoffset;
             }
             else // regular file
             {
@@ -1425,7 +1431,7 @@ void GenerateHash(QString itemid)
         }
         treenodemodel->UpdateNode(itemid, 7, hashstr);
         QString hashheader = "";
-        //delete[] hashdata;
+        delete[] hashdata;
         if(hashsum == 1) // MD5
             hashtype = 1;
         else if(hashsum == 2) // SHA1
@@ -1495,7 +1501,7 @@ void GenerateVidThumbnails(QString thumbid)
             if(readfsinfo != NULL)
                 readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         }
-        char* imgbuf = NULL;
+        char* imgbuf = new char[0];
         ssize_t imglen = 0;
         if(readfileinfo != NULL)
         {
@@ -1513,7 +1519,9 @@ void GenerateVidThumbnails(QString thumbid)
                     curmftentrystart = tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(readfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * readfileinfo->meta->addr + 20;
                 else
                     curmftentrystart = tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(readfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
-                char startoffset[2];
+                char* startoffset = new char[0];
+                startoffset = new char[2];
+                char* type = new char[0];
                 tsk_fs_read(readfileinfo->fs_info, curmftentrystart, startoffset, 2);
                 uint16_t teststart = startoffset[1] * 256 + startoffset[0];
                 adssize = (qint64)teststart;
@@ -1521,7 +1529,7 @@ void GenerateVidThumbnails(QString thumbid)
                 cnt = tsk_fs_file_attr_getsize(readfileinfo);
                 for(i = 0; i < cnt; i++)
                 {
-                    char type[512];
+                    type = new char[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(readfileinfo, i);
                     adssize += 24;
                     adssize += (qint64)fsattr->size;
@@ -1540,6 +1548,8 @@ void GenerateVidThumbnails(QString thumbid)
                         }
                     }
                 }
+                delete[] type;
+                delete[] startoffset;
             }
             else // regular file
             {
@@ -1726,7 +1736,7 @@ void GenerateThumbnails(QString thumbid)
             if(readfsinfo != NULL)
                 readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
         }
-        char* imgbuf = NULL;
+        char* imgbuf = new char[0];
         ssize_t imglen = 0;
         if(readfileinfo != NULL)
         {
@@ -1744,7 +1754,9 @@ void GenerateThumbnails(QString thumbid)
                     curmftentrystart = tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(readfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize * readfileinfo->meta->addr + 20;
                 else
                     curmftentrystart = tsk_getu16(readfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(readfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) + recordsize + 20;
-                char startoffset[2];
+                char* startoffset = new char[0];
+                startoffset = new char[2];
+                char* type = new char[0];
                 tsk_fs_read(readfileinfo->fs_info, curmftentrystart, startoffset, 2);
                 uint16_t teststart = startoffset[1] * 256 + startoffset[0];
                 adssize = (qint64)teststart;
@@ -1752,7 +1764,7 @@ void GenerateThumbnails(QString thumbid)
                 cnt = tsk_fs_file_attr_getsize(readfileinfo);
                 for(i = 0; i < cnt; i++)
                 {
-                    char type[512];
+                    type = new char[512];
                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(readfileinfo, i);
                     adssize += 24;
                     adssize += (qint64)fsattr->size;
@@ -1771,6 +1783,8 @@ void GenerateThumbnails(QString thumbid)
                         }
                     }
                 }
+                delete[] type;
+                delete[] startoffset;
             }
             else // regular file
             {
@@ -1837,7 +1851,6 @@ void GenerateThumbnails(QString thumbid)
             }
         }
         delete[] imgbuf;
-        //free(imgbuf);
         digimgthumbcount++;
         isignals->DigUpd(0, digimgthumbcount);
     }
@@ -2317,7 +2330,6 @@ void InitializeEvidenceStructure(QString evidname)
     }
     mutex.lock();
     reportstring += "</table></div><br/>\n";
-    evidrepdatalist.clear();
     EvidenceReportData tmpdata;
     tmpdata.evidid = evidcnt;
     tmpdata.evidname = evidencename;
@@ -3784,6 +3796,8 @@ QString GenerateCategorySignature(const QMimeType mimetype)
     else if(geniconstr.contains("text")) // Text
         if(mimesignature.contains("email") || mimesignature.contains("mail") || mimesignature.contains("reference to remote file"))
             mimecategory = "Email";
+        else if(mimesignature.contains("html", Qt::CaseInsensitive))
+            mimecategory = "HTML";
         else
             mimecategory = "Text";
     else if(geniconstr.contains("audio")) // Audio

@@ -590,7 +590,13 @@ void WombatForensics::ShowDigStatus()
 
 void WombatForensics::ShowExternalViewer()
 {
-    qint64 curobjaddr = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-f").at(1).toLongLong();
+    char* imgbuf = new char[0];
+    ssize_t imglen = 0;
+    TSK_IMG_INFO* readimginfo;
+    TSK_FS_INFO* readfsinfo;
+    TSK_FS_FILE* readfileinfo;
+    const TSK_TCHAR** imagepartspath;
+    qint64 curobjaddr = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-f").at(1).split("-a").at(0).split(":").at(0).toLongLong(); 
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
@@ -603,24 +609,26 @@ void WombatForensics::ShowExternalViewer()
     QString vstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
     QString pstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
     QString fstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
+    if(fstring.contains(":") == true)
+        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
     tmpstr = evidfile.readLine();
     evidlist = tmpstr.split(",");
-    tskexternalptr->partcount = evidlist.at(3).split("|").size();
+    int partcount = evidlist.at(3).split("|").size();
     evidfile.close();
     for(int i = 0; i < evidlist.at(3).split("|").size(); i++)
         pathvector.push_back(evidlist.at(3).split("|").at(i).toStdString());
-    tskexternalptr->imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
+    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
     for(uint i = 0; i < pathvector.size(); i++)
-        tskexternalptr->imagepartspath[i] = pathvector[i].c_str();
-    tskexternalptr->readimginfo = tsk_img_open(tskexternalptr->partcount, tskexternalptr->imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(tskexternalptr->readimginfo == NULL)
+        imagepartspath[i] = pathvector[i].c_str();
+    readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
+    if(readimginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
         //LogMessage("Image opening error");
     }
-    free(tskexternalptr->imagepartspath);
+    free(imagepartspath);
     tmpstr = "";
     QStringList partlist;
     partlist.clear();
@@ -629,16 +637,43 @@ void WombatForensics::ShowExternalViewer()
     tmpstr = partfile.readLine();
     partfile.close();
     partlist = tmpstr.split(",");
-    tskexternalptr->readfsinfo = tsk_fs_open_img(tskexternalptr->readimginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
-    tskexternalptr->readfileinfo = tsk_fs_file_open_meta(tskexternalptr->readfsinfo, NULL, curobjaddr);
-    ssize_t filelen = 0;
-    if(tskexternalptr->readfileinfo->meta != NULL)
+    readfsinfo = tsk_fs_open_img(readimginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curobjaddr);
+    QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
+    QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+    QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
+    filefile.open(QIODevice::ReadOnly);
+    tmpstr = filefile.readLine();
+    if(filefile.isOpen())
+        filefile.close();
+    if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
     {
-        char ibuffer[tskexternalptr->readfileinfo->meta->size];
-        //char* ibuffer = new char[tskexternalptr->readfileinfo->meta->size];
-        // WILL NEED TO FIGURE OUT IF ITS AN ATTRIBUTE OR NOT AND HANDLE THE IF BELOW...
-        //if(objtype == 5)
-        filelen = tsk_fs_file_read(tskexternalptr->readfileinfo, 0, ibuffer, tskexternalptr->readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
+        if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).split(":").count() > 1) // IF ADS
+        {
+            if(readfileinfo->meta != NULL)
+            {
+                imgbuf = new char[tmpstr.split(",").at(8).toULongLong()];
+                imglen = tsk_fs_file_read_type(readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+                if(imglen == -1)
+                    qDebug() << tsk_error_get_errstr();
+            }
+        }
+        else // IF NOT ADS
+        {
+            if(readfileinfo->meta != NULL)
+            {
+                imgbuf = new char[readfileinfo->meta->size];
+                imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+            }
+        }
+    }
+    else // OTHER FILE SYSTEM
+    {
+        imgbuf = new char[readfileinfo->meta->size];
+        imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+    }
+    if(readfileinfo->meta != NULL)
+    {
         //else
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
@@ -647,10 +682,9 @@ void WombatForensics::ShowExternalViewer()
         if(tmpfile.open(QIODevice::WriteOnly))
         {
             QDataStream outbuffer(&tmpfile);
-            outbuffer.writeRawData(ibuffer, filelen);
+            outbuffer.writeRawData(imgbuf, imglen);
             tmpfile.close();
         }
-        //delete[] ibuffer;
         QProcess* process = new QProcess(this);
         QStringList arguments;
         arguments << tmpstring;
@@ -658,6 +692,10 @@ void WombatForensics::ShowExternalViewer()
     }
     else
         qDebug() << "no file meta for file size";
+    delete[] imgbuf;
+    tsk_fs_file_close(readfileinfo);
+    tsk_fs_close(readfsinfo);
+    tsk_img_close(readimginfo);
 }
 
 void WombatForensics::SetSelectedFromImageViewer(QString objectid)
@@ -672,7 +710,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //qDebug() << "index8:" << index.sibling(index.row(), 8).data().toString();
     //qDebug() << "index9:" << index.sibling(index.row(), 9).data().toString();
-    if(index.sibling(index.row(), 8).data().toString().contains("image"))
+    if(index.sibling(index.row(), 8).data().toString().contains("Image"))
     {
         imageviewer = new ImageWindow();
         imageviewer->setWindowIcon(QIcon(":/img"));
@@ -681,7 +719,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), 11).data().toString());
         imageviewer->show();
     }
-    else if(index.sibling(index.row(), 8).data().toString().contains("video"))
+    else if(index.sibling(index.row(), 8).data().toString().contains("Video"))
     {
         videowindow = new VideoViewer();
         videowindow->setAttribute(Qt::WA_DeleteOnClose);
@@ -689,7 +727,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Video Viewer");
         videowindow->ShowVideo(index);
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("html"))
+    else if(index.sibling(index.row(), 9).data().toString().contains("HTML"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
@@ -697,7 +735,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " HTML Viewer");
         htmlviewer->ShowHtml(index);
     }
-    else if(index.sibling(index.row(), 8).data().toString().contains("text"))
+    else if(index.sibling(index.row(), 8).data().toString().contains("Text"))
     {
         // toggle the button...
         textviewer = new TextViewer();
@@ -1375,6 +1413,7 @@ void WombatForensics::AddEvidence()
     }
     if(newevidence.count() > 0)
     {
+        evidrepdatalist.clear();
         QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
         sqlwatcher.setFuture(tmpfuture);
     }
@@ -2293,9 +2332,12 @@ void WombatForensics::closeEvent(QCloseEvent* event)
 void WombatForensics::RemoveTmpFiles()
 {
     QDir tmpdir(wombatvariable.tmpfilepath);
+    //QStringList tmplist;
+    //tmplist.clear();
+    //tmplist = tmpdir.entryList(QStringList("*-tmp"
     if(!tmpdir.removeRecursively())
     {
-        DisplayError("2.7", "Tmp File Removal", "All tmp files may not have been removed. Please manually remove them to avoid evidence contamination.");
+        DisplayError("2.7", "Tmp File Removal", "All tmp files may not have been removed. Please manually remove them.");
     }
 }
 
@@ -2865,6 +2907,17 @@ void WombatForensics::SaveState()
     RemoveTmpFiles();
     UpdateCheckState();
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+    // BEGIN TAR METHOD
+    QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
+    QByteArray tmparray = tmptar.toLocal8Bit();
+    QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
+    QByteArray tmparray3 = QString("./" + wombatvariable.casename).toLocal8Bit();
+    TAR* casehandle;
+    tar_open(&casehandle, tmparray.data(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
+    tar_append_tree(casehandle, tmparray2.data(), tmparray3.data());
+    tar_close(casehandle);
+    // END TAR METHOD
+    //StatusUpdate("Saved...");
 }
 
 void WombatForensics::UpdateCheckCount()

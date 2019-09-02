@@ -949,8 +949,8 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             {
                                 for(int i=0; i < curblocklist.count(); i++)
                                 {
-        	    	        	curblkstart = 0;
-    	                		curblkend = 0;
+        	    	            curblkstart = 0;
+    	                	    curblkend = 0;
                                     curblkstart = fsoffset + curblocklist.at(i).toLongLong() * blocksize;
                                     curblkend = curblkstart + blocksize - 1;
                                     if(posBa >= byteoffset && posBa <= byteoffset + filelength)
@@ -970,7 +970,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                     {
                         //qDebug() << "resident attribute 2";
                         curblkstart = 0;
-        		    curblkend = 0;
+        		curblkend = 0;
                         curblkstart = residentoffset + fsoffset;
                         curblkend = curblkstart + mftrecordsize - dataoffset - 1;
                         //qDebug() << "curblkend:" << curblkend;
@@ -1028,7 +1028,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 {
                     int ch = (uchar)_dataShown.at(bPosLine + colIdx);
                     if ( ch < 0x20 )
-                        ch = '.';
+                    ch = '.';
                     r.setRect(pxPosAsciiX2, pxPosY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight);
                     painter.fillRect(r, c);
                     painter.drawText(pxPosAsciiX2, pxPosY, QChar(ch));
@@ -1041,35 +1041,35 @@ void QHexEdit::paintEvent(QPaintEvent *event)
     }
 
     // paint cursor
-	// _cursorPosition counts in 2, _bPosFirst counts in 1
-	int hexPositionInShowData = _cursorPosition - 2 * _bPosFirst;
+    // _cursorPosition counts in 2, _bPosFirst counts in 1
+    int hexPositionInShowData = _cursorPosition - 2 * _bPosFirst;
 
-	// due to scrolling the cursor can go out of the currently displayed data
-	if ((hexPositionInShowData >= 0) && (hexPositionInShowData < _hexDataShown.size()))
+    // due to scrolling the cursor can go out of the currently displayed data
+    if ((hexPositionInShowData >= 0) && (hexPositionInShowData < _hexDataShown.size()))
+    {
+	if (!_readOnly)
 	{
-		if (!_readOnly)
-		{
-			QColor color;
+	    QColor color;
 
-			if (_blink && !_readOnly && hasFocus())
-				color = viewport()->palette().color(QPalette::WindowText);
-			else
-				color = viewport()->palette().color(QPalette::Base);
-			painter.fillRect(_cursorRect, color);
-		}
-		else
-		{
-			painter.fillRect(QRect(_pxCursorX - pxOfsX, _pxCursorY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight), viewport()->palette().dark().color());
-			if (_editAreaIsAscii)
+	    if (_blink && !_readOnly && hasFocus())
+	    	color = viewport()->palette().color(QPalette::WindowText);
+	    else
+		color = viewport()->palette().color(QPalette::Base);
+		painter.fillRect(_cursorRect, color);
+	}
+	else
+	{
+	    painter.fillRect(QRect(_pxCursorX - pxOfsX, _pxCursorY - _pxCharHeight + _pxSelectionSub, _pxCharWidth, _pxCharHeight), viewport()->palette().dark().color());
+	    if (_editAreaIsAscii)
             {
-				// every 2 hex there is 1 ascii
-				int asciiPositionInShowData = hexPositionInShowData / 2;
+		// every 2 hex there is 1 ascii
+		int asciiPositionInShowData = hexPositionInShowData / 2;
 
-				int ch = (uchar)_dataShown.at(asciiPositionInShowData);
-				if (ch < ' ')
-					ch = '.';
+		int ch = (uchar)_dataShown.at(asciiPositionInShowData);
+		if (ch < ' ')
+		    ch = '.';
 
-				painter.drawText(_pxCursorX - pxOfsX, _pxCursorY, QChar(ch));
+		painter.drawText(_pxCursorX - pxOfsX, _pxCursorY, QChar(ch));
             } else {
                 painter.drawText(_pxCursorX - pxOfsX, _pxCursorY, _hexDataShown.mid(hexPositionInShowData, 1));
             }
