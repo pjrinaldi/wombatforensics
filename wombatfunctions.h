@@ -61,5 +61,6 @@ void PopulateCarvedFiles(QString cfile);
 QString GenerateCategorySignature(const QMimeType mimetype);
 void TransferThumbnails(QString thumbid, QString reppath);
 void TransferFiles(QString thumbid, QString reppath);
+void GenerateWombatCaseFile(void);
 
 #endif // wombatfunctions.h

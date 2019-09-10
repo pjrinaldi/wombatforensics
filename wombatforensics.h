@@ -207,6 +207,7 @@ private slots:
     void FinishCarve(void);
     void LaunchChomp(void);
     void UpdateTimeZone(QString newtz);
+    void FinishWombatCaseFile(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -251,6 +252,7 @@ private:
     QFuture<void> videofuture;
     QFutureWatcher<void> videowatcher;
     //QFutureWatcher<void> carvewatcher;
+    QFutureWatcher<void> savewcfwatcher;
 
     QProcess* xmntprocess;
 

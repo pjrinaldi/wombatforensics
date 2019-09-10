@@ -110,6 +110,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&hashingwatcher, SIGNAL(finished()), this, SLOT(HashingFinish()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
     //connect(&carvewatcher, SIGNAL(finished()), this, SLOT(FinishCarve()), Qt::QueuedConnection);
+    connect(&savewcfwatcher, SIGNAL(finished()), this, SLOT(FinishWombatCaseFile()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     //connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
     connect(ui->actionFile, SIGNAL(triggered(bool)), this, SLOT(CarveFile()), Qt::DirectConnection);
@@ -2378,10 +2379,10 @@ void WombatForensics::on_actionOpen_Case_triggered()
 
 void WombatForensics::on_actionSaveState_triggered()
 {
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     SaveState();
-    qInfo() << "Current State Saved.";
-    QApplication::restoreOverrideCursor();
+    //qInfo() << "Current State Saved.";
+    //QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::on_actionCheck_triggered()
@@ -2907,6 +2908,11 @@ void WombatForensics::SaveState()
     RemoveTmpFiles();
     UpdateCheckState();
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+    QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
+    savewcfwatcher.setFuture(tmpfuture);
+    /*
+    // MOVE ALL THE BELOW TO A DIFFERENT THREAD...
+    //ReplaceSelectedTmpFile();
     // BEGIN TAR METHOD
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
     QByteArray tmparray = tmptar.toLocal8Bit();
@@ -2918,6 +2924,7 @@ void WombatForensics::SaveState()
     tar_close(casehandle);
     // END TAR METHOD
     //StatusUpdate("Saved...");
+    */
 }
 
 void WombatForensics::UpdateCheckCount()
@@ -2993,12 +3000,12 @@ void WombatForensics::UpdateSelectedState(QString id)
 void WombatForensics::AutoSaveState()
 {
     // change display text
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     StatusUpdate("Saving State Started");
-    SaveState();
-    qInfo() << "Current State Auto Saved.";
-    StatusUpdate("Evidence ready");
-    QApplication::restoreOverrideCursor();
+    SaveState(); // send to another thread and then send the finish to spit out the saved log info and update the status..
+    //qInfo() << "Current State Auto Saved.";
+    //StatusUpdate("Evidence ready");
+    //QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::SetHexOffset()
@@ -3108,4 +3115,12 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
         StatusUpdate("Ready");
         isignals->ReloadPreview();
     }
+}
+
+void WombatForensics::FinishWombatCaseFile(void)
+{
+    qInfo() << "Current State Saved.";
+    StatusUpdate("Evidence ready");
+    //QApplication::restoreOverrideCursor();
+    // place status here....
 }

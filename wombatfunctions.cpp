@@ -4012,3 +4012,20 @@ void TransferFiles(QString thumbid, QString reppath)
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
 }
+
+void GenerateWombatCaseFile(void)
+{
+    // place replace code and tar code in here...
+    //ReplaceSelectedTmpFile();
+    // BEGIN TAR METHOD
+    QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
+    QByteArray tmparray = tmptar.toLocal8Bit();
+    QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
+    QByteArray tmparray3 = QString("./" + wombatvariable.casename).toLocal8Bit();
+    TAR* casehandle;
+    tar_open(&casehandle, tmparray.data(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
+    tar_append_tree(casehandle, tmparray2.data(), tmparray3.data());
+    tar_close(casehandle);
+    // END TAR METHOD
+    //StatusUpdate("Saved...");
+}
