@@ -453,6 +453,7 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/virtualfile.png \
 		Resources/deletedfile.png \
 		Resources/virtualfolder.png \
+		Resources/filmstrip.png \
 		Resources/foldersexplorer.png \
 		Resources/dig.png \
 		Resources/bookmark-new.png \
