@@ -4032,6 +4032,22 @@ void GenerateWombatCaseFile(void)
 
 QByteArray ReturnSelectedIdContent(QString selectedid)
 {
+    TskImgInfo* imginfo = new TskImgInfo();
+    const TSK_TCHAR** imagepartspath;
+    std::vector<std::string> pathvector;
+    pathvector.clear();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QString tmpstr = "";
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split(".e").first();
+    QString estring = selectedid.split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = selectedid.split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = selectedid.split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = selectedid.split("-", QString::SkipEmptyParts).at(3);
+    if(fstring.contains(":"))
+        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    qint64 curaddr = selectedid.split("-f").at(1).split(":").at(0).toLongLong();
+
     /*
      *
     char* imgbuf = new char[0];
@@ -4039,19 +4055,6 @@ QByteArray ReturnSelectedIdContent(QString selectedid)
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
-    QString tmpstr = "";
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    std::vector<std::string> pathvector;
-    const TSK_TCHAR** imagepartspath;
-    pathvector.clear();
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-    QString evidencename = evidfiles.at(0).split(".e").first();
-    QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
-    if(fstring.contains(":") == true)
-        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
     qint64 curaddress = objectid.split("-f").at(1).split("-a").at(0).split(":").at(0).toLongLong(); 
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     evidfile.open(QIODevice::ReadOnly);
