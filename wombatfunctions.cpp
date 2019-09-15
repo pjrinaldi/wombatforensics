@@ -4107,50 +4107,9 @@ QByteArray ReturnSelectedIdContent(QString selectedid)
             }
         }
     }
-    /*
-     *
-    char* imgbuf = new char[0];
-    ssize_t imglen = 0;
-    QImage fileimage;
-    //char imgbuf[readfileinfo->meta->size];
-    //ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-    if(readfileinfo->meta != NULL)
-    {
-        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
-        {
-            if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
-            {
-                imgbuf = new char[tmpstr.split(",").at(8).toULongLong()];
-                imglen = tsk_fs_file_read_type(readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
-                if(imglen == -1)
-                    qDebug() << tsk_error_get_errstr();
-            }
-            else // IF NOT ADS
-            {
-                imgbuf = new char[readfileinfo->meta->size];
-                imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
-            }
-        }
-        else // OTHER FILE SYSTEM
-        {
-            imgbuf = new char[readfileinfo->meta->size];
-            imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
-        }
-        bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
-        if(imageloaded)
-        {
-            ui->label->setPixmap(QPixmap::fromImage(fileimage));
-        }
-        else
-        {
-            ui->label->setPixmap(QPixmap::fromImage(QImage(":/bar/missingthumb")));
-        }
-    }
-    delete[] imgbuf;
-    tsk_fs_file_close(readfileinfo);
-    tsk_fs_close(readfsinfo);
-    tsk_img_close(readimginfo);
-     */ 
+    delete imgbuf;
+    delete fsfile;
+    delete fsinfo;
     delete imginfo;
     QByteArray contentarray;
     contentarray.clear();
