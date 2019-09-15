@@ -2908,29 +2908,9 @@ void WombatForensics::SaveState()
     RemoveTmpFiles();
     UpdateCheckState();
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
-    //char* fhexbuf = new char[0];
-    //char* imgbuf = new char[0];
-    //char* fhexbuf = ReturnSelectedIdContent(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     RewriteSelectedIdContent(selectedindex.sibling(selectedindex.row(), 11).data().toString());
-    /*
-    QDir dir;
-    dir.mkpath(wombatvariable.tmpfilepath);
-    hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "-fhex";
-    QFile tmpfile(hexstring);
-    if(!tmpfile.isOpen())
-        tmpfile.open(QIODevice::WriteOnly);
-    if(tmpfile.isOpen())
-    {
-        QDataStream outbuffer(&tmpfile);
-        outbuffer.writeRawData(fhexbuf, strlen(fhexbuf));
-    }
-    tmpfile.close();
-    delete[] fhexbuf;
-    */
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);
-    /*
-    */
 }
 
 void WombatForensics::UpdateCheckCount()

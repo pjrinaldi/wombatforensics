@@ -4030,15 +4030,9 @@ void GenerateWombatCaseFile(void)
     //StatusUpdate("Saved...");
 }
 
-//QByteArray ReturnSelectedIdContent(QString selectedid)
-//char* ReturnSelectedIdContent(QString selectedid)
-//void ReturnSelectedIdContent(QString selectedid, char* imgbuf)
 void RewriteSelectedIdContent(QString selectedid)
 {
     TskImgInfo* imginfo = new TskImgInfo();
-    //const TSK_TCHAR** imagepartspath;
-    //std::vector<std::string> pathvector;
-    //pathvector.clear();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QString tmpstr = "";
     QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
@@ -4055,21 +4049,13 @@ void RewriteSelectedIdContent(QString selectedid)
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
-    //int partcount = tmpstr.split(",").at(3).split("|").size();
     evidfile.close();
-    //for(int i=0; i < partcount; i++)
-    //    pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
-    //imagepartsparth = (const char**)malloc(pathvector.size()*sizeof(char*));
-    //for(uint i=0; i < pathvector.size(); i++)
-    //    imagepartspath[i] = pathvector[i].c_str();
-    //imginfo->open(partcount, imagespartspath, TSK_IMG_TYPE_DETECT, 0);
     imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
     if(imginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
         //LogMessage("Image opening error");
     }
-    //free(imgpartspath);
     tmpstr = "";
     QStringList partlist;
     partlist.clear();
@@ -4132,5 +4118,4 @@ void RewriteSelectedIdContent(QString selectedid)
     }
     tmpfile.close();
     delete[] imgbuf;
-    //return imgbuf;
 }

@@ -63,6 +63,5 @@ void TransferThumbnails(QString thumbid, QString reppath);
 void TransferFiles(QString thumbid, QString reppath);
 void GenerateWombatCaseFile(void);
 void RewriteSelectedIdContent(QString selectedid);
-//void ReturnSelectedIdContent(QString selectedid, char* imgbuf);
 
 #endif // wombatfunctions.h
