@@ -2080,9 +2080,50 @@ void InitializeEvidenceStructure(QString evidname)
     mutex.unlock();
     // Write Evidence Properties Here...
     //WriteEvidenceProperties(imginfo, evidencepath, evidname);
+    TskVsInfo* vsinfo = new TskVsInfo();
+    uint vsopen = vsinfo->open(imginfo, 0, TSK_VS_TYPE_DETECT);
+    QString volname = "Dummy Volume (NO PART)";
+    int voltype = 240;
+    int volsectorsize = (int)imginfo->getSectorSize();
+    qint64 voloffset = 0;
+    if(vsopen == 0)
+    {
+        voltype = (int)vsinfo->getVsType();
+        volname = QString::fromUtf8(vsinfo->typeToDesc(vsinfo->getVsType()));
+        volsectorsize = (int)vsinfo->getBlockSize();
+        voloffset = (qint64)vsinfo->getOffset();
+    }
+    QDir voldir = QDir(evidencepath);
+    QStringList volfiles = voldir.entryList(QStringList(QString("v*")), QDir::NoSymLinks | QDir::Dirs);
+    volcnt = volfiles.count();
+    QString volumepath = evidencepath + "v" + QString::number(volcnt) + "/";
+    QDir dir;
+    dir.mkpath(volumepath);
+    QFile volfile(volumepath + "stat");
+    volfile.open(QIODevice::Append | QIODevice::Text);
+    out.setDevice(&volfile);
+    out << voltype << "," << (qint64)imginfo->getSize() << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) << ",0";
+    out.flush();
+    volfile.close();
+    treeout.clear();
+    treeout << volname << "0" << QString::number(imginfo->getSize()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)); // NAME IN FIRST COLUMN
+    nodedata.clear();
+    for(int i=0; i < treeout.count(); i++)
+        nodedata << treeout.at(i);
+    QString reportstring = "";
+    mutex.lock();
+    reportstring = "<div id='e" + QString::number(evidcnt) + "'><table width='98%'>";
+    reportstring += "<tr><th colspan='2'>Evidence Item (E" + QString::number(evidcnt) + "):" + evidname + "</th></tr>";
+    reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString::number(imginfo->getSize()) + " bytes</td></tr>";
+    reportstring += "<tr class='even vtop'><td>Sector Size:</td><td>" + QString::number(imginfo->getSectorSize()) + " bytes</td></tr>";
+    reportstring += "<tr class='odd vtop'><td>Volume (V" + QString::number(volcnt) + "):</td><td>" + volname + "</td></tr>";
+    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+    mutex.unlock();
+    //if(readvsinfo != NULL)
+    //    WriteVolumeProperties(readvsinfo, volumepath);
 
 
-
+    // OLD C CALLBACK METHOD
     /*
     // REPLACE ALL THE GLOBAL VARIABLES WITH LOCAL ONES...
     AddEvidenceVariable addevidvar;
