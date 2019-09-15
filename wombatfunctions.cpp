@@ -2051,6 +2051,39 @@ void PopulateTreeModel(QString evidstring)
 
 void InitializeEvidenceStructure(QString evidname)
 {
+    // c++ posix redo...
+    int evidcnt = 0;
+    int volcnt = 0;
+    int partint = 0;
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString(evidname.split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
+    evidcnt = evidfiles.at(0).split(".e").last().toInt();
+    QString evidencename = evidname.split("/").last();
+    TskImgInfo* imginfo = new TskImgInfo();
+    imginfo->open(evidname.toStdString().c_str(), TSK_IMG_TYPE_DETECT, 0);
+    QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
+    QFile evidfile(evidencepath + "stat");
+    evidfile.open(QIODevice::Append | QIODevice::Text);
+    QTextStream out(&evidfile);
+    out << (int)imginfo->getType() << "," << (qint64)imginfo->getSize() << "," << (int)imginfo->getSectorSize() << ",";
+    out << evidname << "," << 1 << ",e" + QString::number(evidcnt) << ",0";
+    out.flush();
+    evidfile.close();
+    QStringList treeout;
+    treeout << evidencename << "0" << QString::number(imginfo->getSize()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt)); // NAME IN FIRST COLUMN
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    for(int i=0; i < treeout.count(); i++)
+        nodedata << treeout.at(i);
+    mutex.lock();
+    treenodemodel->AddNode(nodedata,  "-1", -1, -1);
+    mutex.unlock();
+    // Write Evidence Properties Here...
+    //WriteEvidenceProperties(imginfo, evidencepath, evidname);
+
+
+
+    /*
     // REPLACE ALL THE GLOBAL VARIABLES WITH LOCAL ONES...
     AddEvidenceVariable addevidvar;
     AddEvidenceVariable* aevar = &addevidvar;
@@ -2345,6 +2378,7 @@ void InitializeEvidenceStructure(QString evidname)
     readvsinfo = NULL;
     tsk_img_close(readimginfo);
     readimginfo = NULL;
+    */
 }
 
 QString GetAdsBlockList(TSK_FS_FILE* tmpfile, qint64 attrid)
