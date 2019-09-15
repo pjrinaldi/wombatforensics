@@ -4030,7 +4030,8 @@ void GenerateWombatCaseFile(void)
     //StatusUpdate("Saved...");
 }
 
-QByteArray ReturnSelectedIdContent(QString selectedid)
+//QByteArray ReturnSelectedIdContent(QString selectedid)
+char* ReturnSelectedIdContent(QString selectedid)
 {
     TskImgInfo* imginfo = new TskImgInfo();
     //const TSK_TCHAR** imagepartspath;
@@ -4106,13 +4107,19 @@ QByteArray ReturnSelectedIdContent(QString selectedid)
                 imglen = fsfile->read(0, imgbuf, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
             }
         }
+        else
+        {
+            imgbuf = new char[fsfile->getMeta()->getSize()];
+            imglen = fsfile->read(0, imgbuf, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+        }
     }
-    delete imgbuf;
+    //delete[] imgbuf;
     delete fsfile;
     delete fsinfo;
     delete imginfo;
-    QByteArray contentarray;
-    contentarray.clear();
-    contentarray.fromRawData(imgbuf, imglen);
-    return contentarray;
+    return imgbuf;
+    //QByteArray contentarray;
+    //contentarray.clear();
+    //contentarray = QByteArray::fromRawData(imgbuf, imglen);
+    //return contentarray;
 }
