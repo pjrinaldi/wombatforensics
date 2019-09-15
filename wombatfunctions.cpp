@@ -4113,13 +4113,9 @@ char* ReturnSelectedIdContent(QString selectedid)
             imglen = fsfile->read(0, imgbuf, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
         }
     }
-    //delete[] imgbuf;
     delete fsfile;
     delete fsinfo;
     delete imginfo;
+
     return imgbuf;
-    //QByteArray contentarray;
-    //contentarray.clear();
-    //contentarray = QByteArray::fromRawData(imgbuf, imglen);
-    //return contentarray;
 }

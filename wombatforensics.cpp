@@ -2909,9 +2909,6 @@ void WombatForensics::SaveState()
     UpdateCheckState();
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     char* fhexbuf = ReturnSelectedIdContent(selectedindex.sibling(selectedindex.row(), 11).data().toString());
-    //ssize_t fhexlen = strlen(fhexbuf);
-    //QByteArray selectedcontent = QByteArray(ReturnSelectedIdContent(selectedindex.sibling(selectedindex.row(), 11).data().toString()));
-    //qDebug() << "selectedcontent:" << QString::fromStdString(selectedcontent.toStdString());
     QDir dir;
     dir.mkpath(wombatvariable.tmpfilepath);
     hexstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "-fhex";
@@ -2922,31 +2919,11 @@ void WombatForensics::SaveState()
     {
         QDataStream outbuffer(&tmpfile);
         outbuffer.writeRawData(fhexbuf, strlen(fhexbuf));
-        //tmpfile.write(selectedcontent);
     }
     tmpfile.close();
     delete[] fhexbuf;
-    //QDataStream outbuffer(&tmpfile);
-    //outbuffer.writeRawData(fhexbuf, fhexlen);
-    //tmpfile.close();
-    //delete[] fhexbuf;
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);
-    /*
-    // MOVE ALL THE BELOW TO A DIFFERENT THREAD...
-    //ReplaceSelectedTmpFile();
-    // BEGIN TAR METHOD
-    QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
-    QByteArray tmparray = tmptar.toLocal8Bit();
-    QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
-    QByteArray tmparray3 = QString("./" + wombatvariable.casename).toLocal8Bit();
-    TAR* casehandle;
-    tar_open(&casehandle, tmparray.data(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
-    tar_append_tree(casehandle, tmparray2.data(), tmparray3.data());
-    tar_close(casehandle);
-    // END TAR METHOD
-    //StatusUpdate("Saved...");
-    */
 }
 
 void WombatForensics::UpdateCheckCount()
