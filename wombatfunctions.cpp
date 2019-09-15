@@ -4031,7 +4031,9 @@ void GenerateWombatCaseFile(void)
 }
 
 //QByteArray ReturnSelectedIdContent(QString selectedid)
-char* ReturnSelectedIdContent(QString selectedid)
+//char* ReturnSelectedIdContent(QString selectedid)
+//void ReturnSelectedIdContent(QString selectedid, char* imgbuf)
+void RewriteSelectedIdContent(QString selectedid)
 {
     TskImgInfo* imginfo = new TskImgInfo();
     //const TSK_TCHAR** imagepartspath;
@@ -4117,5 +4119,18 @@ char* ReturnSelectedIdContent(QString selectedid)
     delete fsinfo;
     delete imginfo;
 
-    return imgbuf;
+    QDir dir;
+    dir.mkpath(wombatvariable.tmpfilepath);
+    hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
+    QFile tmpfile(hexstring);
+    if(!tmpfile.isOpen())
+        tmpfile.open(QIODevice::WriteOnly);
+    if(tmpfile.isOpen())
+    {
+        QDataStream outbuffer(&tmpfile);
+        outbuffer.writeRawData(imgbuf, imglen);
+    }
+    tmpfile.close();
+    delete[] imgbuf;
+    //return imgbuf;
 }

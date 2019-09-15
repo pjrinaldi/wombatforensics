@@ -62,6 +62,7 @@ QString GenerateCategorySignature(const QMimeType mimetype);
 void TransferThumbnails(QString thumbid, QString reppath);
 void TransferFiles(QString thumbid, QString reppath);
 void GenerateWombatCaseFile(void);
-char* ReturnSelectedIdContent(QString selectedid);
+void RewriteSelectedIdContent(QString selectedid);
+//void ReturnSelectedIdContent(QString selectedid, char* imgbuf);
 
 #endif // wombatfunctions.h
