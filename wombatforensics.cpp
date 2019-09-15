@@ -1486,6 +1486,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 4)
     {
+        /*
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.at(0).split(".e").first();
@@ -1618,6 +1619,10 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         tsk_fs_file_close(filehexfileinfo);
         tsk_fs_close(filehexfsinfo);
         tsk_img_close(fileheximginfo);
+        */
+        if(curindex.sibling(curindex.row(), 2).data().toLongLong() > 0)
+            RewriteSelectedIdContent(curindex.sibling(curindex.row(), 11).data().toString());
+        fileviewer->BypassColor(true);
     }
 }
 
