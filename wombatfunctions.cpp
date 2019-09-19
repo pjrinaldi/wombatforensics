@@ -2060,9 +2060,17 @@ void InitializeEvidenceStructure(QString evidname)
     evidcnt = evidfiles.at(0).split(".e").last().toInt();
     QString evidencename = evidname.split("/").last();
     const TSK_TCHAR** images;
-    images[0] = evidname.toStdString().c_str();
+    std::vector<std::string> fullpathvector;
+    fullpathvector.clear();
+    fullpathvector.push_back(evidname.toStdString());
+    images = (const char**)malloc(fullpathvector.size()*sizeof(char*));
+    for(uint i=0; i < fullpathvector.size(); i++)
+    {
+        images[i] = fullpathvector[i].c_str();
+    }
     TSK_IMG_INFO* imginfo = NULL;
     imginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
+    free(images);
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
     QTextStream out;
     QFile evidfile(evidencepath + "stat");
@@ -2071,8 +2079,8 @@ void InitializeEvidenceStructure(QString evidname)
     if(evidfile.isOpen())
     {
         out.setDevice(&evidfile);
-        out << (int)imginfo->itype << "," << (qint64)imginfo->size << "," << (int)imginfo->sector_size << ",";
-        out << evidname << "," << 1 << ",e" + QString::number(evidcnt) << ",0";
+        out << QString::number(imginfo->itype) << "," << QString::number(imginfo->size) << "," << QString::number(imginfo->sector_size) << ",";
+        out << evidname << "," << QString::number(1) << ",e" + QString::number(evidcnt) << ",0";
         out.flush();
         evidfile.close();
     }
@@ -4367,4 +4375,46 @@ void RewriteSelectedIdContent(QString selectedid)
     }
     tmpfile.close();
     delete[] imgbuf;
+}
+
+uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path)
+{
+    TSK_FS_DIR* fsdir = NULL;
+    fsdir = tsk_fs_dir_open_meta(fsinfo, dirinum);
+    if(fsdir != NULL)
+    {
+        std::string path2 = "";
+        for(int i=0; i < tsk_fs_dir_getsize(fsdir); i++)
+        {
+            TSK_FS_FILE* fsfile = NULL;
+            fsfile = tsk_fs_dir_get(fsdir, i);
+            if(fsfile != NULL)
+            {
+                if(fsfile->meta)
+                {
+                    if(fsfile->meta->type == TSK_FS_META_TYPE_REG) // REGULAR FILE
+                    {
+                        // DO MY STUFF HERE....
+                    }
+                    else if(fsfile->meta->type == TSK_FS_META_TYPE_DIR) // DIRECTORY
+                    {
+                        // DO MY STUFF AND RECURSE HERE...
+                        if(TSK_FS_ISDOT(fsfile->name->name) == 0)
+                        {
+                            if(tsk_stack_find(stack, fsfile->meta->addr) == 0) // process if it's not on stack
+                            {
+                                tsk_stack_push(stack, fsfile->meta->addr);
+                                path2 = std::string(path) + "/" + std::string(fsfile->name->name);
+                                qDebug() << "cur path:" << QString::fromStdString(path2);
+                                //ProcessDir(fsinfo, stack, fsfile->meta->addr, path2.c_str());
+                                tsk_stack_pop(stack);
+                            }
+                        }
+                    }
+                }
+            }
+            tsk_fs_file_close(fsfile);
+        }
+    }
+    tsk_fs_dir_close(fsdir);
 }
