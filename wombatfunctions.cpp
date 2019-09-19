@@ -2187,7 +2187,7 @@ void InitializeEvidenceStructure(QString evidname)
             WriteFileSystemProperties(fsinfo, partitionpath);
             TSK_STACK* stack = NULL;
             stack = tsk_stack_create();
-            //ProcessDir(fsinfo, stack, fsinfo->root_inum, "");
+            ProcessDir(fsinfo, stack, fsinfo->root_inum, "");
             tsk_fs_close(fsinfo);
             tsk_stack_free(stack);
         }
@@ -2247,7 +2247,7 @@ void InitializeEvidenceStructure(QString evidname)
                         mutex.unlock();
                         reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
                         WriteFileSystemProperties(fsinfo, partitionpath);
-                        //ProcessDir(fsinfo, stack, fsinfo->root_inum, "");
+                        ProcessDir(fsinfo, stack, fsinfo->root_inum, "");
                     }
                     else
                     {
@@ -2295,15 +2295,8 @@ void InitializeEvidenceStructure(QString evidname)
     tmpdata.evidcontent = reportstring;
     evidrepdatalist.append(tmpdata);
     mutex.unlock();
-    //tsk_fs_file_close(fileinfo);
-    //fileinfo = NULL;
-    //tsk_fs_close(fsinfo);
-    //fsinfo = NULL;
-    //partinfo = NULL;
     tsk_vs_close(vsinfo);
-    //vsinfo = NULL;
     tsk_img_close(imginfo);
-    //imginfo = NULL;
 
     // OLD C CALLBACK METHOD
     /*
