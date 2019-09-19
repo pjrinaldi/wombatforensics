@@ -2051,7 +2051,7 @@ void PopulateTreeModel(QString evidstring)
 
 void InitializeEvidenceStructure(QString evidname)
 {
-    // c++ posix redo...
+    // c++/c posix redo...
     int evidcnt = 0;
     int volcnt = 0;
     int partint = 0;
@@ -2059,8 +2059,10 @@ void InitializeEvidenceStructure(QString evidname)
     QStringList evidfiles = eviddir.entryList(QStringList(QString(evidname.split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
     evidcnt = evidfiles.at(0).split(".e").last().toInt();
     QString evidencename = evidname.split("/").last();
-    TskImgInfo* imginfo = new TskImgInfo();
-    imginfo->open(evidname.toStdString().c_str(), TSK_IMG_TYPE_DETECT, 0);
+    const TSK_TCHAR** images;
+    images[0] = evidname.toStdString().c_str();
+    TSK_IMG_INFO* imginfo = NULL;
+    imginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
     QTextStream out;
     QFile evidfile(evidencepath + "stat");
@@ -2069,13 +2071,13 @@ void InitializeEvidenceStructure(QString evidname)
     if(evidfile.isOpen())
     {
         out.setDevice(&evidfile);
-        out << (int)imginfo->getType() << "," << (qint64)imginfo->getSize() << "," << (int)imginfo->getSectorSize() << ",";
+        out << (int)imginfo->itype << "," << (qint64)imginfo->size << "," << (int)imginfo->sector_size << ",";
         out << evidname << "," << 1 << ",e" + QString::number(evidcnt) << ",0";
         out.flush();
         evidfile.close();
     }
     QStringList treeout;
-    treeout << evidencename << "0" << QString::number(imginfo->getSize()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt)); // NAME IN FIRST COLUMN
+    treeout << evidencename << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt)); // NAME IN FIRST COLUMN
     QList<QVariant> nodedata;
     nodedata.clear();
     for(int i=0; i < treeout.count(); i++)
@@ -2084,19 +2086,20 @@ void InitializeEvidenceStructure(QString evidname)
     treenodemodel->AddNode(nodedata,  "-1", -1, -1);
     mutex.unlock();
     // Write Evidence Properties Here...
-    //WriteEvidenceProperties(imginfo, evidencepath, evidname);
-    TskVsInfo* vsinfo = new TskVsInfo();
-    uint vsopen = vsinfo->open(imginfo, 0, TSK_VS_TYPE_DETECT);
+    if(imginfo != NULL)
+        WriteEvidenceProperties(imginfo, evidencepath, evidname);
+    TSK_VS_INFO* vsinfo = NULL;
+    vsinfo = tsk_vs_open(imginfo, 0, TSK_VS_TYPE_DETECT);
     QString volname = "Dummy Volume (NO PART)";
     int voltype = 240;
-    int volsectorsize = (int)imginfo->getSectorSize();
+    int volsectorsize = (int)imginfo->sector_size;
     qint64 voloffset = 0;
-    if(vsopen == 0)
+    if(vsinfo != NULL)
     {
-        voltype = (int)vsinfo->getVsType();
-        volname = QString::fromUtf8(vsinfo->typeToDesc(vsinfo->getVsType()));
-        volsectorsize = (int)vsinfo->getBlockSize();
-        voloffset = (qint64)vsinfo->getOffset();
+        voltype = (int)vsinfo->vstype;
+        volname = QString::fromUtf8(tsk_vs_type_todesc(vsinfo->vstype));
+        volsectorsize = (int)vsinfo->block_size;
+        voloffset = (qint64)vsinfo->offset;
     }
     QDir voldir = QDir(evidencepath);
     QStringList volfiles = voldir.entryList(QStringList(QString("v*")), QDir::NoSymLinks | QDir::Dirs);
@@ -2110,12 +2113,12 @@ void InitializeEvidenceStructure(QString evidname)
     if(volfile.isOpen())
     {
         out.setDevice(&volfile);
-        out << voltype << "," << (qint64)imginfo->getSize() << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) << ",0";
+        out << voltype << "," << (qint64)imginfo->size << "," << volname << "," << volsectorsize << "," << voloffset << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) << ",0";
         out.flush();
         volfile.close();
     }
     treeout.clear();
-    treeout << volname << "0" << QString::number(imginfo->getSize()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)); // NAME IN FIRST COLUMN
+    treeout << volname << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)); // NAME IN FIRST COLUMN
     nodedata.clear();
     for(int i=0; i < treeout.count(); i++)
         nodedata << treeout.at(i);
@@ -2123,29 +2126,29 @@ void InitializeEvidenceStructure(QString evidname)
     mutex.lock();
     reportstring = "<div id='e" + QString::number(evidcnt) + "'><table width='98%'>";
     reportstring += "<tr><th colspan='2'>Evidence Item (E" + QString::number(evidcnt) + "):" + evidname + "</th></tr>";
-    reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString::number(imginfo->getSize()) + " bytes</td></tr>";
-    reportstring += "<tr class='even vtop'><td>Sector Size:</td><td>" + QString::number(imginfo->getSectorSize()) + " bytes</td></tr>";
+    reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString::number(imginfo->size) + " bytes</td></tr>";
+    reportstring += "<tr class='even vtop'><td>Sector Size:</td><td>" + QString::number(imginfo->sector_size) + " bytes</td></tr>";
     reportstring += "<tr class='odd vtop'><td>Volume (V" + QString::number(volcnt) + "):</td><td>" + volname + "</td></tr>";
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
     mutex.unlock();
-    //if(readvsinfo != NULL)
-    //    WriteVolumeProperties(readvsinfo, volumepath);
-    if(vsopen == 1) // no volume, so a signle file system is all there is in the image
+    if(vsinfo != NULL)
+        WriteVolumeProperties(vsinfo, volumepath);
+    if(vsinfo == NULL) // no volume, so a single file system is all there is in the image
     {
-        TskFsInfo* fsinfo = new TskFsInfo();
-        uint fsopen = fsinfo->open(imginfo, 0, TSK_FS_TYPE_DETECT);
-        if(fsopen == 1) // unrecognized filesystem
+        TSK_FS_INFO* fsinfo = NULL;
+        fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
+        if(fsinfo == NULL) // unrecognized filesystem
         {
             QString partitionpath = volumepath + "p0/";
             dir.mkpath(partitionpath);
             QFile pfile(partitionpath + "stat");
             pfile.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&pfile);
-            out << "240," << QString::number(imginfo->getSize()) << ",NON-RECOGNIZED FS,0,0," << (qint64)imginfo->getSize()/volsectorsize << "," << volsectorsize << ",0,0,0,e" << QString::number(evidcnt) + "-v0-p0,0";
+            out << "240," << QString::number(imginfo->size) << ",NON-RECOGNIZED FS,0,0," << (qint64)imginfo->size/volsectorsize << "," << volsectorsize << ",0,0,0,e" << QString::number(evidcnt) + "-v0-p0,0";
             out.flush();
             pfile.close();
             treeout.clear();
-            treeout << "NON-RECOGNIZED FS" << "0" << QString::number(imginfo->getSize()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0");
+            treeout << "NON-RECOGNIZED FS" << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0");
             nodedata.clear();
             for(int i=0; i < treeout.count(); i++)
                 nodedata << treeout.at(i);
@@ -2161,201 +2164,120 @@ void InitializeEvidenceStructure(QString evidname)
             QFile pfile(partitionpath + "stat");
             pfile.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&pfile);
-            //out << fsinfo->getFsType() << "," << (qint64)fsinfo->getBlockSize() * (qint64)fsinfo->getBlockCount() << "," << GetFileSystemLabel(readfsinfo) << "," << (qint64)readfsinfo->root_inum << "," << (qint64)readfsinfo->offset << "," << (qint64)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
-            out.flush();
-            pfile.close();
-            //treeout.clear();
-            //treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
-            //nodedata.clear();
-            //for(int i=0; i < treeout.count(); i++)
-            //    nodedata << treeout.at(i);
-            //mutex.lock();
-            //treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
-            //mutex.unlock();
-            //reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>" + QString(GetFileSystemLabel(readfsinfo)) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</td></tr>";
-            //WriteFileSystemProperties(readfsinfo, partitionpath);
-            //uint8_t walkreturn;
-            //int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
-            //walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, (void*)aevar);
-            //walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
-            //if(walkreturn == 1)
-            //{
-            //    qWarning() << "Issues with traversing the file structure were encountered";
-            //    tsk_error_print(stderr);
-            //    //LogMessage("Issues with traversing the file structure were encountered");
-            //    errorcount++;
-            //}
-        }
-    }
-
-/*
- *
- *  if(readvsinfo == NULL) // No volume, so a single file system is all there is in the image.
-    {
-        readfsinfo = tsk_fs_open_img(readimginfo, 0, TSK_FS_TYPE_DETECT);
-        if(readfsinfo == NULL) // unrecognized fs
-        {
-            qDebug() << "unrecognized single file system, need to catch and describe.";
-            QString partitionpath = volumepath + "p0/";
-            addevidvar.partitionpath = partitionpath;
-            addevidvar.partint = partint;
-            dir.mkpath(partitionpath);
-            QFile pfile(partitionpath + "stat");
-            pfile.open(QIODevice::Append | QIODevice::Text);
-            out.setDevice(&pfile);
-            out << "240," << QString::number(readimginfo->size) << ",NON-RECOGNIZED FS,0,0," << (qint64)readimginfo->size/volsectorsize << "," << volsectorsize << ",0,0,0,e" << QString::number(evidcnt) + "-v0-p0,0";
+            out << fsinfo->ftype << "," << (qint64)fsinfo->block_size * (qint64)fsinfo->block_count << "," << GetFileSystemLabel(fsinfo) << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
             out.flush();
             pfile.close();
             treeout.clear();
-            treeout << "NON-RECOGNIZED FS" << "0" << QString::number(readimginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0");
-            nodedata.clear();
-            for(int i=0; i < treeout.count(); i++)
-                nodedata << treeout.at(i);
-            mutex.lock();
-            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), -1, 0);
-            mutex.unlock();
-            reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>NON RECOGNIZED FS</td></tr>";
-        }
-        else
-        {
-            QString partitionpath = volumepath + "p0/";
-            addevidvar.partitionpath = partitionpath;
-            addevidvar.partint = partint;
-            dir.mkpath(partitionpath);
-            QFile pfile(partitionpath + "stat");
-            pfile.open(QIODevice::Append | QIODevice::Text);
-            out.setDevice(&pfile);
-            out << readfsinfo->ftype << "," << (qint64)readfsinfo->block_size * (qint64)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (qint64)readfsinfo->root_inum << "," << (qint64)readfsinfo->offset << "," << (qint64)readfsinfo->block_count << "," << (int)readfsinfo->block_size << ",0,0,0,e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
-            out.flush();
-            pfile.close();
-            treeout.clear();
-            treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+            treeout << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
             nodedata.clear();
             for(int i=0; i < treeout.count(); i++)
                 nodedata << treeout.at(i);
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
             mutex.unlock();
-            reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>" + QString(GetFileSystemLabel(readfsinfo)) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</td></tr>";
-            WriteFileSystemProperties(readfsinfo, partitionpath);
-            uint8_t walkreturn;
-            int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
-            walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, (void*)aevar);
-            //walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
-            if(walkreturn == 1)
-            {
-                qWarning() << "Issues with traversing the file structure were encountered";
-                tsk_error_print(stderr);
-                //LogMessage("Issues with traversing the file structure were encountered");
-                errorcount++;
-            }
+            reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>" + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
+            WriteFileSystemProperties(fsinfo, partitionpath);
+            TSK_STACK* stack = NULL;
+            stack = tsk_stack_create();
+            //ProcessDir(fsinfo, stack, fsinfo->root_inum, "");
+            tsk_fs_close(fsinfo);
+            tsk_stack_free(stack);
         }
     }
     else
     {
         QFile pfile;
-        if(readvsinfo->part_count > 0)
+        const TSK_VS_PART_INFO* partinfo = NULL;
+        if(vsinfo->part_count > 0)
         {
-            //qDebug() << "readvsinfo->part_count:" << readvsinfo->part_count;
-            for(uint32_t i=0; i < readvsinfo->part_count; i++)
+            for(uint32_t i=0; i < vsinfo->part_count; i++)
             {
-                //qDebug() << "partint:" << partint << "partcount:" << readvsinfo->part_count;
-                readpartinfo = tsk_vs_part_get(readvsinfo, i);
-                if(readpartinfo == NULL)
+                partinfo = tsk_vs_part_get(vsinfo, i);
+                if(partinfo == NULL)
                 {
                     qDebug() << "tsk_vs_part_get error:";
                     tsk_error_print(stderr);
                 }
-                //qDebug() << "slot num:" << readpartinfo->slot_num;
                 QString partitionpath = volumepath + "p" + QString::number(partint) + "/";
-                addevidvar.partitionpath = partitionpath;
-                addevidvar.partint = partint;
                 dir.mkpath(partitionpath);
                 pfile.setFileName(partitionpath + "stat");
                 pfile.open(QIODevice::Append | QIODevice::Text);
                 out.setDevice(&pfile);
-                if(readpartinfo->flags == 0x02 || readpartinfo->flags == 0x04) // unallocated partition or meta entry
+                if(partinfo->flags == 0x02 || partinfo->flags == 0x04) // unallocated partition or meta entry
                 {
-                    out << "0," << (qint64)readpartinfo->len * readvsinfo->block_size << "," << QString(readpartinfo->desc) << ",0," << (qint64)readpartinfo->start * (int)readvsinfo->block_size << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
+                    out << "0," << (qint64)partinfo->len * vsinfo->block_size << "," << QString(partinfo->desc) << ",0," << (qint64)partinfo->start * (int)vsinfo->block_size << "," << (qint64)partinfo->len << "," << (int)vsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)vsinfo->block_size << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
                     out.flush();
                     pfile.close();
                     treeout.clear();
-                    treeout << QString(readpartinfo->desc) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+                    treeout << QString(partinfo->desc) << "0" << QString::number(partinfo->len * vsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
                     nodedata.clear();
                     for(int j=0; j < treeout.count(); j++)
                         nodedata << treeout.at(j);
                     mutex.lock();
                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                     mutex.unlock();
-                    reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(readpartinfo->desc) + "</td></tr>";
-                    //reportstring += "<div><span>Partition (P" + QString::number(partint) + "): </span><span>" + QString(readpartinfo->desc) + "</span></div><br/>";
+                    reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + "</td></tr>";
                 }
-                else if(readpartinfo->flags == 0x01) // allocated partition
+                else if(partinfo->flags == 0x01) // allocated partition
                 {
-                    readfsinfo = tsk_fs_open_vol(readpartinfo, TSK_FS_TYPE_DETECT);
-                    if(readfsinfo != NULL)
+                    TSK_FS_INFO* fsinfo = NULL;
+                    TSK_STACK* stack = NULL;
+                    fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
+                    stack = tsk_stack_create();
+                    if(fsinfo != NULL)
                     {
-                        out << readfsinfo->ftype << "," << (qint64)readfsinfo->block_size * (qint64)readfsinfo->block_count << "," << GetFileSystemLabel(readfsinfo) << "," << (qint64)readfsinfo->root_inum << "," << (qint64)readfsinfo->offset << "," << (qint64)readfsinfo->block_count << "," << (int)readfsinfo->block_size << "," << readpartinfo->flags << "," << (qint64)readpartinfo->len << "," << (int)readfsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
+                        out << fsinfo->ftype << "," << (qint64)fsinfo->block_size * (qint64)fsinfo->block_count << "," << GetFileSystemLabel(fsinfo) << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)fsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
                         out.flush();
                         pfile.close();
                         treeout.clear();
-                        treeout << QString(GetFileSystemLabel(readfsinfo) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")") << "0" << QString::number(readfsinfo->block_size * readfsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+                        treeout << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
                         nodedata.clear();
                         for(int j=0; j < treeout.count(); j++)
                             nodedata << treeout.at(j);
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
-                        reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(GetFileSystemLabel(readfsinfo)) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</td></tr>";
-                        //reportstring += "<div><span>Partition (P" + QString::number(partint) + "): </span><span>" + QString(GetFileSystemLabel(readfsinfo)) + " (" + QString(tsk_fs_type_toname(readfsinfo->ftype)).toUpper() + ")</span></div><br/>";
-                        WriteFileSystemProperties(readfsinfo, partitionpath);
-                        uint8_t walkreturn;
-                        int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
-                        walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, (void*)aevar);
-                        //walkreturn = tsk_fs_dir_walk(readfsinfo, readfsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, RootEntries, NULL);
-                        if(walkreturn == 1)
-                        {
-                            qWarning() << "Issues with traversing the file structure were encountered";
-                            //LogMessage("Issues with traversing the file structure were encountered");
-                            errorcount++;
-                        }
+                        reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
+                        WriteFileSystemProperties(fsinfo, partitionpath);
+                        //ProcessDir(fsinfo, stack, fsinfo->root_inum, "");
                     }
                     else
                     {
-                        out << "0," << (qint64)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (qint64)readpartinfo->start * (int)readvsinfo->block_size << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
+                        out << "0," << (qint64)partinfo->len * (int)vsinfo->block_size << "," << QString(partinfo->desc) << " (Non-Recognized FS),0," << (qint64)partinfo->start * (int)vsinfo->block_size << "," << (qint64)partinfo->len << "," << (int)vsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)vsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
                         out.flush();
                         pfile.close();
                         treeout.clear();
-                        treeout << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+                        treeout << QString(QString(partinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(partinfo->len * vsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
                         nodedata.clear();
                         for(int j=0; j < treeout.count(); j++)
                             nodedata << treeout.at(j);
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
-                        reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(readpartinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
-                        //reportstring += "<div><span>Partition (P" + QString::number(partint) + "): </span><span>" + QString(readpartinfo->desc) + " (NON-RECOGNIZED FS)</span></div><br/>";
+                        reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
                     }
+                    tsk_stack_free(stack);
+                    tsk_fs_close(fsinfo);
                 }
                 else
                 {
-                    out << "0," << (qint64)readpartinfo->len * (int)readvsinfo->block_size << "," << QString(readpartinfo->desc) << " (Non-Recognized FS),0," << (qint64)readpartinfo->start * (int)readvsinfo->block_size << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << "," << readpartinfo->flags << "," << (qint64)readpartinfo->len << "," << (int)readvsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
+                    out << "0," << (qint64)partinfo->len * (int)vsinfo->block_size << "," << QString(partinfo->desc) << " (Non-Recognized FS),0," << (qint64)partinfo->start * (int)vsinfo->block_size << "," << (qint64)partinfo->len << "," << (int)vsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)vsinfo->block_size << ",e" << QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
                     out.flush();
                     pfile.close();
                     treeout.clear();
-                    treeout << QString(QString(readpartinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(readpartinfo->len * readvsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+                    treeout << QString(QString(partinfo->desc) + QString(" (Non-Recognized FS)")) << "0" << QString::number(partinfo->len * vsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
                     nodedata.clear();
                     for(int j=0; j < treeout.count(); j++)
                         nodedata << treeout.at(j);
                     mutex.lock();
                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
-                    reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(readpartinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
-                    //reportstring += "<div><span>Partition (P" + QString::number(partint) + "): </span><span>" + QString(readpartinfo->desc) + " (NON-RECOGNIZED FS)</span></div><br/>";
+                    reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
                     mutex.unlock();
                 }
                 partint++;
             }
         }
+        partinfo = NULL;
     }
     mutex.lock();
     reportstring += "</table></div><br/>\n";
@@ -2365,23 +2287,15 @@ void InitializeEvidenceStructure(QString evidname)
     tmpdata.evidcontent = reportstring;
     evidrepdatalist.append(tmpdata);
     mutex.unlock();
-    tsk_fs_file_close(readfileinfo);
-    readfileinfo = NULL;
-    tsk_fs_close(readfsinfo);
-    readfsinfo = NULL;
-    readpartinfo = NULL;
-    tsk_vs_close(readvsinfo);
-    readvsinfo = NULL;
-    tsk_img_close(readimginfo);
-    readimginfo = NULL;
-
- *
- *
- */ 
-
-
-
-
+    //tsk_fs_file_close(fileinfo);
+    //fileinfo = NULL;
+    //tsk_fs_close(fsinfo);
+    //fsinfo = NULL;
+    //partinfo = NULL;
+    tsk_vs_close(vsinfo);
+    //vsinfo = NULL;
+    tsk_img_close(imginfo);
+    //imginfo = NULL;
 
     // OLD C CALLBACK METHOD
     /*
