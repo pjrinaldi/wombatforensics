@@ -2187,7 +2187,7 @@ void InitializeEvidenceStructure(QString evidname)
             WriteFileSystemProperties(fsinfo, partitionpath);
             TSK_STACK* stack = NULL;
             stack = tsk_stack_create();
-            ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint);
+            ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
             tsk_fs_close(fsinfo);
             tsk_stack_free(stack);
         }
@@ -2247,7 +2247,7 @@ void InitializeEvidenceStructure(QString evidname)
                         mutex.unlock();
                         reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
                         WriteFileSystemProperties(fsinfo, partitionpath);
-                        ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint);
+                        ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
                     }
                     else
                     {
@@ -4370,7 +4370,7 @@ void RewriteSelectedIdContent(QString selectedid)
     delete[] imgbuf;
 }
 
-uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint)
+uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partpath)
 {
     TSK_FS_DIR* fsdir = NULL;
     fsdir = tsk_fs_dir_open_meta(fsinfo, dirinum);
@@ -4431,74 +4431,73 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 treeout << "0";
                 treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1);
                 treeout << "0"; // empty bookmark value
+                // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
+                if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
+                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr);
+                else
+                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr);
+                if(fsfile->meta != NULL)
+                    treeout << QString::number(fsfile->meta->type);
+                else
+                    treeout << QString::number(fsfile->name->type);
+                if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
+                {
+                    outstring += ",1";
+                    treeout << "1";
+                }
+                else
+                {
+                    if(tmpfile->meta != NULL)
+                    {
+                        if(((tmpfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((tmpfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
+                        {
+                            outstring += ",1";
+                            treeout << "1";
+                        }
+                        else
+                        {
+                                outstring += ",0";
+                                treeout << "0";
+                        }
+                    }
+                    else
+                    {
+                        if((tmpfile->name->flags & TSK_FS_NAME_FLAG_UNALLOC) == 0x02)
+                        {
+                            outstring += ",1";
+                            treeout << "1";
+                        }
+                        else
+                        {
+                            outstring += ",0";
+                            treeout << "0";
+                        }
+                    }
+                }
+                outstring += ",0"; // empty bookmark value
+                QFile filefile;
+                QTextStream out(&filefile);
+                if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
+                    filefile.setFileName(partpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
+                else
+                    filefile.setFileName(partpath + "f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(paraddress) + ".stat");
+                filefile.open(QIODevice::Append | QIODevice::Text);
+                out << outstring;
+                out.flush();
+                if(filefile.isOpen())
+                    filefile.close();
+                QList<QVariant> nodedata;
+                nodedata.clear();
+                for(int i=0; i < 12; i++)
+                    nodedata << treeout.at(i);
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, parentstr, treeout.at(12).toInt(), treeout.at(13).toInt());
+                mutex.unlock();
+                listeditems.append(treeout.at(11));
+                //else
+                //    qDebug() << "file file failed to open.";
                     /*
-    QList<QVariant> nodedata;
-    nodedata.clear();
-    // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
-    if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-        treeout << "e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(tmpfile->name->par_addr);
-    else
-        treeout << "e" + QString::number(aevar->evidcnt) + "-v" + QString::number(aevar->volcnt) + "-p" + QString::number(aevar->partint) + "-f" + QString::number(tmpfile->name->meta_addr) + "-a" + QString::number(tmpfile->name->par_addr);
-    if(tmpfile->meta != NULL)
-        treeout << QString::number(tmpfile->meta->type);
-    else
-        treeout << QString::number(tmpfile->name->type);
 
-    if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-    {
-        outstring += ",1";
-        treeout << "1";
-    }
-    else
-    {
-        if(tmpfile->meta != NULL)
-        {
-            if(((tmpfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((tmpfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
-            {
-                outstring += ",1";
-                treeout << "1";
-            }
-            else
-            {
-                    outstring += ",0";
-                    treeout << "0";
-            }
-        }
-        else
-        {
-            if((tmpfile->name->flags & TSK_FS_NAME_FLAG_UNALLOC) == 0x02)
-            {
-                outstring += ",1";
-                treeout << "1";
-            }
-            else
-            {
-                outstring += ",0";
-                treeout << "0";
-            }
-        }
-    }
-    outstring += ",0"; // empty bookmark value
-    QFile filefile;
-    QTextStream out(&filefile);
-    if(tmpfile->name->meta_addr == 0 && strcmp(tmpfile->name->name, "$MFT") != 0)
-        filefile.setFileName(aevar->partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
-    else
-        filefile.setFileName(aevar->partitionpath + "f" + QString::number(tmpfile->name->meta_addr) + ".a" + QString::number(paraddress) + ".stat");
-    filefile.open(QIODevice::Append | QIODevice::Text);
-    out << outstring;
-    out.flush();
-    if(filefile.isOpen())
-        filefile.close();
-    else
-        qDebug() << "file file failed to open.";
-    nodedata.clear();
-    for(int i=0; i < 12; i++)
-        nodedata << treeout.at(i);
-    mutex.lock();
-    treenodemodel->AddNode(nodedata, parentstr, treeout.at(12).toInt(), treeout.at(13).toInt());
-    mutex.unlock();
-    listeditems.append(treeout.at(11));
     if(tmpfile->name != NULL)
     {
         if(!TSK_FS_ISDOT(tmpfile->name->name))
@@ -4507,7 +4506,8 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
     else
         qDebug() << "tmpfile->name is suddenly null";
     isignals->ProgUpd();
-
+                    */
+                /*
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
     {
         char* startoffset = new char[0];
@@ -4595,7 +4595,7 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                                 tsk_stack_push(stack, fsfile->meta->addr);
                                 path2 = std::string(path) + "/" + std::string(fsfile->name->name);
                                 qDebug() << "cur path:" << QString::fromStdString(path2);
-                                ProcessDir(fsinfo, stack, fsfile->meta->addr, path2.c_str(), evidcnt, volcnt, partint);
+                                ProcessDir(fsinfo, stack, fsfile->meta->addr, path2.c_str(), evidcnt, volcnt, partint, partpath);
                                 tsk_stack_pop(stack);
                             }
                         }
