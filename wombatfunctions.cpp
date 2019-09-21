@@ -4394,11 +4394,11 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 ba.clear();
                 ba.append(QString(fsfile->name->name));
                 outstring += ba.toBase64() + "," + QString::number(fsfile->name->type) + "," + QString::number(fsfile->name->par_addr) + ",";
-                treeout << ba.toBase64();
+                treeout << ba.toBase64(); // NAME - 0
                 ba.clear();
                 ba.append(QString("/" + QString::fromStdString(std::string(path))));
                 outstring += ba.toBase64() + ",";
-                treeout << ba.toBase64();
+                treeout << ba.toBase64(); // FULL PATH - 1
                 //ba.clear();
                 if(fsfile->name->par_addr == fsfile->fs_info->root_inum)
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint);
@@ -4411,8 +4411,11 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     outstring += QString::number(fsfile->meta->atime) + "," + QString::number(fsfile->meta->ctime) + "," + QString::number(fsfile->meta->crtime) + "," + QString::number(fsfile->meta->mtime) + "," + QString::number(fsfile->meta->size) + "," + QString::number(fsfile->meta->addr) + ",";
                     treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime);
                 }
-                outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ",";
-                treeout << "0" << "0" << "0" << "0" << "0";
+                else
+                {
+                    outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ",";
+                    treeout << "0" << "0" << "0" << "0" << "0";
+                }
                 char* magicbuffer = new char[0];
                 magicbuffer = new char[1024];
                 QByteArray tmparray("intro");
