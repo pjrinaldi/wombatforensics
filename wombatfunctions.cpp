@@ -4573,24 +4573,27 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     delete[] type;
                     delete[] startoffset;
                 }
-                if(fsfile->meta->type == TSK_FS_META_TYPE_DIR) // DIRECTORY
+                if(fsfile->meta != NULL)
                 {
-                    if(TSK_FS_ISDOT(fsfile->name->name) == 0)
+                    if(fsfile->meta->type == TSK_FS_META_TYPE_DIR) // DIRECTORY
                     {
-                        if(tsk_stack_find(stack, fsfile->meta->addr) == 0) // process if it's not on stack
+                        if(TSK_FS_ISDOT(fsfile->name->name) == 0)
                         {
-                            // DO MY RECURSE HERE...
-                            tsk_stack_push(stack, fsfile->meta->addr);
-                            path2 = std::string(path) + "/" + std::string(fsfile->name->name);
-                            qDebug() << "cur path:" << QString::fromStdString(path2);
-                            ProcessDir(fsinfo, stack, fsfile->meta->addr, path2.c_str(), eint, vint, pint, partpath);
-                            tsk_stack_pop(stack);
+                            if(tsk_stack_find(stack, fsfile->meta->addr) == 0) // process if it's not on stack
+                            {
+                                // DO MY RECURSE HERE...
+                                tsk_stack_push(stack, fsfile->meta->addr);
+                                path2 = std::string(path) + "/" + std::string(fsfile->name->name);
+                                qDebug() << "cur path:" << QString::fromStdString(path2);
+                                ProcessDir(fsinfo, stack, fsfile->meta->addr, path2.c_str(), eint, vint, pint, partpath);
+                                tsk_stack_pop(stack);
+                            }
                         }
                     }
                 }
             }
             // FIX THIS FUNCTION TOO..
-            //WriteFileProperties(fsfile, )
+            WriteFileProperties(fsfile, partpath);
             if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
                 orphancount++;
             tsk_fs_file_close(fsfile);
