@@ -64,5 +64,6 @@ void TransferFiles(QString thumbid, QString reppath);
 void GenerateWombatCaseFile(void);
 void RewriteSelectedIdContent(QString selectedid);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
+//void ParseDir();
 
 #endif // wombatfunctions.h

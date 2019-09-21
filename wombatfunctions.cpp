@@ -4638,3 +4638,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
         tsk_fs_dir_close(fsdir);
     }
 }
+/*
+void ParseDir()
+{
+}
+*/
