@@ -1986,7 +1986,7 @@ void PopulateTreeModel(QString evidstring)
                 partitionpath = volumepath + "p0/";
                 QStringList plist;
                 plist.clear();
-                QFile partfile(partitionpath + ".stat");
+                QFile partfile(partitionpath + "stat");
                 if(!partfile.isOpen())
                     partfile.open(QIODevice::ReadOnly | QIODevice::Text);
                 if(partfile.isOpen())
@@ -2024,7 +2024,7 @@ void PopulateTreeModel(QString evidstring)
                 partitionpath = volumepath + "p" + QString::number(j) + "/";
                 QStringList plist;
                 plist.clear();
-                QFile pfile(partitionpath + ".stat");
+                QFile pfile(partitionpath + "stat");
                 if(!pfile.isOpen())
                     pfile.open(QIODevice::ReadOnly | QIODevice::Text);
                 if(pfile.isOpen())
