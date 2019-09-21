@@ -4500,6 +4500,7 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 mutex.unlock();
                 listeditems.append(treeout.at(11));
                 filesfound++;
+                WriteFileProperties(fsfile, partpath);
                 isignals->ProgUpd();
                 if(fsfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
                 {
@@ -4593,7 +4594,6 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 }
             }
             // FIX THIS FUNCTION TOO..
-            WriteFileProperties(fsfile, partpath);
             if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
                 orphancount++;
             tsk_fs_file_close(fsfile);
