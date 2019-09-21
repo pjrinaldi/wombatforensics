@@ -1903,25 +1903,29 @@ void PopulateCarvedFiles(QString cfilestr)
 
 void PopulateTreeModel(QString evidstring)
 {
-    AddEvidenceVariable addevidvar;
-    AddEvidenceVariable* aevar = &addevidvar;
+    // IMPLEMENT NEW C++ STYLE GETTING CONTENT FROM FILES...
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
     QString evidid = "." + evidlist.first().split(".").last();
-    addevidvar.evidcnt = evidlist.first().split(".").last().mid(1).toInt();
-    QString tmpstr = "";
+    /*addevidvar.evidcnt = evidlist.first().split(".").last().mid(1).toInt();*/
+    QStringList elist;
+    elist.clear();
+    /*QString tmpstr = "";*/
     QString evidencename = evidlist.first().split(evidid).first();
     //qDebug() << "evidencename:" << evidencename;
     QFile evidfile(wombatvariable.tmpmntpath + evidlist.first() + "/stat");
-    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(!evidfile.isOpen())
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
-        tmpstr = evidfile.readLine();
-    else
-        qDebug() << "evidence file:" << evidfile.fileName() << "failed to open.";
+        elist = QString(evidfile.readLine()).split(",");
     evidfile.close();
+    /* old C CALLBACK  METHOD
+    AddEvidenceVariable addevidvar;
+    AddEvidenceVariable* aevar = &addevidvar;
+    */
     std::vector<std::string> pathvector;
     pathvector.clear();
-    pathvector.push_back(tmpstr.split(",").at(3).toStdString());
+    pathvector.push_back(elist.at(3).toStdString());
     TSK_IMG_INFO* imginfo = NULL;
     TSK_VS_INFO* vsinfo = NULL;
     const TSK_VS_PART_INFO* partinfo = NULL;
@@ -1943,8 +1947,9 @@ void PopulateTreeModel(QString evidstring)
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + evidid + "/";
     QList<QVariant> nodedata;
     nodedata.clear();
+    nodedata << evidencename << "0" << elist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << elist.at(6) << evidid.mid(1);
     //qDebug() << "tmpstr:" << tmpstr;
-    nodedata << evidencename << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(6) << evidid.mid(1);
+    /*nodedata << evidencename << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << tmpstr.split(",").at(6) << evidid.mid(1);*/
     mutex.lock();
     treenodemodel->AddNode(nodedata, "-1", -1, -1);
     mutex.unlock();
@@ -1957,21 +1962,21 @@ void PopulateTreeModel(QString evidstring)
     QString partitionpath = "";
     for(int i=0; i < vollist.count(); i++)
     {
-        addevidvar.volcnt = vollist.at(i).mid(1).toInt();
+        /*addevidvar.volcnt = vollist.at(i).mid(1).toInt();*/
         QString volumepath = evidencepath + vollist.at(i) + "/";
         nodedata.clear();
-        nodedata << volname << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i));
+        nodedata << volname << "0" << elist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i));
         mutex.lock();
         treenodemodel->AddNode(nodedata, evidid.mid(1), -1, 0);
         mutex.unlock();
         if(vsinfo == NULL) // No volume so a single file system is all there is in the image
         {
-            addevidvar.partint = 0;
+            //addevidvar.partint = 0;
             fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
             if(fsinfo == NULL)
             {
                 nodedata.clear();
-                nodedata << QString("NON-RECOGNIZED FS") << "0" << QString::number(imginfo->size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
+                nodedata << QString("NON-RECOGNIZED FS") << "0" << elist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
                 mutex.unlock();
@@ -1979,12 +1984,25 @@ void PopulateTreeModel(QString evidstring)
             else
             {
                 partitionpath = volumepath + "p0/";
-                addevidvar.partitionpath = partitionpath;
+                QStringList plist;
+                plist.clear();
+                QFile partfile(partitionpath + ".stat");
+                if(!partfile.isOpen())
+                    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(partfile.isOpen())
+                    plist = QString(partfile.readLine()).split(",");
+                partfile.close();
+                /*addevidvar.partitionpath = partitionpath;*/
                 nodedata.clear();
+                nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
+                /*
                 nodedata << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p0");
+                */
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
                 mutex.unlock();
+                //ParseDir(fsinfo, ....);
+                /*
                 uint8_t walkreturn;
                 int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                 walkreturn = tsk_fs_dir_walk(fsinfo, fsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
@@ -1993,8 +2011,7 @@ void PopulateTreeModel(QString evidstring)
                     qWarning() << "Issues with traversing the file structure were encountered";
                     //LogMessage("Issues with traversing the file structure were encountered");
                     errorcount++;
-                }
-
+                }*/
             }
         }
         else
@@ -2003,14 +2020,25 @@ void PopulateTreeModel(QString evidstring)
             QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::Dirs);
             for(int j=0; j < partlist.count(); j++)
             {
-                addevidvar.partint = j;
+                /*addevidvar.partint = j;*/
                 partitionpath = volumepath + "p" + QString::number(j) + "/";
-                addevidvar.partitionpath = partitionpath;
+                QStringList plist;
+                plist.clear();
+                QFile pfile(partitionpath + ".stat");
+                if(!pfile.isOpen())
+                    pfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(pfile.isOpen())
+                    plist = QString(pfile.readLine()).split(",");
+                pfile.close();
+                /*addevidvar.partitionpath = partitionpath;*/
                 partinfo = tsk_vs_part_get(vsinfo, j);
                 if(partinfo->flags == 0x02 || partinfo->flags == 0x04) // unallocated partition or meta entry
                 {
                     nodedata.clear();
+                    nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p" + QString::number(j) + "/");
+                    /*
                     nodedata << QString(partinfo->desc) << "0" << QString::number(partinfo->len * vsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p" + QString::number(j) + "/");
+                    */
                     mutex.lock();
                     treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
                     mutex.unlock();
@@ -2021,10 +2049,15 @@ void PopulateTreeModel(QString evidstring)
                     if(fsinfo != NULL)
                     {
                         nodedata.clear();
+                        nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p" + QString::number(j) + "/");
+                        /*
                         nodedata << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p" + QString::number(j));
+                        */
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
                         mutex.unlock();
+                        //ParseDir(fsinfo, ....)
+                        /*
                         uint8_t walkreturn;
                         int walkflags = TSK_FS_DIR_WALK_FLAG_ALLOC | TSK_FS_DIR_WALK_FLAG_UNALLOC | TSK_FS_DIR_WALK_FLAG_RECURSE;
                         walkreturn = tsk_fs_dir_walk(fsinfo, fsinfo->root_inum, (TSK_FS_DIR_WALK_FLAG_ENUM)walkflags, TreeEntries, (void*)aevar);
@@ -2034,11 +2067,15 @@ void PopulateTreeModel(QString evidstring)
                             //LogMessage("Issues with traversing the file structure were encountered");
                             errorcount++;
                         }
+                        */
                     }
                     else
                     {
                         nodedata.clear();
+                        nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p" + QString::number(j) + "/");
+                        /*
                         nodedata << QString(QString(partinfo->desc) + QString(" (NON-RECOGNIZED FS)")) << "0" << QString::number(partinfo->len * vsinfo->block_size) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString(evidid.mid(1) + "-" + vollist.at(i) + "-p" + QString::number(j));
+                        */
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(j)), -1, 0);
                         mutex.unlock();
