@@ -4404,17 +4404,17 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint);
                 else
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
+                curaddress = fsfile->name->meta_addr;
+                paraddress = fsfile->name->par_addr;
                 if(fsfile->meta)
                 {
-                    curaddress = fsfile->name->meta_addr;
-                    paraddress = fsfile->name->par_addr;
                     outstring += QString::number(fsfile->meta->atime) + "," + QString::number(fsfile->meta->ctime) + "," + QString::number(fsfile->meta->crtime) + "," + QString::number(fsfile->meta->mtime) + "," + QString::number(fsfile->meta->size) + "," + QString::number(fsfile->meta->addr) + ",";
-                    treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime);
+                    treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime); // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
                 else
                 {
-                    outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ",";
-                    treeout << "0" << "0" << "0" << "0" << "0";
+                    outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ","; 
+                    treeout << "0" << "0" << "0" << "0" << "0"; // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
                 char* magicbuffer = new char[0];
                 magicbuffer = new char[1024];
@@ -4433,22 +4433,22 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     outstring += QString::number(fsfile->name->meta_addr);
                 outstring += "-a" + QString::number(fsfile->name->par_addr);
                 outstring += ",0";
-                treeout << "0";
-                treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1);
-                treeout << "0"; // empty bookmark value
+                treeout << "0"; // HASH - 7
+                treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
+                treeout << "0"; // TAG - 10
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
-                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr);
+                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
                 else
-                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr);
+                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
                 if(fsfile->meta != NULL)
-                    treeout << QString::number(fsfile->meta->type);
+                    treeout << QString::number(fsfile->meta->type); // file type - 12
                 else
-                    treeout << QString::number(fsfile->name->type);
+                    treeout << QString::number(fsfile->name->type); // file type - 12
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
                 {
                     outstring += ",1";
-                    treeout << "1";
+                    treeout << "1"; // orphan - 13
                 }
                 else
                 {
@@ -4457,12 +4457,12 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                         if(((fsfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((fsfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
                         {
                             outstring += ",1";
-                            treeout << "1";
+                            treeout << "1"; // UNALLOC - 13
                         }
                         else
                         {
-                                outstring += ",0";
-                                treeout << "0";
+                            outstring += ",0";
+                            treeout << "0"; // ALLOC - 13
                         }
                     }
                     else
@@ -4470,12 +4470,12 @@ uint ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                         if((fsfile->name->flags & TSK_FS_NAME_FLAG_UNALLOC) == 0x02)
                         {
                             outstring += ",1";
-                            treeout << "1";
+                            treeout << "1"; // UNALLOC - 13
                         }
                         else
                         {
                             outstring += ",0";
-                            treeout << "0";
+                            treeout << "0"; // ALLOC = 13
                         }
                     }
                 }
