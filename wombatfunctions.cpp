@@ -4261,6 +4261,12 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char
 {
     TskFsDir* fsdir = new TskFsDir();
     fsdir->open(fsinfo, dirnum);
+    int pathcount = partitionpath.split("/").count();
+    QString evalue = partitionpath.split("/").at(pathcount - 3);
+    QString vvalue = partitionpath.split("/").at(pathcount - 2);
+    QString pvalue = partitionpath.split("/").at(pathcount - 1);
+    qDebug() << evalue << vvalue << pvalue;
+    /*
     if(fsdir != NULL)
     {
         std::string path2 = "";
@@ -4271,10 +4277,20 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char
             if(fsfile != NULL && !TSK_FS_ISDOT(fsfile->getName()->getName()))
             {
                 QString parentstr = "";
+                if(fsfile->getName()->getParentAddr() == fsinfo->getRootInum())
+                    parentstr = partitionpath.split("/").first().split(".").last() + "-" + partitionpath.split("/").at(1) + "-" + partitionpath.split("/").at(2);
+                else
+                    parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
                 QDir filedir = QDir(partitionpath);
                 QStringList flist;
                 flist.clear();
                 // NEED TO DETERMINE IF ITS AN ORPHAN...
+                if(fsfile->getName()->getMetaAddr() == 0 && strcmp(fsfile->getName()->getName(), "$MFT") != 0)
+                {
+                }
+                else
+                {
+                }
                 QStringList filelist = filedir.entryList(QStringList("f" + QString::number(fsfile->getName()->getMetaAddr()) + "*.a" + QString::number(fsfile->getName()->getParentAddr()) + ".stat"), QDir::NoSymLinks | QDir::Files);
                 QFile filefile(partitionpath + filelist.at(0));
                 if(!filefile.isOpen())
@@ -4338,6 +4354,9 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char
     }
     fsdir->close();
     delete fsdir;
+    */
+
+
     /*
                 // DO MY STUFF HERE...
                 if(fsfile->name->par_addr == fsfile->fs_info->root_inum)
@@ -4348,9 +4367,6 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char
                     filefile.setFileName(partpath + "f*" + QString::number(orphancount) + ".a" + QString::number(paraddress) + ".stat");
                 else
                     filefile.setFileName(partpath + "f" + QString::number(fsfile->name->meta_addr) + ".a" + QString::number(paraddress) + ".stat");
-                isignals->ProgUpd();
-                if(fsfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
-                {
                                     QFile adsfile(partpath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
                                     adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
                                     adsout << adsba.toBase64() << "," << fsfile->name->type << "," << fsfile->meta->addr << "," << ba.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (qint64)fsattr->size + 16 << "," << mimestr << "," << QString::number(fsattr->id) << ",e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr) << ",0,0,0";
