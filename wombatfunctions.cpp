@@ -4268,7 +4268,6 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char
     TskFsDir* fsdir = new TskFsDir();
     int dbool = 0;
     dbool = fsdir->open(fsinfo, dirnum);
-    qDebug() << fsdir->getMetaAddr();
     int pathcount = partitionpath.split("/", QString::SkipEmptyParts).count();
     QString evalue = partitionpath.split("/", QString::SkipEmptyParts).at(pathcount - 3).split(".").last();
     QString vvalue = partitionpath.split("/", QString::SkipEmptyParts).at(pathcount - 2);
