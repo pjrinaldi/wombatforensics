@@ -1981,20 +1981,23 @@ void PopulateTreeModel(QString evidstring)
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString(evidid.mid(1) + "-" + vollist.at(i)), -1, 0);
             mutex.unlock();
-            if(partinfo->getFlags() == 0x01) // allocated partition
+            TskFsInfo* fsinfo = new TskFsInfo();
+            TSK_STACK* stack;
+            if(partinfo != NULL)
             {
-                TskFsInfo* fsinfo = new TskFsInfo();
-                TSK_STACK* stack;
-                fsinfo->open(partinfo, TSK_FS_TYPE_DETECT);
-                if(fsinfo != NULL)
-                {
-                    stack = tsk_stack_create();
-                    ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
-                }
-                tsk_stack_free(stack);
-                fsinfo->close();
-                delete fsinfo;
+                if(partinfo->getFlags() == 0x01) // allocated partition
+                    fsinfo->open(partinfo, TSK_FS_TYPE_DETECT);
             }
+            else
+                fsinfo->open(imginfo, 0, TSK_FS_TYPE_DETECT);
+            if(fsinfo != NULL)
+            {
+                stack = tsk_stack_create();
+                ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
+            }
+            tsk_stack_free(stack);
+            fsinfo->close();
+            delete fsinfo;
         }
     }
     vsinfo->close();
@@ -4262,37 +4265,41 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char
     TskFsDir* fsdir = new TskFsDir();
     fsdir->open(fsinfo, dirnum);
     int pathcount = partitionpath.split("/").count();
-    QString evalue = partitionpath.split("/").at(pathcount - 3);
-    QString vvalue = partitionpath.split("/").at(pathcount - 2);
-    QString pvalue = partitionpath.split("/").at(pathcount - 1);
-    qDebug() << evalue << vvalue << pvalue;
-    /*
+    QString evalue = partitionpath.split("/").at(pathcount - 4).split(".").last();
+    QString vvalue = partitionpath.split("/").at(pathcount - 3);
+    QString pvalue = partitionpath.split("/").at(pathcount - 2);
     if(fsdir != NULL)
     {
+        size_t i;
+        qDebug() << fsdir->getSize();
         std::string path2 = "";
-        for(uint i=0; i < fsdir->getSize(); i++)
+        for(i=0; i < fsdir->getSize(); i++)
         {
             TskFsFile* fsfile = new TskFsFile();
             fsfile = fsdir->getFile(i);
             if(fsfile != NULL && !TSK_FS_ISDOT(fsfile->getName()->getName()))
             {
                 QString parentstr = "";
-                if(fsfile->getName()->getParentAddr() == fsinfo->getRootInum())
-                    parentstr = partitionpath.split("/").first().split(".").last() + "-" + partitionpath.split("/").at(1) + "-" + partitionpath.split("/").at(2);
+                if(fsfile->getName()->getParentAddr() == fsinfo->getRootINum())
+                {
+                    qDebug() << "root inum";
+                    parentstr = evalue + "-" + vvalue + "-" + pvalue;
+                }
                 else
-                    parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
+                {
+                    qDebug() << "not root inum";
+                    parentstr = evalue + "-" + vvalue + "-" + pvalue + "-f" + QString::number(fsfile->getName()->getParentAddr());
+                }
                 QDir filedir = QDir(partitionpath);
                 QStringList flist;
                 flist.clear();
                 // NEED TO DETERMINE IF ITS AN ORPHAN...
+                QFile filefile;
                 if(fsfile->getName()->getMetaAddr() == 0 && strcmp(fsfile->getName()->getName(), "$MFT") != 0)
-                {
-                }
+                    filefile.setFileName(partitionpath + "f*" + QString::number(orphancount) + ".a" + QString::number(fsfile->getName()->getParentAddr()) + ".stat");
                 else
-                {
-                }
+                    filefile.setFileName(partitionpath + "f" + QString::number(fsfile->getName()->getMetaAddr()) + ".a" + QString::number(fsfile->getName()->getParentAddr()) + ".stat");
                 QStringList filelist = filedir.entryList(QStringList("f" + QString::number(fsfile->getName()->getMetaAddr()) + "*.a" + QString::number(fsfile->getName()->getParentAddr()) + ".stat"), QDir::NoSymLinks | QDir::Files);
-                QFile filefile(partitionpath + filelist.at(0));
                 if(!filefile.isOpen())
                     filefile.open(QIODevice::ReadOnly | QIODevice::Text);
                 if(filefile.isOpen())
@@ -4322,7 +4329,7 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char
                     nodedata.clear();
                     nodedata << alist.at(0) << alist.at(3) << alist.at(8) << alist.at(6) << alist.at(4) << alist.at(7) << alist.at(5) << alist.at(13) << alist.at(10).split("/").first() << alist.at(10).split("/").last() << alist.at(15) << alist.at(12);
                     mutex.lock();
-                    // SET PARENTSTR... e0-v0-p0-f0
+                    parentstr = evalue + "-" + vvalue + "-" + pvalue + "-f" + alist.at(2);
                     treenodemodel->AddNode(nodedata, parentstr, 10, 0);
                     mutex.unlock();
                     listeditems.append(alist.at(12));
@@ -4354,7 +4361,6 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char
     }
     fsdir->close();
     delete fsdir;
-    */
 
 
     /*
