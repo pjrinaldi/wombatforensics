@@ -1958,7 +1958,7 @@ void PopulateTreeModel(QString evidstring)
             vlist = QString(volfile.readLine()).split(",");
         volfile.close();
         nodedata.clear();
-        nodedata << vlist.at(2) << "0" << vlist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << vlist.at(6);
+        nodedata << vlist.at(2) << "0" << vlist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << vlist.at(5);
         mutex.lock();
         treenodemodel->AddNode(nodedata, evidid.mid(1), -1, 0);
         mutex.unlock();
@@ -1980,7 +1980,7 @@ void PopulateTreeModel(QString evidstring)
             nodedata.clear();
             nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
             mutex.lock();
-            treenodemodel->AddNode(nodedata, vlist.at(6), -1, 0);
+            treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
             mutex.unlock();
             TskFsInfo* fsinfo = new TskFsInfo();
             TSK_STACK* stack;
