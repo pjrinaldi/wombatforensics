@@ -38,6 +38,7 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
 
 void ImageWindow::GetImage(QString objectid)
 {
+    /*
     char* imgbuf = new char[0];
     ssize_t imglen = 0;
     TSK_IMG_INFO* readimginfo;
@@ -129,6 +130,13 @@ void ImageWindow::GetImage(QString objectid)
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
+    */
+    QImage fileimage;
+    bool imageloaded = fileimage.load(wombatvariable.tmpfilepath + objectid + "-fhex");
+    if(imageloaded)
+        ui->label->setPixmap(QPixmap::fromImage(fileimage));
+    else
+        ui->label->setPixmap(QPixmap::fromImage(QImage(":/bar/missingthumb")));
 }
 
 ImageViewer::ImageViewer(QWidget* parent) : QDialog(parent), ui(new Ui::ImageViewer)

@@ -61,9 +61,10 @@ void VideoViewer::SetDuration(qint64 pos)
 
 void VideoViewer::GetVideo(const QModelIndex &index)
 {
-    //QString thumbid = index.sibling(index.row(), 11).data().toString();
+    QString thumbid = index.sibling(index.row(), 11).data().toString();
     char* ibuffer = new char[0];
     ssize_t imglen = 0;
+    /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
@@ -142,26 +143,69 @@ void VideoViewer::GetVideo(const QModelIndex &index)
         filebuf->open(QIODevice::ReadOnly);
         vplayer->setMedia(QMediaContent(), filebuf);
     }
+    */
     //imglen = PopulateFileBuffer(thumbid, &ibuffer);
     //qDebug() << "imglen:" << imglen;
     //qDebug() << "ibuffer size:" << strlen(ibuffer);
     //QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);
     //QByteArray filedata = PopulateFileBuffer(thumbid);
-    //qDebug() << "imglen:" << imglen << "bytearray length:" << filedata.size();
+    //qDebug() << "bytearray length:" << filedata.size();
+    /*
+    if(filedata.size() > 1000000)
+    {
+        qDebug() << "write to a file!";
+        QDir dir;
+        dir.mkpath(wombatvariable.tmpfilepath);
+        QString vidstring = wombatvariable.tmpfilepath + thumbid + "-vid";
+        QFile tmpfile(vidstring);
+        if(!tmpfile.isOpen())
+            tmpfile.open(QIODevice::WriteOnly);
+        if(tmpfile.isOpen())
+        {
+            QDataStream outbuffer(&tmpfile);
+            outbuffer.writeRawData(ibuffer, imglen);
+        }
+        tmpfile.close();
+        qDebug() << "set videoplayer to file somehow";
+    }
+    else
+    {
+        qDebug() << "store in memory!";
+        QBuffer* filebuf = new QBuffer(vplayer);
+        filebuf->setData(filedata);
+        filebuf->open(QIODevice::ReadOnly);
+        vplayer->setMedia(QMediaContent(), filebuf);
+    }
     //QBuffer* filebuf = new QBuffer(vplayer);
     //filebuf->setData(filedata);
     //filebuf->open(QIODevice::ReadOnly);
     //vplayer->setMedia(QMediaContent(), filebuf);
     delete[] ibuffer;
+    /*
+    QDir dir;
+    dir.mkpath(wombatvariable.tmpfilepath);
+    hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
+    QFile tmpfile(hexstring);
+    if(!tmpfile.isOpen())
+        tmpfile.open(QIODevice::WriteOnly);
+    if(tmpfile.isOpen())
+    {
+        QDataStream outbuffer(&tmpfile);
+        outbuffer.writeRawData(imgbuf, imglen);
+    }
+    tmpfile.close();
+
+     */ 
 }
 
 void VideoViewer::ShowVideo(const QModelIndex &index)
 {
     this->show();
     ui->label_2->setVisible(true);
-    this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), 1).data().toString()));
+    this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), 11).data().toString()));
     curobjaddr = index.sibling(index.row(), 11).data().toString().split("-f").at(1).toLongLong();
-    GetVideo(index);
+    vplayer->setMedia(QUrl::fromLocalFile(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
+    //GetVideo(index);
     vplayer->play();
     ui->label_2->setVisible(false);
 }

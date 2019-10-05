@@ -26,7 +26,8 @@ void HtmlViewer::HideClicked()
 void HtmlViewer::ShowHtml(const QModelIndex &index)
 {
     curobjaddr = index.sibling(index.row(), 11).data().toString().split("-f").at(1).toLongLong();
-    GetHtmlContent(index);
+    ui->webView->setUrl(QUrl::fromLocalFile(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
+    //GetHtmlContent(index);
     this->show();
 }
 

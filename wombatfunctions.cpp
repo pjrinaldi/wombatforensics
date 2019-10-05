@@ -4369,8 +4369,9 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString pa
     delete fsdir;
 }
 
+//QByteArray PopulateFileBuffer(QString objectid)
 /*
-QByteArray PopulateFileBuffer(QString objectid)
+ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
 {
     TskImgInfo* imginfo = new TskImgInfo();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -4442,12 +4443,14 @@ QByteArray PopulateFileBuffer(QString objectid)
             bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
         }
     }
+    *ibuffer = filebuffer;
     delete fsfile;
     delete fsinfo;
     delete imginfo;
-    QByteArray returnarray = QByteArray::fromRawData(filebuffer, bufferlength);
+    //QByteArray returnarray = QByteArray::fromRawData(filebuffer, bufferlength);
     delete[] filebuffer;
 
-    return returnarray;
+    //return returnarray;
+    return bufferlength;
 }
 */
