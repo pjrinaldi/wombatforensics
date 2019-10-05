@@ -56,6 +56,7 @@ void HtmlViewer::closeEvent(QCloseEvent* e)
 
 void HtmlViewer::GetHtmlContent(const QModelIndex &index)
 {
+    //QString thumbid = index.sibling(index.row(), 11).data().toString();
     char* ibuffer = new char[0];
     ssize_t imglen = 0;
     QString tmpstr = "";
@@ -133,6 +134,9 @@ void HtmlViewer::GetHtmlContent(const QModelIndex &index)
         htmldata = QByteArray::fromRawData(ibuffer, imglen);
         ui->webView->setContent(htmldata, "text/html", QUrl(""));
     }
+    //imglen = PopulateFileBuffer(thumbid, &ibuffer);
+    //htmldata = QByteArray::fromRawData(ibuffer, imglen);
+    //ui->webView->setContent(htmldata, "text/html", QUrl(""));
     delete[] ibuffer;
 }
 

@@ -7,6 +7,7 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "ui_videoviewer.h"
+//#include "wombatfunctions.h"
 
 namespace Ui
 {

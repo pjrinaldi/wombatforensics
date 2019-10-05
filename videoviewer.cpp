@@ -61,6 +61,7 @@ void VideoViewer::SetDuration(qint64 pos)
 
 void VideoViewer::GetVideo(const QModelIndex &index)
 {
+    //QString thumbid = index.sibling(index.row(), 11).data().toString();
     char* ibuffer = new char[0];
     ssize_t imglen = 0;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -141,6 +142,16 @@ void VideoViewer::GetVideo(const QModelIndex &index)
         filebuf->open(QIODevice::ReadOnly);
         vplayer->setMedia(QMediaContent(), filebuf);
     }
+    //imglen = PopulateFileBuffer(thumbid, &ibuffer);
+    //qDebug() << "imglen:" << imglen;
+    //qDebug() << "ibuffer size:" << strlen(ibuffer);
+    //QByteArray filedata = QByteArray::fromRawData(ibuffer, imglen);
+    //QByteArray filedata = PopulateFileBuffer(thumbid);
+    //qDebug() << "imglen:" << imglen << "bytearray length:" << filedata.size();
+    //QBuffer* filebuf = new QBuffer(vplayer);
+    //filebuf->setData(filedata);
+    //filebuf->open(QIODevice::ReadOnly);
+    //vplayer->setMedia(QMediaContent(), filebuf);
     delete[] ibuffer;
 }
 
