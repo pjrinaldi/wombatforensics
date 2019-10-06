@@ -1131,6 +1131,14 @@ TSK_WALK_RET_ENUM RootEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 void ProcessExport(QString objectid)
 {
+    ssize_t imglen = 0;
+    char* imgbuf = new char[0];
+    qDebug() << "imglen:" << imglen;
+    qDebug() << "buflen:" << strlen(imgbuf);
+    imglen = PopulateFileBuffer(objectid, &imgbuf);
+    qDebug() << "imglen:" << imglen;
+    qDebug() << "buflen:" << strlen(imgbuf);
+    /*
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
@@ -1236,6 +1244,7 @@ void ProcessExport(QString objectid)
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
+    */
     exportcount++;
     isignals->ExportUpd();
 }
@@ -4370,7 +4379,7 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString pa
 }
 
 //QByteArray PopulateFileBuffer(QString objectid)
-/*
+
 ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
 {
     TskImgInfo* imginfo = new TskImgInfo();
@@ -4419,11 +4428,13 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     if(filefile.isOpen())
         tmpstr = filefile.readLine();
     filefile.close();
+    qDebug() << "tmpstr:" << tmpstr;
+    qDebug() << "size:" << tmpstr.split(",").at(8).toULongLong();
     char* filebuffer = new char[0];
     //char* imgbuf = new char[0];
     ssize_t bufferlength = 0;
-    if(fsfile->getMeta())
-    {
+    //if(fsfile->getMeta())
+    //{
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
         {
             if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
@@ -4433,16 +4444,18 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
             }
             else // IF NOT ADS
             {
-                filebuffer = new char[fsfile->getMeta()->getSize()];
-                bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+                filebuffer = new char[tmpstr.split(",").at(8).toULongLong()];
+                bufferlength = fsfile->read(0, filebuffer, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
             }
         }
         else
         {
-            filebuffer = new char[fsfile->getMeta()->getSize()];
-            bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+            filebuffer = new char[tmpstr.split(",").at(8).toULongLong()];
+            bufferlength = fsfile->read(0, filebuffer, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+            qDebug() << "other fs";
         }
-    }
+    //}
+    qDebug() << "bufferlength:" << bufferlength;
     *ibuffer = filebuffer;
     delete fsfile;
     delete fsinfo;
@@ -4453,4 +4466,3 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     //return returnarray;
     return bufferlength;
 }
-*/
