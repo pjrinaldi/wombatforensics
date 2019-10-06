@@ -3819,6 +3819,56 @@ void TransferFiles(QString thumbid, QString reppath)
 {
     char* imgbuf = new char[0];
     ssize_t imglen = 0;
+    QString tmpstr = "";
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+    if(fstring.contains(":") == true)
+        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split(".e").first();
+    imglen = PopulateFileBuffer(thumbid, &imgbuf);
+    QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
+    QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
+    QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
+    if(!filefile.isOpen())
+        filefile.open(QIODevice::ReadOnly);
+    if(filefile.isOpen())
+        tmpstr = filefile.readLine();
+    filefile.close();
+    QString tmppath = reppath + "files/";
+    QString tmpname = tmpstr.split(",", QString::SkipEmptyParts).at(12);
+    if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
+    {
+        QDir dir;
+        bool tmpdir = dir.mkpath(QString(tmppath + tmpname));
+        if(!tmpdir)
+        {
+            qWarning() << "Creation of export directory tree for file:" << tmppath << "failed";
+            //LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
+            errorcount++;
+        }
+    }
+    else
+    {
+        QDir dir;
+        bool tmpdir = dir.mkpath(QDir::cleanPath(tmppath));
+        if(tmpdir == true)
+        {
+            QFile tmpfile(tmppath + tmpname);
+            if(tmpfile.open(QIODevice::WriteOnly))
+            {
+                QDataStream outbuffer(&tmpfile);
+                outbuffer.writeRawData(imgbuf, imglen);
+                if(tmpfile.isOpen())
+                    tmpfile.close();
+            }
+        }
+    }
+
+    /*
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
     TSK_FS_FILE* readfileinfo;
@@ -3935,6 +3985,7 @@ void TransferFiles(QString thumbid, QString reppath)
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
+    */
 }
 
 void GenerateWombatCaseFile(void)
