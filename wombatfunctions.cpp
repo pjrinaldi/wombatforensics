@@ -1235,6 +1235,19 @@ void GenerateHash(QString itemid)
     if(itemid.split("-").count() == 5)
     {
         int hashtype = 1;
+        QString tmpstr = "";
+        QStringList tmplist;
+        tmplist.clear();
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + itemid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.at(0).split(".e").first();
+        QString hashstr = "";
+        char* hashdata = new char[0];
+        ssize_t hashdatalen = 0;
+        hashdatalen = PopulateFileBuffer(itemid, &hashdata);
+        qDebug() << "hashdatalen:" << hashdatalen;
+        /*
+        int hashtype = 1;
         // given itemid, open file stat, file prop
         TSK_IMG_INFO* readimginfo = NULL;
         TSK_FS_INFO* readfsinfo = NULL;
@@ -1343,8 +1356,10 @@ void GenerateHash(QString itemid)
         readfileinfo = NULL;
         readfsinfo = NULL;
         readimginfo = NULL;
+        */
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
         QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
+        //delete[] hashdata;
         QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + itemid.split("-").at(0) + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2));
         QStringList filefiles;
         QFile filefile;
@@ -1358,7 +1373,8 @@ void GenerateHash(QString itemid)
             filefiles = filedir.entryList(QStringList(itemid.split("-").at(3) + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
             filefile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + itemid.split("-").at(0) + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2) + "/" + filefiles.at(0));
         }
-        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(!filefile.isOpen())
+            filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
             tmpstr = filefile.readLine();
         filefile.close();
@@ -1383,14 +1399,14 @@ void GenerateHash(QString itemid)
             for(int i=0; i < tmplist.count() - 1; i++)
                 tmpstr += tmplist.at(i) + ",";
             tmpstr += tmplist.last();
-            filefile.open(QIODevice::WriteOnly | QIODevice::Text);
+            if(!filefile.isOpen())
+                filefile.open(QIODevice::WriteOnly | QIODevice::Text);
             if(filefile.isOpen())
                 filefile.write(tmpstr.toStdString().c_str());
             filefile.close();
         }
         treenodemodel->UpdateNode(itemid, 7, hashstr);
         QString hashheader = "";
-        delete[] hashdata;
         if(hashsum == 1) // MD5
             hashtype = 1;
         else if(hashsum == 2) // SHA1
@@ -4325,8 +4341,6 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString pa
     delete fsdir;
 }
 
-//QByteArray PopulateFileBuffer(QString objectid)
-
 ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
 {
     TskImgInfo* imginfo = new TskImgInfo();
@@ -4378,35 +4392,29 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     ssize_t bufferlength = 0;
     TskFsFile* fsfile = new TskFsFile();
     fsfile->open(fsinfo, fsfile, curaddr);
-    //if(fsfile->getMeta())
-    //{
-        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
+    if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
+    {
+        if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
         {
-            if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
-            {
-                filebuffer = new char[tmpstr.split(",").at(8).toULongLong()];
-                bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
-            }
-            else // IF NOT ADS
-            {
-                filebuffer = new char[tmpstr.split(",").at(8).toULongLong()];
-                bufferlength = fsfile->read(0, filebuffer, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
-            }
+            filebuffer = new char[tmpstr.split(",").at(8).toULongLong()];
+            bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
         }
-        else
+        else // IF NOT ADS
         {
             filebuffer = new char[tmpstr.split(",").at(8).toULongLong()];
             bufferlength = fsfile->read(0, filebuffer, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
-            qDebug() << "other fs";
         }
-    //}
+    }
+    else
+    {
+        filebuffer = new char[tmpstr.split(",").at(8).toULongLong()];
+        bufferlength = fsfile->read(0, filebuffer, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+    }
     *ibuffer = filebuffer;
     delete fsfile;
     delete fsinfo;
     delete imginfo;
-    //QByteArray returnarray = QByteArray::fromRawData(filebuffer, bufferlength);
     delete[] filebuffer;
 
-    //return returnarray;
     return bufferlength;
 }

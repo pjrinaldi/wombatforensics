@@ -65,7 +65,6 @@ void GenerateWombatCaseFile(void);
 void RewriteSelectedIdContent(QString selectedid);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString partitionpath);
-//QByteArray PopulateFileBuffer(QString objectid);
 ssize_t PopulateFileBuffer(QString objectid, char** filebuffer);
 
 #endif // wombatfunctions.h
