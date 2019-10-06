@@ -34,7 +34,14 @@ void TextViewer::ShowText(const QModelIndex &index)
     //curindex = index;
     //curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toLongLong();
     //UpdateEncoding(0);
-    GetTextContent(index);
+    //GetTextContent(index);
+    //ui->webView->setUrl(QUrl::fromLocalFile(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
+    QFile tfile(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex");
+    if(!tfile.isOpen())
+        tfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(tfile.isOpen())
+        decodedstring = tfile.readAll();
+    tfile.close();
     ui->textEdit->setPlainText(decodedstring);
     this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 11).data().toString()));
     this->show();
@@ -79,6 +86,7 @@ void TextViewer::FindCodecs()
 
 void TextViewer::GetTextContent(const QModelIndex &index)
 {
+    /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*." + index.sibling(index.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
@@ -139,7 +147,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
             // should show an alert, then display 1st 2gb of text and display right click menu???
         }
         */
-        QFile filefile;
+/*        QFile filefile;
         if(fstring.split(":").count() > 1)
             filefile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring.split(":").first() + "-" + fstring.split(":").last() + ".a" + paridstr + ".stat");
         else
@@ -185,6 +193,7 @@ void TextViewer::GetTextContent(const QModelIndex &index)
     tsk_fs_file_close(tskptr->readfileinfo);
     tsk_fs_close(tskptr->readfsinfo);
     tsk_img_close(tskptr->readimginfo);
+    */
 }
 
 void TextViewer::UpdateEncoding(int unused)

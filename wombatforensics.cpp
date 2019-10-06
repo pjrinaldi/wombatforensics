@@ -2778,7 +2778,8 @@ void WombatForensics::SaveState()
     RemoveTmpFiles();
     UpdateCheckState();
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
-    RewriteSelectedIdContent(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 4)
+        RewriteSelectedIdContent(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);
 }

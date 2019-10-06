@@ -15,8 +15,8 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -29,7 +29,7 @@ public:
     QLabel *label;
     QComboBox *comboBox;
     QSpacerItem *horizontalSpacer;
-    QTextEdit *textEdit;
+    QPlainTextEdit *textEdit;
 
     void setupUi(QDialog *TextViewer)
     {
@@ -62,7 +62,7 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        textEdit = new QTextEdit(TextViewer);
+        textEdit = new QPlainTextEdit(TextViewer);
         textEdit->setObjectName(QString::fromUtf8("textEdit"));
         textEdit->setUndoRedoEnabled(false);
         textEdit->setReadOnly(true);

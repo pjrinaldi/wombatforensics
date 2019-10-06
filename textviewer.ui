@@ -70,7 +70,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTextEdit" name="textEdit">
+    <widget class="QPlainTextEdit" name="textEdit">
      <property name="undoRedoEnabled">
       <bool>false</bool>
      </property>
