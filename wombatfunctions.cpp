@@ -1133,11 +1133,17 @@ void ProcessExport(QString objectid)
 {
     ssize_t imglen = 0;
     char* imgbuf = new char[0];
-    qDebug() << "imglen:" << imglen;
-    qDebug() << "buflen:" << strlen(imgbuf);
     imglen = PopulateFileBuffer(objectid, &imgbuf);
     qDebug() << "imglen:" << imglen;
     qDebug() << "buflen:" << strlen(imgbuf);
+    // NOW I NEED TO:
+    // 1. READ FILEFILE CONTENT TO GET FILENAME AND ORIGINAL PATH
+    // 2. WRITE CONTENT TO A FILE AT CORRECT PATH...
+    //
+
+
+
+
     /*
     TSK_IMG_INFO* readimginfo;
     TSK_FS_INFO* readfsinfo;
@@ -4393,7 +4399,7 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
     if(fstring.contains(":"))
         fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
-    qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong();
+    //qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     if(!evidfile.isOpen())
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -4418,8 +4424,6 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     tmpstr = "";
     TskFsInfo* fsinfo = new TskFsInfo();
     fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
-    TskFsFile* fsfile = new TskFsFile();
-    fsfile->open(fsinfo, fsfile, curaddr);
     QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
     QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
     QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
@@ -4428,11 +4432,11 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     if(filefile.isOpen())
         tmpstr = filefile.readLine();
     filefile.close();
-    qDebug() << "tmpstr:" << tmpstr;
-    qDebug() << "size:" << tmpstr.split(",").at(8).toULongLong();
+    qint64 curaddr = tmpstr.split(",").at(9).toLongLong();
     char* filebuffer = new char[0];
-    //char* imgbuf = new char[0];
     ssize_t bufferlength = 0;
+    TskFsFile* fsfile = new TskFsFile();
+    fsfile->open(fsinfo, fsfile, curaddr);
     //if(fsfile->getMeta())
     //{
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
@@ -4455,7 +4459,6 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
             qDebug() << "other fs";
         }
     //}
-    qDebug() << "bufferlength:" << bufferlength;
     *ibuffer = filebuffer;
     delete fsfile;
     delete fsinfo;
