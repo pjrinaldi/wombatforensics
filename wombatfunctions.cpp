@@ -1422,6 +1422,22 @@ void GenerateVidThumbnails(QString thumbid)
 {
     if(thumbid.split("-").count() == 5)
     {
+        QString tmpstr = "";
+        QString filestr = "";
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+        QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
+        QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
+        QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+        if(fstring.contains(":"))
+            fstring = thumbid.split("-").at(3).split(":").first() + "-" + thumbid.split("-").at(3).split(":").last();
+        QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.at(0).split(".e").first();
+        char* imgbuf = new char[0];
+        ssize_t imglen = 0;
+        imglen = PopulateFileBuffer(thumbid, &imgbuf);
+        /*
         TSK_IMG_INFO* readimginfo = NULL;
         TSK_FS_INFO* readfsinfo = NULL;
         TSK_FS_FILE* readfileinfo = NULL;
@@ -1535,6 +1551,7 @@ void GenerateVidThumbnails(QString thumbid)
                 }
             }
         }
+    */
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
@@ -1548,6 +1565,7 @@ void GenerateVidThumbnails(QString thumbid)
                 tmpfile.close();
             }
         }
+        /*
         delete[] imgbuf;
         tsk_fs_file_close(readfileinfo);
         tsk_fs_close(readfsinfo);
@@ -1555,10 +1573,11 @@ void GenerateVidThumbnails(QString thumbid)
         readfileinfo = NULL;
         readfsinfo = NULL;
         readimginfo = NULL;
-
+        */
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
         //qDebug() << "id:filename" << thumbid << filefile.fileName().split("mntpt/").at(1);
-        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(!filefile.isOpen())
+            filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
             filestr = filefile.readLine();
         filefile.close();
@@ -1657,6 +1676,22 @@ void GenerateThumbnails(QString thumbid)
 {
     if(thumbid.split("-").count() == 5)
     {
+        QString tmpstr = "";
+        QString filestr = "";
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
+        QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
+        QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
+        QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+        if(fstring.contains(":"))
+            fstring = thumbid.split("-").at(3).split(":").first() + "-" + thumbid.split("-").at(3).split(":").last();
+        QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
+        QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
+        QString evidencename = evidfiles.at(0).split(".e").first();
+        char* imgbuf = new char[0];
+        ssize_t imglen = 0;
+        imglen = PopulateFileBuffer(thumbid, &imgbuf);
+        /*
         TSK_IMG_INFO* readimginfo = NULL;
         TSK_FS_INFO* readfsinfo = NULL;
         TSK_FS_FILE* readfileinfo = NULL;
@@ -1777,10 +1812,11 @@ void GenerateThumbnails(QString thumbid)
         readfileinfo = NULL;
         readfsinfo = NULL;
         readimginfo = NULL;
-
+*/
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
         //qDebug() << "id:filename" << thumbid << filefile.fileName().split("mntpt/").at(1);
-        filefile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(!filefile.isOpen())
+            filefile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(filefile.isOpen())
             filestr = filefile.readLine();
         filefile.close();
@@ -1825,7 +1861,7 @@ void GenerateThumbnails(QString thumbid)
                 }
             }
         }
-        delete[] imgbuf;
+        //delete[] imgbuf;
         digimgthumbcount++;
         isignals->DigUpd(0, digimgthumbcount);
     }

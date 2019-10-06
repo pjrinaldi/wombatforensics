@@ -591,6 +591,12 @@ void WombatForensics::ShowDigStatus()
 
 void WombatForensics::ShowExternalViewer()
 {
+    QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "-fhex";
+    QProcess* process = new QProcess(this);
+    QStringList arguments;
+    arguments << tmpstring;
+    process->startDetached(((QAction*)QObject::sender())->text(), arguments);
+    /*
     char* imgbuf = new char[0];
     ssize_t imglen = 0;
     TSK_IMG_INFO* readimginfo;
@@ -697,6 +703,7 @@ void WombatForensics::ShowExternalViewer()
     tsk_fs_file_close(readfileinfo);
     tsk_fs_close(readfsinfo);
     tsk_img_close(readimginfo);
+    */
 }
 
 void WombatForensics::SetSelectedFromImageViewer(QString objectid)
