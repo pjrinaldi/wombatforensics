@@ -4099,11 +4099,14 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
 {
     TSK_FS_DIR* fsdir = NULL;
     fsdir = tsk_fs_dir_open_meta(fsinfo, dirinum);
+    if(fsdir == NULL)
+        qDebug() << "dir is null, maybe we should convert it using something else...";
     if(fsdir != NULL)
     {
         std::string path2 = "";
         for(uint i=0; i < tsk_fs_dir_getsize(fsdir); i++)
         {
+            // switch tmpfile and fs file so my code works...
             TSK_FS_FILE* fsfile = NULL;
             fsfile = tsk_fs_dir_get(fsdir, i);
             if(fsfile != NULL && !TSK_FS_ISDOT(fsfile->name->name))
@@ -4131,13 +4134,24 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
                 curaddress = fsfile->name->meta_addr;
                 paraddress = fsfile->name->par_addr;
-                if(fsfile->meta)
+                if(fsfile->meta == NULL)
+                {
+                    TSK_FS_FILE* tmpfile = NULL;
+                    tmpfile = tsk_fs_file_open_meta(fsinfo, fsfile, fsfile->name->meta_addr);
+                    if(tmpfile->meta != NULL)
+                        qDebug() << "new meta works:" << tmpfile->meta->atime;
+                    else
+                        qDebug() << "still can't get meta...";
+                }
+                if(fsfile->meta != NULL)
                 {
                     outstring += QString::number(fsfile->meta->atime) + "," + QString::number(fsfile->meta->ctime) + "," + QString::number(fsfile->meta->crtime) + "," + QString::number(fsfile->meta->mtime) + "," + QString::number(fsfile->meta->size) + "," + QString::number(fsfile->meta->addr) + ",";
                     treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime); // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
                 else
                 {
+                    qDebug() << "no meta:" << fsfile->name->meta_addr;
+                    //qDebug() << fsfile->name->name << fsfile->meta->atime;
                     outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ","; 
                     treeout << "0" << "0" << "0" << "0" << "0"; // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
@@ -4301,7 +4315,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 }
                 if(fsfile->meta != NULL)
                 {
-                    if(fsfile->meta->type == TSK_FS_META_TYPE_DIR) // DIRECTORY
+                    if(fsfile->meta->type == TSK_FS_META_TYPE_DIR || QString(fsfile->name->name).contains("$OrphanFiles")) // DIRECTORY
                     {
                         if(TSK_FS_ISDOT(fsfile->name->name) == 0)
                         {
@@ -4322,8 +4336,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 orphancount++;
             tsk_fs_file_close(fsfile);
         }
-        tsk_fs_dir_close(fsdir);
     }
+    tsk_fs_dir_close(fsdir);
 }
 
 void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString partitionpath)
@@ -4403,7 +4417,7 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString pa
                 }
                 if(fsfile->getMeta())
                 {
-                    if(fsfile->getMeta()->getType() == TSK_FS_META_TYPE_DIR) // DIRECTORY
+                    if(fsfile->getMeta()->getType() == TSK_FS_META_TYPE_DIR || QString(fsfile->getName()->getName()).contains("$OrphanFiles")) // DIRECTORY
                     {
                         if(TSK_FS_ISDOT(fsfile->getName()->getName()) == 0)
                         {
