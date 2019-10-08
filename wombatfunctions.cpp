@@ -4097,18 +4097,28 @@ void RewriteSelectedIdContent(QString selectedid)
 
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partpath)
 {
+    // CURRENTLY IT WORKS FOR REGULAR FILES, BUT FAILS ON ORPHANS.
+    // THERE IS NO META FOR ORPHANS EVEN THOUGH THERE SHOULD BE....
+    // NOW I HAVE TO TEST IF ORPHANS WORKED ON A CALLBACK FUNCTION, THE OLD WAY
     TSK_FS_DIR* fsdir = NULL;
     fsdir = tsk_fs_dir_open_meta(fsinfo, dirinum);
-    if(fsdir == NULL)
-        qDebug() << "dir is null, maybe we should convert it using something else...";
     if(fsdir != NULL)
     {
         std::string path2 = "";
         for(uint i=0; i < tsk_fs_dir_getsize(fsdir); i++)
         {
-            // switch tmpfile and fs file so my code works...
             TSK_FS_FILE* fsfile = NULL;
             fsfile = tsk_fs_dir_get(fsdir, i);
+            if(fsfile->meta != NULL)
+            {
+                qDebug() << "fsfile meta works" << fsfile->meta->addr;
+            }
+            else
+                qDebug() << "fsfile meta doesn't work";
+            if(fsfile->name != NULL)
+                qDebug() << "fsfile name works";
+            else
+                qDebug() << "fsfile name doesn't work";
             if(fsfile != NULL && !TSK_FS_ISDOT(fsfile->name->name))
             {
                 // DO MY STUFF HERE...
@@ -4134,15 +4144,6 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
                 curaddress = fsfile->name->meta_addr;
                 paraddress = fsfile->name->par_addr;
-                if(fsfile->meta == NULL)
-                {
-                    TSK_FS_FILE* tmpfile = NULL;
-                    tmpfile = tsk_fs_file_open_meta(fsinfo, fsfile, fsfile->name->meta_addr);
-                    if(tmpfile->meta != NULL)
-                        qDebug() << "new meta works:" << tmpfile->meta->atime;
-                    else
-                        qDebug() << "still can't get meta...";
-                }
                 if(fsfile->meta != NULL)
                 {
                     outstring += QString::number(fsfile->meta->atime) + "," + QString::number(fsfile->meta->ctime) + "," + QString::number(fsfile->meta->crtime) + "," + QString::number(fsfile->meta->mtime) + "," + QString::number(fsfile->meta->size) + "," + QString::number(fsfile->meta->addr) + ",";
@@ -4151,7 +4152,6 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 else
                 {
                     qDebug() << "no meta:" << fsfile->name->meta_addr;
-                    //qDebug() << fsfile->name->name << fsfile->meta->atime;
                     outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ","; 
                     treeout << "0" << "0" << "0" << "0" << "0"; // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
