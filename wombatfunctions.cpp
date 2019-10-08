@@ -4100,6 +4100,51 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
     // CURRENTLY IT WORKS FOR REGULAR FILES, BUT FAILS ON ORPHANS.
     // THERE IS NO META FOR ORPHANS EVEN THOUGH THERE SHOULD BE....
     // NOW I HAVE TO TEST IF ORPHANS WORKED ON A CALLBACK FUNCTION, THE OLD WAY
+    
+    // ALSO WILL NEED TO DO THIS FOR PARSEDIR()
+    // MAY NEED TO ABSTRACT THE STACK* some so it is more functional.
+    // NEED TO REIMPLEMENT SOMETHING LIKE THIS TO GET THE META...
+    /*
+    // allocate a structure to return
+    if ((fs_file = tsk_fs_file_alloc(a_fs_dir->fs_info)) == NULL)
+        return NULL;
+
+    fs_name = &(a_fs_dir->names[a_idx]);
+
+    // copy the name into another structure that we can return and later free
+    if ((fs_file->name =
+            tsk_fs_name_alloc(fs_name->name ? strlen(fs_name->name) +
+                1 : 0,
+                fs_name->shrt_name ? strlen(fs_name->shrt_name) +
+                1 : 0)) == NULL) {
+        return NULL;
+    }
+    if (tsk_fs_name_copy(fs_file->name, fs_name))
+        return NULL;
+
+     * load the fs_meta structure if possible.
+     * Must have non-zero inode addr or have allocated name (if inode is 0)
+    if (((fs_name->meta_addr)
+            || (fs_name->flags & TSK_FS_NAME_FLAG_ALLOC))) {
+        if (a_fs_dir->fs_info->file_add_meta(a_fs_dir->fs_info, fs_file,
+                fs_name->meta_addr)) {
+            if (tsk_verbose)
+                tsk_error_print(stderr);
+            tsk_error_reset();
+        }
+
+        // if the sequence numbers don't match, then don't load the meta
+        // should ideally have sequence in previous lookup, but it isn't 
+        // in all APIs yet
+        if ((fs_file->meta) && (fs_file->meta->seq != fs_name->meta_seq)) {
+            tsk_fs_meta_close(fs_file->meta);
+            fs_file->meta = NULL;
+        }
+    }
+    return fs_file;
+}
+    
+    */
     TSK_FS_DIR* fsdir = NULL;
     fsdir = tsk_fs_dir_open_meta(fsinfo, dirinum);
     if(fsdir != NULL)
@@ -4114,7 +4159,10 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 qDebug() << "fsfile meta works" << fsfile->meta->addr;
             }
             else
+            {
+                // HERE IS WHERE I WOULD ATTEMPT TO IMPLEMENT THE ABOVE...
                 qDebug() << "fsfile meta doesn't work";
+            }
             if(fsfile->name != NULL)
                 qDebug() << "fsfile name works";
             else
