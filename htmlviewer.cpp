@@ -26,7 +26,10 @@ void HtmlViewer::HideClicked()
 void HtmlViewer::ShowHtml(const QModelIndex &index)
 {
     curobjaddr = index.sibling(index.row(), 11).data().toString().split("-f").at(1).toLongLong();
-    ui->webView->setUrl(QUrl::fromLocalFile(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
+    QString oldfile = wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex";
+    QString newfile = oldfile + ".html";
+    QFile::copy(oldfile, newfile);
+    ui->webView->setUrl(QUrl::fromLocalFile(newfile));
     //GetHtmlContent(index);
     this->show();
 }
