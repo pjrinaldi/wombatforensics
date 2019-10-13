@@ -38,6 +38,7 @@ struct AddEvidenceVariable
 struct FSFileVariable
 {
     TskFsFile* fsfile;
+    TskFsInfo* fsinfo;
     QString partpath;
     TSK_STACK* stack;
 };
