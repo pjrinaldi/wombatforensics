@@ -68,5 +68,11 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
 //void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString partitionpath);
 ssize_t PopulateFileBuffer(QString objectid, char** filebuffer);
 //void ParseFile(FSFileVariable tmpvar);
+void InitializeHashList(void);
+void InitializeTaggedList(void);
+void SaveHashList(void);
+void SaveTaggedList(void);
+//void UpdateTaggedNodes(void); // when open an existing case to populate tagged files
+//void UpdateHashNodes(void); // when open an existing case to populate hashes
 
 #endif // wombatfunctions.h

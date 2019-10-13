@@ -49,6 +49,8 @@ extern QString reportpath; // report path settings variable
 extern QString hexstring; // tmp hex file filename with path
 extern QHash<QString, bool> checkhash; // hash value list for check boxes.
 extern QHash<QString, QString> imageshash; // list of thumbnail ids, paths
+extern QHash<QString, QString> taggedhash; // list of tagged files: [id], tag
+extern QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 extern QMutex mutex; // mutex so my code will work when multithreaded (mainly for adding treeview nodes)
 
 struct dosdate
@@ -413,11 +415,11 @@ public:
         }
         else if(role == Qt::DisplayRole)
         {
-            if(index.column() == 11) // used to be 0
-            {
-                return itemnode->Data(index.column()).toString().split("-a").at(0);
-            }
-            else if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
+            //if(index.column() == 11) // used to be 0
+            //{
+            //    return itemnode->Data(index.column()).toString();
+            //}
+            if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
             {
                 //if(nodetype == 4)
                 if(nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))

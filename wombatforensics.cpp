@@ -455,6 +455,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
 {
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 4)
     {
+        /*
         QModelIndex parindex = curindex.parent();
         QString paridstr = parindex.sibling(parindex.row(), 11).data().toString().split("-f").last();
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -502,17 +503,30 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
             if(i < tmplist.count() - 1)
                 tmpstr += ",";
         }
+        */
         QTimeZone tmpzone = QTimeZone(reporttimezone);
         // APPLY ABOVE CODE TO THE BELOW CODE TO PUSH PREVIEW DATA WITH CORRECT TIMEZONE
+        /*
         filefile.open(QIODevice::WriteOnly | QIODevice::Text);
         if(filefile.isOpen())
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
+        */
+        taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
         treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
         QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
         filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
         filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
+        if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 3).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Accessed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 4).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 5).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 5).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Changed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 6).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        /*
         if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
             filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(tmplist.at(6).toInt(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
@@ -521,6 +535,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
             filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(tmplist.at(7).toInt(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
         if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
             filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(tmplist.at(5).toInt(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        */
         if(!curindex.sibling(curindex.row(), 7).data().toString().isEmpty())
         {
             filestr += "<tr class='odd'><td class='pvalue'>";
@@ -536,9 +551,9 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
         if(curindex.sibling(curindex.row(), 8).data().toString().contains("Image") || curindex.sibling(curindex.row(), 8).data().toString().contains("Video"))
-            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + tmplist.at(12) + "\")'><img src='./thumbs/" + tmplist.at(12) + ".jpg'/></a></td></tr>";
+            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'><img src='./thumbs/" + curindex.sibling(curindex.row(), 11).data().toString() + ".jpg'/></a></td></tr>";
         else
-            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent('\"./files/" + tmplist.at(12) + "\")'>Link</a></td></tr>";
+            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent('\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'>Link</a></td></tr>";
         filestr += "</table></td>";
         RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
         //RemoveFileItem(tagname, curindex.sibling(curindex.row(), 11).data().toString());
@@ -1125,6 +1140,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
 
 void WombatForensics::OpenUpdate()
 {
+    // MIGHT WANT TO LAUNCH THESE GUYS BEFORE THE BELOW STUFF, SO THEY FINISH BEFORE I SET MODEL.
+    QtConcurrent::run(InitializeHashList);
+    QtConcurrent::run(InitializeTaggedList);
     // Need to account
     QString hashstr = "MD5 Hash";
     // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
@@ -1141,6 +1159,8 @@ void WombatForensics::OpenUpdate()
         QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash); // load images hash after case open to speed up thumbnail viewing
         thashwatcher.setFuture(tmpfuture);
     }
+    // LOAD HASHVALUES HERE
+    // LOAD TAG VALUES HERE
     // add manual carved files
     QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
     QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
@@ -1402,6 +1422,9 @@ void WombatForensics::UpdateStatus()
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
     QApplication::restoreOverrideCursor();
+    QtConcurrent::run(GenerateWombatCaseFile);
+    //QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
+    //savewcfwatcher.setFuture(tmpfuture);
 }
 
 void WombatForensics::AddEvidence()
@@ -2090,6 +2113,7 @@ void WombatForensics::HashingFinish()
         treenodemodel->UpdateHeaderNode(7, "SHA256 Hash");
     //qDebug() << hashsum;
     qDebug() << "Hashing should be Finished";
+    QtConcurrent::run(SaveHashList); // save ids/hashed values to hashlist file for re-opening a case.
 }
 
 void WombatForensics::UpdateDig(int digid, int digcnt)
@@ -2787,6 +2811,7 @@ void WombatForensics::SaveState()
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
     if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 4)
         RewriteSelectedIdContent(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+    SaveTaggedList();
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);
 }

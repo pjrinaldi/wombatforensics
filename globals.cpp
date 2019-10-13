@@ -48,6 +48,8 @@ bool originalpath = true;
 QString hexstring = "";
 QHash<QString, bool> checkhash;
 QHash<QString, QString> imageshash;
+QHash<QString, QString> taggedhash; // list of tagged files: [id], tag
+QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 QMutex mutex;
 FilterValues filtervalues;
 QList<EvidenceReportData> evidrepdatalist;

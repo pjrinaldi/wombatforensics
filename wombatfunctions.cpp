@@ -1231,7 +1231,6 @@ void LoadImagesHash()
 
 void GenerateHash(QString itemid)
 {
-    // NEED TO IMPLEMENT NTFS AND ADS USING WHETHER IT HAS THE :
     if(itemid.split("-").count() == 5)
     {
         int hashtype = 1;
@@ -1245,7 +1244,7 @@ void GenerateHash(QString itemid)
         char* hashdata = new char[0];
         ssize_t hashdatalen = 0;
         hashdatalen = PopulateFileBuffer(itemid, &hashdata);
-        qDebug() << "hashdatalen:" << hashdatalen;
+        //qDebug() << "hashdatalen:" << hashdatalen;
         /*
         int hashtype = 1;
         // given itemid, open file stat, file prop
@@ -1360,6 +1359,8 @@ void GenerateHash(QString itemid)
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
         QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
         //delete[] hashdata;
+
+        /*
         QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + itemid.split("-").at(0) + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2));
         QStringList filefiles;
         QFile filefile;
@@ -1405,6 +1406,8 @@ void GenerateHash(QString itemid)
                 filefile.write(tmpstr.toStdString().c_str());
             filefile.close();
         }
+        */
+        hashlist.insert(itemid, hashstr);
         treenodemodel->UpdateNode(itemid, 7, hashstr);
         QString hashheader = "";
         if(hashsum == 1) // MD5
@@ -4145,7 +4148,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
             if(fsfile != NULL && !TSK_FS_ISDOT(fsfile->name->name))
             {
                 // DO MY STUFF HERE...
-                QString outstring = "";
+                //QString outstring = "";
                 QString parentstr = "";
                 qint64 curaddress = 0;
                 qint64 paraddress = 0;
@@ -4154,11 +4157,11 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 QByteArray ba;
                 ba.clear();
                 ba.append(QString(fsfile->name->name));
-                outstring += ba.toBase64() + "," + QString::number(fsfile->name->type) + "," + QString::number(fsfile->name->par_addr) + ",";
+                //outstring += ba.toBase64() + "," + QString::number(fsfile->name->type) + "," + QString::number(fsfile->name->par_addr) + ",";
                 treeout << ba.toBase64(); // NAME - 0
                 ba.clear();
                 ba.append(QString("/" + QString::fromStdString(std::string(path))));
-                outstring += ba.toBase64() + ",";
+                //outstring += ba.toBase64() + ",";
                 treeout << ba.toBase64(); // FULL PATH - 1
                 //ba.clear();
                 if(fsfile->name->par_addr == fsfile->fs_info->root_inum)
@@ -4169,12 +4172,12 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 paraddress = fsfile->name->par_addr;
                 if(fsfile->meta != NULL)
                 {
-                    outstring += QString::number(fsfile->meta->atime) + "," + QString::number(fsfile->meta->ctime) + "," + QString::number(fsfile->meta->crtime) + "," + QString::number(fsfile->meta->mtime) + "," + QString::number(fsfile->meta->size) + "," + QString::number(fsfile->meta->addr) + ",";
+                    //outstring += QString::number(fsfile->meta->atime) + "," + QString::number(fsfile->meta->ctime) + "," + QString::number(fsfile->meta->crtime) + "," + QString::number(fsfile->meta->mtime) + "," + QString::number(fsfile->meta->size) + "," + QString::number(fsfile->meta->addr) + ",";
                     treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime); // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
                 else
                 {
-                    outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ","; 
+                    //outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ","; 
                     treeout << "0" << "0" << "0" << "0" << "0"; // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
                 char* magicbuffer = new char[0];
@@ -4187,13 +4190,13 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
                 QString mimestr = GenerateCategorySignature(mimetype);
                 delete[] magicbuffer;
-                outstring += mimestr + ",0,e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f";
-                if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
-                    outstring += "*" + QString::number(orphancount);
-                else
-                    outstring += QString::number(fsfile->name->meta_addr);
-                outstring += "-a" + QString::number(fsfile->name->par_addr);
-                outstring += ",0";
+                //outstring += mimestr + ",0,e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f";
+                //if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
+                //    outstring += "*" + QString::number(orphancount);
+                //else
+                //    outstring += QString::number(fsfile->name->meta_addr);
+                //outstring += "-a" + QString::number(fsfile->name->par_addr);
+                //outstring += ",0";
                 treeout << "0"; // HASH - 7
                 treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
                 treeout << "0"; // TAG - 10
@@ -4208,7 +4211,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     treeout << QString::number(fsfile->name->type); // file type - 12
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
                 {
-                    outstring += ",1";
+                    //outstring += ",1";
                     treeout << "1"; // orphan - 13
                 }
                 else
@@ -4217,12 +4220,12 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     {
                         if(((fsfile->meta->flags & TSK_FS_META_FLAG_UNALLOC) == 2) && ((fsfile->meta->flags & TSK_FS_META_FLAG_USED) == 4))
                         {
-                            outstring += ",1";
+                            //outstring += ",1";
                             treeout << "1"; // UNALLOC - 13
                         }
                         else
                         {
-                            outstring += ",0";
+                            //outstring += ",0";
                             treeout << "0"; // ALLOC - 13
                         }
                     }
@@ -4230,16 +4233,17 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     {
                         if((fsfile->name->flags & TSK_FS_NAME_FLAG_UNALLOC) == 0x02)
                         {
-                            outstring += ",1";
+                            //outstring += ",1";
                             treeout << "1"; // UNALLOC - 13
                         }
                         else
                         {
-                            outstring += ",0";
+                            //outstring += ",0";
                             treeout << "0"; // ALLOC = 13
                         }
                     }
                 }
+                /*
                 outstring += ",0"; // empty bookmark value
                 QFile filefile;
                 QTextStream out(&filefile);
@@ -4252,6 +4256,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 out.flush();
                 if(filefile.isOpen())
                     filefile.close();
+                */
                 QList<QVariant> nodedata;
                 nodedata.clear();
                 for(int i=0; i < 12; i++)
@@ -4306,16 +4311,20 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                                     QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
                                     QString mimestr = GenerateCategorySignature(adsmimetype);
                                     delete[] fbuf;
+                                    /*
                                     QFile adsfile(partpath + "f" + QString::number(curaddress) + "-" + QString::number(fsattr->id)  + ".a" + QString::number(curaddress) + ".stat");
                                     adsfile.open(QIODevice::Append | QIODevice::Text);
                                     QTextStream adsout(&adsfile);
+                                    */
                                     adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
-                                    adsout << adsba.toBase64() << "," << fsfile->name->type << "," << fsfile->meta->addr << "," << ba.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (qint64)fsattr->size + 16 << "," << mimestr << "," << QString::number(fsattr->id) << ",e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr) << ",0,0,0";
+                                    //adsout << adsba.toBase64() << "," << fsfile->name->type << "," << fsfile->meta->addr << "," << ba.toBase64() << ",0, 0, 0, 0," << fsattr->size << "," << adssize - (qint64)fsattr->size + 16 << "," << mimestr << "," << QString::number(fsattr->id) << ",e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr) << ",0,0,0";
+                                    /*
                                     adsout.flush();
                                     if(adsfile.isOpen())
                                         adsfile.close();
                                     else
                                         qDebug() << "ads file failed to open.";
+                                    */
                                     treeout.clear();
                                     treeout << adsba.toBase64() << ba.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString("e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                                     nodedata.clear();
@@ -4803,3 +4812,108 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     return bufferlength;
 }
 
+void InitializeHashList(void)
+{
+    hashlist.clear();
+    QString tmpstr = "";
+    QFile hashfile(wombatvariable.tmpmntpath + "hashlist");
+    if(hashfile.exists())
+    {
+        if(!hashfile.isOpen())
+            hashfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(hashfile.isOpen())
+            tmpstr = hashfile.readLine();
+        QStringList hlist = tmpstr.split(",", QString::SkipEmptyParts);
+        for(int i=0; i < hlist.count(); i++)
+            hashlist.insert(hlist.at(i).split("|", QString::SkipEmptyParts).at(0), hlist.at(i).split("|", QString::SkipEmptyParts).at(1));
+    }
+    QHashIterator<QString, QString> i(hashlist);
+    while(i.hasNext())
+    {
+        i.next();
+        treenodemodel->UpdateNode(i.key(), 7, i.value());
+    }
+    //treenodemodel->UpdateNode(itemid, 7, hashstr);
+    //QtConcurrent::map(hashlist, UpdateHashNodes);
+}
+
+void InitializeTaggedList(void)
+{
+    taggedhash.clear();
+    QString tmpstr = "";
+    QFile hashfile(wombatvariable.tmpmntpath + "taggedlist");
+    if(hashfile.exists())
+    {
+        if(!hashfile.isOpen())
+            hashfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(hashfile.isOpen())
+            tmpstr = hashfile.readLine();
+        QStringList hlist = tmpstr.split(",", QString::SkipEmptyParts);
+        for(int i=0; i < hlist.count(); i++)
+            taggedhash.insert(hlist.at(i).split("|", QString::SkipEmptyParts).at(0), hlist.at(i).split("|", QString::SkipEmptyParts).at(1));
+    }
+    //QtConcurrent::map(taggedhash, UpdateTaggedNodes);
+}
+
+void SaveHashList(void)
+{
+    QFile hfile(wombatvariable.tmpmntpath + "hashlist");
+    if(!hfile.isOpen())
+        hfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(hfile.isOpen())
+    {
+        QHashIterator<QString, QString> i(hashlist);
+        while(i.hasNext())
+        {
+            i.next();
+            hfile.write(i.key().toStdString().c_str());
+            hfile.write("|");
+            hfile.write(i.value().toStdString().c_str());
+            hfile.write(",");
+        }
+    }
+    hfile.close();
+}
+
+void SaveTaggedList(void)
+{
+    QFile hfile(wombatvariable.tmpmntpath + "hashlist");
+    if(!hfile.isOpen())
+        hfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(hfile.isOpen())
+    {
+        QHashIterator<QString, QString> i(taggedhash);
+        while(i.hasNext())
+        {
+            i.next();
+            hfile.write(i.key().toStdString().c_str());
+            hfile.write("|");
+            hfile.write(i.value().toStdString().c_str());
+            hfile.write(",");
+        }
+    }
+    hfile.close();
+}
+/*
+ *
+void WombatForensics::UpdateCheckState()
+{
+    QFile hashfile(wombatvariable.tmpmntpath + "checkstate");
+    hashfile.open(QIODevice::WriteOnly);
+    QHashIterator<QString, bool> i(checkhash);
+    QByteArray hasharray;
+    while(i.hasNext())
+    {
+        i.next();
+        if(checkhash.contains(i.key()))
+        {
+            hasharray.clear();
+            hasharray.append(QString(i.key() + "|" + QString::number(i.value()) + ","));
+            hashfile.write(hasharray);
+        }
+    }
+    hashfile.close();
+}
+
+ *
+ */ 
