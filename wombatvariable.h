@@ -35,6 +35,13 @@ struct AddEvidenceVariable
     int partint;
 };
 
+struct FSFileVariable
+{
+    TskFsFile* fsfile;
+    QString partpath;
+    TSK_STACK* stack;
+};
+
 typedef struct
 {
     TSK_IMG_INFO imginfo;
@@ -50,5 +57,6 @@ typedef struct
 Q_DECLARE_METATYPE(WombatVariable);
 Q_DECLARE_METATYPE(AddEvidenceVariable);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);
+Q_DECLARE_METATYPE(FSFileVariable);
 
 #endif // WOMBATVARIABLE_H
