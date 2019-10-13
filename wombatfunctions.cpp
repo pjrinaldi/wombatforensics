@@ -4097,54 +4097,6 @@ void RewriteSelectedIdContent(QString selectedid)
 
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partpath)
 {
-    // CURRENTLY IT WORKS FOR REGULAR FILES, BUT FAILS ON ORPHANS.
-    // THERE IS NO META FOR ORPHANS EVEN THOUGH THERE SHOULD BE....
-    // NOW I HAVE TO TEST IF ORPHANS WORKED ON A CALLBACK FUNCTION, THE OLD WAY
-    
-    // ALSO WILL NEED TO DO THIS FOR PARSEDIR()
-    // MAY NEED TO ABSTRACT THE STACK* some so it is more functional.
-    // NEED TO REIMPLEMENT SOMETHING LIKE THIS TO GET THE META...
-    /*
-    // allocate a structure to return
-    if ((fs_file = tsk_fs_file_alloc(a_fs_dir->fs_info)) == NULL)
-        return NULL;
-
-    fs_name = &(a_fs_dir->names[a_idx]);
-
-    // copy the name into another structure that we can return and later free
-    if ((fs_file->name =
-            tsk_fs_name_alloc(fs_name->name ? strlen(fs_name->name) +
-                1 : 0,
-                fs_name->shrt_name ? strlen(fs_name->shrt_name) +
-                1 : 0)) == NULL) {
-        return NULL;
-    }
-    if (tsk_fs_name_copy(fs_file->name, fs_name))
-        return NULL;
-
-     * load the fs_meta structure if possible.
-     * Must have non-zero inode addr or have allocated name (if inode is 0)
-    if (((fs_name->meta_addr)
-            || (fs_name->flags & TSK_FS_NAME_FLAG_ALLOC))) {
-        if (a_fs_dir->fs_info->file_add_meta(a_fs_dir->fs_info, fs_file,
-                fs_name->meta_addr)) {
-            if (tsk_verbose)
-                tsk_error_print(stderr);
-            tsk_error_reset();
-        }
-
-        // if the sequence numbers don't match, then don't load the meta
-        // should ideally have sequence in previous lookup, but it isn't 
-        // in all APIs yet
-        if ((fs_file->meta) && (fs_file->meta->seq != fs_name->meta_seq)) {
-            tsk_fs_meta_close(fs_file->meta);
-            fs_file->meta = NULL;
-        }
-    }
-    return fs_file;
-}
-    
-    */
     TSK_FS_DIR* fsdir = NULL;
     fsdir = tsk_fs_dir_open_meta(fsinfo, dirinum);
     if(fsdir != NULL)
@@ -4154,19 +4106,11 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
         {
             TSK_FS_FILE* fsfile = NULL;
             fsfile = tsk_fs_dir_get(fsdir, i);
-            if(fsfile->meta != NULL)
+            if(fsfile->meta == NULL)
             {
-                qDebug() << "fsfile meta works" << fsfile->meta->addr;
+                if(fsfile->name->meta_addr || (fsfile->name->flags & TSK_FS_NAME_FLAG_ALLOC))
+                    fsdir->fs_info->file_add_meta(fsdir->fs_info, fsfile, fsfile->name->meta_addr);
             }
-            else
-            {
-                // HERE IS WHERE I WOULD ATTEMPT TO IMPLEMENT THE ABOVE...
-                qDebug() << "fsfile meta doesn't work";
-            }
-            if(fsfile->name != NULL)
-                qDebug() << "fsfile name works";
-            else
-                qDebug() << "fsfile name doesn't work";
             if(fsfile != NULL && !TSK_FS_ISDOT(fsfile->name->name))
             {
                 // DO MY STUFF HERE...
@@ -4199,7 +4143,6 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 }
                 else
                 {
-                    qDebug() << "no meta:" << fsfile->name->meta_addr;
                     outstring += "0,0,0,0,0," + QString::number(fsfile->name->meta_addr) + ","; 
                     treeout << "0" << "0" << "0" << "0" << "0"; // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
@@ -4361,18 +4304,18 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     delete[] type;
                     delete[] startoffset;
                 }
-                if(fsfile->meta != NULL)
+                if(fsfile->name != NULL)
                 {
-                    if(fsfile->meta->type == TSK_FS_META_TYPE_DIR || QString(fsfile->name->name).contains("$OrphanFiles")) // DIRECTORY
+                    if(fsfile->name->type == TSK_FS_NAME_TYPE_DIR || QString(fsfile->name->name).contains("$OrphanFiles")) // DIRECTORY
                     {
                         if(TSK_FS_ISDOT(fsfile->name->name) == 0)
                         {
-                            if(tsk_stack_find(stack, fsfile->meta->addr) == 0) // process if it's not on stack
+                            if(tsk_stack_find(stack, fsfile->name->meta_addr) == 0) // process if it's not on stack
                             {
                                 // DO MY RECURSE HERE...
-                                tsk_stack_push(stack, fsfile->meta->addr);
+                                tsk_stack_push(stack, fsfile->name->meta_addr);
                                 path2 = std::string(path) + "/" + std::string(fsfile->name->name);
-                                ProcessDir(fsinfo, stack, fsfile->meta->addr, path2.c_str(), eint, vint, pint, partpath);
+                                ProcessDir(fsinfo, stack, fsfile->name->meta_addr, path2.c_str(), eint, vint, pint, partpath);
                                 tsk_stack_pop(stack);
                             }
                         }
@@ -4463,17 +4406,17 @@ void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString pa
                         isignals->ProgUpd();
                     }
                 }
-                if(fsfile->getMeta())
+                if(fsfile->getName())
                 {
-                    if(fsfile->getMeta()->getType() == TSK_FS_META_TYPE_DIR || QString(fsfile->getName()->getName()).contains("$OrphanFiles")) // DIRECTORY
+                    if(fsfile->getName()->getType() == TSK_FS_NAME_TYPE_DIR || QString(fsfile->getName()->getName()).contains("$OrphanFiles")) // DIRECTORY
                     {
                         if(TSK_FS_ISDOT(fsfile->getName()->getName()) == 0)
                         {
-                            if(tsk_stack_find(stack, fsfile->getMeta()->getAddr()) == 0) // process if it's not on stack
+                            if(tsk_stack_find(stack, fsfile->getName()->getMetaAddr()) == 0) // process if it's not on stack
                             {
                                 // DO MY RECURSE HERE...
-                                tsk_stack_push(stack, fsfile->getMeta()->getAddr());
-                                ParseDir(fsinfo, stack, fsfile->getMeta()->getAddr(), partitionpath);
+                                tsk_stack_push(stack, fsfile->getName()->getMetaAddr());
+                                ParseDir(fsinfo, stack, fsfile->getName()->getMetaAddr(), partitionpath);
                                 tsk_stack_pop(stack);
                             }
                         }
