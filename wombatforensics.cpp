@@ -2090,8 +2090,6 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             }
             if(digoptions.at(i) == 4 || digoptions.at(i) == 5)
             {
-                //for(int j=0; j < digfilelist.count(); j++)
-                //    GenerateVidThumbnails(digfilelist.at(j));
                 videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
                 videowatcher.setFuture(videofuture);
             }
