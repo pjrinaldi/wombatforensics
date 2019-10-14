@@ -1138,12 +1138,14 @@ void ProcessExport(QString objectid)
     QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
     QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
+    QString astring = objectid.split("-", QString::SkipEmptyParts).at(4);
     if(fstring.contains(":") == true)
         fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
     QString tmpstr = "";
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
+    /*
     QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
     QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
     QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
@@ -1152,20 +1154,29 @@ void ProcessExport(QString objectid)
     if(filefile.isOpen())
         tmpstr = filefile.readLine();
     filefile.close();
+
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    */
+    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    qDebug() << "ProcessExport()->indxlist count:" << indxlist.count();
     QString tmppath = "";
-    QByteArray ba;
-    ba.clear();
-    ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
-    QString tmpname = QByteArray::fromBase64(ba);
+    //QByteArray ba;
+    //ba.clear();
+    //ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
+    QString tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
+    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+    //QString tmpname = QByteArray::fromBase64(ba);
     if(originalpath == true)
     {
-        ba.clear();
-        ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(3));
-        tmppath = exportpath + QByteArray::fromBase64(ba);
+        tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+        //ba.clear();
+        //ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(3));
+        //tmppath = exportpath + QByteArray::fromBase64(ba);
     }
     else
         tmppath = exportpath + "/";
-    if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
+    //if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
+    if(curitem->itemtype == 2 || curitem->itemtype == 11)
     {
         QDir dir;
         bool tmpdir = dir.mkpath(QString(tmppath + tmpname));
