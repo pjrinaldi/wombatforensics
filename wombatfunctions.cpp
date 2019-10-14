@@ -1158,12 +1158,12 @@ void ProcessExport(QString objectid)
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     */
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     QString tmppath = "";
     //QByteArray ba;
     //ba.clear();
     //ba.append(tmpstr.split(",", QString::SkipEmptyParts).at(0));
     QString tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
-    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     //QString tmpname = QByteArray::fromBase64(ba);
     if(originalpath == true)
     {
@@ -1447,7 +1447,7 @@ void GenerateVidThumbnails(QString thumbid)
     if(thumbid.split("-").count() == 5)
     {
         QString tmpstr = "";
-        QString filestr = "";
+        //QString filestr = "";
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
         QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
@@ -1579,6 +1579,7 @@ void GenerateVidThumbnails(QString thumbid)
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
+        qDebug() << "tmpstring:" << tmpstring;
         if(imglen > 0)
         {
             QFile tmpfile(tmpstring);
@@ -1588,6 +1589,8 @@ void GenerateVidThumbnails(QString thumbid)
                 outbuffer.writeRawData(imgbuf, imglen);
                 tmpfile.close();
             }
+            else
+                qDebug() << thumbid << "error writing file.";
         }
         /*
         delete[] imgbuf;
@@ -1598,6 +1601,8 @@ void GenerateVidThumbnails(QString thumbid)
         readfsinfo = NULL;
         readimginfo = NULL;
         */
+
+        /*
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
         //qDebug() << "id:filename" << thumbid << filefile.fileName().split("mntpt/").at(1);
         if(!filefile.isOpen())
@@ -1606,18 +1611,22 @@ void GenerateVidThumbnails(QString thumbid)
             filestr = filefile.readLine();
         filefile.close();
         if(filestr.count() > 1)
-        {
-            QString filemime = filestr.split(",").at(10);
-            QString filecat = filemime.split("/").first();
+        */
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+            QString filecat = curitem->Data(8).toString();
+            //QString filemime = filestr.split(",").at(10);
+            //QString filecat = filemime.split("/").first();
             if(filecat.contains("Video"))
             {
                 if(imglen > 0)
                 {
                     QByteArray ba;
-                    QByteArray ba2;
-                    ba.append(filestr.split(",").at(0));
-                    ba2.append(filestr.split(",").at(3));
-                    QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+                    QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
+                    //QByteArray ba2;
+                    //ba.append(filestr.split(",").at(0));
+                    //ba2.append(filestr.split(",").at(3));
+                    //QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
                     ba.clear();
                     ba.append(fullpath);
                     imageshash.insert(thumbid, QString(ba.toBase64()));
@@ -1645,8 +1654,8 @@ void GenerateVidThumbnails(QString thumbid)
                         videothumbnailer.setSeekPercentage(seekpercentage);
                         videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());
                     }
+                    qDebug() << thumbid << "tlist count:" << tlist.count();
                     delete filmstripfilter;
-                    //qDebug() << "tlist:" << tlist;
                     // implement imagemagick montage...
                     std::list<Magick::Image> thmbimages;
                     std::list<Magick::Image> montage;
@@ -1656,7 +1665,7 @@ void GenerateVidThumbnails(QString thumbid)
                         image.read(tlist.at(i).toStdString());
                         thmbimages.push_back(image);
                     }
-                    //qDebug() << "thmbimages:" << thmbimages.size();
+                    qDebug() << thumbid << "thmbimages:" << thmbimages.size();
                     //QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
                     QString thumbout = genthmbpath + "thumbs/" + thumbid + ".jpg";
                     Magick::Montage montageopts;
@@ -1690,7 +1699,6 @@ void GenerateVidThumbnails(QString thumbid)
                     writer.write(thumbimage);
                 }
             }
-        }
         digimgthumbcount++;
         isignals->DigUpd(4, digimgthumbcount);
     }
@@ -1701,7 +1709,7 @@ void GenerateThumbnails(QString thumbid)
     if(thumbid.split("-").count() == 5)
     {
         QString tmpstr = "";
-        QString filestr = "";
+        //QString filestr = "";
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
         QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
@@ -1837,6 +1845,7 @@ void GenerateThumbnails(QString thumbid)
         readfsinfo = NULL;
         readimginfo = NULL;
 */
+        /*
         QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".stat");
         //qDebug() << "id:filename" << thumbid << filefile.fileName().split("mntpt/").at(1);
         if(!filefile.isOpen())
@@ -1844,18 +1853,26 @@ void GenerateThumbnails(QString thumbid)
         if(filefile.isOpen())
             filestr = filefile.readLine();
         filefile.close();
-        if(filestr.count() > 1)
+        */
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        //if(filestr.count() > 1)
         {
-            QString filemime = filestr.split(",").at(10);
-            QString filecat = filemime.split("/").first();
+            //QString filemime = curitem->Data(9).toString();
+            QString filecat = curitem->Data(8).toString();
+            //QString filemime = filestr.split(",").at(10);
+            //QString filecat = filemime.split("/").first();
             if(filecat.contains("Image"))
             {
                 QByteArray ba;
-                QByteArray ba2;
-                ba.append(filestr.split(",").at(0));
-                ba2.append(filestr.split(",").at(3));
-                QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
                 ba.clear();
+                QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
+                //QByteArray ba;
+                //QByteArray ba2;
+                //ba.append(filestr.split(",").at(0));
+                //ba2.append(filestr.split(",").at(3));
+                //QString fullpath = QString(QByteArray::fromBase64(ba2)) + QString(QByteArray::fromBase64(ba));
+                //ba.clear();
                 ba.append(fullpath);
                 imageshash.insert(thumbid, QString(ba.toBase64()));
                 QImage fileimage;
