@@ -453,7 +453,7 @@ void WombatForensics::CreateNewTag()
 
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
 {
-    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 4)
+    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
     {
         /*
         QModelIndex parindex = curindex.parent();
@@ -1140,10 +1140,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
 
 void WombatForensics::OpenUpdate()
 {
-    // MIGHT WANT TO LAUNCH THESE GUYS BEFORE THE BELOW STUFF, SO THEY FINISH BEFORE I SET MODEL.
-    QtConcurrent::run(InitializeHashList);
-    QtConcurrent::run(InitializeTaggedList);
-    // Need to account
     QString hashstr = "MD5 Hash";
     // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
     if(hashsum == 2)
@@ -1159,8 +1155,6 @@ void WombatForensics::OpenUpdate()
         QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash); // load images hash after case open to speed up thumbnail viewing
         thashwatcher.setFuture(tmpfuture);
     }
-    // LOAD HASHVALUES HERE
-    // LOAD TAG VALUES HERE
     // add manual carved files
     QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
     QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
@@ -1471,7 +1465,7 @@ void WombatForensics::UpdateProperties()
     {
         propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(2) + "/prop");
     }
-    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 4) // file
+    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 5) // file
     {
         QString tmpfvalue = "";
         QString parentstr = "5"; // NTFS ROOT INUM
@@ -1488,10 +1482,10 @@ void WombatForensics::UpdateProperties()
         }
         else
             parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-").at(3).mid(1);
-        if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").last().contains(":"))
-            tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").last().split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").last().split(":").at(1);
+        if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).contains(":"))
+            tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).split(":").at(1);
         else
-            tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").last();
+            tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3);
         propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
     }
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -1514,10 +1508,10 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
-    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 4)
+    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
     {
         if(curindex.sibling(curindex.row(), 2).data().toLongLong() > 0)
-            RewriteSelectedIdContent(curindex.sibling(curindex.row(), 11).data().toString());
+            RewriteSelectedIdContent(curindex);
     }
 }
 
@@ -1615,6 +1609,7 @@ void WombatForensics::LoadHexContents()
                 mftentryoffset = tmpstring.split("||").at(1);
         }
         partpropfile.close();
+        /*
         QFile filefile;
         if(nodeid.split("-").at(3).split(":").count() > 1)
             filefile.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3).split(":").first() + "-" + nodeid.split("-").at(3).split(":").last() + ".a" + paridstr + ".stat");
@@ -1624,15 +1619,29 @@ void WombatForensics::LoadHexContents()
         if(filefile.isOpen())
             tmpstr = filefile.readLine();
         filefile.close();
+        */
         int mftaddress = 0;
+        if(nodeid.split("-").at(3).split(":").count() > 1) // ads attribute
+            mftaddress = nodeid.split("-a").last().toInt();
+        else
+            mftaddress = nodeid.split("-f").last().split("-").first().toInt();
+        /*
         if(nodeid.split("-").at(3).split(":").count() > 1) // ads attribute
             mftaddress = tmpstr.split(",").at(2).toInt();
         else
             mftaddress = tmpstr.split(",").at(9).toInt();
+        */
         ui->hexview->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
-        if(tmpstr.split(",").at(8).toInt() == 0) // zero file
+        //if(tmpstr.split(",").at(8).toInt() == 0) // zero file
+        if(selectednode->Data(2).toInt() == 0) // zero file
         {
+            casedatafile.setFileName(QDir::tempPath() + "/zfile");
+            casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
+            casedatafile.write("dummy zerofile");
+            casedatafile.close();
+            ui->hexview->BypassColor(true);
+            ui->hexview->setData(casedatafile);
             ui->hexview->setEnabled(false);
             ui->actionsearchhex->setEnabled(false);
         }
@@ -1673,12 +1682,12 @@ void WombatForensics::LoadHexContents()
                 {
                     if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                     {
-                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, tmpstr.split(",").at(8).toLongLong(), 0);
+                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
                         ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
                     }
                     else // IF RESIDENT
                     {
-                        if(tmpstr.split(",").at(8).toLongLong() < 700) // takes care of $BadClus which is non-resident but doesn't have blocks
+                        if(selectednode->Data(2).toLongLong() < 700) // takes care of $BadClus which is non-resident but doesn't have blocks
                         {
                         qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
                         //qDebug() << "(resident ads) residentoffset:" << residentoffset;
@@ -1712,7 +1721,7 @@ void WombatForensics::LoadHexContents()
                         mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                         resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
     
-                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, tmpstr.split(",").at(8).toLongLong(), (curoffset + resoffset));
+                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
                         ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                         }
                         else
@@ -1721,7 +1730,8 @@ void WombatForensics::LoadHexContents()
                 }
                 else // IF NOT ADS
                 {
-                    if(tmpstr.split(",").at(1).toInt() == 3) // IF DIR
+                    //if(tmpstr.split(",").at(1).toInt() == 3) // IF DIR
+                    if(selectednode->itemtype == 2 || selectednode->itemtype == 11)
                     {
                         qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
                         //qDebug() << "(resident dir) residentoffset:" << residentoffset;
@@ -1810,7 +1820,7 @@ void WombatForensics::LoadHexContents()
                                 mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                                 resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
                             }
-                            ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, tmpstr.split(",").at(8).toLongLong(), (curoffset + resoffset));
+                            ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
                             ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                         }
                     }
@@ -1819,7 +1829,7 @@ void WombatForensics::LoadHexContents()
             else // OTHER FILE SYSTEM
             {
                 //qDebug() << "not ntfs";
-                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, tmpstr.split(",").at(8).toLongLong(), 0);
+                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
                 ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
             }
         }
@@ -1835,6 +1845,8 @@ void WombatForensics::CloseCurrentCase()
     {
         UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
         UpdateCheckState();
+        SaveTaggedList();
+        SaveHashList();
         ui->dirTreeView->clearSelection();
         delete treenodemodel;
         //qDebug() << "treenodemodel deleted";
@@ -2809,9 +2821,10 @@ void WombatForensics::SaveState()
     RemoveTmpFiles();
     UpdateCheckState();
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
-    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 4)
-        RewriteSelectedIdContent(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 5)
+        RewriteSelectedIdContent(selectedindex);
     SaveTaggedList();
+    SaveHashList();
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);
 }

@@ -62,7 +62,7 @@ QString GenerateCategorySignature(const QMimeType mimetype);
 void TransferThumbnails(QString thumbid, QString reppath);
 void TransferFiles(QString thumbid, QString reppath);
 void GenerateWombatCaseFile(void);
-void RewriteSelectedIdContent(QString selectedid);
+void RewriteSelectedIdContent(QModelIndex selectedid);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath);
 //void ParseDir(TskFsInfo* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, QString partitionpath);
@@ -72,7 +72,5 @@ void InitializeHashList(void);
 void InitializeTaggedList(void);
 void SaveHashList(void);
 void SaveTaggedList(void);
-//void UpdateTaggedNodes(void); // when open an existing case to populate tagged files
-//void UpdateHashNodes(void); // when open an existing case to populate hashes
 
 #endif // wombatfunctions.h
