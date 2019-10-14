@@ -1158,7 +1158,6 @@ void ProcessExport(QString objectid)
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     */
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    qDebug() << "ProcessExport()->indxlist count:" << indxlist.count();
     QString tmppath = "";
     //QByteArray ba;
     //ba.clear();
