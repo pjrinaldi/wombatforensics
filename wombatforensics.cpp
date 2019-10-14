@@ -2070,7 +2070,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     //LogMessage("Digging Deeper into Evidence");
     for(int i = 0; i < digoptions.count(); i++)
     {
-        qDebug() << "current digoption:" << digoptions.at(i);
+        //qDebug() << "current digoption:" << digoptions.at(i);
         if(dtype == 0) // selected
         {
             TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
@@ -2078,7 +2078,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         }
         else
             digfilelist = GetFileLists(dtype);
-        qDebug() << "digfilelist count:" << digfilelist;
+        //qDebug() << "digfilelist count:" << digfilelist;
         digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {

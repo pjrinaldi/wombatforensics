@@ -1579,8 +1579,6 @@ void GenerateVidThumbnails(QString thumbid)
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
-        qDebug() << "tmpstring:" << tmpstring;
-        qDebug() << "imgbuf length:" << strlen(imgbuf);
         if(imglen > 0)
         {
             QFile tmpfile(tmpstring);
@@ -1590,8 +1588,6 @@ void GenerateVidThumbnails(QString thumbid)
                 outbuffer.writeRawData(imgbuf, imglen);
                 tmpfile.close();
             }
-            else
-                qDebug() << thumbid << "error writing file.";
         }
         /*
         delete[] imgbuf;
@@ -1655,7 +1651,6 @@ void GenerateVidThumbnails(QString thumbid)
                         videothumbnailer.setSeekPercentage(seekpercentage);
                         videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());
                     }
-                    qDebug() << thumbid << "tlist count:" << tlist.count();
                     delete filmstripfilter;
                     // implement imagemagick montage...
                     std::list<Magick::Image> thmbimages;
@@ -1666,7 +1661,6 @@ void GenerateVidThumbnails(QString thumbid)
                         image.read(tlist.at(i).toStdString());
                         thmbimages.push_back(image);
                     }
-                    qDebug() << thumbid << "thmbimages:" << thmbimages.size();
                     //QString thumbout = wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg";
                     QString thumbout = genthmbpath + "thumbs/" + thumbid + ".jpg";
                     Magick::Montage montageopts;
@@ -3866,6 +3860,7 @@ void TransferThumbnails(QString thumbid, QString reppath)
     // open stat file with id..
     // then get the full id with -a* value
     // then do qfile::copy( with the full id...
+    /*
     QString tmpstr = "";
     QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
     QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
@@ -3888,6 +3883,9 @@ void TransferThumbnails(QString thumbid, QString reppath)
     //qDebug() << "full id:" << tmpstr.split(",", QString::SkipEmptyParts).at(12);
     if(QFile::exists(wombatvariable.tmpmntpath + "thumbs/" + tmpstr.split(",", QString::SkipEmptyParts).at(12) + ".jpg"))
         QFile::copy(wombatvariable.tmpmntpath + "thumbs/" + tmpstr.split(",", QString::SkipEmptyParts).at(12) + ".jpg", reppath + "thumbs/" + tmpstr.split(",",QString::SkipEmptyParts).at(12) + ".jpg");
+    */
+    if(QFile::exists(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg"))
+        QFile::copy(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg", reppath + "thumbs/" + thumbid + ".jpg");
 }
 
 void TransferFiles(QString thumbid, QString reppath)
@@ -3905,6 +3903,7 @@ void TransferFiles(QString thumbid, QString reppath)
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     imglen = PopulateFileBuffer(thumbid, &imgbuf);
+    /*
     QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
     QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
     QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
@@ -3913,12 +3912,16 @@ void TransferFiles(QString thumbid, QString reppath)
     if(filefile.isOpen())
         tmpstr = filefile.readLine();
     filefile.close();
+    */
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
     QString tmppath = reppath + "files/";
-    QString tmpname = tmpstr.split(",", QString::SkipEmptyParts).at(12);
-    if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
+    //QString tmpname = tmpstr.split(",", QString::SkipEmptyParts).at(12);
+    //if(tmpstr.split(",", QString::SkipEmptyParts).at(1).toInt() == 3) // directory
+    if(curnode->itemtype == 2 || curnode->itemtype == 11) // directory
     {
         QDir dir;
-        bool tmpdir = dir.mkpath(QString(tmppath + tmpname));
+        bool tmpdir = dir.mkpath(QString(tmppath + thumbid));
         if(!tmpdir)
         {
             qWarning() << "Creation of export directory tree for file:" << tmppath << "failed";
@@ -3932,7 +3935,7 @@ void TransferFiles(QString thumbid, QString reppath)
         bool tmpdir = dir.mkpath(QDir::cleanPath(tmppath));
         if(tmpdir == true)
         {
-            QFile tmpfile(tmppath + tmpname);
+            QFile tmpfile(tmppath + thumbid);
             if(tmpfile.open(QIODevice::WriteOnly))
             {
                 QDataStream outbuffer(&tmpfile);
@@ -4854,7 +4857,6 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     }
     else
     {
-        qDebug() << objectid << "PopulateFileBuffer()->fsfile size:" << fsfile->getMeta()->getSize();
         filebuffer = new char[fsfile->getMeta()->getSize()];
         bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
     }
