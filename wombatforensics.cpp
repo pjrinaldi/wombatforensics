@@ -2090,10 +2090,10 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             }
             if(digoptions.at(i) == 4 || digoptions.at(i) == 5)
             {
-                for(int j=0; j < digfilelist.count(); j++)
-                    GenerateVidThumbnails(digfilelist.at(j));
-                //videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
-                //videowatcher.setFuture(videofuture);
+                //for(int j=0; j < digfilelist.count(); j++)
+                //    GenerateVidThumbnails(digfilelist.at(j));
+                videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
+                videowatcher.setFuture(videofuture);
             }
         }
         else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 || digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256

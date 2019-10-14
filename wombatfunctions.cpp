@@ -1580,6 +1580,7 @@ void GenerateVidThumbnails(QString thumbid)
         dir.mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
         qDebug() << "tmpstring:" << tmpstring;
+        qDebug() << "imgbuf length:" << strlen(imgbuf);
         if(imglen > 0)
         {
             QFile tmpfile(tmpstring);
@@ -4853,6 +4854,7 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     }
     else
     {
+        qDebug() << objectid << "PopulateFileBuffer()->fsfile size:" << fsfile->getMeta()->getSize();
         filebuffer = new char[fsfile->getMeta()->getSize()];
         bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
     }
@@ -4860,7 +4862,7 @@ ssize_t PopulateFileBuffer(QString objectid, char** ibuffer)
     delete fsfile;
     delete fsinfo;
     delete imginfo;
-    delete[] filebuffer;
+    //delete[] filebuffer;
 
     return bufferlength;
 }
