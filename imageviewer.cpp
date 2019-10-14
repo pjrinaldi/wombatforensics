@@ -197,7 +197,7 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
     }
     else if(iconimage.width() > thumbsize)
     {
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(item->text().split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(item->text()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         if(indexlist.count() > 0)
         {
             videowindow = new VideoViewer();
@@ -214,5 +214,5 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
 void ImageViewer::HighlightTreeViewItem(QListWidgetItem* item)
 {
     //qDebug() << "image item:" << item->text();
-    emit SendObjectToTreeView(item->text().split("-a").at(0));
+    emit SendObjectToTreeView(item->text());
 }

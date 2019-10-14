@@ -1578,7 +1578,7 @@ void GenerateVidThumbnails(QString thumbid)
     */
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
-        QString tmpstring = wombatvariable.tmpfilepath + thumbid.split("-a").first() + "-tmp";
+        QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
         if(imglen > 0)
         {
             QFile tmpfile(tmpstring);
@@ -1646,7 +1646,7 @@ void GenerateVidThumbnails(QString thumbid)
                         if(seekpercentage == 100)
                             seekpercentage = 95;
                         //qDebug() << "seekpercentage:" << seekpercentage;
-                        QString tmpoutfile = wombatvariable.tmpfilepath + thumbid.split("-a").first() + ".t" + QString::number(seekpercentage) + ".jpg";
+                        QString tmpoutfile = wombatvariable.tmpfilepath + thumbid + ".t" + QString::number(seekpercentage) + ".jpg";
                         tlist.append(tmpoutfile);
                         videothumbnailer.setSeekPercentage(seekpercentage);
                         videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());

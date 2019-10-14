@@ -705,6 +705,7 @@ public:
 signals:
     void CheckedNodesChanged();
 private:
+    /*
     void AddEvidence(const QStringList &nodes, TreeNode* parent)
     {
         // parent is the zero item...
@@ -798,7 +799,7 @@ private:
                 }
             }
         }
-    };
+    };*/
 
 public:
     void AddNode(QList<QVariant> data, QString parid, int type, int deleted)
@@ -815,18 +816,18 @@ public:
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid)));
             else
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
-            parents[data.at(11).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
+            parents[data.at(11).toString()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
             if(checkhash.contains(data.at(11).toString())) // USED TO BE 0
-                parents.value(data.at(11).toString().split("-a").first())->SetChecked(true); // USED TO BE 0
+                parents.value(data.at(11).toString())->SetChecked(true); // USED TO BE 0
             if(deleted == 1)
-                parents.value(data.at(11).toString().split("-a").first())->SetDeleted(true); // USED TO BE 0
+                parents.value(data.at(11).toString())->SetDeleted(true); // USED TO BE 0
         }
     };
 
     void UpdateNode(QString itemid, int column, QString hash)
     {
         const QVariant tmpvar(hash);
-        parents.value(itemid.split("-a").first())->SetData(column, tmpvar);
+        parents.value(itemid)->SetData(column, tmpvar);
     };
     
     void UpdateHeaderNode(int column, QString hash)

@@ -212,15 +212,17 @@ void WombatForensics::UnCheckChecked()
     QStringList checkeditems;
     checkeditems.clear();
     checkeditems = GetFileLists(1);
-    qDebug() << "checekeditems:" << checkeditems;
+    //qDebug() << "checekeditems:" << checkeditems;
     for(int i=0; i < checkeditems.count(); i++)
     {
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         if(indexlist.count() > 0)
         {
             actionitem = static_cast<TreeNode*>(indexlist.first().internalPointer());
             if(!actionitem->IsChecked())
                 actionitem->SetChecked(true);
+            else
+                actionitem->SetChecked(false);
         }
     }
     emit treenodemodel->CheckedNodesChanged();
@@ -337,7 +339,7 @@ void WombatForensics::RemoveTag()
         //qDebug() << "Remove Tag Checked Items:" << checkeditems;
         for(int i=0; i < checkeditems.count(); i++)
         {
-            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             //qDebug() << "indexlist:" << indexlist.count();
             if(indexlist.count() > 0)
             {
@@ -436,7 +438,7 @@ void WombatForensics::CreateNewTag()
                 //qDebug() << "Tag File Checked Items:" << checkeditems;
                 for(int i=0; i < checkeditems.count(); i++)
                 {
-                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
                     //qDebug() << "indexlist:" << indexlist.count();
                     if(indexlist.count() > 0)
                     {
@@ -580,7 +582,7 @@ void WombatForensics::SetBookmark()
         //qDebug() << "Tag File Checked Items:" << checkeditems;
         for(int i=0; i < checkeditems.count(); i++)
         {
-            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i).split("-a").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             //qDebug() << "indexlist:" << indexlist.count();
             if(indexlist.count() > 0)
             {
