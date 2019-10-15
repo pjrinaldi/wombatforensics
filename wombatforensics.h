@@ -59,8 +59,6 @@ class WombatForensics : public QMainWindow
 public:
     explicit WombatForensics(QWidget *parent = 0);
     ~WombatForensics();
-    TskObject tskexternalobject;
-    TskObject* tskexternalptr;
     PropertiesWindow* propertywindow;
     ExportDialog* exportdialog;
     DigDeeperDialog* digdeeperdialog;

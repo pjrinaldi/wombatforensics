@@ -118,6 +118,5 @@
 #include <tsk_fs_i.h>
 #include <tsk_img_i.h>
 #include <tsk_vs_i.h>
-#include <tskvariable.h>
 
 #endif // WOMBATINCLUDE_H

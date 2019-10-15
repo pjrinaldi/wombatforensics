@@ -6,10 +6,6 @@
 ImageWindow::ImageWindow(QWidget* parent) : QDialog(parent), ui(new Ui::ImageWindow)
 {
     ui->setupUi(this);
-    //tskptr = &tskobj;
-    //tskptr->readimginfo = NULL;
-    //tskptr->readfsinfo = NULL;
-    //tskptr->readfileinfo = NULL;
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(SwitchScale(bool)));
 }
 
@@ -38,99 +34,6 @@ void ImageWindow::mousePressEvent(QMouseEvent* e)
 
 void ImageWindow::GetImage(QString objectid)
 {
-    /*
-    char* imgbuf = new char[0];
-    ssize_t imglen = 0;
-    TSK_IMG_INFO* readimginfo;
-    TSK_FS_INFO* readfsinfo;
-    TSK_FS_FILE* readfileinfo;
-    QString tmpstr = "";
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    std::vector<std::string> pathvector;
-    const TSK_TCHAR** imagepartspath;
-    pathvector.clear();
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-    QString evidencename = evidfiles.at(0).split(".e").first();
-    QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
-    QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
-    QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
-    QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
-    if(fstring.contains(":") == true)
-        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
-    qint64 curaddress = objectid.split("-f").at(1).split("-a").at(0).split(":").at(0).toLongLong(); 
-    QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
-    evidfile.open(QIODevice::ReadOnly);
-    tmpstr = evidfile.readLine();
-    int partcount = tmpstr.split(",").at(3).split("|").size();
-    evidfile.close();
-    for(int i=0; i < partcount; i++)
-        pathvector.push_back(tmpstr.split(",").at(3).split("|").at(i).toStdString());
-    imagepartspath = (const char**)malloc(pathvector.size()*sizeof(char*));
-    for(uint i=0; i < pathvector.size(); i++)
-        imagepartspath[i] = pathvector[i].c_str();
-    readimginfo = tsk_img_open(partcount, imagepartspath, TSK_IMG_TYPE_DETECT, 0);
-    if(readimginfo == NULL)
-    {
-        qDebug() << tsk_error_get_errstr();
-        //LogMessage("Image opening error");
-    }
-    free(imagepartspath);
-    tmpstr = "";
-    QStringList partlist;
-    partlist.clear();
-    QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
-    partfile.open(QIODevice::ReadOnly);
-    tmpstr = partfile.readLine();
-    partlist = tmpstr.split(",");
-    readfsinfo = tsk_fs_open_img(readimginfo, tmpstr.split(",").at(4).toLongLong(), TSK_FS_TYPE_DETECT);
-    readfileinfo = tsk_fs_file_open_meta(readfsinfo, NULL, curaddress);
-    QImage fileimage;
-    //char imgbuf[readfileinfo->meta->size];
-    //ssize_t imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_NONE);
-    QDir filedir = QDir(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring);
-    QStringList filefiles = filedir.entryList(QStringList(fstring + ".a*.stat"), QDir::NoSymLinks | QDir::Files);
-    QFile filefile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + filefiles.at(0));
-    filefile.open(QIODevice::ReadOnly);
-    tmpstr = filefile.readLine();
-    if(filefile.isOpen())
-        filefile.close();
-    if(readfileinfo->meta != NULL)
-    {
-        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
-        {
-            if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
-            {
-                imgbuf = new char[tmpstr.split(",").at(8).toULongLong()];
-                imglen = tsk_fs_file_read_type(readfileinfo, TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, tmpstr.split(",").at(8).toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
-                if(imglen == -1)
-                    qDebug() << tsk_error_get_errstr();
-            }
-            else // IF NOT ADS
-            {
-                imgbuf = new char[readfileinfo->meta->size];
-                imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
-            }
-        }
-        else // OTHER FILE SYSTEM
-        {
-            imgbuf = new char[readfileinfo->meta->size];
-            imglen = tsk_fs_file_read(readfileinfo, 0, imgbuf, readfileinfo->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
-        }
-        bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
-        if(imageloaded)
-        {
-            ui->label->setPixmap(QPixmap::fromImage(fileimage));
-        }
-        else
-        {
-            ui->label->setPixmap(QPixmap::fromImage(QImage(":/bar/missingthumb")));
-        }
-    }
-    delete[] imgbuf;
-    tsk_fs_file_close(readfileinfo);
-    tsk_fs_close(readfsinfo);
-    tsk_img_close(readimginfo);
-    */
     QImage fileimage;
     bool imageloaded = fileimage.load(wombatvariable.tmpfilepath + objectid + "-fhex");
     if(imageloaded)

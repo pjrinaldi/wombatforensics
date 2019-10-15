@@ -1055,7 +1055,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
 	    	color = viewport()->palette().color(QPalette::WindowText);
 	    else
 		color = viewport()->palette().color(QPalette::Base);
-		painter.fillRect(_cursorRect, color);
+	    painter.fillRect(_cursorRect, color);
 	}
 	else
 	{

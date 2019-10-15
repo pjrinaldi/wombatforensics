@@ -38,7 +38,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addPermanentWidget(vline2, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
-    tskexternalptr = &tskexternalobject;
     isignals = new InterfaceSignals();
     idfilterview = new IdFilter(this);
     jumpfilterview = new JumpHex(this);

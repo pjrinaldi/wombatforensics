@@ -26,7 +26,6 @@ public:
 
 private slots:
     void HideClicked();
-    void GetHtmlContent(const QModelIndex &index);
     void Reload();
     
 signals:
@@ -38,8 +37,6 @@ protected:
 
 private:
     Ui::HtmlViewer* ui;
-    TskObject tskobj;
-    TskObject* tskptr;
     qint64 curobjaddr;
     QByteArray htmldata;
     

@@ -38,15 +38,12 @@ public slots:
     void PlayPause();
     void UpdateSlider(qint64);
     void SetDuration(qint64);
-    void GetVideo(const QModelIndex &index);
     
 private:
     Ui::VideoViewer* ui;
     QMediaPlayer* vplayer;
     QVideoWidget* videowidget;
     qint64 curobjaddr;
-    TskObject tskobj;
-    TskObject* tskptr;
 protected:
     void mousePressEvent(QMouseEvent* event);
 };

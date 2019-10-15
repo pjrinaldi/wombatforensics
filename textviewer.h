@@ -26,7 +26,6 @@ public:
 private slots:
     void HideClicked();
     void UpdateEncoding(int unused);
-    void GetTextContent(const QModelIndex &index);
 signals:
     void HideTextViewerWindow(bool checkstate);
 
@@ -35,8 +34,6 @@ protected:
 
 private:
     Ui::TextViewer* ui;
-    TskObject tskobj;
-    TskObject* tskptr;
     //QByteArray txtdata;
     //QByteArray tmpdata;
     QString decodedstring;
