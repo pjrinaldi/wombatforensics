@@ -3007,8 +3007,6 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
             {
                 // DO MY STUFF HERE...
                 QString parentstr = "";
-                qint64 curaddress = 0;
-                qint64 paraddress = 0;
                 QStringList treeout;
                 treeout.clear();
                 QByteArray ba;
@@ -3022,8 +3020,6 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint);
                 else
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
-                curaddress = fsfile->name->meta_addr;
-                paraddress = fsfile->name->par_addr;
                 if(fsfile->meta != NULL)
                 {
                     treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime); // SIZE, 4-DATES - 2, 3, 4, 5, 6
