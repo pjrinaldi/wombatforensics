@@ -388,9 +388,10 @@ void FileTypeFilter::DisplayFilter()
     QStringList tmptype;
     tmptype.clear();
     ui->typecomboBox->clear();
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QFile tmpfile;
-    QString tmpstr = "";
+    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    //QFile tmpfile;
+    //QString tmpstr = "";
+    /*
     QStringList evidlist = eviddir.entryList(QStringList("*.e*"), QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
     for(int i=0; i < evidlist.count(); i++)
     {
@@ -416,6 +417,14 @@ void FileTypeFilter::DisplayFilter()
                 }
             }
         }
+    }
+    */
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 9, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
+    for(int i=0; i < indexlist.count(); i++)
+    {
+        TreeNode* tmpnode = static_cast<TreeNode*>(indexlist.at(i).internalPointer());
+        if(tmpnode->Data(9).toString() != "0")
+            tmptype.append(tmpnode->Data(9).toString());
     }
     tmptype.removeDuplicates();
     for(int i=0; i < tmptype.count(); i++)
@@ -498,6 +507,7 @@ void FileCategoryFilter::DisplayFilter()
     QStringList tmpcategory;
     tmpcategory.clear();
     ui->categorycomboBox->clear();
+    /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QFile tmpfile;
     QString tmpstr = "";
@@ -526,6 +536,14 @@ void FileCategoryFilter::DisplayFilter()
                 }
             }
         }
+    }
+    */
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
+    for(int i=0; i < indexlist.count(); i++)
+    {
+        TreeNode* tmpnode = static_cast<TreeNode*>(indexlist.at(i).internalPointer());
+        if(tmpnode->Data(8).toString() != "0")
+            tmpcategory.append(tmpnode->Data(8).toString());
     }
     tmpcategory.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
@@ -570,6 +588,7 @@ void HashFilter::DisplayFilter()
 
 void HashFilter::HideClicked()
 {
+    /*
     QFile tmpfile;
     QString tmpstr = "";
     filtervalues.hashdupcnt = 0;
@@ -586,6 +605,14 @@ void HashFilter::HideClicked()
         tmpstr = tmpfile.readLine();
         tmpfile.close();
         filtervalues.hashlist.append(tmpstr.split(",", QString::SkipEmptyParts).at(13));
+    }
+    */
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 7, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
+    for(int i=0; i < indexlist.count(); i++)
+    {
+        TreeNode* tmpnode = static_cast<TreeNode*>(indexlist.at(i).internalPointer());
+        if(tmpnode->Data(7).toString() == "0")
+            filtervalues.hashlist.append(tmpnode->Data(7).toString());
     }
     if(filtervalues.hashbool)
     {
