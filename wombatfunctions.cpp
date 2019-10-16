@@ -1175,9 +1175,14 @@ void GenerateThumbnails(QString thumbid)
         bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
     }
     //*ibuffer = filebuffer;
-    delete fsfile;
-    delete fsinfo;
+    fsfile->close();
+    fsinfo->close();
+    fsfile = NULL;
+    fsinfo = NULL;
+    //delete fsfile;
+    //delete fsinfo;
     delete imginfo;
+    imginfo = NULL;
     //return bufferlength;
 
         //
