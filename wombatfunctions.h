@@ -60,7 +60,7 @@ void GenerateWombatCaseFile(void);
 void RewriteSelectedIdContent(QModelIndex selectedid);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath);
-ssize_t PopulateFileBuffer(QString objectid, char** filebuffer);
+//ssize_t PopulateFileBuffer(QString objectid, char** filebuffer);
 void InitializeHashList(void);
 void InitializeTaggedList(void);
 void SaveHashList(void);
