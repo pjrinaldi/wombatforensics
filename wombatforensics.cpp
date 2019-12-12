@@ -1946,6 +1946,23 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             if(tmpstr.contains("e" + evidfiles.first().split(".e").last()))
                 selectfile.write("");
             selectfile.close();
+            // 2.5 Remove e# entries from hashlist and taggedhash
+            QHashIterator<QString, QString> n(hashlist);
+            while(n.hasNext())
+            {
+                n.next();
+                if(n.key().contains(QString("e" + evidfiles.first().split(".e").last())))
+                    hashlist.remove(n.key());
+            }
+            SaveHashList();
+            QHashIterator<QString, QString> o(taggedhash);
+            while(o.hasNext())
+            {
+                o.next();
+                if(o.key().contains(QString("e" + evidfiles.first().split(".e").last())))
+                    taggedhash.remove(o.key());
+            }
+            SaveTaggedList();
             // 3. Delete evid directory.
             QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
             edir.removeRecursively();
