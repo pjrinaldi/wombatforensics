@@ -987,8 +987,10 @@ void GenerateVidThumbnails(QString thumbid)
         //char* imgbuf = new char[0];
         //ssize_t imglen = 0;
         //imglen = PopulateFileBuffer(thumbid, &imgbuf);
-        //
-        TskImgInfo* imginfo = new TskImgInfo();
+	TSK_IMG_INFO* imginfo = NULL;
+	std::vector<std::string> pathvector;
+	pathvector.clear();
+        //TskImgInfo* imginfo = new TskImgInfo();
     //QDir eviddir = QDir(wombatvariable.tmpmntpath);
     //QString tmpstr = "";
     //QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
@@ -1006,7 +1008,13 @@ void GenerateVidThumbnails(QString thumbid)
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
-    imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
+    pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(pathvector.size()*sizeof(char*));
+    images[0] = pathvector[0].c_str();
+    int partcount = tmpstr.split(",").at(3).split("|").size();
+    imginfo = tsk_img_open(partcount, images, TSK_IMG_TYPE_DETECT, 0);
+    //imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
     if(imginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
@@ -1022,39 +1030,57 @@ void GenerateVidThumbnails(QString thumbid)
         tmpstr = partfile.readLine();
     partlist = tmpstr.split(",");
     tmpstr = "";
-    TskFsInfo* fsinfo = new TskFsInfo();
-    fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+    TSK_FS_INFO* fsinfo = NULL;
+    fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+    //TskFsInfo* fsinfo = new TskFsInfo();
+    //fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
     qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
     //qint64 curaddr = tmpstr.split(",").at(9).toLongLong();
     char* filebuffer = new char[0];
     ssize_t bufferlength = 0;
-    TskFsFile* fsfile = new TskFsFile();
-    fsfile->open(fsinfo, fsfile, curaddr);
+    TSK_FS_FILE* fsfile = NULL;
+    fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
+    //TskFsFile* fsfile = new TskFsFile();
+    //fsfile->open(fsinfo, fsfile, curaddr);
     if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
     {
         if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
         {
             int attrid = objectid.split("-").at(3).split(":").last().toInt();
-            const TskFsAttribute* fsattr = fsfile->getAttr(attrid);
-            filebuffer = new char[fsattr->getSize()];
-            bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, fsattr->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
-            delete fsattr;
+	    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_id(fsfile, attrid);
+	    filebuffer = new char[fsattr->size];
+	    bufferlength = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, 0, filebuffer, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
+	    fsattr = NULL;
+            //const TskFsAttribute* fsattr = fsfile->getAttr(attrid);
+            //filebuffer = new char[fsattr->getSize()];
+            //bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, fsattr->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+            //delete fsattr;
         }
         else // IF NOT ADS
         {
-            filebuffer = new char[fsfile->getMeta()->getSize()];
-            bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+	    filebuffer = new char[fsfile->meta->size];
+	    bufferlength = tsk_fs_file_read(fsfile, 0, filebuffer, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+            //filebuffer = new char[fsfile->getMeta()->getSize()];
+            //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
         }
     }
     else
     {
-        filebuffer = new char[fsfile->getMeta()->getSize()];
-        bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+	filebuffer = new char[fsfile->meta->size];
+	bufferlength = tsk_fs_file_read(fsfile, 0, filebuffer, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+        //filebuffer = new char[fsfile->getMeta()->getSize()];
+        //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
     }
     //*ibuffer = filebuffer;
-    delete fsfile;
-    delete fsinfo;
-    delete imginfo;
+    tsk_fs_file_close(fsfile);
+    fsfile = NULL;
+    tsk_fs_close(fsinfo);
+    fsinfo = NULL;
+    tsk_img_close(imginfo);
+    imginfo = NULL;
+    //delete fsfile;
+    //delete fsinfo;
+    //delete imginfo;
     //return bufferlength;
 
         //
@@ -1176,8 +1202,12 @@ void GenerateThumbnails(QString thumbid)
         //char* imgbuf = new char[0];
         //ssize_t imglen = 0;
         //imglen = PopulateFileBuffer(thumbid, &imgbuf);
-        //
-        TskImgInfo* imginfo = new TskImgInfo();
+        
+	TSK_IMG_INFO* imginfo = NULL;
+	std::vector<std::string> pathvector;
+	pathvector.clear();
+
+        //TskImgInfo* imginfo = new TskImgInfo();
     //QDir eviddir = QDir(wombatvariable.tmpmntpath);
     //QString tmpstr = "";
     //QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
@@ -1195,7 +1225,14 @@ void GenerateThumbnails(QString thumbid)
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
-    imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
+    pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(pathvector.size()*sizeof(char*));
+    images[0] = pathvector[0].c_str();
+    int partcount = tmpstr.split(",").at(3).split("|").size();
+    imginfo = tsk_img_open(partcount, images, TSK_IMG_TYPE_DETECT, 0);
+
+    //imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
     if(imginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
@@ -1211,44 +1248,66 @@ void GenerateThumbnails(QString thumbid)
         tmpstr = partfile.readLine();
     partlist = tmpstr.split(",");
     tmpstr = "";
-    TskFsInfo* fsinfo = new TskFsInfo();
-    fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+    TSK_FS_INFO* fsinfo = NULL;
+    fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+
+    //TskFsInfo* fsinfo = new TskFsInfo();
+    //fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
     qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
     //qint64 curaddr = tmpstr.split(",").at(9).toLongLong();
     char* filebuffer = new char[0];
     ssize_t bufferlength = 0;
-    TskFsFile* fsfile = new TskFsFile();
-    fsfile->open(fsinfo, fsfile, curaddr);
+    TSK_FS_FILE* fsfile = NULL;
+    fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
+
+    //TskFsFile* fsfile = new TskFsFile();
+    //fsfile->open(fsinfo, fsfile, curaddr);
     if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
     {
         if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
         {
             int attrid = objectid.split("-").at(3).split(":").last().toInt();
-            const TskFsAttribute* fsattr = fsfile->getAttr(attrid);
-            filebuffer = new char[fsattr->getSize()];
-            bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, fsattr->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
-            delete fsattr;
+	    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_id(fsfile, attrid);
+	    filebuffer = new char[fsattr->size];
+	    bufferlength = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, 0, filebuffer, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
+	    fsattr = NULL;
+
+            //const TskFsAttribute* fsattr = fsfile->getAttr(attrid);
+            //filebuffer = new char[fsattr->getSize()];
+            //bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, fsattr->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+            //delete fsattr;
         }
         else // IF NOT ADS
         {
-            filebuffer = new char[fsfile->getMeta()->getSize()];
-            bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+	    filebuffer = new char[fsfile->meta->size];
+	    bufferlength = tsk_fs_file_read(fsfile, 0, filebuffer, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+            //filebuffer = new char[fsfile->getMeta()->getSize()];
+            //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
         }
     }
     else
     {
-        filebuffer = new char[fsfile->getMeta()->getSize()];
-        bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+	filebuffer = new char[fsfile->meta->size];
+	bufferlength = tsk_fs_file_read(fsfile, 0, filebuffer, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+        //filebuffer = new char[fsfile->getMeta()->getSize()];
+        //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
     }
     //*ibuffer = filebuffer;
-    fsfile->close();
-    fsinfo->close();
-    fsfile = NULL;
-    fsinfo = NULL;
+    //fsfile->close();
+    //fsinfo->close();
+    //fsfile = NULL;
+    //fsinfo = NULL;
     //delete fsfile;
     //delete fsinfo;
-    delete imginfo;
+    //delete imginfo;
+    //imginfo = NULL;
+    tsk_fs_file_close(fsfile);
+    fsfile = NULL;
+    tsk_fs_close(fsinfo);
+    fsinfo = NULL;
+    tsk_img_close(imginfo);
     imginfo = NULL;
+
     //return bufferlength;
 
         //
@@ -3228,8 +3287,11 @@ void TransferFiles(QString thumbid, QString reppath)
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     //imglen = PopulateFileBuffer(thumbid, &imgbuf);
-    //
-    TskImgInfo* imginfo = new TskImgInfo();
+    TSK_IMG_INFO* imginfo = NULL;
+    std::vector<std::string> pathvector;
+    pathvector.clear();
+
+    //TskImgInfo* imginfo = new TskImgInfo();
     //QDir eviddir = QDir(wombatvariable.tmpmntpath);
     //QString tmpstr = "";
     //QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
@@ -3247,7 +3309,14 @@ void TransferFiles(QString thumbid, QString reppath)
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
-    imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
+    pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(pathvector.size()*sizeof(char*));
+    images[0] = pathvector[0].c_str();
+    int partcount = tmpstr.split(",").at(3).split("|").size();
+    imginfo = tsk_img_open(partcount, images, TSK_IMG_TYPE_DETECT, 0);
+
+    //imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
     if(imginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
@@ -3263,39 +3332,61 @@ void TransferFiles(QString thumbid, QString reppath)
         tmpstr = partfile.readLine();
     partlist = tmpstr.split(",");
     tmpstr = "";
-    TskFsInfo* fsinfo = new TskFsInfo();
-    fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+    TSK_FS_INFO* fsinfo = NULL;
+    fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+
+    //TskFsInfo* fsinfo = new TskFsInfo();
+    //fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
     qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
     //qint64 curaddr = tmpstr.split(",").at(9).toLongLong();
     char* filebuffer = new char[0];
     ssize_t bufferlength = 0;
-    TskFsFile* fsfile = new TskFsFile();
-    fsfile->open(fsinfo, fsfile, curaddr);
+    TSK_FS_FILE* fsfile = NULL;
+    fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
+
+    //TskFsFile* fsfile = new TskFsFile();
+    //fsfile->open(fsinfo, fsfile, curaddr);
     if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
     {
         if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
         {
             int attrid = objectid.split("-").at(3).split(":").last().toInt();
-            const TskFsAttribute* fsattr = fsfile->getAttr(attrid);
-            filebuffer = new char[fsattr->getSize()];
-            bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, fsattr->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
-            delete fsattr;
+	    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_id(fsfile, attrid);
+	    filebuffer = new char[fsattr->size];
+	    bufferlength = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, 0, filebuffer, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
+	    fsattr = NULL;
+
+            //const TskFsAttribute* fsattr = fsfile->getAttr(attrid);
+            //filebuffer = new char[fsattr->getSize()];
+            //bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, fsattr->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+            //delete fsattr;
         }
         else // IF NOT ADS
         {
-            filebuffer = new char[fsfile->getMeta()->getSize()];
-            bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+	    filebuffer = new char[fsfile->meta->size];
+	    bufferlength = tsk_fs_file_read(fsfile, 0, filebuffer, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+
+            //filebuffer = new char[fsfile->getMeta()->getSize()];
+            //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
         }
     }
     else
     {
-        filebuffer = new char[fsfile->getMeta()->getSize()];
-        bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+	filebuffer = new char[fsfile->meta->size];
+	bufferlength = tsk_fs_file_read(fsfile, 0, filebuffer, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+        //filebuffer = new char[fsfile->getMeta()->getSize()];
+        //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
     }
     //*ibuffer = filebuffer;
-    delete fsfile;
-    delete fsinfo;
-    delete imginfo;
+    //delete fsfile;
+    //delete fsinfo;
+    //delete imginfo;
+    tsk_fs_file_close(fsfile);
+    fsfile = NULL;
+    tsk_fs_close(fsinfo);
+    fsinfo = NULL;
+    tsk_img_close(imginfo);
+    imginfo = NULL;
     //return bufferlength;
 
     //
@@ -3350,7 +3441,11 @@ void GenerateWombatCaseFile(void)
 void RewriteSelectedIdContent(QModelIndex selectedindex)
 {
     QString selectedid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
-    TskImgInfo* imginfo = new TskImgInfo();
+    TSK_IMG_INFO* imginfo = NULL;
+    std::vector<std::string> pathvector;
+    pathvector.clear();
+
+    //TskImgInfo* imginfo = new TskImgInfo();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QString tmpstr = "";
     QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
@@ -3370,7 +3465,14 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
-    imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
+    pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(pathvector.size()*sizeof(char*));
+    images[0] = pathvector[0].c_str();
+    int partcount = tmpstr.split(",").at(3).split("|").size();
+    imginfo = tsk_img_open(partcount, images, TSK_IMG_TYPE_DETECT, 0);
+    
+    //imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
     if(imginfo == NULL)
     {
         qDebug() << tsk_error_get_errstr();
@@ -3386,36 +3488,53 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
         tmpstr = partfile.readLine();
     partlist = tmpstr.split(",");
     tmpstr = "";
-    TskFsInfo* fsinfo = new TskFsInfo();
-    fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
-    TskFsFile* fsfile = new TskFsFile();
-    fsfile->open(fsinfo, fsfile, curaddr);
+    TSK_FS_INFO* fsinfo = NULL;
+    fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+    TSK_FS_FILE* fsfile = NULL;
+    fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
+    //TskFsInfo* fsinfo = new TskFsInfo();
+    //fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
+    //TskFsFile* fsfile = new TskFsFile();
+    //fsfile->open(fsinfo, fsfile, curaddr);
     char* imgbuf = new char[0];
     ssize_t imglen = 0;
-    if(fsfile->getMeta())
+    //if(fsfile->getMeta())
+    if(fsfile->meta != NULL)
     {
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
         {
             if(selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
             {
                 imgbuf = new char[selectedindex.sibling(selectedindex.row(), 2).data().toULongLong()];
-                imglen = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, selectedid.split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+		imglen = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, selectedid.split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+                //imglen = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, selectedid.split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
             }
             else // IF NOT ADS
             {
-                imgbuf = new char[fsfile->getMeta()->getSize()];
-                imglen = fsfile->read(0, imgbuf, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+		imgbuf = new char[fsfile->meta->size];
+		imglen = tsk_fs_file_read(fsfile, 0, imgbuf, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+                //imgbuf = new char[fsfile->getMeta()->getSize()];
+                //imglen = fsfile->read(0, imgbuf, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
             }
         }
         else
         {
-            imgbuf = new char[fsfile->getMeta()->getSize()];
-            imglen = fsfile->read(0, imgbuf, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
+	    imgbuf = new char[fsfile->meta->size];
+	    imglen = tsk_fs_file_read(fsfile, 0, imgbuf, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+            //imgbuf = new char[fsfile->getMeta()->getSize()];
+            //imglen = fsfile->read(0, imgbuf, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
         }
     }
-    delete fsfile;
-    delete fsinfo;
-    delete imginfo;
+    tsk_fs_file_close(fsfile);
+    fsfile = NULL;
+    tsk_fs_close(fsinfo);
+    fsinfo = NULL;
+    tsk_img_close(imginfo);
+    imginfo = NULL;
+
+    //delete fsfile;
+    //delete fsinfo;
+    //delete imginfo;
 
     QDir dir;
     dir.mkpath(wombatvariable.tmpfilepath);
