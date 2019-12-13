@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'idfilter.ui'
 **
-** Created by: Qt User Interface Compiler version 5.13.1
+** Created by: Qt User Interface Compiler version 5.13.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
