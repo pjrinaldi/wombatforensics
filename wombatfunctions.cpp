@@ -982,6 +982,7 @@ void GenerateHash(QString objectid)
         //delete[] filebuffer;
 	//hasharray.clear();
 
+        // TRY THE NO BUFFER SIZE EMPTY HASH NEXT AND CHECK MEMORY
         int hashtype = 1; // for testing purposes... remove once i solve issue
         dighashcount++;
         isignals->DigUpd(hashtype, dighashcount);
