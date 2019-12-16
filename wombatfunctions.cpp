@@ -935,7 +935,7 @@ void GenerateHash(QString objectid)
         //delete imginfo;
 	//return bufferlength;
 
-        //
+        /*
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
         QByteArray hasharray = QByteArray::fromRawData(filebuffer, bufferlength);
         //QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
@@ -952,7 +952,7 @@ void GenerateHash(QString objectid)
             else if(hashsum == 4)
                 hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
         }
-        hashlist.insert(objectid, hashstr);
+        //hashlist.insert(objectid, hashstr);
         treenodemodel->UpdateNode(objectid, 7, hashstr);
         QString hashheader = "";
         if(hashsum == 1) // MD5
@@ -961,8 +961,9 @@ void GenerateHash(QString objectid)
             hashtype = 2;
         else if(hashsum == 4) // SHA256
             hashtype = 3;
+        */
         delete[] filebuffer;
-	hasharray.clear();
+	//hasharray.clear();
         dighashcount++;
         isignals->DigUpd(hashtype, dighashcount);
     }
