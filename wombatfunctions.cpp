@@ -814,6 +814,7 @@ void GenerateHash(QString objectid)
 {
     if(objectid.split("-").count() == 5)
     {
+        /*
         //QString objectid = itemid;
         int hashtype = 1;
         QString tmpstr = "";
@@ -880,6 +881,7 @@ void GenerateHash(QString objectid)
 	    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(partfile.isOpen())
 	    tmpstr = partfile.readLine();
+        partfile.close();
         partlist = tmpstr.split(",");
 	tmpstr = "";
         TSK_FS_INFO* fsinfo = NULL;
@@ -888,12 +890,16 @@ void GenerateHash(QString objectid)
 	//fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
         qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
 	//qint64 curaddr = tmpstr.split(",").at(9).toLongLong();
-        char* filebuffer = new char[0];
+
+
+        //char* filebuffer = new char[0];
 	ssize_t bufferlength = 0;
         TSK_FS_FILE* fsfile = NULL;
 	fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
         //TskFsFile* fsfile = new TskFsFile();
 	//fsfile->open(fsinfo, fsfile, curaddr);
+
+        /*
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
 	{
 	    if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
@@ -923,7 +929,11 @@ void GenerateHash(QString objectid)
             //filebuffer = new char[fsfile->getMeta()->getSize()];
 	    //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
         }
+        */
 	//*ibuffer = filebuffer;
+        
+
+        /*
         tsk_fs_file_close(fsfile);
 	fsfile = NULL;
         tsk_fs_close(fsinfo);
@@ -934,15 +944,21 @@ void GenerateHash(QString objectid)
 	//delete fsinfo;
         //delete imginfo;
 	//return bufferlength;
-
+        
         /*
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
         QByteArray hasharray = QByteArray::fromRawData(filebuffer, bufferlength);
+        */
         //QByteArray hasharray = QByteArray::fromRawData(hashdata, hashdatalen);
 
         //if(hashdatalen > 0)
+
+
+        /*
         if(bufferlength > 0)
-            hashstr = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+        {
+            //hashstr = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+        }
         else
         {
             if(hashsum == 1)
@@ -953,7 +969,7 @@ void GenerateHash(QString objectid)
                 hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
         }
         //hashlist.insert(objectid, hashstr);
-        treenodemodel->UpdateNode(objectid, 7, hashstr);
+        //treenodemodel->UpdateNode(objectid, 7, hashstr);
         QString hashheader = "";
         if(hashsum == 1) // MD5
             hashtype = 1;
@@ -961,9 +977,12 @@ void GenerateHash(QString objectid)
             hashtype = 2;
         else if(hashsum == 4) // SHA256
             hashtype = 3;
+        
         */
-        delete[] filebuffer;
+        //delete[] filebuffer;
 	//hasharray.clear();
+
+        int hashtype = 1; // for testing purposes... remove once i solve issue
         dighashcount++;
         isignals->DigUpd(hashtype, dighashcount);
     }
