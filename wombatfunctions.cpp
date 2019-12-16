@@ -962,6 +962,7 @@ void GenerateHash(QString objectid)
         else if(hashsum == 4) // SHA256
             hashtype = 3;
         delete[] filebuffer;
+	hasharray.clear();
         dighashcount++;
         isignals->DigUpd(hashtype, dighashcount);
     }
