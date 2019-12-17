@@ -824,7 +824,9 @@ void GenerateHash(QString objectid)
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.at(0).split(".e").first();
+        */
         QString hashstr = "";
+        /*
         //char* hashdata = new char[0];
         //ssize_t hashdatalen = 0;
         //hashdatalen = PopulateFileBuffer(itemid, &hashdata);
@@ -902,7 +904,8 @@ void GenerateHash(QString objectid)
 
 
         //char* filebuffer = new char[0];
-	//ssize_t bufferlength = 0;
+        */
+	ssize_t bufferlength = 0;
         //TSK_FS_FILE* fsfile = NULL;
 	//fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
         //TskFsFile* fsfile = new TskFsFile();
@@ -963,7 +966,6 @@ void GenerateHash(QString objectid)
         //if(hashdatalen > 0)
 
 
-        /*
         if(bufferlength > 0)
         {
             //hashstr = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
@@ -977,8 +979,9 @@ void GenerateHash(QString objectid)
             else if(hashsum == 4)
                 hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
         }
-        //hashlist.insert(objectid, hashstr);
-        //treenodemodel->UpdateNode(objectid, 7, hashstr);
+        hashlist.insert(objectid, hashstr);
+        //qDebug() << "objectid:" << objectid;
+        treenodemodel->UpdateNode(objectid, 7, hashstr);
         QString hashheader = "";
         if(hashsum == 1) // MD5
             hashtype = 1;
@@ -987,7 +990,6 @@ void GenerateHash(QString objectid)
         else if(hashsum == 4) // SHA256
             hashtype = 3;
         
-        */
         //delete[] filebuffer;
 	//hasharray.clear();
 

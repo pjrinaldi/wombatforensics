@@ -19,7 +19,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
     digcountlabel = new QLabel(this);
-    digcountlabel->setText("Digging: 0 of 0");
+    digcountlabel->setText("Digging Session 1: 0 of 0");
     statuslabel = new StatusLabel();
     //statuslabel->setAlignment(Qt::AlignRight);
     StatusUpdate("");
@@ -2081,7 +2081,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         else
             digfilelist = GetFileLists(dtype);
         //qDebug() << "digfilelist count:" << digfilelist;
-        digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
+        digcountlabel->setText("Dig Session 1: 0 of " + QString::number(digfilelist.count()));
+        //digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {
             genthmbpath = wombatvariable.tmpmntpath;
@@ -2118,7 +2119,8 @@ void WombatForensics::HashingFinish()
         StatusUpdate("Ready");
     else
         StatusUpdate("Digging Deeper...");
-    digstatusdialog->UpdateDigState(1, -1);
+    digcountlabel->setText("Digging Session 1 Finished");
+    //digstatusdialog->UpdateDigState(1, -1);
     if(hashsum == 1)
         treenodemodel->UpdateHeaderNode(7, "MD5 Hash");
     else if(hashsum == 2)
@@ -2132,7 +2134,8 @@ void WombatForensics::HashingFinish()
 
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
-    digstatusdialog->UpdateDigState(digid, digcnt);
+    digcountlabel->setText("Digging Session 1: " + QString::number(digcnt) + " of " + QString::number(digfilelist.count()));
+    //digstatusdialog->UpdateDigState(digid, digcnt);
 }
 void WombatForensics::UpdateExport()
 {
