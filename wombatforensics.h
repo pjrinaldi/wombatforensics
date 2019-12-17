@@ -35,7 +35,7 @@ class StatusLabel : public QLabel
     Q_OBJECT
 
     public:
-        void ShowDigStatus(void);
+        //void ShowDigStatus(void);
 
     protected:
         void mousePressEvent(QMouseEvent* e)
@@ -97,7 +97,7 @@ public:
     AboutBox* aboutbox;
     SettingsDialog* settingsdialog;
     AddEvidenceDialog* addevidencedialog;
-    DigStatus* digstatusdialog;
+    //DigStatus* digstatusdialog;
     RemEvidenceDialog* remevidencedialog;
     TagManager* tagmanage;
     CarveDialog* carvedialog;
@@ -167,7 +167,7 @@ private slots:
     void ThreadCancelled(void);
     void ReadXMountOut(void);
     void ReadXMountErr(void);
-    void ShowDigStatus(void);
+    //void ShowDigStatus(void);
     void StatusUpdate(QString tmptext)
     {
         statuslabel->setText(tmptext);

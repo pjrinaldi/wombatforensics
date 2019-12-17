@@ -65,7 +65,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     byteviewer = new ByteConverter(this);
     previewreport = new HtmlViewer(this);
     aboutbox = new AboutBox(this);
-    digstatusdialog = new DigStatus(this);
+    //digstatusdialog = new DigStatus(this);
     searchdialog = new SearchDialog(ui->hexview, this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
@@ -92,9 +92,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     //connect(statuslabel, SIGNAL(clicked()), this, SLOT(ShowDigStatus()), Qt::DirectConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
-    connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
-    connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
-    connect(digstatusdialog, SIGNAL(CancelVidThumbThread()), &videowatcher, SLOT(cancel()), Qt::QueuedConnection);
+    //connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    //connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
+    //connect(digstatusdialog, SIGNAL(CancelVidThumbThread()), &videowatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
@@ -605,13 +605,15 @@ void WombatForensics::ShowSearchDialog()
     searchdialog->show();
 }
 
+/*
 void WombatForensics::ShowDigStatus()
 {
-    QPoint p = QCursor::pos();
-    p += QPoint(40, -300);
-    digstatusdialog->move(p);
-    digstatusdialog->show();
+    //QPoint p = QCursor::pos();
+    //p += QPoint(40, -300);
+    //digstatusdialog->move(p);
+    //digstatusdialog->show();
 }
+*/
 
 void WombatForensics::ShowExternalViewer()
 {
@@ -2376,7 +2378,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             {
                 genthmbpath = wombatvariable.tmpmntpath;
                 StatusUpdate("Generating Thumbnails...");
-                digstatusdialog->SetInitialDigState(0, filesfound);
+                //digstatusdialog->SetInitialDigState(0, filesfound);
                 thumbfuture = QtConcurrent::map(listeditems, GenerateThumbnails); // Process All thumbnails
                 thumbwatcher.setFuture(thumbfuture);
                 videofuture = QtConcurrent::map(listeditems, GenerateVidThumbnails); // Process all Vid Thumbnails
@@ -2395,7 +2397,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 
 void WombatForensics::FinishVideos()
 {
-    digstatusdialog->UpdateDigState(4, -1);
+    //digstatusdialog->UpdateDigState(4, -1);
     StatusUpdate("Thumbnail Generation Finished");
     qInfo() << "Video Thumbnail Generation Finished";
     if(genthmbpath.contains("mntpt"))
@@ -2412,7 +2414,7 @@ void WombatForensics::FinishVideos()
 
 void WombatForensics::FinishThumbs()
 {
-    digstatusdialog->UpdateDigState(0, -1);
+    //digstatusdialog->UpdateDigState(0, -1);
     StatusUpdate("Thumbnail generation finished.");
     qInfo() << "Thumbnail generation finished";
     //LogMessage("Thumbnail generation finished.");

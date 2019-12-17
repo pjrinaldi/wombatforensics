@@ -814,9 +814,55 @@ void GenerateHash(QString objectid)
 {
     if(objectid.split("-").count() == 5)
     {
+	// TSK FREE METHOD IMPLEMENTATION
+	QByteArray filebytes;
+        filebytes.clear();	
+	//qDebug() << "objectid:" << objectid;
+	// need to use objectid to get the e# folder and the v# folder and the p# stat file
+	QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
+	QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
+	QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
+	QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
+	QString astring = objectid.split("-", QString::SkipEmptyParts).at(4);
+	if(fstring.contains(":"))
+	    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+	qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong();
+	QString tmpstr = "";
+	QDir eviddir = QDir(wombatvariable.tmpmntpath);
+	QString evidencename = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs).first().split(".e").first();
+	QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
+	if(!partfile.isOpen())
+	    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	if(partfile.isOpen())
+	    tmpstr = partfile.readLine();
+	partfile.close();
+	QStringList partlist = tmpstr.split(",");
+	tmpstr = "";
+	qint64 fsoffset = partlist.at(4).toLongLong();
+	int blocksize = partlist.at(6).toInt();
+        QString mftentryoffset = "";
+        QFile partpropfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/prop");
+	if(!partpropfile.isOpen())
+	    partpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	if(partpropfile.isOpen())
+	{
+	    while(!partpropfile.atEnd())
+	    {
+		QString tmpstring = partpropfile.readLine();
+                if(tmpstring.contains("MFT Starting Byte Address"))
+                    mftentryoffset = tmpstring.split("||").at(1);
+            }
+	}
+        partpropfile.close();
+        int mftaddress = 0;
+        if(fstring.split(":").count() > 1) // ads attribute
+            mftaddress = objectid.split("-a").last().toInt();
+        else
+            mftaddress = objectid.split("-f").last().split("-").first().toInt();
+
         //QString objectid = itemid;
 
-        int hashtype = 1;
+        //iint hashtype = 1;
         /*
         QString tmpstr = "";
         QStringList tmplist;
@@ -825,7 +871,7 @@ void GenerateHash(QString objectid)
         QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.at(0).split(".e").first();
         */
-        QString hashstr = "";
+        //QString hashstr = "";
         /*
         //char* hashdata = new char[0];
         //ssize_t hashdatalen = 0;
@@ -905,7 +951,7 @@ void GenerateHash(QString objectid)
 
         //char* filebuffer = new char[0];
         */
-	ssize_t bufferlength = 0;
+	//ssize_t bufferlength = 0;
         //TSK_FS_FILE* fsfile = NULL;
 	//fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
         //TskFsFile* fsfile = new TskFsFile();
@@ -945,12 +991,12 @@ void GenerateHash(QString objectid)
 	//*ibuffer = filebuffer;
         
 
-        TSK_IMG_INFO* imginfo = NULL;
+        //TSK_IMG_INFO* imginfo = NULL;
         //tsk_fs_file_close(fsfile);
 	//fsfile = NULL;
         //tsk_fs_close(fsinfo);
 	//fsinfo = NULL;
-        tsk_img_close(imginfo);
+        //tsk_img_close(imginfo);
 	//imginfo = NULL;
         //delete fsfile;
 	//delete fsinfo;
@@ -966,6 +1012,7 @@ void GenerateHash(QString objectid)
         //if(hashdatalen > 0)
 
 
+	/*
         if(bufferlength > 0)
         {
             //hashstr = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
