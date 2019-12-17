@@ -815,7 +815,9 @@ void GenerateHash(QString objectid)
     if(objectid.split("-").count() == 5)
     {
         //QString objectid = itemid;
+
         int hashtype = 1;
+        /*
         QString tmpstr = "";
         QStringList tmplist;
         tmplist.clear();
@@ -828,13 +830,12 @@ void GenerateHash(QString objectid)
         //hashdatalen = PopulateFileBuffer(itemid, &hashdata);
         // going back to c style
         // TskImgInfo* imginfo = new TskImgInfo();
-	//TSK_IMG_INFO* imginfo = NULL;
+	TSK_IMG_INFO* imginfo = NULL;
 
         //QDir eviddir = QDir(wombatvariable.tmpmntpath);
 	//QString tmpstr = "";
         //QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
 	//QString evidencename = evidfiles.at(0).split(".e").first();
-        /*
         QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
 	QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
         QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
@@ -941,11 +942,12 @@ void GenerateHash(QString objectid)
 	//*ibuffer = filebuffer;
         
 
+        TSK_IMG_INFO* imginfo = NULL;
         //tsk_fs_file_close(fsfile);
 	//fsfile = NULL;
         //tsk_fs_close(fsinfo);
 	//fsinfo = NULL;
-        //tsk_img_close(imginfo);
+        tsk_img_close(imginfo);
 	//imginfo = NULL;
         //delete fsfile;
 	//delete fsinfo;

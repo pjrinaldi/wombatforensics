@@ -18,6 +18,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filecountlabel->setText("Found: 0");
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
+    digcountlabel = new QLabel(this);
+    digcountlabel->setText("Digging: 0 of 0");
     statuslabel = new StatusLabel();
     //statuslabel->setAlignment(Qt::AlignRight);
     StatusUpdate("");
@@ -29,13 +31,19 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     vline2->setFrameStyle(QFrame::VLine | QFrame::Raised);
     vline2->setLineWidth(1);
     vline2->setMidLineWidth(0);
+    vline3 = new QFrame(this);
+    vline3->setFrameStyle(QFrame::VLine | QFrame::Raised);
+    vline3->setLineWidth(1);
+    vline3->setMidLineWidth(0);
     this->statusBar()->addWidget(selectedoffset, 0);
     this->statusBar()->addWidget(selectedhex, 0);
     this->statusBar()->addWidget(vline1, 0);
     this->statusBar()->addWidget(filecountlabel, 0);
     this->statusBar()->addWidget(checkedcountlabel, 0);
     this->statusBar()->addWidget(filtercountlabel, 0);
-    this->statusBar()->addPermanentWidget(vline2, 0);
+    this->statusBar()->addWidget(vline2, 0);
+    this->statusBar()->addWidget(digcountlabel, 0);
+    this->statusBar()->addPermanentWidget(vline3, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
     isignals = new InterfaceSignals();
@@ -81,7 +89,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
-    connect(statuslabel, SIGNAL(clicked()), this, SLOT(ShowDigStatus()), Qt::DirectConnection);
+    //connect(statuslabel, SIGNAL(clicked()), this, SLOT(ShowDigStatus()), Qt::DirectConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
@@ -2060,7 +2068,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digfilelist.clear();
     qInfo() << "Digging Deeper into Evidence";
     StatusUpdate("Digging Deeper...");
-    statuslabel->setToolTip("Click for Details");
+    //statuslabel->setToolTip("Click for Details");
     //LogMessage("Digging Deeper into Evidence");
     for(int i = 0; i < digoptions.count(); i++)
     {

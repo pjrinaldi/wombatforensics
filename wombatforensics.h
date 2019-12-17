@@ -265,9 +265,11 @@ private:
     QLabel* filecountlabel;
     QLabel* filtercountlabel;
     QLabel* checkedcountlabel;
+    QLabel* digcountlabel;
     StatusLabel* statuslabel;
     QFrame* vline1;
     QFrame* vline2;
+    QFrame* vline3;
     int exporttype;
     int digtype;
     QVector<int> digoptions;
