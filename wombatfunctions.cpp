@@ -814,7 +814,6 @@ void GenerateHash(QString objectid)
 {
     if(objectid.split("-").count() == 5)
     {
-        /*
         //QString objectid = itemid;
         int hashtype = 1;
         QString tmpstr = "";
@@ -829,12 +828,13 @@ void GenerateHash(QString objectid)
         //hashdatalen = PopulateFileBuffer(itemid, &hashdata);
         // going back to c style
         // TskImgInfo* imginfo = new TskImgInfo();
-	TSK_IMG_INFO* imginfo = NULL;
+	//TSK_IMG_INFO* imginfo = NULL;
 
         //QDir eviddir = QDir(wombatvariable.tmpmntpath);
 	//QString tmpstr = "";
         //QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
 	//QString evidencename = evidfiles.at(0).split(".e").first();
+        /*
         QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
 	QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
         QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
@@ -884,18 +884,26 @@ void GenerateHash(QString objectid)
         partfile.close();
         partlist = tmpstr.split(",");
 	tmpstr = "";
-        TSK_FS_INFO* fsinfo = NULL;
-	fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+
+
+        //TSK_FS_INFO* fsinfo = NULL;
+	//fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+
+
         //TskFsInfo* fsinfo = new TskFsInfo();
 	//fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
-        qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
-	//qint64 curaddr = tmpstr.split(",").at(9).toLongLong();
+
+
+        //qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
+	
+
+        //qint64 curaddr = tmpstr.split(",").at(9).toLongLong();
 
 
         //char* filebuffer = new char[0];
-	ssize_t bufferlength = 0;
-        TSK_FS_FILE* fsfile = NULL;
-	fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
+	//ssize_t bufferlength = 0;
+        //TSK_FS_FILE* fsfile = NULL;
+	//fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
         //TskFsFile* fsfile = new TskFsFile();
 	//fsfile->open(fsinfo, fsfile, curaddr);
 
@@ -933,13 +941,12 @@ void GenerateHash(QString objectid)
 	//*ibuffer = filebuffer;
         
 
-        /*
-        tsk_fs_file_close(fsfile);
-	fsfile = NULL;
-        tsk_fs_close(fsinfo);
-	fsinfo = NULL;
-        tsk_img_close(imginfo);
-	imginfo = NULL;
+        //tsk_fs_file_close(fsfile);
+	//fsfile = NULL;
+        //tsk_fs_close(fsinfo);
+	//fsinfo = NULL;
+        //tsk_img_close(imginfo);
+	//imginfo = NULL;
         //delete fsfile;
 	//delete fsinfo;
         //delete imginfo;
@@ -983,7 +990,6 @@ void GenerateHash(QString objectid)
 	//hasharray.clear();
 
         // TRY THE NO BUFFER SIZE EMPTY HASH NEXT AND CHECK MEMORY
-        int hashtype = 1; // for testing purposes... remove once i solve issue
         dighashcount++;
         isignals->DigUpd(hashtype, dighashcount);
     }
