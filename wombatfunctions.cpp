@@ -903,71 +903,6 @@ void GenerateHash(QString objectid)
 	    }
 	}
 	fileprop.close();
-	if(fstype == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
-	{
-	    if(fstring.split("-").count() > 1) // IF ADS
-	    {
-		if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
-		{
-		}
-		else // IF RESIDENT
-		{
-		}
-	    }
-	    else // IF NOT ADS
-	    {
-	    }
-	}
-	else // OTHER FILE SYSTEM
-	{
-	    //qDebug() << "fsoffset:" << fsoffset << "blocksize:" << blocksize;
-            filebytes.clear();
-            QFile imgfile(datastring);
-            imgfile.open(QIODevice::ReadOnly);
-	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
-	    {
-                imgfile.seek(0);
-	        int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
-                imgfile.seek(blkoffset);
-                if(i * blocksize <= filesize)
-                    filebytes.append(imgfile.read(blocksize));
-                else
-                    filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
-		//qDebug() << "step" << a << ":" << filebytes.count();
-		//qDebug() << "bs[" << i << "] =" << blockstring.split("^^", QString::SkipEmptyParts).at(i);
-		//qDebug() << "blockoffset:" << blkoffset;
-	    }
-            imgfile.close();
-	}
-        QString hashstr = "";
-        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
-        if(filebytes.count() > 0)
-        {
-            hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
-        }
-        else
-        {
-            if(hashsum == 1)
-                hashstr = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
-            else if(hashsum == 2)
-                hashstr = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
-            else if(hashsum == 4)
-                hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
-        }
-	filebytes.clear();
-        qDebug() << "hash value:" << hashstr;
-        hashlist.insert(objectid, hashstr);
-        treenodemodel->UpdateNode(objectid, 7, hashstr);
-	int hashtype = 1;
-        if(hashsum == 1) // MD5
-            hashtype = 1;
-        else if(hashsum == 2) // SHA1
-            hashtype = 2;
-        else if(hashsum == 4) // SHA256
-            hashtype = 3;
-        dighashcount++;
-        isignals->DigUpd(hashtype, dighashcount);
-
 	/**** REFERENCE MATERIAL ****
 	 *
 	 *            
@@ -985,13 +920,9 @@ void GenerateHash(QString objectid)
                 if(nodeid.split("-").at(3).split(":").count() > 1) // IF ADS
                 {
                     if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
-                    {
-                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
-                        ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
-                    }
                     else // IF RESIDENT
                     {
-                        if(selectednode->Data(2).toLongLong() < 700) // takes care of $BadClus which is non-resident but doesn't have blocks
+                        if(selectednode->Data(2).toLongLong() < 700) // takes care of $BadClus which is non-resident but doesn't have blocks (might want to change to (1).toString().contains("$BadClus"))
                         {
                         qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
                         //qDebug() << "(resident ads) residentoffset:" << residentoffset;
@@ -1138,6 +1069,141 @@ void GenerateHash(QString objectid)
         }
     *
     */
+	filebytes.clear();
+	QFile imgfile(datastring);
+	if(fstype == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
+	{
+	    if(fstring.split("-").count() > 1) // IF ADS
+	    {
+		if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
+		{
+		    imgfile.open(QIODevice::ReadOnly);
+		    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
+		    {
+			imgfile.seek(0);
+			int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
+			imgfile.seek(blkoffset);
+			if(i * blocksize <= filesize)
+			    filebytes.append(imgfile.read(blocksize));
+			else
+			    filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
+		    }
+		    imgfile.close();
+		}
+		else // IF RESIDENT
+		{
+		    if(!curnode->Data(1).toString().contains("$BadClus"))
+		    {
+			unsigned int curoffset = 0;
+			uint8_t mftoffset[2];
+			uint8_t nextattrid[2];
+			uint8_t mftlen[4];
+			uint8_t attrtype[4];
+			uint32_t atrtype = 0;
+			uint8_t namelength = 0;
+			uint32_t attrlength = 0;
+			uint32_t contentlength = 0;
+			uint16_t resoffset = 0;
+			qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
+			QByteArray resbuffer;
+			resbuffer.clear();
+			imgfile.open(QIODevice::ReadOnly);
+			imgfile.seek(residentoffset);
+			resbuffer.append(imgfile.read(1024)); // MFT ENTRY
+			imgfile.close();
+                        curoffset = 0;
+                        //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
+                        mftoffset[0] = (uint8_t)resbuffer.at(20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(21);
+                        nextattrid[0] = (uint8_t)resbuffer.at(40);
+                        nextattrid[1] = (uint8_t)resbuffer.at(41);
+                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                        for(int i = 0; i < attrcnt; i++)
+                        {
+                            attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                            attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                            attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                            attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                            atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                            namelength = (uint8_t)resbuffer.at(curoffset + 9);
+                            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                            mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                            mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                            mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                            attrlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                            if(namelength > 0 && atrtype == 128)
+                                break;
+                            curoffset += attrlength;
+                        }
+			mftlen[0] = (uint8_t)resbuffer.at(curoffset + 16);
+			mftlen[1] = (uint8_t)resbuffer.at(curoffset + 17);
+			mftlen[2] = (uint8_t)resbuffer.at(curoffset + 18);
+			mftlen[3] = (uint8_t)resbuffer.at(curoffset + 19);
+			contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                        mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                        mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                        resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+			filebytes.append(resbuffer.mid(curoffset + resoffset, contentlength));
+			//qDebug() << "contentlength:" << contentlength;
+			//qDebug() << "ads resident attr:" << filebytes.toHex();
+		    }
+		}
+	    }
+	    else // IF NOT ADS
+	    {
+	    }
+	}
+	else // OTHER FILE SYSTEM
+	{
+	    //qDebug() << "fsoffset:" << fsoffset << "blocksize:" << blocksize;
+            //filebytes.clear();
+            //QFile imgfile(datastring);
+            imgfile.open(QIODevice::ReadOnly);
+	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
+	    {
+                imgfile.seek(0);
+	        int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
+                imgfile.seek(blkoffset);
+                if(i * blocksize <= filesize)
+                    filebytes.append(imgfile.read(blocksize));
+                else
+                    filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
+		//qDebug() << "step" << a << ":" << filebytes.count();
+		//qDebug() << "bs[" << i << "] =" << blockstring.split("^^", QString::SkipEmptyParts).at(i);
+		//qDebug() << "blockoffset:" << blkoffset;
+	    }
+            imgfile.close();
+	}
+	// HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
+        QString hashstr = "";
+        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+        if(filebytes.count() > 0)
+        {
+            hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+        }
+        else
+        {
+            if(hashsum == 1)
+                hashstr = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
+            else if(hashsum == 2)
+                hashstr = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
+            else if(hashsum == 4)
+                hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
+        }
+	filebytes.clear();
+        qDebug() << "hash value:" << hashstr;
+        hashlist.insert(objectid, hashstr);
+        treenodemodel->UpdateNode(objectid, 7, hashstr);
+	int hashtype = 1;
+        if(hashsum == 1) // MD5
+            hashtype = 1;
+        else if(hashsum == 2) // SHA1
+            hashtype = 2;
+        else if(hashsum == 4) // SHA256
+            hashtype = 3;
+        dighashcount++;
+        isignals->DigUpd(hashtype, dighashcount);
     }
 }
 
@@ -1790,7 +1856,7 @@ void InitializeEvidenceStructure(QString evidname)
             for(int i=0; i < treeout.count(); i++)
                 nodedata << treeout.at(i);
             mutex.lock();
-            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), -1, 0);
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0"), -1, 0);
             mutex.unlock();
             reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>NON RECOGNIZED FS</td></tr>";
         }
