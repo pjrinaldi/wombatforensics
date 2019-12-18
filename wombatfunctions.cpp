@@ -824,6 +824,7 @@ void GenerateHash(QString objectid)
 	QString astring = objectid.split("-", QString::SkipEmptyParts).at(4);
 	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     	TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
+        qint64 filesize = curnode->Data(2).toLongLong();
 	//qDebug() << "curnode id:" << curnode->Data(11).toString() << "size:" << curnode->Data(2).toInt();
 	if(fstring.contains(":"))
 	    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
@@ -922,19 +923,24 @@ void GenerateHash(QString objectid)
             filebytes.clear();
             QFile imgfile(datastring);
             imgfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            int a = 1;
 	    for(int i=0; i < blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
 	    {
                 // MAYBE DETERMINE IF i*blksize is < file size, else just get file size
                 imgfile.reset();
 	        int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i).toLongLong() * blocksize;
                 imgfile.seek(blkoffset);
-                filebytes.append(imgfile.read(blocksize));
+                if(a * blocksize <= filesize)
+                    filebytes.append(imgfile.read(blocksize));
+                else
+                    filebytes.append(imgfile.read(filesize - ((a-1)*blocksize)));
+                a++;
 		//qDebug() << "blockoffset" << blkoffset;
 		// POPULATE BYTE ARRAY HERE...
 		//qDebug() << "bs[" << i << "] =" << blockstring.split("^^", QString::SkipEmptyParts).at(i);
 	    }
             imgfile.close();
-            //qDebug() << "filebyte size:" << filebytes.count();
+            qDebug() << "filebyte size:" << filebytes.count();
 	}
         QString hashstr = "";
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
