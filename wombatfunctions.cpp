@@ -831,6 +831,26 @@ void GenerateHash(QString objectid)
 	QString tmpstr = "";
 	QDir eviddir = QDir(wombatvariable.tmpmntpath);
 	QString evidencename = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs).first().split(".e").first();
+        QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+            tmpstr = evidfile.readLine();
+        evidfile.close();
+        QString datastring = wombatvariable.imgdatapath;
+        if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+            datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+        else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+            datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
+        else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+        {
+            QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+            if(imgext.contains(".000"))
+                datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+            else
+                datastring = tmpstr.split(",").at(3);
+        }
+        qDebug() << "datastring:" << datastring;
+        tmpstr = "";
 	QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
 	if(!partfile.isOpen())
 	    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -899,14 +919,41 @@ void GenerateHash(QString objectid)
 	}
 	else // OTHER FILE SYSTEM
 	{
+            filebytes.clear();
+            QFile imgfile(datastring);
+            imgfile.open(QIODevice::ReadOnly | QIODevice::Text);
 	    for(int i=0; i < blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
 	    {
+                // MAYBE DETERMINE IF i*blksize is < file size, else just get file size
+                imgfile.reset();
 	        int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i).toLongLong() * blocksize;
-		qDebug() << "blockoffset" << blkoffset;
+                imgfile.seek(blkoffset);
+                filebytes.append(imgfile.read(blocksize));
+		//qDebug() << "blockoffset" << blkoffset;
 		// POPULATE BYTE ARRAY HERE...
 		//qDebug() << "bs[" << i << "] =" << blockstring.split("^^", QString::SkipEmptyParts).at(i);
 	    }
+            imgfile.close();
+            //qDebug() << "filebyte size:" << filebytes.count();
 	}
+        QString hashstr = "";
+        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+        if(filebytes.count() > 0)
+        {
+            hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+        }
+        else
+        {
+            if(hashsum == 1)
+                hashstr = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
+            else if(hashsum == 2)
+                hashstr = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
+            else if(hashsum == 4)
+                hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
+        }
+        qDebug() << "hash value:" << hashstr;
+        // PROBABLY NEED TO TAKE THE LAST BLOCK AND DETERMINE THE FILE SIZE AND REMOVE THE SLACK...
+
 
 	/**** REFERENCE MATERIAL ****
 	 *
