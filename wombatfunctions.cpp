@@ -920,27 +920,46 @@ void GenerateHash(QString objectid)
 	}
 	else // OTHER FILE SYSTEM
 	{
+	    qDebug() << "fsoffset:" << fsoffset << "blocksize:" << blocksize;
             filebytes.clear();
             QFile imgfile(datastring);
-            imgfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            imgfile.open(QIODevice::ReadOnly);
             int a = 1;
 	    for(int i=0; i < blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
 	    {
+		//QByteArray blockbytes;
+		//blockbytes.clear();
                 // MAYBE DETERMINE IF i*blksize is < file size, else just get file size
-                imgfile.reset();
+                imgfile.seek(0);
 	        int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i).toLongLong() * blocksize;
                 imgfile.seek(blkoffset);
+		/* METHOD TO NOT INCLUDE SLACK */
                 if(a * blocksize <= filesize)
+		{
+		    //qDebug() << "read regular block";
                     filebytes.append(imgfile.read(blocksize));
+		    //imgfile.seek(0);
+		    //imgfile.seek(blkoffset);
+		    //blockbytes.append(imgfile.read(blocksize));
+		}
                 else
+		{
+		    //qDebug() << "read last remaining bits";
                     filebytes.append(imgfile.read(filesize - ((a-1)*blocksize)));
-                a++;
-		//qDebug() << "blockoffset" << blkoffset;
+		    //imgfile.seek(0);
+		    //imgfile.seek(blkoffset);
+		    //blockbytes.append(imgfile.read(filesize - ((a-1)*blocksize)));
+		}
+		//qDebug() << "step" << a << ":" << filebytes.count();
+		/* METHOD INCLUDING SLACK */
+		//filebytes.append(imgfile.read(blocksize));
+
 		// POPULATE BYTE ARRAY HERE...
 		//qDebug() << "bs[" << i << "] =" << blockstring.split("^^", QString::SkipEmptyParts).at(i);
+		//qDebug() << "blockoffset:" << blkoffset;
+                a++;
 	    }
             imgfile.close();
-            qDebug() << "filebyte size:" << filebytes.count();
 	}
         QString hashstr = "";
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
@@ -958,7 +977,6 @@ void GenerateHash(QString objectid)
                 hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
         }
         qDebug() << "hash value:" << hashstr;
-        // PROBABLY NEED TO TAKE THE LAST BLOCK AND DETERMINE THE FILE SIZE AND REMOVE THE SLACK...
 
 
 	/**** REFERENCE MATERIAL ****
