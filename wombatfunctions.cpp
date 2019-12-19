@@ -906,6 +906,7 @@ void GenerateHash(QString objectid)
 	filebytes.clear();
 	QFile imgfile(datastring);
 	// ALTERNATIVE IF/ELSE METHOD TO SHORTEN CODE
+	/*
 	bool isntfs = false;
 	bool isads = false;
 	bool isres = true;
@@ -937,6 +938,7 @@ void GenerateHash(QString objectid)
 		QByteArray resbuffer;
 		resbuffer.clear();
 		imgfile.open(QIODevice::ReadOnly);
+		imgfile.seek(0);
 		imgfile.seek(residentoffset);
 		resbuffer.append(imgfile.read(1024)); // MFT ENTRY
 		imgfile.close();
@@ -950,6 +952,8 @@ void GenerateHash(QString objectid)
                 int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
                 for(int i = 0; i < attrcnt; i++)
                 {
+		    if(curoffset < (unsigned)resbuffer.size())
+		    {
                     attrtype[0] = (uint8_t)resbuffer.at(curoffset);
                     attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
                     attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
@@ -968,6 +972,7 @@ void GenerateHash(QString objectid)
 		    else if(!isdir && !isads && namelength == 0 && atrtype == 128)
 			break;
                     curoffset += attrlength;
+		    }
                 }
 		mftlen[0] = (uint8_t)resbuffer.at(curoffset + 16);
 		mftlen[1] = (uint8_t)resbuffer.at(curoffset + 17);
@@ -997,8 +1002,10 @@ void GenerateHash(QString objectid)
 	    }
 	    imgfile.close();
 	}
+	*/
 
 	/*
+	// OLD LONGER REPETITIVE METHOD
 	if(fstype == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
 	{
 	    if(fstring.split("-").count() > 1) // IF ADS
@@ -1037,6 +1044,7 @@ void GenerateHash(QString objectid)
 			QByteArray resbuffer;
 			resbuffer.clear();
 			imgfile.open(QIODevice::ReadOnly);
+			imgfile.seek(0);
 			imgfile.seek(residentoffset);
 			resbuffer.append(imgfile.read(1024)); // MFT ENTRY
 			imgfile.close();
@@ -1097,6 +1105,7 @@ void GenerateHash(QString objectid)
 		    QByteArray resbuffer;
 		    resbuffer.clear();
 		    imgfile.open(QIODevice::ReadOnly);
+		    imgfile.seek(0);
 		    imgfile.seek(residentoffset);
 		    resbuffer.append(imgfile.read(1024)); // MFT ENTRY
 		    imgfile.close();
@@ -1109,6 +1118,8 @@ void GenerateHash(QString objectid)
 		    int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
 		    for(int i=0; i < attrcnt; i++)
 		    {
+		    	if(curoffset < (unsigned)resbuffer.size())
+			{
                         attrtype[0] = (uint8_t)resbuffer.at(curoffset);
                         attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
                         attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
@@ -1122,6 +1133,7 @@ void GenerateHash(QString objectid)
                         if(atrtype == 144)
                             break;
                         curoffset += attrlength;
+			}
 		    }
 		    mftlen[0] = (uint8_t)resbuffer.at(curoffset + 16);
 		    mftlen[1] = (uint8_t)resbuffer.at(curoffset + 17);
@@ -1172,6 +1184,7 @@ void GenerateHash(QString objectid)
 			QByteArray resbuffer;
 			resbuffer.clear();
 			imgfile.open(QIODevice::ReadOnly);
+			imgfile.seek(0);
 			imgfile.seek(residentoffset);
 			resbuffer.append(imgfile.read(1024)); // MFT ENTRY
 			imgfile.close();
@@ -1237,6 +1250,8 @@ void GenerateHash(QString objectid)
 	}
 	*/
 	// IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
+	filebytes.clear();
+	filebytes = ReturnFileContent(objectid);
 	// HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
         QString hashstr = "";
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
@@ -4425,4 +4440,205 @@ void SaveTaggedList(void)
         }
     }
     hfile.close();
+}
+
+QByteArray ReturnFileContent(QString objectid)
+{
+	// TSK FREE METHOD IMPLEMENTATION
+	QByteArray filebytes;
+        filebytes.clear();	
+	QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
+	QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
+	QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
+	QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
+	QString astring = objectid.split("-", QString::SkipEmptyParts).at(4);
+	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    	TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
+        qint64 filesize = curnode->Data(2).toLongLong();
+	//qDebug() << "curnode id:" << curnode->Data(11).toString() << "size:" << curnode->Data(2).toInt();
+	if(fstring.contains(":"))
+	    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+	qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong();
+	QString tmpstr = "";
+	QDir eviddir = QDir(wombatvariable.tmpmntpath);
+	QString evidencename = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs).first().split(".e").first();
+        QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+            tmpstr = evidfile.readLine();
+        evidfile.close();
+        QString datastring = wombatvariable.imgdatapath;
+        if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+            datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+        else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+            datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
+        else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+        {
+            QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+            if(imgext.contains(".000"))
+                datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+            else
+                datastring = tmpstr.split(",").at(3);
+        }
+        qDebug() << "datastring:" << datastring;
+        tmpstr = "";
+	QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
+	if(!partfile.isOpen())
+	    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	if(partfile.isOpen())
+	    tmpstr = partfile.readLine();
+	partfile.close();
+	QStringList partlist = tmpstr.split(",");
+	tmpstr = "";
+	qint64 fsoffset = partlist.at(4).toLongLong();
+	int blocksize = partlist.at(6).toInt();
+	int fstype = partlist.at(0).toInt();
+	partlist.clear();
+        QString mftentryoffset = "";
+        QFile partpropfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/prop");
+	if(!partpropfile.isOpen())
+	    partpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	if(partpropfile.isOpen())
+	{
+	    while(!partpropfile.atEnd())
+	    {
+		QString tmpstring = partpropfile.readLine();
+                if(tmpstring.contains("MFT Starting Byte Address"))
+                    mftentryoffset = tmpstring.split("||").at(1);
+            }
+	}
+        partpropfile.close();
+        int mftaddress = 0;
+	QString blockstring = "";
+	QString residentstring = "";
+	QString bytestring = "";
+        if(fstring.split("-").count() > 1) // ads attribute
+            mftaddress = objectid.split("-a").last().toInt();
+        else
+            mftaddress = objectid.split("-f").last().split("-").first().toInt();
+	QFile fileprop(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".prop");
+	if(!fileprop.isOpen())
+	    fileprop.open(QIODevice::ReadOnly | QIODevice::Text);
+	if(fileprop.isOpen())
+	{
+	    while(!fileprop.atEnd())
+	    {
+		QString tmpstring = fileprop.readLine();
+		if(tmpstring.contains("Block Address"))
+		    blockstring = tmpstring.split("||").at(1);
+		else if(tmpstring.contains("Resident Offset"))
+		    residentstring = tmpstring.split("||").at(1);
+		else if(tmpstring.contains("Byte Offset"))
+		    bytestring = tmpstring.split("||").at(1);
+	    }
+	}
+	fileprop.close();
+	filebytes.clear();
+	QFile imgfile(datastring);
+	// ALTERNATIVE IF/ELSE METHOD TO SHORTEN CODE
+	bool isntfs = false;
+	bool isads = false;
+	bool isres = true;
+	bool isdir = false;
+	if(fstype == TSK_FS_TYPE_NTFS_DETECT)
+	    isntfs = true;
+	if(fstring.split("-").count() > 1)
+	    isads = true;
+	if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
+	    isres = false;
+	if(curnode->itemtype == 2 || curnode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
+	    isdir = true;
+
+	if(filesize > 0)
+	{
+	if(isntfs && isres) // NTFS & RESIDENT
+	{
+		qDebug() << "already found filesize:" << filesize;
+		qDebug() << "filesize:" << curnode->Data(2).toLongLong();
+	    if(curnode->Data(2).toLongLong() < 700) // resident should be less than 700
+	    {
+		unsigned int curoffset = 0;
+		uint8_t mftoffset[2];
+		uint8_t nextattrid[2];
+		uint8_t mftlen[4];
+		uint8_t attrtype[4];
+		uint32_t atrtype = 0;
+		uint8_t namelength = 0;
+		uint32_t attrlength = 0;
+		uint32_t contentlength = 0;
+		uint16_t resoffset = 0;
+		qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
+		QByteArray resbuffer;
+		resbuffer.clear();
+		imgfile.open(QIODevice::ReadOnly);
+		while(imgfile.waitForReadyRead(-1))
+		{
+		imgfile.seek(0);
+		imgfile.seek(residentoffset);
+		resbuffer.append(imgfile.read(1024)); // MFT ENTRY
+		}
+		imgfile.close();
+		qDebug() << "resbuffer length:" << resbuffer.count();
+                curoffset = 0;
+                //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
+                mftoffset[0] = (uint8_t)resbuffer.at(20);
+                mftoffset[1] = (uint8_t)resbuffer.at(21);
+                nextattrid[0] = (uint8_t)resbuffer.at(40);
+                nextattrid[1] = (uint8_t)resbuffer.at(41);
+                curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+                int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+                for(int i = 0; i < attrcnt; i++)
+                {
+                    attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                    attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
+                    attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
+                    attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
+                    atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
+                    namelength = (uint8_t)resbuffer.at(curoffset + 9);
+                    mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
+                    mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
+                    mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
+                    mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
+                    attrlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+		    if(isdir && atrtype == 144)
+			break;
+		    else if(!isdir && isads && namelength > 0 && atrtype == 128)
+			break;
+		    else if(!isdir && !isads && namelength == 0 && atrtype == 128)
+			break;
+                    curoffset += attrlength;
+                }
+		mftlen[0] = (uint8_t)resbuffer.at(curoffset + 16);
+		mftlen[1] = (uint8_t)resbuffer.at(curoffset + 17);
+		mftlen[2] = (uint8_t)resbuffer.at(curoffset + 18);
+		mftlen[3] = (uint8_t)resbuffer.at(curoffset + 19);
+		contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
+                mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
+                resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+		filebytes.append(resbuffer.mid(curoffset + resoffset, contentlength));
+		//qDebug() << "contentlength:" << contentlength;
+		//qDebug() << "ads resident attr:" << filebytes.toHex();
+	    }
+	}
+	else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
+	{
+	    imgfile.open(QIODevice::ReadOnly);
+	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
+	    {
+		while(imgfile.waitForReadyRead(-1))
+		{
+		imgfile.seek(0);
+		int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
+		imgfile.seek(blkoffset);
+		if(i * blocksize <= filesize)
+		    filebytes.append(imgfile.read(blocksize));
+		else
+		    filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
+		}
+	    }
+	    imgfile.close();
+	}
+	}
+	return filebytes;
 }
