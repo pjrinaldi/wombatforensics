@@ -4592,6 +4592,7 @@ QByteArray ReturnFileContent(QString objectid)
                 int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
                 for(int i = 0; i < attrcnt; i++)
                 {
+			// getting erros with black saying attrtype error
                     attrtype[0] = (uint8_t)resbuffer.at(curoffset);
                     attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
                     attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
