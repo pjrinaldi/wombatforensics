@@ -4512,6 +4512,7 @@ QByteArray ReturnFileContent(QString objectid)
 	QString blockstring = "";
 	QString residentstring = "";
 	QString bytestring = "";
+	qDebug() << "fstring to determine if it has -:" << fstring;
         if(fstring.split("-").count() > 1) // ads attribute
             mftaddress = objectid.split("-a").last().toInt();
         else
@@ -4579,6 +4580,8 @@ QByteArray ReturnFileContent(QString objectid)
 		}
 		imgfile.close();
 		qDebug() << "resbuffer length:" << resbuffer.count();
+		if(resbuffer.count() > 0)
+		{
                 curoffset = 0;
                 //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
                 mftoffset[0] = (uint8_t)resbuffer.at(20);
@@ -4619,6 +4622,7 @@ QByteArray ReturnFileContent(QString objectid)
 		filebytes.append(resbuffer.mid(curoffset + resoffset, contentlength));
 		//qDebug() << "contentlength:" << contentlength;
 		//qDebug() << "ads resident attr:" << filebytes.toHex();
+		}
 	    }
 	}
 	else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
