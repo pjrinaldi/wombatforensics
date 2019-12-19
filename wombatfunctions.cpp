@@ -1077,6 +1077,7 @@ void GenerateHash(QString objectid)
 	    {
 		if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
 		{
+                    // CURRENTLY NOT WORKING, NEED TO FIGURE OUT WHICH OFFSET IT IS STARTING AT...
 		    imgfile.open(QIODevice::ReadOnly);
 		    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
 		    {
@@ -1089,6 +1090,7 @@ void GenerateHash(QString objectid)
 			    filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
 		    }
 		    imgfile.close();
+                    qDebug() << "non resident ads:" << filebytes.toHex();
 		}
 		else // IF RESIDENT
 		{
