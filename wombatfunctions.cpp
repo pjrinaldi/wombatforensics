@@ -4572,12 +4572,12 @@ QByteArray ReturnFileContent(QString objectid)
 		QByteArray resbuffer;
 		resbuffer.clear();
 		imgfile.open(QIODevice::ReadOnly);
-		while(imgfile.waitForReadyRead(-1))
-		{
+		//while(imgfile.waitForReadyRead(-1))
+		//{
 		imgfile.seek(0);
 		imgfile.seek(residentoffset);
 		resbuffer.append(imgfile.read(1024)); // MFT ENTRY
-		}
+		//}
 		imgfile.close();
 		qDebug() << "resbuffer length:" << resbuffer.count();
 		if(resbuffer.count() > 0)
@@ -4630,8 +4630,8 @@ QByteArray ReturnFileContent(QString objectid)
 	    imgfile.open(QIODevice::ReadOnly);
 	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
 	    {
-		while(imgfile.waitForReadyRead(-1))
-		{
+		//while(imgfile.waitForReadyRead(-1))
+		//{
 		imgfile.seek(0);
 		int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
 		imgfile.seek(blkoffset);
@@ -4639,7 +4639,7 @@ QByteArray ReturnFileContent(QString objectid)
 		    filebytes.append(imgfile.read(blocksize));
 		else
 		    filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
-		}
+		//}
 	    }
 	    imgfile.close();
 	}
