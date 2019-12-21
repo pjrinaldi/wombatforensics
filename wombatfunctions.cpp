@@ -828,7 +828,7 @@ void GenerateHash(QString objectid)
 	//qDebug() << "curnode id:" << curnode->Data(11).toString() << "size:" << curnode->Data(2).toInt();
 	if(fstring.contains(":"))
 	    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
-	qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong();
+	//qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong(); // NOT USED
 	QString tmpstr = "";
 	QDir eviddir = QDir(wombatvariable.tmpmntpath);
 	QString evidencename = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs).first().split(".e").first();
@@ -850,7 +850,7 @@ void GenerateHash(QString objectid)
             else
                 datastring = tmpstr.split(",").at(3);
         }
-        qDebug() << "datastring:" << datastring;
+        //qDebug() << "datastring:" << datastring;
         tmpstr = "";
 	QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
 	if(!partfile.isOpen())
@@ -4480,7 +4480,7 @@ QByteArray ReturnFileContent(QString objectid)
             else
                 datastring = tmpstr.split(",").at(3);
         }
-        qDebug() << "datastring:" << datastring;
+        //qDebug() << "datastring:" << datastring;
         tmpstr = "";
 	QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
 	if(!partfile.isOpen())
@@ -4512,7 +4512,6 @@ QByteArray ReturnFileContent(QString objectid)
 	QString blockstring = "";
 	QString residentstring = "";
 	QString bytestring = "";
-	qDebug() << "fstring to determine if it has -:" << fstring;
         if(fstring.split("-").count() > 1) // ads attribute
             mftaddress = objectid.split("-a").last().toInt();
         else
@@ -4554,9 +4553,7 @@ QByteArray ReturnFileContent(QString objectid)
 	{
 	if(isntfs && isres) // NTFS & RESIDENT
 	{
-		qDebug() << "already found filesize:" << filesize;
-		qDebug() << "filesize:" << curnode->Data(2).toLongLong();
-	    if(curnode->Data(2).toLongLong() < 700) // resident should be less than 700
+	    if(filesize < 700) // resident should be less than 700
 	    {
 		unsigned int curoffset = 0;
 		uint8_t mftoffset[2];
@@ -4571,15 +4568,19 @@ QByteArray ReturnFileContent(QString objectid)
 		qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
 		QByteArray resbuffer;
 		resbuffer.clear();
-		imgfile.open(QIODevice::ReadOnly);
+                if(!imgfile.isOpen())
+		    imgfile.open(QIODevice::ReadOnly);
 		//while(imgfile.waitForReadyRead(-1))
 		//{
 		imgfile.seek(0);
 		imgfile.seek(residentoffset);
+                //qDebug() << "pos:" << imgfile.pos();
 		resbuffer.append(imgfile.read(1024)); // MFT ENTRY
 		//}
-		imgfile.close();
-		qDebug() << "resbuffer length:" << resbuffer.count();
+                //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
+                if(imgfile.isOpen())
+		    imgfile.close();
+		//qDebug() << "resbuffer length:" << resbuffer.count();
 		if(resbuffer.count() > 0)
 		{
                 curoffset = 0;
@@ -4628,21 +4629,29 @@ QByteArray ReturnFileContent(QString objectid)
 	}
 	else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
 	{
-	    imgfile.open(QIODevice::ReadOnly);
+            if(!imgfile.isOpen())
+	        imgfile.open(QIODevice::ReadOnly);
 	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
 	    {
+                //qDebug() << "i:" << i << "i*blksize:" << i*blocksize;
+                //qDebug() << "blocksize:" << blocksize;
+                //qDebug() << "filesize - (i-1)*blocksize:" << (filesize - ((i-1)*blocksize));
 		//while(imgfile.waitForReadyRead(-1))
 		//{
 		imgfile.seek(0);
 		int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
 		imgfile.seek(blkoffset);
-		if(i * blocksize <= filesize)
+		if((i * blocksize) <= filesize)
 		    filebytes.append(imgfile.read(blocksize));
 		else
-		    filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
+                {
+                    qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+		    filebytes.append(imgfile.read(filesize - ((i)*blocksize)));
+                }
 		//}
 	    }
-	    imgfile.close();
+            if(imgfile.isOpen())
+	        imgfile.close();
 	}
 	}
 	return filebytes;
