@@ -4631,7 +4631,7 @@ QByteArray ReturnFileContent(QString objectid)
 	{
             if(!imgfile.isOpen())
 	        imgfile.open(QIODevice::ReadOnly);
-	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
+	    for(int i=0; i < blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
 	    {
                 //qDebug() << "i:" << i << "i*blksize:" << i*blocksize;
                 //qDebug() << "blocksize:" << blocksize;
@@ -4639,7 +4639,7 @@ QByteArray ReturnFileContent(QString objectid)
 		//while(imgfile.waitForReadyRead(-1))
 		//{
 		imgfile.seek(0);
-		int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
+		int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i).toLongLong() * blocksize;
 		imgfile.seek(blkoffset);
 		if((i * blocksize) <= filesize)
 		    filebytes.append(imgfile.read(blocksize));
