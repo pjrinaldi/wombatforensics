@@ -1094,6 +1094,18 @@ void GenerateThumbnails(QString thumbid)
 {
     if(thumbid.split("-").count() == 5)
     {
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        QString filecat = curitem->Data(8).toString();
+        qint64 filesize = curitem->Data(2).toLongLong();
+        if(filecat.contains("Image") && filesize > 0)
+        {
+	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
+	    QByteArray filebytes;
+            filebytes.clear();
+	    filebytes = ReturnFileContent(thumbid);
+	    // HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
+        /*
         QString objectid = thumbid;
         QString tmpstr = "";
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -1223,6 +1235,7 @@ void GenerateThumbnails(QString thumbid)
         QString filecat = curitem->Data(8).toString();
         if(filecat.contains("Image"))
         {
+        */
             QByteArray ba;
             ba.clear();
             QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
@@ -1232,9 +1245,10 @@ void GenerateThumbnails(QString thumbid)
             QImage thumbimage;
             QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".jpg");
             //if(imglen > 0)
-            if(bufferlength > 0)
-            {
-                bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(filebuffer, bufferlength));
+            //if(bufferlength > 0)
+            //{
+            bool imageloaded = fileimage.loadFromData(filebytes);
+                //bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(filebuffer, bufferlength));
                 //bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
                 if(imageloaded)
                 {
@@ -1247,15 +1261,19 @@ void GenerateThumbnails(QString thumbid)
                     thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
                     writer.write(thumbimage);
                 }
-            }
-            else
-            {
-                fileimage.load(":/missingimage");
-                thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-                writer.write(thumbimage);
-            }
+            //}
         }
-        delete[] filebuffer;
+        else if(filecat.contains("Image") && filesize == 0)
+        {
+            QImage fileimage;
+            QImage thumbimage;
+            QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".jpg");
+            fileimage.load(":/missingimage");
+            thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+            writer.write(thumbimage);
+        }
+        //}
+        //delete[] filebuffer;
         digimgthumbcount++;
         isignals->DigUpd(0, digimgthumbcount);
     }
