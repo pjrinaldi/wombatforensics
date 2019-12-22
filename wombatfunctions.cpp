@@ -2216,6 +2216,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
     filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&filepropfile);
     if(curfileinfo->name != NULL) proplist << "Short Name||" << curfileinfo->name->shrt_name << "||Short Name for a file" << endl;
+    bool isdir = false;
     if(curfileinfo->meta != NULL)
     {
         proplist << "Target File Name||" << QString(curfileinfo->meta->link) << "||Name of target file if this is a symbolic link" << endl;
@@ -2262,9 +2263,17 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             else if(fsattr->type == 256) attrstr += "$LOGGED_UTILITY_STREAM,";
         }
         proplist << attrstr << "||Attributes Types" << endl;
+        if(curfileinfo->meta->type == TSK_FS_META_TYPE_DIR || curfileinfo->meta->type == TSK_FS_META_TYPE_VIRT_DIR)
+            isdir = true;
     }
-    proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
-    if(GetBlockList(curfileinfo).compare("") == 0 || GetBlockList(curfileinfo).compare("0^^") == 0)
+    QString blockliststring = "";
+    if(!isdir)
+        blockliststring = GetBlockList(curfileinfo);
+    //qDebug() << "blockliststring:" << blockliststring;
+    proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
+    //proplist << "Block Address||" << GetBlockList(curfileinfo) << "||List of block addresses which contain the contents of the file" << endl;
+    //if(GetBlockList(curfileinfo).compare("") == 0 || GetBlockList(curfileinfo).compare("0^^") == 0)
+    if(blockliststring.compare("") == 0 || blockliststring.compare("0^^") == 0)
     {
         if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
@@ -2281,10 +2290,11 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
                 proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset) << "||" << endl;
         }
         else
-            proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file" << endl;
+            proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file system" << endl;
     }
     else
-        proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+        proplist << "Byte Offset||" << QString::number(blockliststring.split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+        //proplist << "Byte Offset||" << QString::number(GetBlockList(curfileinfo).split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
     proplist.flush();
     if(filepropfile.isOpen())
     {
