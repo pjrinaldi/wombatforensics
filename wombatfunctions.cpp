@@ -816,7 +816,8 @@ void GenerateHash(QString objectid)
     {
 	// TSK FREE METHOD IMPLEMENTATION
 	QByteArray filebytes;
-        filebytes.clear();	
+        //filebytes.clear();	
+        /*
 	QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
 	QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
 	QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
@@ -824,7 +825,7 @@ void GenerateHash(QString objectid)
 	QString astring = objectid.split("-", QString::SkipEmptyParts).at(4);
 	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     	TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
-        qint64 filesize = curnode->Data(2).toLongLong();
+        //qint64 filesize = curnode->Data(2).toLongLong();
 	//qDebug() << "curnode id:" << curnode->Data(11).toString() << "size:" << curnode->Data(2).toInt();
 	if(fstring.contains(":"))
 	    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
@@ -860,9 +861,9 @@ void GenerateHash(QString objectid)
 	partfile.close();
 	QStringList partlist = tmpstr.split(",");
 	tmpstr = "";
-	qint64 fsoffset = partlist.at(4).toLongLong();
-	int blocksize = partlist.at(6).toInt();
-	int fstype = partlist.at(0).toInt();
+	//qint64 fsoffset = partlist.at(4).toLongLong();
+	//int blocksize = partlist.at(6).toInt();
+	//int fstype = partlist.at(0).toInt();
 	partlist.clear();
         QString mftentryoffset = "";
         QFile partpropfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/prop");
@@ -905,6 +906,7 @@ void GenerateHash(QString objectid)
 	fileprop.close();
 	filebytes.clear();
 	QFile imgfile(datastring);
+        */
 	// ALTERNATIVE IF/ELSE METHOD TO SHORTEN CODE
 	/*
 	bool isntfs = false;
@@ -4458,7 +4460,7 @@ QByteArray ReturnFileContent(QString objectid)
 	//qDebug() << "curnode id:" << curnode->Data(11).toString() << "size:" << curnode->Data(2).toInt();
 	if(fstring.contains(":"))
 	    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
-	qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong();
+	//qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong();
 	QString tmpstr = "";
 	QDir eviddir = QDir(wombatvariable.tmpmntpath);
 	QString evidencename = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs).first().split(".e").first();
@@ -4631,22 +4633,26 @@ QByteArray ReturnFileContent(QString objectid)
 	{
             if(!imgfile.isOpen())
 	        imgfile.open(QIODevice::ReadOnly);
-	    for(int i=0; i < blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
+	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
 	    {
                 //qDebug() << "i:" << i << "i*blksize:" << i*blocksize;
                 //qDebug() << "blocksize:" << blocksize;
                 //qDebug() << "filesize - (i-1)*blocksize:" << (filesize - ((i-1)*blocksize));
 		//while(imgfile.waitForReadyRead(-1))
 		//{
+                if(blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() != 0)
+                {
 		imgfile.seek(0);
-		int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i).toLongLong() * blocksize;
+		int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
 		imgfile.seek(blkoffset);
 		if((i * blocksize) <= filesize)
 		    filebytes.append(imgfile.read(blocksize));
 		else
                 {
+                    qDebug() << "i:" << i << "i*blksize:" << i*blocksize;
                     qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
-		    filebytes.append(imgfile.read(filesize - ((i)*blocksize)));
+		    filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
+                }
                 }
 		//}
 	    }
