@@ -1890,7 +1890,11 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             else
                 recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
             if(curfileinfo->meta != NULL)
+            {
+                qDebug() << "filename:" << curfileinfo->name->name;
+                qDebug() << "fs sector size:" << tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) << "cluster size:" << ntfsinfo->fs->csize << "mft cluster:" << tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) << "recordsize:" << recordsize << "file inode:" << curfileinfo->meta->addr << "fs offset:" << curfileinfo->fs_info->offset;
                 proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset) << "||" << endl;
+            }
         }
         else
             proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file system" << endl;
@@ -4441,7 +4445,7 @@ QByteArray ReturnFileContent(QString objectid)
 	    if(resbuffer.count() > 0)
 	    {
                 curoffset = 0;
-                //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
+                qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
                 mftoffset[0] = (uint8_t)resbuffer.at(20);
                 mftoffset[1] = (uint8_t)resbuffer.at(21);
                 nextattrid[0] = (uint8_t)resbuffer.at(40);
@@ -4451,7 +4455,9 @@ QByteArray ReturnFileContent(QString objectid)
                 for(int i = 0; i < attrcnt; i++)
                 {
 		    // getting erros with black saying attrtype error
-                    attrtype[0] = (uint8_t)resbuffer.at(curoffset);
+                    qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+                    attrtype[0] = (uint8_t)resbuffer.at(curoffset); // ERRORS HERE... outside scope... probably with new if/else
+                    // RESIDENT OFFSET CALCULATION WHCIH GETS WRITTEN TO PROP FILE IS WRONG...
                     attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
                     attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
                     attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
@@ -4463,11 +4469,23 @@ QByteArray ReturnFileContent(QString objectid)
                     mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
                     attrlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
 		    if(isdir && atrtype == 144)
+                    {
+                        qDebug() << "dir failure";
+                        qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
-		    else if(!isdir && isads && namelength > 0 && atrtype == 128)
+                    }
+		    if(!isdir && isads && namelength > 0 && atrtype == 128)
+                    {
+                        qDebug() << "res ads failure";
+                        qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
+                    }
 		    else if(!isdir && !isads && namelength == 0 && atrtype == 128)
+                    {
+                        qDebug() << "res file failure";
+                        qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
+                    }
                     curoffset += attrlength;
                 }
 		mftlen[0] = (uint8_t)resbuffer.at(curoffset + 16);
