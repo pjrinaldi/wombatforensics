@@ -3626,6 +3626,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     {
                         type = new char[512];
                         const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(fsfile, i);
+                        // NEED TO IMPLEMENT THE $DATA ATTRIBUTE: RESIDENT/NON RESIDENT value for the properties file
                         adssize += 24;
                         adssize += (qint64)fsattr->size;
                         if(ntfs_attrname_lookup(fsfile->fs_info, fsattr->type, type, 512) == 0)
