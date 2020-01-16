@@ -30,6 +30,7 @@ void PropertiesWindow::UpdateTableView()
     pmodel = new PropertyModel(propertylist);
     ui->tableView->setModel(pmodel);
     ui->tableView->hideColumn(2);
+    //ui->label->setText("hello");
     ui->tableView->resizeRowsToContents();
     ui->tableView->resizeColumnsToContents();
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
@@ -40,5 +41,5 @@ void PropertiesWindow::SelectionChanged(const QItemSelection &selitem, const QIt
     if(deselitem.indexes().count() > 0)
         oldselectedindex = deselitem.indexes().at(0);
     selectedindex = selitem.indexes().at(0);
-    ui->label->setText(selectedindex.sibling(selectedindex.row(), 1).data().toString());
+    ui->label->setText(selectedindex.sibling(selectedindex.row(), 2).data().toString());
 }
