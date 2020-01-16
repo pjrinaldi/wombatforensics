@@ -1847,6 +1847,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         proplist << "Attributes||";
         QString attrstr = "";
         int attrcnt = tsk_fs_file_attr_getsize(curfileinfo);
+        QString rnrstr = "Data Attribute||";
         for(int i=0; i < attrcnt; i++)
         {
             const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(curfileinfo, i);
@@ -1859,7 +1860,14 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             else if(fsattr->type == 80) attrstr += "SECURITY_DESCRIPTOR,";
             else if(fsattr->type == 96) attrstr += "$VOLUME_NAME,";
             else if(fsattr->type == 112) attrstr += "$VOLUME_INFORMATION,";
-            else if(fsattr->type == 128) attrstr += "$DATA,";
+            else if(fsattr->type == 128)
+            {
+                attrstr += "$DATA,";
+                if(fsattr->flags & TSK_FS_ATTR_NONRES)
+                    rnrstr += "Non Resident";
+                else if(fsattr->flags & TSK_FS_ATTR_RES)
+                    rnrstr += "Resident";
+            }
             else if(fsattr->type == 144) attrstr += "$INDEX_ROOT,";
             else if(fsattr->type == 160) attrstr += "$INDEX_ALLOCATION,";
             else if(fsattr->type == 176) attrstr += "$BITMAP,";
@@ -1869,6 +1877,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             else if(fsattr->type == 256) attrstr += "$LOGGED_UTILITY_STREAM,";
         }
         proplist << attrstr << "||Attributes Types" << endl;
+        proplist << rnrstr << "||Whether attribute is resident or non resident. A resident attribute is stored in the $DATA attribute of the MFT entry. A non resident attribute is stored in a cluster run outside of the MFT entry." << endl;
         if(curfileinfo->meta->type == TSK_FS_META_TYPE_DIR || curfileinfo->meta->type == TSK_FS_META_TYPE_VIRT_DIR)
             isdir = true;
     }
