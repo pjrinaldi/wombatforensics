@@ -1862,11 +1862,16 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             else if(fsattr->type == 112) attrstr += "$VOLUME_INFORMATION,";
             else if(fsattr->type == 128)
             {
-                attrstr += "$DATA,";
-                if(fsattr->flags & TSK_FS_ATTR_NONRES)
-                    rnrstr += "Non Resident";
-                else if(fsattr->flags & TSK_FS_ATTR_RES)
-                    rnrstr += "Resident";
+                if(fsattr->name == NULL)
+                {
+                    attrstr += "$DATA,";
+                    if(fsattr->flags & TSK_FS_ATTR_NONRES)
+                        rnrstr += "Non Resident";
+                    else if(fsattr->flags & TSK_FS_ATTR_RES)
+                        rnrstr += "Resident";
+                }
+                else
+                    qDebug() << "attr name is not null:" << fsattr->name;
             }
             else if(fsattr->type == 144) attrstr += "$INDEX_ROOT,";
             else if(fsattr->type == 160) attrstr += "$INDEX_ALLOCATION,";
