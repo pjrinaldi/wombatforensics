@@ -1797,6 +1797,7 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
         //if(curblockstring.compare("") != 0)
         if(!isres && !adsname.contains("$BadClus:$Bad"))
             proplist << "Byte Offset||" << QString::number(curblockstring.split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+        /*
         else
         {
             if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
@@ -1811,6 +1812,13 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
                 //proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset + adssize) << "||Resident offset within the MFT for the file's contents" << endl;
             }
         }
+        */
+        proplist << "Data Attribute||";
+        if(isres)
+            proplist << "Resident";
+        else
+            proplist << "Non Resident";
+        proplist << "||" << endl;
         proplist.flush();
         if(adspropfile.isOpen())
         {
@@ -4270,6 +4278,7 @@ QByteArray ReturnFileContent(QString objectid)
     int blocksize = partlist.at(6).toInt();
     int fstype = partlist.at(0).toInt();
     partlist.clear();
+    /*
     QString mftentryoffset = "";
     QFile partpropfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/prop");
     if(!partpropfile.isOpen())
@@ -4284,9 +4293,10 @@ QByteArray ReturnFileContent(QString objectid)
         }
     }
     partpropfile.close();
+    */
     int mftaddress = 0;
     QString blockstring = "";
-    //QString residentstring = "";
+    QString residentstring = "";
     QString bytestring = "";
     if(fstring.split("-").count() > 1) // ads attribute
         mftaddress = objectid.split("-a").last().toInt();
@@ -4306,8 +4316,14 @@ QByteArray ReturnFileContent(QString objectid)
 		//residentstring = tmpstring.split("||").at(1);
 	    else if(tmpstring.contains("Byte Offset"))
     	        bytestring = tmpstring.split("||").at(1);
+            else if(tmpstring.contains("Data Attribute"))
+                residentstring = tmpstring.split("||").at(1);
 	}
     }
+    bool isresident = true;
+    if(residentstring.contains("Non"))
+        isresident = false;
+    qDebug() << "is resident:" << isresident << "residentstring:" << residentstring;
     fileprop.close();
     QByteArray filebytes;
     filebytes.clear();
@@ -4560,16 +4576,17 @@ QByteArray ReturnFileContent(QString objectid)
     }
     */
     // ALTERNATIVE IF/ELSE METHOD TO SHORTEN CODE
+    bool isres = isresident;
     bool isntfs = false;
     bool isads = false;
-    bool isres = true;
+    //bool isres = true;
     bool isdir = false;
     if(fstype == TSK_FS_TYPE_NTFS_DETECT)
 	isntfs = true;
     if(fstring.split("-").count() > 1)
 	isads = true;
-    if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
-	isres = false;
+    //if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
+	//isres = false;
     if(curnode->itemtype == 2 || curnode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	isdir = true;
 
