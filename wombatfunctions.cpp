@@ -1886,6 +1886,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             else if(fsattr->type == 144)
             {
                 isresident = true;
+                rnrstr += "Resident";
                 //isdir = true;
                 attrstr += "$INDEX_ROOT,";
             }
@@ -1923,8 +1924,11 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
                 recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
             if(curfileinfo->meta != NULL)
             {
-                //qDebug() << "filename:" << curfileinfo->name->name;
-                //qDebug() << "fs sector size:" << tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) << "cluster size:" << ntfsinfo->fs->csize << "mft cluster:" << tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) << "recordsize:" << recordsize << "file inode:" << curfileinfo->meta->addr << "fs offset:" << curfileinfo->fs_info->offset;
+                //if(curfileinfo->meta->addr == 10664)
+                //{
+                    //qDebug() << "filename:" << curfileinfo->name->name;
+                    //qDebug() << "fs sector size:" << tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) << "cluster size:" << ntfsinfo->fs->csize << "mft cluster:" << tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) << "recordsize:" << recordsize << "file inode:" << curfileinfo->meta->addr << "fs offset:" << curfileinfo->fs_info->offset;
+                //}
                 proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset) << "||" << endl;
             }
         }
@@ -4488,7 +4492,8 @@ QByteArray ReturnFileContent(QString objectid)
 	    if(resbuffer.count() > 0)
 	    {
                 curoffset = 0;
-                //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
+                qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+                qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
                 mftoffset[0] = (uint8_t)resbuffer.at(20);
                 mftoffset[1] = (uint8_t)resbuffer.at(21);
                 nextattrid[0] = (uint8_t)resbuffer.at(40);
