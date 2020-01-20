@@ -4590,7 +4590,7 @@ QByteArray ReturnFileContent(QString objectid)
     if(curnode->itemtype == 2 || curnode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	isdir = true;
 
-    if(filesize > 0)
+    if(filesize > 0 && !residentstring.isEmpty())
     {
     if(isntfs && isres) // NTFS & RESIDENT
     {
