@@ -1639,7 +1639,7 @@ void WombatForensics::LoadHexContents()
         else
         {
             QString blockstring = "";
-            QString residentstring = "";
+            //QString residentstring = "";
             QString bytestring = "";
             QFile filefileprop;
             if(nodeid.split("-").at(3).split(":").count() > 1)
@@ -1652,8 +1652,8 @@ void WombatForensics::LoadHexContents()
                 QString tmpstring = filefileprop.readLine();
                 if(tmpstring.contains("Block Address"))
                     blockstring = tmpstring.split("||").at(1);
-                else if(tmpstring.contains("Resident Offset"))
-                    residentstring = tmpstring.split("||").at(1);
+                //else if(tmpstring.contains("Resident Offset"))
+                    //residentstring = tmpstring.split("||").at(1);
                 else if(tmpstring.contains("Byte Offset"))
                     bytestring = tmpstring.split("||").at(1);
             }
@@ -1673,7 +1673,8 @@ void WombatForensics::LoadHexContents()
                 {
                     if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                     {
-                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
+                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+                        //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
                         ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
                     }
                     else // IF RESIDENT
@@ -1682,6 +1683,7 @@ void WombatForensics::LoadHexContents()
                         {
                         //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
                         // NEW RESIDENT OFFSET METHOD
+                        //qint64 residentoffset = residentstring.toLongLong();
                         qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
                         //qDebug() << "(resident ads) residentoffset:" << residentoffset;
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
@@ -1725,7 +1727,9 @@ void WombatForensics::LoadHexContents()
                 {
                     if(selectednode->itemtype == 2 || selectednode->itemtype == 11)
                     {
-                        qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * 2048) + fsoffset;
+                        //qint64 residentoffset = residentstring.toLongLong();
+                        //qDebug() << "residentstring:" << residentoffset << "resoffset:" << (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
+                        qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
                         //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
                         //qDebug() << "(resident dir) residentoffset:" << residentoffset;
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
@@ -1770,13 +1774,15 @@ void WombatForensics::LoadHexContents()
                     {
                         if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
                         {
-                            ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
+                            ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+                            //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
                             ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
                         }
                         else // IF RESIDENT
                         {
+                            //qint64 residentoffset = residentstring.toLongLong();
                             //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
-                            qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * 2048) + fsoffset;
+                            qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
                             //qDebug() << "(resident file) residentoffset:" << residentoffset;
                             QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                             curoffset = 0;
@@ -1823,7 +1829,8 @@ void WombatForensics::LoadHexContents()
             else // OTHER FILE SYSTEM
             {
                 //qDebug() << "not ntfs";
-                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
+                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+                //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
                 ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
             }
         }

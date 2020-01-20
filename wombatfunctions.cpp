@@ -1807,7 +1807,8 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
                     recordsize = ntfsinfo->fs->mft_rsize_c * ntfsinfo->fs->csize * tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize);
                 else
                     recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
-                proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset + adssize) << "||Resident offset within the MFT for the file's contents" << endl;
+                //proplist << "Resident Offset||" << QString::number((mftblocklist.at(curfileinfo->name->meta_addr/2).toLongLong() * (int)curfileinfo->fs_info->block_size) + curfileinfo->fs_info->offset)<< "||Offset to start of the mft entry for a resident attribute in bytes" << endl;
+                //proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset + adssize) << "||Resident offset within the MFT for the file's contents" << endl;
             }
         }
         proplist.flush();
@@ -2034,8 +2035,9 @@ tsk_fs_attr_print(const TSK_FS_ATTR * a_fs_attr, FILE* hFile) {
                 //{
                     //qDebug() << "filename:" << curfileinfo->name->name;
                     //qDebug() << "fs sector size:" << tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) << "cluster size:" << ntfsinfo->fs->csize << "mft cluster:" << tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) << "recordsize:" << recordsize << "file inode:" << curfileinfo->meta->addr << "fs offset:" << curfileinfo->fs_info->offset;
-                //}
-                proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset) << "||" << endl;
+      //(int)fsinfo->block_size          //}
+                //proplist << "Resident Offset||" << QString::number((mftblocklist.at(curfileinfo->name->meta_addr/2).toLongLong() * (int)curfileinfo->fs_info->block_size) + curfileinfo->fs_info->offset) << "||Offset to start of the mft entry for a resident attribute in bytes" << endl;
+                //proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset) << "||" << endl;
             }
         }
         //else
@@ -4284,7 +4286,7 @@ QByteArray ReturnFileContent(QString objectid)
     partpropfile.close();
     int mftaddress = 0;
     QString blockstring = "";
-    QString residentstring = "";
+    //QString residentstring = "";
     QString bytestring = "";
     if(fstring.split("-").count() > 1) // ads attribute
         mftaddress = objectid.split("-a").last().toInt();
@@ -4300,8 +4302,8 @@ QByteArray ReturnFileContent(QString objectid)
 	    QString tmpstring = fileprop.readLine();
             if(tmpstring.contains("Block Address"))
 		blockstring = tmpstring.split("||").at(1);
-	    else if(tmpstring.contains("Resident Offset"))
-		residentstring = tmpstring.split("||").at(1);
+	    //else if(tmpstring.contains("Resident Offset"))
+		//residentstring = tmpstring.split("||").at(1);
 	    else if(tmpstring.contains("Byte Offset"))
     	        bytestring = tmpstring.split("||").at(1);
 	}
@@ -4588,7 +4590,8 @@ QByteArray ReturnFileContent(QString objectid)
 	    uint32_t contentlength = 0;
 	    uint16_t resoffset = 0;
             // NEW RESIDENT OFFSET CALCULATION
-            qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * 2048) + fsoffset;
+            qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
+            //qDebug() << "residentstring:" << residentstring << "residentoffset:" << residentoffset;
 	    //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
 	    QByteArray resbuffer;
 	    resbuffer.clear();
