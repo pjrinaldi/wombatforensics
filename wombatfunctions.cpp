@@ -835,7 +835,7 @@ void GenerateHash(QString objectid)
                 hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
         }
 	filebytes.clear();
-        qDebug() << "hash value:" << hashstr;
+        //qDebug() << "hash value:" << hashstr;
         hashlist.insert(objectid, hashstr);
         treenodemodel->UpdateNode(objectid, 7, hashstr);
 	int hashtype = 1;
@@ -4474,6 +4474,7 @@ QByteArray ReturnFileContent(QString objectid)
 	    imgfile.seek(0);
 	    imgfile.seek(residentoffset);
             //qDebug() << "pos:" << imgfile.pos();
+            qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 	    resbuffer.append(imgfile.read(1024)); // MFT ENTRY
             //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
             if(imgfile.isOpen())
@@ -4482,7 +4483,7 @@ QByteArray ReturnFileContent(QString objectid)
 	    if(resbuffer.count() > 0)
 	    {
                 curoffset = 0;
-                qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
+                //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
                 mftoffset[0] = (uint8_t)resbuffer.at(20);
                 mftoffset[1] = (uint8_t)resbuffer.at(21);
                 nextattrid[0] = (uint8_t)resbuffer.at(40);
@@ -4492,7 +4493,7 @@ QByteArray ReturnFileContent(QString objectid)
                 for(int i = 0; i < attrcnt; i++)
                 {
 		    // getting erros with black saying attrtype error
-                    qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+                    //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
                     attrtype[0] = (uint8_t)resbuffer.at(curoffset); // ERRORS HERE... outside scope... probably with new if/else
                     // RESIDENT OFFSET CALCULATION WHCIH GETS WRITTEN TO PROP FILE IS WRONG...
                     attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
@@ -4507,20 +4508,20 @@ QByteArray ReturnFileContent(QString objectid)
                     attrlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
 		    if(isdir && atrtype == 144)
                     {
-                        qDebug() << "dir failure";
-                        qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+                        //qDebug() << "dir failure";
+                        //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
                     }
 		    if(!isdir && isads && namelength > 0 && atrtype == 128)
                     {
-                        qDebug() << "res ads failure";
-                        qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+                        //qDebug() << "res ads failure";
+                        //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
                     }
 		    else if(!isdir && !isads && namelength == 0 && atrtype == 128)
                     {
-                        qDebug() << "res file failure";
-                        qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+                        //qDebug() << "res file failure";
+                        //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
                     }
                     curoffset += attrlength;
@@ -4563,6 +4564,7 @@ QByteArray ReturnFileContent(QString objectid)
 	    }
             if(imgfile.isOpen())
 	        imgfile.close();
+            qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 	}
     }
     return filebytes;
