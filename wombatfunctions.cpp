@@ -4479,7 +4479,7 @@ QByteArray ReturnFileContent(QString objectid)
 	    imgfile.seek(0);
 	    imgfile.seek(residentoffset);
             //qDebug() << "pos:" << imgfile.pos();
-            qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+            //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 	    resbuffer.append(imgfile.read(1024)); // MFT ENTRY
             //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
             if(imgfile.isOpen())
@@ -4569,7 +4569,7 @@ QByteArray ReturnFileContent(QString objectid)
 	    }
             if(imgfile.isOpen())
 	        imgfile.close();
-            qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+            //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 	}
     }
     return filebytes;
