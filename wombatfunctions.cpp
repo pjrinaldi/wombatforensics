@@ -1921,8 +1921,8 @@ tsk_fs_attr_print(const TSK_FS_ATTR * a_fs_attr, FILE* hFile) {
     tot_size = a_fs_attr->size;
     skip_remain = a_fs_attr->nrd.skiplen;
 
-    for (fs_attr_run = a_fs_attr->nrd.run; fs_attr_run;
-        fs_attr_run = fs_attr_run->next) {
+    for (fs_attr_run = a_fs_attr->nrd.run; fs_attr_run; fs_attr_run = fs_attr_run->next)
+    {
         TSK_DADDR_T addr, len_idx, run_len, run_start_addr;
 
         addr = fs_attr_run->addr;
@@ -2002,6 +2002,18 @@ tsk_fs_attr_print(const TSK_FS_ATTR * a_fs_attr, FILE* hFile) {
     {
         blockliststring = GetBlockList(curfileinfo);
         proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
+        if(curfileinfo->name->meta_addr == 0 && strcmp(curfileinfo->name->name, "$MFT") == 0)
+        {
+            //qDebug() << "curfile name:" << curfileinfo->name->name;
+            mftblocklist.clear();
+            mftblocklist = blockliststring.split("^^", QString::SkipEmptyParts);
+            /*
+            if(mftblocklist.count() > 0)
+                qDebug() << "mftblocklist.at(10664/2):" << mftblocklist.at(10664/2);
+            else
+                qDebug() << "mft hasn't been read yet...";
+            */
+        }
     }
     //if(blockliststring.compare("") == 0 || blockliststring.compare("0^^") == 0)
     if(isresident)
@@ -3877,6 +3889,12 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                 treeout << "0"; // HASH - 7
                 treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
                 treeout << "0"; // TAG - 10
+                // POPULATE MFTBLOCKLIST
+                if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") == 0)
+                {
+                    mftblocklist.clear();
+                    mftblocklist = GetBlockList(fsfile).split("^^", QString::SkipEmptyParts);
+                }
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
                     treeout << evalue + "-" + vvalue + "-" + pvalue + "-f*" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
@@ -4569,7 +4587,9 @@ QByteArray ReturnFileContent(QString objectid)
 	    uint32_t attrlength = 0;
 	    uint32_t contentlength = 0;
 	    uint16_t resoffset = 0;
-	    qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
+            // NEW RESIDENT OFFSET CALCULATION
+            qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * 2048) + fsoffset;
+	    //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
 	    QByteArray resbuffer;
 	    resbuffer.clear();
             if(!imgfile.isOpen())
@@ -4596,10 +4616,9 @@ QByteArray ReturnFileContent(QString objectid)
                 int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
                 for(int i = 0; i < attrcnt; i++)
                 {
-		    // getting erros with black saying attrtype error
+		    // getting erros with blake saying attrtype error
                     //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
                     attrtype[0] = (uint8_t)resbuffer.at(curoffset); // ERRORS HERE... outside scope... probably with new if/else
-                    // RESIDENT OFFSET CALCULATION WHCIH GETS WRITTEN TO PROP FILE IS WRONG...
                     attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
                     attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
                     attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);

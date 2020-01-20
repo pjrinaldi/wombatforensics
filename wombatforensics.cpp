@@ -1605,6 +1605,7 @@ void WombatForensics::LoadHexContents()
         partfile.close();
         qint64 fsoffset = partlist.at(4).toLongLong();
         qint64 rootinum = partlist.at(3).toLongLong();
+        int blocksize = partlist.at(6).toInt();
         if(paridstr.contains("-"))
             paridstr = QString::number(rootinum);
         QString mftentryoffset = "";
@@ -1679,7 +1680,9 @@ void WombatForensics::LoadHexContents()
                     {
                         if(selectednode->Data(2).toLongLong() < 700) // takes care of $BadClus which is non-resident but doesn't have blocks
                         {
-                        qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
+                        //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
+                        // NEW RESIDENT OFFSET METHOD
+                        qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
                         //qDebug() << "(resident ads) residentoffset:" << residentoffset;
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                         curoffset = 0;
@@ -1722,7 +1725,8 @@ void WombatForensics::LoadHexContents()
                 {
                     if(selectednode->itemtype == 2 || selectednode->itemtype == 11)
                     {
-                        qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
+                        qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * 2048) + fsoffset;
+                        //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
                         //qDebug() << "(resident dir) residentoffset:" << residentoffset;
                         QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                         //qDebug() << "resbuffer length:" << resbuffer.length();
@@ -1771,7 +1775,8 @@ void WombatForensics::LoadHexContents()
                         }
                         else // IF RESIDENT
                         {
-                            qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
+                            //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
+                            qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * 2048) + fsoffset;
                             //qDebug() << "(resident file) residentoffset:" << residentoffset;
                             QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
                             curoffset = 0;
