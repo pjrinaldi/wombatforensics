@@ -1883,7 +1883,12 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
                 //else
                 //    qDebug() << "attr name is not null:" << fsattr->name;
             }
-            else if(fsattr->type == 144) attrstr += "$INDEX_ROOT,";
+            else if(fsattr->type == 144)
+            {
+                isresident = true;
+                //isdir = true;
+                attrstr += "$INDEX_ROOT,";
+            }
             else if(fsattr->type == 160) attrstr += "$INDEX_ALLOCATION,";
             else if(fsattr->type == 176) attrstr += "$BITMAP,";
             else if(fsattr->type == 192) attrstr += "$REPARSE_POINT,";
