@@ -1771,12 +1771,16 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
     //return blockstring;
 }
 
-void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, qint64 adssize, QString attrid, QString partpath)
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, qint64 adssize, QString attrid, QString partpath, bool isres)
 {
-    QString curblockstring = GetAdsBlockList(curfileinfo, attrid.toLongLong());
+    //qDebug() << "cur ads parent file:" << curfileinfo->name->name;
+    //qDebug() << "cur ads name:" << adsname;
+    QString curblockstring = "";
+    if(!isres)
+        curblockstring = GetAdsBlockList(curfileinfo, attrid.toLongLong());
     //qDebug() << "ads block string:" << curblockstring;
-    if(curblockstring.compare("0^^") == 0)
-        curblockstring = "";
+    //if(curblockstring.compare("0^^") == 0)
+    //    curblockstring = "";
     QFile adspropfile;
     if(curfileinfo->name != NULL)
     {
@@ -1787,9 +1791,11 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
         proplist << "Name||" << adsname << "||Name for the NTFS parent file additional $Data attribute" << endl;
         proplist << "Parent Address||" << QString::number(curfileinfo->meta->addr) << "||NTFS address ID for the parent file" << endl;
         proplist << "Parent File Name||" << QString(curfileinfo->name->name) << "||File name of the parent file" << endl;
-        proplist << "Block Address||" << curblockstring << "||List of block addresses which contain the contents of the alternate data stream" << endl;
+        if(!isres)
+            proplist << "Block Address||" << curblockstring << "||List of block addresses which contain the contents of the alternate data stream" << endl;
         proplist << "Attribute ID||" << attrid << "||ID for the file's ADS attribute" << endl;
-        if(curblockstring.compare("") != 0)
+        //if(curblockstring.compare("") != 0)
+        if(!isres && !adsname.contains("$BadClus:$Bad"))
             proplist << "Byte Offset||" << QString::number(curblockstring.split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
         else
         {
@@ -1822,7 +1828,8 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
     filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream proplist(&filepropfile);
     if(curfileinfo->name != NULL) proplist << "Short Name||" << curfileinfo->name->shrt_name << "||Short Name for a file" << endl;
-    bool isdir = false;
+    //bool isdir = false;
+    bool isresident = false;
     if(curfileinfo->meta != NULL)
     {
         proplist << "Target File Name||" << QString(curfileinfo->meta->link) << "||Name of target file if this is a symbolic link" << endl;
@@ -1868,10 +1875,13 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
                     if(fsattr->flags & TSK_FS_ATTR_NONRES)
                         rnrstr += "Non Resident";
                     else if(fsattr->flags & TSK_FS_ATTR_RES)
+                    {
                         rnrstr += "Resident";
+                        isresident = true;
+                    }
                 }
-                else
-                    qDebug() << "attr name is not null:" << fsattr->name;
+                //else
+                //    qDebug() << "attr name is not null:" << fsattr->name;
             }
             else if(fsattr->type == 144) attrstr += "$INDEX_ROOT,";
             else if(fsattr->type == 160) attrstr += "$INDEX_ALLOCATION,";
@@ -1883,19 +1893,22 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         }
         proplist << attrstr << "||Attributes Types" << endl;
         proplist << rnrstr << "||Whether attribute is resident or non resident. A resident attribute is stored in the $DATA attribute of the MFT entry. A non resident attribute is stored in a cluster run outside of the MFT entry." << endl;
-        if(curfileinfo->meta->type == TSK_FS_META_TYPE_DIR || curfileinfo->meta->type == TSK_FS_META_TYPE_VIRT_DIR)
-            isdir = true;
+        //if(curfileinfo->meta->type == TSK_FS_META_TYPE_DIR || curfileinfo->meta->type == TSK_FS_META_TYPE_VIRT_DIR)
+        //    isdir = true;
     }
     QString blockliststring = "";
-    if(!isdir)
+    //if(!isdir && !isresident)
+    if(!isresident)
+    {
         blockliststring = GetBlockList(curfileinfo);
-    proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
-    if(blockliststring.compare("") == 0 || blockliststring.compare("0^^") == 0)
+        proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
+    }
+    //if(blockliststring.compare("") == 0 || blockliststring.compare("0^^") == 0)
+    if(isresident)
     {
         if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
             NTFS_INFO* ntfsinfo = (NTFS_INFO*)curfileinfo->fs_info;
-
             int recordsize = 0;
             if(ntfsinfo->fs->mft_rsize_c > 0)
             {
@@ -1905,16 +1918,19 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
                 recordsize = 1 << -ntfsinfo->fs->mft_rsize_c;
             if(curfileinfo->meta != NULL)
             {
-                qDebug() << "filename:" << curfileinfo->name->name;
-                qDebug() << "fs sector size:" << tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) << "cluster size:" << ntfsinfo->fs->csize << "mft cluster:" << tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) << "recordsize:" << recordsize << "file inode:" << curfileinfo->meta->addr << "fs offset:" << curfileinfo->fs_info->offset;
+                //qDebug() << "filename:" << curfileinfo->name->name;
+                //qDebug() << "fs sector size:" << tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) << "cluster size:" << ntfsinfo->fs->csize << "mft cluster:" << tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust) << "recordsize:" << recordsize << "file inode:" << curfileinfo->meta->addr << "fs offset:" << curfileinfo->fs_info->offset;
                 proplist << "Resident Offset||" << QString::number(((tsk_getu16(curfileinfo->fs_info->endian, ntfsinfo->fs->ssize) * ntfsinfo->fs->csize * tsk_getu64(curfileinfo->fs_info->endian, ntfsinfo->fs->mft_clust)) + (recordsize * curfileinfo->meta->addr)) + curfileinfo->fs_info->offset) << "||" << endl;
             }
         }
-        else
-            proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file system" << endl;
+        //else
+        //    proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file system" << endl;
     }
     else
-        proplist << "Byte Offset||" << QString::number(blockliststring.split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+    {
+        if(blockliststring.split("^^", QString::SkipEmptyParts).count() > 0)
+            proplist << "Byte Offset||" << QString::number(blockliststring.split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
+    }
     proplist.flush();
     if(filepropfile.isOpen())
     {
@@ -3629,17 +3645,23 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     cnt = tsk_fs_file_attr_getsize(fsfile);
                     for(i = 0; i < cnt; i++)
                     {
-                        type = new char[512];
+                        //type = new char[512];
                         const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(fsfile, i);
                         // NEED TO IMPLEMENT THE $DATA ATTRIBUTE: RESIDENT/NON RESIDENT value for the properties file
                         adssize += 24;
                         adssize += (qint64)fsattr->size;
-                        if(ntfs_attrname_lookup(fsfile->fs_info, fsattr->type, type, 512) == 0)
+                        if(fsattr->type == 128 && fsattr->name != NULL)
                         {
-                            if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
-                            {
-                                if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
-                                {
+                        //if(ntfs_attrname_lookup(fsfile->fs_info, fsattr->type, type, 512) == 0)
+                        //{
+                        //    if(QString::compare(QString(type), "$DATA", Qt::CaseSensitive) == 0)
+                        //    {
+                                //if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                                //if(fsattr->name != NULL && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
+                                //{
+                                    bool isresident = false;
+                                    if(fsattr->flags & TSK_FS_ATTR_RES)
+                                        isresident = true;
                                     char* fbuf = new char[fsattr->size];
                                     ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                                     QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
@@ -3659,12 +3681,12 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                                     listeditems.append(treeout.at(11)); // UNCOMMENT ONCE I CAN CAPTURE ADS IN GEN HASH AND IMG THUMB
                                     filesfound++;
                                     isignals->ProgUpd();
-                                    WriteAlternateDataStreamProperties(fsfile, QString(fsfile->name->name) + QString(":") + QString(fsattr->name), (qint64)(adssize - fsattr->size + 16), QString::number(fsattr->id), partpath);
-                                }
-                            }
+                                    WriteAlternateDataStreamProperties(fsfile, QString(fsfile->name->name) + QString(":") + QString(fsattr->name), (qint64)(adssize - fsattr->size + 16), QString::number(fsattr->id), partpath, isresident);
+                                //}
+                            //}
                         }
                     }
-                    delete[] type;
+                    //delete[] type;
                     delete[] startoffset;
                 }
                 if(fsfile->name != NULL)

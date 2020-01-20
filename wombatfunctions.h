@@ -43,7 +43,7 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QSt
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath);
-void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, qint64 adssize, QString attrid, QString partpath);
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, qint64 adssize, QString attrid, QString partpath, bool isres);
 //void LogMessage(QString message);
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr);
 QString GetFilePermissions(TSK_FS_META* tmpmeta);
