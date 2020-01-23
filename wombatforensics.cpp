@@ -1269,7 +1269,8 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionsearchhex->setEnabled(true);
         StatusUpdate("Loading Hex Contents...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        LoadHexContents();
+        // FOR TESTING
+        //LoadHexContents();
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
