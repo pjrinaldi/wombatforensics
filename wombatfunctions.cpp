@@ -2987,9 +2987,9 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QSt
                 case LIBEWF_FORMAT_SMART:
                     proplist << QString("SMART") << "||Format used to store the evidence image" << endl;
                     break;
-                case LIBEWF_FORMAT_FTK:
-                    proplist << QString("FTK Imager") << "||Format used to store the evidence image" << endl;
-                    break;
+                //case LIBEWF_FORMAT_FTK:
+                //    proplist << QString("FTK Imager") << "||Format used to store the evidence image" << endl;
+                //    break;
                 case LIBEWF_FORMAT_ENCASE1:
                     proplist << QString("EnCase 1") << "||Format used to store the evidence image" << endl;
                     break;
@@ -4608,7 +4608,18 @@ QByteArray ReturnFileContent(QString objectid)
 	    uint16_t resoffset = 0;
             // NEW RESIDENT OFFSET CALCULATION
             // NEED TO MAKE THIS (mftaddress [inode] * (1024/cluster size))
-            qint64 residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
+            qint64 residentoffset = 0;
+            if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.
+            {
+                residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
+            }
+            else // odd number, get starting block and jump the fractional amount to get to the correct entry.
+            {
+                float mftblock = mftaddress * 1024.0/blocksize;
+                int mftblockint = floor(mftblock);
+                residentoffset = (mftblocklist.at(mftblockint).toLongLong() * blocksize) + fsoffset + (blocksize * (mftblock/mftblockint));
+            }
+            //qint64 residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
             //qDebug() << "residentstring:" << residentstring << "residentoffset:" << residentoffset;
 	    //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
 	    QByteArray resbuffer;
@@ -4678,6 +4689,11 @@ QByteArray ReturnFileContent(QString objectid)
                         //qDebug() << "res file failure";
                         //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
+                    }
+                    if(atrtype == 4294967295)
+                    {
+                        qDebug() << "next attribute is 0xFFFFFFFF";
+                        break;
                     }
                     curoffset += attrlength;
                     qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
