@@ -4278,6 +4278,7 @@ QByteArray ReturnFileContent(QString objectid)
     int blocksize = partlist.at(6).toInt();
     int fstype = partlist.at(0).toInt();
     partlist.clear();
+    qDebug() << "blocksize:" << blocksize;
     /*
     QString mftentryoffset = "";
     QFile partpropfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/prop");
@@ -4617,7 +4618,8 @@ QByteArray ReturnFileContent(QString objectid)
             {
                 float mftblock = mftaddress * 1024.0/blocksize;
                 int mftblockint = floor(mftblock);
-                residentoffset = (mftblocklist.at(mftblockint).toLongLong() * blocksize) + fsoffset + (blocksize * (mftblock/mftblockint));
+                qDebug() << "mftblock:" << mftblock << "mftblockint:" << mftblockint << "mftblock cluster:" << mftblocklist.at(mftblockint);
+                residentoffset = (mftblocklist.at(mftblockint).toLongLong() * blocksize) + fsoffset + (blocksize * (mftblock - mftblockint));
             }
             //qint64 residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
             //qDebug() << "residentstring:" << residentstring << "residentoffset:" << residentoffset;
