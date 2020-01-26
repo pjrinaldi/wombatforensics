@@ -1194,7 +1194,7 @@ void WombatForensics::OpenUpdate()
         //QThread::sleep(60);
         ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
         //selectedindex = indexlist.first();
-        //LoadHexContents();
+        LoadHexContents();
         //bool test = false;
         //qDebug() << ui->hexview->addressOffset() << selectedoffset->text().split("0x").last().toLongLong(&test, 16);
         //test = false;
@@ -1269,7 +1269,6 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionsearchhex->setEnabled(true);
         StatusUpdate("Loading Hex Contents...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        // FOR TESTING
         LoadHexContents();
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
@@ -1616,18 +1615,6 @@ void WombatForensics::LoadHexContents()
         int fstype = partlist.at(0).toInt();
         if(paridstr.contains("-"))
             paridstr = QString::number(rootinum);
-        /*
-        QString mftentryoffset = "";
-        QFile partpropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/prop");
-        partpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        while(!partpropfile.atEnd())
-        {
-            QString tmpstring = partpropfile.readLine();
-            if(tmpstring.contains("MFT Starting Byte Address"))
-                mftentryoffset = tmpstring.split("||").at(1);
-        }
-        partpropfile.close();
-        */
         int mftaddress = 0;
         if(nodeid.split("-").at(3).split(":").count() > 1) // ads attribute
             mftaddress = nodeid.split("-a").last().toInt();
@@ -1649,7 +1636,6 @@ void WombatForensics::LoadHexContents()
         else
         {
             QString blockstring = "";
-            //QString residentstring = "";
             QString residentstring = "";
             QString bytestring = "";
             QFile filefileprop;
@@ -1663,8 +1649,6 @@ void WombatForensics::LoadHexContents()
                 QString tmpstring = filefileprop.readLine();
                 if(tmpstring.contains("Block Address"))
                     blockstring = tmpstring.split("||").at(1);
-                //else if(tmpstring.contains("Resident Offset"))
-                    //residentstring = tmpstring.split("||").at(1);
                 else if(tmpstring.contains("Byte Offset"))
                     bytestring = tmpstring.split("||").at(1);
                 else if(tmpstring.contains("Data Attribute"))
@@ -1674,206 +1658,20 @@ void WombatForensics::LoadHexContents()
             bool isresident = true;
             if(residentstring.contains("Non"))
                 isresident = false;
-            qDebug() << "is resident:" << isresident << "residentstring:" << residentstring;
-            /*
-            if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS (ADS/FILE/DIR/RES/NONRES)
-            {
-                unsigned int curoffset = 0;
-                uint8_t mftoffset[2];
-                uint8_t nextattrid[2];
-                uint8_t mftlen[4];
-                uint8_t attrtype[4];
-                uint32_t atrtype = 0;
-                uint8_t namelength = 0;
-                uint32_t contentlength = 0;
-                uint16_t resoffset = 0;
-                if(nodeid.split("-").at(3).split(":").count() > 1) // IF ADS
-                {
-                    if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
-                    {
-                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
-                        //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
-                        ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
-                    }
-                    else // IF RESIDENT
-                    {
-                        if(selectednode->Data(2).toLongLong() < 700) // takes care of $BadClus which is non-resident but doesn't have blocks
-                        {
-                        //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
-                        // NEW RESIDENT OFFSET METHOD
-                        //qint64 residentoffset = residentstring.toLongLong();
-                        qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
-                        //qDebug() << "(resident ads) residentoffset:" << residentoffset;
-                        QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
-                        curoffset = 0;
-                        //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
-                        mftoffset[0] = (uint8_t)resbuffer.at(20);
-                        mftoffset[1] = (uint8_t)resbuffer.at(21);
-                        nextattrid[0] = (uint8_t)resbuffer.at(40);
-                        nextattrid[1] = (uint8_t)resbuffer.at(41);
-                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                        for(int i = 0; i < attrcnt; i++)
-                        {
-                            attrtype[0] = (uint8_t)resbuffer.at(curoffset);
-                            attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                            attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                            attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                            atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                            namelength = (uint8_t)resbuffer.at(curoffset + 9);
-                            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                            mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                            mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                            mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                            contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                            if(namelength > 0 && atrtype == 128)
-                                break;
-                            curoffset += contentlength;
-                        }
-                        mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-                        mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                        resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-    
-                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
-                        ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                        }
-                        else
-                            ui->hexview->setCursorPosition(0);
-                    }
-                }
-                else // IF NOT ADS
-                {
-                    if(selectednode->itemtype == 2 || selectednode->itemtype == 11)
-                    {
-                        //qint64 residentoffset = residentstring.toLongLong();
-                        //qDebug() << "residentstring:" << residentoffset << "resoffset:" << (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
-                        qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
-                        //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
-                        //qDebug() << "(resident dir) residentoffset:" << residentoffset;
-                        QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
-                        //qDebug() << "resbuffer length:" << resbuffer.length();
-                        curoffset = 0;
-                        resoffset = 0;
-                        mftoffset[0] = (uint8_t)resbuffer.at(20);
-                        mftoffset[1] = (uint8_t)resbuffer.at(21);
-                        nextattrid[0] = (uint8_t)resbuffer.at(40);
-                        nextattrid[1] = (uint8_t)resbuffer.at(41);
-                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                        int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                        //qDebug() << "attrcnt:" << attrcnt;
-                        for(int i = 0; i < attrcnt; i++)
-                        {
-                            if(curoffset < (unsigned)resbuffer.size())
-                            {
-                                attrtype[0] = (uint8_t)resbuffer.at(curoffset);
-                                attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                                attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                                attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                                atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                                mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                                mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                                mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                                mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                                contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                                if(atrtype == 144)
-                                    break;
-                                curoffset += contentlength;
-                            }
-                        }
-                        //qDebug() << "curoffset:" << curoffset;
-                        // offset to type 144 resident attribute content
-                        mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-                        mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                        curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                        ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), "", QString::number(residentoffset + curoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), curoffset);
-                        ui->hexview->setCursorPosition((residentoffset + curoffset)*2);
-                    }
-                    else // IF FILE AND OTHER STUFF
-                    {
-                        if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0) // IF NON-RESIDENT
-                        {
-                            ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
-                            //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
-                            ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
-                        }
-                        else // IF RESIDENT
-                        {
-                            //qint64 residentoffset = residentstring.toLongLong();
-                            //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
-                            qint64 residentoffset = (mftblocklist.at(mftaddress/2).toLongLong() * blocksize) + fsoffset;
-                            //qDebug() << "(resident file) residentoffset:" << residentoffset;
-                            QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
-                            curoffset = 0;
-                            mftoffset[0] = (uint8_t)resbuffer.at(20);
-                            mftoffset[1] = (uint8_t)resbuffer.at(21);
-                            nextattrid[0] = (uint8_t)resbuffer.at(40);
-                            nextattrid[1] = (uint8_t)resbuffer.at(41);
-                            curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                            int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                            //qDebug() << "attrcnt:" << attrcnt;
-                            for(int i = 0; i < attrcnt; i++)
-                            {
-                                if(curoffset < (unsigned)resbuffer.size())
-                                {
-                                    attrtype[0] = (uint8_t)resbuffer.at(curoffset);
-                                    attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                                    attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                                    attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                                    atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                                    namelength = (uint8_t)resbuffer.at(curoffset + 9);
-                                    mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                                    mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                                    mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                                    mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                                    contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                                    if(namelength == 0 && atrtype == 128)
-                                        break;
-                                    curoffset += contentlength;
-                                }
-                            }
-                            //qDebug() << "curoffset:" << curoffset;
-                            if(curoffset < (unsigned)resbuffer.size())
-                            {
-                                mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-                                mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                                resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                            }
-                            ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
-                            ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                        }
-                    }
-                }
-            }
-            else // OTHER FILE SYSTEM
-            {
-                //qDebug() << "not ntfs";
-                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
-                //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
-                ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
-            }
-        }
-        */
     // ALTERNATIVE IF/ELSE METHOD TO SHORTEN CODE
     bool isres = isresident;
     bool isntfs = false;
     bool isads = false;
-    //bool isres = true;
     bool isdir = false;
     if(fstype == TSK_FS_TYPE_NTFS_DETECT)
 	isntfs = true;
-    if(fstring.split("-").count() > 1)
+    if(fstring.split(":").count() > 1)
 	isads = true;
-    //if(blockstring.compare("") != 0 && blockstring.compare("0^^") != 0)
-	//isres = false;
     if(selectednode->itemtype == 2 || selectednode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	isdir = true;
 
-    if(filesize > 0 && !residentstring.isEmpty())
-    {
     if(isntfs && isres) // NTFS & RESIDENT
     {
-	if(filesize < 700) // resident should be less than 700
-	{
     	    unsigned int curoffset = 0;
 	    uint8_t mftoffset[2];
 	    uint8_t nextattrid[2];
@@ -1885,7 +1683,6 @@ void WombatForensics::LoadHexContents()
 	    uint32_t contentlength = 0;
 	    uint16_t resoffset = 0;
             // NEW RESIDENT OFFSET CALCULATION
-            // NEED TO MAKE THIS (mftaddress [inode] * (1024/cluster size))
             qint64 residentoffset = 0;
             if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.
             {
@@ -1895,137 +1692,91 @@ void WombatForensics::LoadHexContents()
             {
                 float mftblock = mftaddress * 1024.0/blocksize;
                 int mftblockint = floor(mftblock);
-                qDebug() << "mftblock:" << mftblock << "mftblockint:" << mftblockint << "mftblock cluster:" << mftblocklist.at(mftblockint);
+                //qDebug() << "mftblock:" << mftblock << "mftblockint:" << mftblockint << "mftblock cluster:" << mftblocklist.at(mftblockint);
                 residentoffset = (mftblocklist.at(mftblockint).toLongLong() * blocksize) + fsoffset + (blocksize * (mftblock - mftblockint));
             }
-            //qint64 residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
-            //qDebug() << "residentstring:" << residentstring << "residentoffset:" << residentoffset;
-	    //qint64 residentoffset = mftentryoffset.toLongLong() + (1024 * mftaddress) + fsoffset;
-	    //QByteArray resbuffer;
-	    //resbuffer.clear();
             QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
-            //if(!imgfile.isOpen())
-		//imgfile.open(QIODevice::ReadOnly);
-	    //imgfile.seek(0);
-	    //imgfile.seek(residentoffset);
-            //qDebug() << "pos:" << imgfile.pos();
-            //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
-	    //resbuffer.append(imgfile.read(1024)); // MFT ENTRY
             //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
-            //if(imgfile.isOpen())
-		//imgfile.close();
-	    //qDebug() << "resbuffer length:" << resbuffer.count();
 	    if(resbuffer.count() > 0)
 	    {
                 curoffset = 0;
-                qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(selectednode->Data(0).toString().toStdString())) << "filesize:" << filesize;
-                qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
+                //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(selectednode->Data(0).toString().toStdString())) << "filesize:" << filesize;
+                //qDebug() << "resbuffer MFT SIG:" << QString(resbuffer.at(0)) << QString(resbuffer.at(1)) << QString(resbuffer.at(2)) << QString(resbuffer.at(3));
                 mftoffset[0] = (uint8_t)resbuffer.at(20);
                 mftoffset[1] = (uint8_t)resbuffer.at(21);
                 nextattrid[0] = (uint8_t)resbuffer.at(40);
                 nextattrid[1] = (uint8_t)resbuffer.at(41);
                 curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                qDebug() << "initial curoffset value:" << curoffset;
+                //qDebug() << "initial curoffset value:" << curoffset;
                 int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                qDebug() << "attribute count():" << attrcnt;
+                //qDebug() << "attribute count():" << attrcnt;
                 for(int i = 0; i < attrcnt; i++)
                 {
-		    // getting erros with blake saying attrtype error
                     //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
                     attrtype[0] = (uint8_t)resbuffer.at(curoffset); // ERRORS HERE... outside scope... probably with new if/else
                     attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
                     attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
                     attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
                     atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                    qDebug() << "atrtype:" << atrtype;
+                    //qDebug() << "atrtype:" << atrtype;
                     namelength = (uint8_t)resbuffer.at(curoffset + 9);
-                    qDebug() << "namelength:" << namelength;
+                    //qDebug() << "namelength:" << namelength;
                     mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
                     mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
                     mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
                     mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
                     attrlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                    qDebug() << "attrlength:" << attrlength;
+                    //qDebug() << "attrlength:" << attrlength;
 		    if(isdir && atrtype == 144)
                     {
-                        qDebug() << "break a dir in loop...";
-                        qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
-                        //qDebug() << "dir failure";
+                        //qDebug() << "break a dir in loop...";
+                        //qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
                         //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
                     }
 		    if(!isdir && isads && namelength > 0 && atrtype == 128)
                     {
-                        qDebug() << "break at an ads data attribute...";
-                        qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
-                        //qDebug() << "res ads failure";
+                        //qDebug() << "break at an ads data attribute...";
+                        //qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
                         //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
                     }
 		    else if(!isdir && !isads && namelength == 0 && atrtype == 128)
                     {
-                        qDebug() << "break at a res file data attribute...";
-                        qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
-                        //qDebug() << "res file failure";
+                        //qDebug() << "break at a res file data attribute...";
+                        //qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
                         //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
 			break;
                     }
                     if(atrtype == 4294967295)
                     {
-                        qDebug() << "next attribute is 0xFFFFFFFF";
+                        //qDebug() << "next attribute is 0xFFFFFFFF";
                         break;
                     }
                     curoffset += attrlength;
-                    qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
-                    qDebug() << "still looping...next id:" << i + 1;
+                    //qDebug() << "curoffset:" << curoffset << "for attrid:" << i << "and atrtype:" << atrtype;
+                    //qDebug() << "still looping...next id:" << i + 1;
                 }
-                qDebug() << "curoffset outside of for loop:" << curoffset;
+                //qDebug() << "curoffset outside of for loop:" << curoffset;
 		mftlen[0] = (uint8_t)resbuffer.at(curoffset + 16);
 		mftlen[1] = (uint8_t)resbuffer.at(curoffset + 17);
 		mftlen[2] = (uint8_t)resbuffer.at(curoffset + 18);
 		mftlen[3] = (uint8_t)resbuffer.at(curoffset + 19);
 		contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-                qDebug() << "contentlength:" << contentlength;
+                //qDebug() << "contentlength:" << contentlength;
                 mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
                 mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
                 resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                qDebug() << "resident offset from curoffset:" << resoffset;
-                qDebug() << "resident data should start at:" << curoffset + resoffset << "and be:" << contentlength << "bytes long";
+                //qDebug() << "resident offset from curoffset:" << resoffset;
+                //qDebug() << "resident data should start at:" << curoffset + resoffset << "and be:" << contentlength << "bytes long";
                 ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
                 ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
 		//filebytes.append(resbuffer.mid(curoffset + resoffset, contentlength));
 		//qDebug() << "contentlength:" << contentlength;
 		//qDebug() << "ads resident attr:" << filebytes.toHex();
-	    }
-	}
 	}
 	else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
 	{
-            //if(!imgfile.isOpen())
-	    //    imgfile.open(QIODevice::ReadOnly);
-            /*
-	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
-	    {
-                //qDebug() << "i:" << i << "i*blksize:" << i*blocksize;
-                //qDebug() << "blocksize:" << blocksize;
-                //qDebug() << "filesize - (i-1)*blocksize:" << (filesize - ((i-1)*blocksize));
-                //qDebug() << "i:" << i << "i*blksize:" << i*blocksize;
-                //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
-                if(blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() != 0)
-                {
-                    /*
-		    imgfile.seek(0);
-        	    int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
-		    imgfile.seek(blkoffset);
-		    if((i * blocksize) <= filesize)
-		        filebytes.append(imgfile.read(blocksize));
-		    else
-		        filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
-                    */
-           //     }
-	   // }
-            //if(imgfile.isOpen())
-	    //    imgfile.close();
             //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
             ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
                 //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, residentstring, bytestring, selectednode->Data(2).toLongLong(), 0);
