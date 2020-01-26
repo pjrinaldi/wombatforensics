@@ -818,6 +818,8 @@ void GenerateHash(QString objectid)
 	QByteArray filebytes;
 	filebytes.clear();
 	filebytes = ReturnFileContent(objectid);
+        qDebug() << "hash filebytes:" << filebytes;
+        qDebug() << "objectid:" << objectid;
 	// HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
         QString hashstr = "";
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
@@ -864,9 +866,9 @@ void GenerateVidThumbnails(QString thumbid)
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
 	    QByteArray filebytes;
             filebytes.clear();
-            qDebug() << "thumbid:" << thumbid;
 	    filebytes = ReturnFileContent(thumbid);
-            qDebug() << "filebytes count:" << filebytes.count();
+            qDebug() << "vid filebytes count:" << filebytes.count();
+            qDebug() << "thumbid:" << thumbid;
 	    // HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
             QDir dir;
             dir.mkpath(wombatvariable.tmpfilepath);
