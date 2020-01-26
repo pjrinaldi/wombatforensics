@@ -864,6 +864,7 @@ void GenerateVidThumbnails(QString thumbid)
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
 	    QByteArray filebytes;
             filebytes.clear();
+            qDebug() << "thumbid:" << thumbid;
 	    filebytes = ReturnFileContent(thumbid);
             qDebug() << "filebytes count:" << filebytes.count();
 	    // HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
