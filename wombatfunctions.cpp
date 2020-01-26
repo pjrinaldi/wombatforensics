@@ -835,7 +835,6 @@ void GenerateHash(QString objectid)
                 hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
         }
 	filebytes.clear();
-        //qDebug() << "hash value:" << hashstr;
         hashlist.insert(objectid, hashstr);
         treenodemodel->UpdateNode(objectid, 7, hashstr);
 	int hashtype = 1;
@@ -860,151 +859,14 @@ void GenerateVidThumbnails(QString thumbid)
         qint64 filesize = curitem->Data(2).toLongLong();
         if(filecat.contains("Video") && filesize > 0)
         {
+            qDebug() << "filecat:" << filecat << "filesize:" << filesize;
+            qDebug() << "it is a video with a filesize as it should be";
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
 	    QByteArray filebytes;
             filebytes.clear();
 	    filebytes = ReturnFileContent(thumbid);
+            qDebug() << "filebytes count:" << filebytes.count();
 	    // HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
-        /*
-        QString objectid = thumbid;
-        QString tmpstr = "";
-        //QString filestr = "";
-        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
-        QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
-        QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
-        QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
-        if(fstring.contains(":"))
-            fstring = thumbid.split("-").at(3).split(":").first() + "-" + thumbid.split("-").at(3).split(":").last();
-        QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
-        QStringList evidfiles = eviddir.entryList(QStringList("*." + estring), QDir::NoSymLinks | QDir::Dirs);
-        QString evidencename = evidfiles.at(0).split(".e").first();
-        //char* imgbuf = new char[0];
-        //ssize_t imglen = 0;
-        //imglen = PopulateFileBuffer(thumbid, &imgbuf);
-	TSK_IMG_INFO* imginfo = NULL;
-	std::vector<std::string> pathvector;
-	pathvector.clear();
-        //TskImgInfo* imginfo = new TskImgInfo();
-    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    //QString tmpstr = "";
-    //QStringList evidfiles = eviddir.entryList(QStringList("*." + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-    //QString evidencename = evidfiles.at(0).split(".e").first();
-    //QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
-    //QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
-    //QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
-    //QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
-    if(fstring.contains(":"))
-        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
-    //qint64 curaddr = objectid.split("-f").at(1).split(":").at(0).toLongLong();
-    QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
-    if(!evidfile.isOpen())
-        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(evidfile.isOpen())
-        tmpstr = evidfile.readLine();
-    evidfile.close();
-    pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
-    const TSK_TCHAR** images;
-    images = (const char**)malloc(pathvector.size()*sizeof(char*));
-    images[0] = pathvector[0].c_str();
-    int partcount = tmpstr.split(",").at(3).split("|").size();
-    imginfo = tsk_img_open(partcount, images, TSK_IMG_TYPE_DETECT, 0);
-    //imginfo->open((const TSK_TCHAR*)(tmpstr.split(",").at(3).split("|").at(0).toStdString().c_str()), TSK_IMG_TYPE_DETECT, 0);
-    if(imginfo == NULL)
-    {
-        qDebug() << tsk_error_get_errstr();
-        //LogMessage("Image opening error");
-    }
-    tmpstr = "";
-    QStringList partlist;
-    partlist.clear();
-    QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
-    if(!partfile.isOpen())
-        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(partfile.isOpen())
-        tmpstr = partfile.readLine();
-    partlist = tmpstr.split(",");
-    tmpstr = "";
-    TSK_FS_INFO* fsinfo = NULL;
-    fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-    //TskFsInfo* fsinfo = new TskFsInfo();
-    //fsinfo->open(imginfo, partlist.at(4).toLongLong(), TSK_FS_TYPE_DETECT);
-    qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
-    //qint64 curaddr = tmpstr.split(",").at(9).toLongLong();
-    char* filebuffer = new char[0];
-    ssize_t bufferlength = 0;
-    TSK_FS_FILE* fsfile = NULL;
-    fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
-    //TskFsFile* fsfile = new TskFsFile();
-    //fsfile->open(fsinfo, fsfile, curaddr);
-    if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
-    {
-        if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
-        {
-            int attrid = objectid.split("-").at(3).split(":").last().toInt();
-	    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_id(fsfile, attrid);
-	    filebuffer = new char[fsattr->size];
-	    bufferlength = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, 0, filebuffer, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
-	    fsattr = NULL;
-            //const TskFsAttribute* fsattr = fsfile->getAttr(attrid);
-            //filebuffer = new char[fsattr->getSize()];
-            //bufferlength = fsfile->read(TSK_FS_ATTR_TYPE_NTFS_DATA, objectid.split("-").at(3).split(":").at(1).toInt(), 0, filebuffer, fsattr->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
-            //delete fsattr;
-        }
-        else // IF NOT ADS
-        {
-	    filebuffer = new char[fsfile->meta->size];
-	    bufferlength = tsk_fs_file_read(fsfile, 0, filebuffer, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
-            //filebuffer = new char[fsfile->getMeta()->getSize()];
-            //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
-        }
-    }
-    else
-    {
-	filebuffer = new char[fsfile->meta->size];
-	bufferlength = tsk_fs_file_read(fsfile, 0, filebuffer, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
-        //filebuffer = new char[fsfile->getMeta()->getSize()];
-        //bufferlength = fsfile->read(0, filebuffer, fsfile->getMeta()->getSize(), TSK_FS_FILE_READ_FLAG_SLACK);
-    }
-    //*ibuffer = filebuffer;
-    tsk_fs_file_close(fsfile);
-    fsfile = NULL;
-    tsk_fs_close(fsinfo);
-    fsinfo = NULL;
-    tsk_img_close(imginfo);
-    imginfo = NULL;
-    //delete fsfile;
-    //delete fsinfo;
-    //delete imginfo;
-    //return bufferlength;
-
-        //
-        QDir dir;
-        dir.mkpath(wombatvariable.tmpfilepath);
-        QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
-        //if(imglen > 0)
-        if(bufferlength > 0)
-        {
-            QFile tmpfile(tmpstring);
-            if(tmpfile.open(QIODevice::WriteOnly))
-            {
-                QDataStream outbuffer(&tmpfile);
-                outbuffer.writeRawData(filebuffer, bufferlength);
-                //outbuffer.writeRawData(imgbuf, imglen);
-                tmpfile.close();
-            }
-        }
-        delete[] filebuffer;
-
-        */
-        //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        //TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        //QString filecat = curitem->Data(8).toString();
-        //if(filecat.contains("Video"))
-        //{
-                //if(imglen > 0)
-                //if(bufferlength > 0)
-                //{
             QDir dir;
             dir.mkpath(wombatvariable.tmpfilepath);
             QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
@@ -1012,9 +874,6 @@ void GenerateVidThumbnails(QString thumbid)
             if(tmpfile.open(QIODevice::WriteOnly))
             {
                 tmpfile.write(filebytes);
-                //QDataStream outbuffer(&tmpfile);
-                //outbuffer.writeRawData(filebuffer, bufferlength);
-                //outbuffer.writeRawData(imgbuf, imglen);
                 tmpfile.close();
             }
             QByteArray ba;
@@ -1077,6 +936,7 @@ void GenerateVidThumbnails(QString thumbid)
         }
         else if(filecat.contains("Video") && filesize == 0) // video was 0 length
         {
+            qDebug() << "it is a video with no filesize";
             QString thumbout = genthmbpath + "thumbs/" + thumbid + ".jpg";
             QImage fileimage;
             QImage thumbimage;
