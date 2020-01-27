@@ -818,8 +818,8 @@ void GenerateHash(QString objectid)
 	QByteArray filebytes;
 	filebytes.clear();
 	filebytes = ReturnFileContent(objectid);
-        qDebug() << "hash filebytes:" << filebytes;
-        qDebug() << "objectid:" << objectid;
+        //qDebug() << "hash filebytes count:" << filebytes.count();
+        //qDebug() << "objectid:" << objectid;
 	// HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
         QString hashstr = "";
         QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
@@ -867,8 +867,8 @@ void GenerateVidThumbnails(QString thumbid)
 	    QByteArray filebytes;
             filebytes.clear();
 	    filebytes = ReturnFileContent(thumbid);
-            qDebug() << "vid filebytes count:" << filebytes.count();
-            qDebug() << "thumbid:" << thumbid;
+            //qDebug() << "vid filebytes count:" << filebytes.count();
+            //qDebug() << "thumbid:" << thumbid;
 	    // HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
             QDir dir;
             dir.mkpath(wombatvariable.tmpfilepath);
@@ -4285,9 +4285,10 @@ QByteArray ReturnFileContent(QString objectid)
 	    filebytes.append(resbuffer.mid(curoffset + resoffset, contentlength));
 	    //qDebug() << "contentlength:" << contentlength;
 	    //qDebug() << "ads resident attr:" << filebytes.toHex();
-	}
-	else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
-	{
+        }
+    }
+    else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
+    {
             if(!imgfile.isOpen())
 	        imgfile.open(QIODevice::ReadOnly);
 	    for(int i=1; i <= blockstring.split("^^", QString::SkipEmptyParts).count(); i++)
@@ -4311,7 +4312,6 @@ QByteArray ReturnFileContent(QString objectid)
             if(imgfile.isOpen())
 	        imgfile.close();
             //qDebug() << "file:" << QByteArray::fromBase64(QByteArray::fromStdString(curnode->Data(0).toString().toStdString())) << "filesize:" << filesize;
-	}
     }
     return filebytes;
 }
