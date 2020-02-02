@@ -1,4 +1,4 @@
-QT += widgets core concurrent sql multimedia multimediawidgets webenginewidgets gui
+QT += widgets core concurrent sql multimedia multimediawidgets webenginewidgets gui avwidgets
 #QT -= opengl quick network qml
 linux:CONFIG += debug_and_release debug_and_release_target qt x11 build_all c++11
 #linux:CONFIG += release qt x11 build_all c++11

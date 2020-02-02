@@ -7,6 +7,8 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "ui_videoviewer.h"
+#include <QtAV>
+#include <QtAVWidgets>
 //#include "wombatfunctions.h"
 
 namespace Ui
@@ -41,8 +43,8 @@ public slots:
     
 private:
     Ui::VideoViewer* ui;
-    QMediaPlayer* vplayer;
-    QVideoWidget* videowidget;
+    //QMediaPlayer* vplayer;
+    //QVideoWidget* videowidget;
     qint64 curobjaddr;
 protected:
     void mousePressEvent(QMouseEvent* event);

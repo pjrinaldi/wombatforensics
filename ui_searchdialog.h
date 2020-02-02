@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'searchdialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.14.0
+** Created by: Qt User Interface Compiler version 5.14.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
