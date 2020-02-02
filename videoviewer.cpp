@@ -19,17 +19,17 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
     connect(vplayer, SIGNAL(started()), this, SLOT(UpdateSlider()));
     connect(vplayer, SIGNAL(notifyIntervalChanged()), this, SLOT(UpdateSliderUnit()));
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
+    //connect(vplayer, SIGNAL(durationChanged(qint64)), this, SLOT(SetDuration(qint64)));
+    ui->pushButton->setText("Pause");
     /*
     vplayer = new QMediaPlayer;
     videowidget = new QVideoWidget;
     vplayer->setVideoOutput(videowidget);
     ui->horizontalLayout->addWidget(videowidget);
-    ui->pushButton->setText("Pause");
     ui->horizontalSlider->setEnabled(false);
     connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
     connect(vplayer, SIGNAL(positionChanged(qint64)), this, SLOT(UpdateSlider(qint64)));
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
-    connect(vplayer, SIGNAL(durationChanged(qint64)), this, SLOT(SetDuration(qint64)));
     */
 }
 
@@ -57,9 +57,11 @@ void VideoViewer::PlayPause()
     if(!vplayer->isPlaying())
     {
         vplayer->play();
+        ui->pushButton->setText("Pause");
         return;
     }
     vplayer->pause(vplayer->isPaused());
+    ui->pushButton->setText("Play");
     /*
     if(vplayer->state() == QMediaPlayer::PlayingState)
     {
@@ -79,7 +81,9 @@ void VideoViewer::UpdateSlider(qint64 pos)
     ui->horizontalSlider->setRange(0, int(vplayer->duration()/vunit));
     ui->horizontalSlider->setValue(int(pos/vunit));
     //ui->horizontalSlider->setValue(int(pos/1000LL));
-    //ui->label->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
+    ui->label->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
+    ui->label3->setText(QTime(0, 0, 0).addMSecs(vplayer->duration()/vunit).toString("HH:mm:ss"));
+    //ui->label3->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
 }
 
 void VideoViewer::UpdateSlider()
@@ -106,14 +110,13 @@ void VideoViewer::ShowVideo(const QModelIndex &index)
     this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), 11).data().toString()));
     curobjaddr = index.sibling(index.row(), 11).data().toString().toLongLong();
     vplayer->play(QString(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
-    //vplayer->setMedia(QUrl::fromLocalFile(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
-    //vplayer->play();
     ui->label_2->setVisible(false);
 }
 void VideoViewer::mousePressEvent(QMouseEvent* e)
 {
     if(e->type() == QEvent::MouseButtonPress)
     {
+        vplayer->stop();
         //vplayer->stop();
         this->close();
     }
