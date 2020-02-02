@@ -9,7 +9,6 @@
 #include "ui_videoviewer.h"
 #include <QtAV>
 #include <QtAVWidgets>
-//#include "wombatfunctions.h"
 
 namespace Ui
 {
@@ -48,8 +47,6 @@ private:
     Ui::VideoViewer* ui;
     QtAV::AVPlayer* vplayer;
     QtAV::VideoOutput* voutput;
-    //QMediaPlayer* vplayer;
-    //QVideoWidget* videowidget;
     qint64 curobjaddr;
     int vunit;
 protected:
