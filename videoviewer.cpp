@@ -3,9 +3,22 @@
 // Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
+using namespace QtAV;
+
 VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoViewer)
 {
     ui->setupUi(this);
+    vunit = 1000;
+    vplayer = new AVPlayer(this);
+    voutput = new VideoOutput(this);
+    vplayer->setRenderer(voutput);
+    ui->horizontalLayout->addWidget(voutput->widget());
+    connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
+    connect(ui->horizontalSlider, SIGNAL(sliderPressed()), this, SLOT(Seek()));
+    connect(vplayer, SIGNAL(positionChanged(qint64)), this, SLOT(UpdateSlider(qint64)));
+    connect(vplayer, SIGNAL(started()), this, SLOT(UpdateSlider()));
+    connect(vplayer, SIGNAL(notifyIntervalChanged()), this, SLOT(UpdateSliderUnit()));
+    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
     /*
     vplayer = new QMediaPlayer;
     videowidget = new QVideoWidget;
@@ -28,11 +41,25 @@ VideoViewer::~VideoViewer()
 
 void VideoViewer::Seek(int pos)
 {
+    if(!vplayer->isPlaying())
+        return;
+    vplayer->seek(qint64(pos*vunit));
     //vplayer->setPosition(pos*1000LL);
+}
+
+void VideoViewer::SeekBySlider()
+{
+    Seek(ui->horizontalSlider->value());
 }
 
 void VideoViewer::PlayPause()
 {
+    if(!vplayer->isPlaying())
+    {
+        vplayer->play();
+        return;
+    }
+    vplayer->pause(vplayer->isPaused());
     /*
     if(vplayer->state() == QMediaPlayer::PlayingState)
     {
@@ -49,8 +76,21 @@ void VideoViewer::PlayPause()
 
 void VideoViewer::UpdateSlider(qint64 pos)
 {
+    ui->horizontalSlider->setRange(0, int(vplayer->duration()/vunit));
+    ui->horizontalSlider->setValue(int(pos/vunit));
     //ui->horizontalSlider->setValue(int(pos/1000LL));
     //ui->label->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
+}
+
+void VideoViewer::UpdateSlider()
+{
+    UpdateSlider(vplayer->position());
+}
+
+void VideoViewer::UpdateSliderUnit()
+{
+    vunit = vplayer->notifyInterval();
+    UpdateSlider();
 }
 
 void VideoViewer::SetDuration(qint64 pos)
@@ -65,6 +105,7 @@ void VideoViewer::ShowVideo(const QModelIndex &index)
     ui->label_2->setVisible(true);
     this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), 11).data().toString()));
     curobjaddr = index.sibling(index.row(), 11).data().toString().toLongLong();
+    vplayer->play(QString(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
     //vplayer->setMedia(QUrl::fromLocalFile(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
     //vplayer->play();
     ui->label_2->setVisible(false);

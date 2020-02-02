@@ -37,15 +37,21 @@ public:
 public slots:
     void ShowVideo(const QModelIndex &index);
     void Seek(int);
+    void SeekBySlider();
     void PlayPause();
     void UpdateSlider(qint64);
+    void UpdateSlider();
+    void UpdateSliderUnit();
     void SetDuration(qint64);
     
 private:
     Ui::VideoViewer* ui;
+    QtAV::AVPlayer* vplayer;
+    QtAV::VideoOutput* voutput;
     //QMediaPlayer* vplayer;
     //QVideoWidget* videowidget;
     qint64 curobjaddr;
+    int vunit;
 protected:
     void mousePressEvent(QMouseEvent* event);
 };
