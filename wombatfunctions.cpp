@@ -4303,6 +4303,7 @@ QByteArray ReturnFileContent(QString objectid)
 		    imgfile.seek(0);
         	    int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
 		    imgfile.seek(blkoffset);
+                    qDebug() << objectid << blkoffset << imgfile.size();
 		    if((i * blocksize) <= filesize)
 		        filebytes.append(imgfile.read(blocksize));
 		    else

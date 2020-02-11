@@ -14,8 +14,8 @@ EQ            = =
 CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_MULTIMEDIAWIDGETS_LIB -DQT_WEBENGINEWIDGETS_LIB -DQT_PRINTSUPPORT_LIB -DQT_AVWIDGETS_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_MULTIMEDIA_LIB -DQT_WEBENGINECORE_LIB -DQT_QUICK_LIB -DQT_AV_LIB -DQT_GUI_LIB -DQT_CONCURRENT_LIB -DQT_SQL_LIB -DQT_QMLMODELS_LIB -DQT_WEBCHANNEL_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_POSITIONING_LIB -DQT_CORE_LIB
-CFLAGS        = -pipe -O2 -march=x86-64 -mtune=generic -O2 -pipe -fno-plt -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -march=x86-64 -mtune=generic -O2 -pipe -fno-plt -std=gnu++11 -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
+CFLAGS        = -pipe -O2 -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -O2 -std=gnu++11 -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
 INCPATH       = -I. -isystem /usr/include/tsk -isystem /usr/include/tsk/auto -isystem /usr/include/tsk/base -isystem /usr/include/tsk/fs -isystem /usr/include/tsk/hashdb -isystem /usr/include/tsk/img -isystem /usr/include/tsk/vs -isystem /usr/include/libffmpegthumbnailer -isystem /usr/include/ImageMagick-7 -isystem /usr/include/qt -isystem /usr/include/qt/QtMultimediaWidgets -isystem /usr/include/qt/QtWebEngineWidgets -isystem /usr/include/qt/QtPrintSupport -isystem /usr/include/qt/QtAVWidgets -isystem /usr/include/qt/QtOpenGL -isystem /usr/include/qt/QtWidgets -isystem /usr/include/qt/QtMultimedia -isystem /usr/include/qt/QtWebEngineCore -isystem /usr/include/qt/QtQuick -isystem /usr/include/qt/QtAV -isystem /usr/include/qt/QtGui -isystem /usr/include/qt/QtConcurrent -isystem /usr/include/qt/QtSql -isystem /usr/include/qt/QtQmlModels -isystem /usr/include/qt/QtWebChannel -isystem /usr/include/qt/QtQml -isystem /usr/include/qt/QtNetwork -isystem /usr/include/qt/QtPositioning -isystem /usr/include/qt/QtCore -Irelease -I. -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
@@ -38,7 +38,7 @@ COMPRESS      = gzip -9f
 DISTNAME      = wombatforensics1.0.0
 DISTDIR = /home/pasquale/Projects/wombatforensics/release/wombatforensics1.0.0
 LINK          = g++
-LFLAGS        = -Wl,-O1 -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now -Wl,-rpath-link,/usr/lib
+LFLAGS        = -Wl,-rpath-link,/usr/lib
 LIBS          = $(SUBLIBS) -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV /usr/lib/libQt5MultimediaWidgets.so /usr/lib/libQt5WebEngineWidgets.so /usr/lib/libQt5PrintSupport.so /usr/lib/libQt5OpenGL.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Multimedia.so /usr/lib/libQt5WebEngineCore.so /usr/lib/libQt5Quick.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Concurrent.so /usr/lib/libQt5Sql.so /usr/lib/libQt5QmlModels.so /usr/lib/libQt5WebChannel.so /usr/lib/libQt5Qml.so /usr/lib/libQt5Network.so /usr/lib/libQt5Positioning.so /usr/lib/libQt5Core.so -lGL -lpthread -lmd4c -lXext -lX11 -lm  
 AR            = ar cqs
 RANLIB        = 
@@ -496,7 +496,7 @@ compiler_moc_predefs_make_all: release/moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) release/moc_predefs.h
 release/moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O2 -march=x86-64 -mtune=generic -O2 -pipe -fno-plt -std=gnu++11 -dM -E -o release/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
+	g++ -pipe -O2 -std=gnu++11 -dM -E -o release/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: release/moc_wombatforensics.cpp release/moc_exportdialog.cpp release/moc_globals.cpp release/moc_propertieswindow.cpp release/moc_fileviewer.cpp release/moc_filterviews.cpp release/moc_imageviewer.cpp release/moc_videoviewer.cpp release/moc_viewermanager.cpp release/moc_textviewer.cpp release/moc_htmlviewer.cpp release/moc_messageviewer.cpp release/moc_byteconverter.cpp release/moc_digdeeperdialog.cpp release/moc_aboutbox.cpp release/moc_qhexedit.cpp release/moc_chunks.cpp release/moc_commands.cpp release/moc_settingsdialog.cpp release/moc_addevidencedialog.cpp release/moc_digstatus.cpp release/moc_remevidencedialog.cpp release/moc_tagmanager.cpp release/moc_searchdialog.cpp release/moc_carvedialog.cpp
 compiler_moc_header_clean:
