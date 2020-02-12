@@ -4303,7 +4303,12 @@ QByteArray ReturnFileContent(QString objectid)
 		    imgfile.seek(0);
         	    int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
 		    imgfile.seek(blkoffset);
-                    qDebug() << objectid << blkoffset << imgfile.size();
+                    if(objectid.contains("f8139"))
+                    {
+                        qDebug() << objectid << blkoffset << imgfile.size();
+                        qDebug() << "blockaddress:" << blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong();
+                        qDebug() << "filesize:" << filesize << "blocksize:" << blocksize << "i*blocksize:" << i*blocksize;
+                    }
 		    if((i * blocksize) <= filesize)
 		        filebytes.append(imgfile.read(blocksize));
 		    else
