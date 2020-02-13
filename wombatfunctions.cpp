@@ -3525,6 +3525,17 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
                 if(fsfile->meta != NULL)
                 {
+                    // TEST CODE TO GET DATA SIZE
+                    int cnt, i;
+                    cnt = tsk_fs_file_attr_getsize(fsfile);
+                    for(i = 0; i < cnt; i++)
+                    {
+                        const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(fsfile, i);
+                        if(fsattr->type == 128 && fsfile->meta->addr == 8149 && QString::compare(QString(fsattr->name), "") == 0)
+                        {
+                            qDebug() << fsfile->name->name << fsattr->name << "fsfile size:" << QString::number(fsfile->meta->size) << "fsattr size:" << fsattr->size << "fsattr type:" << fsattr->type;
+                        }
+                    }
                     treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime); // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
                 else
@@ -3729,6 +3740,17 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                     parentstr = evalue + "-" + vvalue + "-" + pvalue + "-f" + QString::number(fsfile->name->par_addr);
                 if(fsfile->meta != NULL)
                 {
+                    // TEST CODE TO GET DATA SIZE
+                    int cnt, i;
+                    cnt = tsk_fs_file_attr_getsize(fsfile);
+                    for(i = 0; i < cnt; i++)
+                    {
+                        const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(fsfile, i);
+                        if(fsattr->type == 128 && fsfile->meta->addr == 8149 && QString::compare(QString(fsattr->name), "") == 0)
+                        {
+                            qDebug() << fsfile->name->name << fsattr->name << "fsfile size:" << QString::number(fsfile->meta->size) << "fsattr size:" << fsattr->size << "fsattr type:" << fsattr->type;
+                        }
+                    }
                     treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime); // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
                 else
