@@ -1779,14 +1779,14 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
     }
     else
     {
-        proplist << "Sequence Number||" << QString::number(curfileinfo->name->meta_seq) << "||Sequence number for the metadata structure.";
-        proplist << "Parent Sequence||" << QString::number(curfileinfo->name->par_seq) << "||Sequence number for the parent directory.";
+        proplist << "Sequence Number||" << QString::number(curfileinfo->name->meta_seq) << "||Sequence number for the metadata structure." << endl;
+        proplist << "Parent Sequence||" << QString::number(curfileinfo->name->par_seq) << "||Sequence number for the parent directory." << endl;
         proplist << "Allocation Status||";
         if((curfileinfo->name->flags & TSK_FS_NAME_FLAG_ALLOC) == 1)
             proplist << "Allocated";
         else if((curfileinfo->name->flags & TSK_FS_NAME_FLAG_UNALLOC) == 2)
             proplist << "Unallocated";
-        proplist << "||Allocation status for the file.";
+        proplist << "||Allocation status for the file." << endl;
 
     }
     QString blockliststring = "";
@@ -3328,10 +3328,15 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     QString pstring = selectedid.split("-", QString::SkipEmptyParts).at(2);
     QString fstring = selectedid.split("-", QString::SkipEmptyParts).at(3);
     QString astring = selectedid.split("-", QString::SkipEmptyParts).at(4);
-    if(fstring.contains(":"))
-        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    qint64 curaddr = 0;
+    if(fstring.contains("a"))
+        curaddr = astring.mid(1).toLongLong();
+    else
+        curaddr = fstring.mid(1).toLongLong();
+    //if(fstring.contains(":"))
+    //    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
     //qDebug() << "fstring:" << fstring;
-    qint64 curaddr = fstring.mid(1).split("-").at(0).toLongLong();
+    //qint64 curaddr = fstring.mid(1).split("-").at(0).toLongLong();
     //qDebug() << "curaddr:" << curaddr;
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     if(!evidfile.isOpen())
@@ -3371,11 +3376,13 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     {
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
         {
-            if(selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
+            //if(selectedid.split("-").at(3).split(":").count() > 1) // IF ADS
+            if(fstring.contains("a")) // IF ADS
             {
                 //qDebug() << "attr id:" << selectedid.split("-").at(3).split(":").at(1).toInt();
                 imgbuf = new char[selectedindex.sibling(selectedindex.row(), 2).data().toULongLong()];
-		imglen = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, selectedid.split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+		imglen = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, fstring.mid(2).toInt(), 0, imgbuf, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+		//imglen = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, selectedid.split("-").at(3).split(":").at(1).toInt(), 0, imgbuf, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
             }
             else // IF NOT ADS
             {
@@ -3707,7 +3714,9 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                 }
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
-                    treeout << evalue + "-" + vvalue + "-" + pvalue + "-f*" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
+                    treeout << evalue + "-" + vvalue + "-" + pvalue + "-fo" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr); // Orphan ID - 11
+                else if(fsfile->meta == NULL)
+                    treeout << evalue + "-" + vvalue + "-" + pvalue + "-fd" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // Deleted Recovered ID - 11
                 else
                     treeout << evalue + "-" + vvalue + "-" + pvalue + "-f" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
                 if(fsfile->meta != NULL)
@@ -3798,7 +3807,8 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                                     delete[] fbuf;
                                     adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
                                     treeout.clear();
-                                    treeout << adsba.toBase64() << ba.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString(evalue + "-" + vvalue + "-" + pvalue + "-f" + QString::number(fsfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                                    treeout << adsba.toBase64() << ba.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString(evalue + "-" + vvalue + "-" + pvalue + "-fa" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                                    //treeout << adsba.toBase64() << ba.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString(evalue + "-" + vvalue + "-" + pvalue + "-f" + QString::number(fsfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                                     nodedata.clear();
                                     for(int i=0;  i < 12; i++)
                                         nodedata << treeout.at(i);

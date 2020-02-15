@@ -1601,7 +1601,8 @@ void WombatForensics::LoadHexContents()
         QString pstring = nodeid.split("-", QString::SkipEmptyParts).at(2);
         QString fstring = nodeid.split("-", QString::SkipEmptyParts).at(3);
         QString astring = nodeid.split("-", QString::SkipEmptyParts).at(4);
-        QString paridstr = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-a").last();
+        QString paridstr = astring.mid(1);
+        //QString paridstr = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-a").last();
         QStringList partlist;
         partlist.clear();
         QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
@@ -1616,10 +1617,14 @@ void WombatForensics::LoadHexContents()
         if(paridstr.contains("-"))
             paridstr = QString::number(rootinum);
         int mftaddress = 0;
-        if(nodeid.split("-").at(3).split(":").count() > 1) // ads attribute
-            mftaddress = nodeid.split("-a").last().toInt();
+        //if(nodeid.split("-").at(3).split(":").count() > 1) // ads attribute
+        //    mftaddress = nodeid.split("-a").last().toInt();
+        //else
+        //    mftaddress = nodeid.split("-f").last().split("-").first().toInt();
+        if(fstring.contains("a"))
+            mftaddress = astring.mid(1).toInt();
         else
-            mftaddress = nodeid.split("-f").last().split("-").first().toInt();
+            mftaddress = fstring.mid(1).toInt();
         ui->hexview->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         if(selectednode->Data(2).toInt() == 0) // zero file
@@ -1639,10 +1644,11 @@ void WombatForensics::LoadHexContents()
             QString residentstring = "";
             QString bytestring = "";
             QFile filefileprop;
-            if(nodeid.split("-").at(3).split(":").count() > 1)
-                filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3).split(":").first() + "-" + nodeid.split("-").at(3).split(":").last() + ".a" + paridstr + ".prop");
-            else
-                filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3) + ".a" + paridstr + ".prop");
+            //if(nodeid.split("-").at(3).split(":").count() > 1)
+            //if(fstring.contains("a"))
+                filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + vstring + "/" + pstring + "/" + fstring + ".a" + paridstr + ".prop");
+            //else
+            //    filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/" + nodeid.split("-").at(3) + ".a" + paridstr + ".prop");
             filefileprop.open(QIODevice::ReadOnly | QIODevice::Text);
             while(!filefileprop.atEnd())
             {
@@ -1665,7 +1671,8 @@ void WombatForensics::LoadHexContents()
             bool isdir = false;
             if(fstype == TSK_FS_TYPE_NTFS_DETECT)
                 isntfs = true;
-            if(fstring.split(":").count() > 1)
+            //if(fstring.split(":").count() > 1)
+            if(fstring.contains("a"))
 	        isads = true;
             if(selectednode->itemtype == 2 || selectednode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	        isdir = true;

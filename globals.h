@@ -490,7 +490,7 @@ public:
                         return QIcon(":/bar/carvetofile");
                     else
                     {
-                        if(itemnode->Data(11).toString().contains("f*")) // used to be 0
+                        if(itemnode->Data(11).toString().contains("fd") || itemnode->Data(11).toString().contains("fo")) // used to be 0
                             return QIcon(":/basic/deletedfile");
                         else
                             return QIcon(":/basic/treefile");
