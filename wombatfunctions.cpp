@@ -690,9 +690,11 @@ void ProcessExport(QString objectid)
     //fsfile->open(fsinfo, fsfile, curaddr);
     if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
     {
-        if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
+        //if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
+        if(fstring.contains("a")) // IF ADS
         {
-            int attrid = objectid.split("-").at(3).split(":").last().toInt();
+            //int attrid = objectid.split("-").at(3).split(":").last().toInt();
+            int attrid = fstring.mid(2).toInt();
 	    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_id(fsfile, attrid);
 	    filebuffer = new char[fsattr->size];
 	    bufferlength = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, 0, filebuffer, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
@@ -736,8 +738,8 @@ void ProcessExport(QString objectid)
     //QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
     //QString fstring = objectid.split("-", QString::SkipEmptyParts).at(3);
     //QString astring = objectid.split("-", QString::SkipEmptyParts).at(4);
-    if(fstring.contains(":") == true)
-        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    //if(fstring.contains(":") == true)
+    //    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
     //QString tmpstr = "";
     //QDir eviddir = QDir(wombatvariable.tmpmntpath);
     //QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
@@ -745,10 +747,12 @@ void ProcessExport(QString objectid)
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     QString tmppath = "";
+    //QString tmpname = curitem->Data(0).toString();
     QString tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
     if(originalpath == true)
     {
         tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+        //tmppath = exportpath + curitem->Data(1).toString();
     }
     else
         tmppath = exportpath + "/";
@@ -780,7 +784,7 @@ void ProcessExport(QString objectid)
             }
         }
     }
-    //delete filebuffer;
+    delete filebuffer;
     exportcount++;
     isignals->ExportUpd();
 }
