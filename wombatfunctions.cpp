@@ -855,8 +855,10 @@ void GenerateHash(QString objectid)
             else if(hashsum == 4)
                 hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
         }
+        mutex.lock();
         hashlist.insert(objectid, hashstr);
         treenodemodel->UpdateNode(objectid, 7, hashstr);
+        mutex.unlock();
 	int hashtype = 1;
         if(hashsum == 1) // MD5
             hashtype = 1;
