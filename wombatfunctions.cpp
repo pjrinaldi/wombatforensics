@@ -1647,7 +1647,8 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
     QFile adspropfile;
     if(curfileinfo->name != NULL)
     {
-        adspropfile.setFileName(partpath + "f" + QString::number(curfileinfo->name->meta_addr) + "-" + attrid + ".a" + QString::number(curfileinfo->name->meta_addr) + ".prop");
+        adspropfile.setFileName(partpath + "fa" + attrid + ".a" + QString::number(curfileinfo->name->meta_addr) + ".prop");
+        //adspropfile.setFileName(partpath + "f" + QString::number(curfileinfo->name->meta_addr) + "-" + attrid + ".a" + QString::number(curfileinfo->name->meta_addr) + ".prop");
         adspropfile.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream proplist(&adspropfile);
         proplist << "Alternate Data Stream (ADS)||" << QString::fromStdString(std::string(curfileinfo->name->name)) << "||Alternate data stream which contains different content from what the file's standard content is." << endl;
@@ -1694,7 +1695,9 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
 {
     QFile filepropfile;
     if(curfileinfo->name->meta_addr == 0 && strcmp(curfileinfo->name->name, "$MFT") != 0)
-        filepropfile.setFileName(partpath + "f*" + QString::number(orphancount) + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
+        filepropfile.setFileName(partpath + "fo" + QString::number(orphancount) + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
+    else if(curfileinfo->meta == NULL)
+        filepropfile.setFileName(partpath + "fd" + QString::number(curfileinfo->name->meta_addr) + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
     else
         filepropfile.setFileName(partpath + "f" + QString::number(curfileinfo->name->meta_addr) + ".a" + QString::number(curfileinfo->name->par_addr) + ".prop");
     filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -1774,100 +1777,18 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         //if(curfileinfo->meta->type == TSK_FS_META_TYPE_DIR || curfileinfo->meta->type == TSK_FS_META_TYPE_VIRT_DIR)
         //    isdir = true;
     }
-    /* NEED TO FIGURE OUT HOW OT CAPTURE RUN INFO HERE...
- * Prints the data runs for a non-resident attribute
-uint8_t
-tsk_fs_attr_print(const TSK_FS_ATTR * a_fs_attr, FILE* hFile) {
-    TSK_FS_ATTR_RUN *fs_attr_run;
-    uint32_t skip_remain;
-    TSK_OFF_T tot_size;
-    TSK_FS_INFO *fs = a_fs_attr->fs_file->fs_info;
-    TSK_OFF_T off = 0;
-    uint8_t stop_loop = 0;
-
-    if ( ! (a_fs_attr->flags & TSK_FS_ATTR_NONRES)) {
-        tsk_error_set_errstr("tsk_fs_attr_print called on non-resident attribute");
-        return TSK_ERR;
-    }
-
-    tot_size = a_fs_attr->size;
-    skip_remain = a_fs_attr->nrd.skiplen;
-
-    for (fs_attr_run = a_fs_attr->nrd.run; fs_attr_run; fs_attr_run = fs_attr_run->next)
+    else
     {
-        TSK_DADDR_T addr, len_idx, run_len, run_start_addr;
+        proplist << "Sequence Number||" << QString::number(curfileinfo->name->meta_seq) << "||Sequence number for the metadata structure.";
+        proplist << "Parent Sequence||" << QString::number(curfileinfo->name->par_seq) << "||Sequence number for the parent directory.";
+        proplist << "Allocation Status||";
+        if((curfileinfo->name->flags & TSK_FS_NAME_FLAG_ALLOC) == 1)
+            proplist << "Allocated";
+        else if((curfileinfo->name->flags & TSK_FS_NAME_FLAG_UNALLOC) == 2)
+            proplist << "Unallocated";
+        proplist << "||Allocation status for the file.";
 
-        addr = fs_attr_run->addr;
-        run_len = 0;
-        run_start_addr = addr;
-
-        //cycle through each block in the run
-        for (len_idx = 0; len_idx < fs_attr_run->len; len_idx++) {
-
-
-            // If the address is too large then give an error 
-            if (addr + len_idx > fs->last_block) {
-                if (a_fs_attr->fs_file->
-                    meta->flags & TSK_FS_META_FLAG_UNALLOC)
-                    tsk_error_set_errno(TSK_ERR_FS_RECOVER);
-                else
-                    tsk_error_set_errno(TSK_ERR_FS_BLK_NUM);
-                tsk_error_set_errstr
-                    ("Invalid address in run (too large): %" PRIuDADDR "",
-                    addr + len_idx);
-                return TSK_ERR;
-            }
-
-
-            * Need to account for the skip length, which is the number of bytes
-            * in the start of the attribute that are skipped and that are not
-            * included in the overall length.  We will seek past those and not
-            * return those in the action.  We just read a block size so check
-            * if there is data to be returned in this buffer. 
-
-            if (skip_remain >= fs->block_size) {
-                skip_remain -= fs->block_size;
-                run_start_addr++;
-            }
-            else {
-                size_t ret_len;
-
-                * Do we want to return a full block, or just the end? 
-                if ((TSK_OFF_T)fs->block_size - skip_remain <
-                    tot_size - off)
-                    ret_len = fs->block_size - skip_remain;
-                else
-                    ret_len = (size_t)(tot_size - off);
-
-                off += ret_len;
-                run_len++;
-                skip_remain = 0;
-
-                if (off >= tot_size) {
-                    stop_loop = 1;
-                    break;
-                }
-            }
-        }    
-
-        if (fs_attr_run->flags & TSK_FS_ATTR_RUN_FLAG_SPARSE) {
-            tsk_fprintf(hFile, "  Starting address: X, length: %lld  Sparse", run_len);
-        }
-        else if (fs_attr_run->flags & TSK_FS_ATTR_RUN_FLAG_FILLER) {
-            tsk_fprintf(hFile, "  Starting address: X, length: %lld  Filler", run_len);
-        }
-        else {
-            tsk_fprintf(hFile, "  Starting address: %lld, length: %lld  %s", run_start_addr, run_len, 
-                (fs_attr_run->flags & TSK_FS_ATTR_RUN_FLAG_ENCRYPTED) ? "Encrypted": "");
-        }
-        tsk_fprintf(hFile, "\n");
-        if (stop_loop) {
-            break;
-        }
     }
-    return TSK_OK;
-}
-    */
     QString blockliststring = "";
     //if(!isdir && !isresident)
     if(!isresident)
@@ -3560,7 +3481,9 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 treeout << "0"; // TAG - 10
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
-                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f*" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
+                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-fo" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr); // Orphan ID - 11
+                else if(fsfile->meta == NULL)
+                    treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-fd" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // Deleted Recovered ID - 11
                 else
                     treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
                 if(fsfile->meta != NULL)
@@ -3647,29 +3570,30 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                                 //if(QString::compare(QString(fsattr->name), "") != 0 && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                                 //if(fsattr->name != NULL && QString::compare(QString(fsattr->name), "$I30", Qt::CaseSensitive) != 0)
                                 //{
-                                    bool isresident = false;
-                                    if(fsattr->flags & TSK_FS_ATTR_RES)
-                                        isresident = true;
-                                    char* fbuf = new char[fsattr->size];
-                                    ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
-                                    QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
-                                    QMimeDatabase adsmimedb;
-                                    QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
-                                    QString mimestr = GenerateCategorySignature(adsmimetype);
-                                    delete[] fbuf;
-                                    adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
-                                    treeout.clear();
-                                    treeout << adsba.toBase64() << ba.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString("e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
-                                    nodedata.clear();
-                                    for(int i=0;  i < 12; i++)
-                                        nodedata << treeout.at(i);
-                                    mutex.lock();
-                                    treenodemodel->AddNode(nodedata, QString("e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr)), treeout.at(12).toInt(), treeout.at(13).toInt());
-                                    mutex.unlock();
-                                    listeditems.append(treeout.at(11)); // UNCOMMENT ONCE I CAN CAPTURE ADS IN GEN HASH AND IMG THUMB
-                                    filesfound++;
-                                    isignals->ProgUpd();
-                                    WriteAlternateDataStreamProperties(fsfile, QString(fsfile->name->name) + QString(":") + QString(fsattr->name), (qint64)(adssize - fsattr->size + 16), QString::number(fsattr->id), partpath, isresident);
+                            bool isresident = false;
+                            if(fsattr->flags & TSK_FS_ATTR_RES)
+                            isresident = true;
+                            char* fbuf = new char[fsattr->size];
+                            ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
+                            QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
+                            QMimeDatabase adsmimedb;
+                            QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
+                            QString mimestr = GenerateCategorySignature(adsmimetype);
+                            delete[] fbuf;
+                            adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
+                            treeout.clear();
+                            treeout << adsba.toBase64() << ba.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString("e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-fa" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                            //treeout << adsba.toBase64() << ba.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString("e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + ":" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
+                            nodedata.clear();
+                            for(int i=0;  i < 12; i++)
+                                nodedata << treeout.at(i);
+                            mutex.lock();
+                            treenodemodel->AddNode(nodedata, QString("e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr)), treeout.at(12).toInt(), treeout.at(13).toInt());
+                            mutex.unlock();
+                            listeditems.append(treeout.at(11)); // UNCOMMENT ONCE I CAN CAPTURE ADS IN GEN HASH AND IMG THUMB
+                            filesfound++;
+                            isignals->ProgUpd();
+                            WriteAlternateDataStreamProperties(fsfile, QString(fsfile->name->name) + QString(":") + QString(fsattr->name), (qint64)(adssize - fsattr->size + 16), QString::number(fsattr->id), partpath, isresident);
                                 //}
                             //}
                         }
