@@ -855,8 +855,8 @@ void GenerateHash(QString objectid)
             else if(hashsum == 4)
                 hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
         }
-        mutex.lock();
         hashlist.insert(objectid, hashstr);
+        mutex.lock();
         treenodemodel->UpdateNode(objectid, 7, hashstr);
         mutex.unlock();
 	int hashtype = 1;
@@ -3986,6 +3986,10 @@ QByteArray ReturnFileContent(QString objectid)
     //    mftaddress = objectid.split("-f").last().split("-").first().toInt();
     if(fstring.contains("a")) // ADS ATTRIBUTE
         mftaddress = astring.mid(1).toInt();
+    else if(fstring.contains("o")) // ORPHAN
+        mftaddress = fstring.mid(2).toInt();
+    else if(fstring.contains("d")) // DELETED RECOVERED
+        mftaddress = fstring.mid(2).toInt();
     else
         mftaddress = fstring.mid(1).toInt();
     QFile fileprop(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".prop");
@@ -4019,8 +4023,10 @@ QByteArray ReturnFileContent(QString objectid)
     bool isdir = false;
     if(fstype == TSK_FS_TYPE_NTFS_DETECT)
 	isntfs = true;
-    if(fstring.split("-").count() > 1)
-	isads = true;
+    //if(fstring.split("-").count() > 1)
+	//isads = true;
+    if(fstring.contains("a"))
+        isads = true;
     if(curnode->itemtype == 2 || curnode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	isdir = true;
 

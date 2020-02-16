@@ -277,6 +277,8 @@ private:
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
+    QTimer* digrotatetimer; 
+    //QProgressBar* digprogress;
     TreeNode* actionitem;
     QWidget* cancelwidget;
 };

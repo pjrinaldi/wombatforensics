@@ -21,6 +21,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     digcountlabel = new QLabel(this);
     digcountlabel->setText("Digging Session 1: 0 of 0");
     statuslabel = new StatusLabel();
+    //digprogress = new QProgressBar(this);
+    //digprogress->setFormat("Dug %v of %m  %p");
     //statuslabel->setAlignment(Qt::AlignRight);
     StatusUpdate("");
     vline1 = new QFrame(this);
@@ -43,6 +45,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addWidget(filtercountlabel, 0);
     this->statusBar()->addWidget(vline2, 0);
     this->statusBar()->addWidget(digcountlabel, 0);
+    //this->statusBar()->addWidget(digprogress, 0);
     this->statusBar()->addPermanentWidget(vline3, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
@@ -211,7 +214,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     existingevidence.clear();
     treenodemodel = new TreeNodeModel();
     autosavetimer = new QTimer(this);
+    digrotatetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
+    connect(digrotatetimer, SIGNAL(timeout()), this, SLOT(RotateDig()));
 }
 
 void WombatForensics::UnCheckChecked()
