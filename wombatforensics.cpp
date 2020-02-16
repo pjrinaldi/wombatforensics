@@ -2058,6 +2058,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             digfilelist = GetFileLists(dtype);
         //qDebug() << "digfilelist count:" << digfilelist;
         digcountlabel->setText("Dig Session 1: 0 of " + QString::number(digfilelist.count()));
+        //autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
         //digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {

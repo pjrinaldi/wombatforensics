@@ -3340,40 +3340,31 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint);
                 else
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
-                // TEST CODE TO GET DATA SIZE
-                if(fsfile->name->meta_addr == 8139)
-                    qDebug() << fsfile->name->name << "meta addr:" << fsfile->name->meta_addr << fsfile->name->flags;
                 if(fsfile->meta != NULL)
-                {
-                    // TEST CODE TO GET DATA SIZE
-                    int cnt, i;
-                    cnt = tsk_fs_file_attr_getsize(fsfile);
-                    for(i = 0; i < cnt; i++)
-                    {
-                        const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(fsfile, i);
-                        if(fsattr->type == 128 && fsfile->meta->addr == 8139 && QString::compare(QString(fsattr->name), "") == 0)
-                        {
-                            qDebug() << fsfile->name->name << fsattr->name << "fsfile size:" << QString::number(fsfile->meta->size) << "fsattr size:" << fsattr->size << "fsattr type:" << fsattr->type;
-                        }
-                    }
                     treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime); // SIZE, 4-DATES - 2, 3, 4, 5, 6
-                }
                 else
                 {
                     treeout << "0" << "0" << "0" << "0" << "0"; // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
-                char* magicbuffer = new char[0];
-                magicbuffer = new char[1024];
-                QByteArray tmparray("intro");
-                tmparray.clear();
-                tsk_fs_file_read(fsfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
-                tmparray = QByteArray::fromRawData(magicbuffer, 1024);
-                QMimeDatabase mimedb;
-                const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-                QString mimestr = GenerateCategorySignature(mimetype);
-                delete[] magicbuffer;
                 treeout << "0"; // HASH - 7
-                treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
+                if(fsfile->name->type == TSK_FS_NAME_TYPE_DIR) // DIRECTORY
+                    treeout << "Directory" << "Directory"; // CAT/SIG - 8/9
+                else if(fsfile->name->type == TSK_FS_NAME_TYPE_VIRT_DIR || QString(fsfile->name->name).contains("$OrphanFiles")) // VIRTUAL DIRECTORY
+                    treeout << "Directory" << "Virtual Directory"; // CAT/SIG - 8,9
+                else
+                {
+                    char* magicbuffer = new char[0];
+                    magicbuffer = new char[1024];
+                    QByteArray tmparray("intro");
+                    tmparray.clear();
+                    tsk_fs_file_read(fsfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+                    tmparray = QByteArray::fromRawData(magicbuffer, 1024);
+                    QMimeDatabase mimedb;
+                    const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                    QString mimestr = GenerateCategorySignature(mimetype);
+                    delete[] magicbuffer;
+                    treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
+                }
                 treeout << "0"; // TAG - 10
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
@@ -3473,7 +3464,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                             ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                             QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                             QMimeDatabase adsmimedb;
-                            QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
+                            QMimeType adsmimetype = adsmimedb.mimeTypeForData(fdata);
                             QString mimestr = GenerateCategorySignature(adsmimetype);
                             delete[] fbuf;
                             adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
@@ -3582,18 +3573,25 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                 {
                     treeout << "0" << "0" << "0" << "0" << "0"; // SIZE, 4-DATES - 2, 3, 4, 5, 6
                 }
-                char* magicbuffer = new char[0];
-                magicbuffer = new char[1024];
-                QByteArray tmparray("intro");
-                tmparray.clear();
-                tsk_fs_file_read(fsfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
-                tmparray = QByteArray::fromRawData(magicbuffer, 1024);
-                QMimeDatabase mimedb;
-                const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-                QString mimestr = GenerateCategorySignature(mimetype);
-                delete[] magicbuffer;
                 treeout << "0"; // HASH - 7
-                treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
+                if(fsfile->name->type == TSK_FS_NAME_TYPE_DIR) // DIRECTORY
+                    treeout << "Directory" << "Directory"; // CAT/SIG - 8/9
+                else if(fsfile->name->type == TSK_FS_NAME_TYPE_VIRT_DIR || QString(fsfile->name->name).contains("$OrphanFiles")) // VIRTUAL DIRECTORY
+                    treeout << "Directory" << "Virtual Directory"; // CAT/SIG - 8,9
+                else
+                {
+                    char* magicbuffer = new char[0];
+                    magicbuffer = new char[1024];
+                    QByteArray tmparray("intro");
+                    tmparray.clear();
+                    tsk_fs_file_read(fsfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
+                    tmparray = QByteArray::fromRawData(magicbuffer, 1024);
+                    QMimeDatabase mimedb;
+                    const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                    QString mimestr = GenerateCategorySignature(mimetype);
+                    delete[] magicbuffer;
+                    treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
+                }
                 treeout << "0"; // TAG - 10
                 // POPULATE MFTBLOCKLIST
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") == 0)
@@ -3691,7 +3689,7 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                                     ssize_t flen = tsk_fs_attr_read(fsattr, 0, fbuf, fsattr->size, TSK_FS_FILE_READ_FLAG_NONE);
                                     QByteArray fdata = QByteArray::fromRawData(fbuf, flen);
                                     QMimeDatabase adsmimedb;
-                                    QMimeType adsmimetype = mimedb.mimeTypeForData(fdata);
+                                    QMimeType adsmimetype = adsmimedb.mimeTypeForData(fdata);
                                     QString mimestr = GenerateCategorySignature(adsmimetype);
                                     delete[] fbuf;
                                     adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
