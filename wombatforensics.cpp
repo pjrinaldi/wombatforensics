@@ -1694,6 +1694,7 @@ void WombatForensics::LoadHexContents()
 	        uint32_t attrlength = 0;
 	        uint32_t contentlength = 0;
 	        uint16_t resoffset = 0;
+                // NEED TO REPLACE WITH MFTBLOCKHASH FOR RESPECTIVE E#-V#-P#
                 // NEW RESIDENT OFFSET CALCULATION
                 qint64 residentoffset = 0;
                 if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.

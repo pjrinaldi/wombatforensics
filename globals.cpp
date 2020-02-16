@@ -51,6 +51,7 @@ QHash<QString, bool> checkhash;
 QHash<QString, QString> imageshash;
 QHash<QString, QString> taggedhash; // list of tagged files: [id], tag
 QHash<QString, QString> hashlist; // list of file hashes: ids, hash
+QHash<QString, QString> mftblockhash; //  list of mft blockstrings for each partition for each evidence item
 QMutex mutex;
 FilterValues filtervalues;
 QList<EvidenceReportData> evidrepdatalist;

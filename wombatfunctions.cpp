@@ -1684,6 +1684,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
     {
         blockliststring = GetBlockList(curfileinfo);
         proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
+        // NEED TO REPLACE WITH MFTBLOCKHASH FOR RESPECTIVE E#-V#-P#
         if(curfileinfo->name->meta_addr == 0 && strcmp(curfileinfo->name->name, "$MFT") == 0)
         {
             //qDebug() << "curfile name:" << curfileinfo->name->name;
@@ -3552,19 +3553,6 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                     parentstr = evalue + "-" + vvalue + "-" + pvalue;
                 else
                     parentstr = evalue + "-" + vvalue + "-" + pvalue + "-f" + QString::number(fsfile->name->par_addr);
-                // TEST CODE TO GET DATA SIZE
-                if(fsfile->name->meta_addr == 8139)
-                    qDebug() << fsfile->name->name << "meta addr:" << fsfile->name->meta_addr << fsfile->name->flags;
-                int cnt, i;
-                cnt = tsk_fs_file_attr_getsize(fsfile);
-                for(i = 0; i < cnt; i++)
-                {
-                    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(fsfile, i);
-                    if(fsattr->type == 128 && fsfile->name->meta_addr == 8139 && QString::compare(QString(fsattr->name), "") == 0)
-                    {
-                        qDebug() << fsfile->name->name << fsattr->name << "fsattr size:" << fsattr->size << "fsattr type:" << fsattr->type;
-                    }
-                }
                 if(fsfile->meta != NULL)
                 {
                     treeout << QString::number(fsfile->meta->size) << QString::number(fsfile->meta->crtime) << QString::number(fsfile->meta->mtime) << QString::number(fsfile->meta->atime) << QString::number(fsfile->meta->ctime); // SIZE, 4-DATES - 2, 3, 4, 5, 6
@@ -3593,6 +3581,7 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                     treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
                 }
                 treeout << "0"; // TAG - 10
+                // NEED TO REPLACE WITH MFTBLOCKHASH FOR RESPECTIVE E#-V#-P#
                 // POPULATE MFTBLOCKLIST
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") == 0)
                 {
@@ -4161,12 +4150,6 @@ QByteArray ReturnFileContent(QString objectid)
 		imgfile.seek(0);
                 int blkoffset = fsoffset + blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong() * blocksize;
     	        imgfile.seek(blkoffset);
-                if(objectid.contains("8139"))
-                {
-                    qDebug() << objectid << blkoffset << imgfile.size();
-                    qDebug() << "blockaddress:" << blockstring.split("^^", QString::SkipEmptyParts).at(i-1).toLongLong();
-                    qDebug() << "filesize:" << filesize << "blocksize:" << blocksize << "i*blocksize:" << i*blocksize;
-                }
         	if((i * blocksize) <= filesize)
 	            filebytes.append(imgfile.read(blocksize));
 		else
