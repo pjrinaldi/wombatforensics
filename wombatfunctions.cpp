@@ -993,6 +993,15 @@ void GenerateThumbnails(QString thumbid)
             QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
             ba.append(fullpath);
             imageshash.insert(thumbid, QString(ba.toBase64()));
+	    /* NEW IMAGEMAGICK METHOD */
+	    QSaveFile tmpimgfile(wombatvariable.tmpfilepath + thumbid + ".jpg");
+	    tmpimgfile.write(filebytes);
+	    tmpimgfile.commit();
+	    Magick::Image master(QString(wombatvariable.tmpfilepath + thumbid + ".jpg").toStdString());
+	    master.resize(QString(thumbsize + "x" + thumbsize).toStdString());
+	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".jpg").toStdString());
+	    /* OLD QT5 QImage Method */
+	    /*
             QImage fileimage;
             QImage thumbimage;
             QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".jpg");
@@ -1014,6 +1023,7 @@ void GenerateThumbnails(QString thumbid)
                     writer.write(thumbimage);
                 }
             //}
+	    */
         }
         else if(filecat.contains("Image") && filesize == 0)
         {
