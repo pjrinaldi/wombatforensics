@@ -994,12 +994,15 @@ void GenerateThumbnails(QString thumbid)
             ba.append(fullpath);
             imageshash.insert(thumbid, QString(ba.toBase64()));
 	    /* NEW IMAGEMAGICK METHOD */
-	    QSaveFile tmpimgfile(wombatvariable.tmpfilepath + thumbid + ".jpg");
-	    tmpimgfile.write(filebytes);
-	    tmpimgfile.commit();
-	    Magick::Image master(QString(wombatvariable.tmpfilepath + thumbid + ".jpg").toStdString());
+	    Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
+	    Magick::Image master(blob);
+	    //QSaveFile tmpimgfile(wombatvariable.tmpfilepath + thumbid + ".jpg");
+	    //tmpimgfile.write(filebytes);
+	    //tmpimgfile.commit();
+	    //Magick::Image master(QString(wombatvariable.tmpfilepath + thumbid + ".jpg").toStdString());
+	    master.magick("png");
 	    master.resize(QString(thumbsize + "x" + thumbsize).toStdString());
-	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".jpg").toStdString());
+	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
 	    /* OLD QT5 QImage Method */
 	    /*
             QImage fileimage;
