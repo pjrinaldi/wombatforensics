@@ -1992,6 +1992,20 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
             tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
         return tmplist;
     }
+    else if(filelisttype == 4) // Generate list for Image category
+    {
+	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant(tr("Image")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
+	foreach(QModelIndex index, indexlist)
+	    tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
+	return tmplist;
+    }
+    else if(filelisttype == 5) // Generate list for Video category
+    {
+	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant(tr("Video")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
+	foreach(QModelIndex index, indexlist)
+	    tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
+	return tmplist;
+    }
     return tmplist;
 }
 
@@ -2066,11 +2080,15 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             genthmbpath = wombatvariable.tmpmntpath;
             if(digoptions.at(i) == 0 || digoptions.at(i) == 5)
             {
+		digfilelist.clear();
+		digfilelist = GetFileLists(4); // images only
                 thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
                 thumbwatcher.setFuture(thumbfuture);
             }
             if(digoptions.at(i) == 4 || digoptions.at(i) == 5)
             {
+		digfilelist.clear();
+		digfilelist = GetFileLists(5); // videos only
                 videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
                 videowatcher.setFuture(videofuture);
             }

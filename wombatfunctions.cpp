@@ -980,7 +980,7 @@ void GenerateThumbnails(QString thumbid)
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         QString filecat = curitem->Data(8).toString();
-	QString filesig = curitem->Data(9).toString();
+	//QString filesig = curitem->Data(9).toString();
         qint64 filesize = curitem->Data(2).toLongLong();
         if(filecat.contains("Image") && filesize > 0)
         {
