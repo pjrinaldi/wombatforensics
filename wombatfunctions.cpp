@@ -930,6 +930,9 @@ void GenerateVidThumbnails(QString thumbid)
             }
             delete filmstripfilter;
             // implement imagemagick montage...
+	    // NEED TO IMPLEMENT TRY CATCH HERE FOR IMAGEMAGICK...
+	    try
+	    {
             std::list<Magick::Image> thmbimages;
             std::list<Magick::Image> montage;
             Magick::Image image;
@@ -938,29 +941,40 @@ void GenerateVidThumbnails(QString thumbid)
                 image.read(tlist.at(i).toStdString());
                 thmbimages.push_back(image);
             }
-            QString thumbout = genthmbpath + "thumbs/" + thumbid + ".jpg";
+            QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
             Magick::Montage montageopts;
             Magick::Color color("rgba(0,0,0,0)");
             montageopts.geometry(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize) + "+1+1").toStdString());
             montageopts.tile(QString(QString::number(tlist.count()) + "x1").toStdString());
             montageopts.backgroundColor(color);
-            montageopts.fileName(QString(genthmbpath + "thumbs/" + thumbid + ".jpg").toStdString());
+            montageopts.fileName(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
             Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
             if(montage.size() == 1)
             {
                 //qDebug() << "montage worked:" << thumbout;
                 std::string mstring = thumbout.toStdString();
                 Magick::Image& montageimage = montage.front();
-                montageimage.magick("jpg");
+                montageimage.magick("png");
                 montageimage.write(mstring);
             }
             else
                 qDebug() << "something went wrong:" << montage.size();
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		    qDebug() << "Caught exception:" << error.what();
+		    QImage fileimage;
+		    QImage thumbimage;
+		    QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
+		    fileimage.load(":/missingvideo");
+		    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+		    writer.write(thumbimage);
+	    }
         }
         else if(filecat.contains("Video") && filesize == 0) // video was 0 length
         {
             qDebug() << "it is a video with no filesize";
-            QString thumbout = genthmbpath + "thumbs/" + thumbid + ".jpg";
+            QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
             QImage fileimage;
             QImage thumbimage;
             QImageWriter writer(thumbout);
