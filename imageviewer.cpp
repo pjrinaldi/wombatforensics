@@ -74,7 +74,7 @@ void ImageViewer::LoadThumbnails()
     QByteArray ba;
     ba.clear();
     QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
-    QStringList jpgfiles = tdir.entryList(QStringList("*.jpg"), QDir::NoSymLinks | QDir::Files);
+    QStringList jpgfiles = tdir.entryList(QStringList("*.png"), QDir::NoSymLinks | QDir::Files);
     for(int i = 0; i < jpgfiles.count(); i++)
     {
         QListWidgetItem* tmpitem = new QListWidgetItem(QIcon(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(i)), jpgfiles.at(i).split(".").at(0), ui->listWidget);
@@ -92,7 +92,7 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
     imagedialog->setModal(false);
     imagedialog->setAttribute(Qt::WA_DeleteOnClose);
     imagedialog->setWindowTitle(item->text() + " Image Viewer");
-    QImage iconimage(QString(wombatvariable.tmpmntpath + "thumbs/" + item->text() + ".jpg"));
+    QImage iconimage(QString(wombatvariable.tmpmntpath + "thumbs/" + item->text() + ".png"));
     if(iconimage.width() == thumbsize)
     {
         imagedialog->GetImage(item->text());

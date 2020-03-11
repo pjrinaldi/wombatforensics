@@ -980,6 +980,7 @@ void GenerateThumbnails(QString thumbid)
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         QString filecat = curitem->Data(8).toString();
+	QString filesig = curitem->Data(9).toString();
         qint64 filesize = curitem->Data(2).toLongLong();
         if(filecat.contains("Image") && filesize > 0)
         {
@@ -994,20 +995,34 @@ void GenerateThumbnails(QString thumbid)
             ba.append(fullpath);
             imageshash.insert(thumbid, QString(ba.toBase64()));
 	    /* NEW IMAGEMAGICK METHOD */
-	    Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
-	    Magick::Image master(blob);
-	    //QSaveFile tmpimgfile(wombatvariable.tmpfilepath + thumbid + ".jpg");
-	    //tmpimgfile.write(filebytes);
-	    //tmpimgfile.commit();
-	    //Magick::Image master(QString(wombatvariable.tmpfilepath + thumbid + ".jpg").toStdString());
-	    master.magick("png");
-	    master.resize(QString(thumbsize + "x" + thumbsize).toStdString());
-	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+	    //qDebug() << "filebytes size:" << filebytes.size();
+	    //qDebug() << "thumbpath:" << genthmbpath + "thumbs/" + thumbid + ".png";
+	    try
+	    {
+		Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
+		Magick::Image master(blob);
+		master.quiet(false);
+		//qDebug() << "master filesize:" << master.fileSize();
+		master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
+		master.magick("png");
+		master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		// NEED TO WRITE THE ERROR AND DISPLAY THE MISSING IMAGE...
+		qDebug() << "Caught exception:" << error.what();
+		QImage fileimage;
+		QImage thumbimage;
+		QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
+		fileimage.load(":/missingimage");
+		thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+		writer.write(thumbimage);
+	    }
 	    /* OLD QT5 QImage Method */
 	    /*
             QImage fileimage;
             QImage thumbimage;
-            QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".jpg");
+            QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
             //if(imglen > 0)
             //if(bufferlength > 0)
             //{
@@ -1032,7 +1047,7 @@ void GenerateThumbnails(QString thumbid)
         {
             QImage fileimage;
             QImage thumbimage;
-            QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".jpg");
+            QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
             fileimage.load(":/missingimage");
             thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             writer.write(thumbimage);
