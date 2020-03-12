@@ -14,8 +14,8 @@ EQ            = =
 CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_MULTIMEDIAWIDGETS_LIB -DQT_WEBENGINEWIDGETS_LIB -DQT_PRINTSUPPORT_LIB -DQT_AVWIDGETS_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_MULTIMEDIA_LIB -DQT_WEBENGINECORE_LIB -DQT_QUICK_LIB -DQT_AV_LIB -DQT_GUI_LIB -DQT_CONCURRENT_LIB -DQT_SQL_LIB -DQT_QMLMODELS_LIB -DQT_WEBCHANNEL_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_POSITIONING_LIB -DQT_CORE_LIB
-CFLAGS        = -pipe -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -std=gnu++11 -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
+CFLAGS        = -pipe -O2 -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -O2 -std=gnu++11 -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
 INCPATH       = -I. -isystem /usr/include/tsk -isystem /usr/include/tsk/auto -isystem /usr/include/tsk/base -isystem /usr/include/tsk/fs -isystem /usr/include/tsk/hashdb -isystem /usr/include/tsk/img -isystem /usr/include/tsk/vs -isystem /usr/include/libffmpegthumbnailer -isystem /usr/include/ImageMagick-7 -isystem /usr/include/qt -isystem /usr/include/qt/QtMultimediaWidgets -isystem /usr/include/qt/QtWebEngineWidgets -isystem /usr/include/qt/QtPrintSupport -isystem /usr/include/qt/QtAVWidgets -isystem /usr/include/qt/QtOpenGL -isystem /usr/include/qt/QtWidgets -isystem /usr/include/qt/QtMultimedia -isystem /usr/include/qt/QtWebEngineCore -isystem /usr/include/qt/QtQuick -isystem /usr/include/qt/QtAV -isystem /usr/include/qt/QtGui -isystem /usr/include/qt/QtConcurrent -isystem /usr/include/qt/QtSql -isystem /usr/include/qt/QtQmlModels -isystem /usr/include/qt/QtWebChannel -isystem /usr/include/qt/QtQml -isystem /usr/include/qt/QtNetwork -isystem /usr/include/qt/QtPositioning -isystem /usr/include/qt/QtCore -Irelease -I. -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
@@ -167,38 +167,16 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/g++-base.conf \
 		/usr/lib/qt/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt/mkspecs/qconfig.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3drender.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3drender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KIdleTime.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KScreen.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWaylandClient.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWaylandServer.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bodymovin_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts_private.pri \
@@ -206,8 +184,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_designer.pri \
@@ -221,14 +197,11 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fb_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_glx_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_hunspellinputmethod_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_input_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_kms_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
@@ -241,10 +214,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_nfc.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_nfc_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_openglextensions.pri \
@@ -257,8 +226,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_positioningquick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmldebug_private.pri \
@@ -272,30 +239,12 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickshapes_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_repparser.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_repparser_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_script.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_script_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_sensors.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_sensors_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialport.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql_private.pri \
@@ -309,8 +258,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_vulkan_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient_private.pri \
@@ -549,7 +496,7 @@ compiler_moc_predefs_make_all: release/moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) release/moc_predefs.h
 release/moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
-	g++ -pipe -std=gnu++11 -dM -E -o release/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
+	g++ -pipe -O2 -std=gnu++11 -dM -E -o release/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: release/moc_wombatforensics.cpp release/moc_exportdialog.cpp release/moc_globals.cpp release/moc_propertieswindow.cpp release/moc_fileviewer.cpp release/moc_filterviews.cpp release/moc_imageviewer.cpp release/moc_videoviewer.cpp release/moc_viewermanager.cpp release/moc_textviewer.cpp release/moc_htmlviewer.cpp release/moc_messageviewer.cpp release/moc_byteconverter.cpp release/moc_digdeeperdialog.cpp release/moc_aboutbox.cpp release/moc_qhexedit.cpp release/moc_chunks.cpp release/moc_commands.cpp release/moc_settingsdialog.cpp release/moc_addevidencedialog.cpp release/moc_digstatus.cpp release/moc_remevidencedialog.cpp release/moc_tagmanager.cpp release/moc_searchdialog.cpp release/moc_carvedialog.cpp
 compiler_moc_header_clean:

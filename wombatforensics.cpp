@@ -2080,15 +2080,21 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             genthmbpath = wombatvariable.tmpmntpath;
             if(digoptions.at(i) == 0 || digoptions.at(i) == 5)
             {
-		digfilelist.clear();
-		digfilelist = GetFileLists(4); // images only
+                if(dtype == 2) // all files, only get images...
+                {
+		    digfilelist.clear();
+		    digfilelist = GetFileLists(4); // images only
+                }
                 thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
                 thumbwatcher.setFuture(thumbfuture);
             }
             if(digoptions.at(i) == 4 || digoptions.at(i) == 5)
             {
-		digfilelist.clear();
-		digfilelist = GetFileLists(5); // videos only
+                if(dtype == 2) // all files, only get videos
+                {
+		    digfilelist.clear();
+        	    digfilelist = GetFileLists(5); // videos only
+                }
                 videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
                 videowatcher.setFuture(videofuture);
             }
