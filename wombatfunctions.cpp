@@ -873,16 +873,17 @@ void GenerateHash(QString objectid)
 
 void GenerateVidThumbnails(QString thumbid)
 {
+    qDebug() << "thumbid:" << thumbid << "- count:" << thumbid.split("-").count();
     if(thumbid.split("-").count() == 5)
     {
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         QString filecat = curitem->Data(8).toString();
         qint64 filesize = curitem->Data(2).toLongLong();
-        if(filecat.contains("Video") && filesize > 0)
-        {
-            qDebug() << "filecat:" << filecat << "filesize:" << filesize;
-            qDebug() << "it is a video with a filesize as it should be";
+        if(filesize > 0)
+        //{
+            //qDebug() << "filecat:" << filecat << "filesize:" << filesize;
+            //qDebug() << "it is a video with a filesize as it should be";
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
 	    QByteArray filebytes;
             filebytes.clear();
@@ -971,7 +972,7 @@ void GenerateVidThumbnails(QString thumbid)
 		    writer.write(thumbimage);
 	    }
         }
-        else if(filecat.contains("Video") && filesize == 0) // video was 0 length
+        else if(filesize == 0) // video was 0 length
         {
             qDebug() << "it is a video with no filesize";
             QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";

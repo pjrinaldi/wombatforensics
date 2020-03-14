@@ -272,6 +272,8 @@ private:
     QFrame* vline3;
     int exporttype;
     int digtype;
+    bool isvidthumb = false;
+    bool isimgthumb = false;
     QVector<int> digoptions;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;

@@ -2080,6 +2080,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             genthmbpath = wombatvariable.tmpmntpath;
             if(digoptions.at(i) == 0 || digoptions.at(i) == 5)
             {
+                isimgthumb = true;
                 if(dtype == 2) // all files, only get images...
                 {
 		    digfilelist.clear();
@@ -2090,11 +2091,13 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             }
             if(digoptions.at(i) == 4 || digoptions.at(i) == 5)
             {
+                isvidthumb = true;
                 if(dtype == 2) // all files, only get videos
                 {
 		    digfilelist.clear();
         	    digfilelist = GetFileLists(5); // videos only
                 }
+                qDebug() << "video digfilelist.count():" << digfilelist.count();
                 videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
                 videowatcher.setFuture(videofuture);
             }
@@ -2398,35 +2401,43 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 void WombatForensics::FinishVideos()
 {
     //digstatusdialog->UpdateDigState(4, -1);
-    StatusUpdate("Thumbnail Generation Finished");
+    StatusUpdate("Video Thumbnail Generation Finished");
     qInfo() << "Video Thumbnail Generation Finished";
     if(genthmbpath.contains("mntpt"))
     {
-        QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
-        thashsavewatcher.setFuture(tmpfuture);
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        imagewindow->LoadThumbnails();
-        QApplication::restoreOverrideCursor();
-        if((digoptions.isEmpty() || digoptions.contains(4) || digoptions.contains(5)) && thumbwatcher.isFinished())
+        if((isimgthumb == true && thumbwatcher.isFinished()) || isimgthumb == false)
+        {
+            QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
+            thashsavewatcher.setFuture(tmpfuture);
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            imagewindow->LoadThumbnails(); // GUI Intensive
+            QApplication::restoreOverrideCursor();
             imagewindow->show();
+        }
+        //if((digoptions.isEmpty() || digoptions.contains(4) || digoptions.contains(5)) && thumbwatcher.isFinished())
+        //    imagewindow->show();
     }
 }
 
 void WombatForensics::FinishThumbs()
 {
     //digstatusdialog->UpdateDigState(0, -1);
-    StatusUpdate("Thumbnail generation finished.");
-    qInfo() << "Thumbnail generation finished";
+    StatusUpdate("Image Thumbnail generation finished.");
+    qInfo() << "Image Thumbnail generation finished";
     //LogMessage("Thumbnail generation finished.");
     if(genthmbpath.contains("mntpt"))
     {
-        QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
-        thashsavewatcher.setFuture(tmpfuture);
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        imagewindow->LoadThumbnails(); // GUI Intensive
-        QApplication::restoreOverrideCursor();
-        if((digoptions.isEmpty() || digoptions.contains(0) || digoptions.contains(5)) && videowatcher.isFinished())
+        if((isvidthumb == true && videowatcher.isFinished()) || isvidthumb == false)
+        {
+            QFuture<void> tmpfuture = QtConcurrent::run(SaveImagesHash);
+            thashsavewatcher.setFuture(tmpfuture);
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            imagewindow->LoadThumbnails(); // GUI Intensive
+            QApplication::restoreOverrideCursor();
             imagewindow->show();
+        }
+        //if((digoptions.isEmpty() || digoptions.contains(0) || digoptions.contains(5)) && videowatcher.isFinished())
+        //    imagewindow->show();
     }
     qInfo() << "Digging Complete";
     qInfo() << "Evidence Ready";
