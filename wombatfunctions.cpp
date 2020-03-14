@@ -873,67 +873,66 @@ void GenerateHash(QString objectid)
 
 void GenerateVidThumbnails(QString thumbid)
 {
-    qDebug() << "thumbid:" << thumbid << "- count:" << thumbid.split("-").count();
-    if(thumbid.split("-").count() == 5)
+    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+    //QString filecat = curitem->Data(8).toString();
+    qint64 filesize = curitem->Data(2).toLongLong();
+    qDebug() << "thumbid:" << thumbid << "filesize" << filesize;
+    /*
+    if(filesize > 0)
     {
-        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        QString filecat = curitem->Data(8).toString();
-        qint64 filesize = curitem->Data(2).toLongLong();
-        if(filesize > 0)
-        //{
-            //qDebug() << "filecat:" << filecat << "filesize:" << filesize;
-            //qDebug() << "it is a video with a filesize as it should be";
-	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
-	    QByteArray filebytes;
-            filebytes.clear();
-	    filebytes = ReturnFileContent(thumbid);
-            //qDebug() << "vid filebytes count:" << filebytes.count();
-            //qDebug() << "thumbid:" << thumbid;
-	    // HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
-            QDir dir;
-            dir.mkpath(wombatvariable.tmpfilepath);
-            QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
-            QFile tmpfile(tmpstring);
-            if(tmpfile.open(QIODevice::WriteOnly))
-            {
-                tmpfile.write(filebytes);
-                tmpfile.close();
-            }
-            QByteArray ba;
-            QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
-            ba.clear();
-            ba.append(fullpath);
-            imageshash.insert(thumbid, QString(ba.toBase64()));
-            // implement libffmpegthumbnailer...
-            ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
-            videothumbnailer.setThumbnailSize(thumbsize);
-            ffmpegthumbnailer::FilmStripFilter* filmstripfilter = nullptr;
-            filmstripfilter = new ffmpegthumbnailer::FilmStripFilter();
-            videothumbnailer.addFilter(filmstripfilter);
-            videothumbnailer.setPreferEmbeddedMetadata(false);
-            int vtcnt = 100 / vidcount;
-            //qDebug() << "vidcount:" << vidcount << "vtcnt:" << vtcnt;
-            QStringList tlist;
-            tlist.clear();
-            for(int i=0; i <= vtcnt; i++)
-            {
-                int seekpercentage = i * vidcount;
-                if(seekpercentage == 0)
-                    seekpercentage = 5;
-                if(seekpercentage == 100)
-                    seekpercentage = 95;
-                //qDebug() << "seekpercentage:" << seekpercentage;
-                QString tmpoutfile = wombatvariable.tmpfilepath + thumbid + ".t" + QString::number(seekpercentage) + ".jpg";
-                tlist.append(tmpoutfile);
-                videothumbnailer.setSeekPercentage(seekpercentage);
-                videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());
-            }
-            delete filmstripfilter;
-            // implement imagemagick montage...
-	    // NEED TO IMPLEMENT TRY CATCH HERE FOR IMAGEMAGICK...
-	    try
-	    {
+        //qDebug() << "filecat:" << filecat << "filesize:" << filesize;
+        //qDebug() << "it is a video with a filesize as it should be";
+	// IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
+        QByteArray filebytes;
+        filebytes.clear();
+	filebytes = ReturnFileContent(thumbid);
+        //qDebug() << "vid filebytes count:" << filebytes.count();
+        //qDebug() << "thumbid:" << thumbid;
+	// HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
+        QDir dir;
+        dir.mkpath(wombatvariable.tmpfilepath);
+        QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
+        QFile tmpfile(tmpstring);
+        if(tmpfile.open(QIODevice::WriteOnly))
+        {
+            tmpfile.write(filebytes);
+            tmpfile.close();
+        }
+        QByteArray ba;
+        QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
+        ba.clear();
+        ba.append(fullpath);
+        imageshash.insert(thumbid, QString(ba.toBase64()));
+        // implement libffmpegthumbnailer...
+        ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
+        videothumbnailer.setThumbnailSize(thumbsize);
+        ffmpegthumbnailer::FilmStripFilter* filmstripfilter = nullptr;
+        filmstripfilter = new ffmpegthumbnailer::FilmStripFilter();
+        videothumbnailer.addFilter(filmstripfilter);
+        videothumbnailer.setPreferEmbeddedMetadata(false);
+        int vtcnt = 100 / vidcount;
+        //qDebug() << "vidcount:" << vidcount << "vtcnt:" << vtcnt;
+        QStringList tlist;
+        tlist.clear();
+        for(int i=0; i <= vtcnt; i++)
+        {
+            int seekpercentage = i * vidcount;
+            if(seekpercentage == 0)
+                seekpercentage = 5;
+            if(seekpercentage == 100)
+                seekpercentage = 95;
+            //qDebug() << "seekpercentage:" << seekpercentage;
+            QString tmpoutfile = wombatvariable.tmpfilepath + thumbid + ".t" + QString::number(seekpercentage) + ".jpg";
+            tlist.append(tmpoutfile);
+            videothumbnailer.setSeekPercentage(seekpercentage);
+            videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());
+        }
+        delete filmstripfilter;
+        // implement imagemagick montage...
+        // NEED TO IMPLEMENT TRY CATCH HERE FOR IMAGEMAGICK...
+	try
+        {
             std::list<Magick::Image> thmbimages;
             std::list<Magick::Image> montage;
             Magick::Image image;
@@ -960,32 +959,32 @@ void GenerateVidThumbnails(QString thumbid)
             }
             else
                 qDebug() << "something went wrong:" << montage.size();
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		    qDebug() << "Caught exception:" << error.what();
-		    QImage fileimage;
-		    QImage thumbimage;
-		    QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
-		    fileimage.load(":/missingvideo");
-		    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-		    writer.write(thumbimage);
-	    }
-        }
-        else if(filesize == 0) // video was 0 length
-        {
-            qDebug() << "it is a video with no filesize";
-            QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
-            QImage fileimage;
-            QImage thumbimage;
-            QImageWriter writer(thumbout);
-            fileimage.load(":/basic/missingvideo");
-            thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-            writer.write(thumbimage);
-        }
-        digimgthumbcount++;
-        isignals->DigUpd(4, digimgthumbcount);
+	}
+	catch(Magick::Exception &error)
+	{
+            qDebug() << "Caught exception:" << error.what();
+	    QImage fileimage;
+	    QImage thumbimage;
+	    QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
+	    fileimage.load(":/missingvideo");
+	    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+	    writer.write(thumbimage);
+	}
     }
+    else if(filesize == 0) // video was 0 length
+    {
+        qDebug() << "it is a video with no filesize";
+        QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
+        QImage fileimage;
+        QImage thumbimage;
+        QImageWriter writer(thumbout);
+        fileimage.load(":/basic/missingvideo");
+        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+        writer.write(thumbimage);
+    }
+    */
+    digimgthumbcount++;
+    isignals->DigUpd(4, digimgthumbcount);
 }
 
 void GenerateThumbnails(QString thumbid)

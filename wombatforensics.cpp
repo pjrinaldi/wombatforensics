@@ -216,7 +216,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     autosavetimer = new QTimer(this);
     digrotatetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
-    connect(digrotatetimer, SIGNAL(timeout()), this, SLOT(RotateDig()));
+    //connect(digrotatetimer, SIGNAL(timeout()), this, SLOT(RotateDig()));
 }
 
 void WombatForensics::UnCheckChecked()
