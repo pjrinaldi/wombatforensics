@@ -886,6 +886,22 @@ void GenerateVidThumbnails(QString thumbid)
         qDebug() << "file is greater than 0 bytes";
     else
         qDebug() << "file is 0 bytes";
+    QByteArray filebytes;
+    filebytes.clear();
+    filebytes = ReturnFileContent(thumbid);
+    QDir dir;
+    dir.mkpath(wombatvariable.tmpfilepath);
+    QString tmpfile = wombatvariable.tmpfilepath + thumbid + "-tmp";
+    qDebug << "tmpfile:" << tmpfile;
+    QFile tmpfile(tmpstring);
+    if(tmpfile.Open(QIODevice::WriteOnly))
+    {
+        tmpfile.write(filebytes);
+        tmpfile.close();
+    }
+    else
+        qDebug() << "issue with opening file:" << tmpfile.fileName();
+    // TMP FIle IS WRITTEN, DO FFMPEG CODE NOW...
     /*
     if(filesize > 0)
     {
