@@ -1,5 +1,9 @@
 #include "wombatfunctions.h"
 #include <Magick++.h>
+//#include <filmstripfilter.h>
+//#include <videothumbnailer.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 
 // Copyright 2015-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -877,7 +881,11 @@ void GenerateVidThumbnails(QString thumbid)
     TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     //QString filecat = curitem->Data(8).toString();
     qint64 filesize = curitem->Data(2).toLongLong();
-    qDebug() << "thumbid:" << thumbid << "filesize" << filesize;
+    //qDebug() << "thumbid:" << thumbid << "filesize" << filesize;
+    if(filesize > 0)
+        qDebug() << "file is greater than 0 bytes";
+    else
+        qDebug() << "file is 0 bytes";
     /*
     if(filesize > 0)
     {
