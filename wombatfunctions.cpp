@@ -891,10 +891,10 @@ void GenerateVidThumbnails(QString thumbid)
     filebytes = ReturnFileContent(thumbid);
     QDir dir;
     dir.mkpath(wombatvariable.tmpfilepath);
-    QString tmpfile = wombatvariable.tmpfilepath + thumbid + "-tmp";
-    qDebug << "tmpfile:" << tmpfile;
-    QFile tmpfile(tmpstring);
-    if(tmpfile.Open(QIODevice::WriteOnly))
+    QString tmpfilename = wombatvariable.tmpfilepath + thumbid + "-tmp";
+    qDebug() << "tmpfilename:" << tmpfilename;
+    QFile tmpfile(tmpfilename);
+    if(tmpfile.open(QIODevice::WriteOnly))
     {
         tmpfile.write(filebytes);
         tmpfile.close();
