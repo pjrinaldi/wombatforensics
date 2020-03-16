@@ -1,9 +1,11 @@
 #include "wombatfunctions.h"
 #include <Magick++.h>
-//#include <filmstripfilter.h>
-//#include <videothumbnailer.h>
+#include <filmstripfilter.h>
+#include <videothumbnailer.h>
+extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+}
 
 // Copyright 2015-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -875,6 +877,53 @@ void GenerateHash(QString objectid)
     }
 }
 
+static void save_gray_frame(unsigned char *buf, int wrap, int xsize, int ysize, char *filename)
+{
+        FILE *f;
+        int i;
+        f = fopen(filename,"w");
+        // writing the minimal required header for a pgm file format
+        // portable graymap format -> https://en.wikipedia.org/wiki/Netpbm_format#PGM_example
+        fprintf(f, "P5\n%d %d\n%d\n", xsize, ysize, 255);
+        // writing line by line
+        for (i = 0; i < ysize; i++)
+            fwrite(buf + i * wrap, 1, xsize, f);
+        fclose(f);
+}
+
+static int decode_packet(AVPacket *pPacket, AVCodecContext *pCodecContext, AVFrame *pFrame)
+{
+    // Supply raw packet data as input to a decoder
+    int response = avcodec_send_packet(pCodecContext, pPacket);
+    if (response < 0)
+    {
+        //logging("Error while sending a packet to the decoder: %s", av_err2str(response));
+        return response;
+    }
+    while (response >= 0)
+    {
+        // Return decoded output data (into a frame) from a decoder
+        response = avcodec_receive_frame(pCodecContext, pFrame);
+        if (response == AVERROR(EAGAIN) || response == AVERROR_EOF)
+        {
+            break;
+        }
+        else if (response < 0)
+        {
+            //logging("Error while receiving a frame from the decoder: %s", av_err2str(response));
+            return response;
+        }
+        if (response >= 0)
+        {
+            char frame_filename[1024];
+            snprintf(frame_filename, sizeof(frame_filename), "%s-%d.pgm", "frame", pCodecContext->frame_number);
+            // save a grayscale frame into a .pgm file
+            save_gray_frame(pFrame->data[0], pFrame->linesize[0], pFrame->width, pFrame->height, frame_filename);
+        }
+    }
+    return 0;
+}
+
 void GenerateVidThumbnails(QString thumbid)
 {
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -882,27 +931,104 @@ void GenerateVidThumbnails(QString thumbid)
     //QString filecat = curitem->Data(8).toString();
     qint64 filesize = curitem->Data(2).toLongLong();
     //qDebug() << "thumbid:" << thumbid << "filesize" << filesize;
+    //if(filesize > 0)
+    //    qDebug() << "file is greater than 0 bytes";
+    //else
+    //    qDebug() << "file is 0 bytes";
+    // FFMPEG METHOD WHICH I DON'T UNDERSTAND...
+    /*
     if(filesize > 0)
-        qDebug() << "file is greater than 0 bytes";
-    else
-        qDebug() << "file is 0 bytes";
-    QByteArray filebytes;
-    filebytes.clear();
-    filebytes = ReturnFileContent(thumbid);
-    QDir dir;
-    dir.mkpath(wombatvariable.tmpfilepath);
-    QString tmpfilename = wombatvariable.tmpfilepath + thumbid + "-tmp";
-    qDebug() << "tmpfilename:" << tmpfilename;
-    QFile tmpfile(tmpfilename);
-    if(tmpfile.open(QIODevice::WriteOnly))
     {
-        tmpfile.write(filebytes);
-        tmpfile.close();
+        QByteArray filebytes;
+        filebytes.clear();
+        filebytes = ReturnFileContent(thumbid);
+        QDir dir;
+        dir.mkpath(wombatvariable.tmpfilepath);
+        QString tmpfilename = wombatvariable.tmpfilepath + thumbid + "-tmp";
+        //qDebug() << "tmpfilename:" << tmpfilename;
+        QFile tmpfile(tmpfilename);
+        if(tmpfile.open(QIODevice::WriteOnly))
+        {
+            tmpfile.write(filebytes);
+            tmpfile.close();
+        }
+        else
+            qDebug() << "issue with opening file:" << tmpfile.fileName();
+        AVFormatContext* pformatcontext = avformat_alloc_context();
+        avformat_open_input(&pformatcontext, tmpfilename.toStdString().c_str(), NULL, NULL);
+        if(avformat_find_stream_info(pformatcontext, NULL) < 0)
+        {
+            qDebug() << "could not get stream info, load no video graphic here...";
+        }
+        AVCodec* pcodec = NULL;
+        AVCodecParameters* pcodecparameters = NULL;
+        int videostreamindex = -1;
+        for(int i=0; i < pformatcontext->nb_streams; i++)
+        {
+            AVCodecParameters* plocalcodecparameters = NULL;
+            plocalcodecparameters = pformatcontext->streams[i]->codecpar;
+            AVCodec* plocalcodec = NULL;
+            plocalcodec = avcodec_find_decoder(plocalcodecparameters->codec_id);
+            if(plocalcodec == NULL)
+            {
+                qDebug() << "unsupported codec... load no video graphic here...";
+            }
+            if(plocalcodecparameters->codec_type == AVMEDIA_TYPE_VIDEO)
+            {
+                if(videostreamindex == -1)
+                {
+                    videostreamindex = i;
+                    pcodec = plocalcodec;
+                    pcodecparameters = plocalcodecparameters;
+                }
+            }
+            else if(plocalcodecparameters->codec_type == AVMEDIA_TYPE_AUDIO)
+            {
+                // ignore...
+            }
+        }
+        AVCodecContext* pcodeccontext = avcodec_alloc_context3(pcodec);
+        if(!pcodeccontext)
+        {
+            qDebug() << "failed to allocate memory for avcodeccontext...";
+        }
+
+        if(avcodec_parameters_to_context(pcodeccontext, pcodecparameters) < 0)
+        {
+            qDebug() << "failed to copy codec params to codec context";
+        }
+        if(avcodec_open2(pcodeccontext, pcodec, NULL) < 0)
+            qDebug() << "failed to open codec through avcodec_open2";
+        AVFrame* pframe = av_frame_alloc();
+        if(!pframe)
+            qDebug() << "failed to allocate memory for AVFrame";
+        AVPacket* ppacket = av_packet_alloc();
+        if(!ppacket)
+            qDebug() << "failed to allocate memory for AVPacket";
+        int response = 0;
+        int packetcount = 0;
+        while(av_read_frame(pformatcontext, ppacket) >= 0)
+        {
+            if(ppacket->stream_index == videostreamindex)
+            {
+                response = decode_packet(ppacket, pcodeccontext, pframe);
+                if(response < 0)
+                    break;
+                if(--packetcount <= 0) break;
+            }
+            av_packet_unref(ppacket);
+        }
+        avformat_close_input(&pformatcontext);
+        avformat_free_context(pformatcontext);
+        av_packet_free(&ppacket);
+        av_frame_free(&pframe);
+        avcodec_free_context(&pcodeccontext);
     }
     else
-        qDebug() << "issue with opening file:" << tmpfile.fileName();
-    // TMP FIle IS WRITTEN, DO FFMPEG CODE NOW...
-    /*
+    {
+        qDebug() << "file is zero bytes, load no video graphic here...";
+    }
+    */
     if(filesize > 0)
     {
         //qDebug() << "filecat:" << filecat << "filesize:" << filesize;
@@ -923,38 +1049,47 @@ void GenerateVidThumbnails(QString thumbid)
             tmpfile.write(filebytes);
             tmpfile.close();
         }
+        else
+            qDebug() << "couldn't open file for writing...";
         QByteArray ba;
         QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
         ba.clear();
         ba.append(fullpath);
         imageshash.insert(thumbid, QString(ba.toBase64()));
         // implement libffmpegthumbnailer...
-        ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
-        videothumbnailer.setThumbnailSize(thumbsize);
-        ffmpegthumbnailer::FilmStripFilter* filmstripfilter = nullptr;
-        filmstripfilter = new ffmpegthumbnailer::FilmStripFilter();
-        videothumbnailer.addFilter(filmstripfilter);
-        videothumbnailer.setPreferEmbeddedMetadata(false);
-        int vtcnt = 100 / vidcount;
-        //qDebug() << "vidcount:" << vidcount << "vtcnt:" << vtcnt;
         QStringList tlist;
-        tlist.clear();
-        for(int i=0; i <= vtcnt; i++)
+        try
         {
-            int seekpercentage = i * vidcount;
-            if(seekpercentage == 0)
-                seekpercentage = 5;
-            if(seekpercentage == 100)
-                seekpercentage = 95;
-            //qDebug() << "seekpercentage:" << seekpercentage;
-            QString tmpoutfile = wombatvariable.tmpfilepath + thumbid + ".t" + QString::number(seekpercentage) + ".jpg";
-            tlist.append(tmpoutfile);
-            videothumbnailer.setSeekPercentage(seekpercentage);
-            videothumbnailer.generateThumbnail(tmpstring.toStdString(), Jpeg, tmpoutfile.toStdString());
+            ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
+            videothumbnailer.setThumbnailSize(QString::number(thumbsize).toStdString());
+            std::unique_ptr<ffmpegthumbnailer::FilmStripFilter> filmstripfilter;
+            filmstripfilter.reset(new ffmpegthumbnailer::FilmStripFilter());
+            videothumbnailer.addFilter(filmstripfilter.get());
+            videothumbnailer.setPreferEmbeddedMetadata(false);
+            int vtcnt = 100 / vidcount;
+            //qDebug() << "vidcount:" << vidcount << "vtcnt:" << vtcnt;
+            tlist.clear();
+            for(int i=0; i <= vtcnt; i++)
+            {
+                int seekpercentage = i * vidcount;
+                if(seekpercentage == 0)
+                    seekpercentage = 5;
+                if(seekpercentage == 100)
+                    seekpercentage = 95;
+                //qDebug() << "seekpercentage:" << seekpercentage;
+                QString tmpoutfile = wombatvariable.tmpfilepath + thumbid + ".t" + QString::number(seekpercentage) + ".png";
+                tlist.append(tmpoutfile);
+                videothumbnailer.setSeekPercentage(seekpercentage);
+                videothumbnailer.generateThumbnail(tmpstring.toStdString(), Png, tmpoutfile.toStdString());
+            }
+            //delete filmstripfilter;
         }
-        delete filmstripfilter;
-        // implement imagemagick montage...
-        // NEED TO IMPLEMENT TRY CATCH HERE FOR IMAGEMAGICK...
+        catch(std::exception& e)
+        {
+            qDebug() << "Libffmpegthumbnailer Error:" << e.what();
+        }
+            // implement imagemagick montage...
+            // NEED TO IMPLEMENT TRY CATCH HERE FOR IMAGEMAGICK...
 	try
         {
             std::list<Magick::Image> thmbimages;
@@ -995,7 +1130,7 @@ void GenerateVidThumbnails(QString thumbid)
 	    writer.write(thumbimage);
 	}
     }
-    else if(filesize == 0) // video was 0 length
+    else // video was 0 length
     {
         qDebug() << "it is a video with no filesize";
         QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
@@ -1006,10 +1141,11 @@ void GenerateVidThumbnails(QString thumbid)
         thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
         writer.write(thumbimage);
     }
-    */
+
     digimgthumbcount++;
     isignals->DigUpd(4, digimgthumbcount);
 }
+
 
 void GenerateThumbnails(QString thumbid)
 {

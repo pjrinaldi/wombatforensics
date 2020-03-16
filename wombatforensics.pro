@@ -30,7 +30,7 @@ SOURCES = main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp glob
 RESOURCES += wombatforensics.qrc
 release: DESTDIR = release
 debug:   DESTDIR = debug
-linux:LIBS = -lewf -ltsk -ltar -lavcodec -lavformat -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV
+linux:LIBS = -lewf -ltsk -ltar -lavutil -lavcodec -lavformat -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 }
 #linux:
