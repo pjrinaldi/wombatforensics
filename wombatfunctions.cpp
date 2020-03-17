@@ -2,10 +2,6 @@
 #include <Magick++.h>
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-}
 
 // Copyright 2015-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -834,26 +830,20 @@ void GenerateHash(QString objectid)
     {
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        //QString filecat = curitem->Data(8).toString();
         qint64 filesize = curitem->Data(2).toLongLong();
-	// IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
         QString hashstr = "";
         if(filesize > 0)
         {
             QByteArray filebytes;
 	    filebytes.clear();
 	    filebytes = ReturnFileContent(objectid);
-            //qDebug() << "hash filebytes count:" << filebytes.count();
-            //qDebug() << "objectid:" << objectid;
-	    // HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
             QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
-        //if(filebytes.count() > 0)
-        //{
             hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
 	    filebytes.clear();
         }
         else
         {
+            qDebug() << "Item:" << objectid << "had zero file size. Zero hash value used.";
             if(hashsum == 1)
                 hashstr = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
             else if(hashsum == 2)
@@ -877,169 +867,17 @@ void GenerateHash(QString objectid)
     }
 }
 
-static void save_gray_frame(unsigned char *buf, int wrap, int xsize, int ysize, char *filename)
-{
-        FILE *f;
-        int i;
-        f = fopen(filename,"w");
-        // writing the minimal required header for a pgm file format
-        // portable graymap format -> https://en.wikipedia.org/wiki/Netpbm_format#PGM_example
-        fprintf(f, "P5\n%d %d\n%d\n", xsize, ysize, 255);
-        // writing line by line
-        for (i = 0; i < ysize; i++)
-            fwrite(buf + i * wrap, 1, xsize, f);
-        fclose(f);
-}
-
-static int decode_packet(AVPacket *pPacket, AVCodecContext *pCodecContext, AVFrame *pFrame)
-{
-    // Supply raw packet data as input to a decoder
-    int response = avcodec_send_packet(pCodecContext, pPacket);
-    if (response < 0)
-    {
-        //logging("Error while sending a packet to the decoder: %s", av_err2str(response));
-        return response;
-    }
-    while (response >= 0)
-    {
-        // Return decoded output data (into a frame) from a decoder
-        response = avcodec_receive_frame(pCodecContext, pFrame);
-        if (response == AVERROR(EAGAIN) || response == AVERROR_EOF)
-        {
-            break;
-        }
-        else if (response < 0)
-        {
-            //logging("Error while receiving a frame from the decoder: %s", av_err2str(response));
-            return response;
-        }
-        if (response >= 0)
-        {
-            char frame_filename[1024];
-            snprintf(frame_filename, sizeof(frame_filename), "%s-%d.pgm", "frame", pCodecContext->frame_number);
-            // save a grayscale frame into a .pgm file
-            save_gray_frame(pFrame->data[0], pFrame->linesize[0], pFrame->width, pFrame->height, frame_filename);
-        }
-    }
-    return 0;
-}
-
 void GenerateVidThumbnails(QString thumbid)
 {
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-    //QString filecat = curitem->Data(8).toString();
     qint64 filesize = curitem->Data(2).toLongLong();
-    //qDebug() << "thumbid:" << thumbid << "filesize" << filesize;
-    //if(filesize > 0)
-    //    qDebug() << "file is greater than 0 bytes";
-    //else
-    //    qDebug() << "file is 0 bytes";
-    // FFMPEG METHOD WHICH I DON'T UNDERSTAND...
-    /*
     if(filesize > 0)
     {
-        QByteArray filebytes;
-        filebytes.clear();
-        filebytes = ReturnFileContent(thumbid);
-        QDir dir;
-        dir.mkpath(wombatvariable.tmpfilepath);
-        QString tmpfilename = wombatvariable.tmpfilepath + thumbid + "-tmp";
-        //qDebug() << "tmpfilename:" << tmpfilename;
-        QFile tmpfile(tmpfilename);
-        if(tmpfile.open(QIODevice::WriteOnly))
-        {
-            tmpfile.write(filebytes);
-            tmpfile.close();
-        }
-        else
-            qDebug() << "issue with opening file:" << tmpfile.fileName();
-        AVFormatContext* pformatcontext = avformat_alloc_context();
-        avformat_open_input(&pformatcontext, tmpfilename.toStdString().c_str(), NULL, NULL);
-        if(avformat_find_stream_info(pformatcontext, NULL) < 0)
-        {
-            qDebug() << "could not get stream info, load no video graphic here...";
-        }
-        AVCodec* pcodec = NULL;
-        AVCodecParameters* pcodecparameters = NULL;
-        int videostreamindex = -1;
-        for(int i=0; i < pformatcontext->nb_streams; i++)
-        {
-            AVCodecParameters* plocalcodecparameters = NULL;
-            plocalcodecparameters = pformatcontext->streams[i]->codecpar;
-            AVCodec* plocalcodec = NULL;
-            plocalcodec = avcodec_find_decoder(plocalcodecparameters->codec_id);
-            if(plocalcodec == NULL)
-            {
-                qDebug() << "unsupported codec... load no video graphic here...";
-            }
-            if(plocalcodecparameters->codec_type == AVMEDIA_TYPE_VIDEO)
-            {
-                if(videostreamindex == -1)
-                {
-                    videostreamindex = i;
-                    pcodec = plocalcodec;
-                    pcodecparameters = plocalcodecparameters;
-                }
-            }
-            else if(plocalcodecparameters->codec_type == AVMEDIA_TYPE_AUDIO)
-            {
-                // ignore...
-            }
-        }
-        AVCodecContext* pcodeccontext = avcodec_alloc_context3(pcodec);
-        if(!pcodeccontext)
-        {
-            qDebug() << "failed to allocate memory for avcodeccontext...";
-        }
-
-        if(avcodec_parameters_to_context(pcodeccontext, pcodecparameters) < 0)
-        {
-            qDebug() << "failed to copy codec params to codec context";
-        }
-        if(avcodec_open2(pcodeccontext, pcodec, NULL) < 0)
-            qDebug() << "failed to open codec through avcodec_open2";
-        AVFrame* pframe = av_frame_alloc();
-        if(!pframe)
-            qDebug() << "failed to allocate memory for AVFrame";
-        AVPacket* ppacket = av_packet_alloc();
-        if(!ppacket)
-            qDebug() << "failed to allocate memory for AVPacket";
-        int response = 0;
-        int packetcount = 0;
-        while(av_read_frame(pformatcontext, ppacket) >= 0)
-        {
-            if(ppacket->stream_index == videostreamindex)
-            {
-                response = decode_packet(ppacket, pcodeccontext, pframe);
-                if(response < 0)
-                    break;
-                if(--packetcount <= 0) break;
-            }
-            av_packet_unref(ppacket);
-        }
-        avformat_close_input(&pformatcontext);
-        avformat_free_context(pformatcontext);
-        av_packet_free(&ppacket);
-        av_frame_free(&pframe);
-        avcodec_free_context(&pcodeccontext);
-    }
-    else
-    {
-        qDebug() << "file is zero bytes, load no video graphic here...";
-    }
-    */
-    if(filesize > 0)
-    {
-        //qDebug() << "filecat:" << filecat << "filesize:" << filesize;
-        //qDebug() << "it is a video with a filesize as it should be";
 	// IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
         QByteArray filebytes;
         filebytes.clear();
 	filebytes = ReturnFileContent(thumbid);
-        //qDebug() << "vid filebytes count:" << filebytes.count();
-        //qDebug() << "thumbid:" << thumbid;
-	// HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
         QDir dir;
         dir.mkpath(wombatvariable.tmpfilepath);
         QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
@@ -1050,13 +888,12 @@ void GenerateVidThumbnails(QString thumbid)
             tmpfile.close();
         }
         else
-            qDebug() << "couldn't open file for writing...";
+            qDebug() << "Item:" << thumbid << "couldn't open file for writing contents.";
         QByteArray ba;
         QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
         ba.clear();
         ba.append(fullpath);
         imageshash.insert(thumbid, QString(ba.toBase64()));
-        // implement libffmpegthumbnailer...
         QStringList tlist;
         try
         {
@@ -1067,7 +904,6 @@ void GenerateVidThumbnails(QString thumbid)
             videothumbnailer.addFilter(filmstripfilter.get());
             videothumbnailer.setPreferEmbeddedMetadata(false);
             int vtcnt = 100 / vidcount;
-            //qDebug() << "vidcount:" << vidcount << "vtcnt:" << vtcnt;
             tlist.clear();
             for(int i=0; i <= vtcnt; i++)
             {
@@ -1082,14 +918,19 @@ void GenerateVidThumbnails(QString thumbid)
                 videothumbnailer.setSeekPercentage(seekpercentage);
                 videothumbnailer.generateThumbnail(tmpstring.toStdString(), Png, tmpoutfile.toStdString());
             }
-            //delete filmstripfilter;
         }
         catch(std::exception& e)
         {
-            qDebug() << "Libffmpegthumbnailer Error:" << e.what();
+            qDebug() << "Item:" << thumbid << "libffmpegthumbnailer error:" << e.what() << ". Missing video thumbnail used instead.";
+            QImage fileimage;
+            QImage thumbimage;
+            //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
+            //writer.setFormat("png");
+            fileimage.load(":/basic/missingvideo");
+            thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+            thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
+            //writer.write(thumbimage);
         }
-            // implement imagemagick montage...
-            // NEED TO IMPLEMENT TRY CATCH HERE FOR IMAGEMAGICK...
 	try
         {
             std::list<Magick::Image> thmbimages;
@@ -1110,38 +951,50 @@ void GenerateVidThumbnails(QString thumbid)
             Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
             if(montage.size() == 1)
             {
-                //qDebug() << "montage worked:" << thumbout;
                 std::string mstring = thumbout.toStdString();
                 Magick::Image& montageimage = montage.front();
                 montageimage.magick("png");
                 montageimage.write(mstring);
             }
             else
-                qDebug() << "something went wrong:" << montage.size();
+            {
+                qDebug() << "Item:" << thumbid << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
+	        QImage fileimage;
+        	QImage thumbimage;
+	        //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
+                //writer.setFormat("png");
+	        fileimage.load(":/basic/missingvideo");
+	        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
+	        //writer.write(thumbimage);
+            }
 	}
 	catch(Magick::Exception &error)
 	{
-            qDebug() << "Caught exception:" << error.what();
+            qDebug() << "Item:" << thumbid << "caught exception during montage operation:" << error.what() << ". Missing video thumbnail will be used.";
 	    QImage fileimage;
 	    QImage thumbimage;
-	    QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
-	    fileimage.load(":/missingvideo");
+	    //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
+            //writer.setFormat("png");
+	    fileimage.load(":/basic/missingvideo");
 	    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-	    writer.write(thumbimage);
+            thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
+	    //writer.write(thumbimage);
 	}
     }
     else // video was 0 length
     {
-        qDebug() << "it is a video with no filesize";
+        qDebug() << "Item:" << thumbid << " has no filesize.";
         QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
         QImage fileimage;
         QImage thumbimage;
-        QImageWriter writer(thumbout);
+        //QImageWriter writer(thumbout);
+        //writer.setFormat("png");
         fileimage.load(":/basic/missingvideo");
         thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-        writer.write(thumbimage);
+        thumbimage.save(thumbout, "PNG");
+        //writer.write(thumbimage);
     }
-
     digimgthumbcount++;
     isignals->DigUpd(4, digimgthumbcount);
 }
@@ -1149,87 +1002,54 @@ void GenerateVidThumbnails(QString thumbid)
 
 void GenerateThumbnails(QString thumbid)
 {
-    if(thumbid.split("-").count() == 5)
+    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+    qint64 filesize = curitem->Data(2).toLongLong();
+    if(filesize > 0)
     {
-        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        QString filecat = curitem->Data(8).toString();
-        qint64 filesize = curitem->Data(2).toLongLong();
-        if(filecat.contains("Image") && filesize > 0)
+	// IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
+        QByteArray filebytes;
+        filebytes.clear();
+	filebytes = ReturnFileContent(thumbid);
+        QByteArray ba;
+        ba.clear();
+        QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
+        ba.append(fullpath);
+        imageshash.insert(thumbid, QString(ba.toBase64()));
+	try
         {
-	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
-	    QByteArray filebytes;
-            filebytes.clear();
-	    filebytes = ReturnFileContent(thumbid);
-	    // HAVE QBYTEARRAY WITH CONTENT, NOW DO SOMETHING WITH IT.... (HASH, THUMBNAIL, ETC)
-            QByteArray ba;
-            ba.clear();
-            QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
-            ba.append(fullpath);
-            imageshash.insert(thumbid, QString(ba.toBase64()));
-	    /* NEW IMAGEMAGICK METHOD */
-	    //qDebug() << "filebytes size:" << filebytes.size();
-	    //qDebug() << "thumbpath:" << genthmbpath + "thumbs/" + thumbid + ".png";
-	    try
-	    {
-		Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
-		Magick::Image master(blob);
-		master.quiet(false);
-		//qDebug() << "master filesize:" << master.fileSize();
-		master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
-		master.magick("png");
-		master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		// NEED TO WRITE THE ERROR AND DISPLAY THE MISSING IMAGE...
-		qDebug() << "Caught exception:" << error.what();
-		QImage fileimage;
-		QImage thumbimage;
-		QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
-		fileimage.load(":/missingimage");
-		thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-		writer.write(thumbimage);
-	    }
-	    /* OLD QT5 QImage Method */
-	    /*
-            QImage fileimage;
-            QImage thumbimage;
-            QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
-            //if(imglen > 0)
-            //if(bufferlength > 0)
-            //{
-            bool imageloaded = fileimage.loadFromData(filebytes);
-                //bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(filebuffer, bufferlength));
-                //bool imageloaded = fileimage.loadFromData(QByteArray::fromRawData(imgbuf, imglen));
-                if(imageloaded)
-                {
-                    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-                    writer.write(thumbimage);
-                }
-                else
-                {
-                    fileimage.load(":/missingimage");
-                    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-                    writer.write(thumbimage);
-                }
-            //}
-	    */
-        }
-        else if(filecat.contains("Image") && filesize == 0)
-        {
-            QImage fileimage;
-            QImage thumbimage;
-            QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
-            fileimage.load(":/missingimage");
-            thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-            writer.write(thumbimage);
-        }
-        //}
-        //delete[] filebuffer;
-        digimgthumbcount++;
-        isignals->DigUpd(0, digimgthumbcount);
+	    Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
+            Magick::Image master(blob);
+    	    master.quiet(false);
+	    master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
+	    master.magick("png");
+	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+	}
+	catch(Magick::Exception &error)
+	{
+	    qDebug() << "Item:" << thumbid << "magick resize exception:" << error.what() << ". Missing image thumbnail used.";
+	    QImage fileimage;
+	    QImage thumbimage;
+	    //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
+	    fileimage.load(":/missingimage");
+	    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+            thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
+	    //writer.write(thumbimage);
+	}
     }
+    else if(filesize == 0)
+    {
+        qDebug() << "Item:" << thumbid << "has zero filesize, so missing image thumbnail is used.";
+        QImage fileimage;
+        QImage thumbimage;
+        //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
+        fileimage.load(":/missingimage");
+        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+        thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
+        //writer.write(thumbimage);
+    }
+    digimgthumbcount++;
+    isignals->DigUpd(0, digimgthumbcount);
 }
 
 int SegmentDigits(int number)
