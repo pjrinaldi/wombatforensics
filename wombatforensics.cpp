@@ -2643,6 +2643,11 @@ void WombatForensics::NextItem()
                 ui->dirTreeView->setCurrentIndex(tmplist.at(i+1));
                 break;
             }
+            else
+            {
+                ui->dirTreeView->setCurrentIndex(tmplist.at(0));
+                break;
+            }
         }
     }
 }
@@ -2676,7 +2681,7 @@ void WombatForensics::UpdateFilterCount()
     QModelIndexList tmplist = treenodemodel->match(treenodemodel->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     for(int i=0; i < tmplist.count(); i++)
     {
-        if(tmplist.at(i).sibling(tmplist.at(i).row(), 11).data().toString().split("-").count() == 4)
+        if(tmplist.at(i).sibling(tmplist.at(i).row(), 11).data().toString().split("-").count() == 5)
             filtercount++;
     }
     if(filtercount == filesfound)

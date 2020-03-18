@@ -1043,6 +1043,7 @@ void GenerateThumbnails(QString thumbid)
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     qint64 filesize = curitem->Data(2).toLongLong();
+    Magick::Geometry thumbgeometry(thumbsize, thumbsize);
     if(filesize > 0)
     {
 	// IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
@@ -1058,9 +1059,10 @@ void GenerateThumbnails(QString thumbid)
         {
 	    Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
             Magick::Image master(blob);
+            qDebug() << "image size:" << master.size().width() << "width by" << master.size().height() << "height";
     	    master.quiet(false);
-	    master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
-	    master.magick("png");
+	    master.resize(thumbgeometry);
+	    master.magick("PNG");
 	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
 	}
 	catch(Magick::Exception &error)
@@ -1076,7 +1078,7 @@ void GenerateThumbnails(QString thumbid)
                 Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
                 Magick::Image master(blob);
         	master.quiet(false);
-	        master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
+	        master.resize(thumbgeometry);
 	        master.magick("PNG");
         	master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
             }
@@ -1099,7 +1101,7 @@ void GenerateThumbnails(QString thumbid)
             Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
             Magick::Image master(blob);
     	    master.quiet(false);
-	    master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
+	    master.resize(thumbgeometry);
 	    master.magick("PNG");
     	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
         }
