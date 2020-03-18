@@ -1084,11 +1084,6 @@ void GenerateThumbnails(QString thumbid)
             {
                 qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
             }
-	    //QImage fileimage;
-	    //QImage thumbimage;
-	    //fileimage.load(":/missingimage");
-	    //thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-            //thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
 	}
     }
     else if(filesize == 0)
@@ -1112,11 +1107,6 @@ void GenerateThumbnails(QString thumbid)
         {
             qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
         }
-        //QImage fileimage;
-        //QImage thumbimage;
-        //fileimage.load(":/missingimage");
-        //thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-        //thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
     }
     digimgthumbcount++;
     isignals->DigUpd(0, digimgthumbcount);
