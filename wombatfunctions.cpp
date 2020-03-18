@@ -912,7 +912,6 @@ void GenerateVidThumbnails(QString thumbid)
                     seekpercentage = 5;
                 if(seekpercentage == 100)
                     seekpercentage = 95;
-                //qDebug() << "seekpercentage:" << seekpercentage;
                 QString tmpoutfile = wombatvariable.tmpfilepath + thumbid + ".t" + QString::number(seekpercentage) + ".png";
                 tlist.append(tmpoutfile);
                 videothumbnailer.setSeekPercentage(seekpercentage);
@@ -922,14 +921,27 @@ void GenerateVidThumbnails(QString thumbid)
         catch(std::exception& e)
         {
             qDebug() << "Item:" << thumbid << "libffmpegthumbnailer error:" << e.what() << ". Missing video thumbnail used instead.";
-            QImage fileimage;
-            QImage thumbimage;
-            //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
-            //writer.setFormat("png");
-            fileimage.load(":/basic/missingvideo");
-            thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-            thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
-            //writer.write(thumbimage);
+            try
+            {
+                qDebug() << "Item:" << thumbid << "png test with imagemagick.";
+                QImage fileimage;
+                //QImage thumbimage;
+                fileimage.load(":/basic/missingvideo");
+                qDebug() << fileimage.format();
+                QByteArray imgarray = QByteArray::fromRawData((const char*)fileimage.bits(), fileimage.sizeInBytes());
+	        Magick::Blob blob(static_cast<const void*>(imgarray.data()), imgarray.size());
+                Magick::Image master(blob);
+        	    master.quiet(false);
+	        master.resize(QString(QString::number(thumbsize) + "X" + QString::number(thumbsize)).toStdString());
+	        master.magick("PNG32");
+        	master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+            }
+            catch(Magick::Exception &error)
+            {
+                qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
+            }
+            //thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+            //thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
         }
 	try
         {
@@ -961,12 +973,9 @@ void GenerateVidThumbnails(QString thumbid)
                 qDebug() << "Item:" << thumbid << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
 	        QImage fileimage;
         	QImage thumbimage;
-	        //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
-                //writer.setFormat("png");
 	        fileimage.load(":/basic/missingvideo");
 	        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
                 thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
-	        //writer.write(thumbimage);
             }
 	}
 	catch(Magick::Exception &error)
@@ -974,12 +983,9 @@ void GenerateVidThumbnails(QString thumbid)
             qDebug() << "Item:" << thumbid << "caught exception during montage operation:" << error.what() << ". Missing video thumbnail will be used.";
 	    QImage fileimage;
 	    QImage thumbimage;
-	    //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
-            //writer.setFormat("png");
 	    fileimage.load(":/basic/missingvideo");
 	    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
-	    //writer.write(thumbimage);
 	}
     }
     else // video was 0 length
@@ -988,12 +994,9 @@ void GenerateVidThumbnails(QString thumbid)
         QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
         QImage fileimage;
         QImage thumbimage;
-        //QImageWriter writer(thumbout);
-        //writer.setFormat("png");
         fileimage.load(":/basic/missingvideo");
         thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
         thumbimage.save(thumbout, "PNG");
-        //writer.write(thumbimage);
     }
     digimgthumbcount++;
     isignals->DigUpd(4, digimgthumbcount);
@@ -1030,11 +1033,9 @@ void GenerateThumbnails(QString thumbid)
 	    qDebug() << "Item:" << thumbid << "magick resize exception:" << error.what() << ". Missing image thumbnail used.";
 	    QImage fileimage;
 	    QImage thumbimage;
-	    //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
 	    fileimage.load(":/missingimage");
 	    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
-	    //writer.write(thumbimage);
 	}
     }
     else if(filesize == 0)
@@ -1042,11 +1043,9 @@ void GenerateThumbnails(QString thumbid)
         qDebug() << "Item:" << thumbid << "has zero filesize, so missing image thumbnail is used.";
         QImage fileimage;
         QImage thumbimage;
-        //QImageWriter writer(genthmbpath + "thumbs/" + thumbid + ".png");
         fileimage.load(":/missingimage");
         thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
         thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
-        //writer.write(thumbimage);
     }
     digimgthumbcount++;
     isignals->DigUpd(0, digimgthumbcount);
