@@ -924,16 +924,22 @@ void GenerateVidThumbnails(QString thumbid)
             try
             {
                 qDebug() << "Item:" << thumbid << "png test with imagemagick.";
-                QImage fileimage;
+                //QImage fileimage;
                 //QImage thumbimage;
-                fileimage.load(":/basic/missingvideo");
-                qDebug() << fileimage.format();
-                QByteArray imgarray = QByteArray::fromRawData((const char*)fileimage.bits(), fileimage.sizeInBytes());
-	        Magick::Blob blob(static_cast<const void*>(imgarray.data()), imgarray.size());
+                //fileimage.load(":/basic/missingvideo");
+                QPixmap pixmap;
+                QByteArray iarray;
+                QBuffer buffer(&iarray);
+                buffer.open(QIODevice::WriteOnly);
+                pixmap.save(&buffer, "PNG");
+                Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
+                //qDebug() << fileimage.format();
+                //QByteArray imgarray = QByteArray::fromRawData((const char*)fileimage.bits(), fileimage.sizeInBytes());
+	        //Magick::Blob blob(static_cast<const void*>(imgarray.data()), imgarray.size());
                 Magick::Image master(blob);
         	    master.quiet(false);
-	        master.resize(QString(QString::number(thumbsize) + "X" + QString::number(thumbsize)).toStdString());
-	        master.magick("PNG32");
+	        master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
+	        master.magick("PNG");
         	master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
             }
             catch(Magick::Exception &error)
