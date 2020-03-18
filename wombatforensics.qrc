@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file alias="videoerror">Resources/videoerror.png</file>
     <file alias="xchomp">Resources/xchomp</file>
     <file alias="remcheck">Resources/process-remove.svg</file>
     <file alias="missingimage">Resources/image-missing.png</file>

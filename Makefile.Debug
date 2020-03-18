@@ -452,6 +452,7 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/multimedia-photo-manager.svg \
 		Resources/utilities-terminal.svg \
 		Resources/edit-copy.svg \
+		Resources/videoerror.png \
 		Resources/document-export.svg \
 		Resources/information.html \
 		Resources/gparted.png \

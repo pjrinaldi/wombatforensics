@@ -273,7 +273,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QString::fromUtf8("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 1641, 23));
+        mainMenubar->setGeometry(QRect(0, 0, 1641, 20));
         mainMenubar->setAcceptDrops(true);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);

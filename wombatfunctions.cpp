@@ -917,6 +917,51 @@ void GenerateVidThumbnails(QString thumbid)
                 videothumbnailer.setSeekPercentage(seekpercentage);
                 videothumbnailer.generateThumbnail(tmpstring.toStdString(), Png, tmpoutfile.toStdString());
             }
+            try
+            {
+                std::list<Magick::Image> thmbimages;
+                std::list<Magick::Image> montage;
+                Magick::Image image;
+                for(int i=0; i < tlist.count(); i++)
+                {
+                    image.read(tlist.at(i).toStdString());
+                    thmbimages.push_back(image);
+                }
+                QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
+                Magick::Montage montageopts;
+                Magick::Color color("rgba(0,0,0,0)");
+                montageopts.geometry(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize) + "+1+1").toStdString());
+                montageopts.tile(QString(QString::number(tlist.count()) + "x1").toStdString());
+                montageopts.backgroundColor(color);
+                montageopts.fileName(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+                Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
+                if(montage.size() == 1)
+                {
+                    std::string mstring = thumbout.toStdString();
+                    Magick::Image& montageimage = montage.front();
+                    montageimage.magick("png");
+                    montageimage.write(mstring);
+                }
+                else
+                {
+                    qDebug() << "Item:" << thumbid << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
+	            QImage fileimage;
+        	    QImage thumbimage;
+    	            fileimage.load(":/basic/missingvideo");
+    	            thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                    thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
+                }
+	    }
+            catch(Magick::Exception &error)
+	    {
+                qDebug() << "Item:" << thumbid << "caught exception during montage operation:" << error.what() << ". Missing video thumbnail will be used.";
+        	QImage fileimage;
+	        QImage thumbimage;
+	        fileimage.load(":/basic/missingvideo");
+	        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
+                thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
+	    }
+
         }
         catch(std::exception& e)
         {
@@ -927,7 +972,7 @@ void GenerateVidThumbnails(QString thumbid)
                 //QImage fileimage;
                 //QImage thumbimage;
                 //fileimage.load(":/basic/missingvideo");
-                QPixmap pixmap;
+                QPixmap pixmap(":/videoerror", "PNG");
                 QByteArray iarray;
                 QBuffer buffer(&iarray);
                 buffer.open(QIODevice::WriteOnly);
@@ -949,50 +994,6 @@ void GenerateVidThumbnails(QString thumbid)
             //thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
             //thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
         }
-	try
-        {
-            std::list<Magick::Image> thmbimages;
-            std::list<Magick::Image> montage;
-            Magick::Image image;
-            for(int i=0; i < tlist.count(); i++)
-            {
-                image.read(tlist.at(i).toStdString());
-                thmbimages.push_back(image);
-            }
-            QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
-            Magick::Montage montageopts;
-            Magick::Color color("rgba(0,0,0,0)");
-            montageopts.geometry(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize) + "+1+1").toStdString());
-            montageopts.tile(QString(QString::number(tlist.count()) + "x1").toStdString());
-            montageopts.backgroundColor(color);
-            montageopts.fileName(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-            Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
-            if(montage.size() == 1)
-            {
-                std::string mstring = thumbout.toStdString();
-                Magick::Image& montageimage = montage.front();
-                montageimage.magick("png");
-                montageimage.write(mstring);
-            }
-            else
-            {
-                qDebug() << "Item:" << thumbid << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
-	        QImage fileimage;
-        	QImage thumbimage;
-	        fileimage.load(":/basic/missingvideo");
-	        thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-                thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
-            }
-	}
-	catch(Magick::Exception &error)
-	{
-            qDebug() << "Item:" << thumbid << "caught exception during montage operation:" << error.what() << ". Missing video thumbnail will be used.";
-	    QImage fileimage;
-	    QImage thumbimage;
-	    fileimage.load(":/basic/missingvideo");
-	    thumbimage = fileimage.scaled(QSize(thumbsize, thumbsize), Qt::KeepAspectRatio, Qt::FastTransformation);
-            thumbimage.save(genthmbpath + "thumbs/" + thumbid + ".png", "PNG");
-	}
     }
     else // video was 0 length
     {
