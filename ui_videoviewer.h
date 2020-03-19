@@ -111,7 +111,7 @@ public:
         label->setText(QCoreApplication::translate("VideoViewer", "00:00:00", nullptr));
         label2->setText(QCoreApplication::translate("VideoViewer", "/", nullptr));
         label3->setText(QCoreApplication::translate("VideoViewer", "00:00:00", nullptr));
-        pushButton->setText(QString());
+        pushButton->setText(QCoreApplication::translate("VideoViewer", "Play/Pause", nullptr));
     } // retranslateUi
 
 };

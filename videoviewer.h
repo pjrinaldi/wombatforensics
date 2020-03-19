@@ -36,13 +36,12 @@ public:
 public slots:
     void ShowVideo(const QModelIndex &index);
     void Seek(int);
-    //void Seek();
     void SeekBySlider();
     void PlayPause();
     void UpdateSlider(qint64);
     void UpdateSlider();
     void UpdateSliderUnit();
-    void SetDuration(qint64);
+    //void SetDuration(qint64);
     
 private:
     Ui::VideoViewer* ui;

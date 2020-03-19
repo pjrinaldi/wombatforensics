@@ -14,13 +14,15 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
     vplayer->setRenderer(voutput);
     ui->horizontalLayout->addWidget(voutput->widget());
     connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
-    //connect(ui->horizontalSlider, SIGNAL(sliderPressed()), this, SLOT(Seek()));
+    connect(ui->horizontalSlider, SIGNAL(sliderPressed()), this, SLOT(SeekBySlider()));
     connect(vplayer, SIGNAL(positionChanged(qint64)), this, SLOT(UpdateSlider(qint64)));
     connect(vplayer, SIGNAL(started()), this, SLOT(UpdateSlider()));
     connect(vplayer, SIGNAL(notifyIntervalChanged()), this, SLOT(UpdateSliderUnit()));
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
+    ui->label2->setVisible(false);
+    ui->label3->setVisible(false);
     //connect(vplayer, SIGNAL(durationChanged(qint64)), this, SLOT(SetDuration(qint64)));
-    ui->pushButton->setText("Pause");
+    //ui->pushButton->setText("Pause");
     /*
     vplayer = new QMediaPlayer;
     videowidget = new QVideoWidget;
@@ -47,14 +49,6 @@ void VideoViewer::Seek(int pos)
     //vplayer->setPosition(pos*1000LL);
 }
 
-/*
-void VideoViewer::Seek()
-{
-    if(!vplayer->isPlaying())
-        return;
-    //vplayer
-*/
-
 void VideoViewer::SeekBySlider()
 {
     Seek(ui->horizontalSlider->value());
@@ -62,31 +56,12 @@ void VideoViewer::SeekBySlider()
 
 void VideoViewer::PlayPause()
 {
-    if(vplayer->isPaused())
+    if(!vplayer->isPlaying())
     {
         vplayer->play();
-        ui->pushButton->setText("Pause");
-        //return;
+        return;
     }
-    else
-    {
-        vplayer->pause();
-        ui->pushButton->setText("Play");
-    }
-    //vplayer->pause(vplayer->isPaused());
-    //ui->pushButton->setText("Play");
-    /*
-    if(vplayer->state() == QMediaPlayer::PlayingState)
-    {
-        ui->pushButton->setText("Play");
-        vplayer->pause();
-    }
-    else
-    {
-        ui->pushButton->setText("Pause");
-        vplayer->play();
-    }
-    */
+    vplayer->pause(!vplayer->isPaused());
 }
 
 void VideoViewer::UpdateSlider(qint64 pos)
@@ -95,7 +70,7 @@ void VideoViewer::UpdateSlider(qint64 pos)
     ui->horizontalSlider->setValue(int(pos/vunit));
     //ui->horizontalSlider->setValue(int(pos/1000LL));
     ui->label->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
-    ui->label3->setText(QTime(0, 0, 0).addMSecs(vplayer->duration()/vunit).toString("HH:mm:ss"));
+    //ui->label3->setText(QTime(0, 0, 0).addMSecs(int(vplayer->mediaStopPosition()/vunit)).toString("HH:mm:ss"));
     //ui->label3->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
 }
 
@@ -110,11 +85,13 @@ void VideoViewer::UpdateSliderUnit()
     UpdateSlider();
 }
 
+/*
 void VideoViewer::SetDuration(qint64 pos)
 {
     //ui->horizontalSlider->setRange(0, int(pos/1000LL));
     //ui->label3->setText(QTime(0, 0, 0).addMSecs(pos).toString("HH:mm:ss"));
 }
+*/
 
 void VideoViewer::ShowVideo(const QModelIndex &index)
 {
@@ -124,13 +101,13 @@ void VideoViewer::ShowVideo(const QModelIndex &index)
     curobjaddr = index.sibling(index.row(), 11).data().toString().toLongLong();
     vplayer->play(QString(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
     ui->label_2->setVisible(false);
+    //ui->label3->setText(QTime(0, 0, 0).addMSecs(vplayer->mediaStopPosition()/vunit).toString("HH:mm:ss"));
 }
 void VideoViewer::mousePressEvent(QMouseEvent* e)
 {
     if(e->type() == QEvent::MouseButtonPress)
     {
         vplayer->stop();
-        //vplayer->stop();
         this->close();
     }
 }
