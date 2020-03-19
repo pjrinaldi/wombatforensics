@@ -1266,7 +1266,6 @@ void PopulateTreeModel(QString evidstring)
 
 void InitializeEvidenceStructure(QString evidname)
 {
-    // c++/c posix redo...
     int evidcnt = 0;
     int volcnt = 0;
     int partint = 0;
@@ -1768,6 +1767,9 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         blockliststring = GetBlockList(curfileinfo);
         proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
         // NEED TO REPLACE WITH MFTBLOCKHASH FOR RESPECTIVE E#-V#-P#
+	// INFO I NEED TO GET MFTBLOCKHASH KEY
+	qDebug() << partpath << filepropfile.fileName();
+	// END INFO I NEED TO GET MFTBLOCKHASH KEY
         if(curfileinfo->name->meta_addr == 0 && strcmp(curfileinfo->name->name, "$MFT") == 0)
         {
             //qDebug() << "curfile name:" << curfileinfo->name->name;
@@ -3667,20 +3669,24 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                     treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
                 }
                 treeout << "0"; // TAG - 10
+                // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
+		QString objid = "";
+                if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
+                    objid = evalue + "-" + vvalue + "-" + pvalue + "-fo" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr); // Orphan ID - 11
+                else if(fsfile->meta == NULL)
+                    objid = evalue + "-" + vvalue + "-" + pvalue + "-fd" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // Deleted Recovered ID - 11
+                else
+                    objid =  evalue + "-" + vvalue + "-" + pvalue + "-f" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
+		treeout << objid;
                 // NEED TO REPLACE WITH MFTBLOCKHASH FOR RESPECTIVE E#-V#-P#
                 // POPULATE MFTBLOCKLIST
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") == 0)
                 {
+		    mftblockhash.insert(objid, GetBlockList(fsfile));
                     mftblocklist.clear();
                     mftblocklist = GetBlockList(fsfile).split("^^", QString::SkipEmptyParts);
                 }
-                // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
-                if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
-                    treeout << evalue + "-" + vvalue + "-" + pvalue + "-fo" + QString::number(orphancount) + "-a" + QString::number(fsfile->name->par_addr); // Orphan ID - 11
-                else if(fsfile->meta == NULL)
-                    treeout << evalue + "-" + vvalue + "-" + pvalue + "-fd" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // Deleted Recovered ID - 11
-                else
-                    treeout << evalue + "-" + vvalue + "-" + pvalue + "-f" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
+
                 if(fsfile->meta != NULL)
                     treeout << QString::number(fsfile->meta->type); // file type - 12
                 else
