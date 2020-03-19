@@ -1695,10 +1695,17 @@ void WombatForensics::LoadHexContents()
 	        uint32_t contentlength = 0;
 	        uint16_t resoffset = 0;
                 // NEED TO REPLACE WITH MFTBLOCKHASH FOR RESPECTIVE E#-V#-P#
+		QStringList mftblocklist;
+		mftblocklist.clear();
+		QString mftid = nodeid.split("-").first() + "-" + nodeid.split("-").at(1) + "-" + nodeid.split("-").at(2) + "-f0-a5";
+		//qDebug() << "nodeid:" << mftid << "blockliststring:" << mftblockhash.value(mftid);
+		mftblocklist = mftblockhash.value(mftid).split("^^", QString::SkipEmptyParts);
+		//qDebug() << "mftblocklist count:" << mftblocklist.count();
                 // NEW RESIDENT OFFSET CALCULATION
                 qint64 residentoffset = 0;
                 if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.
                 {
+		    //qDebug() << "mftblocklist needed mftblock:" << mftaddress * 1024/blocksize;
                     residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
                 }
                 else // odd number, get starting block and jump the fractional amount to get to the correct entry.

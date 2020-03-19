@@ -40,7 +40,7 @@ QStringList digfilelist;
 QStringList listeditems;
 QStringList existingevidence;
 QStringList newevidence;
-QStringList mftblocklist;
+//QStringList mftblocklist; // SWITCH TO LOCAL ONCE MFTBLOCKHASH IS IMPLEMENTED
 QString casepath = QDir::homePath(); // case path settings variable
 QString reportpath = QDir::homePath(); // report path settings variable
 QString exportpath = "";

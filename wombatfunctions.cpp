@@ -1767,19 +1767,20 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         blockliststring = GetBlockList(curfileinfo);
         proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
         // NEED TO REPLACE WITH MFTBLOCKHASH FOR RESPECTIVE E#-V#-P#
-	// INFO I NEED TO GET MFTBLOCKHASH KEY
 	QStringList objidlist = filepropfile.fileName().split("/");
 	QString faid = objidlist.last();
 	QString pid = objidlist.at(objidlist.count()-2);
 	QString vid = objidlist.at(objidlist.count()-3);
 	QString eid = objidlist.at(objidlist.count()-4);
-	qDebug() << eid.split(".").last() << vid << pid << faid.split(".").first() << faid.split(".").at(1);
-	// END INFO I NEED TO GET MFTBLOCKHASH KEY
+	QString objid = eid.split(".").last() + "-" + vid + "-" + pid + "-" + faid.split(".").first() + "-" + faid.split(".").at(1);
+	//qDebug() << objid;
         if(curfileinfo->name->meta_addr == 0 && strcmp(curfileinfo->name->name, "$MFT") == 0)
         {
             //qDebug() << "curfile name:" << curfileinfo->name->name;
-            mftblocklist.clear();
-            mftblocklist = blockliststring.split("^^", QString::SkipEmptyParts);
+	    mftblockhash.insert(objid, blockliststring);
+	    // comment out mftblocklist once mftblockhash is implemented
+            //mftblocklist.clear();
+            //mftblocklist = blockliststring.split("^^", QString::SkipEmptyParts);
             /*
             if(mftblocklist.count() > 0)
                 qDebug() << "mftblocklist.at(10664/2):" << mftblocklist.at(10664/2);
@@ -3688,8 +3689,9 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") == 0)
                 {
 		    mftblockhash.insert(objid, GetBlockList(fsfile));
-                    mftblocklist.clear();
-                    mftblocklist = GetBlockList(fsfile).split("^^", QString::SkipEmptyParts);
+	    	    // comment out mftblocklist once mftblockhash is implemented
+                    //mftblocklist.clear();
+                    //mftblocklist = GetBlockList(fsfile).split("^^", QString::SkipEmptyParts);
                 }
 
                 if(fsfile->meta != NULL)
@@ -4126,8 +4128,14 @@ QByteArray ReturnFileContent(QString objectid)
 	uint32_t attrlength = 0;
 	uint32_t contentlength = 0;
         uint16_t resoffset = 0;
+	QStringList mftblocklist;
+        mftblocklist.clear();
+	QString mftid = objectid.split("-").first() + "-" + objectid.split("-").at(1) + "-" + objectid.split("-").at(2) + "-f0-a5";
+	mftblocklist = mftblockhash.value(mftid).split("^^", QString::SkipEmptyParts);
+	//mftblocklist = mftblockhash.value(objectid).split("^^", QString::SkipEmptyParts);
          // NEW RESIDENT OFFSET CALCULATION
         qint64 residentoffset = 0;
+	// NEED TO IMPLEMENT MFTBLOCKHASH HERE INSTEAD OF MFTBLOCKLIST
         if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.
         {
             residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
