@@ -14,7 +14,7 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
     vplayer->setRenderer(voutput);
     ui->horizontalLayout->addWidget(voutput->widget());
     connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
-    connect(ui->horizontalSlider, SIGNAL(sliderPressed()), this, SLOT(Seek()));
+    //connect(ui->horizontalSlider, SIGNAL(sliderPressed()), this, SLOT(Seek()));
     connect(vplayer, SIGNAL(positionChanged(qint64)), this, SLOT(UpdateSlider(qint64)));
     connect(vplayer, SIGNAL(started()), this, SLOT(UpdateSlider()));
     connect(vplayer, SIGNAL(notifyIntervalChanged()), this, SLOT(UpdateSliderUnit()));
@@ -47,6 +47,14 @@ void VideoViewer::Seek(int pos)
     //vplayer->setPosition(pos*1000LL);
 }
 
+/*
+void VideoViewer::Seek()
+{
+    if(!vplayer->isPlaying())
+        return;
+    //vplayer
+*/
+
 void VideoViewer::SeekBySlider()
 {
     Seek(ui->horizontalSlider->value());
@@ -54,14 +62,19 @@ void VideoViewer::SeekBySlider()
 
 void VideoViewer::PlayPause()
 {
-    if(!vplayer->isPlaying())
+    if(vplayer->isPaused())
     {
         vplayer->play();
         ui->pushButton->setText("Pause");
-        return;
+        //return;
     }
-    vplayer->pause(vplayer->isPaused());
-    ui->pushButton->setText("Play");
+    else
+    {
+        vplayer->pause();
+        ui->pushButton->setText("Play");
+    }
+    //vplayer->pause(vplayer->isPaused());
+    //ui->pushButton->setText("Play");
     /*
     if(vplayer->state() == QMediaPlayer::PlayingState)
     {
