@@ -1768,7 +1768,12 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
         // NEED TO REPLACE WITH MFTBLOCKHASH FOR RESPECTIVE E#-V#-P#
 	// INFO I NEED TO GET MFTBLOCKHASH KEY
-	qDebug() << partpath << filepropfile.fileName();
+	QStringList objidlist = filepropfile.fileName().split("/");
+	QString faid = objidlist.last();
+	QString pid = objidlist.at(objidlist.count()-2);
+	QString vid = objidlist.at(objidlist.count()-3);
+	QString eid = objidlist.at(objidlist.count()-4);
+	qDebug() << eid.split(".").last() << vid << pid << faid.split(".").first() << faid.split(".").at(1);
 	// END INFO I NEED TO GET MFTBLOCKHASH KEY
         if(curfileinfo->name->meta_addr == 0 && strcmp(curfileinfo->name->name, "$MFT") == 0)
         {
