@@ -1242,7 +1242,7 @@ void WombatForensics::ThashSaveFinish(void)
     qDebug() << "SaveImageHashes Finished";
     StatusUpdate("Thumbnail Library Saved");
     //if(hashingwatcher.isFinished())
-    if(!digrotatetimer.isActive())
+    if(!digrotatetimer->isActive())
         StatusUpdate("Ready");
     else
         StatusUpdate("Digging Deeper...");
@@ -1254,7 +1254,7 @@ void WombatForensics::ThashFinish(void)
     StatusUpdate("Thumbnail Library Ready");
     ui->actionView_Image_Gallery->setEnabled(true);
     //if(hashingwatcher.isFinished())
-    if(!digrotatetimer.isActive())
+    if(!digrotatetimer->isActive())
     	StatusUpdate("Ready");
     else
 	StatusUpdate("Digging Deeper...");
@@ -2104,7 +2104,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 }
 		//qDebug() << "img list:" << digfilelist.count();
                 digimgthumbtotal = digfilelist.count();
-		digimgcountstring = "Thumbnailed: 0 of " + digimgthumbtotal + " Images";
+		digimgcountstring = "Thumbnailed: 0 of " + QString::number(digimgthumbtotal) + " Images";
                 if(digimgthumbtotal > 0)
                 {
                     thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
@@ -2121,7 +2121,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 }
 		//qDebug() << "vid list:" << digfilelist.count();
                 digvidthumbtotal = digfilelist.count();
-		digvidcountstring = "Thumbnailed: 0 of " + digvidthumbtotal + " Videos";
+		digvidcountstring = "Thumbnailed: 0 of " + QString::number(digvidthumbtotal) + " Videos";
                 if(digvidthumbtotal > 0)
                 {
                     videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
@@ -2158,7 +2158,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 void WombatForensics::HashingFinish()
 {
     //if(thumbwatcher.isFinished())
-    if(!digrotatetimer.isActive())
+    if(!digrotatetimer->isActive())
         StatusUpdate("Ready");
     else
         StatusUpdate("Digging Deeper...");
@@ -2443,14 +2443,14 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
 		imgitems.clear();
 		imgitems = GetFileLists(4); // images file category only
                 digimgthumbtotal = imgitems.count();
-		digimgcountstring = "Thumbnailed: 0 of " + digimgthumbtotal + " Images";
+		digimgcountstring = "Thumbnailed: 0 of " + QString::number(digimgthumbtotal) + " Images";
                 thumbfuture = QtConcurrent::map(imgitems, GenerateThumbnails); // Process All thumbnails
                 thumbwatcher.setFuture(thumbfuture);
 		QStringList viditems;
 		viditems.clear();
 		viditems = GetFileLists(5); // videos file category only
                 digvidthumbtotal = viditems.count();
-		digvidcountstring = "Thumbnailed: 0 of " + digvidthumbtotal + " Videos";
+		digvidcountstring = "Thumbnailed: 0 of " + QString::number(digvidthumbtotal) + " Videos";
                 videofuture = QtConcurrent::map(viditems, GenerateVidThumbnails); // Process all Vid Thumbnails
                 videowatcher.setFuture(videofuture);
 		dighashtotal = 0;
@@ -2490,7 +2490,7 @@ void WombatForensics::FinishVideos()
         //if((digoptions.isEmpty() || digoptions.contains(4) || digoptions.contains(5)) && thumbwatcher.isFinished())
         //    imagewindow->show();
     }
-    if(digrotatetimer.isActive())
+    if(digrotatetimer->isActive())
 	StatusUpdate("Digging Deeper...");
     else
 	StatusUpdate("Ready");
@@ -2516,7 +2516,7 @@ void WombatForensics::FinishThumbs()
         //if((digoptions.isEmpty() || digoptions.contains(0) || digoptions.contains(5)) && videowatcher.isFinished())
         //    imagewindow->show();
     }
-    if(digrotatetimer.isActive())
+    if(digrotatetimer->isActive())
 	StatusUpdate("Digging Deeper...");
     else
 	StatusUpdate("Ready");
@@ -3161,7 +3161,7 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
 void WombatForensics::FinishWombatCaseFile(void)
 {
     qInfo() << "Current State Saved.";
-    if(digrotatetimer.isActive())
+    if(digrotatetimer->isActive())
     	StatusUpdate("Digging Deeper...");
     else
 	StatusUpdate("Ready");
