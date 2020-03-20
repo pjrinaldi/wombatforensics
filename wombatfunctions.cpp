@@ -1040,7 +1040,7 @@ void GenerateVidThumbnails(QString thumbid)
 
 void GenerateThumbnails(QString thumbid)
 {
-    qDebug() << "thumbid:" << thumbid;
+    //qDebug() << "thumbid:" << thumbid;
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     qint64 filesize = curitem->Data(2).toLongLong();

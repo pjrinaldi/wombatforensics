@@ -2141,7 +2141,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                     //StatusUpdate("Generating Hash...");
 	    //qDebug() << "hash list:" << digfilelist.count();
             dighashtotal = digfilelist.count();
-	    dighashcountstring = "Hashed: 0 of " + dighashtotal;
+	    dighashcountstring = "Hashed: 0 of " + QString::number(dighashtotal);
             if(dighashtotal > 0)
             {
                 hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
