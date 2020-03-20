@@ -832,7 +832,8 @@ void GenerateHash(QString objectid)
         TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         qint64 filesize = curitem->Data(2).toLongLong();
         QString hashstr = "";
-        if(filesize > 0 && !objectid.endsWith("-a8")) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
+        //if(filesize > 0 && !objectid.endsWith("-a8")) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
+        if(filesize > 0)
         {
             QByteArray filebytes;
 	    filebytes.clear();
@@ -843,7 +844,7 @@ void GenerateHash(QString objectid)
         }
         else
         {
-            qDebug() << "Item:" << objectid << "had zero file size. Zero hash value used.";
+            //qDebug() << "Item:" << objectid << "had zero file size. Zero hash value used.";
             if(hashsum == 1)
                 hashstr = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
             else if(hashsum == 2)
@@ -1013,7 +1014,7 @@ void GenerateVidThumbnails(QString thumbid)
     }
     else // video was 0 length
     {
-        qDebug() << "Item:" << thumbid << " has no filesize.";
+        //qDebug() << "Item:" << thumbid << " has no filesize.";
         try
         {
             QPixmap pixmap(":/videoerror", "PNG");
@@ -1060,7 +1061,7 @@ void GenerateThumbnails(QString thumbid)
         {
 	    Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
             Magick::Image master(blob);
-            qDebug() << "image size:" << master.size().width() << "width by" << master.size().height() << "height";
+            //qDebug() << "image size:" << master.size().width() << "width by" << master.size().height() << "height";
     	    master.quiet(false);
 	    master.resize(thumbgeometry);
 	    master.magick("PNG");
