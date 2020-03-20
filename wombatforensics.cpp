@@ -2160,11 +2160,11 @@ void WombatForensics::HashingFinish()
 
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
-    if(digid == 0)
+    if(digid == 0 && digimgthumbtotal > 0)
 	digimgcountstring = "Thumbnailed: " + QString::number(digcnt) + " of " + QString::number(digimgthumbtotal) + " Images";
-    else if(digid == 1 || digid == 2 || digid == 3)
+    else if((digid == 1 || digid == 2 || digid == 3) && dighashtotal > 0)
         dighashcountstring = "Hashed: " + QString::number(digcnt) + " of " + QString::number(dighashtotal); 
-    else if(digid == 4)
+    else if(digid == 4 && digvidthumbtotal > 0)
 	digvidcountstring = "Thumbnailed: " + QString::number(dignct) + " of + " + QString::number(digvidthumbtotal) + " Videos";
     digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount) + " of " + QString::number(digtotalcount);
     // DETERMINE DIG TYPE (HASH, VID, IMG) THEN UPDATE VARIABLE ACORDINGLY... DIGVIDTHUMBCOUNT = DIGCNT, ETC.
@@ -2965,17 +2965,17 @@ void WombatForensics::AutoSaveState()
 
 void WombatForensics::RotateDig()
 {
-    if(digtimercounter == 0)
+    if(digtimercounter == 0 && digimgthumbtotal > 0)
     {
         digcountlabel->setText(digimgcountstring);
 	digtimercounter++;
     }
-    else if(digtimercounter == 1)
+    else if(digtimercounter == 1 && dighashtotal > 0)
     {
 	digcountlabel->setText(dighashcountstring);
 	digtimercounter++;
     }
-    else if(digtimercounter == 2)
+    else if(digtimercounter == 2 && digvidthumbtotal > 0)
     {
 	digcountlabel->setText(digvidcountstring);
 	digtimercounter++;
