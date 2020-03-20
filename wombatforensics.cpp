@@ -19,7 +19,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
     digcountlabel = new QLabel(this);
-    digcountlabel->setText("Dug: 0 of 0");
+    //digcountlabel->setText("Dug: 0 of 0");
     statuslabel = new StatusLabel();
     //digprogress = new QProgressBar(this);
     //digprogress->setFormat("Dug %v of %m  %p");
@@ -739,9 +739,11 @@ void WombatForensics::ShowExternalViewer()
 
 void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    QApplication::restoreOverrideCursor();
 }
 
 void WombatForensics::ShowFile(const QModelIndex &index)
@@ -1239,7 +1241,8 @@ void WombatForensics::ThashSaveFinish(void)
 {
     qDebug() << "SaveImageHashes Finished";
     StatusUpdate("Thumbnail Library Saved");
-    if(hashingwatcher.isFinished())
+    //if(hashingwatcher.isFinished())
+    if(!digrotatetimer.isActive())
         StatusUpdate("Ready");
     else
         StatusUpdate("Digging Deeper...");
@@ -1250,7 +1253,11 @@ void WombatForensics::ThashFinish(void)
     qDebug() << "LoadImageHashes Finished";
     StatusUpdate("Thumbnail Library Ready");
     ui->actionView_Image_Gallery->setEnabled(true);
-    StatusUpdate("Ready");
+    //if(hashingwatcher.isFinished())
+    if(!digrotatetimer.isActive())
+    	StatusUpdate("Ready");
+    else
+	StatusUpdate("Digging Deeper...");
 }
 
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
@@ -1272,12 +1279,12 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionByteConverter->setEnabled(true);
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
-        StatusUpdate("Loading Hex Contents...");
+        //StatusUpdate("Loading Hex Contents...");
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         LoadHexContents();
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
-        StatusUpdate("Ready");
+        //StatusUpdate("Ready");
     }
 }
 
@@ -1307,6 +1314,7 @@ void WombatForensics::ImgHexMenu(const QPoint &pt)
         selectionmenu->exec(ui->hexview->mapToGlobal(pt));
 }
 
+// I DONT THINK THIS FUNCTION IS USED ANYMORE
 void WombatForensics::UpdateDataTable()
 {
     StatusUpdate("Processing Complete");
@@ -2079,7 +2087,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         else
             digfilelist = GetFileLists(dtype);
         //qDebug() << "digfilelist count:" << digfilelist;
-        digcountlabel->setText("Dug: 0 of " + QString::number(digfilelist.count()));
+	//digcountlabel->setText("Digging...");
+        //digcountlabel->setText("Dug: 0 of " + QString::number(digfilelist.count()));
         //autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
         //digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
@@ -2093,8 +2102,10 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 		    digfilelist.clear();
 		    digfilelist = GetFileLists(4); // images only
                 }
+		//qDebug() << "img list:" << digfilelist.count();
                 digimgthumbtotal = digfilelist.count();
-                if(digimgthumbcount >= 0)
+		digimgcountstring = "Thumbnailed: 0 of " + digimgthumbtotal + " Images";
+                if(digimgthumbtotal > 0)
                 {
                     thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
                     thumbwatcher.setFuture(thumbfuture);
@@ -2108,8 +2119,10 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 		    digfilelist.clear();
         	    digfilelist = GetFileLists(5); // videos only
                 }
+		//qDebug() << "vid list:" << digfilelist.count();
                 digvidthumbtotal = digfilelist.count();
-                if(digvidthumbcount >= 0)
+		digvidcountstring = "Thumbnailed: 0 of " + digvidthumbtotal + " Videos";
+                if(digvidthumbtotal > 0)
                 {
                     videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
                     videowatcher.setFuture(videofuture);
@@ -2126,8 +2139,10 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 hashsum = 1;
             //qInfo() << "Generating Hash...";
                     //StatusUpdate("Generating Hash...");
+	    //qDebug() << "hash list:" << digfilelist.count();
             dighashtotal = digfilelist.count();
-            if(dighashcount >= 0)
+	    dighashcountstring = "Hashed: 0 of " + dighashtotal;
+            if(dighashtotal > 0)
             {
                 hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
                 hashingwatcher.setFuture(hashingfuture);
@@ -2135,13 +2150,15 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         }
     }
     digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal;
-    qDebug() << "dig img count:" << digimgthumbtotal << "dig vid count:" << digvidthumbtotal << "dig hash count:" << dighashtotal << "dig total count:" << digtotalcount;
-    digrotatetimer->start(2000);
+    digtotalcountstring = "Dug: 0 of " + digtotalcount;
+    //qDebug() << "dig img count:" << digimgthumbtotal << "dig vid count:" << digvidthumbtotal << "dig hash count:" << dighashtotal << "dig total count:" << digtotalcount;
+    digrotatetimer->start(1500);
 }
 
 void WombatForensics::HashingFinish()
 {
-    if(thumbwatcher.isFinished())
+    //if(thumbwatcher.isFinished())
+    if(!digrotatetimer.isActive())
         StatusUpdate("Ready");
     else
         StatusUpdate("Digging Deeper...");
@@ -2160,12 +2177,22 @@ void WombatForensics::HashingFinish()
 
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
-    if(digid == 0 && digimgthumbtotal > 0)
+    if(digid == 0)
+    {
+	//digcountlabel->setText("Thumbnailed: " + QString::number(digcnt) + " of " + QString::number(digimgthumbtotal) + " Images");
 	digimgcountstring = "Thumbnailed: " + QString::number(digcnt) + " of " + QString::number(digimgthumbtotal) + " Images";
-    else if((digid == 1 || digid == 2 || digid == 3) && dighashtotal > 0)
+    }
+    else if(digid == 1 || digid == 2 || digid == 3)
+    {
+        //digcountlabel->setText("Hashed: " + QString::number(digcnt) + " of " + QString::number(dighashtotal));
         dighashcountstring = "Hashed: " + QString::number(digcnt) + " of " + QString::number(dighashtotal); 
-    else if(digid == 4 && digvidthumbtotal > 0)
-	digvidcountstring = "Thumbnailed: " + QString::number(dignct) + " of + " + QString::number(digvidthumbtotal) + " Videos";
+    }
+    else if(digid == 4)
+    {
+	//digcountlabel->setText("Thumbnailed: " + QString::number(digcnt) + " of + " + QString::number(digvidthumbtotal) + " Videos");
+	digvidcountstring = "Thumbnailed: " + QString::number(digcnt) + " of " + QString::number(digvidthumbtotal) + " Videos";
+    }
+    //digcountlabel->setText("Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount) + " of " + QString::number(digtotalcount));
     digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount) + " of " + QString::number(digtotalcount);
     // DETERMINE DIG TYPE (HASH, VID, IMG) THEN UPDATE VARIABLE ACORDINGLY... DIGVIDTHUMBCOUNT = DIGCNT, ETC.
     //digcountlabel->setText("Dug: " + QString::number(digcnt) + " of " + QString::number(digfilelist.count()));
@@ -2412,17 +2439,33 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
                 genthmbpath = wombatvariable.tmpmntpath;
                 StatusUpdate("Generating Thumbnails...");
                 //digstatusdialog->SetInitialDigState(0, filesfound);
-                thumbfuture = QtConcurrent::map(listeditems, GenerateThumbnails); // Process All thumbnails
+		QStringList imgitems;
+		imgitems.clear();
+		imgitems = GetFileLists(4); // images file category only
+                digimgthumbtotal = imgitems.count();
+		digimgcountstring = "Thumbnailed: 0 of " + digimgthumbtotal + " Images";
+                thumbfuture = QtConcurrent::map(imgitems, GenerateThumbnails); // Process All thumbnails
                 thumbwatcher.setFuture(thumbfuture);
-                videofuture = QtConcurrent::map(listeditems, GenerateVidThumbnails); // Process all Vid Thumbnails
+		QStringList viditems;
+		viditems.clear();
+		viditems = GetFileLists(5); // videos file category only
+                digvidthumbtotal = viditems.count();
+		digvidcountstring = "Thumbnailed: 0 of " + digvidthumbtotal + " Videos";
+                videofuture = QtConcurrent::map(viditems, GenerateVidThumbnails); // Process all Vid Thumbnails
                 videowatcher.setFuture(videofuture);
+		dighashtotal = 0;
+    		digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal;
+		digtotalcountstring = "Dug: 0 of " + digtotalcount;
+    		digrotatetimer->start(1500);
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
         }
         else
         {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             imagewindow->LoadThumbnails();
+            QApplication::restoreOverrideCursor();
             imagewindow->show();
         }
     }
@@ -2447,6 +2490,10 @@ void WombatForensics::FinishVideos()
         //if((digoptions.isEmpty() || digoptions.contains(4) || digoptions.contains(5)) && thumbwatcher.isFinished())
         //    imagewindow->show();
     }
+    if(digrotatetimer.isActive())
+	StatusUpdate("Digging Deeper...");
+    else
+	StatusUpdate("Ready");
 }
 
 void WombatForensics::FinishThumbs()
@@ -2469,11 +2516,15 @@ void WombatForensics::FinishThumbs()
         //if((digoptions.isEmpty() || digoptions.contains(0) || digoptions.contains(5)) && videowatcher.isFinished())
         //    imagewindow->show();
     }
-    qInfo() << "Digging Complete";
-    qInfo() << "Evidence Ready";
+    if(digrotatetimer.isActive())
+	StatusUpdate("Digging Deeper...");
+    else
+	StatusUpdate("Ready");
+    //qInfo() << "Digging Complete";
+    //qInfo() << "Evidence Ready";
     //LogMessage("Digging Complete");
     //LogMessage("Evidence ready");
-    StatusUpdate("Evidence ready");
+    //StatusUpdate("Evidence ready");
 }
 
 void WombatForensics::on_actionViewerManager_triggered()
@@ -2968,24 +3019,32 @@ void WombatForensics::RotateDig()
     if(digtimercounter == 0 && digimgthumbtotal > 0)
     {
         digcountlabel->setText(digimgcountstring);
-	digtimercounter++;
+	if(dighashtotal > 0)
+	    digtimercounter = 1;
+	else if(digvidthumbtotal > 0)
+	    digtimercounter = 2;
+	else
+	    digtimercounter = 50;
     }
     else if(digtimercounter == 1 && dighashtotal > 0)
     {
 	digcountlabel->setText(dighashcountstring);
-	digtimercounter++;
+	if(digvidthumbtotal > 0)
+	    digtimercounter = 2;
+	else
+	    digtimercounter = 50;
     }
     else if(digtimercounter == 2 && digvidthumbtotal > 0)
     {
 	digcountlabel->setText(digvidcountstring);
-	digtimercounter++;
+	digtimercounter = 50;
     }
     else
     {
 	digcountlabel->setText(digtotalcountstring);
 	digtimercounter = 0;
     }
-    //digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount) + " of " + QString::number(digtotalcount);
+    qDebug() << "dig count:" << digvidthumbcount << digimgthumbcount << dighashcount << digtotalcount;
     if(digtotalcount == (digvidthumbcount + digimgthumbcount + dighashcount))
 	digrotatetimer->stop();
 }
@@ -3102,7 +3161,10 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
 void WombatForensics::FinishWombatCaseFile(void)
 {
     qInfo() << "Current State Saved.";
-    StatusUpdate("Evidence ready");
+    if(digrotatetimer.isActive())
+    	StatusUpdate("Digging Deeper...");
+    else
+	StatusUpdate("Ready");
     //QApplication::restoreOverrideCursor();
     // place status here....
 }

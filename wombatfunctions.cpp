@@ -832,7 +832,7 @@ void GenerateHash(QString objectid)
         TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         qint64 filesize = curitem->Data(2).toLongLong();
         QString hashstr = "";
-        if(filesize > 0)
+        if(filesize > 0 && !objectid.endsWith("-a8")) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
         {
             QByteArray filebytes;
 	    filebytes.clear();
@@ -1034,12 +1034,13 @@ void GenerateVidThumbnails(QString thumbid)
         }
     }
     digvidthumbcount++;
-    isignals->DigUpd(4, digimgthumbcount);
+    isignals->DigUpd(4, digvidthumbcount);
 }
 
 
 void GenerateThumbnails(QString thumbid)
 {
+    qDebug() << "thumbid:" << thumbid;
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     qint64 filesize = curitem->Data(2).toLongLong();
