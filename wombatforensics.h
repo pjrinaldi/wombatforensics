@@ -283,6 +283,13 @@ private:
     //QProgressBar* digprogress;
     TreeNode* actionitem;
     QWidget* cancelwidget;
+    //qint64 imgthumbcount = 0;
+    //qint64 vidthumbcount = 0;
+    //qint64 filehashcount = 0;
+    qint64 digtotalcount = 0;
+    QString digimgcountstring = "";
+    QString digvidcountstring = "";
+    QString dighashcountstring = "";
 };
 
 #endif // WOMBATFORENSICS_H

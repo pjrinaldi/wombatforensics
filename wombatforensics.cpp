@@ -19,7 +19,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
     digcountlabel = new QLabel(this);
-    digcountlabel->setText("Digging Session 1: 0 of 0");
+    digcountlabel->setText("Dug: 0 of 0");
     statuslabel = new StatusLabel();
     //digprogress = new QProgressBar(this);
     //digprogress->setFormat("Dug %v of %m  %p");
@@ -2079,7 +2079,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         else
             digfilelist = GetFileLists(dtype);
         //qDebug() << "digfilelist count:" << digfilelist;
-        digcountlabel->setText("Dig Session 1: 0 of " + QString::number(digfilelist.count()));
+        digcountlabel->setText("Dug: 0 of " + QString::number(digfilelist.count()));
         //autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
         //digstatusdialog->SetInitialDigState(digoptions.at(i), digfilelist.count());
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
@@ -2093,8 +2093,12 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 		    digfilelist.clear();
 		    digfilelist = GetFileLists(4); // images only
                 }
-                thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
-                thumbwatcher.setFuture(thumbfuture);
+                digimgthumbcount = digfilelist.count();
+                if(digimgthumbcount >= 0)
+                {
+                    thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
+                    thumbwatcher.setFuture(thumbfuture);
+                }
             }
             if(digoptions.at(i) == 4 || digoptions.at(i) == 5)
             {
@@ -2104,9 +2108,12 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 		    digfilelist.clear();
         	    digfilelist = GetFileLists(5); // videos only
                 }
-                qDebug() << "video digfilelist.count():" << digfilelist.count();
-                videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
-                videowatcher.setFuture(videofuture);
+                digvidthumbcount = digfilelist.count();
+                if(digvidthumbcount >= 0)
+                {
+                    videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
+                    videowatcher.setFuture(videofuture);
+                }
             }
         }
         else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 || digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
@@ -2119,10 +2126,16 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 hashsum = 1;
             //qInfo() << "Generating Hash...";
                     //StatusUpdate("Generating Hash...");
-            hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
-            hashingwatcher.setFuture(hashingfuture);
+            dighashcount = digfilelist.count();
+            if(dighashcount >= 0)
+            {
+                hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
+                hashingwatcher.setFuture(hashingfuture);
+            }
         }
     }
+    digtotalcount = digimgthumbcount + digvidthumbcount + dighashcount;
+    qDebug() << "dig img count:" << digimgthumbcount << "dig vid count:" << digvidthumbcount << "dig hash count:" << dighashcount << "dig total count:" << digtotalcount;
 }
 
 void WombatForensics::HashingFinish()
@@ -2131,7 +2144,7 @@ void WombatForensics::HashingFinish()
         StatusUpdate("Ready");
     else
         StatusUpdate("Digging Deeper...");
-    digcountlabel->setText("Digging Session 1 Finished");
+    digcountlabel->setText("Digging Finished");
     //digstatusdialog->UpdateDigState(1, -1);
     if(hashsum == 1)
         treenodemodel->UpdateHeaderNode(7, "MD5 Hash");
@@ -2146,7 +2159,7 @@ void WombatForensics::HashingFinish()
 
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
-    digcountlabel->setText("Digging Session 1: " + QString::number(digcnt) + " of " + QString::number(digfilelist.count()));
+    digcountlabel->setText("Dug: " + QString::number(digcnt) + " of " + QString::number(digfilelist.count()));
     //digstatusdialog->UpdateDigState(digid, digcnt);
 }
 void WombatForensics::UpdateExport()
@@ -2340,6 +2353,7 @@ void WombatForensics::on_actionDigDeeper_triggered()
     totalchecked = fileschecked;
     dighashcount = 0;
     digimgthumbcount = 0;
+    digvidthumbcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
     connect(digdeeperdialog, SIGNAL(StartDig(int, QVector<int>)), this, SLOT(DigFiles(int, QVector<int>)), Qt::DirectConnection);
     digdeeperdialog->show();

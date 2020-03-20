@@ -18,6 +18,7 @@ qint64 totalcount = 0;
 qint64 exportcount = 0;
 qint64 dighashcount = 0;
 qint64 digimgthumbcount = 0;
+qint64 digvidthumbcount = 0;
 qint64 errorcount = 0;
 qint64 jumpoffset = 0;
 qint64 filejumpoffset = 0;

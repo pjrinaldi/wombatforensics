@@ -21,7 +21,8 @@ extern qint64 totalcount; // used for dig deeper and export dialogs
 extern qint64 totalchecked; // used for dig deeper and export dialogs
 extern qint64 exportcount; // used for exporting files
 extern qint64 dighashcount; // used for hashing files with dig deeper
-extern qint64 digimgthumbcount; // used for generating thumbnails
+extern qint64 digimgthumbcount; // used for generating image thumbnails
+extern qint64 digvidthumbcount; // used for generating video thumbnails
 extern qint64 errorcount; // export error count variable
 extern qint64 jumpoffset; // stores offset hex value when the user wants to jump to that offset
 extern qint64 filejumpoffset; // stores offset hex value when the user wants to jump to that offset in the file hexviewer
