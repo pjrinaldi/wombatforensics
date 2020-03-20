@@ -191,6 +191,7 @@ private slots:
     void CarveFile(void);
     void PublishResults(void);
     void AutoSaveState(void);
+    void RotateDig(void);
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
     void PrepareEvidenceImage(void);
     void SetHexOffset(void);
@@ -272,6 +273,7 @@ private:
     QFrame* vline3;
     int exporttype;
     int digtype;
+    int digtimercounter = 0;
     bool isvidthumb = false;
     bool isimgthumb = false;
     QVector<int> digoptions;
@@ -283,13 +285,14 @@ private:
     //QProgressBar* digprogress;
     TreeNode* actionitem;
     QWidget* cancelwidget;
-    //qint64 imgthumbcount = 0;
-    //qint64 vidthumbcount = 0;
-    //qint64 filehashcount = 0;
+    qint64 digimgthumbtotal = 0;
+    qint64 digvidthumbtotal = 0;
+    qint64 dighashtotal = 0;
     qint64 digtotalcount = 0;
     QString digimgcountstring = "";
     QString digvidcountstring = "";
     QString dighashcountstring = "";
+    QString digtotalcountstring = "";
 };
 
 #endif // WOMBATFORENSICS_H

@@ -1033,7 +1033,7 @@ void GenerateVidThumbnails(QString thumbid)
             qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
         }
     }
-    digimgthumbcount++;
+    digvidthumbcount++;
     isignals->DigUpd(4, digimgthumbcount);
 }
 

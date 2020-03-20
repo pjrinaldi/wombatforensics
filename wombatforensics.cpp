@@ -216,7 +216,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     autosavetimer = new QTimer(this);
     digrotatetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
-    //connect(digrotatetimer, SIGNAL(timeout()), this, SLOT(RotateDig()));
+    connect(digrotatetimer, SIGNAL(timeout()), this, SLOT(RotateDig()));
 }
 
 void WombatForensics::UnCheckChecked()
@@ -2093,7 +2093,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 		    digfilelist.clear();
 		    digfilelist = GetFileLists(4); // images only
                 }
-                digimgthumbcount = digfilelist.count();
+                digimgthumbtotal = digfilelist.count();
                 if(digimgthumbcount >= 0)
                 {
                     thumbfuture = QtConcurrent::map(digfilelist, GenerateThumbnails); // Process Thumbnails
@@ -2108,7 +2108,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 		    digfilelist.clear();
         	    digfilelist = GetFileLists(5); // videos only
                 }
-                digvidthumbcount = digfilelist.count();
+                digvidthumbtotal = digfilelist.count();
                 if(digvidthumbcount >= 0)
                 {
                     videofuture = QtConcurrent::map(digfilelist, GenerateVidThumbnails);
@@ -2126,7 +2126,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 hashsum = 1;
             //qInfo() << "Generating Hash...";
                     //StatusUpdate("Generating Hash...");
-            dighashcount = digfilelist.count();
+            dighashtotal = digfilelist.count();
             if(dighashcount >= 0)
             {
                 hashingfuture = QtConcurrent::map(digfilelist, GenerateHash);
@@ -2134,8 +2134,9 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             }
         }
     }
-    digtotalcount = digimgthumbcount + digvidthumbcount + dighashcount;
-    qDebug() << "dig img count:" << digimgthumbcount << "dig vid count:" << digvidthumbcount << "dig hash count:" << dighashcount << "dig total count:" << digtotalcount;
+    digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal;
+    qDebug() << "dig img count:" << digimgthumbtotal << "dig vid count:" << digvidthumbtotal << "dig hash count:" << dighashtotal << "dig total count:" << digtotalcount;
+    digrotatetimer->start(2000);
 }
 
 void WombatForensics::HashingFinish()
@@ -2159,7 +2160,15 @@ void WombatForensics::HashingFinish()
 
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
-    digcountlabel->setText("Dug: " + QString::number(digcnt) + " of " + QString::number(digfilelist.count()));
+    if(digid == 0)
+	digimgcountstring = "Thumbnailed: " + QString::number(digcnt) + " of " + QString::number(digimgthumbtotal) + " Images";
+    else if(digid == 1 || digid == 2 || digid == 3)
+        dighashcountstring = "Hashed: " + QString::number(digcnt) + " of " + QString::number(dighashtotal); 
+    else if(digid == 4)
+	digvidcountstring = "Thumbnailed: " + QString::number(dignct) + " of + " + QString::number(digvidthumbtotal) + " Videos";
+    digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount) + " of " + QString::number(digtotalcount);
+    // DETERMINE DIG TYPE (HASH, VID, IMG) THEN UPDATE VARIABLE ACORDINGLY... DIGVIDTHUMBCOUNT = DIGCNT, ETC.
+    //digcountlabel->setText("Dug: " + QString::number(digcnt) + " of " + QString::number(digfilelist.count()));
     //digstatusdialog->UpdateDigState(digid, digcnt);
 }
 void WombatForensics::UpdateExport()
@@ -2952,6 +2961,33 @@ void WombatForensics::AutoSaveState()
     //qInfo() << "Current State Auto Saved.";
     //StatusUpdate("Evidence ready");
     //QApplication::restoreOverrideCursor();
+}
+
+void WombatForensics::RotateDig()
+{
+    if(digtimercounter == 0)
+    {
+        digcountlabel->setText(digimgcountstring);
+	digtimercounter++;
+    }
+    else if(digtimercounter == 1)
+    {
+	digcountlabel->setText(dighashcountstring);
+	digtimercounter++;
+    }
+    else if(digtimercounter == 2)
+    {
+	digcountlabel->setText(digvidcountstring);
+	digtimercounter++;
+    }
+    else
+    {
+	digcountlabel->setText(digtotalcountstring);
+	digtimercounter = 0;
+    }
+    //digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount) + " of " + QString::number(digtotalcount);
+    if(digtotalcount == (digvidthumbcount + digimgthumbcount + dighashcount))
+	digrotatetimer->stop();
 }
 
 void WombatForensics::SetHexOffset()
