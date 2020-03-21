@@ -133,7 +133,7 @@ private slots:
     void UpdateProgress(qint64 count);
     void UpdateExport(void);
     void UpdateDig(int digstateid, int digcount);
-    void HashingFinish(void);
+    //void HashingFinish(void);
     void OpenUpdate(void);
     void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
@@ -160,8 +160,9 @@ private slots:
     void UpdateDataTable(void);
     void UpdateStatus(void);
     void FinishExport(void);
-    void FinishThumbs(void);
-    void FinishVideos(void);
+    //void FinishThumbs(void);
+    //void FinishVideos(void);
+    void FinishDigging(void);
     void ThashFinish(void);
     void ThashSaveFinish(void);
     void ThreadCancelled(void);
@@ -239,17 +240,19 @@ private:
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
-    QFuture<void> thumbfuture;
-    QFutureWatcher<void> thumbwatcher;
-    QFuture<void> hashingfuture;
-    QFutureWatcher<void> hashingwatcher;
+    //QFuture<void> thumbfuture;
+    //QFutureWatcher<void> thumbwatcher;
+    //QFuture<void> hashingfuture;
+    //QFutureWatcher<void> hashingwatcher;
+    QFuture<void> digfuture;
+    QFutureWatcher<void> digwatcher;
     QFutureWatcher<void> thashwatcher;
     QFutureWatcher<void> thashsavewatcher;
     QFutureWatcher<void> exportwatcher;
     QFuture<void> openfuture;
     QFutureWatcher<void> openwatcher;
-    QFuture<void> videofuture;
-    QFutureWatcher<void> videowatcher;
+    //QFuture<void> videofuture;
+    //QFutureWatcher<void> videowatcher;
     //QFutureWatcher<void> carvewatcher;
     QFutureWatcher<void> savewcfwatcher;
 
@@ -276,6 +279,7 @@ private:
     int digtimercounter = 0;
     bool isvidthumb = false;
     bool isimgthumb = false;
+    bool isreport = false;
     QVector<int> digoptions;
     QShortcut* jumpforward;
     QShortcut* jumpbackward;
@@ -293,6 +297,7 @@ private:
     QString digvidcountstring = "";
     QString dighashcountstring = "";
     QString digtotalcountstring = "";
+    QString currentreportpath = "";
 };
 
 #endif // WOMBATFORENSICS_H

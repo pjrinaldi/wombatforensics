@@ -33,6 +33,7 @@ bool FileExists(const std::string& filename);
 void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void GenerateVidThumbnails(QString thumbid);
+void GenerateDigging(QString thumbid);
 void LoadImagesHash(void);
 void SaveImagesHash(void);
 void PopulateTreeModel(QString evidstring);

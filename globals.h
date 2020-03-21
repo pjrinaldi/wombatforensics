@@ -45,6 +45,9 @@ extern QStringList newevidence; // contains the list of new evidence items
 //extern QStringList mftblocklist; // contains the mft blocks. SWITCH TO LOCAL ONCE MFTBLOCKHASH IS IMPLEMENTED
 extern QString exportpath; // path to export files to
 extern bool originalpath; // whether to include original file path or not
+extern bool hashash; // whether we are calculating the hash for the item
+extern bool hasvid; // whether we are calculating the vid thumbnail for the item
+extern bool hasimg; // whether we are calculating the img thumbnail for the item
 extern QString genthmbpath; // global path to place thumbs for each operationgal call of generate thumbnails (mntpt/thumbs or rep/thmb)
 extern QString casepath; // case path settings variable
 extern QString reportpath; // report path settings variable

@@ -856,6 +856,7 @@ void GenerateHash(QString objectid)
         mutex.lock();
         treenodemodel->UpdateNode(objectid, 7, hashstr);
         mutex.unlock();
+        dighashcount++;
 	int hashtype = 1;
         if(hashsum == 1) // MD5
             hashtype = 1;
@@ -863,7 +864,6 @@ void GenerateHash(QString objectid)
             hashtype = 2;
         else if(hashsum == 4) // SHA256
             hashtype = 3;
-        dighashcount++;
         isignals->DigUpd(hashtype, dighashcount);
     }
 }
@@ -1038,6 +1038,24 @@ void GenerateVidThumbnails(QString thumbid)
     isignals->DigUpd(4, digvidthumbcount);
 }
 
+void GenerateDigging(QString thumbid)
+{
+    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+    QString category = curitem->Data(8).toString();
+    //qint64 filesize = curitem->Data(2).toLongLong();
+    bool isvid = false;
+    bool isimg = false;
+    isvid = category.contains("Video");
+    isimg = category.contains("Image");
+    //qDebug() << "thumbid:" << thumbid << "isimg:" << isimg << "isvid:" << isvid;
+    if(hashash)
+        GenerateHash(thumbid);
+    if(hasvid && isvid)
+        GenerateVidThumbnails(thumbid);
+    if(hasimg && isimg)
+        GenerateThumbnails(thumbid);
+}
 
 void GenerateThumbnails(QString thumbid)
 {
@@ -3127,8 +3145,8 @@ QString GenerateCategorySignature(const QMimeType mimetype)
 
 void TransferThumbnails(QString thumbid, QString reppath)
 {
-    if(QFile::exists(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg"))
-        QFile::copy(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".jpg", reppath + "thumbs/" + thumbid + ".jpg");
+    if(QFile::exists(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".png"))
+        QFile::copy(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".png", reppath + "thumbs/" + thumbid + ".png");
 }
 
 void TransferFiles(QString thumbid, QString reppath)

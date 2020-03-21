@@ -47,6 +47,9 @@ QString reportpath = QDir::homePath(); // report path settings variable
 QString exportpath = "";
 QString genthmbpath = "";
 bool originalpath = true;
+bool hashash = false;
+bool hasimg = false;
+bool hasvid = false;
 QString hexstring = "";
 QHash<QString, bool> checkhash;
 QHash<QString, QString> imageshash;
