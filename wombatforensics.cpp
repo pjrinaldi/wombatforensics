@@ -2069,6 +2069,14 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 {
+    digimgthumbtotal = 0;
+    digvidthumbtotal = 0;
+    dighashtotal = 0;
+    digtotalcount = 0;
+    digimgcountstring = "";
+    digvidcountstring = "";
+    dighashcountstring = "";
+    digtotalcountstring = "";
     digtype = dtype;
     digoptions = doptions;
     digfilelist.clear();
