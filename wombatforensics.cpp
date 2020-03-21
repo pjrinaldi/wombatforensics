@@ -2069,6 +2069,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 {
+    // MAYBE THE ISSUE IS LAUNCHING THREE CONCURRENT:MAPS AT ONCE, AND I SHOULD LAUNCH 1 WHICH THEN CALLS EACH GENERATE FOR EACH OPTIONSELECTED... MAYBE SOME SUMMATION THING TO KNOW TO CALL EACH...
     digimgthumbtotal = 0;
     digvidthumbtotal = 0;
     dighashtotal = 0;
