@@ -204,7 +204,6 @@ private slots:
     void ReadBookmarks(void);
     void ShowSearchDialog(void);
     void TagSection(QString ctitle, QString ctag);
-    void FinishCarve(void);
     void LaunchChomp(void);
     void UpdateTimeZone(QString newtz);
     void FinishWombatCaseFile(void);
