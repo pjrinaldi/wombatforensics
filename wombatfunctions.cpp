@@ -3,7 +3,7 @@
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
 
-// Copyright 2015-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 std::string GetTime()

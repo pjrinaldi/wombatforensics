@@ -1,6 +1,6 @@
 #include "wombatforensics.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
@@ -19,11 +19,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
     digcountlabel = new QLabel(this);
-    //digcountlabel->setText("Dug: 0 of 0");
     statuslabel = new StatusLabel();
-    //digprogress = new QProgressBar(this);
-    //digprogress->setFormat("Dug %v of %m  %p");
-    //statuslabel->setAlignment(Qt::AlignRight);
     StatusUpdate("");
     vline1 = new QFrame(this);
     vline1->setFrameStyle(QFrame::VLine | QFrame::Raised);
@@ -45,7 +41,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addWidget(filtercountlabel, 0);
     this->statusBar()->addWidget(vline2, 0);
     this->statusBar()->addWidget(digcountlabel, 0);
-    //this->statusBar()->addWidget(digprogress, 0);
     this->statusBar()->addPermanentWidget(vline3, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
@@ -68,7 +63,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     byteviewer = new ByteConverter(this);
     previewreport = new HtmlViewer(this);
     aboutbox = new AboutBox(this);
-    //digstatusdialog = new DigStatus(this);
     searchdialog = new SearchDialog(ui->hexview, this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
@@ -92,12 +86,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
-    //connect(statuslabel, SIGNAL(clicked()), this, SLOT(ShowDigStatus()), Qt::DirectConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
-    //connect(digstatusdialog, SIGNAL(CancelImgThumbThread()), &thumbwatcher, SLOT(cancel()), Qt::QueuedConnection);
-    //connect(digstatusdialog, SIGNAL(CancelHashThread()), &hashingwatcher, SLOT(cancel()), Qt::QueuedConnection);
-    //connect(digstatusdialog, SIGNAL(CancelVidThumbThread()), &videowatcher, SLOT(cancel()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
