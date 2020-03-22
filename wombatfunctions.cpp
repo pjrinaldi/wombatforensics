@@ -832,8 +832,8 @@ void GenerateHash(QString objectid)
         TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         qint64 filesize = curitem->Data(2).toLongLong();
         QString hashstr = "";
-        //if(filesize > 0 && !objectid.endsWith("-a8")) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
-        if(filesize > 0)
+        //if(filesize > 0)
+        if(filesize > 0 && !objectid.endsWith("-a8")) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
         {
             QByteArray filebytes;
 	    filebytes.clear();
@@ -1625,7 +1625,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
     //return blockstring;
 }
 
-void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, qint64 adssize, QString attrid, QString partpath, bool isres)
+void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString attrid, QString partpath, bool isres)
 {
     //qDebug() << "cur ads parent file:" << curfileinfo->name->name;
     //qDebug() << "cur ads name:" << adsname;
@@ -1810,11 +1810,12 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         }
     }
     //if(blockliststring.compare("") == 0 || blockliststring.compare("0^^") == 0)
+    /*
     if(isresident)
     {
         if(curfileinfo->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
         {
-            NTFS_INFO* ntfsinfo = (NTFS_INFO*)curfileinfo->fs_info;
+            //NTFS_INFO* ntfsinfo = (NTFS_INFO*)curfileinfo->fs_info;
             int recordsize = 0;
             if(ntfsinfo->fs->mft_rsize_c > 0)
             {
@@ -1836,7 +1837,9 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         //else
         //    proplist << "Byte Offset||" << QString::number(curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file system" << endl;
     }
-    else
+    */
+    //else
+    if(!isresident)
     {
         if(blockliststring.split("^^", QString::SkipEmptyParts).count() > 0)
             proplist << "Byte Offset||" << QString::number(blockliststring.split("^^", QString::SkipEmptyParts).at(0).toLongLong()*curfileinfo->fs_info->block_size + curfileinfo->fs_info->offset) << "||Byte Offset for the first block of the file in bytes" << endl;
@@ -3535,7 +3538,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 if(fsfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT)
                 {
                     char* startoffset = new char[0];
-                    char* type = new char[0];
+                    //char* type = new char[0];
                     QByteArray adsba;
                     adsba.clear();
                     qint64 adssize = 0;
@@ -3595,7 +3598,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                             listeditems.append(treeout.at(11)); // UNCOMMENT ONCE I CAN CAPTURE ADS IN GEN HASH AND IMG THUMB
                             filesfound++;
                             isignals->ProgUpd();
-                            WriteAlternateDataStreamProperties(fsfile, QString(fsfile->name->name) + QString(":") + QString(fsattr->name), (qint64)(adssize - fsattr->size + 16), QString::number(fsattr->id), partpath, isresident);
+                            WriteAlternateDataStreamProperties(fsfile, QString(fsfile->name->name) + QString(":") + QString(fsattr->name), QString::number(fsattr->id), partpath, isresident);
+                            //WriteAlternateDataStreamProperties(fsfile, QString(fsfile->name->name) + QString(":") + QString(fsattr->name), (qint64)(adssize - fsattr->size + 16), QString::number(fsattr->id), partpath, isresident);
                                 //}
                             //}
                         }

@@ -1825,7 +1825,9 @@ void WombatForensics::CloseCurrentCase()
     {
         qDebug() << "digwatcher is running....";
         digwatcher.cancel();
-        digfuture.cancel();
+        digwatcher.waitForFinished();
+        //digfuture.cancel();
+        //QThreadPool::globalInstance()->clear();
         qDebug() << "digwatcher is cancelled...";
     }
     else
@@ -1835,9 +1837,15 @@ void WombatForensics::CloseCurrentCase()
     if(ui->dirTreeView->model() != NULL)
     {
         UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        qInfo() << "Selected Item Saved";
         UpdateCheckState();
+        qInfo() << "Check State Saved";
         SaveTaggedList();
+        qInfo() << "Tagged Items Saved";
         SaveHashList();
+        qInfo() << "Hashed Items Saved";
+        SaveImagesHash();
+        qInfo() << "Thumbnailed Videos and Images Saved";
         ui->dirTreeView->clearSelection();
         delete treenodemodel;
         //qDebug() << "treenodemodel deleted";
@@ -1891,6 +1899,7 @@ void WombatForensics::CloseCurrentCase()
     tar_close(casehandle);
     // END TAR METHOD
     StatusUpdate("Saved...");
+    qInfo() << "Wombat Case File Saved";
     statuslabel->repaint();
     statuslabel->adjustSize();
     RemoveTmpFiles();
@@ -3061,6 +3070,7 @@ void WombatForensics::SaveState()
         RewriteSelectedIdContent(selectedindex);
     SaveTaggedList();
     SaveHashList();
+    SaveImagesHash();
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);
 }
