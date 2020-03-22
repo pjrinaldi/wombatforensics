@@ -1825,9 +1825,11 @@ void WombatForensics::CloseCurrentCase()
     {
         qDebug() << "digwatcher is running....";
         digwatcher.cancel();
-        digwatcher.waitForFinished();
+        digfuture.cancel();
+        QThreadPool::globalInstance()->clear();
+        isclosing = true;
+        //digwatcher.waitForFinished();
         //digfuture.cancel();
-        //QThreadPool::globalInstance()->clear();
         qDebug() << "digwatcher is cancelled...";
     }
     else

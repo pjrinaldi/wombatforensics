@@ -50,6 +50,7 @@ bool originalpath = true;
 bool hashash = false;
 bool hasimg = false;
 bool hasvid = false;
+bool isclosing = false;
 QString hexstring = "";
 QHash<QString, bool> checkhash;
 QHash<QString, QString> imageshash;

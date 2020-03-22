@@ -9,10 +9,10 @@ IdFilter::IdFilter(QWidget* parent) : QFrame(parent), ui(new Ui::IdFilter)
     this->hide();
     ui->idlabel->setText("");
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
-    connect(ui->espinBox, SIGNAL(valueChanged(QString)), this, SLOT(BuildId(QString)));
-    connect(ui->vspinBox, SIGNAL(valueChanged(QString)), this, SLOT(BuildId(QString)));
-    connect(ui->pspinBox, SIGNAL(valueChanged(QString)), this, SLOT(BuildId(QString)));
-    connect(ui->fspinBox, SIGNAL(valueChanged(QString)), this, SLOT(BuildId(QString)));
+    connect(ui->espinBox, SIGNAL(textChanged(QString)), this, SLOT(BuildId(QString)));
+    connect(ui->vspinBox, SIGNAL(textChanged(QString)), this, SLOT(BuildId(QString)));
+    connect(ui->pspinBox, SIGNAL(textChanged(QString)), this, SLOT(BuildId(QString)));
+    connect(ui->fspinBox, SIGNAL(textChanged(QString)), this, SLOT(BuildId(QString)));
     connect(ui->echeckBox, SIGNAL(clicked()), this, SLOT(Rebuild()));
     connect(ui->vcheckBox, SIGNAL(clicked()), this, SLOT(Rebuild()));
     connect(ui->pcheckBox, SIGNAL(clicked()), this, SLOT(Rebuild()));
@@ -113,13 +113,13 @@ void IdFilter::BuildId(QString curstring)
 void IdFilter::Rebuild()
 {
     if(sender()->objectName().contains("echeckBox"))
-        emit ui->espinBox->valueChanged(ui->espinBox->text());
+        emit ui->espinBox->textChanged(ui->espinBox->text());
     else if(sender()->objectName().contains("vcheckBox"))
-        emit ui->vspinBox->valueChanged(ui->vspinBox->text());
+        emit ui->vspinBox->textChanged(ui->vspinBox->text());
     else if(sender()->objectName().contains("pcheckBox"))
-        emit ui->pspinBox->valueChanged(ui->pspinBox->text());
+        emit ui->pspinBox->textChanged(ui->pspinBox->text());
     else if(sender()->objectName().contains("fcheckBox"))
-        emit ui->fspinBox->valueChanged(ui->fspinBox->text());
+        emit ui->fspinBox->textChanged(ui->fspinBox->text());
 }
 
 JumpHex::JumpHex(QWidget* parent) : QDialog(parent), ui(new Ui::JumpHex)

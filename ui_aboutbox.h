@@ -15,6 +15,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -25,15 +26,16 @@ public:
     QHBoxLayout *horizontalLayout;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
-    QHBoxLayout *horizontalLayout_2;
-    QLabel *label;
+    QVBoxLayout *verticalLayout;
+    QLabel *piclabel;
+    QLabel *textlabel;
 
     void setupUi(QDialog *AboutBox)
     {
         if (AboutBox->objectName().isEmpty())
             AboutBox->setObjectName(QString::fromUtf8("AboutBox"));
         AboutBox->setWindowModality(Qt::ApplicationModal);
-        AboutBox->resize(564, 500);
+        AboutBox->resize(403, 443);
         AboutBox->setModal(true);
         horizontalLayout = new QHBoxLayout(AboutBox);
         horizontalLayout->setSpacing(0);
@@ -44,25 +46,37 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 562, 498));
-        horizontalLayout_2 = new QHBoxLayout(scrollAreaWidgetContents);
-        horizontalLayout_2->setSpacing(0);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(scrollAreaWidgetContents);
-        label->setObjectName(QString::fromUtf8("label"));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 401, 441));
+        scrollAreaWidgetContents->setCursor(QCursor(Qt::ArrowCursor));
+        verticalLayout = new QVBoxLayout(scrollAreaWidgetContents);
+        verticalLayout->setSpacing(0);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        piclabel = new QLabel(scrollAreaWidgetContents);
+        piclabel->setObjectName(QString::fromUtf8("piclabel"));
+        piclabel->setTextFormat(Qt::PlainText);
+        piclabel->setPixmap(QPixmap(QString::fromUtf8(":/about")));
+        piclabel->setScaledContents(false);
+
+        verticalLayout->addWidget(piclabel);
+
+        textlabel = new QLabel(scrollAreaWidgetContents);
+        textlabel->setObjectName(QString::fromUtf8("textlabel"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy);
-        label->setLineWidth(0);
-        label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
-        label->setWordWrap(true);
-        label->setMargin(15);
-        label->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+        sizePolicy.setHeightForWidth(textlabel->sizePolicy().hasHeightForWidth());
+        textlabel->setSizePolicy(sizePolicy);
+        textlabel->setAutoFillBackground(false);
+        textlabel->setStyleSheet(QString::fromUtf8("background-color: white;"));
+        textlabel->setLineWidth(0);
+        textlabel->setScaledContents(false);
+        textlabel->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+        textlabel->setWordWrap(true);
+        textlabel->setMargin(15);
+        textlabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
 
-        horizontalLayout_2->addWidget(label);
+        verticalLayout->addWidget(textlabel);
 
         scrollArea->setWidget(scrollAreaWidgetContents);
 
@@ -77,7 +91,8 @@ public:
     void retranslateUi(QDialog *AboutBox)
     {
         AboutBox->setWindowTitle(QCoreApplication::translate("AboutBox", "About WombatForensics", nullptr));
-        label->setText(QCoreApplication::translate("AboutBox", "Loading...", nullptr));
+        piclabel->setText(QString());
+        textlabel->setText(QString());
     } // retranslateUi
 
 };

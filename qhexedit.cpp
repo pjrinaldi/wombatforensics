@@ -441,7 +441,7 @@ QByteArray QHexEdit::selectionToByteArray()
 void QHexEdit::setFont(const QFont &font)
 {
     QWidget::setFont(font);
-    _pxCharWidth = fontMetrics().width(QLatin1Char('2'));
+    _pxCharWidth = fontMetrics().horizontalAdvance(QLatin1Char('2'));
     _pxCharHeight = fontMetrics().height();
     _pxGapAdr = _pxCharWidth / 2;
     _pxGapAdrHex = _pxCharWidth;
