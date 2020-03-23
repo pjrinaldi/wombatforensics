@@ -1,7 +1,7 @@
 #ifndef WOMBATFUNCTIONS_H
 #define WOMBATFUNCTIONS_H
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
@@ -61,7 +61,6 @@ void GenerateWombatCaseFile(void);
 void RewriteSelectedIdContent(QModelIndex selectedid);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath);
-//ssize_t PopulateFileBuffer(QString objectid, char** filebuffer);
 QByteArray ReturnFileContent(QString objectid);
 void InitializeHashList(void);
 void InitializeTaggedList(void);
