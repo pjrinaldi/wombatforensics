@@ -1008,9 +1008,15 @@ void GenerateVidThumbnails(QString thumbid)
 
 void GenerateDigging(QString thumbid)
 {
-    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-    QString category = curitem->Data(8).toString();
+    TreeNode* curitem = NULL;
+    QModelIndexList indxlist;
+    QString category = "";
+    if(!isclosing)
+    {
+        indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        category = curitem->Data(8).toString();
+    }
     bool isvid = false;
     bool isimg = false;
     isvid = category.contains("Video");
