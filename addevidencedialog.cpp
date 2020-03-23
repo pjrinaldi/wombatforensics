@@ -1,6 +1,6 @@
 #include "addevidencedialog.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 AddEvidenceDialog::AddEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new Ui::AddEvidenceDialog)
@@ -48,8 +48,8 @@ void AddEvidenceDialog::SelectEvidence()
         }
         else
         {
-            QMessageBox::warning(this, tr("Unsupported Format"), tr("Unfortunately, this format is not supported YET, it should be supported by v0.2"), QMessageBox::Ok);
-            qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.2.";
+            QMessageBox::warning(this, tr("Unsupported Format"), tr("Unfortunately, this format is not supported YET, it should be supported by v0.5"), QMessageBox::Ok);
+            qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.5.";
         }
     }
     else
@@ -103,7 +103,6 @@ void AddEvidenceDialog::dropEvent(QDropEvent* e)
         {
             ui->evidencelist->addItem(url.toLocalFile());
             ui->startbutton->setEnabled(true);
-            //qDebug() << "dropped filepath:" << url.toLocalFile();
         }
     }
 }

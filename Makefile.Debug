@@ -73,7 +73,6 @@ SOURCES       = main.cpp \
 		commands.cpp \
 		settingsdialog.cpp \
 		addevidencedialog.cpp \
-		digstatus.cpp \
 		remevidencedialog.cpp \
 		tskcpp.cpp \
 		tagmanager.cpp \
@@ -99,7 +98,6 @@ SOURCES       = main.cpp \
 		debug/moc_commands.cpp \
 		debug/moc_settingsdialog.cpp \
 		debug/moc_addevidencedialog.cpp \
-		debug/moc_digstatus.cpp \
 		debug/moc_remevidencedialog.cpp \
 		debug/moc_tagmanager.cpp \
 		debug/moc_searchdialog.cpp \
@@ -126,7 +124,6 @@ OBJECTS       = debug/main.o \
 		debug/commands.o \
 		debug/settingsdialog.o \
 		debug/addevidencedialog.o \
-		debug/digstatus.o \
 		debug/remevidencedialog.o \
 		debug/tskcpp.o \
 		debug/tagmanager.o \
@@ -153,7 +150,6 @@ OBJECTS       = debug/main.o \
 		debug/moc_commands.o \
 		debug/moc_settingsdialog.o \
 		debug/moc_addevidencedialog.o \
-		debug/moc_digstatus.o \
 		debug/moc_remevidencedialog.o \
 		debug/moc_tagmanager.o \
 		debug/moc_searchdialog.o \
@@ -167,16 +163,38 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/g++-base.conf \
 		/usr/lib/qt/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt/mkspecs/qconfig.pri \
-		/usr/lib/qt/mkspecs/modules/qt_KIdleTime.pri \
-		/usr/lib/qt/mkspecs/modules/qt_KScreen.pri \
-		/usr/lib/qt/mkspecs/modules/qt_KWaylandClient.pri \
-		/usr/lib/qt/mkspecs/modules/qt_KWaylandServer.pri \
-		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3drender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3drender_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_bodymovin_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts_private.pri \
@@ -184,6 +202,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_designer.pri \
@@ -197,11 +217,14 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fb_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_glx_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_hunspellinputmethod_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_input_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_kms_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
@@ -214,6 +237,10 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_nfc.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_nfc_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_openglextensions.pri \
@@ -226,6 +253,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_positioningquick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmldebug_private.pri \
@@ -239,12 +268,30 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickshapes_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_repparser.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_repparser_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_script.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_script_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_sensors.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_sensors_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_serialport.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql_private.pri \
@@ -258,6 +305,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_vulkan_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient_private.pri \
@@ -341,7 +390,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		commands.h \
 		settingsdialog.h \
 		addevidencedialog.h \
-		digstatus.h \
 		remevidencedialog.h \
 		tskcpp.h \
 		tagmanager.h \
@@ -368,7 +416,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		commands.cpp \
 		settingsdialog.cpp \
 		addevidencedialog.cpp \
-		digstatus.cpp \
 		remevidencedialog.cpp \
 		tskcpp.cpp \
 		tagmanager.cpp \
@@ -382,7 +429,7 @@ TARGET        = debug/wombatforensics
 first: all
 ####### Build rules
 
-debug/wombatforensics: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h $(OBJECTS)  
+debug/wombatforensics: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h $(OBJECTS)  
 	@test -d debug/ || mkdir -p debug/
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -402,9 +449,9 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents wombatforensics.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h digstatus.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp digstatus.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui digstatus.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui $(DISTDIR)/
+	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -500,9 +547,9 @@ compiler_moc_predefs_clean:
 debug/moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++11 -dM -E -o debug/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_digstatus.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp
+compiler_moc_header_make_all: debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_digstatus.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp
+	-$(DEL_FILE) debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp
 debug/moc_wombatforensics.cpp: wombatforensics.h \
 		wombatinclude.h \
 		wombatvariable.h \
@@ -557,8 +604,6 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 		ui_settingsdialog.h \
 		addevidencedialog.h \
 		ui_addevidencedialog.h \
-		digstatus.h \
-		ui_digstatus.h \
 		remevidencedialog.h \
 		ui_remevidencedialog.h \
 		tagmanager.h \
@@ -763,15 +808,6 @@ debug/moc_addevidencedialog.cpp: addevidencedialog.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include addevidencedialog.h -o debug/moc_addevidencedialog.cpp
 
-debug/moc_digstatus.cpp: digstatus.h \
-		wombatinclude.h \
-		globals.h \
-		wombatvariable.h \
-		ui_digstatus.h \
-		debug/moc_predefs.h \
-		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include digstatus.h -o debug/moc_digstatus.cpp
-
 debug/moc_remevidencedialog.cpp: remevidencedialog.h \
 		wombatinclude.h \
 		globals.h \
@@ -820,9 +856,9 @@ compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h
+compiler_uic_make_all: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_digstatus.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h
+	-$(DEL_FILE) ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h
 ui_aboutbox.h: aboutbox.ui \
 		/usr/bin/uic
 	/usr/bin/uic aboutbox.ui -o ui_aboutbox.h
@@ -956,10 +992,6 @@ ui_addevidencedialog.h: addevidencedialog.ui \
 		/usr/bin/uic
 	/usr/bin/uic addevidencedialog.ui -o ui_addevidencedialog.h
 
-ui_digstatus.h: digstatus.ui \
-		/usr/bin/uic
-	/usr/bin/uic digstatus.ui -o ui_digstatus.h
-
 ui_remevidencedialog.h: remevidencedialog.ui \
 		/usr/bin/uic
 	/usr/bin/uic remevidencedialog.ui -o ui_remevidencedialog.h
@@ -1044,8 +1076,6 @@ debug/main.o: main.cpp wombatinclude.h \
 		ui_settingsdialog.h \
 		addevidencedialog.h \
 		ui_addevidencedialog.h \
-		digstatus.h \
-		ui_digstatus.h \
 		remevidencedialog.h \
 		ui_remevidencedialog.h \
 		tagmanager.h \
@@ -1108,8 +1138,6 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		ui_settingsdialog.h \
 		addevidencedialog.h \
 		ui_addevidencedialog.h \
-		digstatus.h \
-		ui_digstatus.h \
 		remevidencedialog.h \
 		ui_remevidencedialog.h \
 		tagmanager.h \
@@ -1283,13 +1311,6 @@ debug/addevidencedialog.o: addevidencedialog.cpp addevidencedialog.h \
 		ui_addevidencedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/addevidencedialog.o addevidencedialog.cpp
 
-debug/digstatus.o: digstatus.cpp digstatus.h \
-		wombatinclude.h \
-		globals.h \
-		wombatvariable.h \
-		ui_digstatus.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/digstatus.o digstatus.cpp
-
 debug/remevidencedialog.o: remevidencedialog.cpp remevidencedialog.h \
 		wombatinclude.h \
 		globals.h \
@@ -1393,9 +1414,6 @@ debug/moc_settingsdialog.o: debug/moc_settingsdialog.cpp
 
 debug/moc_addevidencedialog.o: debug/moc_addevidencedialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/moc_addevidencedialog.o debug/moc_addevidencedialog.cpp
-
-debug/moc_digstatus.o: debug/moc_digstatus.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/moc_digstatus.o debug/moc_digstatus.cpp
 
 debug/moc_remevidencedialog.o: debug/moc_remevidencedialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/moc_remevidencedialog.o debug/moc_remevidencedialog.cpp

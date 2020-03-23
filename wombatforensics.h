@@ -1,7 +1,7 @@
 #ifndef WOMBATFORENSICS_H
 #define WOMBATFORENSICS_H
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
@@ -24,7 +24,6 @@
 #include "aboutbox.h"
 #include "settingsdialog.h"
 #include "addevidencedialog.h"
-#include "digstatus.h"
 #include "remevidencedialog.h"
 #include "tagmanager.h"
 #include "searchdialog.h"
@@ -35,7 +34,6 @@ class StatusLabel : public QLabel
     Q_OBJECT
 
     public:
-        //void ShowDigStatus(void);
 
     protected:
         void mousePressEvent(QMouseEvent* e)
@@ -97,7 +95,6 @@ public:
     AboutBox* aboutbox;
     SettingsDialog* settingsdialog;
     AddEvidenceDialog* addevidencedialog;
-    //DigStatus* digstatusdialog;
     RemEvidenceDialog* remevidencedialog;
     TagManager* tagmanage;
     CarveDialog* carvedialog;
@@ -133,7 +130,6 @@ private slots:
     void UpdateProgress(qint64 count);
     void UpdateExport(void);
     void UpdateDig(int digstateid, int digcount);
-    //void HashingFinish(void);
     void OpenUpdate(void);
     void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
@@ -160,15 +156,12 @@ private slots:
     void UpdateDataTable(void);
     void UpdateStatus(void);
     void FinishExport(void);
-    //void FinishThumbs(void);
-    //void FinishVideos(void);
     void FinishDigging(void);
     void ThashFinish(void);
     void ThashSaveFinish(void);
     void ThreadCancelled(void);
     void ReadXMountOut(void);
     void ReadXMountErr(void);
-    //void ShowDigStatus(void);
     void StatusUpdate(QString tmptext)
     {
         statuslabel->setText(tmptext);
@@ -239,10 +232,6 @@ private:
 
     QFuture<void> sqlfuture;
     QFutureWatcher<void> sqlwatcher;
-    //QFuture<void> thumbfuture;
-    //QFutureWatcher<void> thumbwatcher;
-    //QFuture<void> hashingfuture;
-    //QFutureWatcher<void> hashingwatcher;
     QFuture<void> digfuture;
     QFutureWatcher<void> digwatcher;
     QFutureWatcher<void> thashwatcher;
@@ -250,9 +239,6 @@ private:
     QFutureWatcher<void> exportwatcher;
     QFuture<void> openfuture;
     QFutureWatcher<void> openwatcher;
-    //QFuture<void> videofuture;
-    //QFutureWatcher<void> videowatcher;
-    //QFutureWatcher<void> carvewatcher;
     QFutureWatcher<void> savewcfwatcher;
 
     QProcess* xmntprocess;
@@ -285,7 +271,6 @@ private:
     QShortcut* showitem;
     QTimer* autosavetimer;
     QTimer* digrotatetimer; 
-    //QProgressBar* digprogress;
     TreeNode* actionitem;
     QWidget* cancelwidget;
     qint64 digimgthumbtotal = 0;
