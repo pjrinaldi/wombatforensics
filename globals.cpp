@@ -1,6 +1,6 @@
 #include "globals.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 WombatVariable wombatvariable;
@@ -41,7 +41,6 @@ QStringList digfilelist;
 QStringList listeditems;
 QStringList existingevidence;
 QStringList newevidence;
-//QStringList mftblocklist; // SWITCH TO LOCAL ONCE MFTBLOCKHASH IS IMPLEMENTED
 QString casepath = QDir::homePath(); // case path settings variable
 QString reportpath = QDir::homePath(); // report path settings variable
 QString exportpath = "";
