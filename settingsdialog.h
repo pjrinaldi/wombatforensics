@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "wombatfunctions.h"
 #include "ui_settingsdialog.h"
+#include "carvingfiletypesdialog.h"
 
 namespace Ui
 {
@@ -36,6 +37,8 @@ private:
     Ui::SettingsDialog* ui;
     QList<QByteArray> zoneids;
     QString newtz = "";
+    CarvingFileTypesDialog* filetypedialog;
+    
 protected:
 };
 

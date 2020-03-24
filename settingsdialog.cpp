@@ -6,10 +6,12 @@
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    filetypedialog = new CarvingFileTypesDialog(this);
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(CancelChanges()));
     connect(ui->savebutton, SIGNAL(clicked()), this, SLOT(SaveChanges()));
     connect(ui->casepathbutton, SIGNAL(clicked()), this, SLOT(GetCaseFolder()));
     connect(ui->reportpathbutton, SIGNAL(clicked()), this, SLOT(GetReportFolder()));
+    connect(ui->carvingfiletypepushbutton, SIGNAL(clicked()), filetypedialog, SLOT(ShowText()));
     zoneids.clear();
     zoneids = QTimeZone::availableTimeZoneIds();
     foreach(QByteArray id, zoneids)
