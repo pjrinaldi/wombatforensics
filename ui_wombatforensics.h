@@ -58,6 +58,7 @@ public:
     QAction *actionsearchhex;
     QAction *actionpublishresults;
     QAction *actionchomp;
+    QAction *actionCarve;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -234,6 +235,9 @@ public:
         QIcon icon27;
         icon27.addFile(QString::fromUtf8(":/bar/xchomppng"), QSize(), QIcon::Normal, QIcon::Off);
         actionchomp->setIcon(icon27);
+        actionCarve = new QAction(WombatForensics);
+        actionCarve->setObjectName(QString::fromUtf8("actionCarve"));
+        actionCarve->setIcon(icon12);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -309,6 +313,7 @@ public:
         analysisToolBar->addAction(actionView_Image_Gallery);
         analysisToolBar->addAction(actionDigDeeper);
         analysisToolBar->addAction(actionCopy_Selection_To);
+        analysisToolBar->addAction(actionCarve);
         analysisToolBar->addAction(actionExport_Evidence);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionBookmark_Manager);
@@ -422,6 +427,7 @@ public:
 #if QT_CONFIG(tooltip)
         actionchomp->setToolTip(QCoreApplication::translate("WombatForensics", "Play xchomp While  You Wait", nullptr));
 #endif // QT_CONFIG(tooltip)
+        actionCarve->setText(QCoreApplication::translate("WombatForensics", "File Carving", nullptr));
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());
 #endif // QT_CONFIG(tooltip)

@@ -754,6 +754,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionpreviewreport->setEnabled(false);
     ui->actionsearchhex->setEnabled(false);
     ui->actionpublishresults->setEnabled(false);
+    ui->actionCarve->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -975,6 +976,7 @@ void WombatForensics::OpenUpdate()
         ui->actionRemove_Evidence->setEnabled(true);
         ui->actionSaveState->setEnabled(true);
         ui->actionDigDeeper->setEnabled(true);
+        ui->actionCarve->setEnabled(true);
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         //ui->actionExpandAll->setEnabled(true);
@@ -1176,6 +1178,7 @@ void WombatForensics::UpdateStatus()
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
+    ui->actionCarve->setEnabled(true);
     ui->actionsearchhex->setEnabled(true);
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
@@ -2075,6 +2078,15 @@ void WombatForensics::on_actionExport_triggered()
     exportdialog->show();
 }
 
+void WombatForensics::on_actionCarve_triggered()
+{
+    QStringList partitionlist;
+    QStringList filetypelist;
+
+    filecarvedialog = new FileCarvingDialog(this);
+    //connect(filecarvingdialog, SIGNAL(StartCarve()), this, SLOT(StartCarving()), Qt::DirectConnection);
+    filecarvedialog->show();
+}
 void WombatForensics::on_actionDigDeeper_triggered()
 {
     totalcount = filesfound;

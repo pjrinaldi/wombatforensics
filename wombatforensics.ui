@@ -156,6 +156,7 @@
    <addaction name="actionView_Image_Gallery"/>
    <addaction name="actionDigDeeper"/>
    <addaction name="actionCopy_Selection_To"/>
+   <addaction name="actionCarve"/>
    <addaction name="actionExport_Evidence"/>
    <addaction name="separator"/>
    <addaction name="actionBookmark_Manager"/>
@@ -551,6 +552,15 @@
    </property>
    <property name="toolTip">
     <string>Play xchomp While  You Wait</string>
+   </property>
+  </action>
+  <action name="actionCarve">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/carvetofile</normaloff>:/bar/carvetofile</iconset>
+   </property>
+   <property name="text">
+    <string>File Carving</string>
    </property>
   </action>
  </widget>

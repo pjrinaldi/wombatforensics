@@ -77,7 +77,8 @@ SOURCES       = main.cpp \
 		tskcpp.cpp \
 		tagmanager.cpp \
 		searchdialog.cpp \
-		carvedialog.cpp debug/qrc_wombatforensics.cpp \
+		carvedialog.cpp \
+		filecarvingdialog.cpp debug/qrc_wombatforensics.cpp \
 		debug/moc_wombatforensics.cpp \
 		debug/moc_exportdialog.cpp \
 		debug/moc_globals.cpp \
@@ -101,7 +102,8 @@ SOURCES       = main.cpp \
 		debug/moc_remevidencedialog.cpp \
 		debug/moc_tagmanager.cpp \
 		debug/moc_searchdialog.cpp \
-		debug/moc_carvedialog.cpp
+		debug/moc_carvedialog.cpp \
+		debug/moc_filecarvingdialog.cpp
 OBJECTS       = debug/main.o \
 		debug/wombatforensics.o \
 		debug/wombatfunctions.o \
@@ -129,6 +131,7 @@ OBJECTS       = debug/main.o \
 		debug/tagmanager.o \
 		debug/searchdialog.o \
 		debug/carvedialog.o \
+		debug/filecarvingdialog.o \
 		debug/qrc_wombatforensics.o \
 		debug/moc_wombatforensics.o \
 		debug/moc_exportdialog.o \
@@ -153,7 +156,8 @@ OBJECTS       = debug/main.o \
 		debug/moc_remevidencedialog.o \
 		debug/moc_tagmanager.o \
 		debug/moc_searchdialog.o \
-		debug/moc_carvedialog.o
+		debug/moc_carvedialog.o \
+		debug/moc_filecarvingdialog.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \
@@ -341,7 +345,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		tskcpp.h \
 		tagmanager.h \
 		searchdialog.h \
-		carvedialog.h main.cpp \
+		carvedialog.h \
+		filecarvingdialog.h main.cpp \
 		wombatforensics.cpp \
 		wombatfunctions.cpp \
 		exportdialog.cpp \
@@ -367,7 +372,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		tskcpp.cpp \
 		tagmanager.cpp \
 		searchdialog.cpp \
-		carvedialog.cpp
+		carvedialog.cpp \
+		filecarvingdialog.cpp
 QMAKE_TARGET  = wombatforensics
 DESTDIR       = debug/
 TARGET        = debug/wombatforensics
@@ -376,7 +382,7 @@ TARGET        = debug/wombatforensics
 first: all
 ####### Build rules
 
-debug/wombatforensics: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h $(OBJECTS)  
+debug/wombatforensics: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h ui_filecarvingdialog.h $(OBJECTS)  
 	@test -d debug/ || mkdir -p debug/
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -396,9 +402,9 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents wombatforensics.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui $(DISTDIR)/
+	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui filecarvingdialog.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -494,9 +500,9 @@ compiler_moc_predefs_clean:
 debug/moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++11 -dM -E -o debug/moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp
+compiler_moc_header_make_all: debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp debug/moc_filecarvingdialog.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp
+	-$(DEL_FILE) debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp debug/moc_filecarvingdialog.cpp
 debug/moc_wombatforensics.cpp: wombatforensics.h \
 		wombatinclude.h \
 		wombatvariable.h \
@@ -557,6 +563,7 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 		ui_tagmanager.h \
 		carvedialog.h \
 		ui_carvedialog.h \
+		filecarvingdialog.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include wombatforensics.h -o debug/moc_wombatforensics.cpp
@@ -799,13 +806,20 @@ debug/moc_carvedialog.cpp: carvedialog.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include carvedialog.h -o debug/moc_carvedialog.cpp
 
+debug/moc_filecarvingdialog.cpp: filecarvingdialog.h \
+		wombatinclude.h \
+		wombatvariable.h \
+		debug/moc_predefs.h \
+		/usr/bin/moc
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include filecarvingdialog.h -o debug/moc_filecarvingdialog.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h
+compiler_uic_make_all: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h ui_filecarvingdialog.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h
+	-$(DEL_FILE) ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h ui_filecarvingdialog.h
 ui_aboutbox.h: aboutbox.ui \
 		/usr/bin/uic
 	/usr/bin/uic aboutbox.ui -o ui_aboutbox.h
@@ -959,6 +973,10 @@ ui_carvedialog.h: carvedialog.ui \
 		/usr/bin/uic
 	/usr/bin/uic carvedialog.ui -o ui_carvedialog.h
 
+ui_filecarvingdialog.h: filecarvingdialog.ui \
+		/usr/bin/uic
+	/usr/bin/uic filecarvingdialog.ui -o ui_filecarvingdialog.h
+
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
 compiler_yacc_impl_make_all:
@@ -1028,7 +1046,8 @@ debug/main.o: main.cpp wombatinclude.h \
 		tagmanager.h \
 		ui_tagmanager.h \
 		carvedialog.h \
-		ui_carvedialog.h
+		ui_carvedialog.h \
+		filecarvingdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/main.o main.cpp
 
 debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
@@ -1090,7 +1109,8 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		tagmanager.h \
 		ui_tagmanager.h \
 		carvedialog.h \
-		ui_carvedialog.h
+		ui_carvedialog.h \
+		filecarvingdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/wombatforensics.o wombatforensics.cpp
 
 debug/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
@@ -1299,6 +1319,12 @@ debug/carvedialog.o: carvedialog.cpp carvedialog.h \
 		ui_carvedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/carvedialog.o carvedialog.cpp
 
+debug/filecarvingdialog.o: filecarvingdialog.cpp filecarvingdialog.h \
+		wombatinclude.h \
+		wombatvariable.h \
+		ui_filecarvingdialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/filecarvingdialog.o filecarvingdialog.cpp
+
 debug/qrc_wombatforensics.o: debug/qrc_wombatforensics.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/qrc_wombatforensics.o debug/qrc_wombatforensics.cpp
 
@@ -1373,6 +1399,9 @@ debug/moc_searchdialog.o: debug/moc_searchdialog.cpp
 
 debug/moc_carvedialog.o: debug/moc_carvedialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/moc_carvedialog.o debug/moc_carvedialog.cpp
+
+debug/moc_filecarvingdialog.o: debug/moc_filecarvingdialog.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/moc_filecarvingdialog.o debug/moc_filecarvingdialog.cpp
 
 ####### Install
 

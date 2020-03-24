@@ -28,6 +28,7 @@
 #include "tagmanager.h"
 #include "searchdialog.h"
 #include "carvedialog.h"
+#include "filecarvingdialog.h"
 
 class StatusLabel : public QLabel
 {
@@ -98,6 +99,7 @@ public:
     RemEvidenceDialog* remevidencedialog;
     TagManager* tagmanage;
     CarveDialog* carvedialog;
+    FileCarvingDialog* filecarvedialog;
 
 signals:
     void CancelCurrentThread();
@@ -113,6 +115,7 @@ private slots:
     void on_actionCheck_triggered();
     void on_actionExport_triggered();
     void on_actionDigDeeper_triggered();
+    void on_actionCarve_triggered();
     void on_actionView_Properties_triggered(bool checked);
     void on_actionView_File_triggered(bool checked);
     void on_actionView_Image_Gallery_triggered(bool checked);
