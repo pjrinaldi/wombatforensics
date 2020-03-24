@@ -247,6 +247,7 @@ private:
     QProcess* xmntprocess;
 
     QFile casedatafile;
+    // QFile carvingfiletypesfile; maybe do or don't need here, I might get this from a resource
     off_t offset() const;
     QPushButton* lineup;
     QPushButton* linedown;

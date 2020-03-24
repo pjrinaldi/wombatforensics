@@ -2082,11 +2082,6 @@ void WombatForensics::on_actionCarve_triggered()
 {
     // NEED TO GENERATE PARTITION LIST AS THEY ARE ADDED...
     // NEED TO GENERATE FILETYPE LIST FROM SETTINGS FILE
-    //QStringList partitionlist;
-    //QStringList filetypelist;
-    //QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 0, QModelIndex()), Qt::DecorationRole, QVariant(QIcon(":/basic/treefs")), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    //qDebug() << "indexlist count:" << indexlist.count();
-    //QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     filecarvedialog = new FileCarvingDialog(this);
     //connect(filecarvingdialog, SIGNAL(StartCarve()), this, SLOT(StartCarving()), Qt::DirectConnection);
     filecarvedialog->show();
