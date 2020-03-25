@@ -11,7 +11,6 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -39,7 +38,6 @@ public:
     QSpacerItem *horizontalSpacer;
     QPushButton *cancelButton;
     QPushButton *processButton;
-    QButtonGroup *exportButtonGroup;
 
     void setupUi(QDialog *FileCarvingDialog)
     {
@@ -59,6 +57,7 @@ public:
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
         verticalLayout_3 = new QVBoxLayout(groupBox_2);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         partitionlist = new QListWidget(groupBox_2);
@@ -79,6 +78,7 @@ public:
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         verticalLayout_4 = new QVBoxLayout(groupBox);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        verticalLayout_4->setContentsMargins(0, 0, 0, 0);
         filetypelist = new QListWidget(groupBox);
         filetypelist->setObjectName(QString::fromUtf8("filetypelist"));
         filetypelist->setProperty("showDropIndicator", QVariant(false));

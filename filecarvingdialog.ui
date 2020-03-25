@@ -55,6 +55,18 @@
         <string>Carve the Following Partitions(s)</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
@@ -81,6 +93,18 @@
         <string>For the Following File Types</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QListWidget" name="filetypelist">
           <property name="showDropIndicator" stdset="0">
@@ -170,7 +194,4 @@
    </hints>
   </connection>
  </connections>
- <buttongroups>
-  <buttongroup name="exportButtonGroup"/>
- </buttongroups>
 </ui>

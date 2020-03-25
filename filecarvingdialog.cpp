@@ -11,6 +11,7 @@ FileCarvingDialog::FileCarvingDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     parentwidget = parent;
+    connect(ui->processButton, SIGNAL(clicked()), this, SLOT(EnableProcess()));
     /*
     checkcount = curcheckcount;
     QString checktext = QString("Checked (") + QString::number(checkcount) + QString(")");
@@ -45,6 +46,7 @@ FileCarvingDialog::~FileCarvingDialog()
 
 void FileCarvingDialog::EnableProcess(bool checked)
 {
+    this->close();
     //ui->processButton->setEnabled(checked);
     /*
     if(ui->hashcheckbox->isChecked())
