@@ -734,6 +734,11 @@ void WombatForensics::InitializeAppStructure()
         QFile chompfile(homepath + "xchomp");
         chompfile.setPermissions(QFileDevice::ExeOwner);
     }
+    QFile ctypes(homepath + "carvetypes");
+    if(!FileExists(QString(homepath + "carvetypes").toStdString()))
+    {
+        QFile::copy(":/files/carvetypes", homepath + "carvetypes");
+    }
     viewmanage = new ViewerManager(this);
     settingsdialog = new SettingsDialog(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));

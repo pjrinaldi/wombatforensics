@@ -6,6 +6,7 @@
 CarvingFileTypesDialog::CarvingFileTypesDialog(QWidget* parent) : QDialog(parent), ui(new Ui::CarvingFileTypesDialog)
 {
     ui->setupUi(this);
+    ui->filetypeseditor->setVisible(false);
     //decodedstring = "default";
     //qDebug() << "decodedstring at start:" << decodedstring;
     //FindCodecs();
@@ -27,6 +28,44 @@ void CarvingFileTypesDialog::HideClicked()
 
 void CarvingFileTypesDialog::ShowText()
 {
+    // Load Files..
+    QString homepath = QDir::homePath();
+    homepath += "/.local/share/wombatforensics/";
+    QFile ctypes(homepath + "carvetypes");
+    if(!ctypes.isOpen())
+        ctypes.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(ctypes.isOpen())
+    {
+        QTextStream in(&ctypes);
+        int rowcount = 0;
+        while(!in.atEnd())
+        {
+            QString tmpstr = "";
+            QStringList linelist = in.readLine().split(",");
+            for(int i=0; i < linelist.count(); i++)
+            {
+                ui->filetypestablewidget->setItem(rowcount, i, new QTableWidgetItem(linelist.at(i)));
+            }
+            rowcount++;
+        }
+        /*
+        propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        QTextStream in(&propfile);
+        while(!in.atEnd())
+        {
+            QString tmpstr = "";
+            QString line = in.readLine();
+            if(line.split("||").at(1).contains("^^"))
+                tmpstr = QString(line.split("||").at(1)).replace(QString("^^"), QString(", "));
+            else
+                tmpstr = line.split("||").at(1);
+            propertylist << line.split("||").at(0) << tmpstr << line.split("||").at(2);
+        }
+        propfile.close();
+        */
+        //ui->filetypeseditor->setPlainText(ctypes.readAll());
+    }
+    ctypes.close();
     this->show();
 }
 /*
