@@ -6,21 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>727</width>
-    <height>455</height>
+    <width>787</width>
+    <height>473</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Carving File Types Editor</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="1">
-    <widget class="QPushButton" name="savepushbutton">
-     <property name="text">
-      <string>Save</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
     <spacer name="horizontalSpacer">
      <property name="orientation">
@@ -34,7 +27,21 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="0" column="2">
+    <widget class="QPushButton" name="savepushbutton">
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Save &amp;&amp; Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="4">
     <widget class="QPlainTextEdit" name="filetypeseditor">
      <property name="documentTitle">
       <string/>
@@ -42,6 +49,163 @@
      <property name="lineWrapMode">
       <enum>QPlainTextEdit::WidgetWidth</enum>
      </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="4">
+    <widget class="QTableWidget" name="filetypestablewidget">
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="dragDropOverwriteMode">
+      <bool>false</bool>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::SolidLine</enum>
+     </property>
+     <property name="rowCount">
+      <number>3</number>
+     </property>
+     <property name="columnCount">
+      <number>6</number>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>100</number>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <row/>
+     <row/>
+     <row/>
+     <column>
+      <property name="text">
+       <string>Category</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Description</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Header</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Footer</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Extension</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Maximum File Size</string>
+      </property>
+     </column>
+     <item row="0" column="0">
+      <property name="text">
+       <string>Pictures</string>
+      </property>
+     </item>
+     <item row="0" column="1">
+      <property name="text">
+       <string>Generic JPEG</string>
+      </property>
+     </item>
+     <item row="0" column="2">
+      <property name="text">
+       <string>FFD8FFE0????4A464946</string>
+      </property>
+     </item>
+     <item row="0" column="3">
+      <property name="text">
+       <string>FFD9</string>
+      </property>
+     </item>
+     <item row="0" column="4">
+      <property name="text">
+       <string>JPG</string>
+      </property>
+     </item>
+     <item row="0" column="5">
+      <property name="text">
+       <string>2500000</string>
+      </property>
+     </item>
+     <item row="1" column="0">
+      <property name="text">
+       <string>Pictures</string>
+      </property>
+     </item>
+     <item row="1" column="1">
+      <property name="text">
+       <string>Exif JPEG</string>
+      </property>
+     </item>
+     <item row="1" column="2">
+      <property name="text">
+       <string>FFD8FFE1????45786966</string>
+      </property>
+     </item>
+     <item row="1" column="3">
+      <property name="text">
+       <string>FFD9</string>
+      </property>
+     </item>
+     <item row="1" column="4">
+      <property name="text">
+       <string>JPG</string>
+      </property>
+     </item>
+     <item row="1" column="5">
+      <property name="text">
+       <string>2500000</string>
+      </property>
+     </item>
+     <item row="2" column="0">
+      <property name="text">
+       <string>Pictures</string>
+      </property>
+     </item>
+     <item row="2" column="1">
+      <property name="text">
+       <string>SPIFF JPEG</string>
+      </property>
+     </item>
+     <item row="2" column="2">
+      <property name="text">
+       <string>FFD8FFE8????5350494646</string>
+      </property>
+     </item>
+     <item row="2" column="3">
+      <property name="text">
+       <string>FFD9</string>
+      </property>
+     </item>
+     <item row="2" column="4">
+      <property name="text">
+       <string>JPG</string>
+      </property>
+     </item>
+     <item row="2" column="5">
+      <property name="text">
+       <string>2500000</string>
+      </property>
+     </item>
     </widget>
    </item>
   </layout>
