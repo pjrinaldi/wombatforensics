@@ -7,6 +7,10 @@ CarvingFileTypesDialog::CarvingFileTypesDialog(QWidget* parent) : QDialog(parent
 {
     ui->setupUi(this);
     ui->filetypeseditor->setVisible(false);
+    connect(ui->addrowpushbutton, SIGNAL(clicked()), this, SLOT(AddRow()));
+    connect(ui->closebutton, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui->savepushbutton, SIGNAL(clicked()), this, SLOT(Save()));
+    connect(ui->saveclosepushbutton, SIGNAL(clicked()), this, SLOT(SaveClose()));
     //decodedstring = "default";
     //qDebug() << "decodedstring at start:" << decodedstring;
     //FindCodecs();
@@ -29,6 +33,7 @@ void CarvingFileTypesDialog::HideClicked()
 void CarvingFileTypesDialog::ShowText()
 {
     // Load Files..
+    int trowcount = ui->filetypestablewidget->rowCount();
     QString homepath = QDir::homePath();
     homepath += "/.local/share/wombatforensics/";
     QFile ctypes(homepath + "carvetypes");
@@ -40,33 +45,58 @@ void CarvingFileTypesDialog::ShowText()
         int rowcount = 0;
         while(!in.atEnd())
         {
+            if(rowcount == trowcount)
+                ui->filetypestablewidget->setRowCount(trowcount + 5);
             QString tmpstr = "";
             QStringList linelist = in.readLine().split(",");
             for(int i=0; i < linelist.count(); i++)
             {
                 ui->filetypestablewidget->setItem(rowcount, i, new QTableWidgetItem(linelist.at(i)));
             }
+            qDebug() << "rowcount:" << rowcount;
             rowcount++;
         }
-        /*
-        propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        QTextStream in(&propfile);
-        while(!in.atEnd())
-        {
-            QString tmpstr = "";
-            QString line = in.readLine();
-            if(line.split("||").at(1).contains("^^"))
-                tmpstr = QString(line.split("||").at(1)).replace(QString("^^"), QString(", "));
-            else
-                tmpstr = line.split("||").at(1);
-            propertylist << line.split("||").at(0) << tmpstr << line.split("||").at(2);
-        }
-        propfile.close();
-        */
         //ui->filetypeseditor->setPlainText(ctypes.readAll());
     }
     ctypes.close();
+    for(int i=0; i < ui->filetypestablewidget->columnCount(); i++)
+        ui->filetypestablewidget->resizeColumnToContents(i);
     this->show();
+}
+
+void CarvingFileTypesDialog::Save()
+{
+    QString homepath = QDir::homePath();
+    homepath += "/.local/share/wombatforensics/carvetypes";
+    qDebug() << "homepath:" << homepath;
+    QFile ctypes(homepath);
+    if(!ctypes.isOpen())
+        ctypes.open(QIODevice::WriteOnly | QIODevice::Text);
+    else
+        qDebug() << "ctypes is already open";
+    if(ctypes.isOpen())
+    {
+        QTextStream out(&ctypes);
+        qDebug() << "rowcount:" << ui->filetypestablewidget->rowCount();
+        for(int i=0; i < ui->filetypestablewidget->rowCount(); i++)
+        {
+            out << ui->filetypestablewidget->item(i, 0)->text() << "," << ui->filetypestablewidget->item(i, 1)->text() << "," << ui->filetypestablewidget->item(i, 2)->text() << "," << ui->filetypestablewidget->item(i, 3)->text() << "," << ui->filetypestablewidget->item(i, 4)->text() << "," << ui->filetypestablewidget->item(i, 5)->text() << endl;
+        }
+    }
+    else
+        qDebug() << "ctypes failed to open.";
+    ctypes.close();
+}
+
+void CarvingFileTypesDialog::SaveClose()
+{
+    Save();
+    this->close();
+}
+
+void CarvingFileTypesDialog::AddRow()
+{
+    ui->filetypestablewidget->insertRow(ui->filetypestablewidget->rowCount());
 }
 /*
 void CarvingFileTypesDialog::ShowText(const QModelIndex &index)

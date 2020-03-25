@@ -6,14 +6,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>787</width>
-    <height>473</height>
+    <width>957</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Carving File Types Editor</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="4">
+    <widget class="QPushButton" name="savepushbutton">
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
+    <widget class="QPushButton" name="saveclosepushbutton">
+     <property name="text">
+      <string>Save &amp;&amp; Close</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <spacer name="horizontalSpacer">
      <property name="orientation">
@@ -28,30 +42,20 @@
     </spacer>
    </item>
    <item row="0" column="2">
-    <widget class="QPushButton" name="savepushbutton">
+    <widget class="QPushButton" name="addrowpushbutton">
      <property name="text">
-      <string>Save</string>
+      <string>Add Row</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QPushButton" name="pushButton">
+   <item row="0" column="6">
+    <widget class="QPushButton" name="closebutton">
      <property name="text">
-      <string>Save &amp;&amp; Close</string>
+      <string>Close</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="4">
-    <widget class="QPlainTextEdit" name="filetypeseditor">
-     <property name="documentTitle">
-      <string/>
-     </property>
-     <property name="lineWrapMode">
-      <enum>QPlainTextEdit::WidgetWidth</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="4">
+   <item row="2" column="0" colspan="7">
     <widget class="QTableWidget" name="filetypestablewidget">
      <property name="showDropIndicator" stdset="0">
       <bool>false</bool>
@@ -73,6 +77,9 @@
      </property>
      <attribute name="horizontalHeaderCascadingSectionResizes">
       <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderMinimumSectionSize">
+      <number>60</number>
      </attribute>
      <attribute name="horizontalHeaderDefaultSectionSize">
       <number>100</number>
@@ -116,96 +123,16 @@
        <string>Maximum File Size</string>
       </property>
      </column>
-     <item row="0" column="0">
-      <property name="text">
-       <string>Pictures</string>
-      </property>
-     </item>
-     <item row="0" column="1">
-      <property name="text">
-       <string>Generic JPEG</string>
-      </property>
-     </item>
-     <item row="0" column="2">
-      <property name="text">
-       <string>FFD8FFE0????4A464946</string>
-      </property>
-     </item>
-     <item row="0" column="3">
-      <property name="text">
-       <string>FFD9</string>
-      </property>
-     </item>
-     <item row="0" column="4">
-      <property name="text">
-       <string>JPG</string>
-      </property>
-     </item>
-     <item row="0" column="5">
-      <property name="text">
-       <string>2500000</string>
-      </property>
-     </item>
-     <item row="1" column="0">
-      <property name="text">
-       <string>Pictures</string>
-      </property>
-     </item>
-     <item row="1" column="1">
-      <property name="text">
-       <string>Exif JPEG</string>
-      </property>
-     </item>
-     <item row="1" column="2">
-      <property name="text">
-       <string>FFD8FFE1????45786966</string>
-      </property>
-     </item>
-     <item row="1" column="3">
-      <property name="text">
-       <string>FFD9</string>
-      </property>
-     </item>
-     <item row="1" column="4">
-      <property name="text">
-       <string>JPG</string>
-      </property>
-     </item>
-     <item row="1" column="5">
-      <property name="text">
-       <string>2500000</string>
-      </property>
-     </item>
-     <item row="2" column="0">
-      <property name="text">
-       <string>Pictures</string>
-      </property>
-     </item>
-     <item row="2" column="1">
-      <property name="text">
-       <string>SPIFF JPEG</string>
-      </property>
-     </item>
-     <item row="2" column="2">
-      <property name="text">
-       <string>FFD8FFE8????5350494646</string>
-      </property>
-     </item>
-     <item row="2" column="3">
-      <property name="text">
-       <string>FFD9</string>
-      </property>
-     </item>
-     <item row="2" column="4">
-      <property name="text">
-       <string>JPG</string>
-      </property>
-     </item>
-     <item row="2" column="5">
-      <property name="text">
-       <string>2500000</string>
-      </property>
-     </item>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="7">
+    <widget class="QPlainTextEdit" name="filetypeseditor">
+     <property name="documentTitle">
+      <string/>
+     </property>
+     <property name="lineWrapMode">
+      <enum>QPlainTextEdit::WidgetWidth</enum>
+     </property>
     </widget>
    </item>
   </layout>

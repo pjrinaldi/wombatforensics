@@ -738,6 +738,8 @@ void WombatForensics::InitializeAppStructure()
     if(!FileExists(QString(homepath + "carvetypes").toStdString()))
     {
         QFile::copy(":/files/carvetypes", homepath + "carvetypes");
+        QFile ctypefile(homepath + "carvetypes");
+        ctypefile.setPermissions(QFileDevice::WriteOwner | QFileDevice::ReadOwner | QFileDevice::WriteGroup | QFileDevice::ReadGroup | QFileDevice::ReadOther);
     }
     viewmanage = new ViewerManager(this);
     settingsdialog = new SettingsDialog(this);

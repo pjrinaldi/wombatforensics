@@ -1,7 +1,7 @@
 #ifndef CARVINGFILETYPESDIALOG_H
 #define CARVINGFILETYPESDIALOG_H
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 #include "wombatinclude.h"
@@ -27,6 +27,9 @@ public:
 private slots:
     void ShowText();
     void HideClicked();
+    void AddRow();
+    void SaveClose();
+    void Save();
     //void UpdateEncoding(int unused);
 signals:
     void HideCarvingFileTypesDialogWindow(bool checkstate);
