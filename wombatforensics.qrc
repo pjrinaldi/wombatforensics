@@ -23,6 +23,9 @@
     <file alias="log">Resources/utilities-terminal.svg</file>
     <file alias="appicon">./Resources/wombat_32.ico</file>
   </qresource>
+  <qresource prefix="files">
+    <file alias="carvetypes">Resources/carvetypes</file>
+  </qresource>
   <qresource prefix="/basic">
     <file alias="missingvideo">Resources/filmstrip.png</file>
     <file alias="carvedfile">Resources/carvedfile.svg</file>
