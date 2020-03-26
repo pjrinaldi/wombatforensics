@@ -64,6 +64,11 @@ public:
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         partitionlist = new QListWidget(groupBox_2);
         partitionlist->setObjectName(QString::fromUtf8("partitionlist"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(1);
+        sizePolicy.setHeightForWidth(partitionlist->sizePolicy().hasHeightForWidth());
+        partitionlist->setSizePolicy(sizePolicy);
         partitionlist->setProperty("showDropIndicator", QVariant(false));
         partitionlist->setAlternatingRowColors(true);
         partitionlist->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -86,6 +91,8 @@ public:
         __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
         filetypetree->setHeaderItem(__qtreewidgetitem);
         filetypetree->setObjectName(QString::fromUtf8("filetypetree"));
+        sizePolicy.setHeightForWidth(filetypetree->sizePolicy().hasHeightForWidth());
+        filetypetree->setSizePolicy(sizePolicy);
         filetypetree->setProperty("showDropIndicator", QVariant(false));
         filetypetree->setSelectionMode(QAbstractItemView::SingleSelection);
         filetypetree->setUniformRowHeights(true);
@@ -114,11 +121,11 @@ public:
 
         processButton = new QPushButton(FileCarvingDialog);
         processButton->setObjectName(QString::fromUtf8("processButton"));
-        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(processButton->sizePolicy().hasHeightForWidth());
-        processButton->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(processButton->sizePolicy().hasHeightForWidth());
+        processButton->setSizePolicy(sizePolicy1);
 
         horizontalLayout->addWidget(processButton);
 

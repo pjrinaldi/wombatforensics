@@ -20,12 +20,14 @@ public:
     //explicit FileCarvingDialog(QWidget *parent = 0, qint64 curcheckcount = 0, qint64 curlistcount = 0);
     ~FileCarvingDialog();
     void PopulatePartitions(QStringList plist);
+    void PopulateFileTypes();
 
 signals:
     //void StartDig(int digtype, QVector<int> digoptions);
 
 private slots:
-    void EnableProcess(bool checked);
+    void EnableProcess();
+    //void EnableProcess(bool checked);
     //void DigDeeperFiles(void);
 
 private:

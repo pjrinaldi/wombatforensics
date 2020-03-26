@@ -44,6 +44,36 @@ FileCarvingDialog::~FileCarvingDialog()
     delete ui;
 }
 
+void FileCarvingDialog::PopulateFileTypes()
+{
+    QString homepath = QDir::homePath();
+    homepath += "/.local/share/wombatforensics/";
+    QFile ctypes(homepath + "carvetypes");
+    if(!ctypes.isOpen())
+        ctypes.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(ctypes.isOpen())
+    {
+        QTextStream in(&ctypes);
+        //int rowcount = 0;
+        // ui->filetypetree
+        while(!in.atEnd())
+        {
+            //if(rowcount == trowcount)
+                //ui->filetypestablewidget->setRowCount(trowcount + 5);
+            QString tmpstr = "";
+            QStringList linelist = in.readLine().split(",");
+            for(int i=0; i < linelist.count(); i++)
+            {
+                //ui->filetypestablewidget->setItem(rowcount, i, new QTableWidgetItem(linelist.at(i)));
+            }
+            //qDebug() << "rowcount:" << rowcount;
+            //rowcount++;
+        }
+        //ui->filetypeseditor->setPlainText(ctypes.readAll());
+    ctypes.close();
+    }
+}
+
 void FileCarvingDialog::PopulatePartitions(QStringList plist)
 {
     for(int i=0; i < plist.count(); i++)
@@ -52,7 +82,8 @@ void FileCarvingDialog::PopulatePartitions(QStringList plist)
     }
 }
 
-void FileCarvingDialog::EnableProcess(bool checked)
+//void FileCarvingDialog::EnableProcess(bool checked)
+void FileCarvingDialog::EnableProcess()
 {
     this->close();
     //ui->processButton->setEnabled(checked);

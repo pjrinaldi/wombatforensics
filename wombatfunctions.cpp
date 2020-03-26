@@ -1221,6 +1221,8 @@ void PopulateTreeModel(QString evidstring)
         mutex.unlock();
         QDir partdir = QDir(volumepath);
         QStringList partlist = partdir.entryList(QStringList("p*"), QDir::NoSymLinks | QDir::Dirs);
+        TSK_STACK* stack;
+        stack = tsk_stack_create();
         for(int j=0; j < partlist.count(); j++)
         {
             partitionpath = volumepath + "p" + QString::number(j) + "/";
@@ -1238,10 +1240,10 @@ void PopulateTreeModel(QString evidstring)
             nodedata.clear();
             nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
             mutex.lock();
+	    partitionlist.append(plist.at(10) + ": Partition (P" + plist.at(10).split("-").last().mid(1) + ") [" + plist.at(2) + "]");
             treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
             mutex.unlock();
             TSK_FS_INFO* fsinfo = NULL;
-            TSK_STACK* stack;
             if(vsinfo != NULL)
             {
                 if(partinfo->flags == TSK_VS_PART_FLAG_ALLOC) // allocated partition
@@ -1249,15 +1251,13 @@ void PopulateTreeModel(QString evidstring)
             }
             else
                 fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
-	    partitionlist.append(plist.at(10) + ": Partition (P" + plist.at(10).split("-").last().mid(1) + ") [" + plist.at(2) + "]");
             if(fsinfo != NULL)
             {
-                stack = tsk_stack_create();
                 ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
             }
-            tsk_stack_free(stack);
             tsk_fs_close(fsinfo);
         }
+        tsk_stack_free(stack);
     }
     tsk_vs_close(vsinfo);
     tsk_img_close(imginfo);
