@@ -87,6 +87,7 @@ void FileCarvingDialog::PopulateFileTypes()
         QTreeWidgetItem* tmpitem = new QTreeWidgetItem(ui->filetypetree);
         tmpitem->setText(0, categorylist.at(i));
         tmpitem->setCheckState(0, Qt::Unchecked);
+        tmpitem->setFlags(Qt::ItemIsAutoTristate|Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsUserCheckable);
         for(int j=0; j < linelist.count(); j++)
         {
             if(linelist.at(j).split(",").first().contains(categorylist.at(i)))
