@@ -42,6 +42,7 @@ extern QStringList digfilelist; // contains list of files to dig
 extern QStringList listeditems; // contains checked or all list of files for a case
 extern QStringList existingevidence; // contains the list of existing evidence
 extern QStringList newevidence; // contains the list of new evidence items
+extern QStringList partitionlist; // contains the list of partitions for file carving
 extern QString exportpath; // path to export files to
 extern bool originalpath; // whether to include original file path or not
 extern bool hashash; // whether we are calculating the hash for the item

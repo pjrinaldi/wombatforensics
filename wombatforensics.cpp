@@ -199,6 +199,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkhash.clear();
     listeditems.clear();
     existingevidence.clear();
+    partitionlist.clear();
     treenodemodel = new TreeNodeModel();
     autosavetimer = new QTimer(this);
     digrotatetimer = new QTimer(this);
