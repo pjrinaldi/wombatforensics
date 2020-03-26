@@ -14,9 +14,11 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -32,7 +34,7 @@ public:
     QListWidget *partitionlist;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_4;
-    QListWidget *filetypelist;
+    QTreeWidget *filetypetree;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer;
@@ -44,7 +46,7 @@ public:
         if (FileCarvingDialog->objectName().isEmpty())
             FileCarvingDialog->setObjectName(QString::fromUtf8("FileCarvingDialog"));
         FileCarvingDialog->setWindowModality(Qt::ApplicationModal);
-        FileCarvingDialog->resize(365, 314);
+        FileCarvingDialog->resize(485, 406);
         FileCarvingDialog->setModal(true);
         verticalLayout_2 = new QVBoxLayout(FileCarvingDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
@@ -79,12 +81,17 @@ public:
         verticalLayout_4 = new QVBoxLayout(groupBox);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         verticalLayout_4->setContentsMargins(0, 0, 0, 0);
-        filetypelist = new QListWidget(groupBox);
-        filetypelist->setObjectName(QString::fromUtf8("filetypelist"));
-        filetypelist->setProperty("showDropIndicator", QVariant(false));
-        filetypelist->setSelectionMode(QAbstractItemView::MultiSelection);
+        filetypetree = new QTreeWidget(groupBox);
+        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+        __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
+        filetypetree->setHeaderItem(__qtreewidgetitem);
+        filetypetree->setObjectName(QString::fromUtf8("filetypetree"));
+        filetypetree->setProperty("showDropIndicator", QVariant(false));
+        filetypetree->setSelectionMode(QAbstractItemView::SingleSelection);
+        filetypetree->setUniformRowHeights(true);
+        filetypetree->header()->setVisible(false);
 
-        verticalLayout_4->addWidget(filetypelist);
+        verticalLayout_4->addWidget(filetypetree);
 
 
         verticalLayout->addWidget(groupBox);
@@ -95,7 +102,7 @@ public:
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        horizontalLayout->setContentsMargins(-1, -1, 9, -1);
+        horizontalLayout->setContentsMargins(-1, -1, 0, -1);
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);

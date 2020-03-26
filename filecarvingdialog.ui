@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>365</width>
-    <height>314</height>
+    <width>485</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,13 +106,24 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QListWidget" name="filetypelist">
+         <widget class="QTreeWidget" name="filetypetree">
           <property name="showDropIndicator" stdset="0">
            <bool>false</bool>
           </property>
           <property name="selectionMode">
-           <enum>QAbstractItemView::MultiSelection</enum>
+           <enum>QAbstractItemView::SingleSelection</enum>
           </property>
+          <property name="uniformRowHeights">
+           <bool>true</bool>
+          </property>
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string notr="true">1</string>
+           </property>
+          </column>
          </widget>
         </item>
        </layout>
@@ -134,7 +145,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <item>
         <spacer name="horizontalSpacer">
