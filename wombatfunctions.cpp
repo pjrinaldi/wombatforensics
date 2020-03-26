@@ -1246,7 +1246,6 @@ void PopulateTreeModel(QString evidstring)
             TSK_FS_INFO* fsinfo = NULL;
             if(vsinfo != NULL)
             {
-                //qDebug() << "partinfo flags:" << partinfo->flags;
                 if(partinfo->flags == TSK_VS_PART_FLAG_ALLOC) // allocated partition
                     fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
             }
@@ -1254,11 +1253,8 @@ void PopulateTreeModel(QString evidstring)
                 fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
             if(fsinfo != NULL)
             {
-                //qDebug() << "fsinfo is not null..." << j;
                 ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
             }
-            //else
-            //    qDebug() << "fsinfo is null??" << j;
             tsk_fs_close(fsinfo);
         }
         tsk_stack_free(stack);
