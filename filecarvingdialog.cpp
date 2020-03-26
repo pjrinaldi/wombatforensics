@@ -61,11 +61,12 @@ void FileCarvingDialog::PopulateFileTypes()
             //if(rowcount == trowcount)
                 //ui->filetypestablewidget->setRowCount(trowcount + 5);
             QString tmpstr = "";
-            QStringList linelist = in.readLine().split(",");
-            for(int i=0; i < linelist.count(); i++)
-            {
+            qDebug() << "each line:" << in.readLine();
+            //QStringList linelist = in.readLine().split(",");
+            //for(int i=0; i < linelist.count(); i++)
+            //{
                 //ui->filetypestablewidget->setItem(rowcount, i, new QTableWidgetItem(linelist.at(i)));
-            }
+            //}
             //qDebug() << "rowcount:" << rowcount;
             //rowcount++;
         }

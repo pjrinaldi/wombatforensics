@@ -80,7 +80,8 @@ void CarvingFileTypesDialog::Save()
         qDebug() << "rowcount:" << ui->filetypestablewidget->rowCount();
         for(int i=0; i < ui->filetypestablewidget->rowCount(); i++)
         {
-            out << ui->filetypestablewidget->item(i, 0)->text() << "," << ui->filetypestablewidget->item(i, 1)->text() << "," << ui->filetypestablewidget->item(i, 2)->text() << "," << ui->filetypestablewidget->item(i, 3)->text() << "," << ui->filetypestablewidget->item(i, 4)->text() << "," << ui->filetypestablewidget->item(i, 5)->text() << endl;
+            if(ui->filetypestablewidget->item(i,0))
+                out << ui->filetypestablewidget->item(i, 0)->text() << "," << ui->filetypestablewidget->item(i, 1)->text() << "," << ui->filetypestablewidget->item(i, 2)->text() << "," << ui->filetypestablewidget->item(i, 3)->text() << "," << ui->filetypestablewidget->item(i, 4)->text() << "," << ui->filetypestablewidget->item(i, 5)->text() << endl;
         }
     }
     else

@@ -2092,6 +2092,7 @@ void WombatForensics::on_actionCarve_triggered()
     // NEED TO GENERATE FILETYPE LIST FROM SETTINGS FILE
     filecarvedialog = new FileCarvingDialog(this);
     filecarvedialog->PopulatePartitions(partitionlist);
+    filecarvedialog->PopulateFileTypes();
     //connect(filecarvingdialog, SIGNAL(StartCarve()), this, SLOT(StartCarving()), Qt::DirectConnection);
     filecarvedialog->show();
 }
