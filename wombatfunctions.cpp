@@ -1249,6 +1249,7 @@ void PopulateTreeModel(QString evidstring)
             }
             else
                 fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
+	    partitionlist.append(plist.at(10) + ": Partition (P" + plist.at(10).split("-").last().mid(1) + ") [" + plist.at(2) + "]");
             if(fsinfo != NULL)
             {
                 stack = tsk_stack_create();

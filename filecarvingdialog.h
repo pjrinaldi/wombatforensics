@@ -19,6 +19,7 @@ public:
     explicit FileCarvingDialog(QWidget* parent = 0);
     //explicit FileCarvingDialog(QWidget *parent = 0, qint64 curcheckcount = 0, qint64 curlistcount = 0);
     ~FileCarvingDialog();
+    void PopulatePartitions(QStringList plist);
 
 signals:
     //void StartDig(int digtype, QVector<int> digoptions);

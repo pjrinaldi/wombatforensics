@@ -44,6 +44,14 @@ FileCarvingDialog::~FileCarvingDialog()
     delete ui;
 }
 
+void FileCarvingDialog::PopulatePartitions(QStringList plist)
+{
+    for(int i=0; i < plist.count(); i++)
+    {
+	new QListWidgetItem(plist.at(i), ui->partitionlist);
+    }
+}
+
 void FileCarvingDialog::EnableProcess(bool checked)
 {
     this->close();
