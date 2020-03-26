@@ -53,7 +53,7 @@ void CarvingFileTypesDialog::ShowText()
             {
                 ui->filetypestablewidget->setItem(rowcount, i, new QTableWidgetItem(linelist.at(i)));
             }
-            qDebug() << "rowcount:" << rowcount;
+            //qDebug() << "rowcount:" << rowcount;
             rowcount++;
         }
         //ui->filetypeseditor->setPlainText(ctypes.readAll());
@@ -68,24 +68,24 @@ void CarvingFileTypesDialog::Save()
 {
     QString homepath = QDir::homePath();
     homepath += "/.local/share/wombatforensics/carvetypes";
-    qDebug() << "homepath:" << homepath;
+    //qDebug() << "homepath:" << homepath;
     QFile ctypes(homepath);
     if(!ctypes.isOpen())
         ctypes.open(QIODevice::WriteOnly | QIODevice::Text);
-    else
-        qDebug() << "ctypes is already open";
+    //else
+        //qDebug() << "ctypes is already open";
     if(ctypes.isOpen())
     {
         QTextStream out(&ctypes);
-        qDebug() << "rowcount:" << ui->filetypestablewidget->rowCount();
+        //qDebug() << "rowcount:" << ui->filetypestablewidget->rowCount();
         for(int i=0; i < ui->filetypestablewidget->rowCount(); i++)
         {
             if(ui->filetypestablewidget->item(i,0))
                 out << ui->filetypestablewidget->item(i, 0)->text() << "," << ui->filetypestablewidget->item(i, 1)->text() << "," << ui->filetypestablewidget->item(i, 2)->text() << "," << ui->filetypestablewidget->item(i, 3)->text() << "," << ui->filetypestablewidget->item(i, 4)->text() << "," << ui->filetypestablewidget->item(i, 5)->text() << endl;
         }
     }
-    else
-        qDebug() << "ctypes failed to open.";
+    //else
+    //    qDebug() << "ctypes failed to open.";
     ctypes.close();
 }
 

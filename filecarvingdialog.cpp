@@ -49,6 +49,10 @@ void FileCarvingDialog::PopulateFileTypes()
     QString homepath = QDir::homePath();
     homepath += "/.local/share/wombatforensics/";
     QFile ctypes(homepath + "carvetypes");
+    QStringList categorylist;
+    categorylist.clear();
+    QStringList linelist;
+    linelist.clear();
     if(!ctypes.isOpen())
         ctypes.open(QIODevice::ReadOnly | QIODevice::Text);
     if(ctypes.isOpen())
@@ -60,8 +64,10 @@ void FileCarvingDialog::PopulateFileTypes()
         {
             //if(rowcount == trowcount)
                 //ui->filetypestablewidget->setRowCount(trowcount + 5);
-            QString tmpstr = "";
-            qDebug() << "each line:" << in.readLine();
+            QString tmpstr = in.readLine();
+            //qDebug() << "each line:" << in.readLine();
+            linelist.append(tmpstr);
+            categorylist.append(tmpstr.split(",").first());
             //QStringList linelist = in.readLine().split(",");
             //for(int i=0; i < linelist.count(); i++)
             //{
@@ -70,8 +76,17 @@ void FileCarvingDialog::PopulateFileTypes()
             //qDebug() << "rowcount:" << rowcount;
             //rowcount++;
         }
-        //ui->filetypeseditor->setPlainText(ctypes.readAll());
     ctypes.close();
+    }
+    categorylist.removeDuplicates();
+    //qDebug() << "categorylist:" << categorylist;
+    //qDebug() << "linelist:" << linelist;
+    // build treewidget
+    for(int i=0; i < categorylist.count(); i++)
+    {
+        QTreeWidgetItem* tmpitem = new QTreeWidgetItem(ui->filetypetree);
+        tmpitem->setText(0, categorylist.at(i));
+        tmpitem->setCheckState(0, Qt::Unchecked);
     }
 }
 
