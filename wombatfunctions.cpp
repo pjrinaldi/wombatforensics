@@ -1236,7 +1236,6 @@ void PopulateTreeModel(QString evidstring)
             pfile.close();
             const TSK_VS_PART_INFO* partinfo = NULL;
             partinfo = tsk_vs_part_get(vsinfo, j);
-
             nodedata.clear();
             nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
             mutex.lock();
