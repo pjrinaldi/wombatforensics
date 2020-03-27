@@ -1239,7 +1239,7 @@ void PopulateTreeModel(QString evidstring)
             nodedata.clear();
             nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
             mutex.lock();
-	    partitionlist.append(plist.at(10) + ": Partition (P" + plist.at(10).split("-").last().mid(1) + ") [" + plist.at(2) + "]");
+	    //partitionlist.append(plist.at(10) + ": " + plist.at(2) + "(" +  QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
             treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
             mutex.unlock();
             TSK_FS_INFO* fsinfo = NULL;
@@ -1252,8 +1252,11 @@ void PopulateTreeModel(QString evidstring)
                 fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
             if(fsinfo != NULL)
             {
+	    	partitionlist.append(plist.at(10) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                 ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
             }
+	    else
+	    	partitionlist.append(plist.at(10) + ": " + plist.at(2));
             tsk_fs_close(fsinfo);
         }
         tsk_stack_free(stack);
@@ -1378,7 +1381,7 @@ void InitializeEvidenceStructure(QString evidname)
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0"), -1, 0);
             mutex.unlock();
             reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>NON RECOGNIZED FS</td></tr>";
-	    partitionlist.append("e" + QString::number(evidcnt) + "-v0-p0: Partition(P0) [NON-RECOGNIZED FS]");
+	    partitionlist.append("e" + QString::number(evidcnt) + "-v0-p0: NON-RECOGNIZED FS");
         }
         else
         {
@@ -1405,7 +1408,7 @@ void InitializeEvidenceStructure(QString evidname)
             ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
             tsk_fs_close(fsinfo);
             tsk_stack_free(stack);
-	    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": Partition(P0) [" + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")]");
+	    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
         }
     }
     else
@@ -1441,7 +1444,7 @@ void InitializeEvidenceStructure(QString evidname)
                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                     mutex.unlock();
                     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + "</td></tr>";
-		    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(volcnt) + ": Partition (P" + QString::number(partint) + ") [" + QString(partinfo->desc) + "]");
+		    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(partinfo->desc));
                 }
                 else if(partinfo->flags == 0x01) // allocated partition
                 {
@@ -1463,7 +1466,7 @@ void InitializeEvidenceStructure(QString evidname)
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
                         reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
-			partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(volcnt) + ": Partition (P" + QString::number(partint) + ") [" + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")]");
+			partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                         WriteFileSystemProperties(fsinfo, partitionpath);
                         ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
                     }
@@ -1481,7 +1484,7 @@ void InitializeEvidenceStructure(QString evidname)
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
                         reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
-			partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(volcnt) + ": Partition (P" + QString::number(partint) + ") [" + QString(partinfo->desc) + "(NON-RECOGNIZED FS)]");
+			partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(partinfo->desc) + "(NON-RECOGNIZED FS)");
                     }
                     tsk_stack_free(stack);
                     tsk_fs_close(fsinfo);
@@ -1500,7 +1503,7 @@ void InitializeEvidenceStructure(QString evidname)
                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
                     mutex.unlock();
-		    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(volcnt) + ": Partition (P" + QString::number(partint) + ") [" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)]");
+		    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(partinfo->desc) + " (NON-RECOGNIZED FS)]");
                 }
                 partint++;
             }
