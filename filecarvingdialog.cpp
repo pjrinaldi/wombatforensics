@@ -4,39 +4,12 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-//FileCarvingDialog::FileCarvingDialog(QWidget *parent, qint64 curcheckcount, qint64 curlistcount) :
 FileCarvingDialog::FileCarvingDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::FileCarvingDialog)
 {
     ui->setupUi(this);
-    parentwidget = parent;
     connect(ui->processButton, SIGNAL(clicked()), this, SLOT(EnableProcess()));
-    /*
-    checkcount = curcheckcount;
-    QString checktext = QString("Checked (") + QString::number(checkcount) + QString(")");
-    listcount = curlistcount;
-    QString listtext = QString("All (") + QString::number(listcount) + QString(")");
-    ui->checkedFileRadioButton->setText(checktext);
-    ui->listedFileRadioButton->setText(listtext);
-    ui->processButton->setEnabled(false);
-    ui->selectedFileRadioButton->setChecked(true);
-    if(checkcount <= 0)
-        ui->checkedFileRadioButton->setEnabled(false);
-    else
-        ui->checkedFileRadioButton->setEnabled(true);
-    if(listcount <= 0)
-        ui->listedFileRadioButton->setEnabled(false);
-    else
-        ui->listedFileRadioButton->setEnabled(true);
-    ui->md5radiobutton->setEnabled(false);
-    ui->sha1radiobutton->setEnabled(false);
-    ui->sha256radiobutton->setEnabled(false);
-    connect(ui->thumbnailcheckBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
-    connect(ui->videocheckBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
-    connect(ui->hashcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
-    connect(ui->processButton, SIGNAL(clicked()), this, SLOT(DigDeeperFiles()));
-    */
 }
 
 FileCarvingDialog::~FileCarvingDialog()
@@ -58,30 +31,15 @@ void FileCarvingDialog::PopulateFileTypes()
     if(ctypes.isOpen())
     {
         QTextStream in(&ctypes);
-        //int rowcount = 0;
-        // ui->filetypetree
         while(!in.atEnd())
         {
-            //if(rowcount == trowcount)
-                //ui->filetypestablewidget->setRowCount(trowcount + 5);
             QString tmpstr = in.readLine();
-            //qDebug() << "each line:" << in.readLine();
             linelist.append(tmpstr);
             categorylist.append(tmpstr.split(",").first());
-            //QStringList linelist = in.readLine().split(",");
-            //for(int i=0; i < linelist.count(); i++)
-            //{
-                //ui->filetypestablewidget->setItem(rowcount, i, new QTableWidgetItem(linelist.at(i)));
-            //}
-            //qDebug() << "rowcount:" << rowcount;
-            //rowcount++;
         }
     ctypes.close();
     }
     categorylist.removeDuplicates();
-    //qDebug() << "categorylist:" << categorylist;
-    //qDebug() << "linelist:" << linelist;
-    // build treewidget
     for(int i=0; i < categorylist.count(); i++)
     {
         QTreeWidgetItem* tmpitem = new QTreeWidgetItem(ui->filetypetree);
@@ -108,48 +66,20 @@ void FileCarvingDialog::PopulatePartitions(QStringList plist)
     }
 }
 
-//void FileCarvingDialog::EnableProcess(bool checked)
 void FileCarvingDialog::EnableProcess()
 {
     this->close();
-    //ui->processButton->setEnabled(checked);
-    /*
-    if(ui->hashcheckbox->isChecked())
+    QStringList selectedpartitions;
+    selectedpartitions.clear();
+    for(int i=0; i < ui->partitionlist->selectedItems().count(); i++)
+	selectedpartitions.append(ui->partitionlist->selectedItems().at(i)->text().split(":").first());
+    QStringList selectedfiletypes;
+    selectedfiletypes.clear();
+    foreach(QTreeWidgetItem* item, ui->filetypetree->findItems("", Qt::MatchContains | Qt::MatchRecursive))
     {
-        ui->md5radiobutton->setEnabled(true);
-        ui->sha1radiobutton->setEnabled(true);
-        ui->sha256radiobutton->setEnabled(true);
+	if(item->checkState(0) == 2 && item->parent())
+	    selectedfiletypes.append(item->text(0));
     }
-    if(ui->hashcheckbox->isChecked() || ui->thumbnailcheckBox->isChecked() || ui->videocheckBox->isChecked())
-        ui->processButton->setEnabled(true);
-    */
-}
-
-/*
-void FileCarvingDialog::DigDeeperFiles()
-{
-    if(ui->selectedFileRadioButton->isChecked())
-        digtype = 0;
-    if(ui->checkedFileRadioButton->isChecked())
-        digtype = 1;
-    if(ui->listedFileRadioButton->isChecked())
-        digtype = 2;
-    if(ui->thumbnailcheckBox->isChecked() && !ui->videocheckBox->isChecked())
-        digoptions.append(0);
-    else if(!ui->thumbnailcheckBox->isChecked() && ui->videocheckBox->isChecked())
-        digoptions.append(4);
-    else if(ui->thumbnailcheckBox->isChecked() && ui->videocheckBox->isChecked())
-        digoptions.append(5);
-    if(ui->hashcheckbox->isChecked())
-    {
-        if(ui->md5radiobutton->isChecked())
-            digoptions.append(1);
-        else if(ui->sha1radiobutton->isChecked())
-            digoptions.append(2);
-        else if(ui->sha256radiobutton->isChecked())
-            digoptions.append(3);
-    }
-    emit StartDig(digtype, digoptions);
+    emit StartCarve(selectedpartitions, selectedfiletypes);
     this->close();
 }
-*/

@@ -153,6 +153,7 @@ private slots:
     };
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     void DigFiles(int digtype, QVector<int> digoptions);
+    void StartCarving(QStringList plist, QStringList flist);
     void SetOffsetLabel(qint64 pos);
     void HexSelectionChanged(void);
     void UpdateSelectValue(void);
