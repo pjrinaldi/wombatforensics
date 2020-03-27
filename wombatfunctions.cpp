@@ -1236,12 +1236,6 @@ void PopulateTreeModel(QString evidstring)
             pfile.close();
             const TSK_VS_PART_INFO* partinfo = NULL;
             partinfo = tsk_vs_part_get(vsinfo, j);
-            nodedata.clear();
-            nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
-            mutex.lock();
-	    //partitionlist.append(plist.at(10) + ": " + plist.at(2) + "(" +  QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
-            treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
-            mutex.unlock();
             TSK_FS_INFO* fsinfo = NULL;
             if(vsinfo != NULL)
             {
@@ -1252,11 +1246,23 @@ void PopulateTreeModel(QString evidstring)
                 fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
             if(fsinfo != NULL)
             {
+            	nodedata.clear();
+            	nodedata << QString(plist.at(2) + "(" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper()  + ")") << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
+            	mutex.lock();
+            	treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
+            	mutex.unlock();
 	    	partitionlist.append(plist.at(10) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                 ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
             }
 	    else
+	    {
+            	nodedata.clear();
+            	nodedata << plist.at(2) << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
+            	mutex.lock();
+            	treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
+            	mutex.unlock();
 	    	partitionlist.append(plist.at(10) + ": " + plist.at(2));
+	    }
             tsk_fs_close(fsinfo);
         }
         tsk_stack_free(stack);
