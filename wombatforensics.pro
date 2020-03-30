@@ -12,6 +12,13 @@ INCLUDEPATH += /usr/include/tsk/vs/
 INCLUDEPATH += /usr/include/libffmpegthumbnailer/
 INCLUDEPATH += /usr/include/ImageMagick-7/
 INCLUDEPATH += ../scalpel/src/
+INCLUDEPATH += ../revit07-20070804/src/definitions_parser/
+INCLUDEPATH += ../revit07-20070804/src/input_analyzer/
+INCLUDEPATH += ../revit07-20070804/src/input_handler/
+INCLUDEPATH += ../revit07-20070804/src/notify/
+INCLUDEPATH += ../revit07-20070804/src/media_access/
+INCLUDEPATH += ../revit07-20070804/src/output_handler/
+INCLUDEPATH += ../revit07-20070804/src/state_hierarchy/
 VPATH += /usr/include/tsk/
 VPATH += /usr/include/tsk/auto/
 VPATH += /usr/include/tsk/base/
@@ -22,13 +29,20 @@ VPATH += /usr/include/tsk/vs/
 VPATH += /usr/include/libffmpegthumbnailer/
 VPATH += /usr/include/ImageMagick-7/
 VPATH += ../scalpel/src/
+VPATH += ../revit07-20070804/src/definitions_parser/
+VPATH += ../revit07-20070804/src/input_analyzer/
+VPATH += ../revit07-20070804/src/input_handler/
+VPATH += ../revit07-20070804/src/notify/
+VPATH += ../revit07-20070804/src/media_access/
+VPATH += ../revit07-20070804/src/output_handler/
+VPATH += ../revit07-20070804/src/state_hierarchy/
 FORMS = aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui filecarvingdialog.ui carvingfiletypesdialog.ui
 HEADERS = wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h
 SOURCES = main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp
 RESOURCES += wombatforensics.qrc
 release: DESTDIR = release
 debug:   DESTDIR = debug
-linux:LIBS = -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -L../scalpel/src/.libs/lscalpel
+linux:LIBS = -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -L/usr/local/lib/lscalpel -L/usr/local/lib/ldefinitions_parser -L/usr/local/lib/linput_analyzer -L/usr/local/lib/linput_handler -L/usr/local/lib/lmedia_access -L/usr/local/lib/loutput_handler -L/usr/local/lib/lstate_hierarchy -L/usr/local/lib/lnotify
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 }
 #linux:
