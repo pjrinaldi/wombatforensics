@@ -1,8 +1,19 @@
 #include "wombatfunctions.h"
+// IMAGEMAGICK HEADER
 #include <Magick++.h>
+// LIBFFMPEG THUMBNAILER HEADERS
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
+// SCALPEL HEADER
 #include <scalpel.h>
+// REVIT HEADERS
+#include <libdefinitions_parser.h>
+#include <libinput_analyzer.h>
+#include <libinput_handler.h>
+#include <libmedia_access.h>
+#include <libnotify.h>
+#include <liboutput_handler.h>
+#include <libstate_hierarchy.h>
 
 // Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
