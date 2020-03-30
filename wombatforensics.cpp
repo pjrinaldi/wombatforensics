@@ -1780,6 +1780,17 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     exportwatcher.setFuture(tmpfuture);
 }
 
+void WombatForensics::StartCarving(QStringList plist, QStringList flist)
+{
+    qDebug() << plist << flist;
+    // with these lists, i need to use plist to search through the partitions...
+    // need to use flist to open file, and get the information that i am using to search through plist.
+    // then i need to determine the best concurrent methodology to make it happen....
+    // also need to implement some kind of status information in the status bar (p#: type# carved, loop over parititons...)
+    // also need to implement the system by which i will store the carved file information, add to tree somewhere, and then
+    // implement the framework to find it in the hex, when selected in the treeview.
+}
+
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 {
     digimgthumbtotal = 0;
@@ -2088,12 +2099,10 @@ void WombatForensics::on_actionExport_triggered()
 
 void WombatForensics::on_actionCarve_triggered()
 {
-    // NEED TO GENERATE PARTITION LIST AS THEY ARE ADDED...
-    // NEED TO GENERATE FILETYPE LIST FROM SETTINGS FILE
     filecarvedialog = new FileCarvingDialog(this);
     filecarvedialog->PopulatePartitions(partitionlist);
     filecarvedialog->PopulateFileTypes();
-    //connect(filecarvingdialog, SIGNAL(StartCarve()), this, SLOT(StartCarving()), Qt::DirectConnection);
+    connect(filecarvedialog, SIGNAL(StartCarve(QStringList, QStringList)), this, SLOT(StartCarving(QStringList, QStringList)), Qt::DirectConnection);
     filecarvedialog->show();
 }
 void WombatForensics::on_actionDigDeeper_triggered()

@@ -17,26 +17,18 @@ class FileCarvingDialog : public QDialog
     
 public:
     explicit FileCarvingDialog(QWidget* parent = 0);
-    //explicit FileCarvingDialog(QWidget *parent = 0, qint64 curcheckcount = 0, qint64 curlistcount = 0);
     ~FileCarvingDialog();
     void PopulatePartitions(QStringList plist);
     void PopulateFileTypes();
 
 signals:
-    //void StartDig(int digtype, QVector<int> digoptions);
+    void StartCarve(QStringList plist, QStringList flist);
 
 private slots:
     void EnableProcess();
-    //void EnableProcess(bool checked);
-    //void DigDeeperFiles(void);
 
 private:
     Ui::FileCarvingDialog *ui;
-    //qint64 checkcount;
-    //qint64 listcount;
-    //int digtype = 0;
-    //QVector<int> digoptions;
-    QWidget* parentwidget;
 };
 
 #endif // FILECARVINGDIALOG_H
