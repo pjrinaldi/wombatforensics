@@ -2,6 +2,7 @@
 #include <Magick++.h>
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
+#include <scalpel.h>
 
 // Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
