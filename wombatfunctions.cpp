@@ -1057,8 +1057,9 @@ void TestCarving(QStringList plist, QStringList flist)
     // END SCALPEL CARVING TEST...
     // START REVIT CARVING TEST...
     definitions_list_element_t* definitions_list = NULL;
-    const char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
-    if(read_definitions_from_file(configuration_file, &definitions_list) != 1)
+    //const char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
+    //if(read_definitions_from_file(configuration_file, &definitions_list) != 1)
+    if(read_definitions_from_file("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", &definitions_list) != 1)
     {
         fprintf(stderr, "Error int config file\n");
     }
