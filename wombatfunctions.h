@@ -34,6 +34,8 @@ void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void GenerateVidThumbnails(QString thumbid);
 void GenerateDigging(QString thumbid);
+void TestCarving(QStringList plist, QStringList flist);
+//void GenerateCarving(QString partid);
 void LoadImagesHash(void);
 void SaveImagesHash(void);
 void PopulateTreeModel(QString evidstring);

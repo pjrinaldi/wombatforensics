@@ -1522,16 +1522,16 @@ void WombatForensics::CloseCurrentCase()
 {
     if(digwatcher.isRunning())
     {
-        qDebug() << "digwatcher is running....";
+        //qDebug() << "digwatcher is running....";
         digwatcher.cancel();
         digfuture.cancel();
         QThreadPool::globalInstance()->clear();
         isclosing = true;
-        qDebug() << "digwatcher is cancelled...";
+        //qDebug() << "digwatcher is cancelled...";
     }
     else
     {
-        qDebug() << "dig watcher wasn't running although it was..";
+        //qDebug() << "dig watcher wasn't running although it was..";
     }
     if(ui->dirTreeView->model() != NULL)
     {
@@ -1782,7 +1782,10 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 
 void WombatForensics::StartCarving(QStringList plist, QStringList flist)
 {
-    qDebug() << plist << flist;
+    QtConcurrent::run(TestCarving, plist, flist);
+    //or should i qtconcurrent::run(plist,qlist) and then loop over every plist and qtconcurrentmap the carving methodology...
+    //let's start off with a qtconcurrent run method to test calling scalpel and revit...
+    //this would be a QtConcurrent::map(plist); so it goes over every list...
     // with these lists, i need to use plist to search through the partitions...
     // need to use flist to open file, and get the information that i am using to search through plist.
     // then i need to determine the best concurrent methodology to make it happen....

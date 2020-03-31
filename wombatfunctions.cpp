@@ -1041,6 +1041,31 @@ void GenerateDigging(QString thumbid)
         GenerateThumbnails(thumbid);
 }
 
+void TestCarving(QStringList plist, QStringList flist)
+{
+    qDebug() << plist << flist;
+    // START SCALPEL CARVING TEST...
+    scalpelState scalpoptions;
+    scalpoptions.generateHeaderFooterDatabase = FALSE;
+    scalpoptions.handleEmbedded = FALSE;
+    scalpoptions.organizeSubdirectories = FALSE;
+    scalpoptions.previewMode = FALSE;
+    scalpoptions.carveWithMissingFooters = TRUE;
+    scalpoptions.noSearchOverlap = FALSE;
+    scalpelState* scalpstate = new scalpelState(scalpoptions);
+    // need to bypass scalpel large initialize/final and just call what i need...
+    // END SCALPEL CARVING TEST...
+    // START REVIT CARVING TEST...
+    definitions_list_element_t* definitions_list = NULL;
+    const char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
+    if(read_definitions_from_file(configuration_file, &definitions_list) != 1)
+    {
+        fprintf(stderr, "Error int config file\n");
+    }
+    //definitions_list_fprint(stderr, definitions_list, 0);
+    // END REVIT CARVING TEST...
+}
+
 void GenerateThumbnails(QString thumbid)
 {
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
