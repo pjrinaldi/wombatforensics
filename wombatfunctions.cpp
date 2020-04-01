@@ -14,7 +14,6 @@
 #include <libnotify.h>
 #include <liboutput_handler.h>
 #include <libstate_hierarchy.h>
-
 // Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
@@ -1056,9 +1055,10 @@ void TestCarving(QStringList plist, QStringList flist)
     // need to bypass scalpel large initialize/final and just call what i need...
     // END SCALPEL CARVING TEST...
     // START REVIT CARVING TEST...
-    definitions_list_element_t* definitions_list = NULL;
+    definitions_list_element_t *definitions_list = NULL;
     //const char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
     //if(read_definitions_from_file(configuration_file, &definitions_list) != 1)
+//int read_definitions_from_file( const char *filename, definitions_list_element_t **definitions_list );
     if(read_definitions_from_file("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", &definitions_list) != 1)
     {
         fprintf(stderr, "Error int config file\n");
