@@ -1042,7 +1042,9 @@ void GenerateDigging(QString thumbid)
 
 void TestCarving(QStringList plist, QStringList flist)
 {
+    qDebug() << "qtconffurent run works.";
     qDebug() << plist << flist;
+    qDebug() << "qtconffurent run works.";
     // START SCALPEL CARVING TEST...
     scalpelState* scalpstate = NULL;
     scalpelState scalpoptions;
@@ -1054,19 +1056,25 @@ void TestCarving(QStringList plist, QStringList flist)
     scalpoptions.noSearchOverlap = FALSE;
     char* argv[3];
     argv[0] = (char*)"../scalpel/scalpel.conf";
-    scalpstate = new scalpelState(scalpoptions);
+    //scalpstate = new scalpelState(scalpoptions);
     //initializeState(&argv[0], scalpstate);
-    if(libscalpel_initialize(&scalpstate, "../myconf.conf", "../out/", scalpoptions) != SCALPEL_OK)
+    char* conffile = (char*)"../scalpel/scalpel.conf";
+    char* outdir = (char*)"../out/";
+    if(libscalpel_initialize(&scalpstate, conffile, outdir, scalpoptions) != SCALPEL_OK)
     {
 	qDebug() << "libscalpel initialization failed.";
     }
     else
 	qDebug() << "libscalpel initialized successfully.";
-    // need to bypass scalpel large initialize/final and just call what i need...
+    libscalpel_finalize(&scalpstate);
     // END SCALPEL CARVING TEST...
+    // THIS WORKS, BUT IT CARVES TO A FOLDER, SO I WILL HAVE TO EDIT THIS TO ONLY CARVE AND PROVIDE
+    // THE INFO I NEED...
+
+
     // START REVIT CARVING TEST...
-    definitions_list_element_t* definitions_list = NULL;
-    char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
+    //definitions_list_element_t* definitions_list = NULL;
+    //char* configuration_file = (char*)"/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
     /*
     if(read_definitions_from_file(configuration_file, &definitions_list) != 1)
     {
