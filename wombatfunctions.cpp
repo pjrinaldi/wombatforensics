@@ -1044,6 +1044,7 @@ void TestCarving(QStringList plist, QStringList flist)
 {
     qDebug() << plist << flist;
     // START SCALPEL CARVING TEST...
+    scalpelState* scalpstate = NULL;
     scalpelState scalpoptions;
     scalpoptions.generateHeaderFooterDatabase = FALSE;
     scalpoptions.handleEmbedded = FALSE;
@@ -1051,32 +1052,30 @@ void TestCarving(QStringList plist, QStringList flist)
     scalpoptions.previewMode = FALSE;
     scalpoptions.carveWithMissingFooters = TRUE;
     scalpoptions.noSearchOverlap = FALSE;
-    scalpelState* scalpstate = new scalpelState(scalpoptions);
+    char* argv[3];
+    argv[0] = (char*)"../scalpel/scalpel.conf";
+    scalpstate = new scalpelState(scalpoptions);
+    //initializeState(&argv[0], scalpstate);
+    if(libscalpel_initialize(&scalpstate, "../myconf.conf", "../out/", scalpoptions) != SCALPEL_OK)
+    {
+	qDebug() << "libscalpel initialization failed.";
+    }
+    else
+	qDebug() << "libscalpel initialized successfully.";
     // need to bypass scalpel large initialize/final and just call what i need...
     // END SCALPEL CARVING TEST...
     // START REVIT CARVING TEST...
     definitions_list_element_t* definitions_list = NULL;
-    // WILL HAVE TO POPULATE ABOVE LIST ON MY OWN...
-    input_handler_t* input_handler = NULL;
-    // WILL HAVE TO IMPLEMENT THE HANDLER STUFF ON MY OWN...
-
+    char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
     /*
-    //FILE* yyin = fopen("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", "r");
-    //yyparse();
-    //fclose(yyin);
-    //definitions_list_fprint(stderr, definitions_list, 0);
-    // need to bypass revit.c functions and call what i need...
-    //const char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
-    //int retint = read_definitions_from_file("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", &definitions_list);
-    //if(read_definitions_from_file("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", &definitions_list) != 1)
-    //{
-    //    fprintf(stderr, "Error int config file\n");
-    //}
-    //definitions_list_fprint(stderr, definitions_list, 0);
-    //#define REVIT_INPUT_BUFFER_SIZE ( 16 * 1024 * 1024 )
-    //input_handler = input_handler_alloc(16*1024*1024);
-    //input_handler = input_handler_alloc(REVIT_INPUT_BUFFER_SIZE);
+    if(read_definitions_from_file(configuration_file, &definitions_list) != 1)
+    {
+	qDebug() << "error in configuration file";
+    }
     */
+    // WILL HAVE TO POPULATE ABOVE LIST ON MY OWN...
+    //input_handler_t* input_handler = NULL;
+    // WILL HAVE TO IMPLEMENT THE HANDLER STUFF ON MY OWN...
     // END REVIT CARVING TEST...
 }
 
