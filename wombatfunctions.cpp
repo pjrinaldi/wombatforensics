@@ -1055,15 +1055,28 @@ void TestCarving(QStringList plist, QStringList flist)
     // need to bypass scalpel large initialize/final and just call what i need...
     // END SCALPEL CARVING TEST...
     // START REVIT CARVING TEST...
-    definitions_list_element_t *definitions_list = NULL;
-    //const char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
-    //if(read_definitions_from_file(configuration_file, &definitions_list) != 1)
-//int read_definitions_from_file( const char *filename, definitions_list_element_t **definitions_list );
-    if(read_definitions_from_file("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", &definitions_list) != 1)
-    {
-        fprintf(stderr, "Error int config file\n");
-    }
+    definitions_list_element_t* definitions_list = NULL;
+    // WILL HAVE TO POPULATE ABOVE LIST ON MY OWN...
+    input_handler_t* input_handler = NULL;
+    // WILL HAVE TO IMPLEMENT THE HANDLER STUFF ON MY OWN...
+
+    /*
+    //FILE* yyin = fopen("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", "r");
+    //yyparse();
+    //fclose(yyin);
     //definitions_list_fprint(stderr, definitions_list, 0);
+    // need to bypass revit.c functions and call what i need...
+    //const char* configuration_file = "/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
+    //int retint = read_definitions_from_file("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", &definitions_list);
+    //if(read_definitions_from_file("/home/pasquale/Projects/revit07-20070804/etc/file_types.conf", &definitions_list) != 1)
+    //{
+    //    fprintf(stderr, "Error int config file\n");
+    //}
+    //definitions_list_fprint(stderr, definitions_list, 0);
+    //#define REVIT_INPUT_BUFFER_SIZE ( 16 * 1024 * 1024 )
+    //input_handler = input_handler_alloc(16*1024*1024);
+    //input_handler = input_handler_alloc(REVIT_INPUT_BUFFER_SIZE);
+    */
     // END REVIT CARVING TEST...
 }
 
