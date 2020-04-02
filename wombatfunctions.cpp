@@ -1042,8 +1042,17 @@ void GenerateDigging(QString thumbid)
 
 void TestCarving(QStringList plist, QStringList flist)
 {
+    // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
     qDebug() << "qtconffurent run works.";
-    qDebug() << plist << flist;
+    //qDebug() << plist << flist;
+    for(int i=0; i < plist.count(); i++)
+    {
+        qDebug() << "For:" << plist.at(i);
+        for(int j=0; j < flist.count(); j++)
+        {
+            qDebug() << "find each flist:" << flist.at(j);
+        }
+    }
     qDebug() << "qtconffurent run works.";
     // START SCALPEL CARVING TEST...
     scalpelState* scalpstate = NULL;
