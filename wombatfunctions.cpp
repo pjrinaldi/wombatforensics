@@ -1043,7 +1043,6 @@ void GenerateDigging(QString thumbid)
 void TestCarving(QStringList plist, QStringList flist)
 {
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
-    qDebug() << "qtconffurent run works.";
     //qDebug() << plist << flist;
     for(int i=0; i < plist.count(); i++)
     {
@@ -1053,7 +1052,7 @@ void TestCarving(QStringList plist, QStringList flist)
             qDebug() << "find each flist:" << flist.at(j);
         }
     }
-    qDebug() << "qtconffurent run works.";
+    /*
     // START SCALPEL CARVING TEST...
     scalpelState* scalpstate = NULL;
     scalpelState scalpoptions;
@@ -1067,6 +1066,9 @@ void TestCarving(QStringList plist, QStringList flist)
     argv[0] = (char*)"../scalpel/scalpel.conf";
     //scalpstate = new scalpelState(scalpoptions);
     //initializeState(&argv[0], scalpstate);
+    */
+
+    /*
     char* conffile = (char*)"../scalpel/scalpel.conf";
     char* outdir = (char*)"../out/";
     if(libscalpel_initialize(&scalpstate, conffile, outdir, scalpoptions) != SCALPEL_OK)
@@ -1076,6 +1078,7 @@ void TestCarving(QStringList plist, QStringList flist)
     else
 	qDebug() << "libscalpel initialized successfully.";
     libscalpel_finalize(&scalpstate);
+    */
     // END SCALPEL CARVING TEST...
     // THIS WORKS, BUT IT CARVES TO A FOLDER, SO I WILL HAVE TO EDIT THIS TO ONLY CARVE AND PROVIDE
     // THE INFO I NEED...
@@ -2666,6 +2669,10 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath)
         proplist << "Partition Table Entry Size||" << QString::number(tsk_getu32(endian, gptpart->tab_size_b)) << "||Size of each entry in the partition table (0x54-0x57)" << endl;
         proplist << "Partition Table Checksum||" << QString::number(tsk_getu32(endian, gptpart->tab_crc)) << "||CRC32 checksum of the partition table (0x58-0x5B)" << endl;
         proplist << "Reserved||" << "Reserved" << "||Reserved (0x5C-0x01FF)" << endl;
+    }
+    else if(curvolinfo->vstype == TSK_VS_TYPE_APFS)
+    {
+        qDebug() << "apfs stuff here...";
     }
     proplist.flush();
     vpropfile.close();
