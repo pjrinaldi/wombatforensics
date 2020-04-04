@@ -36,7 +36,7 @@ void AddEvidenceDialog::SelectEvidence()
     }
     if(alreadyadded == false)
     {
-        if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff") || evidfilename.toLower().contains(".image"))
+        if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff") || evidfilename.toLower().contains(".image") || evidfilename.toLower().contains(".dmg"))
         {
             // it's an evidence image so process...
             ui->evidencelist->addItem(evidfilename);

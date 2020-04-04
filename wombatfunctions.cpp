@@ -1311,6 +1311,12 @@ void PopulateTreeModel(QString evidstring)
             {
                 if(partinfo->flags == TSK_VS_PART_FLAG_ALLOC) // allocated partition
                     fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
+                // POOL TEST...
+                const TSK_POOL_INFO* pool = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
+                if(pool != nullptr)
+                {
+                    qDebug() << "do apfs stuff here...";
+                }
             }
             else
                 fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
@@ -1530,6 +1536,13 @@ void InitializeEvidenceStructure(QString evidname)
                     stack = tsk_stack_create();
                     if(fsinfo != NULL)
                     {
+                        // POOL TEST...
+                        const TSK_POOL_INFO* pool = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
+                        if(pool != nullptr)
+                        {
+                            qDebug() << "do apfs stuff here...";
+                            // record pstat information. loop over pool volumes..., where the pool volumes are i think link the fsinfo variables...
+                        }
                         out << fsinfo->ftype << "," << (qint64)fsinfo->block_size * (qint64)fsinfo->block_count << "," << GetFileSystemLabel(fsinfo) << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)fsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
                         out.flush();
                         pfile.close();
