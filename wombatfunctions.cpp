@@ -1315,9 +1315,6 @@ void PopulateTreeModel(QString evidstring)
                 const TSK_POOL_INFO* pool = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
                 if(pool != nullptr)
                 {
-                    FILE* pfile;
-                    uint8_t pstatret = pool->poolstat(pool, pfile);
-                    if(pstatret == 0)
                     qDebug() << "do apfs stuff here...";
                 }
             }
@@ -1543,8 +1540,23 @@ void InitializeEvidenceStructure(QString evidname)
                         const TSK_POOL_INFO* pool = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
                         if(pool != nullptr)
                         {
-                            qDebug() << "do apfs stuff here...";
+                            qDebug() << "pool exists.";
+                            if(pool->num_vols > 0)
+                            {
+                                for(int i=0; i < pool->num_vols; i++)
+                                {
+                                    TSK_POOL_VOLUME_INFO curpoolvol = pool->vol_list[i];
+                                    qDebug() << "pool volume description:" << curpoolvol.desc;
+                                }
+                                //qDebug() << "do apfs stuff here...";
+                            }
+                            else
+                                qDebug() << "pool num vols:" << pool->num_vols;
                             // record pstat information. loop over pool volumes..., where the pool volumes are i think link the fsinfo variables...
+                        }
+                        else
+                        {
+                            qDebug() << "pool was null.";
                         }
                         out << fsinfo->ftype << "," << (qint64)fsinfo->block_size * (qint64)fsinfo->block_count << "," << GetFileSystemLabel(fsinfo) << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)fsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
                         out.flush();
