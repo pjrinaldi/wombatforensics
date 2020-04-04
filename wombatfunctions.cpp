@@ -1315,6 +1315,9 @@ void PopulateTreeModel(QString evidstring)
                 const TSK_POOL_INFO* pool = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
                 if(pool != nullptr)
                 {
+                    FILE* pfile;
+                    uint8_t pstatret = pool->poolstat(pool, pfile);
+                    if(pstatret == 0)
                     qDebug() << "do apfs stuff here...";
                 }
             }
