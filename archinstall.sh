@@ -28,7 +28,7 @@ sudo pacman -S qt5 qtav ffmpegthumbnailer imagemagick libewf sleuthkit libtar gs
 sudo pacman -S zip unzip p7zip libheif
 
 # cd back into wombatforensics directory
-cd ../wombatforensics
+cd ../wombatforensics-0.2
 # cp the tsk*.h files into their respective directories
 sudo cp ./tskextra/tsk_base_i.h /usr/include/tsk/base/
 sudo cp ./tskextra/tsk_fs_i.h /usr/include/tsk/fs/
