@@ -1530,6 +1530,7 @@ void InitializeEvidenceStructure(QString evidname)
                 }
                 else if(partinfo->flags == 0x01) // allocated partition
                 {
+                    qDebug() << "partinfo start:" << partinfo->start;
                     TSK_FS_INFO* fsinfo = NULL;
                     TSK_STACK* stack = NULL;
                     stack = tsk_stack_create();
@@ -1539,19 +1540,30 @@ void InitializeEvidenceStructure(QString evidname)
                         fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
                     else
                     {
-                        //if(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_state) & EXT2FS_STATE_VALID)
+                        // FUNCTION I NEED ISN'T IMPLEMENTED YET... CURRENT WORKAROUND RUN..
                         qDebug() << "pool exists with:" << poolinfo->num_vols << "volumes." << tsk_pool_type_toname(poolinfo->ctype);
                         if(poolinfo->num_vols > 0)
                         {
+                            TSK_IMG_INFO* curimginfo = NULL;
                             for(int i=0; i < poolinfo->num_vols; i++)
                             {
                                 TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
                                 qDebug() << "pool volume description:" << curpoolvol.desc;
-                                if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
-                                    qDebug() << "pool volume is encrypted";
-                                else
-                                    qDebug() << "pool volume is not encrypted";
                                 qDebug() << "pool starting block:" << curpoolvol.block << "and number of blocks:" << curpoolvol.num_blocks;
+                                curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
+                                //if ((fs = tsk_fs_open_img_decrypt(img, imgaddr * img->sector_size, fstype, password)) == NULL) {
+                                if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                                {
+                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                                    //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                                    qDebug() << "pool volume is encrypted";
+                                }
+                                else
+                                {
+                                    fsinfo = tsk_fs_open_img(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT);
+                                    //fsinfo = tsk_fs_open_pool(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT);
+                                    qDebug() << "pool volume is not encrypted";
+                                }
                             }
                             //qDebug() << "do apfs stuff here...";
                         }
