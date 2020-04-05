@@ -1532,32 +1532,35 @@ void InitializeEvidenceStructure(QString evidname)
                 {
                     TSK_FS_INFO* fsinfo = NULL;
                     TSK_STACK* stack = NULL;
-                    fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
                     stack = tsk_stack_create();
-                    if(fsinfo != NULL)
+                    const TSK_POOL_INFO* poolinfo = nullptr;
+                    poolinfo = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
+                    if(poolinfo == nullptr)
+                        fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
+                    else
                     {
-                        // POOL TEST...
-                        const TSK_POOL_INFO* pool = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
-                        if(pool != nullptr)
+                        //if(tsk_getu16(curfsinfo->endian, ext2fs->fs->s_state) & EXT2FS_STATE_VALID)
+                        qDebug() << "pool exists with:" << poolinfo->num_vols << "volumes." << tsk_pool_type_toname(poolinfo->ctype);
+                        if(poolinfo->num_vols > 0)
                         {
-                            qDebug() << "pool exists.";
-                            if(pool->num_vols > 0)
+                            for(int i=0; i < poolinfo->num_vols; i++)
                             {
-                                for(int i=0; i < pool->num_vols; i++)
-                                {
-                                    TSK_POOL_VOLUME_INFO curpoolvol = pool->vol_list[i];
-                                    qDebug() << "pool volume description:" << curpoolvol.desc;
-                                }
-                                //qDebug() << "do apfs stuff here...";
+                                TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
+                                qDebug() << "pool volume description:" << curpoolvol.desc;
+                                if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                                    qDebug() << "pool volume is encrypted";
+                                else
+                                    qDebug() << "pool volume is not encrypted";
+                                qDebug() << "pool starting block:" << curpoolvol.block << "and number of blocks:" << curpoolvol.num_blocks;
                             }
-                            else
-                                qDebug() << "pool num vols:" << pool->num_vols;
-                            // record pstat information. loop over pool volumes..., where the pool volumes are i think link the fsinfo variables...
+                            //qDebug() << "do apfs stuff here...";
                         }
                         else
-                        {
-                            qDebug() << "pool was null.";
-                        }
+                            qDebug() << "pool num vols:" << poolinfo->num_vols;
+                        // record pstat information. loop over pool volumes..., where the pool volumes are i think link the fsinfo variables...
+                    }
+                    if(fsinfo != NULL)
+                    {
                         out << fsinfo->ftype << "," << (qint64)fsinfo->block_size * (qint64)fsinfo->block_count << "," << GetFileSystemLabel(fsinfo) << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)fsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
                         out.flush();
                         pfile.close();
