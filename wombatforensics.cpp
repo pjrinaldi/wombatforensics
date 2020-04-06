@@ -1422,7 +1422,7 @@ void WombatForensics::LoadHexContents()
 	    bool isapfs = false;
 	    if(fstype == TSK_FS_TYPE_APFS_DETECT)
 		isapfs = true;
-	    qDebug() << "is apfs:" << isapfs;
+	    qDebug() << "is apfs:" << isapfs << "is ntfs:" << isntfs;
             if(fstype == TSK_FS_TYPE_NTFS_DETECT)
                 isntfs = true;
             if(fstring.contains("a"))
@@ -1510,6 +1510,10 @@ void WombatForensics::LoadHexContents()
                     ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
                     ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                 }
+            }
+            else if(isapfs)
+            {
+                qDebug() << "apfs works...";
             }
             else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
 	    {
