@@ -3358,6 +3358,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
         tmpstr = partfile.readLine();
     partlist = tmpstr.split(",");
     tmpstr = "";
+    // NEED TO IMPLEMENT APFS FS OPEN'S HERE
     TSK_FS_INFO* fsinfo = NULL;
     fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     TSK_FS_FILE* fsfile = NULL;

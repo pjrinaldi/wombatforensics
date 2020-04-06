@@ -1419,6 +1419,10 @@ void WombatForensics::LoadHexContents()
             bool isntfs = false;
             bool isads = false;
             bool isdir = false;
+	    bool isapfs = false;
+	    if(fstype == TSK_FS_TYPE_APFS_DETECT)
+		isapfs = true;
+	    qDebug() << "is apfs:" << isapfs;
             if(fstype == TSK_FS_TYPE_NTFS_DETECT)
                 isntfs = true;
             if(fstring.contains("a"))
@@ -1426,6 +1430,7 @@ void WombatForensics::LoadHexContents()
             if(selectednode->itemtype == 2 || selectednode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	        isdir = true;
 
+	    // ADD APFS FEATURES HERE...
             if(isntfs && isres) // NTFS & RESIDENT
             {
     	        unsigned int curoffset = 0;
