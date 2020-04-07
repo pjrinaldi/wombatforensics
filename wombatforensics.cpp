@@ -1420,9 +1420,11 @@ void WombatForensics::LoadHexContents()
             bool isads = false;
             bool isdir = false;
 	    bool isapfs = false;
+	    bool ishfs = false;
 	    if(fstype == TSK_FS_TYPE_APFS_DETECT)
 		isapfs = true;
-	    qDebug() << "is apfs:" << isapfs << "is ntfs:" << isntfs;
+	    if(fstype == TSK_FS_TYPE_HFS_DETECT)
+		ishfs = true;
             if(fstype == TSK_FS_TYPE_NTFS_DETECT)
                 isntfs = true;
             if(fstring.contains("a"))
@@ -1511,7 +1513,7 @@ void WombatForensics::LoadHexContents()
                     ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                 }
             }
-            else if(isapfs)
+            else if(isapfs || ishfs)
             {
                 qDebug() << "apfs works...";
             }
