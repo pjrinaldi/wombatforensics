@@ -1530,16 +1530,28 @@ void InitializeEvidenceStructure(QString evidname)
                 }
                 else if(partinfo->flags == 0x01) // allocated partition
                 {
-                    qDebug() << "partinfo start:" << partinfo->start;
+                    //qDebug() << "partinfo start:" << partinfo->start;
                     TSK_FS_INFO* fsinfo = NULL;
                     TSK_STACK* stack = NULL;
                     stack = tsk_stack_create();
                     const TSK_POOL_INFO* poolinfo = nullptr;
                     poolinfo = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
+		    FILE* hfile = NULL;
+		    char* pstatcontent = NULL;
+		    size_t pstatsize;
+		    hfile = open_memstream(&pstatcontent, &pstatsize);
+		    poolinfo->poolstat(poolinfo, hfile);
+		    fclose(hfile);
+		    // NOW I HAVE A CHAR* OF POOLSTAT OUTPUT. I NEED TO PARSE THIS AND STORE THAT IN THE POOL/VOL AND FS  PROPERTIES...
+		    //qDebug() << "mem stream:" << pstatcontent;
+		    free(pstatcontent);
+                    poolinfo = nullptr;
+                    poolinfo = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
                     if(poolinfo == nullptr)
                         fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
                     else
                     {
+			//qDebug() << "poolinfo uuid:" << poolinfo->uuid().str.c_str();
                         // FUNCTION I NEED ISN'T IMPLEMENTED YET... CURRENT WORKAROUND RUN..
                         qDebug() << "pool exists with:" << poolinfo->num_vols << "volumes." << tsk_pool_type_toname(poolinfo->ctype);
                         if(poolinfo->num_vols > 0)
