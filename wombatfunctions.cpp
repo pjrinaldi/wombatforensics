@@ -3375,7 +3375,28 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     TSK_FS_INFO* fsinfo = NULL;
     if(fstype == TSK_FS_TYPE_APFS_DETECT)
     {
-        // DO APFS STUFF HERE
+        const TSK_POOL_INFO* poolinfo = nullptr;
+        poolinfo = tsk_pool_open_img_sing(imginfo, partlist.at(4).toULongLong(), TSK_POOL_TYPE_DETECT);
+        if(poolinfo != nullptr)
+        {
+            if(poolinfo->num_vols > 0)
+            {
+                for(int i=0; i < poolinfo->num_vols; i++)
+                {
+                    TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
+                    if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                    {
+                        fsinfo = tsk_fs_open_img_decrypt(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                        //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                    }
+                    else
+                    {
+                        fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS_DETECT);
+                        //fsinfo = tsk_fs_open_pool(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT);
+                    }
+                }
+            }
+        }
     }
     else
         fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
@@ -3383,6 +3404,8 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
     char* imgbuf = new char[0];
     ssize_t imglen = 0;
+    if(fsfile != NULL)
+    {
     if(fsfile->meta != NULL)
     {
         if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
@@ -3403,6 +3426,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
 	    imgbuf = new char[fsfile->meta->size];
 	    imglen = tsk_fs_file_read(fsfile, 0, imgbuf, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
         }
+    }
     }
     tsk_fs_file_close(fsfile);
     fsfile = NULL;
