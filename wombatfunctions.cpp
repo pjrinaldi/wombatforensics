@@ -1564,7 +1564,7 @@ void InitializeEvidenceStructure(QString evidname)
                                 qDebug() << "pool starting block:" << curpoolvol.block << "and number of blocks:" << curpoolvol.num_blocks;
                                 curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
                                 APFSFSCompat* apfsinfo = new APFSFSCompat(curimginfo, poolinfo, curpoolvol.block, "");
-                                qDebug() << "apfs uuid:" << apfsinfo->vol.uuid().str().c_str();
+                                //qDebug() << "apfs uuid:" << apfsinfo->vol.uuid().str().c_str();
                                 //if ((fs = tsk_fs_open_img_decrypt(img, imgaddr * img->sector_size, fstype, password)) == NULL) {
                                 if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                                 {
