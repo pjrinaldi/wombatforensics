@@ -113,8 +113,13 @@
 #include <tsk_iso9660.h>
 #include <tsk_hfs.h>
 #include <tsk_yaffs.h>
-#include <apfs_fs.h>
 #include <tsk_pool.h>
+#include <apfs_fs.h>
+#include <decmpfs.h>
+#include <tsk_apfs.hpp>
+#include <apfs_fs.hpp>
+#include <tsk_apfs.h>
+#include <apfs_compat.hpp>
 
 // THESE NEED TO BE MANUALLY UPDATED AND COPIED TO /USR/INCLUDE/TSK/../ PERIODICALLY AS NEW TSK RELEASES ARE MADE. CURRENTLY AT 4.8.0
 #include <tsk_base_i.h>
