@@ -534,7 +534,7 @@ TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR
         // remove compile warning
     }
 
-    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS)
     {
         *(QString*)ptr += QString::number(addr) + "^^";
         //blockstring += QString::number(addr) + "^^";
@@ -1670,11 +1670,12 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
 {
     QString blkstring = "";
     QString* blkstr = &blkstring;
-    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT)
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS)
     {
-        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT)
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS)
         {
             tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, (void*)blkstr);
+            qDebug() << "blkstr:" << blkstr << "blkstring:" << blkstring;
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
         {
@@ -1826,7 +1827,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             else if(fsattr->type == 80) attrstr += "SECURITY_DESCRIPTOR,";
             else if(fsattr->type == 96) attrstr += "$VOLUME_NAME,";
             else if(fsattr->type == 112) attrstr += "$VOLUME_INFORMATION,";
-            else if(fsattr->type == 128)
+            else if(fsattr->type == 128 || fsattr->type == 4352)
             {
                 if(fsattr->name == NULL)
                 {
@@ -1854,6 +1855,9 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             else if(fsattr->type == 208) attrstr += "$EA_INFORMATION,";
             else if(fsattr->type == 224) attrstr += "$EA,";
             else if(fsattr->type == 256) attrstr += "$LOGGED_UTILITY_STREAM,";
+            else if(fsattr->type == 4353) attrstr += "RSRC,";
+            else if(fsattr->type == 4354) attrstr += "EXT_ATTR,";
+            else if(fsattr->type == 4355) attrstr += "COMP_REC,";
         }
         proplist << attrstr << "||Attributes Types" << endl;
         proplist << rnrstr << "||Whether attribute is resident or non resident. A resident attribute is stored in the $DATA attribute of the MFT entry. A non resident attribute is stored in a cluster run outside of the MFT entry." << endl;
