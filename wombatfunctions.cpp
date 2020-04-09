@@ -1563,7 +1563,7 @@ void InitializeEvidenceStructure(QString evidname)
                                 qDebug() << "pool volume description:" << curpoolvol.desc;
                                 qDebug() << "pool starting block:" << curpoolvol.block << "and number of blocks:" << curpoolvol.num_blocks;
                                 curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
-                                APFSFSCompat* apfsinfo = new APFSFSCompat(curimginfo, poolinfo, curpoolvol.block, "");
+                                //APFSFSCompat* apfsinfo = new APFSFSCompat(curimginfo, poolinfo, curpoolvol.block, "");
                                 //qDebug() << "apfs uuid:" << apfsinfo->vol.uuid().str().c_str();
                                 //if ((fs = tsk_fs_open_img_decrypt(img, imgaddr * img->sector_size, fstype, password)) == NULL) {
                                 if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
@@ -1578,6 +1578,10 @@ void InitializeEvidenceStructure(QString evidname)
                                     //fsinfo = tsk_fs_open_pool(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT);
                                     qDebug() << "pool volume is not encrypted";
                                 }
+                                //apfs_fsstat_info* apfsinfo = nullptr;
+                                //apfs_fsstat_info* apfsinfo;
+                                //tsk_apfs_fsstat(fsinfo, apfsinfo);
+                                //qDebug() << "apfsinfo uuid:" << apfsinfo->uuid;
                             }
                             //qDebug() << "do apfs stuff here...";
                         }
@@ -1670,12 +1674,12 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
 {
     QString blkstring = "";
     QString* blkstr = &blkstring;
-    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS)
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT)
     {
-        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS)
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT)
         {
             tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, (void*)blkstr);
-            qDebug() << "blkstr:" << blkstr << "blkstring:" << blkstring;
+            //qDebug() << "blkstr:" << blkstr << "blkstring:" << blkstring;
         }
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
         {
