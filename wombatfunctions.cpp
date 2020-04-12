@@ -1823,7 +1823,25 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         {
             const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(curfileinfo, i);
             if(fsattr->type == 0) attrstr += "Not Found,";
-            else if(fsattr->type == 1) attrstr += "Default,";
+            else if(fsattr->type == 1 && curfileinfo->fs_info->ftype == TSK_FS_TYPE_HFS)
+            {
+                attrstr += "Default,";
+                // I SHOULD SET A BOOLEAN HERE.... THEN BELOW WHERE I WOULD POPULATE OFFSET AND BLOCKLIST CONVERT THE VALUES TO THAT...
+                // I HAVE THE OPTION TO EITHER WRITE THE FILESYSTEM PROPERTIES TO A VARIABLE I CARRY THOUGH OR READ THE FS PROPERTIES FILE
+                // DOWN BELOW
+                if(curfileinfo->name->meta_addr == 3)
+                    qDebug() << "$ExtentsFile";
+                else if(curfileinfo->name->meta_addr == 4)
+                    qDebug() << "$CatalogFile";
+                else if(curfileinfo->name->meta_addr == 5)
+                    qDebug() << "$BadBlockFile";
+                else if(curfileinfo->name->meta_addr == 6)
+                    qDebug() << "$AllocationFile";
+                else if(curfileinfo->name->meta_addr == 7)
+                    qDebug() << "$StartupFile";
+                else if(curfileinfo->name->meta_addr == 8)
+                    qDebug() << "$AttributesFile";
+            }
             else if(fsattr->type == 16) attrstr += "$STANDARD_INFOMRATION,";
             else if(fsattr->type == 32) attrstr += "$ATTRIBUTE_LIST,";
             else if(fsattr->type == 48) attrstr += "$FILE_NAME,";
@@ -2554,11 +2572,26 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
         proplist << "Mac OS X Blessed System Folder ID||" << QString::number(tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_BOOTX])) << "||Mac OS X blessed system folder id (0x64-0x67)" << endl;
         sprintf(asc, "%08" PRIx32 "%08" PRIx32, tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID1]), tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID2]));
         proplist << "Volume Identifier||" << QString::fromStdString(std::string(asc)) << "||Volume identifier (0x068-0x6F)" << endl;
-        proplist << "Fork Data Allocation File||" << "" << "||Location and size of allocation bitmap files (0x70-0xBF)" << endl;
-        proplist << "Fork Data Extents File||" << "" << "||Location and size of extents file (0x00C0-0x010F)" << endl;
-        proplist << "Fork Data Catalog File||" << "" << "||Location and size of catalog file (0x0110-0x015F)" << endl;
-        proplist << "Fork Data Attributes File||" << "" << "||Location and size of attributes file (0x0160-0x01AF)" << endl;
-        proplist << "Fork Data Startup File||" << "" << "||Location and size of startup file (0x01B0-0x01FF)" << endl;
+        proplist << "Fork Data Allocation File||" << QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->blk_cnt)) << "||Location and size of allocation bitmap files (0x70-0xBF)" << endl;
+        proplist << "Fork Data Catalog File||" << QString::number(tsk_getu32(curfsinfo->endian, hsb->cat_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->cat_file.extents->blk_cnt)) << "||Location and size of catalog file (0x0110-0x015F)" << endl;
+        proplist << "Fork Data Extents File||";
+        if(hfs->has_extents_file)
+            proplist << QString::number(tsk_getu32(curfsinfo->endian, hsb->ext_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->ext_file.extents->blk_cnt));
+        else
+            proplist << "";
+        proplist << "||Location and size of extents file (0x00C0-0x010F)" << endl;
+        proplist << "Fork Data Attributes File||";
+        if(hfs->has_attributes_file)
+            proplist << QString::number(tsk_getu32(curfsinfo->endian, hsb->attr_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->attr_file.extents->blk_cnt));
+        else
+            proplist << "";
+        proplist << "||Location and size of attributes file (0x0160-0x01AF)" << endl;
+        proplist << "Fork Data Startup File||";
+        if(hfs->has_startup_file)
+            proplist << QString::number(tsk_getu32(curfsinfo->endian, hsb->start_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->start_file.extents->blk_cnt));
+        else
+            proplist << "";
+        proplist << "||Location and size of startup file (0x01B0-0x01FF)" << endl;
     }
     proplist << "Endian Ordering||";
     if(curfsinfo->endian == TSK_UNKNOWN_ENDIAN)
