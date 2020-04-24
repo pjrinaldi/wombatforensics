@@ -1823,7 +1823,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         {
             const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(curfileinfo, i);
             if(fsattr->type == 0) attrstr += "Not Found,";
-            else if(fsattr->type == 1 && curfileinfo->fs_info->ftype == TSK_FS_TYPE_HFS)
+            else if(fsattr->type == 1 && (curfileinfo->fs_info->ftype == TSK_FS_TYPE_HFS || curfileinfo->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT))
             {
                 attrstr += "Default,";
                 // I SHOULD SET A BOOLEAN HERE.... THEN BELOW WHERE I WOULD POPULATE OFFSET AND BLOCKLIST CONVERT THE VALUES TO THAT...
