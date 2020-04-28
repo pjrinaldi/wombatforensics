@@ -2573,32 +2573,61 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
         sprintf(asc, "%08" PRIx32 "%08" PRIx32, tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID1]), tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID2]));
         proplist << "Volume Identifier||" << QString::fromStdString(std::string(asc)) << "||Volume identifier (0x068-0x6F)" << endl;
         proplist << "Fork Data Allocation File||" << QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->blk_cnt)) << "||Location and size of allocation bitmap files (0x70-0xBF)" << endl;
-        hfsreserveinfo = "A|" + QString::number((tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk) * curfsinfo->block_size) + curfsinfo->offset);
-        QString tmpstring = QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk)) + "^^";
-        for(uint i=1; i <= tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->blk_cnt); i++)
+        hfsreserveinfo = "A|";
+        //hfsreserveinfo = "A|" + QString::number((tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk);
+        //hfsreserveinfo = "A|" + QString::number((tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk) * curfsinfo->block_size) + curfsinfo->offset);
+        //QString tmpstring = QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk)) + "^^";
+        for(uint i=0; i < tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->blk_cnt); i++)
         {
-            tmpstring += QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk) + i) + "^^";
+            hfsreserveinfo += QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk) + i) + "^^";
+            //tmpstring += QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk) + i) + "^^";
         }
-        hfsreserveinfo += tmpstring + ",";
-        qDebug() << hfsreserveinfo;
+        hfsreserveinfo += ",";
         proplist << "Fork Data Catalog File||" << QString::number(tsk_getu32(curfsinfo->endian, hsb->cat_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->cat_file.extents->blk_cnt)) << "||Location and size of catalog file (0x0110-0x015F)" << endl;
+        hfsreserveinfo += "C|";
+        for(uint i=0; i < tsk_getu32(curfsinfo->endian, hsb->cat_file.extents->blk_cnt); i++)
+        {
+            hfsreserveinfo += QString::number(tsk_getu32(curfsinfo->endian, hsb->cat_file.extents->start_blk) + i) + "^^";
+        }
         proplist << "Fork Data Extents File||";
         if(hfs->has_extents_file)
+        {
+            hfsreserveinfo += ",E|";
+            for(uint i=0; i < tsk_getu32(curfsinfo->endian, hsb->ext_file.extents->blk_cnt); i++)
+            {
+                hfsreserveinfo += QString::number(tsk_getu32(curfsinfo->endian, hsb->ext_file.extents->start_blk) + i) + "^^";
+            }
             proplist << QString::number(tsk_getu32(curfsinfo->endian, hsb->ext_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->ext_file.extents->blk_cnt));
+        }
         else
             proplist << "";
         proplist << "||Location and size of extents file (0x00C0-0x010F)" << endl;
         proplist << "Fork Data Attributes File||";
         if(hfs->has_attributes_file)
+        {
+            hfsreserveinfo += ",B|";
+            for(uint i=0; i < tsk_getu32(curfsinfo->endian, hsb->attr_file.extents->blk_cnt); i++)
+            {
+                hfsreserveinfo += QString::number(tsk_getu32(curfsinfo->endian, hsb->attr_file.extents->start_blk) + i) + "^^";
+            }
             proplist << QString::number(tsk_getu32(curfsinfo->endian, hsb->attr_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->attr_file.extents->blk_cnt));
+        }
         else
             proplist << "";
         proplist << "||Location and size of attributes file (0x0160-0x01AF)" << endl;
         proplist << "Fork Data Startup File||";
         if(hfs->has_startup_file)
+        {
+            hfsreserveinfo += ",S|";
+            for(uint i=0; i < tsk_getu32(curfsinfo->endian, hsb->start_file.extents->blk_cnt); i++)
+            {
+                hfsreserveinfo += QString::number(tsk_getu32(curfsinfo->endian, hsb->start_file.extents->start_blk) + i) + "^^";
+            }
             proplist << QString::number(tsk_getu32(curfsinfo->endian, hsb->start_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->start_file.extents->blk_cnt));
+        }
         else
             proplist << "";
+        qDebug() << "hfsreserveinfo" << hfsreserveinfo;
         proplist << "||Location and size of startup file (0x01B0-0x01FF)" << endl;
     }
     proplist << "Endian Ordering||";
