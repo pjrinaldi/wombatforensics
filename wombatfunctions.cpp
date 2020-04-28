@@ -1794,6 +1794,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
     QTextStream proplist(&filepropfile);
     if(curfileinfo->name != NULL) proplist << "Short Name||" << curfileinfo->name->shrt_name << "||Short Name for a file" << endl;
     bool isresident = false;
+    int hfsreservetype = 0;
     if(curfileinfo->meta != NULL)
     {
         proplist << "Target File Name||" << QString(curfileinfo->meta->link) << "||Name of target file if this is a symbolic link" << endl;
@@ -1830,17 +1831,34 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
                 // I HAVE THE OPTION TO EITHER WRITE THE FILESYSTEM PROPERTIES TO A VARIABLE I CARRY THOUGH OR READ THE FS PROPERTIES FILE
                 // DOWN BELOW
                 if(curfileinfo->name->meta_addr == 3)
+                {
+                    hfsreservetype = 3;
                     qDebug() << "$ExtentsFile";
+                }
                 else if(curfileinfo->name->meta_addr == 4)
+                {
+                    hfsreservetype = 4;
                     qDebug() << "$CatalogFile";
-                else if(curfileinfo->name->meta_addr == 5)
-                    qDebug() << "$BadBlockFile";
+                }
                 else if(curfileinfo->name->meta_addr == 6)
+                {
+                    hfsreservetype = 6;
                     qDebug() << "$AllocationFile";
+                }
                 else if(curfileinfo->name->meta_addr == 7)
+                {
+                    hfsreservetype = 7;
                     qDebug() << "$StartupFile";
+                }
                 else if(curfileinfo->name->meta_addr == 8)
+                {
+                    hfsreservetype = 8;
                     qDebug() << "$AttributesFile";
+                }
+                //else if(curfileinfo->name->meta_addr == 5)
+                //{
+                //    qDebug() << "$BadBlockFile";
+                //}
             }
             else if(fsattr->type == 16) attrstr += "$STANDARD_INFOMRATION,";
             else if(fsattr->type == 32) attrstr += "$ATTRIBUTE_LIST,";
@@ -1899,7 +1917,36 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
     QString blockliststring = "";
     if(!isresident)
     {
-        blockliststring = GetBlockList(curfileinfo);
+        if(hfsreservetype == 3 || hfsreservetype == 4 || hfsreservetype == 6 || hfsreservetype == 7 || hfsreservetype == 8)
+        {
+            if(hfsreservetype == 3) // $ExtentsFile
+            {
+                blockliststring = hfsreserveinfo.split("E|").last().split(",").first();
+                qDebug() << "E:" << blockliststring;
+            }
+            else if(hfsreservetype == 4) // $CatalogFile
+            {
+                blockliststring = hfsreserveinfo.split("C|").last().split(",").first();
+                qDebug() << "C:" << blockliststring;
+            }
+            else if(hfsreservetype == 6) // $AllocationFile
+            {
+                blockliststring = hfsreserveinfo.split("A|").last().split(",").first();
+                qDebug() << "A:" << blockliststring;
+            }
+            else if(hfsreservetype == 7) // $StartupFile
+            {
+                blockliststring = hfsreserveinfo.split("S|").last().split(",").first();
+                qDebug() << "S:" << blockliststring;
+            }
+            else if(hfsreservetype == 8) // $AttributesFile
+            {
+                blockliststring = hfsreserveinfo.split("B|").last().split(",").first();
+                qDebug() << "B:" << blockliststring;
+            }
+        }
+        else
+            blockliststring = GetBlockList(curfileinfo);
         proplist << "Block Address||" << blockliststring << "||List of block addresses which contain the contents of the file" << endl;
 	QStringList objidlist = filepropfile.fileName().split("/");
 	QString faid = objidlist.last();
@@ -2627,7 +2674,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
         }
         else
             proplist << "";
-        qDebug() << "hfsreserveinfo" << hfsreserveinfo;
+        //qDebug() << "hfsreserveinfo" << hfsreserveinfo;
         proplist << "||Location and size of startup file (0x01B0-0x01FF)" << endl;
     }
     proplist << "Endian Ordering||";
