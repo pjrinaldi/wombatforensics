@@ -11,7 +11,6 @@
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
 
-
 int UpdateBookmarkItems(QString tagname);
 void UpdateEvidenceList(void);
 

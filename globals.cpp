@@ -46,6 +46,7 @@ QString casepath = QDir::homePath(); // case path settings variable
 QString reportpath = QDir::homePath(); // report path settings variable
 QString exportpath = "";
 QString genthmbpath = "";
+QString hfsreserveinfo = ""; // hfsreserveinfo file which contains the info for catalog, attribute, allocation, extents, and startup
 bool originalpath = true;
 bool hashash = false;
 bool hasimg = false;

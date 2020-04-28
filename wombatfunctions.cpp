@@ -2573,6 +2573,14 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
         sprintf(asc, "%08" PRIx32 "%08" PRIx32, tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID1]), tsk_getu32(curfsinfo->endian, hsb->finder_info[HFS_VH_FI_ID2]));
         proplist << "Volume Identifier||" << QString::fromStdString(std::string(asc)) << "||Volume identifier (0x068-0x6F)" << endl;
         proplist << "Fork Data Allocation File||" << QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->blk_cnt)) << "||Location and size of allocation bitmap files (0x70-0xBF)" << endl;
+        hfsreserveinfo = "A|" + QString::number((tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk) * curfsinfo->block_size) + curfsinfo->offset);
+        QString tmpstring = QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk)) + "^^";
+        for(uint i=1; i <= tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->blk_cnt); i++)
+        {
+            tmpstring += QString::number(tsk_getu32(curfsinfo->endian, hsb->alloc_file.extents->start_blk) + i) + "^^";
+        }
+        hfsreserveinfo += tmpstring + ",";
+        qDebug() << hfsreserveinfo;
         proplist << "Fork Data Catalog File||" << QString::number(tsk_getu32(curfsinfo->endian, hsb->cat_file.extents->start_blk)) + "," + QString::number(tsk_getu32(curfsinfo->endian, hsb->cat_file.extents->blk_cnt)) << "||Location and size of catalog file (0x0110-0x015F)" << endl;
         proplist << "Fork Data Extents File||";
         if(hfs->has_extents_file)

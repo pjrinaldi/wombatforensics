@@ -53,6 +53,7 @@ extern QString genthmbpath; // global path to place thumbs for each operationgal
 extern QString casepath; // case path settings variable
 extern QString reportpath; // report path settings variable
 extern QString hexstring; // tmp hex file filename with path
+extern QString hfsreserveinfo; // hfsreserveinfo file which contains the info for catalog, attribute, allocation, extents, and startup
 extern QHash<QString, bool> checkhash; // hash value list for check boxes.
 extern QHash<QString, QString> imageshash; // list of thumbnail ids, paths
 extern QHash<QString, QString> taggedhash; // list of tagged files: [id], tag
