@@ -1922,27 +1922,27 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
             if(hfsreservetype == 3) // $ExtentsFile
             {
                 blockliststring = hfsreserveinfo.split("E|").last().split(",").first();
-                qDebug() << "E:" << blockliststring;
+                //qDebug() << "E:" << blockliststring;
             }
             else if(hfsreservetype == 4) // $CatalogFile
             {
                 blockliststring = hfsreserveinfo.split("C|").last().split(",").first();
-                qDebug() << "C:" << blockliststring;
+                //qDebug() << "C:" << blockliststring;
             }
             else if(hfsreservetype == 6) // $AllocationFile
             {
                 blockliststring = hfsreserveinfo.split("A|").last().split(",").first();
-                qDebug() << "A:" << blockliststring;
+                //qDebug() << "A:" << blockliststring;
             }
             else if(hfsreservetype == 7) // $StartupFile
             {
                 blockliststring = hfsreserveinfo.split("S|").last().split(",").first();
-                qDebug() << "S:" << blockliststring;
+                //qDebug() << "S:" << blockliststring;
             }
             else if(hfsreservetype == 8) // $AttributesFile
             {
                 blockliststring = hfsreserveinfo.split("B|").last().split(",").first();
-                qDebug() << "B:" << blockliststring;
+                //qDebug() << "B:" << blockliststring;
             }
         }
         else
