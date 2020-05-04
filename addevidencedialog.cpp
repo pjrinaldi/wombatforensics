@@ -41,6 +41,66 @@ void AddEvidenceDialog::SelectEvidence()
             // it's an evidence image so process...
             ui->evidencelist->addItem(evidfilename);
             ui->startbutton->setEnabled(true);
+            // POPUP HERE FOR EVID ITEM WOULD BE GOOD....
+            // LET's TEST IT OUT...
+            qDebug() << "encryption test begins...";
+            const TSK_TCHAR** images;
+            std::vector<std::string> fullpathvector;
+            fullpathvector.clear();
+            fullpathvector.push_back(evidfilename.toStdString());
+            images = (const char**)malloc(fullpathvector.size()*sizeof(char*));
+            for(uint i=0; i < fullpathvector.size(); i++)
+                images[i] = fullpathvector[i].c_str();
+            TSK_IMG_INFO* imginfo = NULL;
+            imginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
+            if(imginfo == NULL)
+                qDebug() << "imginfo is null...";
+            free(images);
+            TSK_VS_INFO* vsinfo = NULL;
+            const TSK_POOL_INFO* poolinfo = nullptr;
+            TSK_FS_INFO* fsinfo = NULL;
+            if(imginfo != NULL)
+                tsk_vs_open(imginfo, 0, TSK_VS_TYPE_DETECT);
+            if(vsinfo == NULL) // no volume, single fs is all there is...
+            {
+                qDebug() << "vsinfo is null...";
+                qDebug() << "tsk can't open a pool from an image only...";
+                // NEED TO FIGURE OUT IF THERE IS AN INDICATOR OF POOL AND APFS SIGNATURE THAT I COULD DETECT IN THE IMAGE...
+                poolinfo = tsk_pool_open_img_sing(imginfo, 0, TSK_POOL_TYPE_APFS);
+                if(poolinfo == nullptr) // doesn't contain a pool...
+                {
+                    qDebug() << "pool is null...";
+                    fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
+                    if(fsinfo == NULL) // unrecognized fs..
+                    {
+                    }
+                    else
+                    {
+                        if(fsinfo->flags & TSK_FS_INFO_FLAG_ENCRYPTED)
+                            qDebug() << "encrypted FS: prompt for password...";
+                        else
+                            qDebug() << "not encrypted FS...";
+                    }
+                }
+                else // has a pool
+                {
+                    if(poolinfo->num_vols > 0)
+                    {
+                        for(int i=0; i < poolinfo->num_vols; i++)
+                        {
+                            TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
+                            if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                                qDebug() << "encrypted POOL VOLUME: prompt for password...";
+                            else
+                                qDebug() << "not encrypted pool...";
+                        }
+                    }
+                }
+            }
+            else // contains volume... repeat above for each partition...
+            {
+                qDebug() << "vsinfo is not null....";
+            }
         }
         else if(evidfilename.isNull())
         {
