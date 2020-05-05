@@ -163,7 +163,7 @@ void AddEvidenceDialog::SelectEvidence()
 						qDebug() << "prompt here and store password...";
 						qDebug() << "check password, if fs == null, then it didn't work...";
 						qDebug() << "if it worked, store in passwordhash.";
-                                                fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                                                fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "apfspassword");
                                             }
                                             else
                                             {

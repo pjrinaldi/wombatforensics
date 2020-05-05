@@ -1536,16 +1536,16 @@ void InitializeEvidenceStructure(QString evidname)
                     stack = tsk_stack_create();
                     const TSK_POOL_INFO* poolinfo = nullptr;
                     poolinfo = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
-		    FILE* hfile = NULL;
-		    char* pstatcontent = NULL;
-		    size_t pstatsize;
-		    hfile = open_memstream(&pstatcontent, &pstatsize);
-		    poolinfo->poolstat(poolinfo, hfile);
-		    fclose(hfile);
+		    //FILE* hfile = NULL;
+		    //char* pstatcontent = NULL;
+		    //size_t pstatsize;
+		    //hfile = open_memstream(&pstatcontent, &pstatsize);
+		    //poolinfo->poolstat(poolinfo, hfile);
+		    //fclose(hfile);
 		    // NOW I HAVE A CHAR* OF POOLSTAT OUTPUT. I NEED TO PARSE THIS AND STORE THAT IN THE POOL/VOL AND FS  PROPERTIES...
 		    //qDebug() << "mem stream:" << pstatcontent;
-		    free(pstatcontent);
-                    poolinfo = nullptr;
+		    //free(pstatcontent);
+                    //poolinfo = nullptr;
                     poolinfo = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
                     if(poolinfo == nullptr)
                         fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
@@ -1568,7 +1568,7 @@ void InitializeEvidenceStructure(QString evidname)
                                 //if ((fs = tsk_fs_open_img_decrypt(img, imgaddr * img->sector_size, fstype, password)) == NULL) {
                                 if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                                 {
-                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "apfspassword");
                                     //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
                                     qDebug() << "pool volume is encrypted";
                                 }
