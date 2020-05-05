@@ -43,6 +43,8 @@ void AddEvidenceDialog::SelectEvidence()
             ui->startbutton->setEnabled(true);
             // POPUP HERE FOR EVID ITEM WOULD BE GOOD....
             // LET's TEST IT OUT...
+            // IF I DON'T WRITE THE STAT/PROP FILE'S HERE, WHERE I WILL STORE PASSWORDS FOR MULTIPLE EVIDENCE ITEMS WITH MULTIPLE ENCRYPTED POOL'S/FS'S
+            // IF I DO WRITE THE STAT/PROP FILE'S HERE, HOW I WILL NO TO DELETE THE FILES IF THE USER CANCEL'S THE OPERATION...
             qDebug() << "encryption test begins...";
             const TSK_TCHAR** images;
             std::vector<std::string> fullpathvector;
@@ -60,7 +62,7 @@ void AddEvidenceDialog::SelectEvidence()
             const TSK_POOL_INFO* poolinfo = nullptr;
             TSK_FS_INFO* fsinfo = NULL;
             if(imginfo != NULL)
-                tsk_vs_open(imginfo, 0, TSK_VS_TYPE_DETECT);
+                vsinfo = tsk_vs_open(imginfo, 0, TSK_VS_TYPE_DETECT);
             if(vsinfo == NULL) // no volume, single fs is all there is...
             {
                 qDebug() << "vsinfo is null...";
@@ -100,6 +102,66 @@ void AddEvidenceDialog::SelectEvidence()
             else // contains volume... repeat above for each partition...
             {
                 qDebug() << "vsinfo is not null....";
+                const TSK_VS_PART_INFO* partinfo = NULL;
+                if(vsinfo->part_count > 0)
+                {
+                    for(uint32_t i=0; i < vsinfo->part_count; i++)
+                    {
+                        partinfo = tsk_vs_part_get(vsinfo, i);
+                        if(partinfo != NULL)
+                        {
+                            if(partinfo->flags == 0x02 || partinfo->flags == 0x04) // unallocated partition or meta entry
+                            {
+                            }
+                            else if(partinfo->flags == 0x01) // allocated partition
+                            {
+                                fsinfo = NULL;
+                                poolinfo = nullptr;
+                                poolinfo = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
+                                if(poolinfo == nullptr)
+                                {
+                                    fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
+                                }
+                                else
+                                {
+                                    if(poolinfo->num_vols > 0)
+                                    {
+                                        TSK_IMG_INFO* curimginfo = NULL;
+                                        for(int j=0; j < poolinfo->num_vols; j++)
+                                        {
+                                            TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[j];
+                                            curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
+                                            if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                                            {
+                                                qDebug() << "encrypted POOL VOLUME; prompt for password...";
+                                                fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                                            }
+                                            else
+                                            {
+                                                qDebug() << "not encrypted pool volume...";
+                                                fsinfo = tsk_fs_open_img(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT);
+                                            }
+                                            if(fsinfo != NULL)
+                                            {
+                                                if(fsinfo->flags & TSK_FS_INFO_FLAG_ENCRYPTED)
+                                                    qDebug() << "encrypted FS: prompt for password...";
+                                                else
+                                                    qDebug() << "not encrypted FS...";
+                                            }
+                                            else
+                                            {
+                                                qDebug() << "fsinfo is null for some reason...";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                            }
+                        }
+                    }
+                }
             }
         }
         else if(evidfilename.isNull())
