@@ -1583,6 +1583,7 @@ void InitializeEvidenceStructure(QString evidname)
                                 //tsk_apfs_fsstat(fsinfo, apfsinfo);
                                 //qDebug() << "apfsinfo uuid:" << apfsinfo->uuid;
                             }
+			    tsk_img_close(curimginfo);
                             //qDebug() << "do apfs stuff here...";
                         }
                         else
@@ -1625,6 +1626,7 @@ void InitializeEvidenceStructure(QString evidname)
                     }
                     tsk_stack_free(stack);
                     tsk_fs_close(fsinfo);
+		    tsk_pool_close(poolinfo);
                 }
                 else
                 {

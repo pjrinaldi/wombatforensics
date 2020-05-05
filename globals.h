@@ -59,6 +59,7 @@ extern QHash<QString, QString> imageshash; // list of thumbnail ids, paths
 extern QHash<QString, QString> taggedhash; // list of tagged files: [id], tag
 extern QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 extern QHash<QString, QString> mftblockhash; // list of mft blockstrings for each partition for each evidence item
+extern QHash<QString, QString> passwordhash; // list of passwords for encrypted pool volume's/fs's
 extern QMutex mutex; // mutex so my code will work when multithreaded (mainly for adding treeview nodes)
 
 struct dosdate

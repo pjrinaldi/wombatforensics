@@ -79,7 +79,10 @@ void AddEvidenceDialog::SelectEvidence()
                     else
                     {
                         if(fsinfo->flags & TSK_FS_INFO_FLAG_ENCRYPTED)
+			{
+			    qDebug() << evidfilename << "v0" << "p0";
                             qDebug() << "encrypted FS: prompt for password...";
+			}
                         else
                             qDebug() << "not encrypted FS...";
                     }
@@ -88,14 +91,31 @@ void AddEvidenceDialog::SelectEvidence()
                 {
                     if(poolinfo->num_vols > 0)
                     {
+			TSK_IMG_INFO* curimginfo = NULL;
                         for(int i=0; i < poolinfo->num_vols; i++)
                         {
                             TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
+			    curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
                             if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+			    {
                                 qDebug() << "encrypted POOL VOLUME: prompt for password...";
+				qDebug() << evidfilename << "v0" << "p" << i;
+			    }
                             else
+			    {
                                 qDebug() << "not encrypted pool...";
+                                fsinfo = tsk_fs_open_img(curimginfo, 0, TSK_FS_TYPE_APFS_DETECT);
+                                if(fsinfo != NULL)
+                                {
+                               	    if(fsinfo->flags & TSK_FS_INFO_FLAG_ENCRYPTED)
+				    {
+					qDebug() << evidfilename << "v0" << "p" << i;
+                                        qDebug() << "encrypted FS: prompt for password...";
+				    }
+                                }
+			    }
                         }
+			tsk_img_close(curimginfo);
                     }
                 }
             }
@@ -110,10 +130,7 @@ void AddEvidenceDialog::SelectEvidence()
                         partinfo = tsk_vs_part_get(vsinfo, i);
                         if(partinfo != NULL)
                         {
-                            if(partinfo->flags == 0x02 || partinfo->flags == 0x04) // unallocated partition or meta entry
-                            {
-                            }
-                            else if(partinfo->flags == 0x01) // allocated partition
+                            if(partinfo->flags == 0x01) // allocated partition
                             {
                                 fsinfo = NULL;
                                 poolinfo = nullptr;
@@ -121,6 +138,14 @@ void AddEvidenceDialog::SelectEvidence()
                                 if(poolinfo == nullptr)
                                 {
                                     fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
+				    if(fsinfo != NULL)
+				    {
+					if(fsinfo->flags & TSK_FS_INFO_FLAG_ENCRYPTED)
+					{
+					    qDebug() << "encrypted FS: prompt for password...";
+					    qDebug() << evidfilename << "v0" << "f" << i;
+					}
+				    }
                                 }
                                 else
                                 {
@@ -133,7 +158,11 @@ void AddEvidenceDialog::SelectEvidence()
                                             curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
                                             if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                                             {
-                                                qDebug() << "encrypted POOL VOLUME; prompt for password...";
+						// I + J IS EQUIVALENT OF INCREMENTING PARTINT++ BY 1 
+					    	qDebug() << evidfilename << "v0" << "f" << i + j;
+						qDebug() << "prompt here and store password...";
+						qDebug() << "check password, if fs == null, then it didn't work...";
+						qDebug() << "if it worked, store in passwordhash.";
                                                 fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "encrypted");
                                             }
                                             else
@@ -144,25 +173,24 @@ void AddEvidenceDialog::SelectEvidence()
                                             if(fsinfo != NULL)
                                             {
                                                 if(fsinfo->flags & TSK_FS_INFO_FLAG_ENCRYPTED)
+						{
+					    	    qDebug() << evidfilename << "v0" << "f" << i;
                                                     qDebug() << "encrypted FS: prompt for password...";
-                                                else
-                                                    qDebug() << "not encrypted FS...";
-                                            }
-                                            else
-                                            {
-                                                qDebug() << "fsinfo is null for some reason...";
+						}
                                             }
                                         }
+					tsk_img_close(curimginfo);
                                     }
                                 }
-                            }
-                            else
-                            {
                             }
                         }
                     }
                 }
             }
+	    tsk_fs_close(fsinfo);
+	    tsk_pool_close(poolinfo);
+	    tsk_vs_close(vsinfo);
+	    tsk_img_close(imginfo);
         }
         else if(evidfilename.isNull())
         {
@@ -186,6 +214,7 @@ void AddEvidenceDialog::UpdateButtons()
 
 void AddEvidenceDialog::RemoveEvidence()
 {
+    // update passwordhash here
     qDeleteAll(ui->evidencelist->selectedItems());
     if(ui->evidencelist->count() == 0)
         ui->startbutton->setEnabled(false);
@@ -194,6 +223,7 @@ void AddEvidenceDialog::RemoveEvidence()
 void AddEvidenceDialog::Cancel()
 {
     newevidence.clear();
+    // clear passwordhash
     this->close();
 }
 
