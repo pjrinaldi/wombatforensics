@@ -45,6 +45,7 @@ void AddEvidenceDialog::SelectEvidence()
             // LET's TEST IT OUT...
             // IF I DON'T WRITE THE STAT/PROP FILE'S HERE, WHERE I WILL STORE PASSWORDS FOR MULTIPLE EVIDENCE ITEMS WITH MULTIPLE ENCRYPTED POOL'S/FS'S
             // IF I DO WRITE THE STAT/PROP FILE'S HERE, HOW I WILL NO TO DELETE THE FILES IF THE USER CANCEL'S THE OPERATION...
+            /*
             qDebug() << "encryption test begins...";
             const TSK_TCHAR** images;
             std::vector<std::string> fullpathvector;
@@ -191,6 +192,7 @@ void AddEvidenceDialog::SelectEvidence()
 	    tsk_pool_close(poolinfo);
 	    tsk_vs_close(vsinfo);
 	    tsk_img_close(imginfo);
+            */
         }
         else if(evidfilename.isNull())
         {

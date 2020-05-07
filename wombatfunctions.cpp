@@ -3197,15 +3197,17 @@ QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
             hfs = (HFS_INFO*)curinfo;
             char fn[HFS_MAXNAMLEN + 1];
             HFS_ENTRY entry;
-            if(hfs_cat_file_lookup(hfs, HFS_ROOT_INUM, &entry, FALSE))
+            if(!hfs_cat_file_lookup(hfs, HFS_ROOT_INUM, &entry, FALSE))
             {
-                // log error here
+                if(!hfs_UTF16toUTF8(curinfo, entry.thread.name.unicode, tsk_getu16(curinfo->endian, entry.thread.name.length), fn, HFS_MAXNAMLEN + 1, HFS_U16U8_FLAG_REPLACE_SLASH))
+                {
+                    sprintf(asc, "%s", fn);
+                }
+                else
+                    sprintf(asc, "%s", "");
             }
-            if(hfs_UTF16toUTF8(curinfo, entry.thread.name.unicode, tsk_getu16(curinfo->endian, entry.thread.name.length), fn, HFS_MAXNAMLEN + 1, HFS_U16U8_FLAG_REPLACE_SLASH))
-            {
-                // log error here
-            }
-            sprintf(asc, "%s", fn);
+            else
+                sprintf(asc, "%s", "");
             return QString::fromStdString(std::string(asc));
         }
         return "";
@@ -3635,7 +3637,13 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     magicbuffer = new char[charsize];
                     QByteArray tmparray("intro");
                     tmparray.clear();
-                    ssize_t bytesread = tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
+                    ssize_t bytesread = 0;
+                    if(fsfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || fsfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT)
+                    {
+                        bytesread = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_HFS_DATA, 0, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NOID);
+                    }
+                    else
+                        bytesread = tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
 		    qDebug() << "bytesread:" << bytesread;
                     tmparray = QByteArray::fromRawData(magicbuffer, 1024);
                     QMimeDatabase mimedb;
