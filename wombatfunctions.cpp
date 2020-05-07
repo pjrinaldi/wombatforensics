@@ -3647,7 +3647,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                         bytesread = tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
 		    mutex.unlock();
 		    //qDebug() << "bytesread:" << bytesread;
-                    tmparray = QByteArray::fromRawData(magicbuffer, 1024);
+                    tmparray = QByteArray::fromRawData(magicbuffer, charsize);
                     QMimeDatabase mimedb;
                     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
                     QString mimestr = GenerateCategorySignature(mimetype);
