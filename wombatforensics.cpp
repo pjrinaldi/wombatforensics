@@ -1515,7 +1515,7 @@ void WombatForensics::LoadHexContents()
             }
             else if(isapfs || ishfs)
             {
-                qDebug() << "apfs works...";
+                //qDebug() << "apfs works...";
             }
             else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
 	    {

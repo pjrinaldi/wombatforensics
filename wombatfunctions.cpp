@@ -1536,6 +1536,7 @@ void InitializeEvidenceStructure(QString evidname)
                     stack = tsk_stack_create();
                     const TSK_POOL_INFO* poolinfo = nullptr;
                     poolinfo = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
+                    TSK_IMG_INFO* curimginfo = NULL;
 		    //FILE* hfile = NULL;
 		    //char* pstatcontent = NULL;
 		    //size_t pstatsize;
@@ -1556,7 +1557,6 @@ void InitializeEvidenceStructure(QString evidname)
                         qDebug() << "pool exists with:" << poolinfo->num_vols << "volumes." << tsk_pool_type_toname(poolinfo->ctype);
                         if(poolinfo->num_vols > 0)
                         {
-                            TSK_IMG_INFO* curimginfo = NULL;
                             for(int i=0; i < poolinfo->num_vols; i++)
                             {
                                 TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
@@ -1568,6 +1568,7 @@ void InitializeEvidenceStructure(QString evidname)
                                 //if ((fs = tsk_fs_open_img_decrypt(img, imgaddr * img->sector_size, fstype, password)) == NULL) {
                                 if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                                 {
+                                    //fsinfo = apfs_open(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "apfspassword");
                                     fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "apfspassword");
                                     //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
                                     qDebug() << "pool volume is encrypted";
@@ -1583,7 +1584,6 @@ void InitializeEvidenceStructure(QString evidname)
                                 //tsk_apfs_fsstat(fsinfo, apfsinfo);
                                 //qDebug() << "apfsinfo uuid:" << apfsinfo->uuid;
                             }
-			    tsk_img_close(curimginfo);
                             //qDebug() << "do apfs stuff here...";
                         }
                         else
@@ -1627,6 +1627,7 @@ void InitializeEvidenceStructure(QString evidname)
                     tsk_stack_free(stack);
                     tsk_fs_close(fsinfo);
 		    tsk_pool_close(poolinfo);
+		    tsk_img_close(curimginfo);
                 }
                 else
                 {
@@ -1676,9 +1677,9 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
 {
     QString blkstring = "";
     QString* blkstr = &blkstring;
-    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT)
+    if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS)
     {
-        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT)
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS)
         {
             tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, (void*)blkstr);
             //qDebug() << "blkstr:" << blkstr << "blkstring:" << blkstring;
@@ -1835,27 +1836,27 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
                 if(curfileinfo->name->meta_addr == 3)
                 {
                     hfsreservetype = 3;
-                    qDebug() << "$ExtentsFile";
+                    //qDebug() << "$ExtentsFile";
                 }
                 else if(curfileinfo->name->meta_addr == 4)
                 {
                     hfsreservetype = 4;
-                    qDebug() << "$CatalogFile";
+                    //qDebug() << "$CatalogFile";
                 }
                 else if(curfileinfo->name->meta_addr == 6)
                 {
                     hfsreservetype = 6;
-                    qDebug() << "$AllocationFile";
+                    //qDebug() << "$AllocationFile";
                 }
                 else if(curfileinfo->name->meta_addr == 7)
                 {
                     hfsreservetype = 7;
-                    qDebug() << "$StartupFile";
+                    //qDebug() << "$StartupFile";
                 }
                 else if(curfileinfo->name->meta_addr == 8)
                 {
                     hfsreservetype = 8;
-                    qDebug() << "$AttributesFile";
+                    //qDebug() << "$AttributesFile";
                 }
                 //else if(curfileinfo->name->meta_addr == 5)
                 //{
@@ -3637,14 +3638,15 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     magicbuffer = new char[charsize];
                     QByteArray tmparray("intro");
                     tmparray.clear();
-                    ssize_t bytesread = 0;
+                    //ssize_t bytesread = 0;
                     //if(fsfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || fsfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT)
                     //{
                     //    bytesread = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_HFS_DATA, 0, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NOID);
                     //}
                     //else
 		    mutex.lock();
-                        bytesread = tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
+                        //bytesread = tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
+                    tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
 		    mutex.unlock();
 		    //qDebug() << "bytesread:" << bytesread;
                     tmparray = QByteArray::fromRawData(magicbuffer, charsize);
