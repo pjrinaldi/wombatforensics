@@ -1515,6 +1515,9 @@ void WombatForensics::LoadHexContents()
             }
             else if(isapfs || ishfs)
             {
+                // NO BYTESTRING AND BLOCKLIST FOR APFS... NEED TO FIGURE OUT HOW APFS DOES IT...
+                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+                ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
                 //qDebug() << "apfs works...";
             }
             else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
