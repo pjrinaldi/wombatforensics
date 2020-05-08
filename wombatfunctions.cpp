@@ -1679,11 +1679,29 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
     QString* blkstr = &blkstring;
     if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_NTFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_FAT_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS)
     {
-        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS)
+        if(tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_HFS)
         {
             tsk_fs_file_walk_type(tmpfile, TSK_FS_ATTR_TYPE_HFS_DATA, HFS_FS_ATTR_ID_DATA, (TSK_FS_FILE_WALK_FLAG_ENUM)(TSK_FS_FILE_WALK_FLAG_AONLY | TSK_FS_FILE_WALK_FLAG_SLACK), GetBlockAddress, (void*)blkstr);
             //qDebug() << "blkstr:" << blkstr << "blkstring:" << blkstring;
         }
+	else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT || tmpfile->fs_info->ftype == TSK_FS_TYPE_APFS)
+	{
+	    int cnt, i;
+	    cnt = tsk_fs_file_attr_getsize(tmpfile);
+	    for(i=0; i < cnt; i++)
+	    {
+		const TSK_FS_ATTR* tmpattr = tsk_fs_file_attr_get_idx(tmpfile, i);
+		if(tmpattr->flags & TSK_FS_ATTR_NONRES)
+		{
+		    if(tmpattr->type == 4352)
+		    {
+			for(uint j=0; j < tmpattr->nrd.run->len; j++)
+			    blkstring += QString::number(tmpattr->nrd.run->addr + j) + "^^";
+			qDebug() << "fsname inode:" << tmpfile->name->name << tmpfile->name->meta_addr << "blkstring:" << blkstring;
+		    }
+		}
+	    }
+	}
         else if(tmpfile->fs_info->ftype == TSK_FS_TYPE_ISO9660_DETECT)
         {
             iso9660_inode* dinode;
@@ -1821,6 +1839,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
         proplist << "||allocation status for the file." << endl;
         proplist << "Attributes||";
         QString attrstr = "";
+	QString apfsblkstring = "";
         int attrcnt = tsk_fs_file_attr_getsize(curfileinfo);
         QString rnrstr = "Data Attribute||";
         for(int i=0; i < attrcnt; i++)
@@ -1883,6 +1902,7 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath)
                         isresident = true;
                     }
                 }
+		//qDebug() << "fsname:" << curfileinfo->name->name << "1st blk addr:" << fsattr->nrd.run->addr << "# of blocks:" << fsattr->nrd.run->len;
                 //else
                 //    qDebug() << "attr name is not null:" << fsattr->name;
             }
