@@ -1697,7 +1697,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
 		    {
 			for(uint j=0; j < tmpattr->nrd.run->len; j++)
 			    blkstring += QString::number(tmpattr->nrd.run->addr + j) + "^^";
-			qDebug() << "fsname inode:" << tmpfile->name->name << tmpfile->name->meta_addr << "blkstring:" << blkstring;
+			//qDebug() << "fsname inode:" << tmpfile->name->name << tmpfile->name->meta_addr << "blkstring:" << blkstring;
 		    }
 		}
 	    }
@@ -2699,6 +2699,16 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
             proplist << "";
         //qDebug() << "hfsreserveinfo" << hfsreserveinfo;
         proplist << "||Location and size of startup file (0x01B0-0x01FF)" << endl;
+    }
+    else if(curfsinfo->ftype == TSK_FS_TYPE_APFS)
+    {
+        qDebug() << "APFS properties list here...";
+        IMG_POOL_INFO *pool_img = (IMG_POOL_INFO*)curfsinfo->img_info;
+        const auto pool = static_cast<APFSPoolCompat*>(pool_img->pool_info->impl);
+        const APFSPool* mypool = (APFSPool*)pool;
+        APFSFileSystem* myvol = new APFSFileSystem(*mypool, (apfs_block_num)(pool_img->pvol_block));
+        qDebug() << "myvol name:" << QString::fromStdString(myvol->name());
+        qDebug() << "myvol uuid:" << QString::fromStdString(myvol->uuid().str());
     }
     proplist << "Endian Ordering||";
     if(curfsinfo->endian == TSK_UNKNOWN_ENDIAN)

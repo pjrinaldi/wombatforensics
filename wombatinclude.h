@@ -114,6 +114,8 @@
 #include <tsk_hfs.h>
 #include <tsk_yaffs.h>
 #include <tsk_pool.h>
+#include <pool.hpp>
+#include <apfs_pool_compat.hpp>
 #include <apfs_fs.h>
 #include <decmpfs.h>
 #include <tsk_apfs.hpp>
