@@ -2702,10 +2702,27 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_APFS)
     {
-        IMG_POOL_INFO *pool_img = (IMG_POOL_INFO*)curfsinfo->img_info;
+        IMG_POOL_INFO* pool_img = (IMG_POOL_INFO*)curfsinfo->img_info;
         const auto pool = static_cast<APFSPoolCompat*>(pool_img->pool_info->impl);
         const APFSPool* curpool = (APFSPool*)pool;
-        APFSFileSystem* curvol = new APFSFileSystem(*curpool, (apfs_block_num)(pool_img->pvol_block));
+        bool isencrypted = false;
+        qDebug() << "partitionpath:" << partitionpath;
+        qDebug() << "pvol_block:" << pool_img->pvol_block;
+        for(int i=0; i < pool->num_vols(); i++)
+        {
+            TSK_POOL_VOLUME_INFO curpoolvol = pool_img->pool_info->vol_list[i];
+            if(curpoolvol.block == pool_img->pvol_block)
+            {
+                if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                    isencrypted = true;
+            }
+        }
+        // IF not encrypted...
+        APFSFileSystem* curvol = NULL;
+        if(isencrypted)
+            curvol = new APFSFileSystem(*curpool, (apfs_block_num)(pool_img->pvol_block), "apfspassword");
+        else
+            curvol = new APFSFileSystem(*curpool, (apfs_block_num)(pool_img->pvol_block));
         proplist << "Volume UUID||" << QString::fromStdString(curvol->uuid().str()) << "||The universally unique identifier for this volume." << endl;
         proplist << "APSB Block Number||" << QString::number(curvol->block_num()) << "||The block number for the APFS SuperBlock." << endl;
         proplist << "APSB oid||" << QString::number(curvol->oid()) << "||The APFS SuperBlock Object IDentifier." << endl;
@@ -2758,6 +2775,7 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
             proplist << "No";
         proplist << "||Volume is encrypted or not encrypted and is hardware assisted or not (TPM)" << endl;
         proplist << "Formatted by||" << QString::fromStdString(curvol->formatted_by()) << "||Method used to formatted volume." << endl;
+        //QString tstr = 
         // still need to implement created time, changed time, encryption info, snapshots, unmount log, reserved | quota | alloc blocks, last_inum
     }
     proplist << "Endian Ordering||";
@@ -3598,7 +3616,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
                     TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
                     if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                     {
-                        fsinfo = tsk_fs_open_img_decrypt(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                        fsinfo = tsk_fs_open_img_decrypt(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS_DETECT, "apfspassword");
                         //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
                     }
                     else
