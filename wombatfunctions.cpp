@@ -2702,13 +2702,63 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
     }
     else if(curfsinfo->ftype == TSK_FS_TYPE_APFS)
     {
-        qDebug() << "APFS properties list here...";
         IMG_POOL_INFO *pool_img = (IMG_POOL_INFO*)curfsinfo->img_info;
         const auto pool = static_cast<APFSPoolCompat*>(pool_img->pool_info->impl);
-        const APFSPool* mypool = (APFSPool*)pool;
-        APFSFileSystem* myvol = new APFSFileSystem(*mypool, (apfs_block_num)(pool_img->pvol_block));
-        qDebug() << "myvol name:" << QString::fromStdString(myvol->name());
-        qDebug() << "myvol uuid:" << QString::fromStdString(myvol->uuid().str());
+        const APFSPool* curpool = (APFSPool*)pool;
+        APFSFileSystem* curvol = new APFSFileSystem(*curpool, (apfs_block_num)(pool_img->pvol_block));
+        proplist << "Volume UUID||" << QString::fromStdString(curvol->uuid().str()) << "||The universally unique identifier for this volume." << endl;
+        proplist << "APSB Block Number||" << QString::number(curvol->block_num()) << "||The block number for the APFS SuperBlock." << endl;
+        proplist << "APSB oid||" << QString::number(curvol->oid()) << "||The APFS SuperBlock Object IDentifier." << endl;
+        proplist << "APSB xid||" << QString::number(curvol->xid()) << "||The APFS SuperBlock Transaction IDentifier." << endl;
+        proplist << "Volume Name||" << QString::fromStdString(curvol->name()) << "||The APFS Volume name." << endl;
+        proplist << "Volume Role||";
+        switch(curvol->role())
+        {
+            case APFS_VOLUME_ROLE_NONE:
+                proplist << "No specific role";
+                break;
+            case APFS_VOLUME_ROLE_SYSTEM:
+                proplist << "System";
+                break;
+            case APFS_VOLUME_ROLE_USER:
+                proplist << "User";
+                break;
+            case APFS_VOLUME_ROLE_RECOVERY:
+                proplist << "Recovery";
+                break;
+            case APFS_VOLUME_ROLE_VM:
+                proplist << "Virtual Machine";
+                break;
+            case APFS_VOLUME_ROLE_PREBOOT:
+                proplist << "Preboot";
+                break;
+            default:
+                proplist << "Unknown";
+                break;
+        }
+        proplist << "||Defined Role for the specified volume." << endl;
+        proplist << "Capacity Consumed||" << QString::number(curvol->used()) + " bytes" << "||Capacity consumed." << endl;
+        proplist << "Capacity Reserved||" << QString::number(curvol->reserved()) + " bytes" << "Capacity reserved." << endl;
+        proplist << "Capacity Quota||" << QString::number(curvol->quota()) + " bytes" << "Capacity quota." << endl;
+        proplist << "Case Sensitive||";
+        if(curvol->case_sensitive())
+            proplist << "Yes";
+        else
+            proplist << "No";
+        proplist << "||File names on this volume are case (in)sensitive." << endl;
+        proplist << "Encrypted||";
+        if(curvol->encrypted())
+        {
+            QString tmpstr = "Yes";
+            if(curpool->hardware_crypto())
+                tmpstr += " (hardware assisted)";
+            proplist << tmpstr;
+        }
+        else
+            proplist << "No";
+        proplist << "||Volume is encrypted or not encrypted and is hardware assisted or not (TPM)" << endl;
+        proplist << "Formatted by||" << QString::fromStdString(curvol->formatted_by()) << "||Method used to formatted volume." << endl;
+        // still need to implement created time, changed time, encryption info, snapshots, unmount log, reserved | quota | alloc blocks, last_inum
     }
     proplist << "Endian Ordering||";
     if(curfsinfo->endian == TSK_UNKNOWN_ENDIAN)
