@@ -1530,6 +1530,7 @@ void InitializeEvidenceStructure(QString evidname)
                 }
                 else if(partinfo->flags == 0x01) // allocated partition
                 {
+                    QString pooldesc = "";
                     //qDebug() << "partinfo start:" << partinfo->start;
                     TSK_FS_INFO* fsinfo = NULL;
                     TSK_STACK* stack = NULL;
@@ -1552,58 +1553,59 @@ void InitializeEvidenceStructure(QString evidname)
                         fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
                     else
                     {
-			//qDebug() << "poolinfo uuid:" << poolinfo->uuid().str.c_str();
-                        // FUNCTION I NEED ISN'T IMPLEMENTED YET... CURRENT WORKAROUND RUN..
-                        qDebug() << "pool exists with:" << poolinfo->num_vols << "volumes." << tsk_pool_type_toname(poolinfo->ctype);
                         if(poolinfo->num_vols > 0)
                         {
                             for(int i=0; i < poolinfo->num_vols; i++)
                             {
                                 TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
-                                qDebug() << "pool volume description:" << curpoolvol.desc;
-                                qDebug() << "pool starting block:" << curpoolvol.block << "and number of blocks:" << curpoolvol.num_blocks;
+                                pooldesc = curpoolvol.desc;
                                 curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
-                                //APFSFSCompat* apfsinfo = new APFSFSCompat(curimginfo, poolinfo, curpoolvol.block, "");
-                                //qDebug() << "apfs uuid:" << apfsinfo->vol.uuid().str().c_str();
-                                //if ((fs = tsk_fs_open_img_decrypt(img, imgaddr * img->sector_size, fstype, password)) == NULL) {
                                 if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                                 {
-                                    //fsinfo = apfs_open(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "apfspassword");
-                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "apfspassword");
+                                    // CURRENTLY TSK DOESN'T WORK FOR ENCRYPTED APFS VOLUMES...
+                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS, "apfspassword");
+                                    //fsinfo = tsk_fs_open_vol_decrypt(partinfo, TSK_FS_TYPE_APFS, "apfspassword");
                                     //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
-                                    qDebug() << "pool volume is encrypted";
                                 }
                                 else
                                 {
                                     fsinfo = tsk_fs_open_img(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT);
                                     //fsinfo = tsk_fs_open_pool(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT);
-                                    qDebug() << "pool volume is not encrypted";
                                 }
-                                //apfs_fsstat_info* apfsinfo = nullptr;
-                                //apfs_fsstat_info* apfsinfo;
-                                //tsk_apfs_fsstat(fsinfo, apfsinfo);
-                                //qDebug() << "apfsinfo uuid:" << apfsinfo->uuid;
                             }
-                            //qDebug() << "do apfs stuff here...";
                         }
-                        else
-                            qDebug() << "pool num vols:" << poolinfo->num_vols;
-                        // record pstat information. loop over pool volumes..., where the pool volumes are i think link the fsinfo variables...
+                        //else
+                            //qDebug() << "pool num vols:" << poolinfo->num_vols;
                     }
                     if(fsinfo != NULL)
                     {
-                        out << fsinfo->ftype << "," << (qint64)fsinfo->block_size * (qint64)fsinfo->block_count << "," << GetFileSystemLabel(fsinfo) << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)fsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
+                        out << fsinfo->ftype << "," << (qint64)fsinfo->block_size * (qint64)fsinfo->block_count << ",";
+                        if(poolinfo == nullptr)
+                            out << GetFileSystemLabel(fsinfo);
+                        else
+                            out << pooldesc;
+                        out << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)fsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
                         out.flush();
                         pfile.close();
                         treeout.clear();
-                        treeout << QString(GetFileSystemLabel(fsinfo) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+                        QString fsdesc = "";
+                        if(poolinfo == nullptr)
+                            fsdesc = GetFileSystemLabel(fsinfo);
+                        else
+                            fsdesc = pooldesc;
+                        treeout << QString(fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
                         nodedata.clear();
                         for(int j=0; j < treeout.count(); j++)
                             nodedata << treeout.at(j);
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
-                        reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
+                        reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>";
+                        if(poolinfo == nullptr)
+                            reportstring += QString(GetFileSystemLabel(fsinfo));
+                        else
+                            reportstring += fsdesc;
+                        reportstring += " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
 			partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                         WriteFileSystemProperties(fsinfo, partitionpath);
                         ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
@@ -2706,8 +2708,6 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
         const auto pool = static_cast<APFSPoolCompat*>(pool_img->pool_info->impl);
         const APFSPool* curpool = (APFSPool*)pool;
         bool isencrypted = false;
-        qDebug() << "partitionpath:" << partitionpath;
-        qDebug() << "pvol_block:" << pool_img->pvol_block;
         for(int i=0; i < pool->num_vols(); i++)
         {
             TSK_POOL_VOLUME_INFO curpoolvol = pool_img->pool_info->vol_list[i];
@@ -2755,8 +2755,8 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
         }
         proplist << "||Defined Role for the specified volume." << endl;
         proplist << "Capacity Consumed||" << QString::number(curvol->used()) + " bytes" << "||Capacity consumed." << endl;
-        proplist << "Capacity Reserved||" << QString::number(curvol->reserved()) + " bytes" << "Capacity reserved." << endl;
-        proplist << "Capacity Quota||" << QString::number(curvol->quota()) + " bytes" << "Capacity quota." << endl;
+        proplist << "Capacity Reserved||" << QString::number(curvol->reserved()) + " bytes" << "||Capacity reserved." << endl;
+        proplist << "Capacity Quota||" << QString::number(curvol->quota()) + " bytes" << "||Capacity quota." << endl;
         proplist << "Case Sensitive||";
         if(curvol->case_sensitive())
             proplist << "Yes";
@@ -2774,6 +2774,13 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
         else
             proplist << "No";
         proplist << "||Volume is encrypted or not encrypted and is hardware assisted or not (TPM)" << endl;
+        if(curvol->encrypted() && !curpool->hardware_crypto())
+        {
+            const auto crypto = curvol->crypto_info();
+            if(crypto.unlocked)
+                proplist << "Password||" << QString::fromStdString(crypto.password) << "||APFS Volume Password." << endl;
+            proplist << "Password Hint||" << QString::fromStdString(crypto.password_hint) << "||APFS Volume Password hint." << endl;
+        }
         proplist << "Formatted by||" << QString::fromStdString(curvol->formatted_by()) << "||Method used to formatted volume." << endl;
         //QString tstr = 
         // still need to implement created time, changed time, encryption info, snapshots, unmount log, reserved | quota | alloc blocks, last_inum
@@ -3616,7 +3623,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
                     TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
                     if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                     {
-                        fsinfo = tsk_fs_open_img_decrypt(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS_DETECT, "apfspassword");
+                        fsinfo = tsk_fs_open_img_decrypt(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS, "apfspassword");
                         //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
                     }
                     else
