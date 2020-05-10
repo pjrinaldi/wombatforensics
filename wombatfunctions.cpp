@@ -2780,9 +2780,14 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
             if(crypto.unlocked)
                 proplist << "Password||" << QString::fromStdString(crypto.password) << "||APFS Volume Password." << endl;
             proplist << "Password Hint||" << QString::fromStdString(crypto.password_hint) << "||APFS Volume Password hint." << endl;
+
         }
         proplist << "Formatted by||" << QString::fromStdString(curvol->formatted_by()) << "||Method used to formatted volume." << endl;
-        //QString tstr = 
+        char time_buf[1024];
+        tsk_fs_time_to_str_subsecs(curvol->created() / 1000000000, curvol->created() % 1000000000, time_buf);
+        proplist << "Created||" << QString(time_buf) << "||APFS volume creation time." << endl;
+        tsk_fs_time_to_str_subsecs(curvol->changed() / 1000000000, curvol->changed() % 1000000000, time_buf);
+        proplist << "Changed||" << QString(time_buf) << "||APFS volume changed time." << endl;
         // still need to implement created time, changed time, encryption info, snapshots, unmount log, reserved | quota | alloc blocks, last_inum
     }
     proplist << "Endian Ordering||";
