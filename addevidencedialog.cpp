@@ -45,8 +45,7 @@ void AddEvidenceDialog::SelectEvidence()
             // LET's TEST IT OUT...
             // IF I DON'T WRITE THE STAT/PROP FILE'S HERE, WHERE I WILL STORE PASSWORDS FOR MULTIPLE EVIDENCE ITEMS WITH MULTIPLE ENCRYPTED POOL'S/FS'S
             // IF I DO WRITE THE STAT/PROP FILE'S HERE, HOW I WILL NO TO DELETE THE FILES IF THE USER CANCEL'S THE OPERATION...
-            /*
-            qDebug() << "encryption test begins...";
+            //qDebug() << "encryption test begins...";
             const TSK_TCHAR** images;
             std::vector<std::string> fullpathvector;
             fullpathvector.clear();
@@ -66,13 +65,15 @@ void AddEvidenceDialog::SelectEvidence()
                 vsinfo = tsk_vs_open(imginfo, 0, TSK_VS_TYPE_DETECT);
             if(vsinfo == NULL) // no volume, single fs is all there is...
             {
-                qDebug() << "vsinfo is null...";
-                qDebug() << "tsk can't open a pool from an image only...";
+                //qDebug() << "vsinfo is null...";
+                //qDebug() << "tsk can't open a pool from an image only...";
                 // NEED TO FIGURE OUT IF THERE IS AN INDICATOR OF POOL AND APFS SIGNATURE THAT I COULD DETECT IN THE IMAGE...
                 poolinfo = tsk_pool_open_img_sing(imginfo, 0, TSK_POOL_TYPE_APFS);
                 if(poolinfo == nullptr) // doesn't contain a pool...
                 {
-                    qDebug() << "pool is null...";
+                    // THIS METHODOLOGY WON'T WORK CAUSE YOU CAN'T GET TSK_FS_INFO IF IT IS ENCRYPTED TO TELL IF IT IS ENCRYPTED OR NOT...
+                    /*
+                    //qDebug() << "pool is null...";
                     fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
                     if(fsinfo == NULL) // unrecognized fs..
                     {
@@ -82,11 +83,11 @@ void AddEvidenceDialog::SelectEvidence()
                         if(fsinfo->flags & TSK_FS_INFO_FLAG_ENCRYPTED)
 			{
 			    qDebug() << evidfilename << "v0" << "p0";
-                            qDebug() << "encrypted FS: prompt for password...";
+                            //qDebug() << "encrypted FS: prompt for password...";
 			}
-                        else
-                            qDebug() << "not encrypted FS...";
-                    }
+                        //else
+                        //    qDebug() << "not encrypted FS...";
+                    }*/
                 }
                 else // has a pool
                 {
@@ -104,7 +105,9 @@ void AddEvidenceDialog::SelectEvidence()
 			    }
                             else
 			    {
-                                qDebug() << "not encrypted pool...";
+                                // THIS METHODOLOGY WON'T WORK CAUSE YOU CAN'T GET TSK_FS_INFO IF IT IS ENCRYPTED TO TELL IF IT IS ENCRYPTED OR NOT...
+                                /*
+                                //qDebug() << "not encrypted pool...";
                                 fsinfo = tsk_fs_open_img(curimginfo, 0, TSK_FS_TYPE_APFS_DETECT);
                                 if(fsinfo != NULL)
                                 {
@@ -113,7 +116,7 @@ void AddEvidenceDialog::SelectEvidence()
 					qDebug() << evidfilename << "v0" << "p" << i;
                                         qDebug() << "encrypted FS: prompt for password...";
 				    }
-                                }
+                                }*/
 			    }
                         }
 			tsk_img_close(curimginfo);
@@ -122,7 +125,7 @@ void AddEvidenceDialog::SelectEvidence()
             }
             else // contains volume... repeat above for each partition...
             {
-                qDebug() << "vsinfo is not null....";
+                //qDebug() << "vsinfo is not null....";
                 const TSK_VS_PART_INFO* partinfo = NULL;
                 if(vsinfo->part_count > 0)
                 {
@@ -136,8 +139,10 @@ void AddEvidenceDialog::SelectEvidence()
                                 fsinfo = NULL;
                                 poolinfo = nullptr;
                                 poolinfo = tsk_pool_open_sing(partinfo, TSK_POOL_TYPE_DETECT);
+                                // THIS METHODOLOGY WON'T WORK CAUSE YOU CAN'T GET TSK_FS_INFO IF IT IS ENCRYPTED TO TELL IF IT IS ENCRYPTED OR NOT...
                                 if(poolinfo == nullptr)
                                 {
+                                    /*
                                     fsinfo = tsk_fs_open_vol(partinfo, TSK_FS_TYPE_DETECT);
 				    if(fsinfo != NULL)
 				    {
@@ -147,6 +152,7 @@ void AddEvidenceDialog::SelectEvidence()
 					    qDebug() << evidfilename << "v0" << "f" << i;
 					}
 				    }
+                                    */
                                 }
                                 else
                                 {
@@ -166,11 +172,13 @@ void AddEvidenceDialog::SelectEvidence()
 						qDebug() << "if it worked, store in passwordhash.";
                                                 fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, "apfspassword");
                                             }
-                                            else
-                                            {
-                                                qDebug() << "not encrypted pool volume...";
-                                                fsinfo = tsk_fs_open_img(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT);
-                                            }
+                                            //else
+                                            //{
+                                                //qDebug() << "not encrypted pool volume...";
+                                                //fsinfo = tsk_fs_open_img(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT);
+                                            //}
+                                            // THIS METHODOLOGY WON'T WORK CAUSE YOU CAN'T GET TSK_FS_INFO IF IT IS ENCRYPTED TO TELL IF IT IS ENCRYPTED OR NOT...
+                                            /*
                                             if(fsinfo != NULL)
                                             {
                                                 if(fsinfo->flags & TSK_FS_INFO_FLAG_ENCRYPTED)
@@ -178,7 +186,7 @@ void AddEvidenceDialog::SelectEvidence()
 					    	    qDebug() << evidfilename << "v0" << "f" << i;
                                                     qDebug() << "encrypted FS: prompt for password...";
 						}
-                                            }
+                                            }*/
                                         }
 					tsk_img_close(curimginfo);
                                     }
@@ -192,7 +200,6 @@ void AddEvidenceDialog::SelectEvidence()
 	    tsk_pool_close(poolinfo);
 	    tsk_vs_close(vsinfo);
 	    tsk_img_close(imginfo);
-            */
         }
         else if(evidfilename.isNull())
         {
