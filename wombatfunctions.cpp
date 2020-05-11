@@ -4164,6 +4164,11 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                     QMimeDatabase mimedb;
                     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
                     QString mimestr = GenerateCategorySignature(mimetype);
+                    if(mimestr.contains("Unknown")) // generate further analysis
+                    {
+                        if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
+                            mimestr = "Windows System/Shortcut";
+                    }
                     delete[] magicbuffer;
                     treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
                 }

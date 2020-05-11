@@ -559,6 +559,13 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         // THIS FAILS ON ADS
         textviewer->ShowText(index);
     }
+    else if(index.sibling(index.row(), 9).data().toString().contains("Shortcut"))
+    {
+        htmlviewer = new HtmlViewer();
+        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + "LNK Viewer");
+        htmlviewer->ShowLnk(index);
+    }
     else
     {
         QApplication::restoreOverrideCursor();
