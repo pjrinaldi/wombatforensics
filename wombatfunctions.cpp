@@ -3948,24 +3948,21 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     magicbuffer = new char[charsize];
                     QByteArray tmparray("intro");
                     tmparray.clear();
-                    //ssize_t bytesread = 0;
-                    //if(fsfile->fs_info->ftype == TSK_FS_TYPE_HFS_DETECT || fsfile->fs_info->ftype == TSK_FS_TYPE_APFS_DETECT)
-                    //{
-                    //    bytesread = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_HFS_DATA, 0, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NOID);
-                    //}
-                    //else
 		    mutex.lock();
-                        //bytesread = tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
                     tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
 		    mutex.unlock();
-		    //qDebug() << "bytesread:" << bytesread;
                     tmparray = QByteArray::fromRawData(magicbuffer, charsize);
                     QMimeDatabase mimedb;
                     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
                     QString mimestr = GenerateCategorySignature(mimetype);
+                    if(mimestr.contains("Unknown")) // generate further analysis
+                    {
+                        if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
+                            mimestr = "Windows System/Shortcut";
+                    }
+                    //qDebug() << "mimestr:" << mimestr;
                     delete[] magicbuffer;
                     treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
-		    //qDebug() << "mimestr:" << mimestr;
                 }
                 treeout << "0"; // TAG - 10
                 // PUT ID INFO HERE FOR NAME IN FIRST COLUMN
