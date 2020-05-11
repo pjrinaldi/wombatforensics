@@ -67,5 +67,7 @@ void InitializeHashList(void);
 void InitializeTaggedList(void);
 void SaveHashList(void);
 void SaveTaggedList(void);
+void SavePasswordList(void);
+void InitializePasswordList(void);
 
 #endif // wombatfunctions.h

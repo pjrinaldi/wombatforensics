@@ -100,17 +100,17 @@ void AddEvidenceDialog::SelectEvidence()
 			    curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
                             if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
 			    {
-                                QString curitem = evidfilename + "-v0" + "-p" + QString::number(i);
+                                // FOR NOW JUST STORE PASSWORD IN PASSWORD HASH...
+				//qDebug() << "check password, if fs == null, then it didn't work...";
+                                // NEED TO STORE IN HASH, ALSO POSSIBLY ALLOW IT TO BE CHANGED SOMEHOW...
                                 //qDebug() << "encrypted POOL VOLUME: prompt for password...";
 				//qDebug() << evidfilename << "v0" << "p" << i;
+                                QString curitem = evidfilename.split("/", QString::SkipEmptyParts).last() + "-v0" + "-p" + QString::number(i);
                                 bool ok;
                                 QString text = QInputDialog::getText(this, QString("Encrypted File System"), QString(curitem + "\nEnter Password:"), QLineEdit::Normal, "", &ok);
-                                if (ok && !text.isEmpty())
-                                    qDebug() << "password:" << text;
-				qDebug() << "check password, if fs == null, then it didn't work...";
-				qDebug() << "if it worked, store in passwordhash.";
+                                if (ok)
+                                    passwordhash.insert(curitem, text);
                                 fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS_DETECT, text.toStdString().c_str());
-                                // NEED TO STORE IN HASH, ALSO POSSIBLY ALLOW IT TO BE CHANGED SOMEHOW...
 			    }
                             else
 			    {
@@ -174,18 +174,19 @@ void AddEvidenceDialog::SelectEvidence()
                                             curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
                                             if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                                             {
-                                                QString curitem = evidfilename + "-v0" + "-p" + QString::number(i + j);
                                                 //qDebug() << "encrypted POOL VOLUME: prompt for password...";
 		                		//qDebug() << evidfilename << "v0" << "p" << i;
-                                                bool ok;
-                                                QString text = QInputDialog::getText(this, QString("Encrypted File System"), QString(curitem + "\nEnter Password:"), QLineEdit::Normal, "", &ok);
-                                                if (ok && !text.isEmpty())
-                                                    qDebug() << "password:" << text;
+                                                //qDebug() << "password:" << text;
 						// I + J IS EQUIVALENT OF INCREMENTING PARTINT++ BY 1 
 					    	//qDebug() << evidfilename << "v0" << "f" << i + j;
 						//qDebug() << "prompt here and store password...";
-						qDebug() << "check password, if fs == null, then it didn't work...";
-						qDebug() << "if it worked, store in passwordhash.";
+						//qDebug() << "check password, if fs == null, then it didn't work...";
+						//qDebug() << "if it worked, store in passwordhash.";
+                                                QString curitem = evidfilename.split("/", QString::SkipEmptyParts).last() + "-v0" + "-p" + QString::number(i + j);
+                                                bool ok;
+                                                QString text = QInputDialog::getText(this, QString("Encrypted File System"), QString(curitem + "\nEnter Password:"), QLineEdit::Normal, "", &ok);
+                                                if (ok)
+                                                    passwordhash.insert(curitem, text);
                                                 fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT, text.toStdString().c_str());
                                             }
                                             //else

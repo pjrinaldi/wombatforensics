@@ -905,6 +905,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     msglog->clear();
     InitializeCheckState();
+    InitializePasswordList();
     ui->actionAdd_Evidence->setEnabled(true);
     ui->actionBookmark_Manager->setEnabled(true);
     ui->actionpreviewreport->setEnabled(true);
@@ -1188,6 +1189,7 @@ void WombatForensics::UpdateStatus()
     ui->actionDigDeeper->setEnabled(true);
     ui->actionCarve->setEnabled(true);
     ui->actionsearchhex->setEnabled(true);
+    SavePasswordList();
     qInfo() << "Processing Complete";
     //LogMessage("Processing Complete.");
     StatusUpdate("Evidence ready");
@@ -1557,6 +1559,8 @@ void WombatForensics::CloseCurrentCase()
         qInfo() << "Tagged Items Saved";
         SaveHashList();
         qInfo() << "Hashed Items Saved";
+        SavePasswordList();
+        qInfo() << "Password Items Saved";
         SaveImagesHash();
         qInfo() << "Thumbnailed Videos and Images Saved";
         ui->dirTreeView->clearSelection();
@@ -1691,6 +1695,14 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                     taggedhash.remove(o.key());
             }
             SaveTaggedList();
+            QHashIterator<QString, QString> p(passwordhash);
+            while(p.hasNext())
+            {
+                p.next();
+                if(p.key().contains(QString(evidfiles.first().split(".e").first())))
+                    passwordhash.remove(p.key());
+            }
+            SavePasswordList();
             // 3. Delete evid directory.
             QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
             edir.removeRecursively();
@@ -2636,6 +2648,7 @@ void WombatForensics::SaveState()
         RewriteSelectedIdContent(selectedindex);
     SaveTaggedList();
     SaveHashList();
+    SavePasswordList();
     SaveImagesHash();
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);

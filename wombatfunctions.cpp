@@ -1345,6 +1345,7 @@ void PopulateTreeModel(QString evidstring)
                 {
                     for(int k=0; k < poolinfo->num_vols; k++)
                     {
+                        qDebug() << "j+k" << j+k;
                         j = j + k;
                         partitionpath = volumepath + "p" + QString::number(j) + "/";
                         QStringList plist;
@@ -1357,8 +1358,9 @@ void PopulateTreeModel(QString evidstring)
                         pfile.close();
                         TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[k];
                         curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
+                        //fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidname + "-v" + QString::number(volcnt) + "-p" + QString::number(partint));
                         if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
-                            fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, "apfspassword");
+                            fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidstring.split("/", QString::SkipEmptyParts).last() + "-v" + vlist.at(5).split("-v").last() + "-p" + QString::number(j)).toStdString().c_str());
                         else
                             fsinfo = tsk_fs_open_img(curimginfo, 0, TSK_FS_TYPE_APFS_DETECT);
                         if(fsinfo != NULL)
@@ -1505,7 +1507,7 @@ void InitializeEvidenceStructure(QString evidname)
                     if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                     {
                         // CURRENTLY TSK DOESN'T WORK FOR ENCRYPTED APFS VOLUMES...
-                        fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, "apfspassword");
+                        fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidname.split("/").last() + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)).toStdString().c_str());
                         //fsinfo = tsk_fs_open_vol_decrypt(partinfo, TSK_FS_TYPE_APFS, "apfspassword");
                         //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "apfspassword");
                     }
@@ -1559,7 +1561,7 @@ void InitializeEvidenceStructure(QString evidname)
                         treeout << QString(fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
                         nodedata.clear();
                         for(int j=0; j < treeout.count(); j++)
-                            nodedata << treeout.at(i);
+                            nodedata << treeout.at(j);
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                         mutex.unlock();
@@ -1747,6 +1749,8 @@ void InitializeEvidenceStructure(QString evidname)
                     {
                         if(poolinfo->num_vols > 0)
                         {
+                            if(pfile.isOpen())
+                                pfile.close();
                             for(int k=0; k < poolinfo->num_vols; k++)
                             {
                                 TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[k];
@@ -1755,7 +1759,8 @@ void InitializeEvidenceStructure(QString evidname)
                                 if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                                 {
                                     // CURRENTLY TSK DOESN'T WORK FOR ENCRYPTED APFS VOLUMES...
-                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS, "apfspassword");
+                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS, passwordhash.value(evidname.split("/").last() + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)).toStdString().c_str());
+                                    //fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidname + "-v" + QString::number(volcnt) + "-p" + QString::number(partint));
                                     //fsinfo = tsk_fs_open_vol_decrypt(partinfo, TSK_FS_TYPE_APFS, "apfspassword");
                                     //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
                                 }
@@ -1764,6 +1769,11 @@ void InitializeEvidenceStructure(QString evidname)
                                     fsinfo = tsk_fs_open_img(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT);
                                     //fsinfo = tsk_fs_open_pool(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT);
                                 }
+                                QString partitionpath = volumepath + "p" + QString::number(partint) + "/";
+                                dir.mkpath(partitionpath);
+                                pfile.setFileName(partitionpath + "stat");
+                                pfile.open(QIODevice::Append | QIODevice::Text);
+                                out.setDevice(&pfile);
                                 if(fsinfo != NULL)
                                 {
                                     out << fsinfo->ftype << "," << (qint64)fsinfo->block_size * (qint64)fsinfo->block_count << ",";
@@ -2905,8 +2915,12 @@ void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath)
         }
         // IF not encrypted...
         APFSFileSystem* curvol = NULL;
+        //qDebug() << "partitionpath:" << partitionpath;
+        QString passkey = partitionpath.split("/", QString::SkipEmptyParts).at(partitionpath.split("/", QString::SkipEmptyParts).count() - 3).split(".e").first() + "-" + partitionpath.split("/", QString::SkipEmptyParts).at(partitionpath.split("/", QString::SkipEmptyParts).count() - 2) + "-" + partitionpath.split("/", QString::SkipEmptyParts).last();
+        //qDebug() << "password key:" << QString(partitionpath.split("/", QString::SkipEmptyParts).at(partitionpath.split("/", QString::SkipEmptyParts).count() - 3).split(".e").first() + "-" + partitionpath.split("/", QString::SkipEmptyParts).at(partitionpath.split("/", QString::SkipEmptyParts).count() - 2) + "-" + partitionpath.split("/", QString::SkipEmptyParts).last());
+        //qDebug() << "passkey:" << passkey << "password:" << passwordhash.value(passkey);
         if(isencrypted)
-            curvol = new APFSFileSystem(*curpool, (apfs_block_num)(pool_img->pvol_block), "apfspassword");
+            curvol = new APFSFileSystem(*curpool, (apfs_block_num)(pool_img->pvol_block), passwordhash.value(passkey).toStdString().c_str());
         else
             curvol = new APFSFileSystem(*curpool, (apfs_block_num)(pool_img->pvol_block));
         proplist << "Volume UUID||" << QString::fromStdString(curvol->uuid().str()) << "||The universally unique identifier for this volume." << endl;
@@ -3813,7 +3827,8 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
                     TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
                     if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                     {
-                        fsinfo = tsk_fs_open_img_decrypt(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS, "apfspassword");
+                        //fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidname + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)).toStdString().c_str());
+                        fsinfo = tsk_fs_open_img_decrypt(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS, passwordhash.value(evidencename + "-" + vstring + "-" + pstring).toStdString().c_str());
                         //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
                     }
                     else
@@ -4313,6 +4328,7 @@ void InitializeHashList(void)
             hashfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(hashfile.isOpen())
             tmpstr = hashfile.readLine();
+        hashfile.close();
         QStringList hlist = tmpstr.split(",", QString::SkipEmptyParts);
         for(int i=0; i < hlist.count(); i++)
             hashlist.insert(hlist.at(i).split("|", QString::SkipEmptyParts).at(0), hlist.at(i).split("|", QString::SkipEmptyParts).at(1));
@@ -4322,6 +4338,29 @@ void InitializeHashList(void)
     {
         i.next();
         treenodemodel->UpdateNode(i.key(), 7, i.value());
+    }
+}
+
+void InitializePasswordList(void)
+{
+    passwordhash.clear();
+    QString tmpstr = "";
+    QFile hfile(wombatvariable.tmpmntpath + "passlist");
+    QByteArray ba;
+    if(hfile.exists())
+    {
+        if(!hfile.isOpen())
+            hfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(hfile.isOpen())
+            tmpstr = hfile.readLine();
+        hfile.close();
+        QStringList hlist = tmpstr.split(",", QString::SkipEmptyParts);
+        for(int i=0; i < hlist.count(); i++)
+        {
+            ba.clear();
+            ba.append(hlist.at(i).split("|", QString::SkipEmptyParts).at(1));
+            passwordhash.insert(hlist.at(i).split("|", QString::SkipEmptyParts).at(0), QByteArray::fromBase64(ba));
+        }
     }
 }
 
@@ -4339,6 +4378,7 @@ void InitializeTaggedList(void)
         QStringList hlist = tmpstr.split(",", QString::SkipEmptyParts);
         for(int i=0; i < hlist.count(); i++)
             taggedhash.insert(hlist.at(i).split("|", QString::SkipEmptyParts).at(0), hlist.at(i).split("|", QString::SkipEmptyParts).at(1));
+        hashfile.close();
     }
     QHashIterator<QString, QString> i(taggedhash);
     while(i.hasNext())
@@ -4346,6 +4386,28 @@ void InitializeTaggedList(void)
         i.next();
         treenodemodel->UpdateNode(i.key(), 10, i.value());
     }
+}
+
+void SavePasswordList(void)
+{
+    QFile hfile(wombatvariable.tmpmntpath + "passlist");
+    if(!hfile.isOpen())
+        hfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(hfile.isOpen())
+    {
+        QHashIterator<QString, QString> i(passwordhash);
+        while(i.hasNext())
+        {
+            QByteArray ba;
+            ba.clear();
+            i.next();
+            ba.append(i.value());
+            hfile.write(i.key().toStdString().c_str());
+            hfile.write("|");
+            hfile.write(ba.toBase64().toStdString().c_str());
+        }
+    }
+    hfile.close();
 }
 
 void SaveHashList(void)
