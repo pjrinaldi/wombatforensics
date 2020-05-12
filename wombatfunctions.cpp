@@ -1304,7 +1304,11 @@ void PopulateTreeModel(QString evidstring)
 	    TSK_FS_INFO* fsinfo = NULL;
 	    const TSK_POOL_INFO* poolinfo = tsk_pool_open_img_sing(imginfo, 0, TSK_POOL_TYPE_DETECT);
 	    TSK_IMG_INFO* curimginfo = NULL;
-	    fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
+	    if(poolinfo == nullptr)
+	        fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
+	    else
+	    {
+	    }
 	}
 	else
 	{
