@@ -1381,8 +1381,10 @@ void PopulateTreeModel(QString evidstring)
 	else
 	{
 	    // START LOOP WITH VSINFO PART'S TO MATCH THE PARTLIST VALUES..
+            qDebug() << "partition count:" << vsinfo->part_count;
 	    for(uint j=0; j < vsinfo->part_count; j++)
 	    {
+                qDebug() << "partition j:" << j;
 		const TSK_VS_PART_INFO* partinfo = NULL;
 		partinfo = tsk_vs_part_get(vsinfo, j);
 		if(partlist.contains(QString("p" + QString::number(j)))) // ensure there is a directory for it...
@@ -1424,10 +1426,14 @@ void PopulateTreeModel(QString evidstring)
 		    {
                         if(poolinfo->num_vols > 0)
                         {
+                            qDebug() << "poolvol count:" << poolinfo->num_vols;
                             for(int k=0; k < poolinfo->num_vols; k++)
                             {
-                                j = j + k;
-                                partitionpath = volumepath + "p" + QString::number(j) + "/";
+                                qDebug() << "j:" << j;
+                                int pint = j + k;
+                                qDebug() << "pint:" << pint;
+                                //j = j + k;
+                                partitionpath = volumepath + "p" + QString::number(pint) + "/";
                                 QStringList plist;
                                 plist.clear();
                                 QFile pfile(partitionpath + "stat");
@@ -1439,7 +1445,7 @@ void PopulateTreeModel(QString evidstring)
                                 TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[k];
                                 curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
                                 if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
-                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidstring.split("/", QString::SkipEmptyParts).last() + "-v" + vlist.at(5).split("-v").last() + "-p" + QString::number(j)).toStdString().c_str());
+                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidstring.split("/", QString::SkipEmptyParts).last() + "-v" + vlist.at(5).split("-v").last() + "-p" + QString::number(pint)).toStdString().c_str());
                                 else
                                     fsinfo = tsk_fs_open_img(curimginfo, 0, TSK_FS_TYPE_DETECT);
                                 nodedata.clear();
