@@ -1305,15 +1305,83 @@ void PopulateTreeModel(QString evidstring)
 	    const TSK_POOL_INFO* poolinfo = tsk_pool_open_img_sing(imginfo, 0, TSK_POOL_TYPE_DETECT);
 	    TSK_IMG_INFO* curimginfo = NULL;
 	    if(poolinfo == nullptr)
+            {
+                partitionpath = volumepath + "p0/";
+                QStringList plist;
+                plist.clear();
+                QFile pfile(partitionpath + "stat");
+                if(!pfile.isOpen())
+                    pfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(pfile.isOpen())
+                    plist = QString(pfile.readLine()).split(",");
+                pfile.close();
 	        fsinfo = tsk_fs_open_img(imginfo, 0, TSK_FS_TYPE_DETECT);
+		nodedata.clear();
+		if(fsinfo != NULL) // has fs
+		    nodedata << QString(plist.at(2) + "(" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
+		else
+		    nodedata << plist.at(2);
+		nodedata << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
+		mutex.lock();
+		treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
+		mutex.unlock();
+		if(fsinfo != NULL)
+		{
+	    	    partitionlist.append(plist.at(10) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
+            	    ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
+		}
+		else
+	    	    partitionlist.append(plist.at(10) + ": " + plist.at(2));
+            }
 	    else
 	    {
+                if(poolinfo->num_vols > 0)
+                {
+                    for(int k=0; k < poolinfo->num_vols; k++)
+                    {
+                        //j = j + k;
+                        partitionpath = volumepath + "p" + QString::number(k) + "/";
+                        QStringList plist;
+                        plist.clear();
+                        QFile pfile(partitionpath + "stat");
+                        if(!pfile.isOpen())
+                            pfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                        if(pfile.isOpen())
+                            plist = QString(pfile.readLine()).split(",");
+                        pfile.close();
+                        TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[k];
+                        curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
+                        if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                            fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidstring.split("/", QString::SkipEmptyParts).last() + "-v" + vlist.at(5).split("-v").last() + "-p" + QString::number(k)).toStdString().c_str());
+                        else
+                            fsinfo = tsk_fs_open_img(curimginfo, 0, TSK_FS_TYPE_DETECT);
+                        nodedata.clear();
+                        if(fsinfo != NULL)
+                            nodedata << QString(plist.at(2) + "(" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
+                        else
+                            nodedata << plist.at(2);
+                        nodedata << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
+                        mutex.lock();
+                        treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
+                        mutex.unlock();
+                        if(fsinfo != NULL)
+                        {
+	    	            partitionlist.append(plist.at(10) + ": " + plist.at(2) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
+                            ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
+                        }
+                        else
+    	                    partitionlist.append(plist.at(10) + ": " + plist.at(2));
+                        tsk_fs_close(fsinfo);
+                    }
+                }
+                tsk_pool_close(poolinfo);
+                tsk_img_close(curimginfo);
 	    }
 	}
 	else
 	{
 	    // START LOOP WITH VSINFO PART'S TO MATCH THE PARTLIST VALUES..
-	    for(int j=0; j < vsinfo->part_count; j++)
+	    for(uint j=0; j < vsinfo->part_count; j++)
 	    {
 		const TSK_VS_PART_INFO* partinfo = NULL;
 		partinfo = tsk_vs_part_get(vsinfo, j);
@@ -1354,6 +1422,47 @@ void PopulateTreeModel(QString evidstring)
 		    }
 		    else // has pool, loop over poolvol's
 		    {
+                        if(poolinfo->num_vols > 0)
+                        {
+                            for(int k=0; k < poolinfo->num_vols; k++)
+                            {
+                                j = j + k;
+                                partitionpath = volumepath + "p" + QString::number(j) + "/";
+                                QStringList plist;
+                                plist.clear();
+                                QFile pfile(partitionpath + "stat");
+                                if(!pfile.isOpen())
+                                    pfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                                if(pfile.isOpen())
+                                    plist = QString(pfile.readLine()).split(",");
+                                pfile.close();
+                                TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[k];
+                                curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
+                                if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidstring.split("/", QString::SkipEmptyParts).last() + "-v" + vlist.at(5).split("-v").last() + "-p" + QString::number(j)).toStdString().c_str());
+                                else
+                                    fsinfo = tsk_fs_open_img(curimginfo, 0, TSK_FS_TYPE_DETECT);
+                                nodedata.clear();
+                                if(fsinfo != NULL)
+                                    nodedata << QString(plist.at(2) + "(" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
+                                else
+                                    nodedata << plist.at(2);
+                                nodedata << "0" << plist.at(1) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << plist.at(10);
+                                mutex.lock();
+                                treenodemodel->AddNode(nodedata, vlist.at(5), -1, 0);
+                                mutex.unlock();
+                                if(fsinfo != NULL)
+                                {
+	    	                    partitionlist.append(plist.at(10) + ": " + plist.at(2) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
+                                    ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
+                                }
+                                else
+    	                            partitionlist.append(plist.at(10) + ": " + plist.at(2));
+                                tsk_fs_close(fsinfo);
+                            }
+                        }
+                        tsk_pool_close(poolinfo);
+                        tsk_img_close(curimginfo);
 		    }
 		}
 	    }
