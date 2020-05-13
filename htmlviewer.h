@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "wombatfunctions.h"
 #include "ui_htmlviewer.h"
+#include <liblnk.h>
 
 namespace Ui
 {
