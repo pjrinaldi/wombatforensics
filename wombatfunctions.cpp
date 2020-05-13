@@ -1429,9 +1429,9 @@ void PopulateTreeModel(QString evidstring)
                             qDebug() << "poolvol count:" << poolinfo->num_vols;
                             for(int k=0; k < poolinfo->num_vols; k++)
                             {
-                                qDebug() << "j:" << j;
+                                //qDebug() << "j:" << j;
                                 int pint = j + k;
-                                qDebug() << "pint:" << pint;
+                                //qDebug() << "pint:" << pint;
                                 //j = j + k;
                                 partitionpath = volumepath + "p" + QString::number(pint) + "/";
                                 QStringList plist;
@@ -1940,13 +1940,15 @@ void InitializeEvidenceStructure(QString evidname)
                                 pfile.close();
                             for(int k=0; k < poolinfo->num_vols; k++)
                             {
+				int pint = partint + k;
+                                //int pint = j + k;
                                 TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[k];
                                 pooldesc = curpoolvol.desc;
                                 curimginfo = poolinfo->get_img_info(poolinfo, curpoolvol.block);
                                 if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
                                 {
                                     // CURRENTLY TSK DOESN'T WORK FOR ENCRYPTED APFS VOLUMES...
-                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS, passwordhash.value(evidname.split("/").last() + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)).toStdString().c_str());
+                                    fsinfo = tsk_fs_open_img_decrypt(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS, passwordhash.value(evidname.split("/").last() + "-v" + QString::number(volcnt) + "-p" + QString::number(pint)).toStdString().c_str());
                                     //fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidname + "-v" + QString::number(volcnt) + "-p" + QString::number(partint));
                                     //fsinfo = tsk_fs_open_vol_decrypt(partinfo, TSK_FS_TYPE_APFS, "apfspassword");
                                     //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
@@ -1956,7 +1958,7 @@ void InitializeEvidenceStructure(QString evidname)
                                     fsinfo = tsk_fs_open_img(curimginfo, partinfo->start * curimginfo->sector_size, TSK_FS_TYPE_APFS_DETECT);
                                     //fsinfo = tsk_fs_open_pool(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT);
                                 }
-                                QString partitionpath = volumepath + "p" + QString::number(partint) + "/";
+                                QString partitionpath = volumepath + "p" + QString::number(pint) + "/";
                                 dir.mkpath(partitionpath);
                                 pfile.setFileName(partitionpath + "stat");
                                 pfile.open(QIODevice::Append | QIODevice::Text);
@@ -1968,7 +1970,7 @@ void InitializeEvidenceStructure(QString evidname)
                                         out << GetFileSystemLabel(fsinfo);
                                     else
                                         out << pooldesc;
-                                    out << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)fsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) << ",0";
+                                    out << "," << (qint64)fsinfo->root_inum << "," << (qint64)fsinfo->offset << "," << (qint64)fsinfo->block_count << "," << (int)fsinfo->block_size << "," << partinfo->flags << "," << (qint64)partinfo->len << "," << (int)fsinfo->dev_bsize << ",e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(pint) << ",0";
                                     out.flush();
                                     pfile.close();
                                     treeout.clear();
@@ -1977,17 +1979,17 @@ void InitializeEvidenceStructure(QString evidname)
                                         fsdesc = GetFileSystemLabel(fsinfo);
                                     else
                                         fsdesc = pooldesc;
-                                    treeout << QString(fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)); // NAME IN FIRST COLUMN
+                                    treeout << QString(fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")") << "0" << QString::number(fsinfo->block_size * fsinfo->block_count) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(pint)); // NAME IN FIRST COLUMN
                                     nodedata.clear();
                                     for(int j=0; j < treeout.count(); j++)
                                         nodedata << treeout.at(j);
                                     mutex.lock();
                                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                                     mutex.unlock();
-                                    reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
-	                	    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
+                                    reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(pint) + "):</td><td>" + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
+	                	    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(pint) + ": " + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                                     WriteFileSystemProperties(fsinfo, partitionpath);
-                                    ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
+                                    ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, pint, partitionpath);
                                 }
                                 else
                                 {
@@ -2005,7 +2007,7 @@ void InitializeEvidenceStructure(QString evidname)
                                     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
 			            partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(partinfo->desc) + "(NON-RECOGNIZED FS)");
                                 }
-                                partint++;
+                                //partint++;
                             }
                         }
                     }
