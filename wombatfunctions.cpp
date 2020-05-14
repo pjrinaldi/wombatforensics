@@ -32,12 +32,17 @@ std::string GetTime()
     return timeStr;
 }
 
-std::string ConvertWindowsTimeToUnixTime(uint64_t* input)
+std::string ConvertWindowsTimeToUnixTime(uint64_t input)
 {
-    qDebug() << "input:" << *input;
+    //qDebug() << "input:" << *input;
+    /*
+    uint64_t value_64bit -> filetime..
+    internal_filetime->upper = value_64bit >> 32;
+    internal_filetime->lower = value_64bit & 0xffffffffUL;*
+    */ 
     uint64_t temp;
     //long long int temp;
-    temp = *input / TICKS_PER_SECOND; //convert from 100ns intervals to seconds;
+    temp = input / TICKS_PER_SECOND; //convert from 100ns intervals to seconds;
     temp = temp - EPOCH_DIFFERENCE;  //subtract number of seconds between epochs
     time_t crtimet = (time_t)temp;
     qDebug() << "temp:" << temp;
