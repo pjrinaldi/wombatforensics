@@ -31,7 +31,9 @@ void HtmlViewer::ShowHtml(const QModelIndex &index)
 
 void HtmlViewer::ShowLnk(const QModelIndex &index)
 {
-    qDebug() << "parse content here... and display as html...";
+    QString htmlstr = "<html><head><title>" + index.sibling(index.row(), 11).data().toString() + "</title></head>";
+    htmlstr += "<body><h5>LNK File Analysis for " + index.sibling(index.row(), 0).data().toString() + " (" + index.sibling(index.row(), 11).data().toString() + ")</h5><br/>";
+    htmlstr += "<table style='border-collapse: collapse;border: 1px solid black;'><tr><th>NAME</th><th>VALUE</th></tr>";
     QString lnkfile = wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex";
     liblnk_error_t* error = NULL;
     liblnk_file_t* lnkobj = NULL;
@@ -41,17 +43,107 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
     {
         if(liblnk_file_link_refers_to_file(lnkobj, &error))
         {
-            uint64_t crtime;
-            liblnk_file_get_file_creation_time(lnkobj, &crtime, &error);
-	    qDebug() << "crtime:" << crtime;
-            std::string crtimestring = ConvertWindowsTimeToUnixTime(crtime);
-            qDebug() << "crtimestr:" << QString::fromStdString(crtimestring);
-            // something in the time function is wrong and it is using current time rather than the time from the lnk file...
-            // otherwise it works.
+	    std::string timestr = "";
+            uint64_t gettime = 0;
+	    uint32_t tmpuint32 = 0;
+	    size_t tmpsize = 0;
+	    //uint8_t tmpuint8 = 0;
+	    //uint8_t* uint8ptr = NULL;
+            liblnk_file_get_file_creation_time(lnkobj, &gettime, &error);
+            timestr = ConvertWindowsTimeToUnixTime(gettime);
+	    htmlstr += "<tr><td>Creation Time:</td><td>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    gettime = 0;
+	    liblnk_file_get_file_modification_time(lnkobj, &gettime, &error);
+	    timestr = ConvertWindowsTimeToUnixTime(gettime);
+	    htmlstr += "<tr><td>Modification Time:</td><td>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    gettime = 0;
+	    liblnk_file_get_file_access_time(lnkobj, &gettime, &error);
+	    timestr = ConvertWindowsTimeToUnixTime(gettime);
+	    htmlstr += "<tr><td>Access Time:</td><td>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    liblnk_file_get_file_size(lnkobj, &tmpuint32, &error);
+	    htmlstr += "<tr><td>File Size:</td><td>" + QString::number(tmpuint32) + " bytes</td></tr>";
+	    tmpuint32 = 0;
+	    liblnk_file_get_file_attribute_flags(lnkobj, &tmpuint32, &error);
+	    htmlstr += "<tr><td>File Attributes:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_READ_ONLY) != 0)
+		htmlstr += "Read Only (FILE_ATTRIBUTE_READ_ONLY)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_HIDDEN) != 0)
+		htmlstr += "Hidden (FILE_ATTRIBUTE_HIDDEN)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_SYSTEM) != 0)
+		htmlstr += "System (FILE_ATTRIBUTE_SYSTEM)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_DIRECTORY) != 0)
+		htmlstr += "Directory (FILE_ATTRIBUTE_DIRECTORY)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_ARCHIVE) != 0)
+		htmlstr += "Archived (FILE_ATTRIBUTE_ARCHIVE)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_DEVICE) != 0)
+		htmlstr += "Device (FILE_ATTRIBUTE_DEVICE)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_NORMAL) != 0)
+		htmlstr += "Normal (FILE_ATTRIBUTE_NORMAL)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_TEMPORARY) != 0)
+		htmlstr += "Temporary (FILE_ATTRIBUTE_TEMPORARY)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_SPARSE_FILE) != 0)
+		htmlstr += "Sparse File (FILE_ATTRIBUTE_SPARSE)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_REPARSE_POINT) != 0)
+		htmlstr += "Reparse Point (FILE_ATTRIBUTE_REPARSE_POINT)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_COMPRESSED) != 0)
+		htmlstr += "Compressed (FILE_ATTRIBUTE_COMPRESSED)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_OFFLINE) != 0)
+		htmlstr += "Offline (FILE_ATTRIBUTE_OFFLINE)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_NOT_CONTENT_INDEXED) != 0)
+		htmlstr += "Content should not be indexed (FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_ENCRYPTED) != 0)
+		htmlstr += "Encrypted (FILE_ATTRIBUTE_ENCRYPTED)<br/>";
+	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_VIRTUAL) != 0)
+		htmlstr += "Virtual (FILE_ATTRIBUTE_VIRTUAL)<br/>";
+	    htmlstr += "</td></tr>";
+	    tmpuint32 = 0;
+	    liblnk_file_get_drive_type(lnkobj, &tmpuint32, &error);
+	    htmlstr += "<tr><td>Drive Type:</td><td>";
+	    switch(tmpuint32)
+	    {
+		case LIBLNK_DRIVE_TYPE_UNKNOWN:
+		    htmlstr += "Unknown)";
+		    break;
+		case LIBLNK_DRIVE_TYPE_NO_ROOT_DIR:
+		    htmlstr += "No root directory";
+		    break;
+		case LIBLNK_DRIVE_TYPE_REMOVABLE:
+		    htmlstr += "Removable";
+		    break;
+		case LIBLNK_DRIVE_TYPE_FIXED:
+		    htmlstr += "Fixed";
+		    break;
+		case LIBLNK_DRIVE_TYPE_REMOTE:
+		    htmlstr += "Remote";
+		    break;
+		case LIBLNK_DRIVE_TYPE_CDROM:
+		    htmlstr += "CDROM";
+		    break;
+		case LIBLNK_DRIVE_TYPE_RAMDISK:
+		    htmlstr += "Ram disk";
+		    break;
+		default:
+		    htmlstr += "Unknown";
+		    break;
+	    }
+	    htmlstr += " (" + QString::number(tmpuint32) + ")</td></tr>";
+	    tmpuint32 = 0;
+	    liblnk_file_get_drive_serial_number(lnkobj, &tmpuint32, &error);
+	    htmlstr += "<tr><td>Drive Serial Number:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
+	    liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
+	    uint8_t volabel[tmpsize];
+	    liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
+	    htmlstr += "<tr><td>Volume Label:</td><td>";
+	    //qDebug() << "tmpsize:" << tmpsize;
+	    //qDebug() << "volabel:" << QString::fromUtf8(reinterpret_cast<char*>(volabel));
+	    htmlstr += QString::fromUtf8(reinterpret_cast<char*>(volabel));
+	    htmlstr += "</td></tr>";
         }
     }
     liblnk_file_close(lnkobj, &error);
     liblnk_file_free(&lnkobj, &error);
+    htmlstr += "</table></body></html>";
+    ui->webView->setHtml(htmlstr);
     this->show();
     //curobjaddr = index.sibling(index.row(), 11).data().toString().toULongLong()
 }

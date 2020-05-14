@@ -34,30 +34,23 @@ std::string GetTime()
 
 std::string ConvertWindowsTimeToUnixTime(uint64_t input)
 {
-    //qDebug() << "input:" << *input;
     /*
     uint64_t value_64bit -> filetime..
     internal_filetime->upper = value_64bit >> 32;
     internal_filetime->lower = value_64bit & 0xffffffffUL;*
     */ 
     uint64_t temp;
-    //long long int temp;
     temp = input / TICKS_PER_SECOND; //convert from 100ns intervals to seconds;
     temp = temp - EPOCH_DIFFERENCE;  //subtract number of seconds between epochs
     time_t crtimet = (time_t)temp;
-    qDebug() << "temp:" << temp;
     struct tm* newtime;
-    //time(&crtimet);
     newtime = gmtime(&crtimet);
     char timeStr[64];
     snprintf(timeStr, 64, "%.2d/%.2d/%.2d %.2d:%.2d:%.2d",
         newtime->tm_mon+1,newtime->tm_mday,newtime->tm_year % 100, 
         newtime->tm_hour, newtime->tm_min, newtime->tm_sec);
-    //qDebug() << "timestr:" << timeStr;
     return timeStr;
 }
-
-//std::string ReturnTimeString(
 
 /*
 void LogMessage(QString logmsg)
