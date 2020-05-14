@@ -1,4 +1,5 @@
 #include "htmlviewer.h"
+//#include <shell_items.h>
 
 // Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -130,14 +131,31 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
 	    tmpuint32 = 0;
 	    liblnk_file_get_drive_serial_number(lnkobj, &tmpuint32, &error);
 	    htmlstr += "<tr><td>Drive Serial Number:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
+	    tmpsize = 0;
 	    liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
 	    uint8_t volabel[tmpsize];
 	    liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
-	    htmlstr += "<tr><td>Volume Label:</td><td>";
 	    //qDebug() << "tmpsize:" << tmpsize;
 	    //qDebug() << "volabel:" << QString::fromUtf8(reinterpret_cast<char*>(volabel));
-	    htmlstr += QString::fromUtf8(reinterpret_cast<char*>(volabel));
-	    htmlstr += "</td></tr>";
+	    htmlstr += "<tr><td>Volume Label:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
+	    tmpsize = 0;
+	    liblnk_file_get_utf8_local_path_size(lnkobj, &tmpsize, &error);
+	    uint8_t localpath[tmpsize];
+	    liblnk_file_get_utf8_local_path(lnkobj, localpath, tmpsize, &error);
+	    htmlstr += "<tr><td>Local Path:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(localpath)) + "</td></tr>";
+	    tmpsize = 0;
+	    liblnk_file_get_utf8_working_directory_size(lnkobj, &tmpsize, &error);
+	    uint8_t workdir[tmpsize];
+	    liblnk_file_get_utf8_working_directory(lnkobj, workdir, tmpsize, &error);
+	    htmlstr += "<tr><td>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
+	    /*
+	    tmpsize = 0;
+	    liblnk_file_get_link_target_identifier_data_size(lnkobj, &tmpsize, &error);
+	    qDebug() << "shell item tmpsize:" << tmpsize;
+	    uint8_t shelllist[tmpsize];
+	    liblnk_file_copy_link_target_identifier_data(lnkobj, shelllist, tmpsize, &error);
+	    */
+
         }
     }
     liblnk_file_close(lnkobj, &error);
