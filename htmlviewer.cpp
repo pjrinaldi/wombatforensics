@@ -41,11 +41,19 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
     {
         if(liblnk_file_link_refers_to_file(lnkobj, &error))
         {
-            uint64_t* crtime = NULL;
-            liblnk_file_get_file_creation_time(lnkobj, crtime, &error);
-            qDebug() << "crtime:" << crtime << "crtime:" << &crtime;
-            std::string crtimestring = ConvertWindowsTimeToUnixTime(crtime);
-            qDebug() << "crtimestr:" << QString::fromStdString(crtimestring);
+            uint64_t crtime;
+            liblnk_file_get_file_creation_time(lnkobj, &crtime, &error);
+	    qDebug() << "crtime:" << crtime;
+	    //libfdatetune_filetime_t
+	    //FILETIME myft;
+            //qDebug() << "crtime:" << crtime << "&crtime:" << &crtime << "*crtime:" << *crtime;
+	    /*
+	     * uint64_t value_64bit -> filetime..
+	     internal_filetime->upper = value_64bit >> 32;
+	     internal_filetime->lower = value_64bit & 0xffffffffUL;*
+	     */ 
+            //std::string crtimestring = ConvertWindowsTimeToUnixTime(crtime);
+            //qDebug() << "crtimestr:" << QString::fromStdString(crtimestring);
             // something in the time function is wrong and it is using current time rather than the time from the lnk file...
             // otherwise it works.
         }
