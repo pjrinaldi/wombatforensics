@@ -38,17 +38,17 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
      * 2. when tag file, write the return htmlstring to the file at showcontent...
      * 3. store time as qdatetime so i can convert timezone... look into what i can import to qdatetime, time_t, tm, etc...
      *
-    QString initialhtml = "";
-    previewfile.setFileName(":/html/initialhtml");
-    previewfile.open(QIODevice::ReadOnly);
-    if(previewfile.isOpen())
-        initialhtml = previewfile.readAll();
-    previewfile.close();
     HTML JS FUNCTION: ShowContent('\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'
      */  
-    QString htmlstr = "<html><head><title>" + index.sibling(index.row(), 11).data().toString() + "</title></head>";
-    htmlstr += "<body><h5>LNK File Analysis for " + index.sibling(index.row(), 0).data().toString() + " (" + index.sibling(index.row(), 11).data().toString() + ")</h5><br/>";
-    htmlstr += "<table style='border-collapse: collapse;border: 1px solid black;'><tr><th>NAME</th><th>VALUE</th></tr>";
+    QString htmlstr = "";
+    QFile initfile(":/html/initialhtml");
+    initfile.open(QIODevice::ReadOnly);
+    if(initfile.isOpen())
+        htmlstr = initfile.readAll();
+    initfile.close();
+    //QString htmlstr = "<html><head><title>" + index.sibling(index.row(), 11).data().toString() + "</title></head>";
+    htmlstr += "<div id='infotitle'>LNK File Analysis for " + index.sibling(index.row(), 0).data().toString() + " (" + index.sibling(index.row(), 11).data().toString() + ")</div><br/>";
+    htmlstr += "<table width='600px'><tr><th colspan='1'>NAME</th><th>VALUE</th></tr>";
     QString lnkfile = wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex";
     liblnk_error_t* error = NULL;
     liblnk_file_t* lnkobj = NULL;
@@ -62,24 +62,22 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
             uint64_t gettime = 0;
 	    uint32_t tmpuint32 = 0;
 	    size_t tmpsize = 0;
-	    //uint8_t tmpuint8 = 0;
-	    //uint8_t* uint8ptr = NULL;
             liblnk_file_get_file_creation_time(lnkobj, &gettime, &error);
             timestr = ConvertWindowsTimeToUnixTime(gettime);
-	    htmlstr += "<tr><td>Creation Time:</td><td>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    htmlstr += "<tr class='odd vtop'><td class='pvalue'>Creation Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
 	    gettime = 0;
 	    liblnk_file_get_file_modification_time(lnkobj, &gettime, &error);
 	    timestr = ConvertWindowsTimeToUnixTime(gettime);
-	    htmlstr += "<tr><td>Modification Time:</td><td>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    htmlstr += "<tr class='even'><td class='pvalue'>Modification Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
 	    gettime = 0;
 	    liblnk_file_get_file_access_time(lnkobj, &gettime, &error);
 	    timestr = ConvertWindowsTimeToUnixTime(gettime);
-	    htmlstr += "<tr><td>Access Time:</td><td>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    htmlstr += "<tr class='odd'><td class='pvalue'>Access Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
 	    liblnk_file_get_file_size(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr><td>File Size:</td><td>" + QString::number(tmpuint32) + " bytes</td></tr>";
+	    htmlstr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + QString::number(tmpuint32) + " bytes</td></tr>";
 	    tmpuint32 = 0;
 	    liblnk_file_get_file_attribute_flags(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr><td>File Attributes:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "<br/>";
+	    htmlstr += "<tr class='odd'><td class='pvalue'>File Attributes:</td><td class='property'>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "<br/>";
 	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_READ_ONLY) != 0)
 		htmlstr += "Read Only (FILE_ATTRIBUTE_READ_ONLY)<br/>";
 	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_HIDDEN) != 0)
@@ -113,7 +111,7 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
 	    htmlstr += "</td></tr>";
 	    tmpuint32 = 0;
 	    liblnk_file_get_drive_type(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr><td>Drive Type:</td><td>";
+	    htmlstr += "<tr class='even'><td class='pvalue'>Drive Type:</td><td class='property'>";
 	    switch(tmpuint32)
 	    {
 		case LIBLNK_DRIVE_TYPE_UNKNOWN:
@@ -144,32 +142,24 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
 	    htmlstr += " (" + QString::number(tmpuint32) + ")</td></tr>";
 	    tmpuint32 = 0;
 	    liblnk_file_get_drive_serial_number(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr><td>Drive Serial Number:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
+	    htmlstr += "<tr class='odd'><td class='pvalue'>Drive Serial Number:</td><td class='property'>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
 	    tmpsize = 0;
 	    liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
 	    uint8_t volabel[tmpsize];
 	    liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
 	    //qDebug() << "tmpsize:" << tmpsize;
 	    //qDebug() << "volabel:" << QString::fromUtf8(reinterpret_cast<char*>(volabel));
-	    htmlstr += "<tr><td>Volume Label:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
+	    htmlstr += "<tr class='even'><td class='pvalue'>Volume Label:</td><td class='property'>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
 	    tmpsize = 0;
 	    liblnk_file_get_utf8_local_path_size(lnkobj, &tmpsize, &error);
 	    uint8_t localpath[tmpsize];
 	    liblnk_file_get_utf8_local_path(lnkobj, localpath, tmpsize, &error);
-	    htmlstr += "<tr><td>Local Path:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(localpath)) + "</td></tr>";
+	    htmlstr += "<tr class='odd'><td class='pvalue'>Local Path:</td><td class='property'>" + QString::fromUtf8(reinterpret_cast<char*>(localpath)) + "</td></tr>";
 	    tmpsize = 0;
 	    liblnk_file_get_utf8_working_directory_size(lnkobj, &tmpsize, &error);
 	    uint8_t workdir[tmpsize];
 	    liblnk_file_get_utf8_working_directory(lnkobj, workdir, tmpsize, &error);
-	    htmlstr += "<tr><td>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
-	    /*
-	    tmpsize = 0;
-	    liblnk_file_get_link_target_identifier_data_size(lnkobj, &tmpsize, &error);
-	    qDebug() << "shell item tmpsize:" << tmpsize;
-	    uint8_t shelllist[tmpsize];
-	    liblnk_file_copy_link_target_identifier_data(lnkobj, shelllist, tmpsize, &error);
-	    */
-
+	    htmlstr += "<tr class='even'><td class='pvalue'>Working Directory:</td><td class='property'>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
         }
     }
     liblnk_file_close(lnkobj, &error);
