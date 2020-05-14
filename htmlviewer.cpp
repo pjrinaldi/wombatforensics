@@ -32,6 +32,20 @@ void HtmlViewer::ShowHtml(const QModelIndex &index)
 
 void HtmlViewer::ShowLnk(const QModelIndex &index)
 {
+    /*
+     *
+     * 1. create a function which returns the htmlstring content....
+     * 2. when tag file, write the return htmlstring to the file at showcontent...
+     * 3. store time as qdatetime so i can convert timezone... look into what i can import to qdatetime, time_t, tm, etc...
+     *
+    QString initialhtml = "";
+    previewfile.setFileName(":/html/initialhtml");
+    previewfile.open(QIODevice::ReadOnly);
+    if(previewfile.isOpen())
+        initialhtml = previewfile.readAll();
+    previewfile.close();
+    HTML JS FUNCTION: ShowContent('\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'
+     */  
     QString htmlstr = "<html><head><title>" + index.sibling(index.row(), 11).data().toString() + "</title></head>";
     htmlstr += "<body><h5>LNK File Analysis for " + index.sibling(index.row(), 0).data().toString() + " (" + index.sibling(index.row(), 11).data().toString() + ")</h5><br/>";
     htmlstr += "<table style='border-collapse: collapse;border: 1px solid black;'><tr><th>NAME</th><th>VALUE</th></tr>";
