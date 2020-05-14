@@ -48,7 +48,7 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
     initfile.close();
     //QString htmlstr = "<html><head><title>" + index.sibling(index.row(), 11).data().toString() + "</title></head>";
     htmlstr += "<div id='infotitle'>LNK File Analysis for " + index.sibling(index.row(), 0).data().toString() + " (" + index.sibling(index.row(), 11).data().toString() + ")</div><br/>";
-    htmlstr += "<table width='600px'><tr><th colspan='1'>NAME</th><th>VALUE</th></tr>";
+    htmlstr += "<table width='100%'><tr><th>NAME</th></tr>";
     QString lnkfile = wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex";
     liblnk_error_t* error = NULL;
     liblnk_file_t* lnkobj = NULL;
@@ -58,21 +58,24 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
     {
         if(liblnk_file_link_refers_to_file(lnkobj, &error))
         {
-	    std::string timestr = "";
+	    //std::string timestr = "";
             uint64_t gettime = 0;
 	    uint32_t tmpuint32 = 0;
 	    size_t tmpsize = 0;
             liblnk_file_get_file_creation_time(lnkobj, &gettime, &error);
-            timestr = ConvertWindowsTimeToUnixTime(gettime);
-	    htmlstr += "<tr class='odd vtop'><td class='pvalue'>Creation Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+            //timestr = ConvertWindowsTimeToUnixTime(gettime);
+	    htmlstr += "<tr class='odd'><td class='pvalue' width='300px'>Creation Time:</td><td class='property'>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
+	    //htmlstr += "<tr class='odd'><td class='pvalue' width='300px'>Creation Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
 	    gettime = 0;
 	    liblnk_file_get_file_modification_time(lnkobj, &gettime, &error);
-	    timestr = ConvertWindowsTimeToUnixTime(gettime);
-	    htmlstr += "<tr class='even'><td class='pvalue'>Modification Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    //timestr = ConvertWindowsTimeToUnixTime(gettime);
+	    //htmlstr += "<tr class='even'><td class='pvalue'>Modification Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    htmlstr += "<tr class='even'><td class='pvalue'>Modification Time:</td><td class='property'>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
 	    gettime = 0;
 	    liblnk_file_get_file_access_time(lnkobj, &gettime, &error);
-	    timestr = ConvertWindowsTimeToUnixTime(gettime);
-	    htmlstr += "<tr class='odd'><td class='pvalue'>Access Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    //timestr = ConvertWindowsTimeToUnixTime(gettime);
+	    //htmlstr += "<tr class='odd'><td class='pvalue'>Access Time:</td><td class='property'>" + QString::fromStdString(timestr) + " UTC</td></tr>";
+	    htmlstr += "<tr class='odd'><td class='pvalue'>Access Time:</td><td class='property'>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
 	    liblnk_file_get_file_size(lnkobj, &tmpuint32, &error);
 	    htmlstr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + QString::number(tmpuint32) + " bytes</td></tr>";
 	    tmpuint32 = 0;
@@ -147,8 +150,6 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
 	    liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
 	    uint8_t volabel[tmpsize];
 	    liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
-	    //qDebug() << "tmpsize:" << tmpsize;
-	    //qDebug() << "volabel:" << QString::fromUtf8(reinterpret_cast<char*>(volabel));
 	    htmlstr += "<tr class='even'><td class='pvalue'>Volume Label:</td><td class='property'>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
 	    tmpsize = 0;
 	    liblnk_file_get_utf8_local_path_size(lnkobj, &tmpsize, &error);

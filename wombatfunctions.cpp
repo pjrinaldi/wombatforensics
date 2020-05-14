@@ -32,24 +32,29 @@ std::string GetTime()
     return timeStr;
 }
 
-std::string ConvertWindowsTimeToUnixTime(uint64_t input)
+//std::string ConvertWindowsTimeToUnixTime(uint64_t input)
+QString ConvertWindowsTimeToUnixTime(uint64_t input)
 {
     /*
     uint64_t value_64bit -> filetime..
     internal_filetime->upper = value_64bit >> 32;
     internal_filetime->lower = value_64bit & 0xffffffffUL;*
     */ 
+    QTimeZone tmpzone = QTimeZone(reporttimezone);
     uint64_t temp;
     temp = input / TICKS_PER_SECOND; //convert from 100ns intervals to seconds;
     temp = temp - EPOCH_DIFFERENCE;  //subtract number of seconds between epochs
     time_t crtimet = (time_t)temp;
-    struct tm* newtime;
-    newtime = gmtime(&crtimet);
-    char timeStr[64];
-    snprintf(timeStr, 64, "%.2d/%.2d/%.2d %.2d:%.2d:%.2d",
-        newtime->tm_mon+1,newtime->tm_mday,newtime->tm_year % 100, 
-        newtime->tm_hour, newtime->tm_min, newtime->tm_sec);
-    return timeStr;
+    QString timestr = "";
+    timestr = QDateTime::fromSecsSinceEpoch(crtimet, tmpzone).toString("MM/dd/yyyy hh:mm:ss AP");
+    return timestr;
+    //struct tm* newtime;
+    //newtime = gmtime(&crtimet);
+    //char timeStr[64];
+    //snprintf(timeStr, 64, "%.2d/%.2d/%.2d %.2d:%.2d:%.2d",
+    //    newtime->tm_mon+1,newtime->tm_mday,newtime->tm_year % 100, 
+    //    newtime->tm_hour, newtime->tm_min, newtime->tm_sec);
+    //return timeStr;
 }
 
 /*
