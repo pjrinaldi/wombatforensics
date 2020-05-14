@@ -32,6 +32,27 @@ void HtmlViewer::ShowHtml(const QModelIndex &index)
 void HtmlViewer::ShowLnk(const QModelIndex &index)
 {
     qDebug() << "parse content here... and display as html...";
+    QString lnkfile = wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex";
+    liblnk_error_t* error = NULL;
+    liblnk_file_t* lnkobj = NULL;
+    liblnk_file_initialize(&lnkobj, &error);
+    liblnk_file_open(lnkobj, lnkfile.toStdString().c_str(), liblnk_get_access_flags_read(), &error);
+    if(liblnk_check_file_signature(lnkfile.toStdString().c_str(), &error))
+    {
+        if(liblnk_file_link_refers_to_file(lnkobj, &error))
+        {
+            uint64_t* crtime = NULL;
+            liblnk_file_get_file_creation_time(lnkobj, crtime, &error);
+            qDebug() << "crtime:" << crtime << "crtime:" << &crtime;
+            std::string crtimestring = ConvertWindowsTimeToUnixTime(crtime);
+            qDebug() << "crtimestr:" << QString::fromStdString(crtimestring);
+            // something in the time function is wrong and it is using current time rather than the time from the lnk file...
+            // otherwise it works.
+        }
+    }
+    liblnk_file_close(lnkobj, &error);
+    liblnk_file_free(&lnkobj, &error);
+    this->show();
     //curobjaddr = index.sibling(index.row(), 11).data().toString().toULongLong()
 }
 
