@@ -7,11 +7,12 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "tskcpp.h"
+#include <liblnk.h>
 
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
 QString ConvertWindowsTimeToUnixTime(uint64_t input);
-//std::string ConvertWindowsTimeToUnixTime(uint64_t input);
+QString ParseLnkArtifact(QString lnkname, QString lnkid);
 
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
