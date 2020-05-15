@@ -35,6 +35,14 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
     this->show();
 }
 
+void HtmlViewer::ShowI30(const QModelIndex &index)
+{
+    //QString htmlstring = ParseI30Artifact();
+    //ui->webView->setHtml(htmlstring);
+    ui->webView->setHtml("");
+    this->show();
+}
+
 void HtmlViewer::LoadHtml(QString filepath)
 {
     // populate html here

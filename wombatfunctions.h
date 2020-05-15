@@ -6,6 +6,7 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
+//#include "wombatvariable.h"
 #include "tskcpp.h"
 #include <liblnk.h>
 
@@ -13,6 +14,7 @@
 #define EPOCH_DIFFERENCE 11644473600LL
 QString ConvertWindowsTimeToUnixTime(uint64_t input);
 QString ParseLnkArtifact(QString lnkname, QString lnkid);
+//QString ParseI30Artifact();
 
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);

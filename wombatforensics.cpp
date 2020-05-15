@@ -562,10 +562,17 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("Shortcut"))
     {
-        htmlviewer = new HtmlViewer();
-        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " LNK Viewer");
-        htmlviewer->ShowLnk(index);
+        HtmlViewer* htmlviewer1 = new HtmlViewer();
+        htmlviewer1->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer1->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " LNK Viewer");
+        htmlviewer1->ShowLnk(index);
+    }
+    else if(index.sibling(index.row(), 9).data().toString().contains("Directory"))
+    {
+        HtmlViewer* htmlviewer2 = new HtmlViewer();
+        htmlviewer2->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer2->setWindowTitle("$I30 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer2->ShowI30(index);
     }
     else
     {

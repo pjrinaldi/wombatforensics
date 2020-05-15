@@ -156,6 +156,128 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
     return htmlstr;
 }
 
+/*
+QString ParseI30Artifact()
+{
+    // START WITH THE -FHEX FILE AND CHECK THE $INDEX_ROOT TO SEE IF IT IS THE ONLY ONE... IF NOT
+    // THEN I WILL PULL THE ATTRIBUTES FROM THE BELOW CODE AND GET THE $INDEX_ALLOCATION (160)
+    // ALSO CAN LOOK AT PROCESSDIR/WRITEFILEPROPERTIES TO SEE HOW I LOOP OVER THEM...
+    // SAMPLE CODE TO GET THE FS WHICH WILL LET ME LOOP OVER THE ATTRIBUTES AND THEN PULL THE INDEX_ALLOCATION'S IF NEEDED
+    QString selectedid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
+    TSK_IMG_INFO* imginfo = NULL;
+    std::vector<std::string> pathvector;
+    pathvector.clear();
+
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QString tmpstr = "";
+    QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split(".e").first();
+    QString estring = selectedid.split("-", QString::SkipEmptyParts).at(0);
+    QString vstring = selectedid.split("-", QString::SkipEmptyParts).at(1);
+    QString pstring = selectedid.split("-", QString::SkipEmptyParts).at(2);
+    QString fstring = selectedid.split("-", QString::SkipEmptyParts).at(3);
+    QString astring = selectedid.split("-", QString::SkipEmptyParts).at(4);
+    qint64 curaddr = 0;
+    if(fstring.contains("a"))
+        curaddr = astring.mid(1).toLongLong();
+    else
+        curaddr = fstring.mid(1).toLongLong();
+    QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
+    if(!evidfile.isOpen())
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        tmpstr = evidfile.readLine();
+    evidfile.close();
+    pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
+    const TSK_TCHAR** images;
+    images = (const char**)malloc(pathvector.size()*sizeof(char*));
+    images[0] = pathvector[0].c_str();
+    int partcount = tmpstr.split(",").at(3).split("|").size();
+    imginfo = tsk_img_open(partcount, images, TSK_IMG_TYPE_DETECT, 0);
+    
+    if(imginfo == NULL)
+    {
+        qDebug() << tsk_error_get_errstr();
+        //LogMessage("Image opening error");
+    }
+    tmpstr = "";
+    QStringList partlist;
+    partlist.clear();
+    QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
+    if(!partfile.isOpen())
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(partfile.isOpen())
+        tmpstr = partfile.readLine();
+    partlist = tmpstr.split(",");
+    tmpstr = "";
+    // NEED TO IMPLEMENT APFS FS OPEN'S HERE
+    int fstype = partlist.at(0).toInt();
+    TSK_FS_INFO* fsinfo = NULL;
+    if(fstype == TSK_FS_TYPE_APFS_DETECT)
+    {
+        const TSK_POOL_INFO* poolinfo = nullptr;
+        poolinfo = tsk_pool_open_img_sing(imginfo, partlist.at(4).toULongLong(), TSK_POOL_TYPE_DETECT);
+        if(poolinfo != nullptr)
+        {
+            if(poolinfo->num_vols > 0)
+            {
+                for(int i=0; i < poolinfo->num_vols; i++)
+                {
+                    TSK_POOL_VOLUME_INFO curpoolvol = poolinfo->vol_list[i];
+                    if(curpoolvol.flags & TSK_POOL_VOLUME_FLAG_ENCRYPTED)
+                    {
+                        //fsinfo = tsk_fs_open_img_decrypt(curimginfo, 0, TSK_FS_TYPE_APFS, passwordhash.value(evidname + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)).toStdString().c_str());
+                        fsinfo = tsk_fs_open_img_decrypt(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS, passwordhash.value(evidencename + "-" + vstring + "-" + pstring).toStdString().c_str());
+                        //fsinfo = tsk_fs_open_pool_decrypt(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT, "encrypted");
+                    }
+                    else
+                    {
+                        fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_APFS_DETECT);
+                        //fsinfo = tsk_fs_open_pool(poolinfo, curpoolvol.block, TSK_FS_TYPE_APFS_DETECT);
+                    }
+                }
+            }
+        }
+    }
+    else
+        fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+    TSK_FS_FILE* fsfile = NULL;
+    fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
+    char* imgbuf = new char[0];
+    ssize_t imglen = 0;
+    if(fsfile != NULL)
+    {
+    if(fsfile->meta != NULL)
+    {
+        if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
+        {
+            if(fstring.contains("a")) // IF ADS
+            {
+                imgbuf = new char[selectedindex.sibling(selectedindex.row(), 2).data().toULongLong()];
+		imglen = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, fstring.mid(2).toInt(), 0, imgbuf, selectedindex.sibling(selectedindex.row(), 2).data().toULongLong(), TSK_FS_FILE_READ_FLAG_SLACK);
+            }
+            else // IF NOT ADS
+            {
+		imgbuf = new char[fsfile->meta->size];
+		imglen = tsk_fs_file_read(fsfile, 0, imgbuf, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+            }
+        }
+        else
+        {
+	    imgbuf = new char[fsfile->meta->size];
+	    imglen = tsk_fs_file_read(fsfile, 0, imgbuf, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+        }
+    }
+    }
+    tsk_fs_file_close(fsfile);
+    fsfile = NULL;
+    tsk_fs_close(fsinfo);
+    fsinfo = NULL;
+    tsk_img_close(imginfo);
+    imginfo = NULL;
+}
+*/
+
 QString ConvertWindowsTimeToUnixTime(uint64_t input)
 {
     QTimeZone tmpzone = QTimeZone(reporttimezone);

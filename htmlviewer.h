@@ -23,6 +23,7 @@ public:
     ~HtmlViewer();
     void ShowHtml(const QModelIndex &index);
     void ShowLnk(const QModelIndex &index);
+    void ShowI30(const QModelIndex &index);
     void LoadHtml(QString filepath);
 
 private slots:

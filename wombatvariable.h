@@ -39,7 +39,36 @@ typedef struct
     tsk_lock_t readlock;
 } IMG_EWF_INFO;
 
+/*
+typedef struct
+{
+    uint8_t parentreference[6];         // 0x00
+    uint8_t parentsequencenumber[2];    // 0x06
+    uint8_t createdtime[8];             // 0x08
+    uint8_t modifiedtime[8];            // 0x10
+    uint8_t changedtime[8];             // 0x18
+    uint8_t accessedtime[8];            // 0x20
+    uint8_t logicalsize[8];             // 0x28
+    uint8_t physicalsize[8];            // 0x30
+    uint8_t flags[8];                   // 0x38
+    uint8_t filenamelength;             // 0x40
+    uint8_t filenamenamespace;          // 0x41
+    uint8_t filename;                   // 0x42
+} ntfsattrfname;
+
+typedef struct
+{
+    uint64_t mftreference;      // 0x00
+    uint16_t indxrecordlength;  // 0x08
+    uint16_t attrfnamelength;   // 0x0A
+    uint32_t flags;             // 0x0C
+    ntfsattrfname fnameinfo;    // 0x10
+} ntfsindxrecord;
+*/
+
 Q_DECLARE_METATYPE(WombatVariable);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);
+//Q_DECLARE_METATYPE(ntfsattrfname);
+//Q_DECLARE_METATYPE(ntfsindxrecord);
 
 #endif // WOMBATVARIABLE_H
