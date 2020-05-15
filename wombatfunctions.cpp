@@ -3943,19 +3943,26 @@ void TransferFiles(QString thumbid, QString reppath)
     }
     else
     {
-	// EITHER USE INDEXLIST.FIRST().SIBLING(INDEXLIST.FIRST.ROW(..).DATA().TOSTRING() OR CURNODE->DATA(9) FOR SIGNATURE
-	// THEN I CAN DO IF SHORTCUT OR PREFETCH OR ETC.... TO GENERATE CONTENT AND OUTPUT ACCORDINGLY...
         QDir dir;
         bool tmpdir = dir.mkpath(QDir::cleanPath(tmppath));
         if(tmpdir == true)
         {
             QFile tmpfile(tmppath + thumbid);
-            if(tmpfile.open(QIODevice::WriteOnly))
-            {
-                QDataStream outbuffer(&tmpfile);
-                outbuffer.writeRawData(filebuffer, bufferlength);
-                if(tmpfile.isOpen())
-                    tmpfile.close();
+	    if(!tmpfile.isOpen())
+		tmpfile.open(QIODevice::WriteOnly);
+	    if(tmpfile.isOpen())
+	    {
+	   	if(curnode->Data(9).toString().contains("Shortcut"))
+	    	{
+	    	    QString lnkstr = ParseLnkArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+		    tmpfile.write(lnkstr.toStdString().c_str());
+	    	}
+	    	else
+	    	{
+                    QDataStream outbuffer(&tmpfile);
+                    outbuffer.writeRawData(filebuffer, bufferlength);
+	    	}
+            	tmpfile.close();
             }
         }
     }
