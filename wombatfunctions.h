@@ -14,7 +14,7 @@
 #define EPOCH_DIFFERENCE 11644473600LL
 QString ConvertWindowsTimeToUnixTime(uint64_t input);
 QString ParseLnkArtifact(QString lnkname, QString lnkid);
-QString ParseI30Artifact(QString i30id);
+QString ParseI30Artifact(QString i30name, QString i30id);
 
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);

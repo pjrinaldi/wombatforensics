@@ -37,7 +37,7 @@ void HtmlViewer::ShowLnk(const QModelIndex &index)
 
 void HtmlViewer::ShowI30(const QModelIndex &index)
 {
-    QString htmlstring = ParseI30Artifact(index.sibling(index.row(), 11).data().toString());
+    QString htmlstring = ParseI30Artifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
     ui->webView->setHtml(htmlstring);
     this->show();
 }
