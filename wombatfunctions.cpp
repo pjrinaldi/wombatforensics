@@ -1,4 +1,5 @@
 #include "wombatfunctions.h"
+#include <QtEndian>
 // IMAGEMAGICK HEADER
 #include <Magick++.h>
 // LIBFFMPEG THUMBNAILER HEADERS
@@ -167,12 +168,20 @@ QString ParseI30Artifact(QString i30id)
     if(indxrootfile.isOpen())
         indxrootba = indxrootfile.readAll();
     indxrootfile.close();
-    bool babool = false;
-    QByteArray indxroothdr = indxrootba.left(4);
-    if(indxroothdr.at(0) == 0x30 && indxroothdr.at(1) == 0x00 && indxroothdr.at(2) == 0x00 && indxroothdr.at(3) == 0x00)
-        qDebug() << "index root attribute resident inside MFT..." << QString::number(indxroothdr.at(0));
+    //bool babool = false;
+    //QByteArray indxroothdr = indxrootba.left(4);
+    //uint beroothdr = qFromBigEndian<uint>(indxroothdr);
+    uint leroothdr = qFromLittleEndian<uint>(indxrootba.left(4));
+    //qDebug() << QString::number(beroothdr, 16) << QString::number(leroothdr, 16);
+    //qDebug() << "beroothdr:" << QString::number(beroothdr.at(0), 16);
+    //qDebug() << "leroothdr:" << QString::number(leroothdr.at(0), 16);
+    //if(indxroothdr.at(0) == 0x30 && indxroothdr.at(1) == 0x00 && indxroothdr.at(2) == 0x00 && indxroothdr.at(3) == 0x00)
+    if(leroothdr == 0x30)
+    {
+        qDebug() << "index root attribute resident inside MFT..." << QString::number(indxrootba.at(0), 16);
+    }
     else
-        qDebug() << "do something else here..." << QString::number(indxroothdr.at(0));
+        qDebug() << "do something else here..." << QString::number(indxrootba.at(0), 16);
     
     return "";
     //QString lnkfile = wombatvariable.tmpfilepath + lnkid + "-fhex";
