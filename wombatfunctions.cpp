@@ -166,7 +166,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
         htmlstr = initfile.readAll();
     initfile.close();
     htmlstr += "<div id='infotitle'>$I30 File Analysis for " + i30name + " (" + i30id + ")</div><br/>";
-    htmlstr += "<table width='100%'><tr><th>$I30 Entries</th></tr><tr><td>File Name</td><td>Created</td><td>Modified</td><td>Changed</td><td>Accessed</td><td>Logical Size (bytes)</td><td>Physical Size (bytes)</td><td>Recovered</td></tr>";
+    htmlstr += "<table><tr><th>$I30 Entries</th></tr><tr><td class=subhead style='display: inline;'>File Name</td><td class=subhead style='display: inline;'>Created</td><td class=subhead style='display: inline;'>Modified</td><td class=subhead style='display: inline;'>Changed</td><td class=subhead style='display: inline;'>Accessed</td><td class=subhead style='display: inline;'>Logical Size (bytes)</td><td class=subhead style='display: inline;'>Physical Size (bytes)</td><td class=subhead style='display: inline;'>Recovered</td></tr>";
     // uint8 = 1 byte - uchar
     // uint16 = 2 bytes - ushort
     // uint32 = 4 bytes - uint
@@ -206,9 +206,13 @@ QString ParseI30Artifact(QString i30name, QString i30id)
         else // 0x00
         {
             int curpos = 32;
+            int a=1;
             while(curpos < indexentrylistsize - 32)
             {
-                htmlstr += "<tr class=even>";
+                if(a % 2 == 0)
+                    htmlstr += "<tr class=even>";
+                else
+                    htmlstr += "<tr class=odd>";
                 //uint64_t indxentrymftref = qFromLittleEndian<uint64_t>(indxrootba.mid(curpos, 8));
                 //uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxrootba.mid(curpos + 8, 2));
                 uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxrootba.mid(curpos + 10, 2));
@@ -229,17 +233,18 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                     if(i % 2 == 0)
                         filename.append(filenameattribute.mid(66+i, 1));
                 }
-                htmlstr += "<td>" + filename + "</td>";
-                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(createdtime) + "</td>";
-                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(modifiedtime) + "</td>";
-                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(changedtime) + "</td>";
-                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(accessedtime) + "</td>";
-                htmlstr += "<td>" + QString::number(logicalsize) + "</td>";
-                htmlstr += "<td>" + QString::number(physicalsize) + "</td>";
-                htmlstr += "<td>&nbsp;</td>";
+                htmlstr += "<td style='display: inline;'>" + filename + "</td>";
+                htmlstr += "<td style='display: inline;'>" + ConvertWindowsTimeToUnixTime(createdtime) + "</td>";
+                htmlstr += "<td style='display: inline;'>" + ConvertWindowsTimeToUnixTime(modifiedtime) + "</td>";
+                htmlstr += "<td style='display: inline;'>" + ConvertWindowsTimeToUnixTime(changedtime) + "</td>";
+                htmlstr += "<td style='display: inline;'>" + ConvertWindowsTimeToUnixTime(accessedtime) + "</td>";
+                htmlstr += "<td style='display: inline;'>" + QString::number(logicalsize) + "</td>";
+                htmlstr += "<td style='display: inline;'>" + QString::number(physicalsize) + "</td>";
+                htmlstr += "<td style='display: inline;'>&nbsp;</td>";
                 htmlstr += "</tr>";
                 //qDebug() << "filename:" << filename << "end of indexentry:" << 66 + fnamelength*2 << "indxroot size:" << indxrootba.count();
                 curpos = curpos + 16 + filenamelength;
+                a++;
                 //qDebug() << "curpos:" << curpos;
             }
             /*
