@@ -159,6 +159,10 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
 
 QString ParseI30Artifact(QString i30id)
 {
+    // uint8 = 1 byte - uchar
+    // uint16 = 2 bytes - ushort
+    // uint32 = 4 bytes - uint
+    // uint64 = 8 bytes - ulonglong
     QString indxrootstr = wombatvariable.tmpfilepath + i30id + "-fhex";
     QByteArray indxrootba;
     indxrootba.clear();
@@ -168,23 +172,21 @@ QString ParseI30Artifact(QString i30id)
     if(indxrootfile.isOpen())
         indxrootba = indxrootfile.readAll();
     indxrootfile.close();
-    //bool babool = false;
-    //QByteArray indxroothdr = indxrootba.left(4);
-    //uint beroothdr = qFromBigEndian<uint>(indxroothdr);
-    uint leroothdr = qFromLittleEndian<uint>(indxrootba.left(4));
-    //qDebug() << QString::number(beroothdr, 16) << QString::number(leroothdr, 16);
-    //qDebug() << "beroothdr:" << QString::number(beroothdr.at(0), 16);
-    //qDebug() << "leroothdr:" << QString::number(leroothdr.at(0), 16);
-    //if(indxroothdr.at(0) == 0x30 && indxroothdr.at(1) == 0x00 && indxroothdr.at(2) == 0x00 && indxroothdr.at(3) == 0x00)
+    uint leroothdr = qFromLittleEndian<uint>(indxrootba.left(4)); // uint 4 bytes
     if(leroothdr == 0x30)
     {
         qDebug() << "index root attribute resident inside MFT..." << QString::number(indxrootba.at(0), 16);
+        uint indxrecordsize = qFromLittleEndian<uint>(indxrootba.mid(8, 4));
+        qDebug() << "size of index record:" << indxrecordsize << QString::number(indxrecordsize, 16);
+        uint8_t indxrecordclustersize = qFromLittleEndian<uint8_t>(indxrootba.mid(12, 1));
+        qDebug() << "cluster size:" << indxrecordclustersize;
     }
     else
+    {
         qDebug() << "do something else here..." << QString::number(indxrootba.at(0), 16);
+    }
     
     return "";
-    //QString lnkfile = wombatvariable.tmpfilepath + lnkid + "-fhex";
     // START WITH THE -FHEX FILE AND CHECK THE $INDEX_ROOT TO SEE IF IT IS THE ONLY ONE... IF NOT
     // THE SLACK OF THE $I30 MIGHT INCLUDE SLACK WHICH COULD BE PARSED AS WELL...
     // THIS IS GOING TO BE COMPLEX...
