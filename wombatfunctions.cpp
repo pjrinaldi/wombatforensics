@@ -221,10 +221,19 @@ QString ParseI30Artifact(QString i30id)
             uint8_t fnamelength = qFromLittleEndian<uint8_t>(filenameattribute.mid(64, 1));
             qDebug() << "fnamelength:" << fnamelength;
             uint8_t filenamespace = qFromLittleEndian<uint8_t>(filenameattribute.mid(65, 1));
-            uint8_t filename[fnamelength];
-            *filename = qFromLittleEndian<uint8_t>(filenameattribute.mid(66, fnamelength));
-            qDebug() << "file.at(0):" << filenameattribute.at(65) << "file.at(2):" << filenameattribute.at(66);
-            qDebug() << "filename:" << QString::fromUtf8(reinterpret_cast<char*>(filename)) << "lastpos:" << 66 + fnamelength << "indexroot size:" << indxrootba.count();
+            QString filename = "";
+            for(int i=0; i < fnamelength*2; i++)
+            {
+                if(i % 2 == 0)
+                    filename.append(filenameattribute.mid(66+i, 1));
+            }
+            qDebug() << "filename:" << filename;
+            //uint8_t filename[fnamelength*2];
+            //*filename = qFromLittleEndian<uint8_t>(filenameattribute.mid(66, fnamelength*2));
+            //std::string testfilename = filenameattribute.mid(66, fnamelength).toStdString();
+            //qDebug() << "test filename:" << QString::fromUtf8(testfilename.c_str());
+            //qDebug() << "file.at(0):" << filenameattribute.at(66) << "file.at(2):" << filenameattribute.at(68);
+            //qDebug() << "filename:" << QString::fromUtf8(reinterpret_cast<char*>(filename)) << "lastpos:" << 66 + fnamelength << "indexroot size:" << indxrootba.count();
             //char* filename = new char[fnamelength + 1];
             //strcpy(filename, filenameattribute.mid(66, fnamelength).data());
             //const char* filename = filenameattribute.mid(66, fnamelength).constData();
