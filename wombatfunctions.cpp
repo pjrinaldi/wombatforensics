@@ -212,6 +212,24 @@ QString ParseI30Artifact(QString i30id)
             qDebug() << "filenameattribute size:" << filenameattribute.count();
             uint64_t createdtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(8, 8));
             qDebug() << "createdtime:" << createdtime << ConvertWindowsTimeToUnixTime(createdtime);
+            uint64_t modifiedtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(16, 8));
+            uint64_t changedtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(24, 8));
+            uint64_t accessedtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(32, 8));
+            uint64_t logicalsize = qFromLittleEndian<uint64_t>(filenameattribute.mid(40, 8));
+            uint64_t physicalsize = qFromLittleEndian<uint64_t>(filenameattribute.mid(48, 8));
+            uint64_t filenameflags = qFromLittleEndian<uint64_t>(filenameattribute.mid(56, 8));
+            uint8_t fnamelength = qFromLittleEndian<uint8_t>(filenameattribute.mid(64, 1));
+            qDebug() << "fnamelength:" << fnamelength;
+            uint8_t filenamespace = qFromLittleEndian<uint8_t>(filenameattribute.mid(65, 1));
+            uint8_t filename[fnamelength];
+            *filename = qFromLittleEndian<uint8_t>(filenameattribute.mid(66, fnamelength));
+            qDebug() << "file.at(0):" << filenameattribute.at(65) << "file.at(2):" << filenameattribute.at(66);
+            qDebug() << "filename:" << QString::fromUtf8(reinterpret_cast<char*>(filename)) << "lastpos:" << 66 + fnamelength << "indexroot size:" << indxrootba.count();
+            //char* filename = new char[fnamelength + 1];
+            //strcpy(filename, filenameattribute.mid(66, fnamelength).data());
+            //const char* filename = filenameattribute.mid(66, fnamelength).constData();
+            //qDebug() << "filename:" << QString::fromUtf8(filename) << "lastpos:" << 66 + fnamelength << "indexroot size:" << indxrootba.count();
+            //delete[] filename;
             // 1st filename attribute 0x48
             /*
              *
@@ -227,6 +245,9 @@ QString ParseI30Artifact(QString i30id)
                 uint8_t filenamelength;             // 0x40 file name length
                 uint8_t filenamenamespace;          // 0x41 namespace
                 uint8_t filename;                   // 0x42 file name variable based on 0x40
+	        uint8_t workdir[tmpsize];
+	        liblnk_file_get_utf8_working_directory(lnkobj, workdir, tmpsize, &error);
+	        htmlstr += "<tr class='even'><td class='aval'>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
              */ 
         }
         qDebug() << "since it was only in the indx root to begin with, I will need to pull the indx root slack anyway using tsk functions and looping over fsattr's";
