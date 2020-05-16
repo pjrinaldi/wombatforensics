@@ -172,14 +172,34 @@ QString ParseI30Artifact(QString i30id)
     if(indxrootfile.isOpen())
         indxrootba = indxrootfile.readAll();
     indxrootfile.close();
-    uint leroothdr = qFromLittleEndian<uint>(indxrootba.left(4)); // uint 4 bytes
+    qDebug() << "indx root byte count:" << indxrootba.count();
+    uint32_t leroothdr = qFromLittleEndian<uint32_t>(indxrootba.left(4)); // uint 4 bytes
     if(leroothdr == 0x30)
     {
         qDebug() << "index root attribute resident inside MFT..." << QString::number(indxrootba.at(0), 16);
-        uint indxrecordsize = qFromLittleEndian<uint>(indxrootba.mid(8, 4));
+        uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxrootba.mid(8, 4));
         qDebug() << "size of index record:" << indxrecordsize << QString::number(indxrecordsize, 16);
+        // bytes 4-7 are collation sorting rule, which enforces filename sorting and not needed to parse.
         uint8_t indxrecordclustersize = qFromLittleEndian<uint8_t>(indxrootba.mid(12, 1));
         qDebug() << "cluster size:" << indxrecordclustersize;
+        // bytes 13-15 are often blank, always unused.
+        uint32_t indexentryoffset = qFromLittleEndian<uint32_t>(indxrootba.mid(16, 4));
+        qDebug() << "index entry list offset to 1st entry:" << indexentryoffset;
+        uint32_t indexentrylistsize = qFromLittleEndian<uint32_t>(indxrootba.mid(20, 4));
+        qDebug() << "index entry list size:" << indexentrylistsize;
+        uint32_t indexentrylistallocated = qFromLittleEndian<uint32_t>(indxrootba.mid(24, 4));
+        qDebug() << "index entry list allocated size:" << indexentrylistallocated;
+        uint8_t indxentryflags = qFromLittleEndian<uint8_t>(indxrootba.mid(28, 1));
+        qDebug() << "index entry flags:" << QString::number(indxentryflags, 16);
+        if(indxentryflags == 0x01)
+        {
+            qDebug() << "there is an index allocation and bitmap...";
+        }
+        else
+        {
+            qDebug() << "it is all stored in indx root...";
+        }
+        qDebug() << "since it was only in the indx root to begin with, I will need to pull the indx root slack anyway using tsk functions and looping over fsattr's";
     }
     else
     {
