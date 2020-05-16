@@ -156,15 +156,33 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
     return htmlstr;
 }
 
-/*
-QString ParseI30Artifact()
+QString ParseI30Artifact(QString i30id)
 {
+    QString indxrootstr = wombatvariable.tmpfilepath + i30id + "-fhex";
+    QByteArray indxrootba;
+    indxrootba.clear();
+    QFile indxrootfile(indxrootstr);
+    if(!indxrootfile.isOpen())
+        indxrootfile.open(QIODevice::ReadOnly);
+    if(indxrootfile.isOpen())
+        indxrootba = indxrootfile.readAll();
+    indxrootfile.close();
+    bool babool = false;
+    QByteArray indxroothdr = indxrootba.left(4);
+    if(indxroothdr.at(0) == 0x30 && indxroothdr.at(1) == 0x00 && indxroothdr.at(2) == 0x00 && indxroothdr.at(3) == 0x00)
+        qDebug() << "index root attribute resident inside MFT..." << QString::number(indxroothdr.at(0));
+    else
+        qDebug() << "do something else here..." << QString::number(indxroothdr.at(0));
+    
+    return "";
+    //QString lnkfile = wombatvariable.tmpfilepath + lnkid + "-fhex";
     // START WITH THE -FHEX FILE AND CHECK THE $INDEX_ROOT TO SEE IF IT IS THE ONLY ONE... IF NOT
     // THE SLACK OF THE $I30 MIGHT INCLUDE SLACK WHICH COULD BE PARSED AS WELL...
     // THIS IS GOING TO BE COMPLEX...
     // THEN I WILL PULL THE ATTRIBUTES FROM THE BELOW CODE AND GET THE $INDEX_ALLOCATION (160)
     // ALSO CAN LOOK AT PROCESSDIR/WRITEFILEPROPERTIES TO SEE HOW I LOOP OVER THEM...
     // SAMPLE CODE TO GET THE FS WHICH WILL LET ME LOOP OVER THE ATTRIBUTES AND THEN PULL THE INDEX_ALLOCATION'S IF NEEDED
+    /*
     QString selectedid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
     TSK_IMG_INFO* imginfo = NULL;
     std::vector<std::string> pathvector;
@@ -277,8 +295,8 @@ QString ParseI30Artifact()
     fsinfo = NULL;
     tsk_img_close(imginfo);
     imginfo = NULL;
+    */
 }
-*/
 
 QString ConvertWindowsTimeToUnixTime(uint64_t input)
 {
@@ -4063,6 +4081,15 @@ void TransferFiles(QString thumbid, QString reppath)
             qWarning() << "Creation of export directory tree for file:" << tmppath << "failed";
             //LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
             errorcount++;
+        }
+        QString i30str = ParseI30Artifact(thumbid);
+        QFile tmpfile(tmppath + thumbid);
+        if(!tmpfile.isOpen())
+            tmpfile.open(QIODevice::WriteOnly);
+        if(tmpfile.isOpen())
+        {
+            tmpfile.write(i30str.toStdString().c_str());
+            tmpfile.close();
         }
     }
     else
