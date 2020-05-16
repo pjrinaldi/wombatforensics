@@ -189,15 +189,45 @@ QString ParseI30Artifact(QString i30id)
         qDebug() << "index entry list size:" << indexentrylistsize;
         uint32_t indexentrylistallocated = qFromLittleEndian<uint32_t>(indxrootba.mid(24, 4));
         qDebug() << "index entry list allocated size:" << indexentrylistallocated;
-        uint8_t indxentryflags = qFromLittleEndian<uint8_t>(indxrootba.mid(28, 1));
-        qDebug() << "index entry flags:" << QString::number(indxentryflags, 16);
-        if(indxentryflags == 0x01)
+        uint8_t indxentrylistflags = qFromLittleEndian<uint8_t>(indxrootba.mid(28, 1));
+        qDebug() << "index entry flags (0, 1):" << QString::number(indxentrylistflags, 16);
+        if(indxentrylistflags == 0x01)
         {
             qDebug() << "there is an index allocation and bitmap...";
         }
-        else
+        else // 0x00
         {
             qDebug() << "it is all stored in indx root...";
+            // bytes 29-31 are often blank, always unused. bytes 32 starts the 1st index entry...
+            // byte 32 because header started at byte 16, and offset to 1st index entry was 16, 16+16=32
+            uint64_t indxentrymftref = qFromLittleEndian<uint64_t>(indxrootba.mid(32, 8));
+            qDebug() << "$MFT file reference:" << indxentrymftref;
+            uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxrootba.mid(40, 2));
+            qDebug() << "indx entry length:" << indxentrylength;
+            uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxrootba.mid(42, 2));
+            qDebug() << "$FILE_NAME attribute length:" << filenamelength;
+            uint16_t indxentryflags = qFromLittleEndian<uint16_t>(indxrootba.mid(44, 4));
+            qDebug() << "indxentryflags (0, 1, 2):" << QString::number(indxentryflags, 16);
+            QByteArray filenameattribute = indxrootba.mid(48, filenamelength);
+            qDebug() << "filenameattribute size:" << filenameattribute.count();
+            uint64_t createdtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(8, 8));
+            qDebug() << "createdtime:" << createdtime << ConvertWindowsTimeToUnixTime(createdtime);
+            // 1st filename attribute 0x48
+            /*
+             *
+                uint8_t parentreference[6];         // 0x00 parent directory $MFT Record number
+                uint8_t parentsequencenumber[2];    // 0x06 parent directory sequence number
+                uint8_t createdtime[8];             // 0x08 created (birth) time
+                uint8_t modifiedtime[8];            // 0x10 last written time
+                uint8_t changedtime[8];             // 0x18 record modified
+                uint8_t accessedtime[8];            // 0x20 last accessed time
+                uint8_t logicalsize[8];             // 0x28 logical size
+                uint8_t physicalsize[8];            // 0x30 physical size
+                uint8_t flags[8];                   // 0x38 flags (read only, hidden, etc)
+                uint8_t filenamelength;             // 0x40 file name length
+                uint8_t filenamenamespace;          // 0x41 namespace
+                uint8_t filename;                   // 0x42 file name variable based on 0x40
+             */ 
         }
         qDebug() << "since it was only in the indx root to begin with, I will need to pull the indx root slack anyway using tsk functions and looping over fsattr's";
     }
