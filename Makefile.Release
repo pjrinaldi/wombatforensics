@@ -461,6 +461,7 @@ release/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/edit-copy.svg \
 		Resources/videoerror.png \
 		Resources/document-export.svg \
+		Resources/artfiactprep.html \
 		Resources/information.html \
 		Resources/gparted.png \
 		Resources/folder.png \

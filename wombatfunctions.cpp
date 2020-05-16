@@ -36,13 +36,13 @@ std::string GetTime()
 QString ParseLnkArtifact(QString lnkname, QString lnkid)
 {
     QString htmlstr = "";
-    QFile initfile(":/html/initialhtml");
+    QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
     htmlstr += "<div id='infotitle'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
-    htmlstr += "<table width='100%'><tr><th>NAME</th></tr>";
+    htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
     QString lnkfile = wombatvariable.tmpfilepath + lnkid + "-fhex";
     liblnk_error_t* error = NULL;
     liblnk_file_t* lnkobj = NULL;
@@ -160,13 +160,14 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
 QString ParseI30Artifact(QString i30name, QString i30id)
 {
     QString htmlstr = "";
-    QFile initfile(":/html/initialhtml");
+    QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
     htmlstr += "<div id='infotitle'>$I30 File Analysis for " + i30name + " (" + i30id + ")</div><br/>";
-    htmlstr += "<table><tr><th>$I30 Entries</th></tr><tr><td class=subhead style='display: inline;'>File Name</td><td class=subhead style='display: inline;'>Created</td><td class=subhead style='display: inline;'>Modified</td><td class=subhead style='display: inline;'>Changed</td><td class=subhead style='display: inline;'>Accessed</td><td class=subhead style='display: inline;'>Logical Size (bytes)</td><td class=subhead style='display: inline;'>Physical Size (bytes)</td><td class=subhead style='display: inline;'>Recovered</td></tr>";
+    htmlstr += "<table><tr><th colspan=8>$I30 Entries</th></tr>";
+    htmlstr += "<tr><td class=subhead>File Name</td><td class=subhead>Created</td><td class=subhead>Modified</td><td class=subhead>Changed</td><td class=subhead>Accessed</td><td class=subhead>Logical Size (bytes)</td><td class=subhead>Physical Size (bytes)</td><td class=subhead>Recovered</td></tr>";
     // uint8 = 1 byte - uchar
     // uint16 = 2 bytes - ushort
     // uint32 = 4 bytes - uint
@@ -233,14 +234,14 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                     if(i % 2 == 0)
                         filename.append(filenameattribute.mid(66+i, 1));
                 }
-                htmlstr += "<td style='display: inline;'>" + filename + "</td>";
-                htmlstr += "<td style='display: inline;'>" + ConvertWindowsTimeToUnixTime(createdtime) + "</td>";
-                htmlstr += "<td style='display: inline;'>" + ConvertWindowsTimeToUnixTime(modifiedtime) + "</td>";
-                htmlstr += "<td style='display: inline;'>" + ConvertWindowsTimeToUnixTime(changedtime) + "</td>";
-                htmlstr += "<td style='display: inline;'>" + ConvertWindowsTimeToUnixTime(accessedtime) + "</td>";
-                htmlstr += "<td style='display: inline;'>" + QString::number(logicalsize) + "</td>";
-                htmlstr += "<td style='display: inline;'>" + QString::number(physicalsize) + "</td>";
-                htmlstr += "<td style='display: inline;'>&nbsp;</td>";
+                htmlstr += "<td>" + filename + "</td>";
+                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(createdtime) + "</td>";
+                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(modifiedtime) + "</td>";
+                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(changedtime) + "</td>";
+                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(accessedtime) + "</td>";
+                htmlstr += "<td>" + QString::number(logicalsize) + "</td>";
+                htmlstr += "<td>" + QString::number(physicalsize) + "</td>";
+                htmlstr += "<td>&nbsp;</td>";
                 htmlstr += "</tr>";
                 //qDebug() << "filename:" << filename << "end of indexentry:" << 66 + fnamelength*2 << "indxroot size:" << indxrootba.count();
                 curpos = curpos + 16 + filenamelength;
