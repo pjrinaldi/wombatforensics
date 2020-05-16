@@ -172,6 +172,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
     // uint16 = 2 bytes - ushort
     // uint32 = 4 bytes - uint
     // uint64 = 8 bytes - ulonglong
+    bool isslack = false;
     QString indxrootstr = wombatvariable.tmpfilepath + i30id + "-fhex";
     QByteArray indxrootba;
     indxrootba.clear();
@@ -200,9 +201,122 @@ QString ParseI30Artifact(QString i30name, QString i30id)
         //qDebug() << "index entry list allocated size:" << indexentrylistallocated;
         uint8_t indxentrylistflags = qFromLittleEndian<uint8_t>(indxrootba.mid(28, 1));
         //qDebug() << "index entry flags (0, 1):" << QString::number(indxentrylistflags, 16);
+        if((indexentrylistallocated - indexentrylistsize) > 0)
+            isslack = true;
         if(indxentrylistflags == 0x01)
         {
-            qDebug() << "there is an index allocation and bitmap...";
+            TSK_IMG_INFO* imginfo = NULL;
+            std::vector<std::string> pathvector;
+            pathvector.clear();
+            QDir eviddir = QDir(wombatvariable.tmpmntpath);
+            QString tmpstr = "";
+            QStringList evidfiles = eviddir.entryList(QStringList("*." + i30id.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+            QString evidencename = evidfiles.at(0).split(".e").first();
+            QString estring = i30id.split("-", QString::SkipEmptyParts).at(0);
+            QString vstring = i30id.split("-", QString::SkipEmptyParts).at(1);
+            QString pstring = i30id.split("-", QString::SkipEmptyParts).at(2);
+            QString fstring = i30id.split("-", QString::SkipEmptyParts).at(3);
+            QString astring = i30id.split("-", QString::SkipEmptyParts).at(4);
+            qint64 curaddr = 0;
+            if(fstring.contains("a"))
+                curaddr = astring.mid(1).toLongLong();
+            else
+                curaddr = fstring.mid(1).toLongLong();
+            QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
+            if(!evidfile.isOpen())
+                evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(evidfile.isOpen())
+                tmpstr = evidfile.readLine();
+            evidfile.close();
+            pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
+            const TSK_TCHAR** images;
+            images = (const char**)malloc(pathvector.size()*sizeof(char*));
+            images[0] = pathvector[0].c_str();
+            int partcount = tmpstr.split(",").at(3).split("|").size();
+            imginfo = tsk_img_open(partcount, images, TSK_IMG_TYPE_DETECT, 0);
+            if(imginfo != NULL)
+            {
+                QStringList partlist;
+                tmpstr = "";
+                partlist.clear();
+                QFile partfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat");
+                if(!partfile.isOpen())
+                    partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(partfile.isOpen())
+                    tmpstr = partfile.readLine();
+                partlist = tmpstr.split(",");
+                tmpstr = "";
+                int fstype = partlist.at(0).toInt();
+                TSK_FS_INFO* fsinfo = NULL;
+                if(fstype == TSK_FS_TYPE_NTFS_DETECT)
+                {
+                    fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
+                    if(fsinfo != NULL)
+                    {
+                        TSK_FS_FILE* fsfile = NULL;
+                        fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
+                        if(fsfile != NULL)
+                        {
+                            if(fsfile->meta != NULL)
+                            {
+                                /*
+                                if(isslack)
+                                {
+                                    qDebug() << "need to get the idx_root content with slack from fsfile->fsattr->content...";
+                                    char* imgbuf = new char[0];
+                                    ssize_t imglen = 0;
+		                    imgbuf = new char[fsfile->meta->size];
+                        	    imglen = tsk_fs_file_read(fsfile, 0, imgbuf, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+                                    QByteArray filecontent = QByteArray(imgbuf, imglen);
+                                    delete[] imgbuf;
+                                }
+                                */
+                                QByteArray indxrootcontent;
+                                QByteArray indxalloccontent;
+                                indxrootcontent.clear();
+                                indxalloccontent.clear();
+                                int attrcnt = tsk_fs_file_attr_getsize(fsfile);
+                                char* fscontent = new char[0];
+                                ssize_t fslength = 0;
+                                for(int i=0; i < attrcnt; i++)
+                                {
+                                    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(fsfile, i);
+                                    if(fsattr->type == 144)
+                                    {
+                                        qDebug() << "$INDEX_ROOT";
+                                        qDebug() << "fsattr info:" << fsattr->type << "alloc size:" << fsattr->nrd.allocsize << "size:" << fsattr->size;
+                                        if(isslack)
+                                            qDebug() << "get content here.";
+                                    }
+                                    else if(fsattr->type == 160)
+                                    {
+                                        qDebug() << "$INDEX_ALLOCATION";
+                                        qDebug() << "fsattr info:" << fsattr->type << "alloc size:" << fsattr->nrd.allocsize << "size:" << fsattr->size;
+                                        qDebug() << "get content with slack here to parse index allocation";
+                                        fscontent = new char[fsattr->size];
+                                        fslength = tsk_fs_attr_read(fsattr, 0, fscontent, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
+                                        indxalloccontent.append(QByteArray(fscontent, fslength));
+                                        delete[] fscontent;
+                                        qDebug() << "indxalloccontent size:" << indxalloccontent.count();
+                                        qDebug() << "indx_alloc 0-3:" << indxalloccontent.at(0) << indxalloccontent.at(1) << indxalloccontent.at(2) << indxalloccontent.at(3);
+                                    }
+                                }
+                            }
+                        }
+                        tsk_fs_file_close(fsfile);
+                        fsfile = NULL;
+                    }
+                    tsk_fs_close(fsinfo);
+                    fsinfo = NULL;
+                }
+            }
+            tsk_img_close(imginfo);
+            imginfo = NULL;
+            //qDebug() << "there is an index allocation and bitmap...";
+            /*
+            *
+             */ 
+
         }
         else // 0x00
         {
