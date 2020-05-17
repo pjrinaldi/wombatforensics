@@ -534,7 +534,7 @@ QString ParseInfo2Artifact(QString info2name, QString info2id)
         htmlstr = initfile.readAll();
     initfile.close();
     htmlstr += "<div id='infotitle'>INFO2 File Analysis for " + info2name + " (" + info2id + ")</div><br/>";
-    htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
+    htmlstr += "<table width='100%'><tr><th>FILE NAME</th><th>DELETED</th></tr>";
     QString info2file = wombatvariable.tmpfilepath + info2id + "-fhex";
     QByteArray info2content;
     info2content.clear();
@@ -544,7 +544,26 @@ QString ParseInfo2Artifact(QString info2name, QString info2id)
     if(i2file.isOpen())
         info2content = i2file.readAll();
     i2file.close();
-    qDebug() << "info2 size:" << info2content.count();
+    //qDebug() << "info2 size:" << info2content.count();
+    //uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 24, 4));
+    //QString indxrecordheader = QString::fromStdString(indxalloccontent.mid(curpos, 4).toStdString());
+    uint32_t fileentrysize = qFromLittleEndian<uint32_t>(info2content.mid(12, 4));
+    //qDebug() << "file entry size:" << fileentrysize;
+    int curpos = 20; // content starts after offset
+    int a = 1;
+    while(curpos < info2content.count())
+    {
+        if(a % 2 == 0)
+            htmlstr += "<tr class=even>";
+        else
+            htmlstr += "<tr class=odd>";
+        QString filenamestring = QString::fromStdString(info2content.mid(curpos + 4, 260).trimmed().toStdString());
+        uint64_t deleteddate = qFromLittleEndian<uint64_t>(info2content.mid(curpos + 268, 8));
+        htmlstr += "<td>" + filenamestring + "</td>";
+        htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td>";
+        htmlstr += "</tr>";
+        curpos = curpos + fileentrysize;
+    }
 
     htmlstr += "</table></body></html>";
     
