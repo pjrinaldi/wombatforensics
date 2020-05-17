@@ -195,7 +195,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
         // bytes 13-15 are often blank, always unused.
         //uint32_t indexentryoffset = qFromLittleEndian<uint32_t>(indxrootba.mid(16, 4)); // INDEX NODE HEADER
         //qDebug() << "index entry list offset to 1st entry:" << indexentryoffset;
-        uint32_t indexentrylistsize = qFromLittleEndian<uint32_t>(indxrootba.mid(20, 4)); // USED SIZE FOR ALL INDEX ENTRIES
+        //uint32_t indexentrylistsize = qFromLittleEndian<uint32_t>(indxrootba.mid(20, 4)); // USED SIZE FOR ALL INDEX ENTRIES
         //qDebug() << "index entry list size:" << indexentrylistsize;
         uint32_t indexentrylistallocated = qFromLittleEndian<uint32_t>(indxrootba.mid(24, 4)); // ALLOC SIZE FOR ALL INDEX ENTRIES
         //qDebug() << "index entry list allocated size:" << indexentrylistallocated;
@@ -327,11 +327,11 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                 QString indxrecordheader = QString::fromStdString(indxalloccontent.mid(curpos, 4).toStdString());
                 if(indxrecordheader.contains("INDX")) // moving correctly.
                 {
-                    uint16_t indxrecordfixupoffset = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 4, 2));
-                    uint16_t indxrecordfixupcount = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 6, 2));
+                    //uint16_t indxrecordfixupoffset = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 4, 2));
+                    //uint16_t indxrecordfixupcount = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 6, 2));
                     //qDebug() << "fixup offset:" << indxrecordfixupoffset << "fixup count:" << indxrecordfixupcount;
                     // Bytes 8-15 provide $Logfile sequence number which i don't need for this.
-                    uint64_t indxrecordvcn = qFromLittleEndian<uint64_t>(indxalloccontent.mid(curpos + 16, 8));
+                    //uint64_t indxrecordvcn = qFromLittleEndian<uint64_t>(indxalloccontent.mid(curpos + 16, 8));
                     //qDebug() << "indxallocvcn number:" << indxrecordvcn;
                     uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 24, 4));
                     //qDebug() << "indx entry start offset:" << indxentrystartoffset;
@@ -4690,6 +4690,14 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     {
                         if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
                             mimestr = "Windows System/Shortcut";
+                        else if(strcmp(fsfile->name->name, "INFO2") == 0 && (tmparray.at(0) == 0x04 || tmparray.at(0) == 0x05))
+                        {
+                            mimestr = "Windows System/Recycler";
+                        }
+                        else if(QString::fromStdString(fsfile->name->name).startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02))
+                        {
+                            mimestr = "Windows System/Recycle.Bin";
+                        }
                     }
                     //qDebug() << "mimestr:" << mimestr;
                     delete[] magicbuffer;
