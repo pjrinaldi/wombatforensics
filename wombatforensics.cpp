@@ -574,6 +574,20 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setWindowTitle("$I30 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
         htmlviewer->ShowI30(index);
     }
+    else if(index.sibling(index.row(), 9).data().toString().contains("Recycler"))
+    {
+        htmlviewer = new HtmlViewer();
+        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer->setWindowTitle("INFO2 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->ShowInfo2(index);
+    }
+    else if(index.sibling(index.row(), 9).data().toString().startsWith("Recycle.Bin"))
+    {
+        htmlviewer = new HtmlViewer();
+        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->ShowIDollar(index);
+    }
     else
     {
         QApplication::restoreOverrideCursor();

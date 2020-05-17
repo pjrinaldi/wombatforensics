@@ -42,6 +42,20 @@ void HtmlViewer::ShowI30(const QModelIndex &index)
     this->show();
 }
 
+void HtmlViewer::ShowInfo2(const QModelIndex &index)
+{
+    QString htmlstring = ParseInfo2Artifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+    ui->webView->setHtml(htmlstring);
+    this->show();
+}
+
+void HtmlViewer::ShowIDollar(const QModelIndex &index)
+{
+    QString htmlstring = ParseIDollarArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+    ui->webView->setHtml(htmlstring);
+    this->show();
+}
+
 void HtmlViewer::LoadHtml(QString filepath)
 {
     // populate html here
