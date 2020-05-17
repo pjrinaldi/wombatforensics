@@ -172,7 +172,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
     // uint16 = 2 bytes - ushort
     // uint32 = 4 bytes - uint
     // uint64 = 8 bytes - ulonglong
-    bool isslack = false;
+    bool isindxrootslack = false;
     QString indxrootstr = wombatvariable.tmpfilepath + i30id + "-fhex";
     QByteArray indxrootba;
     indxrootba.clear();
@@ -187,24 +187,30 @@ QString ParseI30Artifact(QString i30name, QString i30id)
     if(leroothdr == 0x30)
     {
         //qDebug() << "index root attribute resident inside MFT..." << QString::number(indxrootba.at(0), 16);
-        uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxrootba.mid(8, 4));
+        uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxrootba.mid(8, 4)); // INDEX RECORD SIZE
         //qDebug() << "size of index record:" << indxrecordsize << QString::number(indxrecordsize, 16);
         // bytes 4-7 are collation sorting rule, which enforces filename sorting and not needed to parse.
         uint8_t indxrecordclustersize = qFromLittleEndian<uint8_t>(indxrootba.mid(12, 1));
         //qDebug() << "cluster size:" << indxrecordclustersize;
         // bytes 13-15 are often blank, always unused.
-        uint32_t indexentryoffset = qFromLittleEndian<uint32_t>(indxrootba.mid(16, 4));
+        uint32_t indexentryoffset = qFromLittleEndian<uint32_t>(indxrootba.mid(16, 4)); // INDEX NODE HEADER
         //qDebug() << "index entry list offset to 1st entry:" << indexentryoffset;
-        uint32_t indexentrylistsize = qFromLittleEndian<uint32_t>(indxrootba.mid(20, 4));
+        uint32_t indexentrylistsize = qFromLittleEndian<uint32_t>(indxrootba.mid(20, 4)); // USED SIZE FOR ALL INDEX ENTRIES
         //qDebug() << "index entry list size:" << indexentrylistsize;
-        uint32_t indexentrylistallocated = qFromLittleEndian<uint32_t>(indxrootba.mid(24, 4));
+        uint32_t indexentrylistallocated = qFromLittleEndian<uint32_t>(indxrootba.mid(24, 4)); // ALLOC SIZE FOR ALL INDEX ENTRIES
         //qDebug() << "index entry list allocated size:" << indexentrylistallocated;
-        uint8_t indxentrylistflags = qFromLittleEndian<uint8_t>(indxrootba.mid(28, 1));
+        uint8_t indxentrylistflags = qFromLittleEndian<uint8_t>(indxrootba.mid(28, 1)); // WHETHER INDEX ALLOCATION EXISTS
         //qDebug() << "index entry flags (0, 1):" << QString::number(indxentrylistflags, 16);
         if((indexentrylistallocated - indexentrylistsize) > 0)
-            isslack = true;
-        if(indxentrylistflags == 0x01)
+            isindxrootslack = true;
+        if(indxentrylistflags == 0x01) // $INDEX_ALLOCATION EXISTS
         {
+            QByteArray indxrootcontent;
+            QByteArray indxalloccontent;
+            QByteArray bitmapcontent;
+            indxrootcontent.clear();
+            indxalloccontent.clear();
+            bitmapcontent.clear();
             TSK_IMG_INFO* imginfo = NULL;
             std::vector<std::string> pathvector;
             pathvector.clear();
@@ -259,36 +265,25 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                         {
                             if(fsfile->meta != NULL)
                             {
-                                /*
-                                if(isslack)
-                                {
-                                    qDebug() << "need to get the idx_root content with slack from fsfile->fsattr->content...";
-                                    char* imgbuf = new char[0];
-                                    ssize_t imglen = 0;
-		                    imgbuf = new char[fsfile->meta->size];
-                        	    imglen = tsk_fs_file_read(fsfile, 0, imgbuf, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
-                                    QByteArray filecontent = QByteArray(imgbuf, imglen);
-                                    delete[] imgbuf;
-                                }
-                                */
-                                QByteArray indxrootcontent;
-                                QByteArray indxalloccontent;
-                                indxrootcontent.clear();
-                                indxalloccontent.clear();
                                 int attrcnt = tsk_fs_file_attr_getsize(fsfile);
                                 char* fscontent = new char[0];
                                 ssize_t fslength = 0;
                                 for(int i=0; i < attrcnt; i++)
                                 {
                                     const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_idx(fsfile, i);
-                                    if(fsattr->type == 144)
+                                    if(fsattr->type == 144) // $INDEX_ROOT
                                     {
                                         qDebug() << "$INDEX_ROOT";
                                         qDebug() << "fsattr info:" << fsattr->type << "alloc size:" << fsattr->nrd.allocsize << "size:" << fsattr->size;
-                                        if(isslack)
+                                        if(isindxrootslack)
+                                        {
+                                            fscontent = new char[fsattr->size];
+                                            fslength = tsk_fs_attr_read(fsattr, 0, fscontent, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
                                             qDebug() << "get content here.";
+                                            indxrootcontent.append(QByteArray(fscontent, fslength));
+                                        }
                                     }
-                                    else if(fsattr->type == 160)
+                                    else if(fsattr->type == 160) // $INDEX_ALLOCATION
                                     {
                                         qDebug() << "$INDEX_ALLOCATION";
                                         qDebug() << "fsattr info:" << fsattr->type << "alloc size:" << fsattr->nrd.allocsize << "size:" << fsattr->size;
@@ -296,11 +291,18 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                                         fscontent = new char[fsattr->size];
                                         fslength = tsk_fs_attr_read(fsattr, 0, fscontent, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
                                         indxalloccontent.append(QByteArray(fscontent, fslength));
-                                        delete[] fscontent;
-                                        qDebug() << "indxalloccontent size:" << indxalloccontent.count();
-                                        qDebug() << "indx_alloc 0-3:" << indxalloccontent.at(0) << indxalloccontent.at(1) << indxalloccontent.at(2) << indxalloccontent.at(3);
+                                        //qDebug() << "indxalloccontent size:" << indxalloccontent.count();
+                                    }
+                                    else if(fsattr->type == 176) // $BITMAP
+                                    {
+                                        qDebug() << "$BITMAP";
+                                        qDebug() << "fsattr info:" << fsattr->type << "alloc size:" << fsattr->rd.buf_size << "size:" << fsattr->size;
+                                        fscontent = new char[fsattr->size];
+                                        fslength = tsk_fs_attr_read(fsattr, 0, fscontent, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
+                                        bitmapcontent.append(QByteArray(fscontent, fslength));
                                     }
                                 }
+                                delete[] fscontent;
                             }
                         }
                         tsk_fs_file_close(fsfile);
@@ -312,17 +314,49 @@ QString ParseI30Artifact(QString i30name, QString i30id)
             }
             tsk_img_close(imginfo);
             imginfo = NULL;
-            //qDebug() << "there is an index allocation and bitmap...";
-            /*
-            *
-             */ 
+            // CONTENT FOR ROOT SLACK, INDEXALLOC AND BITMAP HAS BEEN OBTAINED, SO GO BACK TO PROCESSING INDEX ENTRIES NOW...
+            int indxrecordcnt = indxalloccontent.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
+            int curpos = 0;
+            qDebug() << "indxrecord count:" << indxrecordcnt;
+            for(int i=0; i < indxrecordcnt; i++) // loop over index records
+            {
+                QString indxrecordheader = QString::fromStdString(indxalloccontent.mid(curpos, 4).toStdString());
+                if(indxrecordheader.contains("INDX")) // moving correctly.
+                {
+                    uint16_t indxrecordfixupoffset = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 4, 2));
+                    uint16_t indxrecordfixupcount = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 6, 2));
+                    // Bytes 8-15 provide $Logfile sequence number which i don't need for this.
+                    uint64_t indxrecordvcn = qFromLittleEndian<uint64_t>(indxalloccontent.mid(curpos + 16, 8));
+                    qDebug() << "indxallocvcn number:" << indxrecordvcn;
+                    uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 24, 4));
+                    qDebug() << "indx entry start offset:" << indxentrystartoffset;
+                    uint32_t indxentryendoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 28, 4));
+                    qDebug() << "indx entry end offset:" << indxentryendoffset;
+                    uint32_t indxentryallocoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 32, 4));
+                    qDebug() << "indx entry alloc ending offset:" << indxentryallocoffset;
+                    if(indxentryallocoffset > indxentryendoffset)
+                        qDebug() << "there might be deleted entries available...";
+                    // byte 36-40 are flags that i probably don't use...
+                }
+            }
 
+            // NOT SURE IF I WILL NEED THE BITMAP INFO, BUT THE BITFIELD GETS FLIPPED FOR EACH BYTE
+            /*
+            for(int i=0; i < bitmapcontent.count(); i++)
+            {
+                if(bitmapcontent.at(i) != 0x00)
+                    qDebug() << "bitmap value:" << QString::number(bitmapcontent.at(i), 16);
+            }
+            */
+            //qDebug() << "indxroot size:" << indxrootcontent.count() << "indxalloc size:" << indxalloccontent.count() << "bitmap size:" << bitmapcontent.count();
         }
-        else // 0x00
+        else // 0x00 NO $INDEX_ALLOCATION
         {
-            int curpos = 32;
+            // bytes 29-31 are often blank, always unused. bytes 32 starts the 1st index entry...
+            // byte 32 because header started at byte 16, and offset to 1st index entry was 16, 16+16=32
+            uint curpos = 32;
             int a=1;
-            while(curpos < indexentrylistsize - 32)
+            while(curpos < indexentrylistsize - 32) // LOOPS OVER THE INDEX ENTRIES
             {
                 if(a % 2 == 0)
                     htmlstr += "<tr class=even>";
@@ -363,9 +397,6 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                 //qDebug() << "curpos:" << curpos;
             }
             /*
-            qDebug() << "it is all stored in indx root...";
-            // bytes 29-31 are often blank, always unused. bytes 32 starts the 1st index entry...
-            // byte 32 because header started at byte 16, and offset to 1st index entry was 16, 16+16=32
             uint64_t indxentrymftref = qFromLittleEndian<uint64_t>(indxrootba.mid(32, 8));
             qDebug() << "$MFT file reference:" << indxentrymftref;
             uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxrootba.mid(40, 2));
@@ -396,6 +427,19 @@ QString ParseI30Artifact(QString i30name, QString i30id)
             }
             qDebug() << "filename:" << filename << "end of indexentry:" << 66 + fnamelength*2 << "indxroot size:" << indxrootba.count();
             */
+                                /*
+                                if(isindxrootslack)
+                                {
+                                    qDebug() << "need to get the idx_root content with slack from fsfile->fsattr->content...";
+                                    char* imgbuf = new char[0];
+                                    ssize_t imglen = 0;
+		                    imgbuf = new char[fsfile->meta->size];
+                        	    imglen = tsk_fs_file_read(fsfile, 0, imgbuf, fsfile->meta->size, TSK_FS_FILE_READ_FLAG_SLACK);
+                                    QByteArray filecontent = QByteArray(imgbuf, imglen);
+                                    delete[] imgbuf;
+                                }
+                                */
+
             /*
              *
                 uint8_t parentreference[6];         // 0x00 parent directory $MFT Record number
@@ -417,10 +461,12 @@ QString ParseI30Artifact(QString i30name, QString i30id)
         }
         qDebug() << "since it was only in the indx root to begin with, I will need to pull the indx root slack anyway using tsk functions and looping over fsattr's";
     }
+    /*
     else
     {
         qDebug() << "do something else here..." << QString::number(indxrootba.at(0), 16);
     }
+    */
     htmlstr += "</table></body></html>";
     
     return htmlstr;
