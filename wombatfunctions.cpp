@@ -596,14 +596,14 @@ QString ParseIDollarArtifact(QString idollarname, QString idollarid)
     if(versionformat == 0x01)
     {
         filenamestring = QString::fromStdString(idollarcontent.mid(24, 520).trimmed().toStdString());
-        qDebug() << "filename string:" << filenamestring;
+        //qDebug() << "filename string:" << filenamestring;
         // get file name...(24 for 520 bytes)
     }
     else if(versionformat == 0x02)
     {
         uint32_t filenamesize = qFromLittleEndian<uint32_t>(idollarcontent.mid(24, 4));
         filenamestring = QString::fromStdString(idollarcontent.mid(24, filenamesize).trimmed().toStdString());
-        qDebug() << "file name string:" << filenamestring;
+        //qDebug() << "file name string:" << filenamestring;
     }
     htmlstr += "<tr class=odd><td class=aval>File Name:</td><td>" + filenamestring + "</td></tr>";
     htmlstr += "<tr class=even><td class=aval>Deleted:</td><td>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td></tr>";
