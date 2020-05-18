@@ -589,7 +589,26 @@ QString ParseIDollarArtifact(QString idollarname, QString idollarid)
     if(idollarfile.isOpen())
         idollarcontent = idollarfile.readAll();
     idollarfile.close();
-    qDebug() << "idollar size:" << idollarcontent.count();
+    uint64_t versionformat = qFromLittleEndian<uint64_t>(idollarcontent.left(8));
+    uint64_t filesize = qFromLittleEndian<uint64_t>(idollarcontent.mid(8, 8));
+    uint64_t deleteddate = qFromLittleEndian<uint64_t>(idollarcontent.mid(16, 8));
+    QString filenamestring = "";
+    if(versionformat == 0x01)
+    {
+        filenamestring = QString::fromStdString(idollarcontent.mid(24, 520).trimmed().toStdString());
+        qDebug() << "filename string:" << filenamestring;
+        // get file name...(24 for 520 bytes)
+    }
+    else if(versionformat == 0x02)
+    {
+        uint32_t filenamesize = qFromLittleEndian<uint32_t>(idollarcontent.mid(24, 4));
+        filenamestring = QString::fromStdString(idollarcontent.mid(24, filenamesize).trimmed().toStdString());
+        qDebug() << "file name string:" << filenamestring;
+    }
+    htmlstr += "<tr class=odd><td class=aval>File Name:</td><td>" + filenamestring + "</td></tr>";
+    htmlstr += "<tr class=even><td class=aval>Deleted:</td><td>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td></tr>";
+    htmlstr += "<tr class=odd><td class=aval>File Size:</td><td>" + QString::number(filesize) + " bytes</td></tr>";
+    //qDebug() << "idollar size:" << idollarcontent.count();
 
     htmlstr += "</table></body></html>";
     
