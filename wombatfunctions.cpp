@@ -626,10 +626,26 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     QString pffile = wombatvariable.tmpfilepath + pfid + "-fhex";
     libscca_file_t* pfobj = NULL;
     libscca_error_t* error = NULL;
+    uint32_t tmpuint32 = 0;
+    size_t tmpsize = 0;
     libscca_file_initialize(&pfobj, &error);
     libscca_file_open(pfobj, pffile.toStdString().c_str(), libscca_get_access_flags_read(), &error);
     if(libscca_check_file_signature(pffile.toStdString().c_str(), &error))
     {
+	libscca_file_get_format_version(pfobj, &tmpuint32, &error);
+	htmlstr += "<tr class=odd><td class=aval>Format Version:</td><td>" + QString::number(tmpuint32) + "</td></tr>";
+	    //tmpsize = 0;
+	    //liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
+	    //uint8_t volabel[tmpsize];
+	    //liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
+	    //htmlstr += "<tr class='even'><td class='aval'>Volume Label:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
+	libscca_file_get_utf8_executable_filename_size(pfobj, &tmpsize, &error);
+	uint8_t tmpstr[tmpsize];
+	libscca_file_get_utf8_executable_filename(pfobj, tmpstr, tmpsize, &error);
+	htmlstr += "<tr class=even><td class=aval>Executable File Name:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(tmpstr)) + "</td></tr>";
+	tmpuint32 = 0;
+	libscca_file_get_prefetch_hash(pfobj, &tmpuint32, &error);
+	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "</td></tr>";
     }
     libscca_file_close(pfobj, &error);
     libscca_file_free(&pfobj, &error);
