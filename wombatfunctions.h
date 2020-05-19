@@ -9,6 +9,7 @@
 //#include "wombatvariable.h"
 #include "tskcpp.h"
 #include <liblnk.h>
+#include <libscca.h>
 
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
