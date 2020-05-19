@@ -557,7 +557,9 @@ QString ParseInfo2Artifact(QString info2name, QString info2id)
             htmlstr += "<tr class=even>";
         else
             htmlstr += "<tr class=odd>";
-        QString filenamestring = QString::fromStdString(info2content.mid(curpos + 4, 260).trimmed().toStdString());
+	QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 4, 260).toStdString().c_str(), -1).toStdString());
+	qDebug() << "filename str count:" << filenamestring.count();
+        //QString filenamestring = QString::fromStdString(info2content.mid(curpos + 4, 260).trimmed().toStdString());
         uint64_t deleteddate = qFromLittleEndian<uint64_t>(info2content.mid(curpos + 268, 8));
         htmlstr += "<td>" + filenamestring + "</td>";
         htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td>";
