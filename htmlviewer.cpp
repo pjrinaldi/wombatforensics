@@ -28,6 +28,7 @@ void HtmlViewer::ShowHtml(const QModelIndex &index)
     this->show();
 }
 
+/*
 void HtmlViewer::ShowLnk(const QModelIndex &index)
 {
     QString htmlstring = ParseLnkArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
@@ -55,6 +56,25 @@ void HtmlViewer::ShowIDollar(const QModelIndex &index)
     ui->webView->setHtml(htmlstring);
     this->show();
 }
+*/
+void HtmlViewer::ShowArtifact(int artifactid, const QModelIndex &index)
+{
+    QString htmlstring = "";
+    if(artifactid == 0) // LNK
+	htmlstring = ParseLnkArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+    else if(artifactid == 1) // I30
+	htmlstring = ParseI30Artifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+    else if(artifactid == 2) // INFO2
+	htmlstring = ParseInfo2Artifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+    else if(artifactid == 3) // $I
+	htmlstring = ParseIDollarArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+    else if(artifactid == 4) // Prefetch
+	htmlstring = ParsePrefetchArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+    ui->webView->setHtml(htmlstring);
+    this->show();
+}
+
+//void HtmlViewer::ShowPrefetch(const QModelIndex
 
 void HtmlViewer::LoadHtml(QString filepath)
 {

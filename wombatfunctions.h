@@ -18,6 +18,7 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid);
 QString ParseI30Artifact(QString i30name, QString i30id);
 QString ParseInfo2Artifact(QString info2name, QString info2id);
 QString ParseIDollarArtifact(QString idollarname, QString idollarid);
+QString ParsePrefetchArtifact(QString pfname, QString pfid);
 
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);

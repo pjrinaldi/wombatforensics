@@ -565,28 +565,39 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " LNK Viewer");
-        htmlviewer->ShowLnk(index);
+	htmlviewer->ShowArtifact(0, index); // LNK
+        //htmlviewer->ShowLnk(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("Directory"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("$I30 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
-        htmlviewer->ShowI30(index);
+	htmlviewer->ShowArtifact(1, index); // I30
+        //htmlviewer->ShowI30(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("Recycler"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("INFO2 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
-        htmlviewer->ShowInfo2(index);
+	htmlviewer->ShowArtifact(2, index); // INFO2
+        //htmlviewer->ShowInfo2(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().startsWith("Recycle.Bin"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
-        htmlviewer->ShowIDollar(index);
+	htmlviewer->ShowArtifact(3, index); // $I
+        //htmlviewer->ShowIDollar(index);
+    }
+    else if(index.sibling(index.row(), 9).data().toString().contains("Prefetch"))
+    {
+        htmlviewer = new HtmlViewer();
+        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+	htmlviewer->ShowArtifact(4, index); // Prefetch
     }
     else
     {
@@ -1605,7 +1616,7 @@ void WombatForensics::CloseCurrentCase()
         ui->hexview->BypassColor(true);
 	qInfo() << "start of error?";
         ui->hexview->setData(casedatafile);
-	qInfo() < "end of error?";
+	qInfo() << "end of error?";
     }
     qInfo() << "Hexviewer Reset";
     setWindowTitle("WombatForensics");

@@ -613,6 +613,22 @@ QString ParseIDollarArtifact(QString idollarname, QString idollarid)
     return htmlstr;
 }
 
+QString ParsePrefetchArtifact(QString pfname, QString pfid)
+{
+    QString htmlstr = "";
+    QFile initfile(":/html/artifactprephtml");
+    initfile.open(QIODevice::ReadOnly);
+    if(initfile.isOpen())
+        htmlstr = initfile.readAll();
+    initfile.close();
+    htmlstr += "<div id='infotitle'>Prefetch File Analysis for " + pfname + " (" + pfid + ")</div><br/>";
+    htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
+
+    htmlstr += "</table></body></html>";
+
+    return htmlstr;
+}
+
 QString ConvertWindowsTimeToUnixTime(uint64_t input)
 {
     QTimeZone tmpzone = QTimeZone(reporttimezone);
@@ -4433,6 +4449,11 @@ void TransferFiles(QString thumbid, QString reppath)
                     QString idollarstr = ParseIDollarArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
                     tmpfile.write(idollarstr.toStdString().c_str());
                 }
+		else if(curnode->Data(9).toString().contains("Prefectch"))
+		{
+		    QString pfstr = ParsePrefetchArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+		    tmpfile.write(pfstr.toStdString().c_str());
+		}
 	    	else
 	    	{
                     QDataStream outbuffer(&tmpfile);
@@ -4657,13 +4678,11 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                         if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
                             mimestr = "Windows System/Shortcut";
                         else if(strcmp(fsfile->name->name, "INFO2") == 0 && (tmparray.at(0) == 0x04 || tmparray.at(0) == 0x05))
-                        {
                             mimestr = "Windows System/Recycler";
-                        }
                         else if(QString::fromStdString(fsfile->name->name).startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02))
-                        {
                             mimestr = "Windows System/Recycle.Bin";
-                        }
+			else if(QString::fromStdString(fsfile->name->name).endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
+			    mimestr = "Windows System/Prefetch";
                     }
                     //qDebug() << "mimestr:" << mimestr;
                     delete[] magicbuffer;
@@ -4873,14 +4892,12 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                     {
                         if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
                             mimestr = "Windows System/Shortcut";
-                        else if(strcmp(fsfile->name->name, "INFO2") == 0 && (tmparray.at(0) == 0x04 || tmparray.at(0) == 0x05))
-                        {
+                        else if(strcmp(fsfile->name->name, "INFO2") == 0 && (tmparray.at(0) == 0x04 || tmparray.at(0) == 0x05)) // INFO2 recycle bin file
                             mimestr = "Windows System/Recycler";
-                        }
-                        else if(QString::fromStdString(fsfile->name->name).startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02))
-                        {
+                        else if(QString::fromStdString(fsfile->name->name).startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02)) // $I recycle bin file
                             mimestr = "Windows System/Recycle.Bin";
-                        }
+			else if(QString::fromStdString(fsfile->name->name).endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
+			    mimestr = "Windows System/Prefetch";
                     }
                     delete[] magicbuffer;
                     treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
