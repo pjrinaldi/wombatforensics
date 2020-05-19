@@ -58,6 +58,9 @@ sudo cp ./tskextra/tsk_fs_i.h /usr/include/tsk/fs/
 sudo cp ./tskextra/tsk_img_i.h /usr/include/tsk/img/
 sudo cp ./tskextra/tsk_vs_i.h /usr/include/tsk/vs/
 
+# need to add /usr/local/lib to ldconfig library path
+echo '/usr/local/lib' > local.conf && sudo mv ./local.conf /etc/ld.so.conf.d/
+
 # once the installation is done, you should be able to run qmake "wombatforensics.pro" and then "make" to generate the binaries
 qmake wombatforensics.pro
 make

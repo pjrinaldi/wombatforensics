@@ -1603,8 +1603,11 @@ void WombatForensics::CloseCurrentCase()
         casedatafile.write("dummy zerofile");
         casedatafile.close();
         ui->hexview->BypassColor(true);
+	qInfo() << "start of error?";
         ui->hexview->setData(casedatafile);
+	qInfo() < "end of error?";
     }
+    qInfo() << "Hexviewer Reset";
     setWindowTitle("WombatForensics");
     filesfound = 0;
     fileschecked = 0;
@@ -1631,6 +1634,7 @@ void WombatForensics::CloseCurrentCase()
         }
         */
     }
+    qInfo() << "Forensic Image unmounted";
     existingevidence.clear();
     newevidence.clear();
     // BEGIN TAR METHOD

@@ -545,8 +545,6 @@ QString ParseInfo2Artifact(QString info2name, QString info2id)
         info2content = i2file.readAll();
     i2file.close();
     //qDebug() << "info2 size:" << info2content.count();
-    //uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 24, 4));
-    //QString indxrecordheader = QString::fromStdString(indxalloccontent.mid(curpos, 4).toStdString());
     uint32_t fileentrysize = qFromLittleEndian<uint32_t>(info2content.mid(12, 4));
     //qDebug() << "file entry size:" << fileentrysize;
     int curpos = 20; // content starts after offset
@@ -557,9 +555,7 @@ QString ParseInfo2Artifact(QString info2name, QString info2id)
             htmlstr += "<tr class=even>";
         else
             htmlstr += "<tr class=odd>";
-	QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 4, 260).toStdString().c_str(), -1).toStdString());
-	qDebug() << "filename str count:" << filenamestring.count();
-        //QString filenamestring = QString::fromStdString(info2content.mid(curpos + 4, 260).trimmed().toStdString());
+	QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 3, 260).toStdString().c_str(), -1).toStdString());
         uint64_t deleteddate = qFromLittleEndian<uint64_t>(info2content.mid(curpos + 268, 8));
         htmlstr += "<td>" + filenamestring + "</td>";
         htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td>";
