@@ -624,9 +624,9 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     htmlstr += "<div id='infotitle'>Prefetch File Analysis for " + pfname + " (" + pfid + ")</div><br/>";
     htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
     QString pffile = wombatvariable.tmpfilepath + pfid + "-fhex";
-    libscca_file_t* pfobj = NULL;
-    libscca_error_t* error = NULL;
-    uint32_t tmpuint32 = 0;
+    //libscca_file_t* pfobj = NULL;
+    //libscca_error_t* error = NULL;
+    //uint32_t tmpuint32 = 0;
     size_t tmpsize = 0;
     libscca_file_initialize(&pfobj, &error);
     int errorint = libscca_file_open(pfobj, pffile.toStdString().c_str(), 1, &error);
@@ -652,9 +652,9 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "</td></tr>";
     }
     */
-    libscca_file_close(pfobj, &error);
-    libscca_file_free(&pfobj, &error);
-    libscca_error_free(&error);
+    //libscca_file_close(pfobj, &error);
+    //libscca_file_free(&pfobj, &error);
+    //libscca_error_free(&error);
     /*
      *
             uint64_t gettime = 0;
