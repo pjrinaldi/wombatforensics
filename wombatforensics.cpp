@@ -596,7 +596,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->setWindowTitle("Prefetch Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
 	htmlviewer->ShowArtifact(4, index); // Prefetch
     }
     else
