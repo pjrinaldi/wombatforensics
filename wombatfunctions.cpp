@@ -629,7 +629,11 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     uint32_t tmpuint32 = 0;
     size_t tmpsize = 0;
     libscca_file_initialize(&pfobj, &error);
-    libscca_file_open(pfobj, pffile.toStdString().c_str(), libscca_get_access_flags_read(), &error);
+    int errorint = libscca_file_open(pfobj, pffile.toStdString().c_str(), 1, &error);
+    qDebug() << "errorint:" << errorint;
+    //libscca_file_open(pfobj, pffile.toStdString().c_str(), LIBSCCA_OPEN_READ, &error);
+    //libscca_file_open(pfobj, pffile.toStdString().c_str(), libscca_get_access_flags_read(), &error);
+    /*
     if(libscca_check_file_signature(pffile.toStdString().c_str(), &error))
     {
 	libscca_file_get_format_version(pfobj, &tmpuint32, &error);
@@ -647,8 +651,10 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 	libscca_file_get_prefetch_hash(pfobj, &tmpuint32, &error);
 	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "</td></tr>";
     }
+    */
     libscca_file_close(pfobj, &error);
     libscca_file_free(&pfobj, &error);
+    libscca_error_free(&error);
     /*
      *
             uint64_t gettime = 0;
