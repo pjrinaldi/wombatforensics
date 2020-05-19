@@ -566,7 +566,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " LNK Viewer");
 	htmlviewer->ShowArtifact(0, index); // LNK
-        //htmlviewer->ShowLnk(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("Directory"))
     {
@@ -574,7 +573,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("$I30 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
 	htmlviewer->ShowArtifact(1, index); // I30
-        //htmlviewer->ShowI30(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("Recycler"))
     {
@@ -582,7 +580,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("INFO2 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
 	htmlviewer->ShowArtifact(2, index); // INFO2
-        //htmlviewer->ShowInfo2(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().startsWith("Recycle.Bin"))
     {
@@ -590,7 +587,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
 	htmlviewer->ShowArtifact(3, index); // $I
-        //htmlviewer->ShowIDollar(index);
     }
     else if(index.sibling(index.row(), 9).data().toString().contains("Prefetch"))
     {

@@ -22,12 +22,7 @@ public:
     HtmlViewer(QWidget* parent = 0);
     ~HtmlViewer();
     void ShowHtml(const QModelIndex &index);
-    //void ShowLnk(const QModelIndex &index);
-    //void ShowI30(const QModelIndex &index);
-    //void ShowInfo2(const QModelIndex &index);
-    //void ShowIDollar(const QModelIndex &index);
     void ShowArtifact(int artifacttype, const QModelIndex &index);
-    //void ShowPrefetch(const QModelIndex &index);
     void LoadHtml(QString filepath);
 
 private slots:
