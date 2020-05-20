@@ -626,6 +626,7 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
     QString pffile = wombatvariable.tmpfilepath + pfid + "-fhex";
     qDebug() << "pffile" << pffile;
+    /*
     libscca_file_t* pfobj = NULL;
     libscca_error_t* sccaerror = NULL;
     uint32_t tmpuint32 = 0;
@@ -639,7 +640,6 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     libscca_file_open(pfobj, pffile.toStdString().c_str(), LIBSCCA_OPEN_READ, &sccaerror);
     qDebug() << "end file open";
     //libscca_file_open(pfobj, pffile.toStdString().c_str(), libscca_get_access_flags_read(), &error);
-    /*
     if(libscca_check_file_signature(pffile.toStdString().c_str(), &error))
     {
 	libscca_file_get_format_version(pfobj, &tmpuint32, &error);
@@ -657,12 +657,12 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 	libscca_file_get_prefetch_hash(pfobj, &tmpuint32, &error);
 	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "</td></tr>";
     }
-    */
     qDebug() << "Start close";
     libscca_file_close(pfobj, &sccaerror);
     libscca_file_free(&pfobj, &sccaerror);
     libscca_error_free(&sccaerror);
     qDebug() << "end close";
+    */
     /*
      *
             uint64_t gettime = 0;
