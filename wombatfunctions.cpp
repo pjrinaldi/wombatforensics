@@ -152,6 +152,7 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
     }
     liblnk_file_close(lnkobj, &error);
     liblnk_file_free(&lnkobj, &error);
+    liblnk_error_free(&error);
     htmlstr += "</table></body></html>";
 
     return htmlstr;
@@ -624,14 +625,19 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     htmlstr += "<div id='infotitle'>Prefetch File Analysis for " + pfname + " (" + pfid + ")</div><br/>";
     htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
     QString pffile = wombatvariable.tmpfilepath + pfid + "-fhex";
-    //libscca_file_t* pfobj = NULL;
-    //libscca_error_t* error = NULL;
-    //uint32_t tmpuint32 = 0;
+    qDebug() << "pffile" << pffile;
+    libscca_file_t* pfobj = NULL;
+    libscca_error_t* sccaerror = NULL;
+    uint32_t tmpuint32 = 0;
     size_t tmpsize = 0;
-    libscca_file_initialize(&pfobj, &error);
-    int errorint = libscca_file_open(pfobj, pffile.toStdString().c_str(), 1, &error);
-    qDebug() << "errorint:" << errorint;
-    //libscca_file_open(pfobj, pffile.toStdString().c_str(), LIBSCCA_OPEN_READ, &error);
+    qDebug() << "start initialize";
+    libscca_file_initialize(&pfobj, &sccaerror);
+    qDebug() << "end initialize";
+    qDebug() << "start file open";
+    //int errorint = libscca_file_open(pfobj, pffile.toStdString().c_str(), 1, &error);
+    //qDebug() << "errorint:" << errorint;
+    libscca_file_open(pfobj, pffile.toStdString().c_str(), LIBSCCA_OPEN_READ, &sccaerror);
+    qDebug() << "end file open";
     //libscca_file_open(pfobj, pffile.toStdString().c_str(), libscca_get_access_flags_read(), &error);
     /*
     if(libscca_check_file_signature(pffile.toStdString().c_str(), &error))
@@ -652,9 +658,11 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "</td></tr>";
     }
     */
-    //libscca_file_close(pfobj, &error);
-    //libscca_file_free(&pfobj, &error);
-    //libscca_error_free(&error);
+    qDebug() << "Start close";
+    libscca_file_close(pfobj, &sccaerror);
+    libscca_file_free(&pfobj, &sccaerror);
+    libscca_error_free(&sccaerror);
+    qDebug() << "end close";
     /*
      *
             uint64_t gettime = 0;
