@@ -5,7 +5,6 @@
 // LIBFFMPEG THUMBNAILER HEADERS
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
-#include "/home/pasquale/Projects/wombatforensics/prefetch.h"
 // SCALPEL HEADER
 #include <scalpel.h>
 // REVIT HEADERS
@@ -184,25 +183,17 @@ QString ParseI30Artifact(QString i30name, QString i30id)
     if(indxrootfile.isOpen())
         indxrootba = indxrootfile.readAll();
     indxrootfile.close();
-    //qDebug() << "indx root byte count:" << indxrootba.count();
     uint32_t leroothdr = qFromLittleEndian<uint32_t>(indxrootba.left(4)); // uint 4 bytes
     if(leroothdr == 0x30)
     {
-        //qDebug() << "index root attribute resident inside MFT..." << QString::number(indxrootba.at(0), 16);
-        uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxrootba.mid(8, 4)); // INDEX RECORD SIZE
-        //qDebug() << "size of index record:" << indxrecordsize << QString::number(indxrecordsize, 16);
         // bytes 4-7 are collation sorting rule, which enforces filename sorting and not needed to parse.
+	uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxrootba.mid(8, 4)); // INDEX RECORD SIZE
         //uint8_t indxrecordclustersize = qFromLittleEndian<uint8_t>(indxrootba.mid(12, 1));
-        //qDebug() << "cluster size:" << indxrecordclustersize;
         // bytes 13-15 are often blank, always unused.
         //uint32_t indexentryoffset = qFromLittleEndian<uint32_t>(indxrootba.mid(16, 4)); // INDEX NODE HEADER
-        //qDebug() << "index entry list offset to 1st entry:" << indexentryoffset;
         //uint32_t indexentrylistsize = qFromLittleEndian<uint32_t>(indxrootba.mid(20, 4)); // USED SIZE FOR ALL INDEX ENTRIES
-        //qDebug() << "index entry list size:" << indexentrylistsize;
         uint32_t indexentrylistallocated = qFromLittleEndian<uint32_t>(indxrootba.mid(24, 4)); // ALLOC SIZE FOR ALL INDEX ENTRIES
-        //qDebug() << "index entry list allocated size:" << indexentrylistallocated;
         uint8_t indxentrylistflags = qFromLittleEndian<uint8_t>(indxrootba.mid(28, 1)); // WHETHER INDEX ALLOCATION EXISTS
-        //qDebug() << "index entry flags (0, 1):" << QString::number(indxentrylistflags, 16);
         //if((indexentrylistallocated - indexentrylistsize) > 0)
         //    isindxrootslack = true;
         if(indxentrylistflags == 0x01) // $INDEX_ALLOCATION EXISTS
@@ -276,37 +267,20 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                                     /*
                                     if(fsattr->type == 144) // $INDEX_ROOT
                                     {
-                                        //qDebug() << "$INDEX_ROOT";
-                                        //qDebug() << "fsattr info:" << fsattr->type << "alloc size:" << fsattr->nrd.allocsize << "size:" << fsattr->size;
                                         if(isindxrootslack)
                                         {
                                             fscontent = new char[fsattr->size];
                                             fslength = tsk_fs_attr_read(fsattr, 0, fscontent, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
-                                            //qDebug() << "get content here.";
                                             indxrootcontent.append(QByteArray(fscontent, fslength));
                                         }
                                     }
                                     */
                                     if(fsattr->type == 160) // $INDEX_ALLOCATION
                                     {
-                                        //qDebug() << "$INDEX_ALLOCATION";
-                                        //qDebug() << "fsattr info:" << fsattr->type << "alloc size:" << fsattr->nrd.allocsize << "size:" << fsattr->size;
-                                        //qDebug() << "get content with slack here to parse index allocation";
                                         fscontent = new char[fsattr->size];
                                         fslength = tsk_fs_attr_read(fsattr, 0, fscontent, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
                                         indxalloccontent.append(QByteArray(fscontent, fslength));
-                                        //qDebug() << "indxalloccontent size:" << indxalloccontent.count();
                                     }
-                                    /*
-                                    else if(fsattr->type == 176) // $BITMAP
-                                    {
-                                        qDebug() << "$BITMAP";
-                                        qDebug() << "fsattr info:" << fsattr->type << "alloc size:" << fsattr->rd.buf_size << "size:" << fsattr->size;
-                                        fscontent = new char[fsattr->size];
-                                        fslength = tsk_fs_attr_read(fsattr, 0, fscontent, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
-                                        bitmapcontent.append(QByteArray(fscontent, fslength));
-                                    }
-                                    */
                                 }
                                 delete[] fscontent;
                             }
@@ -323,7 +297,6 @@ QString ParseI30Artifact(QString i30name, QString i30id)
             // CONTENT FOR ROOT SLACK, INDEXALLOC AND BITMAP HAS BEEN OBTAINED, SO GO BACK TO PROCESSING INDEX ENTRIES NOW...
             int indxrecordcnt = indxalloccontent.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
             uint curpos = 0;
-            //qDebug() << "indxrecord count:" << indxrecordcnt;
             for(int i=0; i < indxrecordcnt; i++) // loop over index records
             {
                 QString indxrecordheader = QString::fromStdString(indxalloccontent.mid(curpos, 4).toStdString());
@@ -331,25 +304,15 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                 {
                     //uint16_t indxrecordfixupoffset = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 4, 2));
                     //uint16_t indxrecordfixupcount = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 6, 2));
-                    //qDebug() << "fixup offset:" << indxrecordfixupoffset << "fixup count:" << indxrecordfixupcount;
                     // Bytes 8-15 provide $Logfile sequence number which i don't need for this.
                     //uint64_t indxrecordvcn = qFromLittleEndian<uint64_t>(indxalloccontent.mid(curpos + 16, 8));
-                    //qDebug() << "indxallocvcn number:" << indxrecordvcn;
                     uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 24, 4));
-                    //qDebug() << "indx entry start offset:" << indxentrystartoffset;
                     uint32_t indxentryendoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 28, 4));
-                    //qDebug() << "indx entry end offset:" << indxentryendoffset;
                     uint32_t indxentryallocoffset = qFromLittleEndian<uint32_t>(indxalloccontent.mid(curpos + 32, 4));
-                    //qDebug() << "indx entry alloc ending offset:" << indxentryallocoffset;
-                    //if(indxentryallocoffset > indxentryendoffset)
-                    //    qDebug() << "there might be deleted entries available...";
                     // byte 36-40 are flags that i probably don't use...
                     // SET CURPOS TO THE START OF THE 1ST INDEX ENTRY.. INDXENTRYSTARTOFFSET + 24 (START OF THE NODE HEADER)
-                    //curpos = curpos*indxrecordsize*i + 24 + indxentrystartoffset;
-                    //curpos = curpos + 24 + indxrecordfixupoffset + indxentrystartoffset;
                     curpos = curpos + 24 + indxentrystartoffset;
                     //curpos = 80;
-                    //qDebug() << "curpos before while loop at start of index entry list:" << curpos << "should be 64 for first index record";
                     int a = 1;
                     while(curpos < indxentryallocoffset) // get alloc and deleted, will need to tell apart maybe curpos > endoffset, the deleted...
                     {
@@ -358,10 +321,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                         else
                             htmlstr += "<tr class=odd>";
                         uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 8, 2));
-                        //qDebug() << "indxentrylength:" << indxentrylength;
                         uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxalloccontent.mid(curpos + 10, 2));
-                        //qDebug() << "file name attribute length:" << filenamelength;
-                        //qDebug() << "curpos:" << curpos + 10 << "filename attribute length:"
                         // 12-15 are flags and can be ignored for now...
                         if(indxentrylength == 0 || filenamelength == 0)
                             break;
@@ -391,25 +351,12 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                         else
                             htmlstr += "<td>&nbsp;</td>";
                         htmlstr += "</tr>";
-                        //curpos = curpos + 16 + filenamelength + 8;
                         curpos = curpos + indxentrylength;
-                        //qDebug() << "curpos:" << curpos << "at a:" << a;
                         a++;
                     }
-                    //qDebug() << "curpos after while loop:" << curpos;
                 }
             }
-
-            // NOT SURE IF I WILL NEED THE BITMAP INFO, BUT THE BITFIELD GETS FLIPPED FOR EACH BYTE
-            /*
-            for(int i=0; i < bitmapcontent.count(); i++)
-            {
-                if(bitmapcontent.at(i) != 0x00)
-                    qDebug() << "bitmap value:" << QString::number(bitmapcontent.at(i), 16);
-            }
-            */
-            //qDebug() << "indxroot size:" << indxrootcontent.count() << "indxalloc size:" << indxalloccontent.count() << "bitmap size:" << bitmapcontent.count();
-        }
+         }
         else // 0x00 NO $INDEX_ALLOCATION
         {
             // bytes 29-31 are often blank, always unused. bytes 32 starts the 1st index entry...
@@ -457,11 +404,8 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                 htmlstr += "<td>" + QString::number(physicalsize) + "</td>";
                 htmlstr += "<td>&nbsp;</td>";
                 htmlstr += "</tr>";
-                //qDebug() << "filename:" << filename << "end of indexentry:" << 66 + fnamelength*2 << "indxroot size:" << indxrootba.count();
                 curpos = curpos + 16 + indxentrylength;
-                //curpos = curpos + 16 + filenamelength;
                 a++;
-                //qDebug() << "curpos:" << curpos;
             }
             /*
             uint64_t indxentrymftref = qFromLittleEndian<uint64_t>(indxrootba.mid(32, 8));
@@ -514,14 +458,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
 	        htmlstr += "<tr class='even'><td class='aval'>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
              */ 
         }
-        //qDebug() << "since it was only in the indx root to begin with, I will need to pull the indx root slack anyway using tsk functions and looping over fsattr's";
     }
-    /*
-    else
-    {
-        qDebug() << "do something else here..." << QString::number(indxrootba.at(0), 16);
-    }
-    */
     htmlstr += "</table></body></html>";
     
     return htmlstr;
@@ -546,9 +483,7 @@ QString ParseInfo2Artifact(QString info2name, QString info2id)
     if(i2file.isOpen())
         info2content = i2file.readAll();
     i2file.close();
-    //qDebug() << "info2 size:" << info2content.count();
     uint32_t fileentrysize = qFromLittleEndian<uint32_t>(info2content.mid(12, 4));
-    //qDebug() << "file entry size:" << fileentrysize;
     int curpos = 20; // content starts after offset
     int a = 1;
     while(curpos < info2content.count())
@@ -596,19 +531,15 @@ QString ParseIDollarArtifact(QString idollarname, QString idollarid)
     if(versionformat == 0x01)
     {
         filenamestring = QString::fromStdString(idollarcontent.mid(24, 520).trimmed().toStdString());
-        //qDebug() << "filename string:" << filenamestring;
-        // get file name...(24 for 520 bytes)
     }
     else if(versionformat == 0x02)
     {
         uint32_t filenamesize = qFromLittleEndian<uint32_t>(idollarcontent.mid(24, 4));
         filenamestring = QString::fromStdString(idollarcontent.mid(24, filenamesize).trimmed().toStdString());
-        //qDebug() << "file name string:" << filenamestring;
     }
     htmlstr += "<tr class=odd><td class=aval>File Name:</td><td>" + filenamestring + "</td></tr>";
     htmlstr += "<tr class=even><td class=aval>Deleted:</td><td>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td></tr>";
     htmlstr += "<tr class=odd><td class=aval>File Size:</td><td>" + QString::number(filesize) + " bytes</td></tr>";
-    //qDebug() << "idollar size:" << idollarcontent.count();
 
     htmlstr += "</table></body></html>";
     
@@ -627,146 +558,7 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
     QString pffile = wombatvariable.tmpfilepath + pfid + "-fhex";
     qDebug() << "pffile" << pffile;
-    std::string rethtmlstr = PrefetchParse(pffile.toStdString());
-    htmlstr += QString::fromStdString(rethtmlstr);
-    /*
-    libscca_file_t* pfobj = NULL;
-    libscca_error_t* sccaerror = NULL;
-    uint32_t tmpuint32 = 0;
-    size_t tmpsize = 0;
-    qDebug() << "start initialize";
-    libscca_file_initialize(&pfobj, &sccaerror);
-    qDebug() << "end initialize";
-    qDebug() << "start file open";
-    //int errorint = libscca_file_open(pfobj, pffile.toStdString().c_str(), 1, &error);
-    //qDebug() << "errorint:" << errorint;
-    libscca_file_open(pfobj, pffile.toStdString().c_str(), LIBSCCA_OPEN_READ, &sccaerror);
-    qDebug() << "end file open";
-    //libscca_file_open(pfobj, pffile.toStdString().c_str(), libscca_get_access_flags_read(), &error);
-    //if(libscca_check_file_signature(&pffile.toStdString().c_str(), &error))
-    {
-	libscca_file_get_format_version(pfobj, &tmpuint32, &sccaerror);
-	htmlstr += "<tr class=odd><td class=aval>Format Version:</td><td>" + QString::number(tmpuint32) + "</td></tr>";
-	    //tmpsize = 0;
-	    //liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
-	    //uint8_t volabel[tmpsize];
-	    //liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
-	    //htmlstr += "<tr class='even'><td class='aval'>Volume Label:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
-	libscca_file_get_utf8_executable_filename_size(pfobj, &tmpsize, &sccaerror);
-	uint8_t tmpstr[tmpsize];
-	libscca_file_get_utf8_executable_filename(pfobj, tmpstr, tmpsize, &sccaerror);
-	htmlstr += "<tr class=even><td class=aval>Executable File Name:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(tmpstr)) + "</td></tr>";
-	tmpuint32 = 0;
-	libscca_file_get_prefetch_hash(pfobj, &tmpuint32, &sccaerror);
-	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "</td></tr>";
-    }
-    qDebug() << "Start close";
-    libscca_file_close(pfobj, &sccaerror);
-    libscca_file_free(&pfobj, &sccaerror);
-    libscca_error_free(&sccaerror);
-    qDebug() << "end close";
-    */
-    /*
-     *
-            uint64_t gettime = 0;
-	    uint32_t tmpuint32 = 0;
-	    size_t tmpsize = 0;
-            liblnk_file_get_file_creation_time(lnkobj, &gettime, &error);
-	    htmlstr += "<tr class='odd'><td class='aval'>Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
-	    gettime = 0;
-	    liblnk_file_get_file_modification_time(lnkobj, &gettime, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>Modification Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
-	    gettime = 0;
-	    liblnk_file_get_file_access_time(lnkobj, &gettime, &error);
-	    htmlstr += "<tr class='odd'><td class='aval'>Access Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
-	    liblnk_file_get_file_size(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>File Size:</td><td>" + QString::number(tmpuint32) + " bytes</td></tr>";
-	    tmpuint32 = 0;
-	    liblnk_file_get_file_attribute_flags(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr class='odd'><td class='aval vtop'>File Attributes:</td><td class='vtop'>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_READ_ONLY) != 0)
-		htmlstr += "Read Only (FILE_ATTRIBUTE_READ_ONLY)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_HIDDEN) != 0)
-		htmlstr += "Hidden (FILE_ATTRIBUTE_HIDDEN)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_SYSTEM) != 0)
-		htmlstr += "System (FILE_ATTRIBUTE_SYSTEM)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_DIRECTORY) != 0)
-		htmlstr += "Directory (FILE_ATTRIBUTE_DIRECTORY)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_ARCHIVE) != 0)
-		htmlstr += "Archived (FILE_ATTRIBUTE_ARCHIVE)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_DEVICE) != 0)
-		htmlstr += "Device (FILE_ATTRIBUTE_DEVICE)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_NORMAL) != 0)
-		htmlstr += "Normal (FILE_ATTRIBUTE_NORMAL)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_TEMPORARY) != 0)
-		htmlstr += "Temporary (FILE_ATTRIBUTE_TEMPORARY)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_SPARSE_FILE) != 0)
-		htmlstr += "Sparse File (FILE_ATTRIBUTE_SPARSE)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_REPARSE_POINT) != 0)
-		htmlstr += "Reparse Point (FILE_ATTRIBUTE_REPARSE_POINT)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_COMPRESSED) != 0)
-		htmlstr += "Compressed (FILE_ATTRIBUTE_COMPRESSED)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_OFFLINE) != 0)
-		htmlstr += "Offline (FILE_ATTRIBUTE_OFFLINE)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_NOT_CONTENT_INDEXED) != 0)
-		htmlstr += "Content should not be indexed (FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_ENCRYPTED) != 0)
-		htmlstr += "Encrypted (FILE_ATTRIBUTE_ENCRYPTED)<br/>";
-	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_VIRTUAL) != 0)
-		htmlstr += "Virtual (FILE_ATTRIBUTE_VIRTUAL)<br/>";
-	    htmlstr += "</td></tr>";
-	    tmpuint32 = 0;
-	    liblnk_file_get_drive_type(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>Drive Type:</td><td>";
-	    switch(tmpuint32)
-	    {
-		case LIBLNK_DRIVE_TYPE_UNKNOWN:
-		    htmlstr += "Unknown)";
-		    break;
-		case LIBLNK_DRIVE_TYPE_NO_ROOT_DIR:
-		    htmlstr += "No root directory";
-		    break;
-		case LIBLNK_DRIVE_TYPE_REMOVABLE:
-		    htmlstr += "Removable";
-		    break;
-		case LIBLNK_DRIVE_TYPE_FIXED:
-		    htmlstr += "Fixed";
-		    break;
-		case LIBLNK_DRIVE_TYPE_REMOTE:
-		    htmlstr += "Remote";
-		    break;
-		case LIBLNK_DRIVE_TYPE_CDROM:
-		    htmlstr += "CDROM";
-		    break;
-		case LIBLNK_DRIVE_TYPE_RAMDISK:
-		    htmlstr += "Ram disk";
-		    break;
-		default:
-		    htmlstr += "Unknown";
-		    break;
-	    }
-	    htmlstr += " (" + QString::number(tmpuint32) + ")</td></tr>";
-	    tmpuint32 = 0;
-	    liblnk_file_get_drive_serial_number(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr class='odd'><td class='aval'>Drive Serial Number:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
-	    tmpsize = 0;
-	    liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
-	    uint8_t volabel[tmpsize];
-	    liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>Volume Label:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
-	    tmpsize = 0;
-	    liblnk_file_get_utf8_local_path_size(lnkobj, &tmpsize, &error);
-	    uint8_t localpath[tmpsize];
-	    liblnk_file_get_utf8_local_path(lnkobj, localpath, tmpsize, &error);
-	    htmlstr += "<tr class='odd'><td class='aval'>Local Path:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(localpath)) + "</td></tr>";
-	    tmpsize = 0;
-	    liblnk_file_get_utf8_working_directory_size(lnkobj, &tmpsize, &error);
-	    uint8_t workdir[tmpsize];
-	    liblnk_file_get_utf8_working_directory(lnkobj, workdir, tmpsize, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
-        }
-    }
-     */ 
+    // MANUALLY PARSE PREFETCH
 
     htmlstr += "</table></body></html>";
 
