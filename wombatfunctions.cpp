@@ -5,6 +5,7 @@
 // LIBFFMPEG THUMBNAILER HEADERS
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
+#include "/home/pasquale/Projects/wombatforensics/prefetch.h"
 // SCALPEL HEADER
 #include <scalpel.h>
 // REVIT HEADERS
@@ -626,6 +627,8 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
     QString pffile = wombatvariable.tmpfilepath + pfid + "-fhex";
     qDebug() << "pffile" << pffile;
+    std::string rethtmlstr = PrefetchParse(pffile.toStdString());
+    htmlstr += QString::fromStdString(rethtmlstr);
     /*
     libscca_file_t* pfobj = NULL;
     libscca_error_t* sccaerror = NULL;
@@ -640,21 +643,21 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     libscca_file_open(pfobj, pffile.toStdString().c_str(), LIBSCCA_OPEN_READ, &sccaerror);
     qDebug() << "end file open";
     //libscca_file_open(pfobj, pffile.toStdString().c_str(), libscca_get_access_flags_read(), &error);
-    if(libscca_check_file_signature(pffile.toStdString().c_str(), &error))
+    //if(libscca_check_file_signature(&pffile.toStdString().c_str(), &error))
     {
-	libscca_file_get_format_version(pfobj, &tmpuint32, &error);
+	libscca_file_get_format_version(pfobj, &tmpuint32, &sccaerror);
 	htmlstr += "<tr class=odd><td class=aval>Format Version:</td><td>" + QString::number(tmpuint32) + "</td></tr>";
 	    //tmpsize = 0;
 	    //liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
 	    //uint8_t volabel[tmpsize];
 	    //liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
 	    //htmlstr += "<tr class='even'><td class='aval'>Volume Label:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
-	libscca_file_get_utf8_executable_filename_size(pfobj, &tmpsize, &error);
+	libscca_file_get_utf8_executable_filename_size(pfobj, &tmpsize, &sccaerror);
 	uint8_t tmpstr[tmpsize];
-	libscca_file_get_utf8_executable_filename(pfobj, tmpstr, tmpsize, &error);
+	libscca_file_get_utf8_executable_filename(pfobj, tmpstr, tmpsize, &sccaerror);
 	htmlstr += "<tr class=even><td class=aval>Executable File Name:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(tmpstr)) + "</td></tr>";
 	tmpuint32 = 0;
-	libscca_file_get_prefetch_hash(pfobj, &tmpuint32, &error);
+	libscca_file_get_prefetch_hash(pfobj, &tmpuint32, &sccaerror);
 	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "</td></tr>";
     }
     qDebug() << "Start close";
