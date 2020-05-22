@@ -556,8 +556,52 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     initfile.close();
     htmlstr += "<div id='infotitle'>Prefetch File Analysis for " + pfname + " (" + pfid + ")</div><br/>";
     htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
-    QString pffile = wombatvariable.tmpfilepath + pfid + "-fhex";
-    qDebug() << "pffile" << pffile;
+    QString pffilestr = wombatvariable.tmpfilepath + pfid + "-fhex";
+    QByteArray pfcontent;
+    pfcontent.clear();
+    QFile pffile(pffilestr);
+    if(!pffile.isOpen())
+        pffile.open(QIODevice::ReadOnly);
+    if(pffile.isOpen())
+        pfcontent = pffile.readAll();
+    pffile.close();
+    uint32_t tmpuint32 = 0;
+    QString pfheader = QString::fromStdString(pfcontent.left(4).toStdString());
+    if(pfheader.startsWith("MAM")) // WIN10
+    {
+        qDebug() << "implement win 10 here";
+    }
+    else // SCCA format, reget header value
+    {
+        pfheader = QString::fromStdString(pfcontent.mid(4, 4).toStdString());
+        if(pfheader.contains("SCCA")) // Earlier Windows
+        {
+            uint32_t pfversion = qFromLittleEndian<uint32_t>(pfcontent.left(4));
+            htmlstr += "<tr class=odd><td class=aval>Format Version:</td><td>" + QString::number(pfversion) + "</td></tr>";
+            tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(12, 4));
+            htmlstr += "<tr class=even><td class=aval>File Size:</td><td>" + QString::number(tmpuint32) + " bytes</td></tr>";
+            tmpuint32 = 0;
+            QString filename = QString::fromStdString(pfcontent.mid(16, 60).trimmed().toStdString());
+            qDebug() << "filename:" << filename;
+            //filenamestring = QString::fromStdString(idollarcontent.mid(24, filenamesize).trimmed().toStdString());
+            if(pfversion == 17) // WINXP, WIN2003
+            {
+            }
+            else if(pfversion == 23) // WINVISTA, WIN7
+            {
+            }
+            else if(pfversion == 26) // WIN8.1
+            {
+            }
+            else if(pfversion == 30) // WIN10
+            {
+            }
+        }
+    }
+    //tmpuint32 = qFromLittleEndian<uint32_t>(pffcontent.left(4));
+
+                //QString indxrecordheader = QString::fromStdString(indxalloccontent.mid(curpos, 4).toStdString());
+                //if(indxrecordheader.contains("INDX")) // moving correctly.
     // MANUALLY PARSE PREFETCH
 
     htmlstr += "</table></body></html>";
