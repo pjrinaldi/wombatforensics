@@ -827,6 +827,7 @@ void WombatForensics::InitializeCaseStructure()
         QDir dir;
         dir.mkpath(wombatvariable.tmpmntpath);
         dir.mkpath(wombatvariable.tmpmntpath + "carved/");
+        dir.mkpath(wombatvariable.tmpmntpath + "archives/");
         wombatvariable.iscaseopen = true;
         InitializePreviewReport();
         bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
@@ -972,6 +973,7 @@ void WombatForensics::OpenUpdate()
         hashstr = "SHA256 Hash";
     treenodemodel->UpdateHeaderNode(7, hashstr);
     thumbdir.mkpath(wombatvariable.tmpmntpath + "carved/");
+    thumbdir.mkpath(wombatvariable.tmpmntpath + "archives/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/"); // won't do anything if it already exists
     QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
     if(!tdir.isEmpty())
