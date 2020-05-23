@@ -1,5 +1,6 @@
 #include "wombatfunctions.h"
 #include <QtEndian>
+#include <libfwnt.h>
 // IMAGEMAGICK HEADER
 #include <Magick++.h>
 // LIBFFMPEG THUMBNAILER HEADERS
@@ -571,7 +572,18 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     if(pfheader.startsWith("MAM")) // WIN10
     {
         htmlstr += "<tr class=odd><td colspan=2>STILL NEED TO IMPLEMENT WIN10 PREFETCH PARSER</td></tr>";
-        //qDebug() << "implement win 10 here";
+        uint32_t datasize = qFromLittleEndian<uint32_t>(pfcontent.mid(4, 4));
+        size_t compressedsize = pfcontent.count() - 8;
+        size_t uncompressedsize = datasize;
+        //qDebug() << "datsize:" << datasize;
+        libfwnt_error_t* fwnterror = NULL;
+        uint8_t compresseddata[compressedsize];
+        uint8_t uncompresseddata[uncompressedsize];
+        //compresseddata = (uint8_t*)(pfcontent.mid(8, compressedsize).data());
+        for(uint i=0; i < compressedsize; i++)
+            compresseddata[i] = pfcontent.at(8+1);
+        libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, uncompresseddata, &uncompressedsize, &fwnterror);
+        // NEED TO FIGURE OUT WHAT I HAVE, THEN OPERATE ACCORDINGLY...
     }
     else // SCCA format, reget header value
     {

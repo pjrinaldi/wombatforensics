@@ -41,15 +41,15 @@ makepkg -si
 # cd back into wombatforensics directory
 cd ../wombatforensics
 
-# download libscca source
-curl -O https://github.com/libyal/libscca/releases/download/20191222/libscca-alpha-20191222.tar.gz
-# extract the libscca tar.gz
-tar -xzf libscca-alpha-20191222.tar.gz
-# cd into the libscca-20191222 directory
-cd libscca-20191222
-# run ./configure && make && sudo make install to install the library
-./configure && make && make install
-# cd back into wombatforensisc directory
+# donwload libfwnt source
+curl -O https://github.com/libyal/libfwnt/releases/download/20191222/libfwnt-alpha-20191222.tar.gz
+# extract the libfwnt archive
+tar -xzf libfwnt-alpha-20191222.tar.gz
+# cd into the libfwnt directory
+cd libfwnt-20191222
+# run configure make make install
+./configure && make && sudo make install
+# cd back into wombat forensics directory
 cd ../wombatforensics
 
 # cp the tsk*.h files into their respective directories
@@ -60,6 +60,8 @@ sudo cp ./tskextra/tsk_vs_i.h /usr/include/tsk/vs/
 
 # need to add /usr/local/lib to ldconfig library path
 echo '/usr/local/lib' > local.conf && sudo mv ./local.conf /etc/ld.so.conf.d/
+# update ldconfig cache
+sudo ldconfig
 
 # once the installation is done, you should be able to run qmake "wombatforensics.pro" and then "make" to generate the binaries
 qmake wombatforensics.pro
