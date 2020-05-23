@@ -662,10 +662,68 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
                     htmlstr += "<tr class=odd><td Volume " + QString::number(i+1) + " Serial Number:</td><td>0x" + QString::number(volserial, 16) + "</td></tr>";
                     htmlstr += "<tr class=odd><td Volume " + QString::number(i+1) + " Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
                 }
-                
             }
             else if(pfversion == 23) // WINVISTA, WIN7
             {
+                QByteArray fileinformation = pfcontent.mid(84, 156);
+                fnamestringsoffset = qFromLittleEndian<uint32_t>(fileinformation.mid(16, 4));
+                fnamestringssize = qFromLittleEndian<uint32_t>(fileinformation.mid(20, 4));
+                volinfooffset = qFromLittleEndian<uint32_t>(fileinformation.mid(24, 4));
+                volinfocount = qFromLittleEndian<uint32_t>(fileinformation.mid(28, 4));
+                volinfosize = qFromLittleEndian<uint32_t>(fileinformation.mid(32, 4));
+                tmpuint64 = qFromLittleEndian<uint64_t>(fileinformation.mid(44, 8));
+                runcount = qFromLittleEndian<uint32_t>(fileinformation.mid(68, 4));
+                htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(runcount) + "</td></tr>";
+                htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
+                QByteArray filenamestrings = pfcontent.mid(fnamestringsoffset, fnamestringssize);
+                QByteArray volinfocontent = pfcontent.mid(volinfooffset, volinfosize);
+                QStringList tmpstrlist;
+                tmpstrlist.clear();
+                QString tmpstr = "";
+                for(uint i=0; i < fnamestringssize; i++)
+                {
+                    if(i % 2 == 0)
+                    {
+                        if(filenamestrings.at(i) == '\u0000')
+                        {
+                            tmpstrlist.append(tmpstr);
+                            tmpstr = "";
+                        }
+                        else
+                            tmpstr += filenamestrings.at(i);
+                    }
+                }
+                for(int i=0; i < tmpstrlist.count(); i++)
+                {
+                    /*
+                    htmlstr += "<tr class=";
+                    if(i % 2 == 0) // even
+                        htmlstr += "even";
+                    else
+                        htmlstr += "odd";
+                    htmlstr += "><td class=aval>File Name: " + QString::number(i+1) + "</td><td>" + tmpstrlist.at(i) + "</td></tr>";
+                    */
+                    htmlstr += "<tr class=even><td class=aval>File Name: " + QString::number(i+1) + "</td><td>" + tmpstrlist.at(i) + "</td></tr>";
+                }
+                for(uint i=0; i < volinfocount; i++)
+                {
+                    int curpos = 104*i;
+                    uint32_t volpathoffset = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos, 4));
+                    uint32_t volpathsize = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+4, 4));
+                    QByteArray volpath = volinfocontent.mid(curpos + volpathoffset, volpathsize*2);
+                    QString volpathstr = "";
+                    for(int j=0; j < volpath.count(); j++)
+                    {
+                        if(j % 2 == 0)
+                            volpathstr += volpath.at(j);
+                    }
+                    tmpuint64 = 0;
+                    tmpuint64 = qFromLittleEndian<uint64_t>(volinfocontent.mid(curpos+8, 8));
+                    uint32_t volserial = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+16, 4));
+                    htmlstr += "<tr class=odd><td>Volume " + QString::number(i+1) + " Path:</td><td>" + volpathstr + "</td></tr>";
+                    htmlstr += "<tr class=odd><td Volume " + QString::number(i+1) + " Serial Number:</td><td>0x" + QString::number(volserial, 16) + "</td></tr>";
+                    htmlstr += "<tr class=odd><td Volume " + QString::number(i+1) + " Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
+                }
             }
             else if(pfversion == 26) // WIN8.1
             {
