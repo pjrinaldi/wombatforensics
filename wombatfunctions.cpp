@@ -566,6 +566,7 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
         pfcontent = pffile.readAll();
     pffile.close();
     uint32_t tmpuint32 = 0;
+    uint64_t tmpuint64 = 0;
     QString pfheader = QString::fromStdString(pfcontent.left(4).toStdString());
     if(pfheader.startsWith("MAM")) // WIN10
     {
@@ -578,14 +579,69 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
         {
             uint32_t pfversion = qFromLittleEndian<uint32_t>(pfcontent.left(4));
             htmlstr += "<tr class=odd><td class=aval>Format Version:</td><td>" + QString::number(pfversion) + "</td></tr>";
-            tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(12, 4));
-            htmlstr += "<tr class=even><td class=aval>File Size:</td><td>" + QString::number(tmpuint32) + " bytes</td></tr>";
+            //tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(12, 4));
+            //htmlstr += "<tr class=even><td class=aval>File Size:</td><td>" + QString::number(tmpuint32) + " bytes</td></tr>";
+            //tmpuint32 = 0;
+            QString filenamestring = "";
+            for(int i=16; i < 76; i++)
+            {
+                if(i % 2 == 0)
+                {
+                    if(pfcontent.at(i) == '\u0000')
+                        break;
+                    filenamestring.append(pfcontent.at(i));
+                }
+            }
+            htmlstr += "<tr class=even><td class=aval>Executable File Name:</td><td>" + filenamestring + "</td></tr>";
+            tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(76, 4));
+            htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>" + QString::number(tmpuint32, 16) + "</td></tr>";
             tmpuint32 = 0;
-            QString filename = QString::fromStdString(pfcontent.mid(16, 60).trimmed().toStdString());
-            qDebug() << "filename:" << filename;
-            //filenamestring = QString::fromStdString(idollarcontent.mid(24, filenamesize).trimmed().toStdString());
+            uint32_t fnamestringsoffset = 0;
+            uint32_t fnamestringssize = 0;
+            uint32_t volinfooffset = 0;
+            uint32_t volinfosize = 0;
+            uint32_t volinfocount = 0;
+            uint32_t runcount = 0;
             if(pfversion == 17) // WINXP, WIN2003
             {
+                QByteArray fileinformation = pfcontent.mid(84, 68);
+                fnamestringsoffset = qFromLittleEndian<uint32_t>(fileinformation.mid(16, 4));
+                fnamestringssize = qFromLittleEndian<uint32_t>(fileinformation.mid(20, 4));
+                volinfooffset = qFromLittleEndian<uint32_t>(fileinformation.mid(24, 4));
+                volinfocount = qFromLittleEndian<uint32_t>(fileinformation.mid(28, 4));
+                volinfosize = qFromLittleEndian<uint32_t>(fileinformation.mid(32, 4));
+                tmpuint64 = qFromLittleEndian<uint64_t>(fileinformation.mid(36, 8));
+                runcount = qFromLittleEndian<uint32_t>(fileinformation.mid(60, 4));
+                htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(runcount) + "</td></tr>";
+                htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
+                qDebug() << "fnamestr offset|size:" << fnamestringsoffset << fnamestringssize;
+                QByteArray filenamestrings = pfcontent.mid(fnamestringsoffset, fnamestringssize);
+                QByteArray volinfocontent = pfcontent.mid(volinfooffset, volinfosize);
+                QStringList tmpstrlist;
+                tmpstrlist.clear();
+                QString tmpstr = "";
+                for(uint i=0; i < fnamestringssize; i++)
+                {
+                    if(i % 2 == 0)
+                    {
+                        if(filenamestrings.at(i) == '\u0000')
+                        {
+                            tmpstrlist.append(tmpstr);
+                            tmpstr = "";
+                        }
+                        else
+                            tmpstr += filenamestrings.at(i);
+                    }
+                }
+                for(int i=0; i < tmpstrlist.count(); i++)
+                {
+                    htmlstr += "<tr class=";
+                    if(i % 2 == 0) // even
+                        htmlstr += "even";
+                    else
+                        htmlstr += "odd";
+                    htmlstr += "><td class=aval>File Name: " + QString::number(i+1) + "</td><td>" + tmpstrlist.at(i) + "</td></tr>";
+                }
             }
             else if(pfversion == 23) // WINVISTA, WIN7
             {
@@ -598,12 +654,6 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
             }
         }
     }
-    //tmpuint32 = qFromLittleEndian<uint32_t>(pffcontent.left(4));
-
-                //QString indxrecordheader = QString::fromStdString(indxalloccontent.mid(curpos, 4).toStdString());
-                //if(indxrecordheader.contains("INDX")) // moving correctly.
-    // MANUALLY PARSE PREFETCH
-
     htmlstr += "</table></body></html>";
 
     return htmlstr;
