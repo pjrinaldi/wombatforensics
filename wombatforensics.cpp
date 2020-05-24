@@ -287,11 +287,11 @@ void WombatForensics::RemoveTag()
         if(paridstr.contains("-"))
             paridstr = QString::number(rootinum);
         QFile filefile;
-        QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/";
-        if(fstring.split(":").count() > 1)
-            filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
-        else
-            filefilepath += fstring.split(":").first();
+        QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/" + fstring;
+        //if(fstring.split(":").count() > 1)
+        //    filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
+        //else
+        //    filefilepath += fstring.split(":").first();
         filefilepath += ".a" + paridstr + ".stat";
         filefile.setFileName(filefilepath);
         filefile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -347,11 +347,11 @@ void WombatForensics::RemoveTag()
                 if(paridstr.contains("-"))
                     paridstr = QString::number(rootinum);
                 QFile filefile;
-                QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/";
-                if(fstring.split(":").count() > 1)
-                    filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
-                else
-                    filefilepath += fstring.split(":").first();
+                QString filefilepath = wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/" + fstring;
+                //if(fstring.split(":").count() > 1)
+                //    filefilepath += fstring.split(":").first() + "-" + fstring.split(":").last();
+                //else
+                //    filefilepath += fstring.split(":").first();
                 filefilepath += ".a" + paridstr + ".stat";
                 QString tmpstr = "";
                 QStringList tmplist;
@@ -1338,6 +1338,11 @@ void WombatForensics::LoadHexContents()
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     QString nodeid = selectednode->Data(11).toString();
+    if(nodeid.split("-f").last().startsWith("z"))
+    {
+        selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
+        nodeid = selectednode->Data(11).toString();
+    }
     QString evidid = nodeid.split("-").first();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + evidid)), QDir::NoSymLinks | QDir::Dirs);
@@ -1423,7 +1428,7 @@ void WombatForensics::LoadHexContents()
             paridstr = QString::number(rootinum);
         int mftaddress = 0;
         if(fstring.contains("a"))
-            mftaddress = astring.mid(1).toInt();
+            mftaddress = astring.mid(2).toInt();
         else
             mftaddress = fstring.mid(1).toInt();
         ui->hexview->setEnabled(true);
@@ -2332,6 +2337,7 @@ void WombatForensics::FinishDigging()
     qInfo() << "Digging Finished";
     digrotatetimer->stop();
     digcountlabel->setText(digtotalcountstring);
+    emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     StatusUpdate("Ready");
 }
 

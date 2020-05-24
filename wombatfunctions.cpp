@@ -1681,10 +1681,27 @@ void GenerateArchiveExpansion(QString objectid)
                 else if(filename.endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
                     mimestr = "Windows System/Prefetch";
             }
-            qDebug() << "mimestr:" << mimestr;
+            //qDebug() << "mimestr:" << mimestr;
             delete[] magicbuffer;
-            QString outstr = QString::fromStdString(std::string(zipstat.name)) + ",5," + astring.mid(1) + "," + filepath + filename + "/" + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(estring + "-" + vstring + "-" + pstring + "-f" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
-            qDebug() << outstr;
+            QString outstr = QString::fromStdString(std::string(zipstat.name)) + ",5," + astring.mid(1) + "," + filepath + filename + "/" + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
+            //qDebug() << outstr;
+            QByteArray ba;
+            ba.clear();
+            ba.append(QString::fromStdString(std::string(zipstat.name)));
+            QByteArray ba2;
+            ba2.clear();
+            ba2.append(QString(filepath + filename + "/"));
+            QStringList treeout;
+            treeout.clear();
+            treeout << ba.toBase64() << ba2.toBase64() << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").first() << mimestr.split("/").last() << "0" << QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1));
+            QList<QVariant> nodedata;
+            nodedata.clear();
+            for(int i=0; i < 12; i++)
+                nodedata << treeout.at(i);
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, objectid.split("-a").first(), 5, 0); 
+            mutex.unlock();
+            listeditems.append(treeout.at(11));
             /*
             QFile statfile(statstr);
             if(!statfile.isOpen())
@@ -4820,9 +4837,22 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     QString pstring = selectedid.split("-", QString::SkipEmptyParts).at(2);
     QString fstring = selectedid.split("-", QString::SkipEmptyParts).at(3);
     QString astring = selectedid.split("-", QString::SkipEmptyParts).at(4);
+    //qDebug() << "astring:" << astring;
     qint64 curaddr = 0;
-    if(fstring.contains("a") || fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
+    QString zipid = "";
+    if(fstring.contains("a"))
         curaddr = astring.mid(2).toLongLong();
+    else if(fstring.contains("z"))
+    {
+        zipid = selectedid;
+        selectedid = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString();
+        fstring = selectedid.split("-", QString::SkipEmptyParts).at(3);
+        curaddr = astring.mid(1).toLongLong();
+        //qDebug() << "curaddr:" << curaddr;
+        //qDebug() << "selected parent id:" << selectedid;
+    }
+    else if(fstring.contains("d") || fstring.contains("o"))
+        curaddr = fstring.mid(2).toLongLong();
     else
         curaddr = fstring.mid(1).toLongLong();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
@@ -4932,6 +4962,45 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     }
     tmpfile.close();
     delete[] imgbuf;
+    if(zipid.contains("z"))
+    {
+        //qDebug() << "zipid addr:" << zipid.split("-").at(3).mid(2).toLongLong();
+        int err = 0;
+        //qDebug() << "zipid:" << zipid << "hexstring:" << hexstring;
+        zip* zfile = zip_open(hexstring.toStdString().c_str(), ZIP_RDONLY, &err);
+        struct zip_stat zstat;
+        zip_stat_init(&zstat);
+        zip_stat_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, &zstat);
+        zip_file_t* curfile = NULL;
+        if(zstat.encryption_method == ZIP_EM_NONE)
+            curfile = zip_fopen_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0); // IF NOT ENCRYPTED
+        else
+        {
+            // PROMPT USER FOR PASSWORD HERE....
+            curfile = zip_fopen_index_encrypted(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
+        }
+        if(curfile != NULL)
+        {
+            char* zfbuf = new char[zstat.size];
+            qint64 zcnt = zip_fread(curfile, zfbuf, zstat.size);
+            zip_fclose(curfile);
+            QDir zdir;
+            zdir.mkpath(wombatvariable.tmpfilepath);
+            QString zhexstring = wombatvariable.tmpfilepath + zipid + "-fhex";
+            QFile ztmp(zhexstring);
+            if(!ztmp.isOpen())
+                ztmp.open(QIODevice::WriteOnly);
+            if(ztmp.isOpen())
+            {
+                QDataStream zbuffer(&ztmp);
+                zbuffer.writeRawData(zfbuf, zcnt);
+                ztmp.close();
+            }
+            delete[] zfbuf;
+        }
+        zip_close(zfile);
+        //qDebug() << "extract zip content here...";
+    }
 }
 
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partpath)
