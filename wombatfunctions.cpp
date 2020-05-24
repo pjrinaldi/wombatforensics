@@ -4979,6 +4979,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
             // PROMPT USER FOR PASSWORD HERE....
             curfile = zip_fopen_index_encrypted(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
         }
+        QString zhexstring = wombatvariable.tmpfilepath + zipid + "-fhex";
         if(curfile != NULL)
         {
             char* zfbuf = new char[zstat.size];
@@ -4986,7 +4987,6 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
             zip_fclose(curfile);
             QDir zdir;
             zdir.mkpath(wombatvariable.tmpfilepath);
-            QString zhexstring = wombatvariable.tmpfilepath + zipid + "-fhex";
             QFile ztmp(zhexstring);
             if(!ztmp.isOpen())
                 ztmp.open(QIODevice::WriteOnly);
@@ -4999,6 +4999,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
             delete[] zfbuf;
         }
         zip_close(zfile);
+        hexstring = zhexstring;
         //qDebug() << "extract zip content here...";
     }
 }
