@@ -852,36 +852,6 @@ QString ParseArchiveArtifact(QString archivename, QString archiveid)
         }
         htmlstr += "</td></tr>";
     }
-    /*
-     *
-     * int err = 0;
-        QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
-        zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
-        qint64 zipentrycount = zip_get_num_entries(curzip, 0);
-        for(int i=0; i < zipentrycount; i++)
-        {
-            //QString zipfname = QString::fromStdString(std::string(zip_get_name(curzip, i, ZIP_FL_ENC_GUESS)));
-            //qDebug() << "zipfname" << i << ":" << zipfname;
-            struct zip_stat zipstat;
-            zip_stat_init(&zipstat);
-            zip_stat_index(curzip, i, 0, &zipstat);
-            qDebug() << QString::fromStdString(std::string(zipstat.name));
-            // HERE IS WHERE I CAN BUILD THE STAT FILE, TREENODE AND ADD THEM TO THE TREE...
-            // I DON'T THINK THERE WILL BE ANY PROPERTIES FILE
-        }
-        //qDebug() << "zip entry count:" << zipentrycount;
-        //qDebug() << "objectid:" << objectid;
-        // FSTRING VALUE WILL BE F#, WHERE NUMBER STARTS AT 1 AND INCREMEMNTS PER ZIP ARCHIVE FOR THE NUMBER OF FILES IN IT...
-        QString estring = objectid.split("-").first();
-        QString vstring = objectid.split("-").at(1);
-        QString pstring = objectid.split("-").at(2);
-        QString astring = objectid.split("-").at(3);
-        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        //TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
-        //qDebug() << "filename:" << filename;
-        zip_close(curzip);
-     */ 
     htmlstr += "</table></body></html>";
 
     return htmlstr;
