@@ -1466,6 +1466,8 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 void ProcessExport(QString objectid)
 {
+    // IF ZIP, I.E. FZ#, NEED TO GET THE PARENT FROM TSK METHODS, THEN SAVE OUT TO TMPFILE
+    // USE ZIP METHODS TO OPEN ZIP, FIND SUB FILE BY INDEX, SAVE TO EXPORT PATH...
     TSK_IMG_INFO* imginfo = NULL;
     std::vector<std::string> pathvector;
     pathvector.clear();
@@ -5473,10 +5475,10 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
 		    mftblockhash.insert(objid, GetBlockList(fsfile));
                 }
 
-                if(fsfile->meta != NULL)
-                    treeout << QString::number(fsfile->meta->type); // file type - 12
-                else
-                    treeout << QString::number(fsfile->name->type); // file type - 12
+                //if(fsfile->meta != NULL)
+                //    treeout << QString::number(fsfile->meta->type); // file type - 12
+                //else
+                treeout << QString::number(fsfile->name->type); // file type - 12
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
                 {
                     treeout << "1"; // orphan - 13
