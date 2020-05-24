@@ -1683,6 +1683,7 @@ void GenerateArchiveExpansion(QString objectid)
                     mimestr = "Windows System/Recycle.Bin";
                 else if(filename.endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
                     mimestr = "Windows System/Prefetch";
+                //else if(astring.contains("fa"
             }
             //qDebug() << "mimestr:" << mimestr;
             delete[] magicbuffer;
@@ -5340,6 +5341,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                             QMimeDatabase adsmimedb;
                             QMimeType adsmimetype = adsmimedb.mimeTypeForData(fdata);
                             QString mimestr = GenerateCategorySignature(adsmimetype);
+                            if(mimestr.contains("Unknown")) // generate further analysis
+                                mimestr = "Windows System/Alternate Data Stream";
                             delete[] fbuf;
                             adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
                             treeout.clear();
@@ -5561,6 +5564,8 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                                     QMimeDatabase adsmimedb;
                                     QMimeType adsmimetype = adsmimedb.mimeTypeForData(fdata);
                                     QString mimestr = GenerateCategorySignature(adsmimetype);
+                                    if(mimestr.contains("Unknown"))
+                                        mimestr = "Windows System/Alternate Data Stream";
                                     delete[] fbuf;
                                     adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
                                     treeout.clear();
