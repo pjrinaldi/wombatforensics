@@ -68,6 +68,7 @@ void InitializeEvidenceStructure(QString evidstring);
 int SegmentDigits(int);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
 void PopulateCarvedFiles(QString cfile);
+void PopulateArchiveFiles(QString afile);
 QString GenerateCategorySignature(const QMimeType mimetype);
 void TransferThumbnails(QString thumbid, QString reppath);
 void TransferFiles(QString thumbid, QString reppath);

@@ -1640,7 +1640,8 @@ void GenerateArchiveExpansion(QString objectid)
         {
             // CURRENT METHOD DOESN'T ACCOUNT FOR DIRECTORIES IN ARCHIVES, JUST LEAVES THEM AS THE PATH...
             // ALSO DOESN"T ACCOUNT FOR ENCRYPTED ZIP..
-            QString statstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-f" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
+            QString statstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
+            QString propstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".prop";
             struct zip_stat zipstat;
             zip_stat_init(&zipstat);
             zip_stat_index(curzip, i, 0, &zipstat);
@@ -1683,7 +1684,6 @@ void GenerateArchiveExpansion(QString objectid)
             }
             //qDebug() << "mimestr:" << mimestr;
             delete[] magicbuffer;
-            QString outstr = QString::fromStdString(std::string(zipstat.name)) + ",5," + astring.mid(1) + "," + filepath + filename + "/" + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
             //qDebug() << outstr;
             QByteArray ba;
             ba.clear();
@@ -1691,6 +1691,7 @@ void GenerateArchiveExpansion(QString objectid)
             QByteArray ba2;
             ba2.clear();
             ba2.append(QString(filepath + filename + "/"));
+            QString outstr = ba.toBase64() + ",5," + astring.mid(1) + "," + ba2.toBase64() + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
             QStringList treeout;
             treeout.clear();
             treeout << ba.toBase64() << ba2.toBase64() << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").first() << mimestr.split("/").last() << "0" << QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1));
@@ -1699,10 +1700,9 @@ void GenerateArchiveExpansion(QString objectid)
             for(int i=0; i < 12; i++)
                 nodedata << treeout.at(i);
             mutex.lock();
-            treenodemodel->AddNode(nodedata, objectid.split("-a").first(), 5, 0); 
+            treenodemodel->AddNode(nodedata, objectid.split("-a").first(), 1, 0); 
             mutex.unlock();
             listeditems.append(treeout.at(11));
-            /*
             QFile statfile(statstr);
             if(!statfile.isOpen())
                 statfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -1711,8 +1711,138 @@ void GenerateArchiveExpansion(QString objectid)
                 statfile.write(outstr.toStdString().c_str());
                 statfile.close();
             }
-            */
-            //qDebug() << QString::fromStdString(std::string(zipstat.name));
+            QFile propfile(propstr);
+            if(!propfile.isOpen())
+                propfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            if(propfile.isOpen())
+            {
+                QTextStream proplist(&propfile);
+                proplist << "Compressed Size||" << zipstat.comp_size << " bytes||Compressed size of the file in bytes." << endl;
+                proplist << "Compression Method||";
+                switch(zipstat.comp_method)
+                {
+                    case ZIP_CM_STORE:
+                        proplist << "UNCOMPRESSED";
+                        break;
+                    case ZIP_CM_SHRINK:
+                        proplist << "SHRUNK";
+                        break;
+                    case ZIP_CM_REDUCE_1:
+                        proplist << "FACTOR 1 REDUCED";
+                        break;
+                    case ZIP_CM_REDUCE_2:
+                        proplist << "FACTOR 2 REDUCED";
+                        break;
+                    case ZIP_CM_REDUCE_3:
+                        proplist << "FACTOR 3 REDUCED";
+                        break;
+                    case ZIP_CM_REDUCE_4:
+                        proplist << "FACTOR 4 REDUCED";
+                        break;
+                    case ZIP_CM_IMPLODE:
+                        proplist << "IMPLODED";
+                        break;
+                    case ZIP_CM_DEFLATE:
+                        proplist << "DEFLATE";
+                        break;
+                    case ZIP_CM_DEFLATE64:
+                        proplist << "DEFLATE64";
+                        break;
+                    case ZIP_CM_PKWARE_IMPLODE:
+                        proplist << "PKWARE IMPLODE";
+                        break;
+                    case ZIP_CM_BZIP2:
+                        proplist << "BZIP2";
+                        break;
+                    case ZIP_CM_LZMA:
+                        proplist << "LZMA";
+                        break;
+                    case ZIP_CM_TERSE:
+                        proplist << "IBM TERSE";
+                        break;
+                    case ZIP_CM_LZ77:
+                        proplist << "IBM LZ77";
+                        break;
+                    case ZIP_CM_LZMA2:
+                        proplist << "LZMA2";
+                        break;
+                    case ZIP_CM_XZ:
+                        proplist << "XZ";
+                        break;
+                    case ZIP_CM_JPEG:
+                        proplist << "COMPRESSED JPEG";
+                        break;
+                    case ZIP_CM_WAVPACK:
+                        proplist << "COMPRESSED WAVPACK";
+                        break;
+                    case ZIP_CM_PPMD:
+                        proplist << "PPMD I";
+                        break;
+                    default:
+                        proplist << "DEFLATE";
+                        break;
+                }
+                proplist << "||Compression Method used to add the files to the archive." << endl;
+                proplist << "Encryption Method||";
+                switch(zipstat.encryption_method)
+                {
+                    case ZIP_EM_NONE:
+                        proplist << "NOT ENCRYPTED";
+                        break;
+                    case ZIP_EM_TRAD_PKWARE:
+                        proplist << "PKWARE ENCRYPTED";
+                        break;
+                    /*
+                    case ZIP_EM_DES:
+                        htmlstr += "DES ENCRYPTED";
+                        break;
+                    case ZIP_EM_RC2_OLD:
+                        htmlstr += "RC2 < v5.2 ENCRYPTED";
+                        break;
+                    case ZIP_EM_3DES_168:
+                        htmlstr += "3DES 168 ENCRYPTED";
+                        break;
+                    case ZIP_EM_3DES_112:
+                        htmlstr += "3DES 112 ENCRYPTED";
+                        break;
+                    case ZIP_EM_PKZIP_AES_128:
+                        htmlstr += "PKZIP AES 128 ENCRYPTED";
+                        break;
+                    case ZIP_EM_PKZIP_AES_192:
+                        htmlstr += "PKZIP AES 192 ENCRYPTED";
+                        break;
+                    case ZIP_EM_PKZIP_AES_256:
+                        htmlstr += "PKZIP AES 256 ENCRYPTED";
+                        break;
+                    case ZIP_EM_RC2:
+                        htmlstr += "RC2 > V5.2 ENCRYPTED";
+                        break;
+                    case ZIP_EM_RC4:
+                        htmlstr += "RC4 ENCRYPTED";
+                        break;
+                    */
+                    case ZIP_EM_AES_128:
+                        proplist << "AES 128 ENCRYPTED";
+                        break;
+                    case ZIP_EM_AES_192:
+                        proplist << "AES 192 ENCRYPTED";
+                        break;
+                    case ZIP_EM_AES_256:
+                        proplist << "AES 256 ENCRYPTED";
+                        break;
+                    case ZIP_EM_UNKNOWN:
+                        proplist << "UNKNOWN ALGORITHM";
+                        break;
+                    default:
+                        proplist << "NOT ENCRYPTED";
+                        break;
+                }
+                proplist << "||Encryption Method used to protect the contents of the files added to the archive." << endl;
+                proplist.flush();
+                propfile.close();
+            }
+            //filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            //QTextStream proplist(&filepropfile);
             // HERE IS WHERE I CAN BUILD THE STAT FILE, TREENODE AND ADD THEM TO THE TREE...
             // FILE STAT CONTENTS - filename, filetype, par addr, dir path, atime, ctime, crtime, mtime, size, addr, mime cat/sig, 0, ID, hash, deleted, bookmark
             // FILE PROP CONTENTS - block address of parent, maybe zip properties i display in html double click for zip parent...
@@ -2140,6 +2270,37 @@ int SegmentDigits(int number)
         count++;
     }
     return count;
+}
+
+void PopulateArchiveFiles(QString afilestr)
+{
+    afilestr = wombatvariable.tmpmntpath + "archives/" + afilestr;
+    QFile afile(afilestr);
+    QString tmpstr;
+    if(!afile.isOpen())
+        afile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(afile.isOpen())
+        tmpstr = afile.readLine();
+    afile.close();
+    QStringList slist = tmpstr.split(",");
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << slist.at(0); // name
+    nodedata << slist.at(3); // path
+    nodedata << slist.at(8); // size
+    nodedata << slist.at(6); // crtime
+    nodedata << slist.at(4); // atime
+    nodedata << slist.at(7); // mtime
+    nodedata << slist.at(5); // ctime
+    nodedata << slist.at(13); // hash
+    nodedata << QString(slist.at(10)).split("/").first(); // category
+    nodedata << QString(slist.at(10)).split("/").last(); // signature
+    nodedata << slist.at(15); // tag
+    nodedata << slist.at(12); // id
+    QString parentstr = afilestr.split("/").last().split("-fz").first() + "-f" + afilestr.split("/").last().split("-a").last().split(".stat").first();
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, parentstr, 1, 0);
+    mutex.unlock();
 }
 
 void PopulateCarvedFiles(QString cfilestr)
@@ -5090,10 +5251,10 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                     treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-fd" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // Deleted Recovered ID - 11
                 else
                     treeout << "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->meta_addr) + "-a" + QString::number(fsfile->name->par_addr); // ID - 11
-                if(fsfile->meta != NULL)
-                    treeout << QString::number(fsfile->meta->type); // file type - 12
-                else
-                    treeout << QString::number(fsfile->name->type); // file type - 12
+                //if(fsfile->meta != NULL)
+                //    treeout << QString::number(fsfile->meta->type); // file type - 12
+                //else
+                treeout << QString::number(fsfile->name->type); // file type - 12
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
                 {
                     treeout << "1"; // orphan - 13

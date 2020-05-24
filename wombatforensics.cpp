@@ -996,6 +996,15 @@ void WombatForensics::OpenUpdate()
         QtConcurrent::map(cfiles, PopulateCarvedFiles);
         carvedcount = cfiles.count() + 1;
     }
+    QDir adir = QDir(wombatvariable.tmpmntpath + "archives/");
+    QStringList afiles = adir.entryList(QStringList("*fz*.stat"), QDir::NoSymLinks | QDir::Files);
+    if(!afiles.isEmpty())
+    {
+        QtConcurrent::map(afiles, PopulateArchiveFiles);
+        filesfound = filesfound + afiles.count();
+        isignals->ProgUpd();
+        // should update file count to include the archive files....filesfound = filesfound + afiles.count();
+    }
     PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
@@ -1286,8 +1295,14 @@ void WombatForensics::UpdateProperties()
     }
     if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 5) // file
     {
+        QString itemid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
+        if(itemid.contains("fz")) // archive, change default directory
+            propfile.setFileName(wombatvariable.tmpmntpath + "archives/" + itemid + ".prop");
+        else
+            propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + itemid.split("-").at(0) + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2) + "/" + itemid.split("-").at(3) + "." + itemid.split("-").at(4) + ".prop");
+        /*
         QString tmpfvalue = "";
-        QString parentstr = "5"; // NTFS ROOT INUM
+        //QString parentstr = "5"; // NTFS ROOT INUM
         if(selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-").count() == 3) // root inum
         {
             QFile fsstatfile(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(2) + "/stat");
@@ -1301,11 +1316,12 @@ void WombatForensics::UpdateProperties()
         }
         else
             parentstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-").at(3).mid(1);
-        if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).contains(":"))
-            tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).split(":").at(1);
-        else
+        //if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).contains(":"))
+        //    tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).split(":").at(0) + QString("-") + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3).split(":").at(1);
+        //else
             tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3);
         propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
+        */
     }
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream in(&propfile);
