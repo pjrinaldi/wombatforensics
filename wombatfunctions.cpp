@@ -218,8 +218,8 @@ QString ParseI30Artifact(QString i30name, QString i30id)
             QString fstring = i30id.split("-", QString::SkipEmptyParts).at(3);
             QString astring = i30id.split("-", QString::SkipEmptyParts).at(4);
             qint64 curaddr = 0;
-            if(fstring.contains("a"))
-                curaddr = astring.mid(1).toLongLong();
+            if(fstring.contains("a") || fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
+                curaddr = astring.mid(2).toLongLong();
             else
                 curaddr = fstring.mid(1).toLongLong();
             QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
@@ -1508,10 +1508,8 @@ void ProcessExport(QString objectid)
     TSK_FS_INFO* fsinfo = NULL;
     fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     qint64 curaddr = 0;
-    if(fstring.contains("a"))
-        curaddr = astring.mid(1).toLongLong();
-    else if(fstring.contains("d"))
-        curaddr = fstring.mid(2).toLongLong();
+    if(fstring.contains("a") || fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
+        curaddr = astring.mid(2).toLongLong();
     else
         curaddr = fstring.mid(1).toLongLong();
     char* filebuffer = new char[0];
@@ -1626,24 +1624,6 @@ void GenerateArchiveExpansion(QString objectid)
 {
     if(!isclosing)
     {
-        int err = 0;
-        QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
-        zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
-        qint64 zipentrycount = zip_get_num_entries(curzip, 0);
-        for(int i=0; i < zipentrycount; i++)
-        {
-            //QString zipfname = QString::fromStdString(std::string(zip_get_name(curzip, i, ZIP_FL_ENC_GUESS)));
-            //qDebug() << "zipfname" << i << ":" << zipfname;
-            struct zip_stat zipstat;
-            zip_stat_init(&zipstat);
-            zip_stat_index(curzip, i, 0, &zipstat);
-            qDebug() << QString::fromStdString(std::string(zipstat.name));
-            // HERE IS WHERE I CAN BUILD THE STAT FILE, TREENODE AND ADD THEM TO THE TREE...
-            // I DON'T THINK THERE WILL BE ANY PROPERTIES FILE
-        }
-        //qDebug() << "zip entry count:" << zipentrycount;
-        //qDebug() << "objectid:" << objectid;
-        // FSTRING VALUE WILL BE F#, WHERE NUMBER STARTS AT 1 AND INCREMEMNTS PER ZIP ARCHIVE FOR THE NUMBER OF FILES IN IT...
         QString estring = objectid.split("-").first();
         QString vstring = objectid.split("-").at(1);
         QString pstring = objectid.split("-").at(2);
@@ -1651,7 +1631,76 @@ void GenerateArchiveExpansion(QString objectid)
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         //TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
-        //qDebug() << "filename:" << filename;
+        QString filepath = indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+        int err = 0;
+        QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
+        zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+        qint64 zipentrycount = zip_get_num_entries(curzip, 0);
+        for(int i=0; i < zipentrycount; i++)
+        {
+            // CURRENT METHOD DOESN'T ACCOUNT FOR DIRECTORIES IN ARCHIVES, JUST LEAVES THEM AS THE PATH...
+            // ALSO DOESN"T ACCOUNT FOR ENCRYPTED ZIP..
+            QString statstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-f" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
+            struct zip_stat zipstat;
+            zip_stat_init(&zipstat);
+            zip_stat_index(curzip, i, 0, &zipstat);
+            char* magicbuffer = new char[0];
+            qint64 sigsize = 1024;
+            if(zipstat.size < 1024)
+                sigsize = zipstat.size;
+            magicbuffer = new char[sigsize];
+            QByteArray tmparray("intro");
+            tmparray.clear();
+            mutex.lock();
+            zip_file_t* curfile = NULL;
+            if(zipstat.encryption_method == ZIP_EM_NONE)
+                curfile = zip_fopen_index(curzip, i, 0); // IF NOT ENCRYPTED
+            else
+            {
+                // PROMPT USER FOR PASSWORD HERE....
+                curfile = zip_fopen_index_encrypted(curzip, i, 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
+            }
+            if(curfile != NULL)
+            {
+                zip_fread(curfile, magicbuffer, sigsize);
+                zip_fclose(curfile);
+            }
+            mutex.unlock();
+            tmparray = QByteArray::fromRawData(magicbuffer, sigsize);
+            QMimeDatabase mimedb;
+            const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+            QString mimestr = GenerateCategorySignature(mimetype);
+            if(mimestr.contains("Unknown")) // generate further analysis
+            {
+                if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
+                    mimestr = "Windows System/Shortcut";
+                else if(strcmp(filename.toStdString().c_str(), "INFO2") == 0 && (tmparray.at(0) == 0x04 || tmparray.at(0) == 0x05))
+                    mimestr = "Windows System/Recycler";
+                else if(filename.startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02))
+                    mimestr = "Windows System/Recycle.Bin";
+                else if(filename.endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
+                    mimestr = "Windows System/Prefetch";
+            }
+            qDebug() << "mimestr:" << mimestr;
+            delete[] magicbuffer;
+            QString outstr = QString::fromStdString(std::string(zipstat.name)) + ",5," + astring.mid(1) + "," + filepath + filename + "/" + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(estring + "-" + vstring + "-" + pstring + "-f" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
+            qDebug() << outstr;
+            /*
+            QFile statfile(statstr);
+            if(!statfile.isOpen())
+                statfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            if(statfile.isOpen())
+            {
+                statfile.write(outstr.toStdString().c_str());
+                statfile.close();
+            }
+            */
+            //qDebug() << QString::fromStdString(std::string(zipstat.name));
+            // HERE IS WHERE I CAN BUILD THE STAT FILE, TREENODE AND ADD THEM TO THE TREE...
+            // FILE STAT CONTENTS - filename, filetype, par addr, dir path, atime, ctime, crtime, mtime, size, addr, mime cat/sig, 0, ID, hash, deleted, bookmark
+            // FILE PROP CONTENTS - block address of parent, maybe zip properties i display in html double click for zip parent...
+            // TREENODE CONTENTS - name, path, size, crtime, atime, mtime, ctime, md5, category, signature, tag, id
+        }
         zip_close(curzip);
         digarchivecount++;
         isignals->DigUpd(5, digarchivecount);
@@ -4595,15 +4644,17 @@ void TransferFiles(QString thumbid, QString reppath)
     QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
     QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
+    /*
     if(fstring.contains(":") == true)
         fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    */
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     TSK_IMG_INFO* imginfo = NULL;
     std::vector<std::string> pathvector;
     pathvector.clear();
-    if(fstring.contains(":"))
-        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
+    //if(fstring.contains(":"))
+    //    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     if(!evidfile.isOpen())
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -4633,16 +4684,23 @@ void TransferFiles(QString thumbid, QString reppath)
     tmpstr = "";
     TSK_FS_INFO* fsinfo = NULL;
     fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
-    qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
+    qint64 curaddr = 0;
+    if(fstring.contains("a") || fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
+        curaddr = fstring.mid(2).toLongLong();
+    else
+        curaddr = fstring.mid(1).toLongLong();
+    //qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
     char* filebuffer = new char[0];
     ssize_t bufferlength = 0;
     TSK_FS_FILE* fsfile = NULL;
     fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
     if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
     {
-        if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
+        //if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
+        if(fstring.contains("a")) // IF ADS
         {
-            int attrid = objectid.split("-").at(3).split(":").last().toInt();
+            int attrid = fstring.mid(2).toInt();
+            //int attrid = objectid.split("-").at(3).split(":").last().toInt();
 	    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_id(fsfile, attrid);
 	    filebuffer = new char[fsattr->size];
 	    bufferlength = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, 0, filebuffer, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
@@ -4763,8 +4821,8 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     QString fstring = selectedid.split("-", QString::SkipEmptyParts).at(3);
     QString astring = selectedid.split("-", QString::SkipEmptyParts).at(4);
     qint64 curaddr = 0;
-    if(fstring.contains("a"))
-        curaddr = astring.mid(1).toLongLong();
+    if(fstring.contains("a") || fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
+        curaddr = astring.mid(2).toLongLong();
     else
         curaddr = fstring.mid(1).toLongLong();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
@@ -5498,7 +5556,7 @@ QByteArray ReturnFileContent(QString objectid)
     QString residentstring = "";
     QString bytestring = "";
     if(fstring.contains("a")) // ADS ATTRIBUTE
-        mftaddress = astring.mid(1).toInt();
+        mftaddress = astring.mid(2).toInt();
     else if(fstring.contains("o")) // ORPHAN
         mftaddress = fstring.mid(2).toInt();
     else if(fstring.contains("d")) // DELETED RECOVERED
