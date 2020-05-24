@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "tskcpp.h"
 #include <liblnk.h>
+#include <zip.h>
 
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
@@ -17,6 +18,7 @@ QString ParseI30Artifact(QString i30name, QString i30id);
 QString ParseInfo2Artifact(QString info2name, QString info2id);
 QString ParseIDollarArtifact(QString idollarname, QString idollarid);
 QString ParsePrefetchArtifact(QString pfname, QString pfid);
+QString ParseArchiveArtifact(QString archivename, QString archiveid);
 
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
@@ -42,6 +44,7 @@ bool FileExists(const std::string& filename);
 void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void GenerateVidThumbnails(QString thumbid);
+void GenerateArchiveExpansion(QString thumbid);
 void GenerateDigging(QString thumbid);
 void TestCarving(QStringList plist, QStringList flist);
 //void GenerateCarving(QString partid);

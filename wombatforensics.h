@@ -281,10 +281,12 @@ private:
     qint64 digimgthumbtotal = 0;
     qint64 digvidthumbtotal = 0;
     qint64 dighashtotal = 0;
+    qint64 digarchivetotal = 0;
     qint64 digtotalcount = 0;
     QString digimgcountstring = "";
     QString digvidcountstring = "";
     QString dighashcountstring = "";
+    QString digarchivecountstring = "";
     QString digtotalcountstring = "";
     QString currentreportpath = "";
 };

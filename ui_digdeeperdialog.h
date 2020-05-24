@@ -43,6 +43,8 @@ public:
     QRadioButton *md5radiobutton;
     QRadioButton *sha1radiobutton;
     QRadioButton *sha256radiobutton;
+    QHBoxLayout *horizontalLayout_4;
+    QCheckBox *expandarchivescheckbox;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer;
@@ -135,6 +137,16 @@ public:
 
         verticalLayout_4->addLayout(horizontalLayout_3);
 
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        expandarchivescheckbox = new QCheckBox(groupBox);
+        expandarchivescheckbox->setObjectName(QString::fromUtf8("expandarchivescheckbox"));
+
+        horizontalLayout_4->addWidget(expandarchivescheckbox);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_4);
+
 
         verticalLayout->addWidget(groupBox);
 
@@ -186,6 +198,7 @@ public:
         md5radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "MD5", nullptr));
         sha1radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA1", nullptr));
         sha256radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA256", nullptr));
+        expandarchivescheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Expand Archives (zip)", nullptr));
         cancelButton->setText(QCoreApplication::translate("DigDeeperDialog", "Cancel", nullptr));
         processButton->setText(QCoreApplication::translate("DigDeeperDialog", "Process", nullptr));
     } // retranslateUi

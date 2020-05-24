@@ -701,6 +701,192 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     return htmlstr;
 }
 
+QString ParseArchiveArtifact(QString archivename, QString archiveid)
+{
+    QString htmlstr = "";
+    QFile initfile(":/html/artifactprephtml");
+    initfile.open(QIODevice::ReadOnly);
+    if(initfile.isOpen())
+        htmlstr = initfile.readAll();
+    initfile.close();
+    htmlstr += "<div id='infotitle'>Archive File Analysis for " + archivename + " (" + archiveid + ")</div><br/>";
+    //htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
+    htmlstr += "<table width='100%'><tr><th>File Name</th><th>Uncompressed Size</th><th>Compressed Size</th><th>Modified Time</th><th>Compression Method</th><th>Encryption Method</th></tr>";
+    QString archivefilestr = wombatvariable.tmpfilepath + archiveid + "-fhex";
+    int err = 0;
+    zip* curzip = zip_open(archivefilestr.toStdString().c_str(), ZIP_RDONLY, &err);
+    qint64 zipentrycount = zip_get_num_entries(curzip, 0);
+    for(int i=0; i < zipentrycount; i++)
+    {
+        struct zip_stat zipstat;
+        zip_stat_init(&zipstat);
+        zip_stat_index(curzip, i, 0, &zipstat);
+        htmlstr += "<tr class=";
+        if(i % 2 == 0)
+            htmlstr += "odd";
+        else
+            htmlstr += "even";
+        time_t modtime = zipstat.mtime;
+        uint64_t temp = (uint64_t)modtime;
+        temp = temp + EPOCH_DIFFERENCE;
+        temp = temp * TICKS_PER_SECOND;
+        htmlstr += "><td>" + QString::fromStdString(std::string(zipstat.name)) + "</td><td>" + QString::number(zipstat.size) + "</td><td>" + QString::number(zipstat.comp_size) + "</td><td>" + ConvertWindowsTimeToUnixTime(temp) + "</td><td>";
+        //if(zipstat.comp_method == )
+        switch(zipstat.comp_method)
+        {
+            case ZIP_CM_STORE:
+                htmlstr += "UNCOMPRESSED";
+                break;
+            case ZIP_CM_SHRINK:
+                htmlstr += "SHRUNK";
+                break;
+            case ZIP_CM_REDUCE_1:
+                htmlstr += "FACTOR 1 REDUCED";
+                break;
+            case ZIP_CM_REDUCE_2:
+                htmlstr += "FACTOR 2 REDUCED";
+                break;
+            case ZIP_CM_REDUCE_3:
+                htmlstr += "FACTOR 3 REDUCED";
+                break;
+            case ZIP_CM_REDUCE_4:
+                htmlstr += "FACTOR 4 REDUCED";
+                break;
+            case ZIP_CM_IMPLODE:
+                htmlstr += "IMPLODED";
+                break;
+            case ZIP_CM_DEFLATE:
+                htmlstr += "DEFLATE";
+                break;
+            case ZIP_CM_DEFLATE64:
+                htmlstr += "DEFLATE64";
+                break;
+            case ZIP_CM_PKWARE_IMPLODE:
+                htmlstr += "PKWARE IMPLODE";
+                break;
+            case ZIP_CM_BZIP2:
+                htmlstr += "BZIP2";
+                break;
+            case ZIP_CM_LZMA:
+                htmlstr += "LZMA";
+                break;
+            case ZIP_CM_TERSE:
+                htmlstr += "IBM TERSE";
+                break;
+            case ZIP_CM_LZ77:
+                htmlstr += "IBM LZ77";
+                break;
+            case ZIP_CM_LZMA2:
+                htmlstr += "LZMA2";
+                break;
+            case ZIP_CM_XZ:
+                htmlstr += "XZ";
+                break;
+            case ZIP_CM_JPEG:
+                htmlstr += "COMPRESSED JPEG";
+                break;
+            case ZIP_CM_WAVPACK:
+                htmlstr += "COMPRESSED WAVPACK";
+                break;
+            case ZIP_CM_PPMD:
+                htmlstr += "PPMD I";
+                break;
+            default:
+                htmlstr += "DEFLATE";
+                break;
+        }
+        htmlstr += "</td><td>";
+        //if(zipstat.encryption_method == )
+        switch(zipstat.encryption_method)
+        {
+            case ZIP_EM_NONE:
+                htmlstr += "NOT ENCRYPTED";
+                break;
+            case ZIP_EM_TRAD_PKWARE:
+                htmlstr += "PKWARE ENCRYPTED";
+                break;
+            /*
+            case ZIP_EM_DES:
+                htmlstr += "DES ENCRYPTED";
+                break;
+            case ZIP_EM_RC2_OLD:
+                htmlstr += "RC2 < v5.2 ENCRYPTED";
+                break;
+            case ZIP_EM_3DES_168:
+                htmlstr += "3DES 168 ENCRYPTED";
+                break;
+            case ZIP_EM_3DES_112:
+                htmlstr += "3DES 112 ENCRYPTED";
+                break;
+            case ZIP_EM_PKZIP_AES_128:
+                htmlstr += "PKZIP AES 128 ENCRYPTED";
+                break;
+            case ZIP_EM_PKZIP_AES_192:
+                htmlstr += "PKZIP AES 192 ENCRYPTED";
+                break;
+            case ZIP_EM_PKZIP_AES_256:
+                htmlstr += "PKZIP AES 256 ENCRYPTED";
+                break;
+            case ZIP_EM_RC2:
+                htmlstr += "RC2 > V5.2 ENCRYPTED";
+                break;
+            case ZIP_EM_RC4:
+                htmlstr += "RC4 ENCRYPTED";
+                break;
+            */
+            case ZIP_EM_AES_128:
+                htmlstr += "AES 128 ENCRYPTED";
+                break;
+            case ZIP_EM_AES_192:
+                htmlstr += "AES 192 ENCRYPTED";
+                break;
+            case ZIP_EM_AES_256:
+                htmlstr += "AES 256 ENCRYPTED";
+                break;
+            case ZIP_EM_UNKNOWN:
+                htmlstr += "UNKNOWN ALGORITHM";
+                break;
+            default:
+                htmlstr += "NOT ENCRYPTED";
+                break;
+        }
+        htmlstr += "</td></tr>";
+    }
+    /*
+     *
+     * int err = 0;
+        QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
+        zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+        qint64 zipentrycount = zip_get_num_entries(curzip, 0);
+        for(int i=0; i < zipentrycount; i++)
+        {
+            //QString zipfname = QString::fromStdString(std::string(zip_get_name(curzip, i, ZIP_FL_ENC_GUESS)));
+            //qDebug() << "zipfname" << i << ":" << zipfname;
+            struct zip_stat zipstat;
+            zip_stat_init(&zipstat);
+            zip_stat_index(curzip, i, 0, &zipstat);
+            qDebug() << QString::fromStdString(std::string(zipstat.name));
+            // HERE IS WHERE I CAN BUILD THE STAT FILE, TREENODE AND ADD THEM TO THE TREE...
+            // I DON'T THINK THERE WILL BE ANY PROPERTIES FILE
+        }
+        //qDebug() << "zip entry count:" << zipentrycount;
+        //qDebug() << "objectid:" << objectid;
+        // FSTRING VALUE WILL BE F#, WHERE NUMBER STARTS AT 1 AND INCREMEMNTS PER ZIP ARCHIVE FOR THE NUMBER OF FILES IN IT...
+        QString estring = objectid.split("-").first();
+        QString vstring = objectid.split("-").at(1);
+        QString pstring = objectid.split("-").at(2);
+        QString astring = objectid.split("-").at(3);
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        //TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
+        //qDebug() << "filename:" << filename;
+        zip_close(curzip);
+     */ 
+    htmlstr += "</table></body></html>";
+
+    return htmlstr;
+}
+
 QString ConvertWindowsTimeToUnixTime(uint64_t input)
 {
     QTimeZone tmpzone = QTimeZone(reporttimezone);
@@ -1466,6 +1652,42 @@ void LoadImagesHash()
         imageshash.insert(tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", QString::SkipEmptyParts).at(i).split("|").at(1));
 }
 
+void GenerateArchiveExpansion(QString objectid)
+{
+    if(!isclosing)
+    {
+        int err = 0;
+        QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
+        zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+        qint64 zipentrycount = zip_get_num_entries(curzip, 0);
+        for(int i=0; i < zipentrycount; i++)
+        {
+            //QString zipfname = QString::fromStdString(std::string(zip_get_name(curzip, i, ZIP_FL_ENC_GUESS)));
+            //qDebug() << "zipfname" << i << ":" << zipfname;
+            struct zip_stat zipstat;
+            zip_stat_init(&zipstat);
+            zip_stat_index(curzip, i, 0, &zipstat);
+            qDebug() << QString::fromStdString(std::string(zipstat.name));
+            // HERE IS WHERE I CAN BUILD THE STAT FILE, TREENODE AND ADD THEM TO THE TREE...
+            // I DON'T THINK THERE WILL BE ANY PROPERTIES FILE
+        }
+        //qDebug() << "zip entry count:" << zipentrycount;
+        //qDebug() << "objectid:" << objectid;
+        // FSTRING VALUE WILL BE F#, WHERE NUMBER STARTS AT 1 AND INCREMEMNTS PER ZIP ARCHIVE FOR THE NUMBER OF FILES IN IT...
+        QString estring = objectid.split("-").first();
+        QString vstring = objectid.split("-").at(1);
+        QString pstring = objectid.split("-").at(2);
+        QString astring = objectid.split("-").at(3);
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        //TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
+        //qDebug() << "filename:" << filename;
+        zip_close(curzip);
+        digarchivecount++;
+        isignals->DigUpd(5, digarchivecount);
+    }
+}
+
 void GenerateHash(QString objectid)
 {
     if(objectid.split("-").count() == 5 && !isclosing)
@@ -1721,6 +1943,8 @@ void GenerateDigging(QString thumbid)
         GenerateVidThumbnails(thumbid);
     if(hasimg && isimg && !isclosing)
         GenerateThumbnails(thumbid);
+    if(hasarchive && !isclosing)
+        GenerateArchiveExpansion(thumbid);
 }
 
 void TestCarving(QStringList plist, QStringList flist)

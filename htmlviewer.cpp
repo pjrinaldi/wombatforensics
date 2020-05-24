@@ -41,6 +41,8 @@ void HtmlViewer::ShowArtifact(int artifactid, const QModelIndex &index)
 	htmlstring = ParseIDollarArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
     else if(artifactid == 4) // Prefetch
 	htmlstring = ParsePrefetchArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+    else if(artifactid == 5) // Archive
+        htmlstring = ParseArchiveArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
     ui->webView->setHtml(htmlstring);
     this->show();
 }

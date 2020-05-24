@@ -595,6 +595,13 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setWindowTitle("Prefetch Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
 	htmlviewer->ShowArtifact(4, index); // Prefetch
     }
+    else if(index.sibling(index.row(), 9).data().toString().startsWith("Zip"))
+    {
+        htmlviewer = new HtmlViewer();
+        htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
+        htmlviewer->setWindowTitle("Archive Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->ShowArtifact(5, index); // Archive
+    }
     else
     {
         QApplication::restoreOverrideCursor();
@@ -1802,6 +1809,13 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
 	    tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
 	return tmplist;
     }
+    else if(filelisttype == 6) // Generate list for Archive category
+    {
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant(("Archive")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
+        foreach(QModelIndex index, indexlist)
+            tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
+        return tmplist;
+    }
     return tmplist;
 }
 
@@ -1870,6 +1884,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digtotalcount = 0;
     digimgthumbcount = 0;
     digvidthumbcount = 0;
+    digarchivecount = 0;
     dighashcount = 0;
     digimgcountstring = "";
     digvidcountstring = "";
@@ -1965,8 +1980,33 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 hashash = true;
             }
         }
+        else if(digoptions.at(i) == 6) // 6- EXPAND ARCHIVES
+        {
+            if(dtype == 2) // all files, only get images...
+            {
+                digarchivetotal = GetFileLists(6).count(); // archives only
+            }
+            else if(dtype == 1 || dtype == 3) // checked files, only get images...
+            {
+                QStringList archiveslist = GetFileLists(6); // all archives
+                for(int i=0; i < digfilelist.count(); i++)
+                {
+                    if(archiveslist.contains(digfilelist.at(i)))
+                        digarchivetotal++;
+                }
+            }
+            else if(dtype == 0) // selected file, only get image
+            {
+                QStringList archiveslist = GetFileLists(6); // all archives
+                if(archiveslist.contains(digfilelist.first()))
+                    digarchivetotal = 1;
+            }
+            digarchivecountstring = "Expanded: 0 of " + QString::number(digarchivetotal) + " Archives";
+            if(digarchivetotal > 0)
+                hasarchive = true;
+        }
     }
-    digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal;
+    digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
     digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
     digwatcher.setFuture(digfuture);
@@ -1987,7 +2027,11 @@ void WombatForensics::UpdateDig(int digid, int digcnt)
     {
 	digvidcountstring = "Thumbnailed: " + QString::number(digcnt) + " of " + QString::number(digvidthumbtotal) + " Videos";
     }
-    digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount) + " of " + QString::number(digtotalcount);
+    else if(digid == 5)
+    {
+        digarchivecountstring = "Expanded: " + QString::number(digcnt) + " of " + QString::number(digarchivetotal) + " Archives";
+    }
+    digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount + digarchivecount) + " of " + QString::number(digtotalcount);
 }
 void WombatForensics::UpdateExport()
 {
@@ -2796,6 +2840,11 @@ void WombatForensics::RotateDig()
     {
 	digcountlabel->setText(digvidcountstring);
 	digtimercounter = 50;
+    }
+    else if(digtimercounter == 3 && digarchivetotal > 0)
+    {
+        digcountlabel->setText(digarchivecountstring);
+        digtimercounter = 50;
     }
     else
     {
