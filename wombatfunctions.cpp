@@ -4817,6 +4817,7 @@ void TransferThumbnails(QString thumbid, QString reppath)
 
 void TransferFiles(QString thumbid, QString reppath)
 {
+    // IMPLEMENT SIMILAR FUNCTIONALITY AS EXPORTFILES FOR ZIP ARCHIVE CHILD FILES.
     QString objectid = thumbid;
     QString tmpstr = "";
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
