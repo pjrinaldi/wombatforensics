@@ -1510,8 +1510,10 @@ void ProcessExport(QString objectid)
     TSK_FS_INFO* fsinfo = NULL;
     fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     qint64 curaddr = 0;
-    if(fstring.contains("a") || fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
-        curaddr = astring.mid(2).toLongLong();
+    if(fstring.contains("a"))
+        curaddr = astring.mid(1).toLongLong();
+    else if(fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
+        curaddr = fstring.mid(2).toLongLong();
     else
         curaddr = fstring.mid(1).toLongLong();
     char* filebuffer = new char[0];
@@ -5006,7 +5008,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     qint64 curaddr = 0;
     QString zipid = "";
     if(fstring.contains("a"))
-        curaddr = astring.mid(2).toLongLong();
+        curaddr = astring.mid(1).toLongLong();
     else if(fstring.contains("z"))
     {
         zipid = selectedid;
