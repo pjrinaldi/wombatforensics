@@ -103,6 +103,7 @@ public:
 
 signals:
     void CancelCurrentThread();
+    //void DigType(int dtype);
 
 private slots:
     void AddEvidence();
@@ -161,6 +162,7 @@ private slots:
     void UpdateStatus(void);
     void FinishExport(void);
     void FinishDigging(void);
+    void FinishPreDigging(void);
     void ThashFinish(void);
     void ThashSaveFinish(void);
     void ThreadCancelled(void);
@@ -238,6 +240,8 @@ private:
     QFutureWatcher<void> sqlwatcher;
     QFuture<void> digfuture;
     QFutureWatcher<void> digwatcher;
+    QFuture<void> predigfuture;
+    QFutureWatcher<void> predigwatcher;
     QFutureWatcher<void> thashwatcher;
     QFutureWatcher<void> thashsavewatcher;
     QFutureWatcher<void> exportwatcher;

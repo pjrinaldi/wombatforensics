@@ -1759,6 +1759,7 @@ void GenerateArchiveExpansion(QString objectid)
             mutex.lock();
             treenodemodel->AddNode(nodedata, objectid.split("-a").first(), 1, 0); 
             mutex.unlock();
+            filesfound++;
             listeditems.append(treeout.at(11));
             QFile statfile(statstr);
             if(!statfile.isOpen())
@@ -2158,6 +2159,12 @@ void GenerateVidThumbnails(QString thumbid)
     }
 }
 
+void GeneratePreDigging(QString thumbid)
+{
+    if(hasarchive && !isclosing)
+        GenerateArchiveExpansion(thumbid);
+}
+
 void GenerateDigging(QString thumbid)
 {
     TreeNode* curitem = NULL;
@@ -2179,8 +2186,8 @@ void GenerateDigging(QString thumbid)
         GenerateVidThumbnails(thumbid);
     if(hasimg && isimg && !isclosing)
         GenerateThumbnails(thumbid);
-    if(hasarchive && !isclosing)
-        GenerateArchiveExpansion(thumbid);
+    //if(hasarchive && !isclosing)
+    //    GenerateArchiveExpansion(thumbid);
 }
 
 void TestCarving(QStringList plist, QStringList flist)

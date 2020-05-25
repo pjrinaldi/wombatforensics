@@ -46,6 +46,7 @@ void GenerateHash(QString itemid);
 void GenerateVidThumbnails(QString thumbid);
 void GenerateArchiveExpansion(QString thumbid);
 void GenerateDigging(QString thumbid);
+void GeneratePreDigging(QString thumbid);
 void TestCarving(QStringList plist, QStringList flist);
 //void GenerateCarving(QString partid);
 void LoadImagesHash(void);

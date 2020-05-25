@@ -104,6 +104,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(FinishDigging()), Qt::QueuedConnection);
+    connect(&predigwatcher, SIGNAL(finished()), this, SLOT(FinishPreDigging()), Qt::QueuedConnection);
     connect(&thashwatcher, SIGNAL(finished()), this, SLOT(ThashFinish()), Qt::QueuedConnection);
     connect(&thashsavewatcher, SIGNAL(finished()), this, SLOT(ThashSaveFinish()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
@@ -1611,6 +1612,13 @@ void WombatForensics::LoadHexContents()
 
 void WombatForensics::CloseCurrentCase()
 {
+    if(predigwatcher.isRunning())
+    {
+        predigwatcher.cancel();
+        predigfuture.cancel();
+        QThreadPool::globalInstance()->clear();
+        isclosing = true;
+    }
     if(digwatcher.isRunning())
     {
         //qDebug() << "digwatcher is running....";
@@ -2038,8 +2046,15 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     }
     digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
-    digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
-    digwatcher.setFuture(digfuture);
+    // LAUNCH GENERATEPREDIGGING() MAP HERE...
+    // IMPLEMENT PREDIGWATCHER
+    // ON PREDIGWATCHER RETURN, THEN CALL THE BELOW CODE...
+    // THE TIMER CAN START WITH PREDIG AND CONTINUE UNTIL DIGGING ENDS...
+    // ENSURE ALL COUNTERS WHICH NEED TO GET UPDATED FOR EXPANDED FILES GET UPDATED ACCORDINGLY...
+    predigfuture = QtConcurrent::map(digfilelist, GeneratePreDigging);
+    predigwatcher.setFuture(predigfuture);
+    //digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
+    //digwatcher.setFuture(digfuture);
     digrotatetimer->start(1500);
 }
 
@@ -2318,6 +2333,16 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             imagewindow->show();
         }
     }
+}
+
+void WombatForensics::FinishPreDigging()
+{
+    //if(digtype == 0) // selected
+    //else if(digtype == 1) // checked
+    if(digtype == 2) // all items
+        digfilelist = GetFileLists(2);
+    digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
+    digwatcher.setFuture(digfuture);
 }
 
 void WombatForensics::FinishDigging()
