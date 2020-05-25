@@ -1693,7 +1693,7 @@ void GenerateArchiveExpansion(QString objectid)
         qint64 zipentrycount = zip_get_num_entries(curzip, 0);
         for(int i=0; i < zipentrycount; i++)
         {
-            QString newzipid = estring + "-" + vstring + "-" + pstring + "-" + "-fz" + QString::number(i) + "-a" + astring.mid(1);
+            //QString newzipid = estring + "-" + vstring + "-" + pstring + "-" + "-fz" + QString::number(i) + "-a" + astring.mid(1);
             // CURRENT METHOD DOESN'T ACCOUNT FOR DIRECTORIES IN ARCHIVES, JUST LEAVES THEM AS THE PATH...
             // ALSO DOESN"T ACCOUNT FOR ENCRYPTED ZIP..
             QString statstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
@@ -1906,12 +1906,14 @@ void GenerateArchiveExpansion(QString objectid)
             // TREENODE CONTENTS - name, path, size, crtime, atime, mtime, ctime, md5, category, signature, tag, id
             //isvid = category.contains("Video");
             //isimg = category.contains("Image");
+            /*
             if(hashash && !isclosing)
                 GenerateHash(newzipid);
             if(hasvid && mimestr.contains("Video") && !isclosing)
                 GenerateVidThumbnails(newzipid);
             if(hasimg && mimestr.contains("Image") && !isclosing)
                 GenerateThumbnails(newzipid);
+            */
         }
         zip_close(curzip);
         digarchivecount++;
