@@ -5857,6 +5857,16 @@ QByteArray ReturnFileContent(QString objectid)
 {
     // TSK FREE METHOD IMPLEMENTATION
     // UPDATE FOR ZIP FILES
+    /*
+    QString zipid = "";
+    if(objectid.contains("z")) // exporting a child of a zip file
+    {
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        zipid = objectid;
+        objectid = indxlist.first().parent().sibling(indxlist.first().parent().row(), 11).data().toString();
+    }
+
+     */ 
     if(objectid.contains("z"))
         qDebug() << "zipid:" << objectid;
     QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
@@ -6057,5 +6067,48 @@ QByteArray ReturnFileContent(QString objectid)
         if(imgfile.isOpen())
             imgfile.close();
     }
+    /*
+    if(zipid.contains("z"))
+    {
+        //qDebug() << "zipid addr:" << zipid.split("-").at(3).mid(2).toLongLong();
+        int err = 0;
+        //qDebug() << "zipid:" << zipid << "hexstring:" << hexstring;
+        zip* zfile = zip_open(hexstring.toStdString().c_str(), ZIP_RDONLY, &err);
+        struct zip_stat zstat;
+        zip_stat_init(&zstat);
+        zip_stat_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, &zstat);
+        zip_file_t* curfile = NULL;
+        if(zstat.encryption_method == ZIP_EM_NONE)
+            curfile = zip_fopen_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0); // IF NOT ENCRYPTED
+        else
+        {
+            // PROMPT USER FOR PASSWORD HERE....
+            curfile = zip_fopen_index_encrypted(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
+        }
+        QString zhexstring = wombatvariable.tmpfilepath + zipid + "-fhex";
+        if(curfile != NULL)
+        {
+            char* zfbuf = new char[zstat.size];
+            qint64 zcnt = zip_fread(curfile, zfbuf, zstat.size);
+            zip_fclose(curfile);
+            QDir zdir;
+            zdir.mkpath(wombatvariable.tmpfilepath);
+            QFile ztmp(zhexstring);
+            if(!ztmp.isOpen())
+                ztmp.open(QIODevice::WriteOnly);
+            if(ztmp.isOpen())
+            {
+                QDataStream zbuffer(&ztmp);
+                zbuffer.writeRawData(zfbuf, zcnt);
+                ztmp.close();
+            }
+            delete[] zfbuf;
+        }
+        zip_close(zfile);
+        hexstring = zhexstring;
+        //qDebug() << "extract zip content here...";
+    }
+
+     */ 
     return filebytes;
 }
