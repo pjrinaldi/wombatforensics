@@ -1693,6 +1693,7 @@ void GenerateArchiveExpansion(QString objectid)
         qint64 zipentrycount = zip_get_num_entries(curzip, 0);
         for(int i=0; i < zipentrycount; i++)
         {
+            QString newzipid = estring + "-" + vstring + "-" + pstring + "-" + "-fz" + QString::number(i) + "-a" + astring.mid(1);
             // CURRENT METHOD DOESN'T ACCOUNT FOR DIRECTORIES IN ARCHIVES, JUST LEAVES THEM AS THE PATH...
             // ALSO DOESN"T ACCOUNT FOR ENCRYPTED ZIP..
             QString statstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
@@ -1903,6 +1904,14 @@ void GenerateArchiveExpansion(QString objectid)
             // FILE STAT CONTENTS - filename, filetype, par addr, dir path, atime, ctime, crtime, mtime, size, addr, mime cat/sig, 0, ID, hash, deleted, bookmark
             // FILE PROP CONTENTS - block address of parent, maybe zip properties i display in html double click for zip parent...
             // TREENODE CONTENTS - name, path, size, crtime, atime, mtime, ctime, md5, category, signature, tag, id
+            //isvid = category.contains("Video");
+            //isimg = category.contains("Image");
+            if(hashash && !isclosing)
+                GenerateHash(newzipid);
+            if(hasvid && mimestr.contains("Video") && !isclosing)
+                GenerateVidThumbnails(newzipid);
+            if(hasimg && mimestr.contains("Image") && !isclosing)
+                GenerateThumbnails(newzipid);
         }
         zip_close(curzip);
         digarchivecount++;
@@ -1915,10 +1924,13 @@ void GenerateHash(QString objectid)
     if(objectid.split("-").count() == 5 && !isclosing)
     {
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        QString objectname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
         TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         qint64 filesize = curitem->Data(2).toLongLong();
+        if(objectid.contains("z"))
+            qDebug() << objectid << filesize;
         QString hashstr = "";
-        if(filesize > 0 && !objectid.endsWith("-a8") && !isclosing) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
+        if(filesize > 0 && !objectname.endsWith("$Bad") && !isclosing) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
         {
             QByteArray filebytes;
 	    filebytes.clear();
@@ -5835,6 +5847,9 @@ void SaveTaggedList(void)
 QByteArray ReturnFileContent(QString objectid)
 {
     // TSK FREE METHOD IMPLEMENTATION
+    // UPDATE FOR ZIP FILES
+    if(objectid.contains("z"))
+        qDebug() << "zipid:" << objectid;
     QString estring = objectid.split("-", QString::SkipEmptyParts).at(0);
     QString vstring = objectid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = objectid.split("-", QString::SkipEmptyParts).at(2);
