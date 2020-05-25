@@ -1466,16 +1466,12 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
 
 void ProcessExport(QString objectid)
 {
-    // IF ZIP, I.E. FZ#, NEED TO GET THE PARENT FROM TSK METHODS, THEN SAVE OUT TO TMPFILE
-    // USE ZIP METHODS TO OPEN ZIP, FIND SUB FILE BY INDEX, SAVE TO EXPORT PATH...
     QString zipid = "";
     if(objectid.contains("z")) // exporting a child of a zip file
     {
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         zipid = objectid;
         objectid = indxlist.first().parent().sibling(indxlist.first().parent().row(), 11).data().toString();
-        qDebug() << "parent objectid:" << objectid;
-        //TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     }
     TSK_IMG_INFO* imginfo = NULL;
     std::vector<std::string> pathvector;
@@ -1585,28 +1581,11 @@ void ProcessExport(QString objectid)
             // PROMPT USER FOR PASSWORD HERE....
             curfile = zip_fopen_index_encrypted(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
         }
-        //QString zhexstring = wombatvariable.tmpfilepath + zipid + "-fhex";
         if(curfile != NULL)
         {
             filebuffer = new char[zstat.size];
             bufferlength = zip_fread(curfile, filebuffer, zstat.size);
-            //char* zfbuf = new char[zstat.size];
-            //qint64 zcnt = zip_fread(curfile, zfbuf, zstat.size);
             zip_fclose(curfile);
-            /*
-            QDir zdir;
-            zdir.mkpath(wombatvariable.tmpfilepath);
-            QFile ztmp(zhexstring);
-            if(!ztmp.isOpen())
-                ztmp.open(QIODevice::WriteOnly);
-            if(ztmp.isOpen())
-            {
-                QDataStream zbuffer(&ztmp);
-                zbuffer.writeRawData(zfbuf, zcnt);
-                ztmp.close();
-            }
-            delete[] zfbuf;
-            */
         }
         zip_close(zfile);
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(zipid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -1617,8 +1596,6 @@ void ProcessExport(QString objectid)
             tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
         else
             tmppath = exportpath + "/";
-        //hexstring = zhexstring;
-        qDebug() << "exportpath:" << exportpath << "tmppath:" << tmppath << "tmpname:" << tmpname;
     }
     else
     {
@@ -2648,8 +2625,8 @@ void PopulateTreeModel(QString evidstring)
     }
     tsk_vs_close(vsinfo);
     tsk_img_close(imginfo);
-    InitializeHashList();
-    InitializeTaggedList();
+    //InitializeHashList();
+    //InitializeTaggedList();
 }
 
 void InitializeEvidenceStructure(QString evidname)
@@ -4895,24 +4872,25 @@ void TransferThumbnails(QString thumbid, QString reppath)
 void TransferFiles(QString thumbid, QString reppath)
 {
     // IMPLEMENT SIMILAR FUNCTIONALITY AS EXPORTFILES FOR ZIP ARCHIVE CHILD FILES.
-    QString objectid = thumbid;
+    QString zipid = "";
+    if(thumbid.contains("z")) // transferring a child of a zip file
+    {
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        zipid = thumbid;
+        thumbid = indxlist.first().parent().sibling(indxlist.first().parent().row(), 11).data().toString();
+    }
     QString tmpstr = "";
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QString estring = thumbid.split("-", QString::SkipEmptyParts).at(0);
     QString vstring = thumbid.split("-", QString::SkipEmptyParts).at(1);
     QString pstring = thumbid.split("-", QString::SkipEmptyParts).at(2);
     QString fstring = thumbid.split("-", QString::SkipEmptyParts).at(3);
-    /*
-    if(fstring.contains(":") == true)
-        fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
-    */
+    QString astring = thumbid.split("-", QString::SkipEmptyParts).at(4);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split(".e").first();
     TSK_IMG_INFO* imginfo = NULL;
     std::vector<std::string> pathvector;
     pathvector.clear();
-    //if(fstring.contains(":"))
-    //    fstring = fstring.split(":").first() + "-" + fstring.split(":").last();
     QFile evidfile(wombatvariable.tmpmntpath + evidencename + "." + estring + "/stat");
     if(!evidfile.isOpen())
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -4943,22 +4921,21 @@ void TransferFiles(QString thumbid, QString reppath)
     TSK_FS_INFO* fsinfo = NULL;
     fsinfo = tsk_fs_open_img(imginfo, partlist.at(4).toULongLong(), TSK_FS_TYPE_DETECT);
     qint64 curaddr = 0;
-    if(fstring.contains("a") || fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
+    if(fstring.contains("a"))
+        curaddr = astring.mid(1).toLongLong();
+    else if(fstring.contains("d") || fstring.contains("o") || fstring.contains("z"))
         curaddr = fstring.mid(2).toLongLong();
     else
         curaddr = fstring.mid(1).toLongLong();
-    //qint64 curaddr = objectid.split("-").at(3).split(":").first().mid(1).toLongLong();
     char* filebuffer = new char[0];
     ssize_t bufferlength = 0;
     TSK_FS_FILE* fsfile = NULL;
     fsfile = tsk_fs_file_open_meta(fsinfo, NULL, curaddr);
     if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
     {
-        //if(objectid.split("-").at(3).split(":").count() > 1) // IF ADS
         if(fstring.contains("a")) // IF ADS
         {
             int attrid = fstring.mid(2).toInt();
-            //int attrid = objectid.split("-").at(3).split(":").last().toInt();
 	    const TSK_FS_ATTR* fsattr = tsk_fs_file_attr_get_id(fsfile, attrid);
 	    filebuffer = new char[fsattr->size];
 	    bufferlength = tsk_fs_file_read_type(fsfile, TSK_FS_ATTR_TYPE_NTFS_DATA, attrid, 0, filebuffer, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
@@ -4981,6 +4958,40 @@ void TransferFiles(QString thumbid, QString reppath)
     fsinfo = NULL;
     tsk_img_close(imginfo);
     imginfo = NULL;
+    if(zipid.contains("z"))
+    {
+        QString parstr = wombatvariable.tmpfilepath + thumbid + "-fhex";
+        QFile parfile(parstr);
+        if(!parfile.isOpen())
+            parfile.open(QIODevice::WriteOnly);
+        if(parfile.isOpen())
+        {
+            QDataStream outbuf(&parfile);
+            outbuf.writeRawData(filebuffer, bufferlength);
+            parfile.close();
+        }
+        int err = 0;
+        zip* zfile = zip_open(parstr.toStdString().c_str(), ZIP_RDONLY, &err);
+        struct zip_stat zstat;
+        zip_stat_init(&zstat);
+        zip_stat_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, &zstat);
+        zip_file_t* curfile = NULL;
+        if(zstat.encryption_method == ZIP_EM_NONE)
+            curfile = zip_fopen_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0); // IF NOT ENCRYPTED
+        else
+        {
+            // PROMPT USER FOR PASSWORD HERE....
+            curfile = zip_fopen_index_encrypted(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
+        }
+        if(curfile != NULL)
+        {
+            filebuffer = new char[zstat.size];
+            bufferlength = zip_fread(curfile, filebuffer, zstat.size);
+            zip_fclose(curfile);
+        }
+        zip_close(zfile);
+        thumbid = zipid;
+    }
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
     QString tmppath = reppath + "files/";

@@ -1000,10 +1000,19 @@ void WombatForensics::OpenUpdate()
     QStringList afiles = adir.entryList(QStringList("*fz*.stat"), QDir::NoSymLinks | QDir::Files);
     if(!afiles.isEmpty())
     {
-        QtConcurrent::map(afiles, PopulateArchiveFiles);
+        QFuture<void> tmpfuture = QtConcurrent::map(afiles, PopulateArchiveFiles);
         filesfound = filesfound + afiles.count();
         isignals->ProgUpd();
+        tmpfuture.waitForFinished();
+        //QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
+        InitializeHashList();
+        InitializeTaggedList();
         // should update file count to include the archive files....filesfound = filesfound + afiles.count();
+    }
+    else
+    {
+        InitializeHashList();
+        InitializeTaggedList();
     }
     PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
@@ -1640,9 +1649,9 @@ void WombatForensics::CloseCurrentCase()
         casedatafile.write("dummy zerofile");
         casedatafile.close();
         ui->hexview->BypassColor(true);
-	qInfo() << "start of error?";
+	//qInfo() << "start of error?";
         ui->hexview->setData(casedatafile);
-	qInfo() << "end of error?";
+	//qInfo() << "end of error?";
     }
     qInfo() << "Hexviewer Reset";
     setWindowTitle("WombatForensics");
@@ -2720,7 +2729,7 @@ void WombatForensics::PublishResults()
     StatusUpdate("Publishing Analysis Results...");
     qInfo() << "Publishing Analysis Results...";
     QDir pdir;
-    currentreportpath = reportpath + "/" + QDateTime::currentDateTimeUtc().toString("yyyy-mm-dd-HH-mm-ss") + "/";
+    currentreportpath = reportpath + "/" + QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd-HH-mm-ss") + "/";
     pdir.mkpath(currentreportpath);
     pdir.mkpath(currentreportpath + "thumbs/");
     pdir.mkpath(currentreportpath + "files/");
