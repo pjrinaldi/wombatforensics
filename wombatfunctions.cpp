@@ -1468,6 +1468,15 @@ void ProcessExport(QString objectid)
 {
     // IF ZIP, I.E. FZ#, NEED TO GET THE PARENT FROM TSK METHODS, THEN SAVE OUT TO TMPFILE
     // USE ZIP METHODS TO OPEN ZIP, FIND SUB FILE BY INDEX, SAVE TO EXPORT PATH...
+    QString zipid = "";
+    if(objectid.contains("z")) // exporting a child of a zip file
+    {
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        zipid = objectid;
+        objectid = indxlist.first().parent().sibling(indxlist.first().parent().row(), 11).data().toString();
+        qDebug() << "parent objectid:" << objectid;
+        //TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+    }
     TSK_IMG_INFO* imginfo = NULL;
     std::vector<std::string> pathvector;
     pathvector.clear();
@@ -1548,18 +1557,83 @@ void ProcessExport(QString objectid)
     fsinfo = NULL;
     tsk_img_close(imginfo);
     imginfo = NULL;
-    
-    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     QString tmppath = "";
-    QString tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
-    if(originalpath == true)
+    QString tmpname = "";
+    TreeNode* curitem = NULL;
+    if(zipid.contains("z"))
     {
-        tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+        QString parstr = wombatvariable.tmpfilepath + objectid + "-fhex";
+        QFile parfile(parstr);
+        if(!parfile.isOpen())
+            parfile.open(QIODevice::WriteOnly);
+        if(parfile.isOpen())
+        {
+            QDataStream outbuf(&parfile);
+            outbuf.writeRawData(filebuffer, bufferlength);
+            parfile.close();
+        }
+        int err = 0;
+        zip* zfile = zip_open(parstr.toStdString().c_str(), ZIP_RDONLY, &err);
+        struct zip_stat zstat;
+        zip_stat_init(&zstat);
+        zip_stat_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, &zstat);
+        zip_file_t* curfile = NULL;
+        if(zstat.encryption_method == ZIP_EM_NONE)
+            curfile = zip_fopen_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0); // IF NOT ENCRYPTED
+        else
+        {
+            // PROMPT USER FOR PASSWORD HERE....
+            curfile = zip_fopen_index_encrypted(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
+        }
+        //QString zhexstring = wombatvariable.tmpfilepath + zipid + "-fhex";
+        if(curfile != NULL)
+        {
+            filebuffer = new char[zstat.size];
+            bufferlength = zip_fread(curfile, filebuffer, zstat.size);
+            //char* zfbuf = new char[zstat.size];
+            //qint64 zcnt = zip_fread(curfile, zfbuf, zstat.size);
+            zip_fclose(curfile);
+            /*
+            QDir zdir;
+            zdir.mkpath(wombatvariable.tmpfilepath);
+            QFile ztmp(zhexstring);
+            if(!ztmp.isOpen())
+                ztmp.open(QIODevice::WriteOnly);
+            if(ztmp.isOpen())
+            {
+                QDataStream zbuffer(&ztmp);
+                zbuffer.writeRawData(zfbuf, zcnt);
+                ztmp.close();
+            }
+            delete[] zfbuf;
+            */
+        }
+        zip_close(zfile);
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(zipid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        tmppath = "";
+        tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString().split("/").last();
+        if(originalpath == true)
+            tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+        else
+            tmppath = exportpath + "/";
+        //hexstring = zhexstring;
+        qDebug() << "exportpath:" << exportpath << "tmppath:" << tmppath << "tmpname:" << tmpname;
     }
     else
-        tmppath = exportpath + "/";
-    if(curitem->itemtype == 2 || curitem->itemtype == 11) // directory
+    {
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        tmppath = "";
+        tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
+        if(originalpath == true)
+        {
+            tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+        }
+        else
+            tmppath = exportpath + "/";
+    }
+    if(curitem->itemtype == 3 || curitem->itemtype == 11) // directory
     {
         QDir dir;
         bool tmpdir = dir.mkpath(QString(tmppath + tmpname));
