@@ -1698,7 +1698,7 @@ void GenerateArchiveExpansion(QString objectid)
             // ALSO DOESN'T ACCOUNT FOR ENCRYPTED ZIP..
             QString statstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
             QString propstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".prop";
-	    if(QFile::exists(statstr) || QFile::exists(propstr))
+	    if(!QFile::exists(statstr) || !QFile::exists(propstr))
 	    {
 		struct zip_stat zipstat;
 		zip_stat_init(&zipstat);
@@ -1758,7 +1758,7 @@ void GenerateArchiveExpansion(QString objectid)
 		nodedata.clear();
 		for(int i=0; i < 12; i++)
 		    nodedata << treeout.at(i);
-		if(QFile::exists(statstr))
+		if(!QFile::exists(statstr))
 		{
 		    mutex.lock();
 		    treenodemodel->AddNode(nodedata, objectid.split("-a").first(), 1, 0); 
@@ -1774,7 +1774,7 @@ void GenerateArchiveExpansion(QString objectid)
 			statfile.close();
 		    }
 		}
-		if(QFile::exists(propstr))
+		if(!QFile::exists(propstr))
 		{
 		    QFile propfile(propstr);
 		    if(!propfile.isOpen())
