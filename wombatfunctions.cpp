@@ -2218,6 +2218,42 @@ void GenerateDigging(QString thumbid)
 
 void TestCarving(QStringList plist, QStringList flist)
 {
+    // LOOP OVER FLIST (FILETYPES TO CARVE) AND GENERATE TEMP SCALPEL CONF BY MATCHING THE FLIST ITEM'S TO THE CARVETYPES FILE AND STORE IT IN THE TMPFILEPATH LOCATION
+    QString hpath = QDir::homePath();
+    QHash<QString, QString> ctypelist;
+    QStringList conflist;
+    ctypelist.clear();
+    conflist.clear();
+    hpath += "/.local/share/wombatforensics/";
+    QFile ctypes(hpath + "carvetypes");
+    if(!ctypes.isOpen())
+        ctypes.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(ctypes.isOpen())
+    {
+        QTextStream in(&ctypes);
+        while(!in.atEnd())
+        {
+            QString tmpstr = in.readLine();
+            ctypelist.insert(tmpstr.split(",").at(1), tmpstr);
+        }
+        ctypes.close();
+    }
+    QString tmpcstr = wombatvariable.tmpfilepath + "curcarvesettings";
+    QFile tmpconf(tmpcstr);
+    if(!tmpconf.isOpen())
+        tmpconf.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(tmpconf.isOpen())
+    {
+        for(int i=0; i < flist.count(); i++)
+        {
+            tmpconf.write(ctypelist.value(flist.at(i)).toStdString().c_str());
+            tmpconf.write("\n");
+        }
+        tmpconf.close();
+    }
+    // add current carving settings to log somehow...
+
+
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
     //qDebug() << plist << flist;
     for(int i=0; i < plist.count(); i++)
@@ -2239,11 +2275,14 @@ void TestCarving(QStringList plist, QStringList flist)
     scalpoptions.carveWithMissingFooters = TRUE;
     scalpoptions.noSearchOverlap = FALSE;
     char* argv[3];
+    // GENERATE A TMP SCALPEL.CONF FROM MY SELECTED CARVING OPTIONS....
+    // UPDATE LOG WITH OPTIONS...
     argv[0] = (char*)"../scalpel/scalpel.conf";
-    //scalpstate = new scalpelState(scalpoptions);
-    //initializeState(&argv[0], scalpstate);
+    scalpstate = new scalpelState(scalpoptions);
+    initializeState(&argv[0], scalpstate);
+    // call digImageFile() should generate the list of files found, then i just need to figure out how to access it....
+    // call whatever libscalpel_finalize(&scalpstate) calls...
     */
-
     /*
     char* conffile = (char*)"../scalpel/scalpel.conf";
     char* outdir = (char*)"../out/";
