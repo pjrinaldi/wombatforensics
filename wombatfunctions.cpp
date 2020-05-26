@@ -1695,209 +1695,218 @@ void GenerateArchiveExpansion(QString objectid)
         {
             //QString newzipid = estring + "-" + vstring + "-" + pstring + "-" + "-fz" + QString::number(i) + "-a" + astring.mid(1);
             // CURRENT METHOD DOESN'T ACCOUNT FOR DIRECTORIES IN ARCHIVES, JUST LEAVES THEM AS THE PATH...
-            // ALSO DOESN"T ACCOUNT FOR ENCRYPTED ZIP..
+            // ALSO DOESN'T ACCOUNT FOR ENCRYPTED ZIP..
             QString statstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
             QString propstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".prop";
-            struct zip_stat zipstat;
-            zip_stat_init(&zipstat);
-            zip_stat_index(curzip, i, 0, &zipstat);
-            char* magicbuffer = new char[0];
-            qint64 sigsize = 1024;
-            if(zipstat.size < 1024)
-                sigsize = zipstat.size;
-            magicbuffer = new char[sigsize];
-            QByteArray tmparray("intro");
-            tmparray.clear();
-            mutex.lock();
-            zip_file_t* curfile = NULL;
-            if(zipstat.encryption_method == ZIP_EM_NONE)
-                curfile = zip_fopen_index(curzip, i, 0); // IF NOT ENCRYPTED
-            else
-            {
-                // PROMPT USER FOR PASSWORD HERE....
-                curfile = zip_fopen_index_encrypted(curzip, i, 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
-            }
-            if(curfile != NULL)
-            {
-                zip_fread(curfile, magicbuffer, sigsize);
-                zip_fclose(curfile);
-            }
-            mutex.unlock();
-            tmparray = QByteArray::fromRawData(magicbuffer, sigsize);
-            QMimeDatabase mimedb;
-            const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-            QString mimestr = GenerateCategorySignature(mimetype);
-            if(mimestr.contains("Unknown")) // generate further analysis
-            {
-                if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
-                    mimestr = "Windows System/Shortcut";
-                else if(strcmp(filename.toStdString().c_str(), "INFO2") == 0 && (tmparray.at(0) == 0x04 || tmparray.at(0) == 0x05))
-                    mimestr = "Windows System/Recycler";
-                else if(filename.startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02))
-                    mimestr = "Windows System/Recycle.Bin";
-                else if(filename.endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
-                    mimestr = "Windows System/Prefetch";
-                //else if(astring.contains("fa"
-            }
-            //qDebug() << "mimestr:" << mimestr;
-            delete[] magicbuffer;
-            //qDebug() << outstr;
-            QByteArray ba;
-            ba.clear();
-            ba.append(QString::fromStdString(std::string(zipstat.name)));
-            QByteArray ba2;
-            ba2.clear();
-            ba2.append(QString(filepath + filename + "/"));
-            QString outstr = ba.toBase64() + ",5," + astring.mid(1) + "," + ba2.toBase64() + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
-            QStringList treeout;
-            treeout.clear();
-            treeout << ba.toBase64() << ba2.toBase64() << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").first() << mimestr.split("/").last() << "0" << QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1));
-            QList<QVariant> nodedata;
-            nodedata.clear();
-            for(int i=0; i < 12; i++)
-                nodedata << treeout.at(i);
-            mutex.lock();
-            treenodemodel->AddNode(nodedata, objectid.split("-a").first(), 1, 0); 
-            mutex.unlock();
-            filesfound++;
-            listeditems.append(treeout.at(11));
-            QFile statfile(statstr);
-            if(!statfile.isOpen())
-                statfile.open(QIODevice::WriteOnly | QIODevice::Text);
-            if(statfile.isOpen())
-            {
-                statfile.write(outstr.toStdString().c_str());
-                statfile.close();
-            }
-            QFile propfile(propstr);
-            if(!propfile.isOpen())
-                propfile.open(QIODevice::WriteOnly | QIODevice::Text);
-            if(propfile.isOpen())
-            {
-                QTextStream proplist(&propfile);
-                proplist << "Compressed Size||" << zipstat.comp_size << " bytes||Compressed size of the file in bytes." << endl;
-                proplist << "Compression Method||";
-                switch(zipstat.comp_method)
-                {
-                    case ZIP_CM_STORE:
-                        proplist << "UNCOMPRESSED";
-                        break;
-                    case ZIP_CM_SHRINK:
-                        proplist << "SHRUNK";
-                        break;
-                    case ZIP_CM_REDUCE_1:
-                        proplist << "FACTOR 1 REDUCED";
-                        break;
-                    case ZIP_CM_REDUCE_2:
-                        proplist << "FACTOR 2 REDUCED";
-                        break;
-                    case ZIP_CM_REDUCE_3:
-                        proplist << "FACTOR 3 REDUCED";
-                        break;
-                    case ZIP_CM_REDUCE_4:
-                        proplist << "FACTOR 4 REDUCED";
-                        break;
-                    case ZIP_CM_IMPLODE:
-                        proplist << "IMPLODED";
-                        break;
-                    case ZIP_CM_DEFLATE:
-                        proplist << "DEFLATE";
-                        break;
-                    case ZIP_CM_DEFLATE64:
-                        proplist << "DEFLATE64";
-                        break;
-                    case ZIP_CM_PKWARE_IMPLODE:
-                        proplist << "PKWARE IMPLODE";
-                        break;
-                    case ZIP_CM_BZIP2:
-                        proplist << "BZIP2";
-                        break;
-                    case ZIP_CM_LZMA:
-                        proplist << "LZMA";
-                        break;
-                    case ZIP_CM_TERSE:
-                        proplist << "IBM TERSE";
-                        break;
-                    case ZIP_CM_LZ77:
-                        proplist << "IBM LZ77";
-                        break;
-                    case ZIP_CM_LZMA2:
-                        proplist << "LZMA2";
-                        break;
-                    case ZIP_CM_XZ:
-                        proplist << "XZ";
-                        break;
-                    case ZIP_CM_JPEG:
-                        proplist << "COMPRESSED JPEG";
-                        break;
-                    case ZIP_CM_WAVPACK:
-                        proplist << "COMPRESSED WAVPACK";
-                        break;
-                    case ZIP_CM_PPMD:
-                        proplist << "PPMD I";
-                        break;
-                    default:
-                        proplist << "DEFLATE";
-                        break;
-                }
-                proplist << "||Compression Method used to add the files to the archive." << endl;
-                proplist << "Encryption Method||";
-                switch(zipstat.encryption_method)
-                {
-                    case ZIP_EM_NONE:
-                        proplist << "NOT ENCRYPTED";
-                        break;
-                    case ZIP_EM_TRAD_PKWARE:
-                        proplist << "PKWARE ENCRYPTED";
-                        break;
-                    /*
-                    case ZIP_EM_DES:
-                        htmlstr += "DES ENCRYPTED";
-                        break;
-                    case ZIP_EM_RC2_OLD:
-                        htmlstr += "RC2 < v5.2 ENCRYPTED";
-                        break;
-                    case ZIP_EM_3DES_168:
-                        htmlstr += "3DES 168 ENCRYPTED";
-                        break;
-                    case ZIP_EM_3DES_112:
-                        htmlstr += "3DES 112 ENCRYPTED";
-                        break;
-                    case ZIP_EM_PKZIP_AES_128:
-                        htmlstr += "PKZIP AES 128 ENCRYPTED";
-                        break;
-                    case ZIP_EM_PKZIP_AES_192:
-                        htmlstr += "PKZIP AES 192 ENCRYPTED";
-                        break;
-                    case ZIP_EM_PKZIP_AES_256:
-                        htmlstr += "PKZIP AES 256 ENCRYPTED";
-                        break;
-                    case ZIP_EM_RC2:
-                        htmlstr += "RC2 > V5.2 ENCRYPTED";
-                        break;
-                    case ZIP_EM_RC4:
-                        htmlstr += "RC4 ENCRYPTED";
-                        break;
-                    */
-                    case ZIP_EM_AES_128:
-                        proplist << "AES 128 ENCRYPTED";
-                        break;
-                    case ZIP_EM_AES_192:
-                        proplist << "AES 192 ENCRYPTED";
-                        break;
-                    case ZIP_EM_AES_256:
-                        proplist << "AES 256 ENCRYPTED";
-                        break;
-                    case ZIP_EM_UNKNOWN:
-                        proplist << "UNKNOWN ALGORITHM";
-                        break;
-                    default:
-                        proplist << "NOT ENCRYPTED";
-                        break;
-                }
-                proplist << "||Encryption Method used to protect the contents of the files added to the archive." << endl;
-                proplist.flush();
-                propfile.close();
+	    if(QFile::exists(statstr) || QFile::exists(propstr))
+	    {
+		struct zip_stat zipstat;
+		zip_stat_init(&zipstat);
+		zip_stat_index(curzip, i, 0, &zipstat);
+		char* magicbuffer = new char[0];
+		qint64 sigsize = 1024;
+		if(zipstat.size < 1024)
+		    sigsize = zipstat.size;
+		magicbuffer = new char[sigsize];
+		QByteArray tmparray("intro");
+		tmparray.clear();
+		mutex.lock();
+		zip_file_t* curfile = NULL;
+		if(zipstat.encryption_method == ZIP_EM_NONE)
+		    curfile = zip_fopen_index(curzip, i, 0); // IF NOT ENCRYPTED
+		else
+		{
+		    // PROMPT USER FOR PASSWORD HERE....
+		    curfile = zip_fopen_index_encrypted(curzip, i, 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
+		}
+		if(curfile != NULL)
+		{
+		    zip_fread(curfile, magicbuffer, sigsize);
+		    zip_fclose(curfile);
+		}
+		mutex.unlock();
+		tmparray = QByteArray::fromRawData(magicbuffer, sigsize);
+		QMimeDatabase mimedb;
+		const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+		QString mimestr = GenerateCategorySignature(mimetype);
+		if(mimestr.contains("Unknown")) // generate further analysis
+		{
+		    if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
+			mimestr = "Windows System/Shortcut";
+		    else if(strcmp(filename.toStdString().c_str(), "INFO2") == 0 && (tmparray.at(0) == 0x04 || tmparray.at(0) == 0x05))
+			mimestr = "Windows System/Recycler";
+		    else if(filename.startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02))
+			mimestr = "Windows System/Recycle.Bin";
+		    else if(filename.endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
+			mimestr = "Windows System/Prefetch";
+		    //else if(astring.contains("fa"
+		}
+		//qDebug() << "mimestr:" << mimestr;
+		delete[] magicbuffer;
+		//qDebug() << outstr;
+		QByteArray ba;
+		ba.clear();
+		ba.append(QString::fromStdString(std::string(zipstat.name)));
+		QByteArray ba2;
+		ba2.clear();
+		ba2.append(QString(filepath + filename + "/"));
+		QString outstr = ba.toBase64() + ",5," + astring.mid(1) + "," + ba2.toBase64() + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
+		QStringList treeout;
+		treeout.clear();
+		treeout << ba.toBase64() << ba2.toBase64() << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").first() << mimestr.split("/").last() << "0" << QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1));
+		QList<QVariant> nodedata;
+		nodedata.clear();
+		for(int i=0; i < 12; i++)
+		    nodedata << treeout.at(i);
+		if(QFile::exists(statstr))
+		{
+		    mutex.lock();
+		    treenodemodel->AddNode(nodedata, objectid.split("-a").first(), 1, 0); 
+		    mutex.unlock();
+		    filesfound++;
+		    listeditems.append(treeout.at(11));
+		    QFile statfile(statstr);
+		    if(!statfile.isOpen())
+			statfile.open(QIODevice::WriteOnly | QIODevice::Text);
+		    if(statfile.isOpen())
+		    {
+			statfile.write(outstr.toStdString().c_str());
+			statfile.close();
+		    }
+		}
+		if(QFile::exists(propstr))
+		{
+		    QFile propfile(propstr);
+		    if(!propfile.isOpen())
+			propfile.open(QIODevice::WriteOnly | QIODevice::Text);
+		    if(propfile.isOpen())
+		    {
+			QTextStream proplist(&propfile);
+			proplist << "Compressed Size||" << zipstat.comp_size << " bytes||Compressed size of the file in bytes." << endl;
+			proplist << "Compression Method||";
+			switch(zipstat.comp_method)
+			{
+			    case ZIP_CM_STORE:
+				proplist << "UNCOMPRESSED";
+				break;
+			    case ZIP_CM_SHRINK:
+				proplist << "SHRUNK";
+				break;
+			    case ZIP_CM_REDUCE_1:
+				proplist << "FACTOR 1 REDUCED";
+				break;
+			    case ZIP_CM_REDUCE_2:
+				proplist << "FACTOR 2 REDUCED";
+				break;
+			    case ZIP_CM_REDUCE_3:
+				proplist << "FACTOR 3 REDUCED";
+				break;
+			    case ZIP_CM_REDUCE_4:
+				proplist << "FACTOR 4 REDUCED";
+				break;
+			    case ZIP_CM_IMPLODE:
+				proplist << "IMPLODED";
+				break;
+			    case ZIP_CM_DEFLATE:
+				proplist << "DEFLATE";
+				break;
+			    case ZIP_CM_DEFLATE64:
+				proplist << "DEFLATE64";
+				break;
+			    case ZIP_CM_PKWARE_IMPLODE:
+				proplist << "PKWARE IMPLODE";
+				break;
+			    case ZIP_CM_BZIP2:
+				proplist << "BZIP2";
+				break;
+			    case ZIP_CM_LZMA:
+				proplist << "LZMA";
+				break;
+			    case ZIP_CM_TERSE:
+				proplist << "IBM TERSE";
+				break;
+			    case ZIP_CM_LZ77:
+				proplist << "IBM LZ77";
+				break;
+			    case ZIP_CM_LZMA2:
+				proplist << "LZMA2";
+				break;
+			    case ZIP_CM_XZ:
+				proplist << "XZ";
+				break;
+			    case ZIP_CM_JPEG:
+				proplist << "COMPRESSED JPEG";
+				break;
+			    case ZIP_CM_WAVPACK:
+				proplist << "COMPRESSED WAVPACK";
+				break;
+			    case ZIP_CM_PPMD:
+				proplist << "PPMD I";
+				break;
+			    default:
+				proplist << "DEFLATE";
+				break;
+			}
+			proplist << "||Compression Method used to add the files to the archive." << endl;
+			proplist << "Encryption Method||";
+			switch(zipstat.encryption_method)
+			{
+			    case ZIP_EM_NONE:
+				proplist << "NOT ENCRYPTED";
+				break;
+			    case ZIP_EM_TRAD_PKWARE:
+				proplist << "PKWARE ENCRYPTED";
+				break;
+			    /*
+			    case ZIP_EM_DES:
+				htmlstr += "DES ENCRYPTED";
+				break;
+			    case ZIP_EM_RC2_OLD:
+				htmlstr += "RC2 < v5.2 ENCRYPTED";
+				break;
+			    case ZIP_EM_3DES_168:
+				htmlstr += "3DES 168 ENCRYPTED";
+				break;
+			    case ZIP_EM_3DES_112:
+				htmlstr += "3DES 112 ENCRYPTED";
+				break;
+			    case ZIP_EM_PKZIP_AES_128:
+				htmlstr += "PKZIP AES 128 ENCRYPTED";
+				break;
+			    case ZIP_EM_PKZIP_AES_192:
+				htmlstr += "PKZIP AES 192 ENCRYPTED";
+				break;
+			    case ZIP_EM_PKZIP_AES_256:
+				htmlstr += "PKZIP AES 256 ENCRYPTED";
+				break;
+			    case ZIP_EM_RC2:
+				htmlstr += "RC2 > V5.2 ENCRYPTED";
+				break;
+			    case ZIP_EM_RC4:
+				htmlstr += "RC4 ENCRYPTED";
+				break;
+			    */
+			    case ZIP_EM_AES_128:
+				proplist << "AES 128 ENCRYPTED";
+				break;
+			    case ZIP_EM_AES_192:
+				proplist << "AES 192 ENCRYPTED";
+				break;
+			    case ZIP_EM_AES_256:
+				proplist << "AES 256 ENCRYPTED";
+				break;
+			    case ZIP_EM_UNKNOWN:
+				proplist << "UNKNOWN ALGORITHM";
+				break;
+			    default:
+				proplist << "NOT ENCRYPTED";
+				break;
+			}
+			proplist << "||Encryption Method used to protect the contents of the files added to the archive." << endl;
+			proplist.flush();
+			propfile.close();
+		    }
+		}
             }
             //filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
             //QTextStream proplist(&filepropfile);
@@ -2378,6 +2387,7 @@ void PopulateArchiveFiles(QString afilestr)
     mutex.lock();
     treenodemodel->AddNode(nodedata, parentstr, 1, 0);
     mutex.unlock();
+    listeditems.append(slist.at(12));
 }
 
 void PopulateCarvedFiles(QString cfilestr)
@@ -2408,6 +2418,7 @@ void PopulateCarvedFiles(QString cfilestr)
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString(slist.at(12)).split("-").first(), 15, 0);
     mutex.unlock();
+    listeditems.append(slist.at(12));
     // concurrent map() to read files, populate nodedata and addtreenode...
 }
 

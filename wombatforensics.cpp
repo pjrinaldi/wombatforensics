@@ -2339,7 +2339,7 @@ void WombatForensics::FinishPreDigging()
 {
     //if(digtype == 0) // selected
     //else if(digtype == 1) // checked
-    if(digtype == 2) // all items
+    if(hasarchive && !isclosing && digtype == 2) // all items (now including expanded archives.
         digfilelist = GetFileLists(2);
     digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
     digwatcher.setFuture(digfuture);
