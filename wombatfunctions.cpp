@@ -2238,6 +2238,9 @@ void TestCarving(QStringList plist, QStringList flist)
         }
         ctypes.close();
     }
+    QStringList curcarvelist;
+    curcarvelist.clear();
+    // TMPCONF IS FOR SCALPEL... IF I BUILD MY OWN SIMPLE CARVER, I CAN USE QT AND A STRINGLIST VARIABLE...
     QString tmpcstr = wombatvariable.tmpfilepath + "curcarvesettings";
     QFile tmpconf(tmpcstr);
     if(!tmpconf.isOpen())
@@ -2246,11 +2249,13 @@ void TestCarving(QStringList plist, QStringList flist)
     {
         for(int i=0; i < flist.count(); i++)
         {
+            curcarvelist.append(ctypelist.value(flist.at(i)));
             tmpconf.write(ctypelist.value(flist.at(i)).toStdString().c_str());
             tmpconf.write("\n");
         }
         tmpconf.close();
     }
+    qDebug() << "curcarvelist:" << curcarvelist;
     // add current carving settings to log somehow...
 
 
@@ -2259,7 +2264,28 @@ void TestCarving(QStringList plist, QStringList flist)
     for(int i=0; i < plist.count(); i++)
     {
         qDebug() << "For:" << plist.at(i);
+        QString estring = plist.at(i).split("-").first();
+        QString vstring = plist.at(i).split("-").at(1);
+        QString pstring = plist.at(i).split("-").at(2);
         // get offset and length to find within the mounted raw image file...
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
+        qDebug() << "evidpath:" << evidfiles.at(0);
+        QString evidencename = evidfiles.at(0).split(".e").first();
+        QString partstr = wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat";
+        QFile partfile(partstr);
+        QStringList partlist;
+        partlist.clear();
+        if(!partfile.isOpen())
+            partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+        {
+            QString tmpstr = partfile.readLine();
+            qDebug() << tmpstr;
+            partlist = tmpstr.split(",", QString::SkipEmptyParts);
+            partfile.close();
+        }
+        qDebug() << "partition offset|size|blk size:" << partlist.at(4) << partlist.at(1) << partlist.at(6);
         for(int j=0; j < flist.count(); j++)
         {
             qDebug() << "find each flist:" << flist.at(j);
