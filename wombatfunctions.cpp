@@ -1933,50 +1933,57 @@ void GenerateArchiveExpansion(QString objectid)
 
 void GenerateHash(QString objectid)
 {
+    // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
     if(objectid.split("-").count() == 5 && !isclosing)
     {
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         QString objectname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
-        TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        qint64 filesize = curitem->Data(2).toLongLong();
-        if(objectid.contains("z"))
-            qDebug() << objectid << filesize;
-        QString hashstr = "";
-        if(filesize > 0 && !objectname.endsWith("$Bad") && !isclosing) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
-        {
-            QByteArray filebytes;
-	    filebytes.clear();
-	    filebytes = ReturnFileContent(objectid);
-            QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
-            hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
-	    filebytes.clear();
-        }
-        else
-        {
-            if(hashsum == 1)
-                hashstr = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
-            else if(hashsum == 2)
-                hashstr = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
-            else if(hashsum == 4)
-                hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
-        }
-        if(!isclosing)
-        {
-            hashlist.insert(objectid, hashstr);
-            mutex.lock();
-            treenodemodel->UpdateNode(objectid, 7, hashstr);
-            mutex.unlock();
-            dighashcount++;
-        }
-	int hashtype = 1;
-        if(hashsum == 1) // MD5
-            hashtype = 1;
-        else if(hashsum == 2) // SHA1
-            hashtype = 2;
-        else if(hashsum == 4) // SHA256
-            hashtype = 3;
-        if(!isclosing)
-            isignals->DigUpd(hashtype, dighashcount);
+	int curhashcount = indxlist.first().sibling(indxlist.first().row(), 7).data().toString().count();
+	if((hashsum == 1 && curhashcount != 32) || (hashsum == 2 && curhashcount != 40) || (hashsum == 3 && curhashcount != 64))
+	{
+	    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+	    qint64 filesize = curitem->Data(2).toLongLong();
+	    if(objectid.contains("z"))
+		qDebug() << objectid << filesize;
+	    QString hashstr = "";
+	    if(filesize > 0 && !objectname.endsWith("$Bad") && !isclosing) // speed up hashing if we ignore the sparse file $Bad which doesn't contain relevant information anyway
+	    {
+		QByteArray filebytes;
+		filebytes.clear();
+		filebytes = ReturnFileContent(objectid);
+		QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+		hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+		filebytes.clear();
+	    }
+	    else
+	    {
+		if(hashsum == 1)
+		    hashstr = QString("d41d8cd98f00b204e9800998ecf8427e").toUpper(); // MD5 zero file
+		else if(hashsum == 2)
+		    hashstr = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
+		else if(hashsum == 4)
+		    hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
+	    }
+	    if(!isclosing)
+	    {
+		hashlist.insert(objectid, hashstr);
+		mutex.lock();
+		treenodemodel->UpdateNode(objectid, 7, hashstr);
+		mutex.unlock();
+		dighashcount++;
+	    }
+	    int hashtype = 1;
+	    if(hashsum == 1) // MD5
+		hashtype = 1;
+	    else if(hashsum == 2) // SHA1
+		hashtype = 2;
+	    else if(hashsum == 4) // SHA256
+		hashtype = 3;
+	    if(!isclosing)
+		isignals->DigUpd(hashtype, dighashcount);
+	}
+	else
+	    qDebug() << "already hashed...skipping";
     }
 }
 
