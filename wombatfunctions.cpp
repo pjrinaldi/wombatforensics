@@ -6,6 +6,7 @@
 // LIBFFMPEG THUMBNAILER HEADERS
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
+/*
 // SCALPEL HEADER
 #include <scalpel.h>
 // REVIT HEADERS
@@ -16,6 +17,7 @@
 #include <libnotify.h>
 #include <liboutput_handler.h>
 #include <libstate_hierarchy.h>
+*/
 // Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
@@ -2270,8 +2272,31 @@ void TestCarving(QStringList plist, QStringList flist)
         // get offset and length to find within the mounted raw image file...
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
-        qDebug() << "evidpath:" << evidfiles.at(0);
+        QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
+        QStringList evidlist;
+        evidlist.clear();
+        if(!evidfile.isOpen())
+            evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+        {
+            evidlist = QString(evidfile.readLine()).split(",", QString::SkipEmptyParts);
+            evidfile.close();
+        }
+        QString rawevidencepath = wombatvariable.imgdatapath;
+        if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
+            rawevidencepath += evidlist.at(3).split("/").last() + ".raw";
+        else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
+            rawevidencepath += evidlist.at(3).split("/").last() + "/ewf1";
+        else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
+        {
+            QString imgext = evidlist.at(3).split("/").last().split("/").last();
+            if(imgext.contains("000"))
+                rawevidencepath += evidlist.at(3).split("/").last() + ".raw";
+            else
+                rawevidencepath = evidlist.at(3);
+        }
         QString evidencename = evidfiles.at(0).split(".e").first();
+        qDebug() << "evidencename:" << evidencename << "rawevidencepath:" << rawevidencepath;
         QString partstr = wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat";
         QFile partfile(partstr);
         QStringList partlist;
@@ -2285,12 +2310,14 @@ void TestCarving(QStringList plist, QStringList flist)
             partlist = tmpstr.split(",", QString::SkipEmptyParts);
             partfile.close();
         }
-        qDebug() << "partition offset|size|blk size:" << partlist.at(4) << partlist.at(1) << partlist.at(6);
-        for(int j=0; j < flist.count(); j++)
+        qDebug() << "casedatafile:" << rawevidencepath;
+        qDebug() << "partition offset|size|blk size|#blocks:" << partlist.at(4) << partlist.at(1) << partlist.at(6) << partlist.at(1).toLongLong() / partlist.at(6).toLongLong();
+        for(int j=0; j < flist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
         {
             qDebug() << "find each flist:" << flist.at(j);
         }
     }
+    //
     /* SIMPLE CARVER SAMPLE CODE FROM CS50, MIGRATE TO QT C++ FROM STD::C AND SEE HOW IT COMPARES TO PULLING OUT WHAT I NEED FROM SCALPEL
      *#include <stdio.h>
 #include <stdint.h>
