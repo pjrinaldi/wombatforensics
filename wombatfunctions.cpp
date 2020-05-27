@@ -2224,10 +2224,7 @@ void TestCarving(QStringList plist, QStringList flist)
     QStringList ctypelist;
     QHash<QString, QString> headhash;
     headhash.clear();
-    //QHash<QString, QString> ctypelist;
-    //QStringList conflist;
     ctypelist.clear();
-    //conflist.clear();
     hpath += "/.local/share/wombatforensics/";
     QFile ctypes(hpath + "carvetypes");
     if(!ctypes.isOpen())
@@ -2243,38 +2240,15 @@ void TestCarving(QStringList plist, QStringList flist)
                 if(flist.at(i).contains(tmpstr.split(",").at(1)))
                 {
                     ctypelist.append(tmpstr);
-                    //ctypelist.insert(tmpstr.split(",").at(1), tmpstr);
                 }
             }
         }
         ctypes.close();
     }
-    //qDebug() << "matching header types to look for:" << ctypelist;
-    //QStringList curcarvelist;
-    //curcarvelist.clear();
-    /*
-    // TMPCONF IS FOR SCALPEL... IF I BUILD MY OWN SIMPLE CARVER, I CAN USE QT AND A STRINGLIST VARIABLE...
-    QString tmpcstr = wombatvariable.tmpfilepath + "curcarvesettings";
-    QFile tmpconf(tmpcstr);
-    if(!tmpconf.isOpen())
-        tmpconf.open(QIODevice::WriteOnly | QIODevice::Text);
-    if(tmpconf.isOpen())
-    {
-        for(int i=0; i < flist.count(); i++)
-        {
-            curcarvelist.append(ctypelist.value(flist.at(i)));
-            tmpconf.write(ctypelist.value(flist.at(i)).toStdString().c_str());
-            tmpconf.write("\n");
-        }
-        tmpconf.close();
-    }
-    //qDebug() << "curcarvelist:" << curcarvelist;
-    */
     // add current carving settings to log somehow...
     // HAVE TO FIGURE OUT HOW TO COMPARE STRING WITH ????? AND THE ACTUAL HEX I GET FROM BYTE ARRAY...
 
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
-    //qDebug() << plist << flist;
     for(int i=0; i < plist.count(); i++)
     {
         //qDebug() << "For:" << plist.at(i);
@@ -2308,7 +2282,6 @@ void TestCarving(QStringList plist, QStringList flist)
                 rawevidencepath = evidlist.at(3);
         }
         QString evidencename = evidfiles.at(0).split(".e").first();
-        //qDebug() << "evidencename:" << evidencename << "rawevidencepath:" << rawevidencepath;
         QString partstr = wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat";
         QFile partfile(partstr);
         QStringList partlist;
@@ -2341,24 +2314,30 @@ void TestCarving(QStringList plist, QStringList flist)
         {
             qDebug() << ctypelist.at(j);
             QString curheadstr = ctypelist.at(j).split(",").at(2);
+	    QString curheadname = ctypelist.at(j).split(",").at(1);
+	    qDebug() << "current header string to match:" << curheadstr;
             int bytecount = curheadstr.count() / 2;
-            qDebug() << "bytecount:" << bytecount;
+            //qDebug() << "bytecount:" << bytecount;
             int headleft = curheadstr.indexOf("?");
             int headright = curheadstr.lastIndexOf("?");
-            int headskip = headright + 1 - headleft;
-            qDebug() << "headskip:" << headskip;
+	    qDebug() << "bytecount:" << bytecount << "headleft:" << headleft << "headright:" << headright;
+	    qDebug() << "blockcount:" << blockcount;
+            //int headskip = headright + 1 - headleft;
+            //qDebug() << "headskip:" << headskip;
+	    /*
             if(headleft != -1)
-                qDebug() << "headleft:" << curheadstr.left(headleft);
+                //qDebug() << "headleft:" << curheadstr.left(headleft);
             if(headright != -1)
-                qDebug() << "headright:" << curheadstr.mid(headright+1);
+                //qDebug() << "headright:" << curheadstr.mid(headright+1);
             if(headleft != -1 && headright != -1)
-                qDebug() << "headmid:" << curheadstr.mid(headleft, headright+1-headleft);
+                //qDebug() << "headmid:" << curheadstr.mid(headleft, headright+1-headleft);
             else
-                qDebug() << "head:" << curheadstr;
+                //qDebug() << "head:" << curheadstr;
+	    */
             //qDebug() << "curheadstr count|headleft|headright:" << curheadstr.count() << curheadstr.indexOf("?") << curheadstr.lastIndexOf("?");
             //qDebug() << "find each flist:" << flist.at(j);
             //for(int k=0; k < blockcount; k++)
-            for(int k=0; k < 5; k++) // FOR TESTING PURPOSES, ONLY DO 5 BLOCKS
+            for(int k=0; k < blockcount; k++) // FOR TESTING PURPOSES, ONLY DO 5 BLOCKS
             {
                 QString curkey = pstring + "-b" + QString::number(k);
                 if(!headhash.contains(curkey)) // block hasn't been claimed by any header yet...
@@ -2368,8 +2347,26 @@ void TestCarving(QStringList plist, QStringList flist)
                     bool isseek = rawfile.seek(k * blocksize);
                     if(isseek)
                         headerarray = rawfile.read(bytecount);
-                    qDebug() << "header content for block" << k << ":" << QString::fromStdString(headerarray.toHex(0).toStdString());
+		    QString blockheader = QString::fromStdString(headerarray.toHex(0).toStdString()).toUpper();
+                    //qDebug() << "header content for block" << k << ":" << blockheader;
                     // COMPARE HEADERS AND IF MATCH, ADD TO headhash
+		    if(headleft == -1 && headright == -1) // header without ???'s
+		    {
+			//qDebug() << "compare:" << blockheader << "with" << curheadstr;
+			if(blockheader.contains(curheadstr))
+			{
+			    headhash.insert(curkey, curheadname);
+			    qDebug() << "a match";
+			}
+		    }
+		    else // header with ???'s
+		    {
+			if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
+			{
+			    headhash.insert(curkey, curheadname);
+			    qDebug() << "a match.";
+			}
+		    }
                 }
                 else
                     qDebug() << "block" << k << "has already been claimed by:" << headhash.value(curkey);
@@ -2377,6 +2374,8 @@ void TestCarving(QStringList plist, QStringList flist)
         }
         rawfile.close();
     }
+    qDebug() << "header search finished." << headhash.count() << "results provided.";
+    qDebug() << "headhash:" << headhash;
     /* SIMPLE CARVER SAMPLE CODE FROM CS50, MIGRATE TO QT C++ FROM STD::C AND SEE HOW IT COMPARES TO PULLING OUT WHAT I NEED FROM SCALPEL
      *#include <stdio.h>
 #include <stdint.h>
