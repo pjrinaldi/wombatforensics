@@ -2257,9 +2257,9 @@ void TestCarving(QStringList plist, QStringList flist)
         }
         tmpconf.close();
     }
-    qDebug() << "curcarvelist:" << curcarvelist;
+    //qDebug() << "curcarvelist:" << curcarvelist;
     // add current carving settings to log somehow...
-
+    // HAVE TO FIGURE OUT HOW TO COMPARE STRING WITH ????? AND THE ACTUAL HEX I GET FROM BYTE ARRAY...
 
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
     //qDebug() << plist << flist;
@@ -2296,7 +2296,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 rawevidencepath = evidlist.at(3);
         }
         QString evidencename = evidfiles.at(0).split(".e").first();
-        qDebug() << "evidencename:" << evidencename << "rawevidencepath:" << rawevidencepath;
+        //qDebug() << "evidencename:" << evidencename << "rawevidencepath:" << rawevidencepath;
         QString partstr = wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat";
         QFile partfile(partstr);
         QStringList partlist;
@@ -2310,14 +2310,36 @@ void TestCarving(QStringList plist, QStringList flist)
             partlist = tmpstr.split(",", QString::SkipEmptyParts);
             partfile.close();
         }
-        qDebug() << "casedatafile:" << rawevidencepath;
-        qDebug() << "partition offset|size|blk size|#blocks:" << partlist.at(4) << partlist.at(1) << partlist.at(6) << partlist.at(1).toLongLong() / partlist.at(6).toLongLong();
+        //qDebug() << "casedatafile:" << rawevidencepath;
+        QFile rawfile(rawevidencepath);
+        if(!rawfile.isOpen())
+            rawfile.open(QIODevice::ReadOnly);
+        if(rawfile.isOpen())
+        {
+            // loop over the blocks...
+        }
+        qint64 partoffset = partlist.at(4).toLongLong();
+        qint64 blocksize = partlist.at(6).toLongLong();
+        qint64 partsize = partlist.at(1).toLongLong() - partoffset;
+        qint64 blockcount = partsize / blocksize;
+        // ACCOUTN FOR A POSSIBLE OFFSET OF NOT ZERO, MAYBE OFFSET - OFFSET = START, SIZE - OFFSET = NEW PARTSIZE, STILL MULTIPLE OF BLOCKSIZE
+        //qDebug() << "partition offset|size|blk size|#blocks:" << partlist.at(4) << partlist.at(1) << partlist.at(6) << partlist.at(1).toLongLong() / partlist.at(6).toLongLong();
         for(int j=0; j < flist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
         {
             qDebug() << "find each flist:" << flist.at(j);
+            //for(int k=0; k < blockcount; k++)
+            for(int k=0; k < 5; k++) // FOR TESTING PURPOSES, ONLY DO 5 BLOCKS
+            {
+                QByteArray headerarray;
+                headerarray.clear();
+                bool isseek = rawfile.seek(k * blocksize);
+                if(isseek)
+                    headerarray = rawfile.read(10);
+                qDebug() << "header content for block" << k << ": 0x" << QString::fromStdString(headerarray.toHex(0).toStdString());
+            }
         }
+        rawfile.close();
     }
-    //
     /* SIMPLE CARVER SAMPLE CODE FROM CS50, MIGRATE TO QT C++ FROM STD::C AND SEE HOW IT COMPARES TO PULLING OUT WHAT I NEED FROM SCALPEL
      *#include <stdio.h>
 #include <stdint.h>
