@@ -2345,6 +2345,8 @@ void TestCarving(QStringList plist, QStringList flist)
             qDebug() << "bytecount:" << bytecount;
             int headleft = curheadstr.indexOf("?");
             int headright = curheadstr.lastIndexOf("?");
+            int headskip = headright + 1 - headleft;
+            qDebug() << "headskip:" << headskip;
             if(headleft != -1)
                 qDebug() << "headleft:" << curheadstr.left(headleft);
             if(headright != -1)
