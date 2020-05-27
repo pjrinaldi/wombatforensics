@@ -2220,12 +2220,14 @@ void GenerateDigging(QString thumbid)
 
 void TestCarving(QStringList plist, QStringList flist)
 {
-    // LOOP OVER FLIST (FILETYPES TO CARVE) AND GENERATE TEMP SCALPEL CONF BY MATCHING THE FLIST ITEM'S TO THE CARVETYPES FILE AND STORE IT IN THE TMPFILEPATH LOCATION
     QString hpath = QDir::homePath();
-    QHash<QString, QString> ctypelist;
-    QStringList conflist;
+    QStringList ctypelist;
+    QHash<QString, QString> headhash;
+    headhash.clear();
+    //QHash<QString, QString> ctypelist;
+    //QStringList conflist;
     ctypelist.clear();
-    conflist.clear();
+    //conflist.clear();
     hpath += "/.local/share/wombatforensics/";
     QFile ctypes(hpath + "carvetypes");
     if(!ctypes.isOpen())
@@ -2236,12 +2238,21 @@ void TestCarving(QStringList plist, QStringList flist)
         while(!in.atEnd())
         {
             QString tmpstr = in.readLine();
-            ctypelist.insert(tmpstr.split(",").at(1), tmpstr);
+            for(int i=0; i < flist.count(); i++)
+            {
+                if(flist.at(i).contains(tmpstr.split(",").at(1)))
+                {
+                    ctypelist.append(tmpstr);
+                    //ctypelist.insert(tmpstr.split(",").at(1), tmpstr);
+                }
+            }
         }
         ctypes.close();
     }
-    QStringList curcarvelist;
-    curcarvelist.clear();
+    //qDebug() << "matching header types to look for:" << ctypelist;
+    //QStringList curcarvelist;
+    //curcarvelist.clear();
+    /*
     // TMPCONF IS FOR SCALPEL... IF I BUILD MY OWN SIMPLE CARVER, I CAN USE QT AND A STRINGLIST VARIABLE...
     QString tmpcstr = wombatvariable.tmpfilepath + "curcarvesettings";
     QFile tmpconf(tmpcstr);
@@ -2258,6 +2269,7 @@ void TestCarving(QStringList plist, QStringList flist)
         tmpconf.close();
     }
     //qDebug() << "curcarvelist:" << curcarvelist;
+    */
     // add current carving settings to log somehow...
     // HAVE TO FIGURE OUT HOW TO COMPARE STRING WITH ????? AND THE ACTUAL HEX I GET FROM BYTE ARRAY...
 
@@ -2265,7 +2277,7 @@ void TestCarving(QStringList plist, QStringList flist)
     //qDebug() << plist << flist;
     for(int i=0; i < plist.count(); i++)
     {
-        qDebug() << "For:" << plist.at(i);
+        //qDebug() << "For:" << plist.at(i);
         QString estring = plist.at(i).split("-").first();
         QString vstring = plist.at(i).split("-").at(1);
         QString pstring = plist.at(i).split("-").at(2);
@@ -2306,7 +2318,7 @@ void TestCarving(QStringList plist, QStringList flist)
         if(partfile.isOpen())
         {
             QString tmpstr = partfile.readLine();
-            qDebug() << tmpstr;
+            //qDebug() << tmpstr;
             partlist = tmpstr.split(",", QString::SkipEmptyParts);
             partfile.close();
         }
@@ -2324,18 +2336,41 @@ void TestCarving(QStringList plist, QStringList flist)
         qint64 blockcount = partsize / blocksize;
         // ACCOUTN FOR A POSSIBLE OFFSET OF NOT ZERO, MAYBE OFFSET - OFFSET = START, SIZE - OFFSET = NEW PARTSIZE, STILL MULTIPLE OF BLOCKSIZE
         //qDebug() << "partition offset|size|blk size|#blocks:" << partlist.at(4) << partlist.at(1) << partlist.at(6) << partlist.at(1).toLongLong() / partlist.at(6).toLongLong();
-        for(int j=0; j < flist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
+        //for(int j=0; j < flist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
+        for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
         {
-            qDebug() << "find each flist:" << flist.at(j);
+            qDebug() << ctypelist.at(j);
+            QString curheadstr = ctypelist.at(j).split(",").at(2);
+            int bytecount = curheadstr.count() / 2;
+            qDebug() << "bytecount:" << bytecount;
+            int headleft = curheadstr.indexOf("?");
+            int headright = curheadstr.lastIndexOf("?");
+            if(headleft != -1)
+                qDebug() << "headleft:" << curheadstr.left(headleft);
+            if(headright != -1)
+                qDebug() << "headright:" << curheadstr.mid(headright+1);
+            if(headleft != -1 && headright != -1)
+                qDebug() << "headmid:" << curheadstr.mid(headleft, headright+1-headleft);
+            else
+                qDebug() << "head:" << curheadstr;
+            //qDebug() << "curheadstr count|headleft|headright:" << curheadstr.count() << curheadstr.indexOf("?") << curheadstr.lastIndexOf("?");
+            //qDebug() << "find each flist:" << flist.at(j);
             //for(int k=0; k < blockcount; k++)
             for(int k=0; k < 5; k++) // FOR TESTING PURPOSES, ONLY DO 5 BLOCKS
             {
-                QByteArray headerarray;
-                headerarray.clear();
-                bool isseek = rawfile.seek(k * blocksize);
-                if(isseek)
-                    headerarray = rawfile.read(10);
-                qDebug() << "header content for block" << k << ": 0x" << QString::fromStdString(headerarray.toHex(0).toStdString());
+                QString curkey = pstring + "-b" + QString::number(k);
+                if(!headhash.contains(curkey)) // block hasn't been claimed by any header yet...
+                {
+                    QByteArray headerarray;
+                    headerarray.clear();
+                    bool isseek = rawfile.seek(k * blocksize);
+                    if(isseek)
+                        headerarray = rawfile.read(bytecount);
+                    qDebug() << "header content for block" << k << ":" << QString::fromStdString(headerarray.toHex(0).toStdString());
+                    // COMPARE HEADERS AND IF MATCH, ADD TO headhash
+                }
+                else
+                    qDebug() << "block" << k << "has already been claimed by:" << headhash.value(curkey);
             }
         }
         rawfile.close();
