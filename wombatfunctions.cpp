@@ -2398,6 +2398,7 @@ void TestCarving(QStringList plist, QStringList flist)
 	{
 	    QString pbkey = "p" + QString::number(h.key()) + "-b" + QString::number(blist.at(l));
 	    qDebug() << pbkey;
+	    //for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
 	}
     }
 
