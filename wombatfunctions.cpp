@@ -2222,6 +2222,7 @@ void TestCarving(QStringList plist, QStringList flist)
 {
     QString hpath = QDir::homePath();
     QStringList ctypelist;
+    QHash<int, QList<int> > partblockhash;
     QHash<QString, QString> headhash;
     headhash.clear();
     ctypelist.clear();
@@ -2313,8 +2314,13 @@ void TestCarving(QStringList plist, QStringList flist)
         for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
         {
             qDebug() << ctypelist.at(j);
+	    QString curheadcat = ctypelist.at(j).split(",").at(0);
             QString curheadstr = ctypelist.at(j).split(",").at(2);
 	    QString curheadname = ctypelist.at(j).split(",").at(1);
+	    QString curfootstr = ctypelist.at(j).split(",").at(3);
+	    QString curextstr = ctypelist.at(j).split(",").at(4);
+	    qint64 curmaxsize = ctypelist.at(j).split(",").at(5).toLongLong();
+	    qDebug() << "current header information:" << curfootstr << curextstr << curheadcat << curmaxsize;
 	    qDebug() << "current header string to match:" << curheadstr;
             int bytecount = curheadstr.count() / 2;
             //qDebug() << "bytecount:" << bytecount;
@@ -2334,9 +2340,9 @@ void TestCarving(QStringList plist, QStringList flist)
             else
                 //qDebug() << "head:" << curheadstr;
 	    */
-            //qDebug() << "curheadstr count|headleft|headright:" << curheadstr.count() << curheadstr.indexOf("?") << curheadstr.lastIndexOf("?");
             //qDebug() << "find each flist:" << flist.at(j);
-            //for(int k=0; k < blockcount; k++)
+	    QList<int> blocklist;
+	    blocklist.clear();
             for(int k=0; k < blockcount; k++) // FOR TESTING PURPOSES, ONLY DO 5 BLOCKS
             {
                 QString curkey = pstring + "-b" + QString::number(k);
@@ -2355,6 +2361,7 @@ void TestCarving(QStringList plist, QStringList flist)
 			//qDebug() << "compare:" << blockheader << "with" << curheadstr;
 			if(blockheader.contains(curheadstr))
 			{
+			    blocklist.append(k);
 			    headhash.insert(curkey, curheadname);
 			    qDebug() << "a match";
 			}
@@ -2363,6 +2370,7 @@ void TestCarving(QStringList plist, QStringList flist)
 		    {
 			if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
 			{
+			    blocklist.append(k);
 			    headhash.insert(curkey, curheadname);
 			    qDebug() << "a match.";
 			}
@@ -2371,11 +2379,31 @@ void TestCarving(QStringList plist, QStringList flist)
                 else
                     qDebug() << "block" << k << "has already been claimed by:" << headhash.value(curkey);
             }
+	    if(blocklist.count() > 0)
+		partblockhash.insert(i, blocklist);
         }
         rawfile.close();
     }
     qDebug() << "header search finished." << headhash.count() << "results provided.";
     qDebug() << "headhash:" << headhash;
+    //qDebug() << "ordered blocklist:" << blocklist;
+    qDebug() << "ordered blocklist:" << partblockhash;
+    for(int i=0; i < plist.count(); i++)
+    {
+    }
+    // START FOOTER MATCH....
+    /* no good way to sort block #'s...
+    QHashIterator<QString, QString> h(headhash);
+    QList<qint64> blocklist;
+    blocklist.clear();
+    while(h.hasNext())
+    {
+	h.next();
+	blocklist.append(h.key().split("-b").last().toLongLong());
+	//cout << h.key() << ": " << h.value() << Qt::endl;
+    }
+    qDebug() << "int blocklist:" << blocklist;
+    */
     /* SIMPLE CARVER SAMPLE CODE FROM CS50, MIGRATE TO QT C++ FROM STD::C AND SEE HOW IT COMPARES TO PULLING OUT WHAT I NEED FROM SCALPEL
      *#include <stdio.h>
 #include <stdint.h>
