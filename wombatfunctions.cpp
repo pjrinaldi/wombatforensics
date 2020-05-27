@@ -2388,10 +2388,19 @@ void TestCarving(QStringList plist, QStringList flist)
     qDebug() << "headhash:" << headhash;
     //qDebug() << "ordered blocklist:" << blocklist;
     qDebug() << "ordered blocklist:" << partblockhash;
-    for(int i=0; i < plist.count(); i++)
-    {
-    }
     // START FOOTER MATCH....
+    QHashIterator<int, QList<int> > h(partblockhash);
+    while(h.hasNext())
+    {
+	h.next();
+	QList<int> blist = h.value();
+	for(int l=0; l < blist.count(); l++)
+	{
+	    QString pbkey = "p" + QString::number(h.key()) + "-b" + QString::number(blist.at(l));
+	    qDebug() << pbkey;
+	}
+    }
+
     /* no good way to sort block #'s...
     QHashIterator<QString, QString> h(headhash);
     QList<qint64> blocklist;
