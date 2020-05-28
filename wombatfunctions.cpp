@@ -2367,8 +2367,9 @@ void TestCarving(QStringList plist, QStringList flist)
 			{
 			    blocklist.append(k);
                             tmphash.insert(k, ctypelist.at(j));
-			    headhash.insert(curkey, curheadname);
-			    qDebug() << "a match";
+			    headhash.insert(curkey, ctypelist.at(j));
+			    //headhash.insert(curkey, curheadname);
+			    //qDebug() << "a match";
 			}
 		    }
 		    else // header with ???'s
@@ -2377,45 +2378,72 @@ void TestCarving(QStringList plist, QStringList flist)
 			{
 			    blocklist.append(k);
                             tmphash.insert(k, ctypelist.at(j));
-			    headhash.insert(curkey, curheadname);
-			    qDebug() << "a match.";
+			    headhash.insert(curkey, ctypelist.at(j));
+			    //headhash.insert(curkey, curheadname);
+			    //qDebug() << "a match.";
 			}
 		    }
                 }
                 else
-                    qDebug() << "block" << k << "has already been claimed by:" << headhash.value(curkey);
+		{
+                    //qDebug() << "block" << k << "has already been claimed by:" << headhash.value(curkey);
+		}
             }
             //fullhash.insert(i, tmphash);
 	    if(blocklist.count() > 0)
 		partblockhash.insert(i, blocklist);
+	    // START FOOTER MATCH....
+	    QHashIterator<int, QList<int> > h(partblockhash);
+	    while(h.hasNext())
+	    {
+		qint64 blockdifference;
+		qint64 maxsize;
+		QString footer = "";
+		h.next();
+		QList<int> blist = h.value();
+		for(int l=0; l < blist.count(); l++)
+		{
+		    if(l == (blist.count() - 1))
+		    {
+			blockdifference = (blockcount - blist.at(l)) * blocksize;
+			//qDebug() << "block diff:" << (blockcount - blist.at(l)) * blocksize;
+		    }
+		    else
+		    {
+			blockdifference = (blist.at(l+1) - blist.at(l)) * blocksize;
+			//qDebug() << "block diff:" << (blist.at(l+1) - blist.at(l)) * blocksize;
+		    }
+		    QString pbkey = "p" + QString::number(h.key()) + "-b" + QString::number(blist.at(l));
+		    maxsize = headhash.value(pbkey).split(",").at(5).toLongLong();
+		    footer = headhash.value(pbkey).split(",").at(3);
+		    //qDebug() << "max size:" << headhash.value(pbkey).split(",").at(5);
+		    // still need to get full typestring so i can get the maxsize for comparison
+		    //qDebug() << pbkey;
+		    //for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
+		    if(blockdifference < maxsize) // use blockdifference
+		    {
+			qDebug() << "use blockdifference";
+		    }
+		    else
+		    {
+			qDebug() << "use maxsize";
+		    }
+		    if(!footer.isEmpty())
+		    {
+			QByteArray footarray = 
+		    }
+		}
+	    }
+
         }
         rawfile.close();
     }
     qDebug() << "header search finished." << headhash.count() << "results provided.";
-    qDebug() << "headhash:" << headhash;
+    //qDebug() << "headhash:" << headhash;
     //qDebug() << "ordered blocklist:" << blocklist;
-    qDebug() << "ordered blocklist:" << partblockhash;
+    //qDebug() << "ordered blocklist:" << partblockhash;
     //qDebug() << "full hash:" << fullhash;
     //qDebug() << "full hash.value(0):" << fullhash.value(0);
-    // START FOOTER MATCH....
-    QHashIterator<int, QList<int> > h(partblockhash);
-    while(h.hasNext())
-    {
-	h.next();
-	QList<int> blist = h.value();
-	for(int l=0; l < blist.count(); l++)
-	{
-            if(l == (blist.count() - 1))
-                qDebug() << "block diff:" << "(blockcount - blist.at(l)) * 512";
-            else
-                qDebug() << "block diff:" << (blist.at(l+1) - blist.at(l));
-	    QString pbkey = "p" + QString::number(h.key()) + "-b" + QString::number(blist.at(l));
-            qDebug() << "max size:" << headhash.value(pbkey);
-            // still need to get full typestring so i can get the maxsize for comparison
-	    qDebug() << pbkey;
-	    //for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
-	}
-    }
 
     /* no good way to sort block #'s...
     QHashIterator<QString, QString> h(headhash);
