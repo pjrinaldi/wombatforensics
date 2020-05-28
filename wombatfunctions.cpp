@@ -2224,8 +2224,10 @@ void TestCarving(QStringList plist, QStringList flist)
     QStringList ctypelist;
     QHash<int, QList<int> > partblockhash;
     QHash<QString, QString> headhash;
+    //QHash<int, QHash<int, QString> > fullhash;
     headhash.clear();
     ctypelist.clear();
+    //fullhash.clear();
     hpath += "/.local/share/wombatforensics/";
     QFile ctypes(hpath + "carvetypes");
     if(!ctypes.isOpen())
@@ -2343,6 +2345,8 @@ void TestCarving(QStringList plist, QStringList flist)
             //qDebug() << "find each flist:" << flist.at(j);
 	    QList<int> blocklist;
 	    blocklist.clear();
+            QHash<int, QString> tmphash;
+            tmphash.clear();
             for(int k=0; k < blockcount; k++) // FOR TESTING PURPOSES, ONLY DO 5 BLOCKS
             {
                 QString curkey = pstring + "-b" + QString::number(k);
@@ -2362,6 +2366,7 @@ void TestCarving(QStringList plist, QStringList flist)
 			if(blockheader.contains(curheadstr))
 			{
 			    blocklist.append(k);
+                            tmphash.insert(k, ctypelist.at(j));
 			    headhash.insert(curkey, curheadname);
 			    qDebug() << "a match";
 			}
@@ -2371,6 +2376,7 @@ void TestCarving(QStringList plist, QStringList flist)
 			if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
 			{
 			    blocklist.append(k);
+                            tmphash.insert(k, ctypelist.at(j));
 			    headhash.insert(curkey, curheadname);
 			    qDebug() << "a match.";
 			}
@@ -2379,6 +2385,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 else
                     qDebug() << "block" << k << "has already been claimed by:" << headhash.value(curkey);
             }
+            //fullhash.insert(i, tmphash);
 	    if(blocklist.count() > 0)
 		partblockhash.insert(i, blocklist);
         }
@@ -2388,6 +2395,8 @@ void TestCarving(QStringList plist, QStringList flist)
     qDebug() << "headhash:" << headhash;
     //qDebug() << "ordered blocklist:" << blocklist;
     qDebug() << "ordered blocklist:" << partblockhash;
+    //qDebug() << "full hash:" << fullhash;
+    //qDebug() << "full hash.value(0):" << fullhash.value(0);
     // START FOOTER MATCH....
     QHashIterator<int, QList<int> > h(partblockhash);
     while(h.hasNext())
@@ -2396,7 +2405,13 @@ void TestCarving(QStringList plist, QStringList flist)
 	QList<int> blist = h.value();
 	for(int l=0; l < blist.count(); l++)
 	{
+            if(l == (blist.count() - 1))
+                qDebug() << "block diff:" << "(blockcount - blist.at(l)) * 512";
+            else
+                qDebug() << "block diff:" << (blist.at(l+1) - blist.at(l));
 	    QString pbkey = "p" + QString::number(h.key()) + "-b" + QString::number(blist.at(l));
+            qDebug() << "max size:" << headhash.value(pbkey);
+            // still need to get full typestring so i can get the maxsize for comparison
 	    qDebug() << pbkey;
 	    //for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
 	}
