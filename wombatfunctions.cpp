@@ -2405,18 +2405,20 @@ void TestCarving(QStringList plist, QStringList flist)
 		{
 		    if(l == (blist.count() - 1))
 		    {
+                        //qDebug() << "blockcount:" << blockcount << blist.at(l) << blockcount - blist.at(l) << (blockcount - blist.at(l)) * blocksize;
 			blockdifference = (blockcount - blist.at(l)) * blocksize;
 			//qDebug() << "block diff:" << (blockcount - blist.at(l)) * blocksize;
 		    }
 		    else
 		    {
+                        //qDebug() << "next block:" << blist.at(l+1) << blist.at(l) << blist.at(l+1) - blist.at(l) << (blist.at(l+1) - blist.at(l)) * blocksize;
 			blockdifference = (blist.at(l+1) - blist.at(l)) * blocksize;
 			//qDebug() << "block diff:" << (blist.at(l+1) - blist.at(l)) * blocksize;
 		    }
 		    QString pbkey = "p" + QString::number(h.key()) + "-b" + QString::number(blist.at(l));
 		    maxsize = headhash.value(pbkey).split(",").at(5).toLongLong();
 		    footer = headhash.value(pbkey).split(",").at(3);
-		    //qDebug() << "max size:" << headhash.value(pbkey).split(",").at(5);
+		    //qDebug() << "max size|footer:" << maxsize << footer;
 		    // still need to get full typestring so i can get the maxsize for comparison
 		    //qDebug() << pbkey;
 		    //for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
@@ -2436,22 +2438,35 @@ void TestCarving(QStringList plist, QStringList flist)
                         //qDebug() << "footer" << footer << "arraysize" << arraysize;
                         QByteArray footerarray;
                         footerarray.clear();
+                        //qDebug() << "seek position:" << blist.at(l) * blocksize;
                         bool isseek = rawfile.seek(blist.at(l) * blocksize);
                         if(isseek)
                             footerarray = rawfile.read(arraysize);
+                        //qDebug() << "footerarray count:" << footerarray.count();
                         QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
                         qint64 footerpos = footerstr.indexOf(footer);
-                        if(footerpos == -1) // use full length
+                        //qDebug() << "footerstr count:" << footerstr.count();
+                        qint64 lastfooterpos = footerstr.lastIndexOf(footer);
+                        //qDebug() << "footerpos:" << footerpos;
+                        qDebug() << "last footerpos:" << lastfooterpos;
+                        qint64 carvedstringsize = 0;
+                        if(lastfooterpos == -1) // use full length
                         {
+                            carvedstringsize = arraysize;
+                            // store end pos here..
                             qDebug() << "footer not found, will use arraysize for file content...";
                             // create stat file, prop file, add to tree, etc...
                         }
                         else // it was found...
                         {
+                            carvedstringsize = lastfooterpos + footer.count();
+                            // store end pos here.
                             // do all the above using the offset distance plus the length of the footer...
                             //qDebug() << "file start:" << blist.at(l) * blocksize << QString::number(blist.at(l) * blocksize, 16);
                             //qDebug() << "footerpos:" << footerpos << "footer value:" << footerstr.mid(footerpos, footer.count()) << "actual file end:" << footerpos + footer.count() << QString::number((blist.at(l) * blocksize) + footerpos + footer.count(), 16);
-                            QByteArray tmparray = footerarray.left(footerpos + footer.count());
+                            /*
+                             * TEST FILE DUMP WORKS...
+                            QByteArray tmparray = footerarray.left(lastfooterpos + footer.count());
                             qDebug() << "tmparray size:" << tmparray.count();
                             QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
                             QFile tfile(tmpfstr);
@@ -2459,20 +2474,10 @@ void TestCarving(QStringList plist, QStringList flist)
                             QDataStream otbuf(&tfile);
                             otbuf.writeRawData(tmparray, tmparray.count());
                             tfile.close();
-                            /*
-                             *
-        QString parstr = wombatvariable.tmpfilepath + thumbid + "-fhex";
-        QFile parfile(parstr);
-        if(!parfile.isOpen())
-            parfile.open(QIODevice::WriteOnly);
-        if(parfile.isOpen())
-        {
-            QDataStream outbuf(&parfile);
-            outbuf.writeRawData(filebuffer, bufferlength);
-            parfile.close();
-        }
-                             */ 
+                            */
                         }
+                        //it works using lastfooterpos rather than first footerpos since the footer is more common...
+                        // do all stat/prop tree stuff here....
 		    }
 		}
 	    }
