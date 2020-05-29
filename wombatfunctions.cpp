@@ -2347,7 +2347,7 @@ void TestCarving(QStringList plist, QStringList flist)
 	    blocklist.clear();
             QHash<int, QString> tmphash;
             tmphash.clear();
-            for(int k=0; k < blockcount; k++) // FOR TESTING PURPOSES, ONLY DO 5 BLOCKS
+            for(int k=0; k < blockcount; k++)
             {
                 QString curkey = pstring + "-b" + QString::number(k);
                 if(!headhash.contains(curkey)) // block hasn't been claimed by any header yet...
@@ -2454,8 +2454,7 @@ void TestCarving(QStringList plist, QStringList flist)
                         {
                             carvedstringsize = arraysize;
                             // store end pos here..
-                            qDebug() << "footer not found, will use arraysize for file content...";
-                            // create stat file, prop file, add to tree, etc...
+                            //qDebug() << "footer not found, will use arraysize for file content...";
                         }
                         else // it was found...
                         {
@@ -2485,7 +2484,7 @@ void TestCarving(QStringList plist, QStringList flist)
         }
         rawfile.close();
     }
-    qDebug() << "header search finished." << headhash.count() << "results provided.";
+    //qDebug() << "header search finished." << headhash.count() << "results provided.";
     //qDebug() << "headhash:" << headhash;
     //qDebug() << "ordered blocklist:" << blocklist;
     //qDebug() << "ordered blocklist:" << partblockhash;
