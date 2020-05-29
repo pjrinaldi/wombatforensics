@@ -2444,7 +2444,7 @@ void TestCarving(QStringList plist, QStringList flist)
                             footerarray = rawfile.read(arraysize);
                         //qDebug() << "footerarray count:" << footerarray.count();
                         QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
-                        qint64 footerpos = footerstr.indexOf(footer);
+                        //qint64 footerpos = footerstr.indexOf(footer);
                         //qDebug() << "footerstr count:" << footerstr.count();
                         qint64 lastfooterpos = footerstr.lastIndexOf(footer);
                         //qDebug() << "footerpos:" << footerpos;
