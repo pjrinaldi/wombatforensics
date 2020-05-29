@@ -2321,15 +2321,15 @@ void TestCarving(QStringList plist, QStringList flist)
 	    QString curheadname = ctypelist.at(j).split(",").at(1);
 	    QString curfootstr = ctypelist.at(j).split(",").at(3);
 	    QString curextstr = ctypelist.at(j).split(",").at(4);
-	    qint64 curmaxsize = ctypelist.at(j).split(",").at(5).toLongLong();
-	    qDebug() << "current header information:" << curfootstr << curextstr << curheadcat << curmaxsize;
-	    qDebug() << "current header string to match:" << curheadstr;
+	    //qint64 curmaxsize = ctypelist.at(j).split(",").at(5).toLongLong();
+	    //qDebug() << "current header information:" << curfootstr << curextstr << curheadcat << curmaxsize;
+	    //qDebug() << "current header string to match:" << curheadstr;
             int bytecount = curheadstr.count() / 2;
             //qDebug() << "bytecount:" << bytecount;
             int headleft = curheadstr.indexOf("?");
             int headright = curheadstr.lastIndexOf("?");
-	    qDebug() << "bytecount:" << bytecount << "headleft:" << headleft << "headright:" << headright;
-	    qDebug() << "blockcount:" << blockcount;
+	    //qDebug() << "bytecount:" << bytecount << "headleft:" << headleft << "headright:" << headright;
+	    //qDebug() << "blockcount:" << blockcount;
             //int headskip = headright + 1 - headleft;
             //qDebug() << "headskip:" << headskip;
 	    /*
@@ -2420,17 +2420,59 @@ void TestCarving(QStringList plist, QStringList flist)
 		    // still need to get full typestring so i can get the maxsize for comparison
 		    //qDebug() << pbkey;
 		    //for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
+                    qint64 arraysize = 0;
 		    if(blockdifference < maxsize) // use blockdifference
 		    {
-			qDebug() << "use blockdifference";
+                        arraysize = blockdifference;
+			//qDebug() << "use blockdifference:" << blockdifference;
 		    }
 		    else
 		    {
-			qDebug() << "use maxsize";
+                        arraysize = maxsize;
+			//qDebug() << "use maxsize:" << maxsize;
 		    }
 		    if(!footer.isEmpty())
 		    {
-			QByteArray footarray = 
+                        //qDebug() << "footer" << footer << "arraysize" << arraysize;
+                        QByteArray footerarray;
+                        footerarray.clear();
+                        bool isseek = rawfile.seek(blist.at(l) * blocksize);
+                        if(isseek)
+                            footerarray = rawfile.read(arraysize);
+                        QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
+                        qint64 footerpos = footerstr.indexOf(footer);
+                        if(footerpos == -1) // use full length
+                        {
+                            qDebug() << "footer not found, will use arraysize for file content...";
+                            // create stat file, prop file, add to tree, etc...
+                        }
+                        else // it was found...
+                        {
+                            // do all the above using the offset distance plus the length of the footer...
+                            //qDebug() << "file start:" << blist.at(l) * blocksize << QString::number(blist.at(l) * blocksize, 16);
+                            //qDebug() << "footerpos:" << footerpos << "footer value:" << footerstr.mid(footerpos, footer.count()) << "actual file end:" << footerpos + footer.count() << QString::number((blist.at(l) * blocksize) + footerpos + footer.count(), 16);
+                            QByteArray tmparray = footerarray.left(footerpos + footer.count());
+                            qDebug() << "tmparray size:" << tmparray.count();
+                            QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
+                            QFile tfile(tmpfstr);
+                            tfile.open(QIODevice::WriteOnly);
+                            QDataStream otbuf(&tfile);
+                            otbuf.writeRawData(tmparray, tmparray.count());
+                            tfile.close();
+                            /*
+                             *
+        QString parstr = wombatvariable.tmpfilepath + thumbid + "-fhex";
+        QFile parfile(parstr);
+        if(!parfile.isOpen())
+            parfile.open(QIODevice::WriteOnly);
+        if(parfile.isOpen())
+        {
+            QDataStream outbuf(&parfile);
+            outbuf.writeRawData(filebuffer, bufferlength);
+            parfile.close();
+        }
+                             */ 
+                        }
 		    }
 		}
 	    }
