@@ -2222,12 +2222,7 @@ void TestCarving(QStringList plist, QStringList flist)
 {
     QString hpath = QDir::homePath();
     QStringList ctypelist;
-    QHash<int, QList<int> > partblockhash;
-    QHash<QString, QString> headhash;
-    //QHash<int, QHash<int, QString> > fullhash;
-    headhash.clear();
     ctypelist.clear();
-    //fullhash.clear();
     hpath += "/.local/share/wombatforensics/";
     QFile ctypes(hpath + "carvetypes");
     if(!ctypes.isOpen())
@@ -2249,12 +2244,15 @@ void TestCarving(QStringList plist, QStringList flist)
         ctypes.close();
     }
     // add current carving settings to log somehow...
-    // HAVE TO FIGURE OUT HOW TO COMPARE STRING WITH ????? AND THE ACTUAL HEX I GET FROM BYTE ARRAY...
 
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
     for(int i=0; i < plist.count(); i++)
     {
-        //qDebug() << "For:" << plist.at(i);
+        QHash<int, QString> headhash;
+        //QHash<QString, QString> headhash; // might be able to do QHash<int, qstring> <j, curtypestr> // might not need p# since i'm doing this within the context of the current partition...
+        headhash.clear();
+        QList<int> blocklist;
+        blocklist.clear();
         QString estring = plist.at(i).split("-").first();
         QString vstring = plist.at(i).split("-").at(1);
         QString pstring = plist.at(i).split("-").at(2);
@@ -2294,11 +2292,9 @@ void TestCarving(QStringList plist, QStringList flist)
         if(partfile.isOpen())
         {
             QString tmpstr = partfile.readLine();
-            //qDebug() << tmpstr;
             partlist = tmpstr.split(",", QString::SkipEmptyParts);
             partfile.close();
         }
-        //qDebug() << "casedatafile:" << rawevidencepath;
         QFile rawfile(rawevidencepath);
         if(!rawfile.isOpen())
             rawfile.open(QIODevice::ReadOnly);
@@ -2310,28 +2306,149 @@ void TestCarving(QStringList plist, QStringList flist)
         qint64 blocksize = partlist.at(6).toLongLong();
         qint64 partsize = partlist.at(1).toLongLong() - partoffset;
         qint64 blockcount = partsize / blocksize;
+        for(int j=0; j < blockcount; j++)
+        {
+            // CHECK FOR WOMBATVARIABLE.TMPMNTPATH + CARVED/*.STAT EXIST WHICH MATCHES, E0-V0-P#-C(BLOCK#).STAT
+            // IF EXISTS, SKIP BLOCK CAUSE ALREADY CARVED FOR SOME TYPE...
+            // MIGHT USE HEADHASH AS A VARIABLE GENERATED AT START TIME, BUT I'LL FIGURE IT OUT.
+            //QString curkey = pstring + "-b" + QString::number(j);
+            for(int k=0; k < ctypelist.count(); k++)
+            {
+                QString curtypestr = ctypelist.at(k);
+                QString curheadcat = ctypelist.at(k).split(",").at(0);
+                QString curheadnam = ctypelist.at(k).split(",").at(1);
+                QString curheadstr = ctypelist.at(k).split(",").at(2);
+                QString curfootstr = ctypelist.at(k).split(",").at(3);
+                QString curextstr = ctypelist.at(k).split(",").at(4);
+                QString curmaxsize = ctypelist.at(k).split(",").at(5);
+                int bytecount = curheadstr.count() / 2;
+                if(curheadnam.contains("JPEG"))
+                {
+                    bytecount = 11;
+                }
+                QByteArray headerarray;
+                headerarray.clear();
+                bool isseek = rawfile.seek(j * blocksize);
+                if(isseek)
+                    headerarray = rawfile.read(bytecount);
+                QString blockheader = QString::fromStdString(headerarray.toHex(0).toStdString()).toUpper();
+                if(curheadnam.contains("JPEG"))
+                {
+                    QString exifjpghdr = "FFD8FFE1????45786966";
+                    QString spifjpghdr = "FFD8FFE8????5350494646";
+                    QString jfifjpghdr = "FFD8FFE0????4A464946";
+                    if(blockheader.contains("FFD8FFE1") && blockheader.contains("45786966")) // EXIF JPEG
+                    {
+                        curheadnam = "EXIF JPEG";
+                        curheadstr = exifjpghdr;
+                    }
+                    else if(blockheader.contains("FFD8FFE8") && blockheader.contains("5350494646")) // SPIFF JPEG
+                    {
+                        curheadnam = "SPIFF JPEG";
+                        curheadstr = spifjpghdr;
+                    }
+                    else if(blockheader.contains("FFD8FFE0") && blockheader.contains("4A464946")) // JFIF JPEG
+                    {
+                        curheadnam = "JFIF JPEG";
+                        curheadstr = jfifjpghdr;
+                    }
+                    curtypestr = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
+                }
+                // COMPARE BLOCK HEADER TO THE CURHEADSTR FOR MATCH...
+                int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
+                int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
+                if(headleft == -1 && headright == -1) // header without ???'s
+                {
+                    if(blockheader.contains(curheadstr))
+                    {
+                        blocklist.append(j);
+                        headhash.insert(j, curtypestr);
+                        //headhash.insert(curkey, curtypestr);
+                    }
+                }
+                else // header with ???'s
+                {
+                    if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
+                    {
+                        blocklist.append(j);
+                        headhash.insert(j, curtypestr);
+                        //headhash.insert(curkey, curtypestr);
+                    }
+                }
+            }
+        }
+        for(int j=0; j < blocklist.count(); j++)
+        {
+            QString curtypestr = headhash.value(blocklist.at(j));
+            //qDebug() << "curtypestr:" << curtypestr;
+            qint64 blockdifference = 0;
+            qint64 curmaxsize = curtypestr.split(",").at(5).toLongLong();
+            qint64 arraysize = 0;
+            qint64 carvedstringsize = 0;
+            QString curfooter = curtypestr.split(",").at(3);
+            // GENERATE BLOCKLISTSTRING BELOW FOR THE PROPERTY FILE...
+            if(j == (blocklist.count()-1))
+                blockdifference = (blockcount - blocklist.at(j)) * blocksize;
+            else
+                blockdifference = (blocklist.at(j+1) - blocklist.at(j)) * blocksize;
+            if(blockdifference < curmaxsize)
+                arraysize = blockdifference;
+            else
+                arraysize = curmaxsize;
+            if(!curfooter.isEmpty()) // if footer exists
+            {
+                QByteArray footerarray;
+                footerarray.clear();
+                bool isseek = rawfile.seek(blocklist.at(j) * blocksize);
+                if(isseek)
+                    footerarray = rawfile.read(arraysize);
+                QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
+                qint64 lastfooterpos = footerstr.lastIndexOf(curfooter);
+                if(lastfooterpos == -1) // no footer found, use full length
+                    carvedstringsize = arraysize;
+                else // footer found, so use it
+                    carvedstringsize = lastfooterpos + curfooter.count();
+            }
+            else // no footer defined, just use arraysize as size
+            {
+                carvedstringsize = arraysize;
+            }
+            // DO STAT/PROP/TREENODE here and everything else everywhere else to make it work.
+            qDebug() << "filename:" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(j) + ".stat/.prop" << "filesize" << carvedstringsize << "cat/sig" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1);
+        }
+
+        //qDebug() << blocklist << headhash;
+        //QString exifjpghdr = "FFD8FFE1????45786966";
+        //QString spifjpghdr = "FFD8FFE8????5350494646";
+        //QString jfifjpghdr = "FFD8FFE0????4A464946";
         // ACCOUTN FOR A POSSIBLE OFFSET OF NOT ZERO, MAYBE OFFSET - OFFSET = START, SIZE - OFFSET = NEW PARTSIZE, STILL MULTIPLE OF BLOCKSIZE
         //qDebug() << "partition offset|size|blk size|#blocks:" << partlist.at(4) << partlist.at(1) << partlist.at(6) << partlist.at(1).toLongLong() / partlist.at(6).toLongLong();
         //for(int j=0; j < flist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
+        /*
         for(int j=0; j < ctypelist.count(); j++) // THIS WILL BE REPLACED WITH CONCURRENT::MAP(FLIST ITEM...) OR MAYBE BY MAP(BLOCK#)
         {
             qDebug() << ctypelist.at(j);
-	    QString curheadcat = ctypelist.at(j).split(",").at(0);
-            QString curheadstr = ctypelist.at(j).split(",").at(2);
-	    QString curheadname = ctypelist.at(j).split(",").at(1);
-	    QString curfootstr = ctypelist.at(j).split(",").at(3);
-	    QString curextstr = ctypelist.at(j).split(",").at(4);
-	    //qint64 curmaxsize = ctypelist.at(j).split(",").at(5).toLongLong();
+	    QString curheadcat = ctypelist.at(j).split(",").at(0); // might be moving to own filecarvers.cpp
+            QString curheadstr = ctypelist.at(j).split(",").at(2); // might be moving to own filecarvers.cpp
+	    QString curheadname = ctypelist.at(j).split(",").at(1); // might be moving to own filecarvers.cpp
+	    QString curfootstr = ctypelist.at(j).split(",").at(3); // might be moving to own filecarvers.cpp
+	    QString curextstr = ctypelist.at(j).split(",").at(4); // might be moving to own filecarvers.cpp
+	    //qint64 curmaxsize = ctypelist.at(j).split(",").at(5).toLongLong(); // might be moving to own filecarvers.cpp
 	    //qDebug() << "current header information:" << curfootstr << curextstr << curheadcat << curmaxsize;
 	    //qDebug() << "current header string to match:" << curheadstr;
-            int bytecount = curheadstr.count() / 2;
-            //qDebug() << "bytecount:" << bytecount;
-            int headleft = curheadstr.indexOf("?");
-            int headright = curheadstr.lastIndexOf("?");
+            qDebug() << "current header|header string:" << curheadname << curheadstr;
+            int bytecount = 0;
+            if(curheadname.contains("JPEG"))
+                bytecount = 11;
+            else
+                bytecount = curheadstr.count() / 2;
+            //int bytecount = curheadstr.count() / 2; // might be moving to own filecarvers.cpp
+            qDebug() << "bytecount:" << bytecount;
 	    //qDebug() << "bytecount:" << bytecount << "headleft:" << headleft << "headright:" << headright;
 	    //qDebug() << "blockcount:" << blockcount;
             //int headskip = headright + 1 - headleft;
             //qDebug() << "headskip:" << headskip;
+            */
 	    /*
             if(headleft != -1)
                 //qDebug() << "headleft:" << curheadstr.left(headleft);
@@ -2343,10 +2460,12 @@ void TestCarving(QStringList plist, QStringList flist)
                 //qDebug() << "head:" << curheadstr;
 	    */
             //qDebug() << "find each flist:" << flist.at(j);
+            //if(curheadname.contains("JPEG"))
+            //    CarveJPEG(ctypelist.at(j));
+ // might be moving to own filecarvers.cpp
+            /*
 	    QList<int> blocklist;
 	    blocklist.clear();
-            QHash<int, QString> tmphash;
-            tmphash.clear();
             for(int k=0; k < blockcount; k++)
             {
                 QString curkey = pstring + "-b" + QString::number(k);
@@ -2358,6 +2477,36 @@ void TestCarving(QStringList plist, QStringList flist)
                     if(isseek)
                         headerarray = rawfile.read(bytecount);
 		    QString blockheader = QString::fromStdString(headerarray.toHex(0).toStdString()).toUpper();
+                    // DETERMINE JPEG TYPE....
+                    if(curheadname.contains("JPEG"))
+                    {
+                        if(blockheader.contains("FFD8"))
+                        {
+                            //qDebug() << "generic jpeg";
+                            curheadname = "JPEG";
+                            curheadstr = "FFD8";
+                        }
+                        if(blockheader.contains("FFD8FFE1") && blockheader.contains("45786966")) // EXIF JPEG
+                        {
+                            //qDebug() << "contains exif";
+                            curheadname = "EXIF JPEG";
+                            curheadstr = exifjpghdr;
+                        }
+                        else if(blockheader.contains("FFD8FFE8") && blockheader.contains("5350494646")) // SPIFF JPEG
+                        {
+                            //qDebug() << "contains spiff";
+                            curheadname = "SPIFF JPEG";
+                            curheadstr = spifjpghdr;
+                        }
+                        else if(blockheader.contains("FFD8FFE0") && blockheader.contains("4A464946")) // JFIF JPEG
+                        {
+                            //qDebug() << "contains jfif";
+                            curheadname = "JFIF JPEG";
+                            curheadstr = jfifjpghdr;
+                        }
+                    }
+                    int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
+                    int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
                     //qDebug() << "header content for block" << k << ":" << blockheader;
                     // COMPARE HEADERS AND IF MATCH, ADD TO headhash
 		    if(headleft == -1 && headright == -1) // header without ???'s
@@ -2366,10 +2515,9 @@ void TestCarving(QStringList plist, QStringList flist)
 			if(blockheader.contains(curheadstr))
 			{
 			    blocklist.append(k);
-                            tmphash.insert(k, ctypelist.at(j));
+                            //tmphash.insert(k, ctypelist.at(j));
 			    headhash.insert(curkey, ctypelist.at(j));
 			    //headhash.insert(curkey, curheadname);
-			    //qDebug() << "a match";
 			}
 		    }
 		    else // header with ???'s
@@ -2377,7 +2525,7 @@ void TestCarving(QStringList plist, QStringList flist)
 			if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
 			{
 			    blocklist.append(k);
-                            tmphash.insert(k, ctypelist.at(j));
+                            //tmphash.insert(k, ctypelist.at(j));
 			    headhash.insert(curkey, ctypelist.at(j));
 			    //headhash.insert(curkey, curheadname);
 			    //qDebug() << "a match.";
@@ -2386,23 +2534,28 @@ void TestCarving(QStringList plist, QStringList flist)
                 }
                 else
 		{
-                    //qDebug() << "block" << k << "has already been claimed by:" << headhash.value(curkey);
+                    qDebug() << "block" << k << "has already been claimed by:" << headhash.value(curkey);
 		}
             }
             //fullhash.insert(i, tmphash);
+            */
+            /*
 	    if(blocklist.count() > 0)
 		partblockhash.insert(i, blocklist);
 	    // START FOOTER MATCH....
 	    QHashIterator<int, QList<int> > h(partblockhash);
 	    while(h.hasNext())
-	    {
+	    {*/
+            /*
+            QList<int> blist = blocklist;
 		qint64 blockdifference;
 		qint64 maxsize;
 		QString footer = "";
-		h.next();
-		QList<int> blist = h.value();
+		//h.next();
+		//QList<int> blist = h.value();
 		for(int l=0; l < blist.count(); l++)
 		{
+                    qDebug() << "curheadname:" << curheadname;
 		    if(l == (blist.count() - 1))
 		    {
                         //qDebug() << "blockcount:" << blockcount << blist.at(l) << blockcount - blist.at(l) << (blockcount - blist.at(l)) * blocksize;
@@ -2415,9 +2568,10 @@ void TestCarving(QStringList plist, QStringList flist)
 			blockdifference = (blist.at(l+1) - blist.at(l)) * blocksize;
 			//qDebug() << "block diff:" << (blist.at(l+1) - blist.at(l)) * blocksize;
 		    }
-		    QString pbkey = "p" + QString::number(h.key()) + "-b" + QString::number(blist.at(l));
-		    maxsize = headhash.value(pbkey).split(",").at(5).toLongLong();
-		    footer = headhash.value(pbkey).split(",").at(3);
+		    //QString pbkey = "p" + QString::number(i) + "-b" + QString::number(blist.at(l));
+		    //QString pbkey = "p" + QString::number(h.key()) + "-b" + QString::number(blist.at(l));
+		    //maxsize = headhash.value(pbkey).split(",").at(5).toLongLong();
+		    //footer = headhash.value(pbkey).split(",").at(3);
 		    //qDebug() << "max size|footer:" << maxsize << footer;
 		    // still need to get full typestring so i can get the maxsize for comparison
 		    //qDebug() << pbkey;
@@ -2448,7 +2602,7 @@ void TestCarving(QStringList plist, QStringList flist)
                         //qDebug() << "footerstr count:" << footerstr.count();
                         qint64 lastfooterpos = footerstr.lastIndexOf(footer);
                         //qDebug() << "footerpos:" << footerpos;
-                        qDebug() << "last footerpos:" << lastfooterpos;
+                        //qDebug() << "last footerpos:" << lastfooterpos;
                         qint64 carvedstringsize = 0;
                         if(lastfooterpos == -1) // use full length
                         {
@@ -2463,6 +2617,7 @@ void TestCarving(QStringList plist, QStringList flist)
                             // do all the above using the offset distance plus the length of the footer...
                             //qDebug() << "file start:" << blist.at(l) * blocksize << QString::number(blist.at(l) * blocksize, 16);
                             //qDebug() << "footerpos:" << footerpos << "footer value:" << footerstr.mid(footerpos, footer.count()) << "actual file end:" << footerpos + footer.count() << QString::number((blist.at(l) * blocksize) + footerpos + footer.count(), 16);
+                            */
                             /*
                              * TEST FILE DUMP WORKS...
                             QByteArray tmparray = footerarray.left(lastfooterpos + footer.count());
@@ -2474,14 +2629,16 @@ void TestCarving(QStringList plist, QStringList flist)
                             otbuf.writeRawData(tmparray, tmparray.count());
                             tfile.close();
                             */
-                        }
+                        /*}*/
                         //it works using lastfooterpos rather than first footerpos since the footer is more common...
                         // do all stat/prop tree stuff here....
+                        /*
 		    }
 		}
-	    }
+	    //}
 
         }
+        */
         rawfile.close();
     }
     //qDebug() << "header search finished." << headhash.count() << "results provided.";
@@ -2490,7 +2647,7 @@ void TestCarving(QStringList plist, QStringList flist)
     //qDebug() << "ordered blocklist:" << partblockhash;
     //qDebug() << "full hash:" << fullhash;
     //qDebug() << "full hash.value(0):" << fullhash.value(0);
-
+    //
     /* no good way to sort block #'s...
     QHashIterator<QString, QString> h(headhash);
     QList<qint64> blocklist;
