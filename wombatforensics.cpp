@@ -1369,8 +1369,8 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         cfile.close();
         //qDebug() << "name|id|offset|size:" << tmpstr.split(",").at(0) << tmpstr.split(",").at(12) << tmpstr.split(",").at(16) << tmpstr.split(",").at(8);
         QByteArray carvebuffer = ui->hexview->dataAt(tmpstr.split(",").at(16).toLongLong(), tmpstr.split(",").at(8).toLongLong()); // Carved Data
-        QString fhstr = wombatvariable.tmpfilepath + tmpstr.split(",").at(12) + "-fhex";
-        QFile hexfile(fhstr);
+        hexstring = wombatvariable.tmpfilepath + tmpstr.split(",").at(12) + "-fhex";
+        QFile hexfile(hexstring);
         if(!hexfile.isOpen())
             hexfile.open(QIODevice::WriteOnly);
         if(hexfile.isOpen())
