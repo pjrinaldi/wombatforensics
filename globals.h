@@ -480,6 +480,8 @@ public:
                     return QIcon(":/basic/treefs");
                 else if(nodetype == 4)
                 {
+                    if(itemtype == 3)
+                        return QIcon(":/basic/virtualfolder");
                     return QIcon(":/basic/carveicon");
                     /*
                     if((itemtype == 0 && nodename.contains("$OrphanFiles")) || itemtype == 5) // used to be (2)
@@ -521,7 +523,7 @@ public:
                 {
                     if(nodename.startsWith("$"))
                     {
-                        if(itemtype == 3)
+                        if(itemtype == 3 || nodename.contains("$OrphanFiles"))
                             return QIcon(":/basic/virtualdir");
                         else if(itemtype == 5)
                             return QIcon(":/basic/virtualfile");
