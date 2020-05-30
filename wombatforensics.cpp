@@ -1431,6 +1431,17 @@ void WombatForensics::LoadHexContents()
         partfile.close();
         ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toLongLong()*2);
     }
+    else if(nodeid.split("-").count() == 4) // $Carved directory
+    {
+        casedatafile.setFileName(QDir::tempPath() + "/zfile");
+        casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
+        casedatafile.write("dummy zerofile");
+        casedatafile.close();
+        ui->hexview->BypassColor(true);
+        ui->hexview->setData(casedatafile);
+        ui->hexview->setEnabled(false);
+        ui->actionsearchhex->setEnabled(false);
+    }
     else if(nodeid.split("-").count() == 5) // dir/file
     {
         QString estring = nodeid.split("-", QString::SkipEmptyParts).at(0);
@@ -2649,13 +2660,14 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     qint64 coffset = ui->hexview->GetOffset();
     qint64 clength = ui->hexview->GetSelectionLength();
     QString enumber = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first();
-    char buffer[64];
-    #if _LARGEFILE_SOURCE
-    sprintf(buffer,"0x%llx",coffset);
-    #else
-    sprintf(buffer,"0x%x",coffset);
-    #endif
-    QString offstr = buffer;
+    //char buffer[64];
+    //#if _LARGEFILE_SOURCE
+    //sprintf(buffer,"0x%llx",coffset);
+    //#else
+    //sprintf(buffer,"0x%x",coffset);
+    //#endif
+    //QString offstr = buffer;
+    QString offstr = "0x" + QString::number(coffset, 16);
     QByteArray tmparray = ui->hexview->selectionToByteArray();
     QMimeDatabase mimedb;
     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
@@ -2665,7 +2677,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     ba.append(ctitle);
     QByteArray ba2;
     ba2.clear();
-    //ba2.append(QString(enumber + "->" + offstr));
+    ba2.append(offstr);
     // HASH INFO
     QString curhash = "0";
     QString hashval = selectedindex.sibling(selectedindex.row(), 7).data().toString();

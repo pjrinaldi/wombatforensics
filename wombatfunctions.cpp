@@ -2249,7 +2249,6 @@ void TestCarving(QStringList plist, QStringList flist)
     for(int i=0; i < plist.count(); i++)
     {
         QHash<int, QString> headhash;
-        //QHash<QString, QString> headhash; // might be able to do QHash<int, qstring> <j, curtypestr> // might not need p# since i'm doing this within the context of the current partition...
         headhash.clear();
         QList<int> blocklist;
         blocklist.clear();
@@ -2363,7 +2362,6 @@ void TestCarving(QStringList plist, QStringList flist)
                     {
                         blocklist.append(j);
                         headhash.insert(j, curtypestr);
-                        //headhash.insert(curkey, curtypestr);
                     }
                 }
                 else // header with ???'s
@@ -2372,7 +2370,6 @@ void TestCarving(QStringList plist, QStringList flist)
                     {
                         blocklist.append(j);
                         headhash.insert(j, curtypestr);
-                        //headhash.insert(curkey, curtypestr);
                     }
                 }
             }
@@ -2380,7 +2377,6 @@ void TestCarving(QStringList plist, QStringList flist)
         for(int j=0; j < blocklist.count(); j++)
         {
             QString curtypestr = headhash.value(blocklist.at(j));
-            //qDebug() << "curtypestr:" << curtypestr;
             qint64 blockdifference = 0;
             qint64 curmaxsize = curtypestr.split(",").at(5).toLongLong();
             qint64 arraysize = 0;
@@ -2414,7 +2410,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 carvedstringsize = arraysize;
             }
             // DO STAT/PROP/TREENODE here and everything else everywhere else to make it work.
-            qDebug() << "filename:" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat/.prop" << "filesize" << carvedstringsize << "cat/sig" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1);
+            qDebug() << "filename:" << QString("Carved" + QString::number(blocklist.at(j))) << "id:" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat/.prop" << "filesize" << carvedstringsize << "cat/sig" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "parent:" << estring + "-" + vstring + "-" + pstring + "-pc";
             carvedcount++;
         }
 
@@ -2960,7 +2956,8 @@ void PopulateCarvedFiles(QString cfilestr)
     nodedata << slist.at(15); // tag
     nodedata << slist.at(12); // id
     mutex.lock();
-    treenodemodel->AddNode(nodedata, QString(slist.at(12)).split("-").first(), 15, 0);
+    treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-").first() + "-mc"), 15, 0);
+    //treenodemodel->AddNode(nodedata, QString(slist.at(12)).split("-").first(), 15, 0);
     mutex.unlock();
     listeditems.append(slist.at(12));
     // concurrent map() to read files, populate nodedata and addtreenode...
@@ -3063,6 +3060,12 @@ void PopulateTreeModel(QString evidstring)
 		}
 		else
 	    	    partitionlist.append(plist.at(10) + ": " + plist.at(2));
+                // ADD ManualCarved Folder HERE
+                nodedata.clear();
+                nodedata << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString(plist.at(10) + "-pc");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, plist.at(10), 3, 0);
+                mutex.unlock();
             }
 	    else
 	    {
@@ -3101,6 +3104,12 @@ void PopulateTreeModel(QString evidstring)
                         }
                         else
     	                    partitionlist.append(plist.at(10) + ": " + plist.at(2));
+                        // ADD ManualCarved Folder HERE
+                        nodedata.clear();
+                        nodedata << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString(plist.at(10) + "-pc");
+                        mutex.lock();
+                        treenodemodel->AddNode(nodedata, plist.at(10), 3, 0);
+                        mutex.unlock();
                         tsk_fs_close(fsinfo);
                     }
                 }
@@ -3149,6 +3158,12 @@ void PopulateTreeModel(QString evidstring)
 			}
 			else
 	    	    	    partitionlist.append(plist.at(10) + ": " + plist.at(2));
+                        // ADD ManualCarved Folder HERE
+                        nodedata.clear();
+                        nodedata << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString(plist.at(10) + "-pc");
+                        mutex.lock();
+                        treenodemodel->AddNode(nodedata, plist.at(10), 3, 0);
+                        mutex.unlock();
 		    }
 		    else // has pool, loop over poolvol's
 		    {
@@ -3188,6 +3203,12 @@ void PopulateTreeModel(QString evidstring)
                                 }
                                 else
     	                            partitionlist.append(plist.at(10) + ": " + plist.at(2));
+                                // ADD ManualCarved Folder HERE
+                                nodedata.clear();
+                                nodedata << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString(plist.at(10) + "-pc");
+                                mutex.lock();
+                                treenodemodel->AddNode(nodedata, plist.at(10), 3, 0);
+                                mutex.unlock();
                                 tsk_fs_close(fsinfo);
                             }
                         }
@@ -3198,6 +3219,12 @@ void PopulateTreeModel(QString evidstring)
 	    }
 	}
         tsk_stack_free(stack);
+        // ADD ManualCarved Folder HERE
+        nodedata.clear();
+        nodedata << "$Manual Carved" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString(evidid.mid(1) + "-mc");
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, evidid.mid(1), 3, 0);
+        mutex.unlock();
     }
     tsk_vs_close(vsinfo);
     tsk_img_close(imginfo);
@@ -3294,6 +3321,15 @@ void InitializeEvidenceStructure(QString evidname)
     reportstring += "<tr class='odd vtop'><td>Volume (V" + QString::number(volcnt) + "):</td><td>" + volname + "</td></tr>";
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
     mutex.unlock();
+    // ADD ManualCarved Folder HERE
+    treeout.clear();
+    treeout << "$Manual Carved" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-mc");
+    nodedata.clear();
+    for(int i=0; i < treeout.count(); i++)
+        nodedata << treeout.at(i);
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), 3, 0);
+    mutex.unlock();
     const TSK_POOL_INFO* poolinfo = nullptr;
     TSK_IMG_INFO* curimginfo = NULL;
     TSK_FS_INFO* fsinfo = NULL;
@@ -3342,6 +3378,15 @@ void InitializeEvidenceStructure(QString evidname)
                         mutex.lock();
                         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0"), -1, 0);
                         mutex.unlock();
+                        // ADD ManualCarved Folder HERE
+                        treeout.clear();
+                        treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p" + QString::number(partint) + "-pc");
+                        nodedata.clear();
+                        for(int i=0; i < treeout.count(); i++)
+                            nodedata << treeout.at(i);
+                        mutex.lock();
+                        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p" + QString::number(partint)), 3, 0);
+                        mutex.unlock();
                         reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>NON RECOGNIZED FS</td></tr>";
                         partitionlist.append("e" + QString::number(evidcnt) + "-v0-p" + QString::number(partint) + ": NON-RECOGNIZED FS");
                     }
@@ -3380,6 +3425,15 @@ void InitializeEvidenceStructure(QString evidname)
                         ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
                         tsk_fs_close(fsinfo);
                         tsk_stack_free(stack);
+                        // ADD ManualCarved Folder HERE
+                        treeout.clear();
+                        treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
+                        nodedata.clear();
+                        for(int i=0; i < treeout.count(); i++)
+                            nodedata << treeout.at(i);
+                        mutex.lock();
+                        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)), 3, 0);
+                        mutex.unlock();
                         partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                     }
                     partint++;
@@ -3406,6 +3460,15 @@ void InitializeEvidenceStructure(QString evidname)
                     nodedata << treeout.at(i);
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0"), -1, 0);
+                mutex.unlock();
+                // ADD ManualCarved Folder HERE
+                treeout.clear();
+                treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-pc");
+                nodedata.clear();
+                for(int i=0; i < treeout.count(); i++)
+                    nodedata << treeout.at(i);
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
                 mutex.unlock();
                 reportstring += "<tr class='even vtop'><td>Partition (P0):</td><td>NON RECOGNIZED FS</td></tr>";
 	        partitionlist.append("e" + QString::number(evidcnt) + "-v0-p0: NON-RECOGNIZED FS");
@@ -3445,6 +3508,15 @@ void InitializeEvidenceStructure(QString evidname)
                 ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
                 tsk_fs_close(fsinfo);
                 tsk_stack_free(stack);
+                // ADD ManualCarved Folder HERE
+                treeout.clear();
+                treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
+                nodedata.clear();
+                for(int i=0; i < treeout.count(); i++)
+                    nodedata << treeout.at(i);
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)), 3, 0);
+                mutex.unlock();
         	partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
             }
         }
@@ -3535,6 +3607,15 @@ void InitializeEvidenceStructure(QString evidname)
 	    		    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                             WriteFileSystemProperties(fsinfo, partitionpath);
                             ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
+                            // ADD ManualCarved Folder HERE
+                            treeout.clear();
+                            treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
+                            nodedata.clear();
+                            for(int i=0; i < treeout.count(); i++)
+                                nodedata << treeout.at(i);
+                            mutex.lock();
+                            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)), 3, 0);
+                            mutex.unlock();
                         }
                         else
                         {
@@ -3548,6 +3629,15 @@ void InitializeEvidenceStructure(QString evidname)
                                 nodedata << treeout.at(j);
                             mutex.lock();
                             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
+                            mutex.unlock();
+                            // ADD ManualCarved Folder HERE
+                            treeout.clear();
+                            treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
+                            nodedata.clear();
+                            for(int i=0; i < treeout.count(); i++)
+                                nodedata << treeout.at(i);
+                            mutex.lock();
+                            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)), 3, 0);
                             mutex.unlock();
                             reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
     			    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(partinfo->desc) + "(NON-RECOGNIZED FS)");
@@ -3611,6 +3701,15 @@ void InitializeEvidenceStructure(QString evidname)
 	                	    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(pint) + ": " + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                                     WriteFileSystemProperties(fsinfo, partitionpath);
                                     ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, pint, partitionpath);
+                                    // ADD ManualCarved Folder HERE
+                                    treeout.clear();
+                                    treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
+                                    nodedata.clear();
+                                    for(int i=0; i < treeout.count(); i++)
+                                        nodedata << treeout.at(i);
+                                    mutex.lock();
+                                    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)), 3, 0);
+                                    mutex.unlock();
                                 }
                                 else
                                 {
@@ -3624,6 +3723,15 @@ void InitializeEvidenceStructure(QString evidname)
                                         nodedata << treeout.at(j);
                                     mutex.lock();
                                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
+                                    mutex.unlock();
+                                    // ADD ManualCarved Folder HERE
+                                    treeout.clear();
+                                    treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
+                                    nodedata.clear();
+                                    for(int i=0; i < treeout.count(); i++)
+                                        nodedata << treeout.at(i);
+                                    mutex.lock();
+                                    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)), 3, 0);
                                     mutex.unlock();
                                     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
 			            partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(partinfo->desc) + "(NON-RECOGNIZED FS)");
@@ -3649,6 +3757,15 @@ void InitializeEvidenceStructure(QString evidname)
                     mutex.lock();
                     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt)), -1, 0);
                     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + QString(partinfo->desc) + " (NON-RECOGNIZED FS)</td></tr>";
+                    mutex.unlock();
+                    // ADD ManualCarved Folder HERE
+                    treeout.clear();
+                    treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
+                    nodedata.clear();
+                    for(int i=0; i < treeout.count(); i++)
+                        nodedata << treeout.at(i);
+                    mutex.lock();
+                    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint)), 3, 0);
                     mutex.unlock();
 		    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + QString(partinfo->desc) + " (NON-RECOGNIZED FS)]");
                 }
@@ -5951,6 +6068,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                         }
                     }
                 }
+                if(QString(fsfile->name->name).contains("$OrphanFiles"))
+                    qDebug() << treeout;
                 QList<QVariant> nodedata;
                 nodedata.clear();
                 for(int i=0; i < 12; i++)
