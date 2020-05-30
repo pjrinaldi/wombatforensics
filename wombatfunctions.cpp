@@ -6203,7 +6203,12 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                             {
                                 // DO MY RECURSE HERE...
                                 tsk_stack_push(stack, fsfile->name->meta_addr);
-                                path2 = std::string(path) + "/" + std::string(fsfile->name->name);
+                                std::string strpath(path);
+                                if(strpath.find_last_of("/") == (strpath.length() - 1))
+                                    path2 = std::string(path) + std::string(fsfile->name->name);
+                                else
+                                    path2 = std::string(path) + "/" + std::string(fsfile->name->name);
+                                //path2 = std::string(path) + "/" + std::string(fsfile->name->name);
                                 ProcessDir(fsinfo, stack, fsfile->name->meta_addr, path2.c_str(), eint, vint, pint, partpath);
                                 tsk_stack_pop(stack);
                             }
@@ -6428,7 +6433,11 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                             {
                                 // DO MY RECURSE HERE...
                                 tsk_stack_push(stack, fsfile->name->meta_addr);
-                                path2 = std::string(path) + "/" + std::string(fsfile->name->name);
+                                std::string strpath(path);
+                                if(strpath.find_last_of("/") == (strpath.length() - 1))
+                                    path2 = std::string(path) + std::string(fsfile->name->name);
+                                else
+                                    path2 = std::string(path) + "/" + std::string(fsfile->name->name);
                                 ParseDir(fsinfo, stack, fsfile->name->meta_addr, path2.c_str(), partitionpath);
                                 tsk_stack_pop(stack);
                             }
