@@ -495,7 +495,7 @@ public:
                         else
                             return QIcon(":/basic/treefile");
                     }
-                    else if(nodename.contains("$OrphanFiles"))
+                    else if(nodename.contains("$OrphanFile"))
                         return QIcon(":/basic/virtualdir");
                     else if(itemtype == 3)
                         return QIcon(":/basic/treefolder");

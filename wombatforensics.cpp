@@ -1358,6 +1358,27 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         if(curindex.sibling(curindex.row(), 2).data().toLongLong() > 0)
             RewriteSelectedIdContent(curindex);
     }
+    else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
+    {
+        QString tmpstr;
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + curindex.sibling(curindex.row(), 11).data().toString() + ".stat");
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+            tmpstr = cfile.readLine();
+        cfile.close();
+        //qDebug() << "name|id|offset|size:" << tmpstr.split(",").at(0) << tmpstr.split(",").at(12) << tmpstr.split(",").at(16) << tmpstr.split(",").at(8);
+        QByteArray carvebuffer = ui->hexview->dataAt(tmpstr.split(",").at(16).toLongLong(), tmpstr.split(",").at(8).toLongLong()); // Carved Data
+        QString fhstr = wombatvariable.tmpfilepath + tmpstr.split(",").at(12) + "-fhex";
+        QFile hexfile(fhstr);
+        if(!hexfile.isOpen())
+            hexfile.open(QIODevice::WriteOnly);
+        if(hexfile.isOpen())
+            hexfile.write(carvebuffer);
+        hexfile.close();
+    }
+    else
+        qDebug() << "generatehex isn't setup for:" << curindex.sibling(curindex.row(), 11).data().toString() << "types yet.";
 }
 
 void WombatForensics::LoadHexContents()
