@@ -6027,7 +6027,7 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 ba.append(QString(fsfile->name->name));
                 treeout << ba.toBase64(); // NAME - 0
                 ba.clear();
-                ba.append(QString("/" + QString::fromStdString(std::string(path))));
+                ba.append(QString::fromStdString(std::string(path)));
                 treeout << ba.toBase64(); // FULL PATH - 1
                 if(fsfile->name->par_addr == fsfile->fs_info->root_inum)
                     parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint);
@@ -6251,7 +6251,7 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                 ba.append(QString(fsfile->name->name));
                 treeout << ba.toBase64(); // NAME - 0
                 ba.clear();
-                ba.append(QString("/" + QString::fromStdString(std::string(path))));
+                ba.append(QString::fromStdString(std::string(path)));
                 treeout << ba.toBase64(); // FULL PATH - 1
                 if(fsfile->name->par_addr == fsfile->fs_info->root_inum)
                     parentstr = evalue + "-" + vvalue + "-" + pvalue;

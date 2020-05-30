@@ -286,13 +286,13 @@ public:
         int nodetype = 0;
         int itemtype = 0;
         QByteArray ba;
-        nodetype = itemnode->Data(11).toString().split("-a").first().split("-").count();
+        nodetype = itemnode->Data(11).toString().split("-").count();
         itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
         if(role == Qt::CheckStateRole && index.column() == 11)
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
         else if(role == Qt::ForegroundRole)
         {
-            if(nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")) || (nodetype == 2 && itemnode->Data(11).toString().contains("-mc")))
+            if(nodetype == 5 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")) || (nodetype == 2 && itemnode->Data(11).toString().contains("-mc")))
             {
                 if(itemnode->Data(11).toString().contains(filtervalues.idfilter) == false)
                     return QColor(Qt::lightGray);
@@ -421,7 +421,7 @@ public:
         {
             if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
             {
-                if(nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
+                if(nodetype == 5 || nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
                 {
                     ba.clear();
                     ba.append(itemnode->Data(index.column()).toString());
@@ -470,8 +470,7 @@ public:
                 else if(nodetype == 2)
                 {
                     if(itemnode->Data(11).toString().contains("-c"))
-                        return QIcon("/basic/carveicon");
-                        //return QIcon(":/bar/treefile");
+                        return QIcon(":/basic/carveicon");
                     else if(itemnode->Data(11).toString().contains("-mc"))
                         return QIcon(":/basic/virtualfolder");
                     else
@@ -481,6 +480,8 @@ public:
                     return QIcon(":/basic/treefs");
                 else if(nodetype == 4)
                 {
+                    return QIcon(":/basic/carveicon");
+                    /*
                     if((itemtype == 0 && nodename.contains("$OrphanFiles")) || itemtype == 5) // used to be (2)
                     {
                         if(nodename.compare("AttrDef") == 0 || nodename.compare("$BadClus") == 0 || nodename.compare("$Bitmap") == 0 || nodename.compare("$Boot") == 0 || nodename.compare("$ObjId") == 0 || nodename.compare("$Quota") == 0 || nodename.compare("$Reparse") == 0 || nodename.compare("$LogFile") == 0 || nodename.compare("$MFT") == 0 || nodename.compare("$MFTMirr") == 0 || nodename.compare("$Secure") == 0 || nodename.compare("$UpCase") == 0 || nodename.compare("$Volume") == 0)
@@ -508,10 +509,38 @@ public:
                         return QIcon(":/basic/virtualdir");
                     else if(itemtype == 15)
                         return QIcon(":/basic/carveicon");
-                        //return QIcon(":/basic/treefile");
                     else
                     {
                         if(itemnode->Data(11).toString().contains("fd") || itemnode->Data(11).toString().contains("fo")) // used to be 0
+                            return QIcon(":/basic/deletedfile");
+                        else
+                            return QIcon(":/basic/treefile");
+                    }*/
+                }
+                else if(nodetype == 5)
+                {
+                    if(nodename.startsWith("$"))
+                    {
+                        if(itemtype == 3)
+                            return QIcon(":/basic/virtualdir");
+                        else if(itemtype == 5)
+                            return QIcon(":/basic/virtualfile");
+                        else
+                            return QIcon(":/basic/treefile");
+                    }
+                    else if(itemtype == 3)
+                        return QIcon(":/basic/treefolder");
+                    else if(itemtype == 5)
+                        return QIcon(":/basic/treefile");
+                    else if(itemtype == 10)
+                        return QIcon(":/basic/virtualfile");
+                    else if(itemtype == 11)
+                        return QIcon(":/basic/virtualdir");
+                    else if(itemtype == 15)
+                        return QIcon(":/basic/carveicon");
+                    else
+                    {
+                        if(itemnode->Data(11).toString().contains("fd") || itemnode->Data(11).toString().contains("fo"))
                             return QIcon(":/basic/deletedfile");
                         else
                             return QIcon(":/basic/treefile");
