@@ -2311,6 +2311,7 @@ void TestCarving(QStringList plist, QStringList flist)
             // IF EXISTS, SKIP BLOCK CAUSE ALREADY CARVED FOR SOME TYPE...
             // MIGHT USE HEADHASH AS A VARIABLE GENERATED AT START TIME, BUT I'LL FIGURE IT OUT.
             //QString curkey = pstring + "-b" + QString::number(j);
+            //if(!headhash.contains(curkey)) // block hasn't been claimed by any header yet...
             for(int k=0; k < ctypelist.count(); k++)
             {
                 QString curtypestr = ctypelist.at(k);
@@ -2374,6 +2375,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 }
             }
         }
+        // FOR EACH CLAIMED BLOCK, APPLY THE headhash value...
         for(int j=0; j < blocklist.count(); j++)
         {
             QString curtypestr = headhash.value(blocklist.at(j));
@@ -2410,7 +2412,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 carvedstringsize = arraysize;
             }
             // DO STAT/TREENODE here and everything else everywhere else to make it work.
-            QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0,0,0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + "," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
+            QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
 
             QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
             if(!cfile.isOpen())
@@ -2422,7 +2424,7 @@ void TestCarving(QStringList plist, QStringList flist)
             }
             QList<QVariant> nodedata;
             nodedata.clear();
-            nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << "0" << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
+            nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString(estring + "-" + vstring + "-" + pstring + "-pc"), 15, 0);
             mutex.unlock();
@@ -2829,6 +2831,7 @@ int main(int argc, char *argv[])
     //input_handler_t* input_handler = NULL;
     // WILL HAVE TO IMPLEMENT THE HANDLER STUFF ON MY OWN...
     // END REVIT CARVING TEST...
+    //emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
 }
 
 void GenerateThumbnails(QString thumbid)
@@ -2975,6 +2978,7 @@ void PopulateArchiveFiles(QString afilestr)
 
 void PopulateCarvedFiles(QString cfilestr)
 {
+    // NEED TO GENERATE THE BLOCKLIST OF USED BLOCKS SO I DON'T RECARVE THE SAME ONES....
     cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
     QString tmpstr = "";
     QFile cfile(cfilestr);
@@ -2999,7 +3003,10 @@ void PopulateCarvedFiles(QString cfilestr)
     nodedata << slist.at(15); // tag
     nodedata << slist.at(12); // id
     mutex.lock();
-    treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-").first() + "-mc"), 15, 0);
+    if(slist.at(12).split("-").count() == 2)
+        treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-").first() + "-mc"), 15, 0);
+    else
+        treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-pc"), 15, 0);
     //treenodemodel->AddNode(nodedata, QString(slist.at(12)).split("-").first(), 15, 0);
     mutex.unlock();
     listeditems.append(slist.at(12));

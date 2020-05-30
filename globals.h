@@ -470,7 +470,8 @@ public:
                 else if(nodetype == 2)
                 {
                     if(itemnode->Data(11).toString().contains("-c"))
-                        return QIcon(":/bar/carvetofile");
+                        return QIcon(":/bar/treefile");
+                        //return QIcon(":/bar/carvetofile");
                     else if(itemnode->Data(11).toString().contains("-mc"))
                         return QIcon(":/basic/treefolder");
                     //else if(itemnode->Data(11).toString().contains("-ac"))
@@ -482,7 +483,7 @@ public:
                 //    return QIcon(":/basic/treefolder");
                 else if(nodetype == 3)
                     return QIcon(":/basic/treefs");
-                else if(nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
+                else if(nodetype == 4)
                 {
                     if((itemtype == 0 && nodename.contains("$OrphanFiles")) || itemtype == 5) // used to be (2)
                     {
@@ -510,7 +511,8 @@ public:
                     else if(itemtype == 11)
                         return QIcon(":/basic/virtualdir");
                     else if(itemtype == 15)
-                        return QIcon(":/bar/carvetofile");
+                        return QIcon(":/basic/treefile");
+                        //return QIcon(":/bar/carvetofile");
                     else
                     {
                         if(itemnode->Data(11).toString().contains("fd") || itemnode->Data(11).toString().contains("fo")) // used to be 0

@@ -1411,7 +1411,6 @@ void WombatForensics::LoadHexContents()
     }
     else if(nodeid.contains("-c"))//else if(nodeid.split("-").count() == 2 && nodeid.contains("-c")) // carved file
     {
-        qDebug() << "nodeid:" << nodeid;
         QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".stat");
         if(!cfile.isOpen())
             cfile.open(QIODevice::ReadOnly | QIODevice::Text);
