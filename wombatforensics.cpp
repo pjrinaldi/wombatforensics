@@ -1409,8 +1409,9 @@ void WombatForensics::LoadHexContents()
         volfile.close();
         ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toInt()*2);
     }
-    else if(nodeid.split("-").count() == 2 && nodeid.contains("-c")) // carved file
+    else if(nodeid.contains("-c"))//else if(nodeid.split("-").count() == 2 && nodeid.contains("-c")) // carved file
     {
+        qDebug() << "nodeid:" << nodeid;
         QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".stat");
         if(!cfile.isOpen())
             cfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -2687,7 +2688,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
         QByteArray hasharray = QByteArray::fromRawData(tmparray, clength);
         curhash = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
     }
-    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimestr + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," +  ctag + "," + QString::number(coffset);
+    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimestr + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," + ctag + "," + QString::number(coffset);
     // Add CARVED STAT FILE
     QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".stat");
     if(!cfile.isOpen())

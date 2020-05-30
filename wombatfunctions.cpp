@@ -2409,8 +2409,51 @@ void TestCarving(QStringList plist, QStringList flist)
             {
                 carvedstringsize = arraysize;
             }
-            // DO STAT/PROP/TREENODE here and everything else everywhere else to make it work.
-            qDebug() << "filename:" << QString("Carved" + QString::number(blocklist.at(j))) << "id:" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat/.prop" << "filesize" << carvedstringsize << "cat/sig" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "parent:" << estring + "-" + vstring + "-" + pstring + "-pc";
+            // DO STAT/TREENODE here and everything else everywhere else to make it work.
+            QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0,0,0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + "," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
+
+            QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
+            if(!cfile.isOpen())
+                cfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            if(cfile.isOpen())
+            {
+                cfile.write(cstr.toStdString().c_str());
+                cfile.close();
+            }
+            QList<QVariant> nodedata;
+            nodedata.clear();
+            nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << "0" << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString(estring + "-" + vstring + "-" + pstring + "-pc"), 15, 0);
+            mutex.unlock();
+            //qDebug() << "filename:" << QString("Carved" + QString::number(blocklist.at(j))) << "id:" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat/.prop" << "filesize" << carvedstringsize << "cat/sig" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "parent:" << estring + "-" + vstring + "-" + pstring + "-pc";
+            /*
+             *    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimestr + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," + ctag + "," + QString::number(coffset);
+    // Add CARVED STAT FILE
+    QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".stat");
+    if(!cfile.isOpen())
+        cfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(cfile.isOpen())
+        cfile.write(carvedstring.toStdString().c_str());
+    cfile.close();
+    // ADD CARVED STAT FILE TO THE TREE
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << ba.toBase64();
+    nodedata << ba2.toBase64();
+    nodedata << QString::number(clength);
+    nodedata << "0";
+    nodedata << "0";
+    nodedata << "0";
+    nodedata << "0";
+    nodedata << curhash;
+    nodedata << mimestr.split("/").first();
+    nodedata << mimestr.split("/").last();
+    nodedata << ctag;
+    nodedata << QString(enumber + "-c" + QString::number(carvedcount));
+    treenodemodel->AddNode(nodedata, QString(enumber + "-mc"), 15, 0);
+
+             */ 
             carvedcount++;
         }
 
