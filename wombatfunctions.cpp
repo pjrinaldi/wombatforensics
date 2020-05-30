@@ -2414,7 +2414,8 @@ void TestCarving(QStringList plist, QStringList flist)
                 carvedstringsize = arraysize;
             }
             // DO STAT/PROP/TREENODE here and everything else everywhere else to make it work.
-            qDebug() << "filename:" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(j) + ".stat/.prop" << "filesize" << carvedstringsize << "cat/sig" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1);
+            qDebug() << "filename:" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat/.prop" << "filesize" << carvedstringsize << "cat/sig" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1);
+            carvedcount++;
         }
 
         //qDebug() << blocklist << headhash;
