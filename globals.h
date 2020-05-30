@@ -490,13 +490,13 @@ public:
                     {
                         if(itemtype == 3)
                             return QIcon(":/basic/virtualdir");
-                        else if(nodename.contains("$OrphanFiles"))
-                            return QIcon(":/basic/virtualdir");
                         else if(itemtype == 5)
                             return QIcon(":/basic/virtualfile");
                         else
                             return QIcon(":/basic/treefile");
                     }
+                    else if(nodename.contains("$OrphanFiles"))
+                        return QIcon(":/basic/virtualdir");
                     else if(itemtype == 3)
                         return QIcon(":/basic/treefolder");
                     else if(itemtype == 5)
