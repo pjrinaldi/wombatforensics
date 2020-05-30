@@ -27,6 +27,7 @@
     <file alias="carvetypes">Resources/carvetypes</file>
   </qresource>
   <qresource prefix="/basic">
+    <file alias="carveicon">Resources/PossibleGraphics/carve.png</file>
     <file alias="missingvideo">Resources/filmstrip.png</file>
     <file alias="carvedfile">Resources/carvedfile.svg</file>
     <file alias="deletedfile">Resources/deletedfile.png</file>

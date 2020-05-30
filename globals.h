@@ -470,17 +470,13 @@ public:
                 else if(nodetype == 2)
                 {
                     if(itemnode->Data(11).toString().contains("-c"))
-                        return QIcon(":/bar/treefile");
-                        //return QIcon(":/bar/carvetofile");
+                        return QIcon("/basic/carveicon");
+                        //return QIcon(":/bar/treefile");
                     else if(itemnode->Data(11).toString().contains("-mc"))
-                        return QIcon(":/basic/treefolder");
-                    //else if(itemnode->Data(11).toString().contains("-ac"))
-                    //    return QIcon(":/basic/treefolder");
+                        return QIcon(":/basic/virtualfolder");
                     else
                         return QIcon(":/basic/treevol");
                 }
-                //else if(nodetype == 2 && !itemnode->Data(11).toString().contains("-mc"))
-                //    return QIcon(":/basic/treefolder");
                 else if(nodetype == 3)
                     return QIcon(":/basic/treefs");
                 else if(nodetype == 4)
@@ -501,7 +497,7 @@ public:
                     }
                     else if(itemtype == 3)
                     {
-                        if(nodename.compare("$OrphanFiles") == 0 || nodename.compare("$Extend") == 0 || nodename.compare("$Manual Carved") == 0 || nodename.compare("$Carved") == 0)
+                        if(nodename.compare("$OrphanFiles") == 0 || nodename.compare("$Extend") == 0 || nodename.compare("$Carved") == 0)
                             return QIcon(":/basic/virtualfolder");
                         else
                             return QIcon(":/basic/treefolder");
@@ -511,8 +507,8 @@ public:
                     else if(itemtype == 11)
                         return QIcon(":/basic/virtualdir");
                     else if(itemtype == 15)
-                        return QIcon(":/basic/treefile");
-                        //return QIcon(":/bar/carvetofile");
+                        return QIcon(":/basic/carveicon");
+                        //return QIcon(":/basic/treefile");
                     else
                     {
                         if(itemnode->Data(11).toString().contains("fd") || itemnode->Data(11).toString().contains("fo")) // used to be 0
