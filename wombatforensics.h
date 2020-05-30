@@ -161,6 +161,7 @@ private slots:
     void UpdateDataTable(void);
     void UpdateStatus(void);
     void FinishExport(void);
+    void FinishCarve(void);
     void FinishDigging(void);
     void FinishPreDigging(void);
     void ThashFinish(void);
@@ -242,6 +243,7 @@ private:
     QFutureWatcher<void> digwatcher;
     QFuture<void> predigfuture;
     QFutureWatcher<void> predigwatcher;
+    QFutureWatcher<void> carvewatcher;
     QFutureWatcher<void> thashwatcher;
     QFutureWatcher<void> thashsavewatcher;
     QFutureWatcher<void> exportwatcher;

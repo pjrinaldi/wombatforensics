@@ -108,6 +108,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(&thashwatcher, SIGNAL(finished()), this, SLOT(ThashFinish()), Qt::QueuedConnection);
     connect(&thashsavewatcher, SIGNAL(finished()), this, SLOT(ThashSaveFinish()), Qt::QueuedConnection);
     connect(&exportwatcher, SIGNAL(finished()), this, SLOT(FinishExport()), Qt::QueuedConnection);
+    connect(&carvewatcher, SIGNAL(finished()), this, SLOT(FinishCarve()), Qt::QueuedConnection);
     connect(&savewcfwatcher, SIGNAL(finished()), this, SLOT(FinishWombatCaseFile()), Qt::QueuedConnection);
     connect(ui->actionSection, SIGNAL(triggered(bool)), this, SLOT(AddSection()), Qt::DirectConnection);
     //connect(ui->actionTextSection, SIGNAL(triggered(bool)), this, SLOT(AddTextSection()), Qt::DirectConnection);
@@ -1913,7 +1914,8 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 
 void WombatForensics::StartCarving(QStringList plist, QStringList flist)
 {
-    QtConcurrent::run(TestCarving, plist, flist);
+    QFuture<void> tmpfuture = QtConcurrent::run(TestCarving, plist, flist);
+    carvewatcher.setFuture(tmpfuture);
     //or should i qtconcurrent::run(plist,qlist) and then loop over every plist and qtconcurrentmap the carving methodology...
     //let's start off with a qtconcurrent run method to test calling scalpel and revit...
     //this would be a QtConcurrent::map(plist); so it goes over every list...
@@ -2354,6 +2356,12 @@ void WombatForensics::FinishPreDigging()
         digfilelist = GetFileLists(2);
     digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
     digwatcher.setFuture(digfuture);
+}
+
+void WombatForensics::FinishCarve()
+{
+    qInfo() << "Carving complete.";
+    emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
 }
 
 void WombatForensics::FinishDigging()
