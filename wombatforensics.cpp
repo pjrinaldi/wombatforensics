@@ -2665,7 +2665,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     ba.append(ctitle);
     QByteArray ba2;
     ba2.clear();
-    ba2.append(QString(enumber + "->" + offstr));
+    //ba2.append(QString(enumber + "->" + offstr));
     // HASH INFO
     QString curhash = "0";
     QString hashval = selectedindex.sibling(selectedindex.row(), 7).data().toString();
