@@ -3106,7 +3106,7 @@ void PopulateTreeModel(QString evidstring)
 		if(fsinfo != NULL)
 		{
 	    	    partitionlist.append(plist.at(10) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
-            	    ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
+            	    ParseDir(fsinfo, stack, plist.at(3).toInt(), "/", partitionpath);
 		}
 		else
 	    	    partitionlist.append(plist.at(10) + ": " + plist.at(2));
@@ -3150,7 +3150,7 @@ void PopulateTreeModel(QString evidstring)
                         if(fsinfo != NULL)
                         {
 	    	            partitionlist.append(plist.at(10) + ": " + plist.at(2) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
-                            ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
+                            ParseDir(fsinfo, stack, plist.at(3).toInt(), "/", partitionpath);
                         }
                         else
     	                    partitionlist.append(plist.at(10) + ": " + plist.at(2));
@@ -3204,7 +3204,7 @@ void PopulateTreeModel(QString evidstring)
 			if(fsinfo != NULL)
 			{
 	    	    	    partitionlist.append(plist.at(10) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
-                    	    ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
+                    	    ParseDir(fsinfo, stack, plist.at(3).toInt(), "/", partitionpath);
 			}
 			else
 	    	    	    partitionlist.append(plist.at(10) + ": " + plist.at(2));
@@ -3249,7 +3249,7 @@ void PopulateTreeModel(QString evidstring)
                                 if(fsinfo != NULL)
                                 {
 	    	                    partitionlist.append(plist.at(10) + ": " + plist.at(2) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
-                                    ParseDir(fsinfo, stack, plist.at(3).toInt(), "", partitionpath);
+                                    ParseDir(fsinfo, stack, plist.at(3).toInt(), "/", partitionpath);
                                 }
                                 else
     	                            partitionlist.append(plist.at(10) + ": " + plist.at(2));
@@ -3472,7 +3472,7 @@ void InitializeEvidenceStructure(QString evidname)
                         WriteFileSystemProperties(fsinfo, partitionpath);
                         TSK_STACK* stack = NULL;
                         stack = tsk_stack_create();
-                        ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
+                        ProcessDir(fsinfo, stack, fsinfo->root_inum, "/", evidcnt, volcnt, partint, partitionpath);
                         tsk_fs_close(fsinfo);
                         tsk_stack_free(stack);
                         // ADD ManualCarved Folder HERE
@@ -3555,7 +3555,7 @@ void InitializeEvidenceStructure(QString evidname)
                 WriteFileSystemProperties(fsinfo, partitionpath);
                 TSK_STACK* stack = NULL;
                 stack = tsk_stack_create();
-                ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
+                ProcessDir(fsinfo, stack, fsinfo->root_inum, "/", evidcnt, volcnt, partint, partitionpath);
                 tsk_fs_close(fsinfo);
                 tsk_stack_free(stack);
                 // ADD ManualCarved Folder HERE
@@ -3656,7 +3656,7 @@ void InitializeEvidenceStructure(QString evidname)
                             reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(partint) + "):</td><td>" + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
 	    		    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + ": " + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                             WriteFileSystemProperties(fsinfo, partitionpath);
-                            ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, partint, partitionpath);
+                            ProcessDir(fsinfo, stack, fsinfo->root_inum, "/", evidcnt, volcnt, partint, partitionpath);
                             // ADD ManualCarved Folder HERE
                             treeout.clear();
                             treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
@@ -3750,7 +3750,7 @@ void InitializeEvidenceStructure(QString evidname)
                                     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(pint) + "):</td><td>" + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")</td></tr>";
 	                	    partitionlist.append("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(pint) + ": " + fsdesc + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
                                     WriteFileSystemProperties(fsinfo, partitionpath);
-                                    ProcessDir(fsinfo, stack, fsinfo->root_inum, "", evidcnt, volcnt, pint, partitionpath);
+                                    ProcessDir(fsinfo, stack, fsinfo->root_inum, "/", evidcnt, volcnt, pint, partitionpath);
                                     // ADD ManualCarved Folder HERE
                                     treeout.clear();
                                     treeout << QByteArray("$Carved").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v" + QString::number(volcnt) + "-p" + QString::number(partint) + "-pc");
