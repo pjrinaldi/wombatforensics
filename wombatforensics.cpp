@@ -2710,7 +2710,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     nodedata << mimestr.split("/").last();
     nodedata << ctag;
     nodedata << QString(enumber + "-c" + QString::number(carvedcount));
-    treenodemodel->AddNode(nodedata, enumber, 15, 0);
+    treenodemodel->AddNode(nodedata, QString(enumber + "-mc"), 15, 0);
     // ADD TO PREVIEW REPORT
     QString filestr = "<td class='fitem' id='" + QString(enumber + "-c" + QString::number(carvedcount)) + "'>";
     filestr += "<table width='300px'><tr><th colspan='2'>" + ctitle + "</th></tr>";
