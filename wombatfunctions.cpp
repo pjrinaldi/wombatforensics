@@ -2302,7 +2302,8 @@ void TestCarving(QStringList plist, QStringList flist)
             // loop over the blocks...
         }
         qint64 partoffset = partlist.at(4).toLongLong();
-        qint64 blocksize = partlist.at(6).toLongLong();
+        qint64 blocksize = evidlist.at(2).toULongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
+        //qint64 blocksize = partlist.at(6).toLongLong(); // FS CLUSTER SIZE
         qint64 partsize = partlist.at(1).toLongLong() - partoffset;
         qint64 blockcount = partsize / blocksize;
         for(int j=0; j < blockcount; j++)
