@@ -2291,7 +2291,7 @@ void TestCarving(QStringList plist, QStringList flist)
         if(partfile.isOpen())
         {
             QString tmpstr = partfile.readLine();
-            partlist = tmpstr.split(",", QString::SkipEmptyParts);
+            partlist = tmpstr.split(",");
             partfile.close();
         }
         QFile rawfile(rawevidencepath);
@@ -2328,7 +2328,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 }
                 QByteArray headerarray;
                 headerarray.clear();
-                bool isseek = rawfile.seek(j * blocksize);
+                bool isseek = rawfile.seek(partoffset + (j * blocksize));
                 if(isseek)
                     headerarray = rawfile.read(bytecount);
                 QString blockheader = QString::fromStdString(headerarray.toHex(0).toStdString()).toUpper();
@@ -2359,7 +2359,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
                 if(headleft == -1 && headright == -1) // header without ???'s
                 {
-                    if(blockheader.contains(curheadstr))
+                    if(blockheader.startsWith(curheadstr))
                     {
                         blocklist.append(j);
                         headhash.insert(j, curtypestr);
@@ -2393,11 +2393,11 @@ void TestCarving(QStringList plist, QStringList flist)
                 arraysize = blockdifference;
             else
                 arraysize = curmaxsize;
+            QByteArray footerarray;
+            footerarray.clear();
             if(!curfooter.isEmpty()) // if footer exists
             {
-                QByteArray footerarray;
-                footerarray.clear();
-                bool isseek = rawfile.seek(blocklist.at(j) * blocksize);
+                bool isseek = rawfile.seek(partoffset + (blocklist.at(j) * blocksize));
                 if(isseek)
                     footerarray = rawfile.read(arraysize);
                 QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
@@ -2411,26 +2411,58 @@ void TestCarving(QStringList plist, QStringList flist)
             {
                 carvedstringsize = arraysize;
             }
-            // DO STAT/TREENODE here and everything else everywhere else to make it work.
-            QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
-
-            QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
-            if(!cfile.isOpen())
-                cfile.open(QIODevice::WriteOnly | QIODevice::Text);
-            if(cfile.isOpen())
+            // TRY TO DETERMINE IF IT IS A VALID IMAGE....
+            bool isvalidfile = false;
+            if(curtypestr.split(",").at(1).contains("JPEG")) // validity check for jpeg
             {
-                cfile.write(cstr.toStdString().c_str());
-                cfile.close();
+	        Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
+	        Magick::Image master(blob);
+                if(QString::fromStdString(master.magick()).contains("JPEG"))
+                    isvalidfile = true;
             }
-            QList<QVariant> nodedata;
-            nodedata.clear();
-            nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
-            mutex.lock();
-            treenodemodel->AddNode(nodedata, QString(estring + "-" + vstring + "-" + pstring + "-pc"), 15, 0);
-            mutex.unlock();
-            listeditems.append(QString(estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount)));
-            //qDebug() << "filename:" << QString("Carved" + QString::number(blocklist.at(j))) << "id:" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat/.prop" << "filesize" << carvedstringsize << "cat/sig" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "parent:" << estring + "-" + vstring + "-" + pstring + "-pc";
-            carvedcount++;
+            else if(curtypestr.split(",").at(1).contains("PNG")) // validity check for png
+            {
+	        Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
+	        Magick::Image master(blob);
+                //qDebug() << QString::fromStdString(master.magick());
+                if(QString::fromStdString(master.magick()).contains("PNG"))
+                    isvalidfile = true;
+            }
+            else if(curtypestr.split(",").at(1).contains("GIF")) // validity check for gif
+            {
+	        Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
+	        Magick::Image master(blob);
+                if(QString::fromStdString(master.magick()).contains("GIF"))
+                    isvalidfile = true;
+            }
+            else
+            {
+                // smart carving check doesn't exist for file type yet... so process it anyway...
+                isvalidfile = true;
+            }
+            if(isvalidfile)
+            {
+                //qDebug() << "valid image:" << "Carved" + QString::number(blocklist.at(j)) << carvedcount;
+                // DO STAT/TREENODE here and everything else everywhere else to make it work.
+                QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
+
+                QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
+                if(!cfile.isOpen())
+                    cfile.open(QIODevice::WriteOnly | QIODevice::Text);
+                if(cfile.isOpen())
+                {
+                    cfile.write(cstr.toStdString().c_str());
+                    cfile.close();
+                }
+                QList<QVariant> nodedata;
+                nodedata.clear();
+                nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString(estring + "-" + vstring + "-" + pstring + "-pc"), 15, 0);
+                mutex.unlock();
+                listeditems.append(QString(estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount)));
+                carvedcount++;
+            }
             /*
              * TEST FILE DUMP WORKS...
             QByteArray tmparray = footerarray.left(lastfooterpos + footer.count());
@@ -2445,136 +2477,6 @@ void TestCarving(QStringList plist, QStringList flist)
         }
         rawfile.close();
     }
-    /* SIMPLE CARVER SAMPLE CODE FROM CS50, MIGRATE TO QT C++ FROM STD::C AND SEE HOW IT COMPARES TO PULLING OUT WHAT I NEED FROM SCALPEL
-     *#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-
-#define BLOCK_SIZE 512
-
-typedef uint8_t BYTE;
-
-int main(int argc, char *argv[])
-{
-    // ensure proper usage
-    if (argc != 2)
-    {
-        fprintf(stderr, "Usage: recover infile\n");
-        return 1;
-    }
-
-    // remember filenames
-    char *infile = argv[1];
-
-    // open input file
-    FILE *inptr = fopen(infile, "r");
-    if (inptr == NULL)
-    {
-        fprintf(stderr, "Could not open %s.\n", infile);
-        return 2;
-    }
-
-    BYTE buffer[512];
-    int imageCount = 0;
-
-    char filename[8];
-    FILE *outptr = NULL;
-
-    while (true)
-    {
-        // read a block of the memory card image
-        size_t bytesRead = fread(buffer, sizeof(BYTE), BLOCK_SIZE, inptr);
-
-        // break out of the loop when we reach the end of the card image
-        if (bytesRead == 0 && feof(inptr))
-        {
-            break;
-        }
-
-        // check if we found a JPEG
-        bool containsJpegHeader = buffer[0] == 0xff && buffer[1] == 0xd8 && buffer[2] == 0xff && (buffer[3] & 0xf0) == 0xe0;
-
-        // if we found a yet another JPEG, we must close the previous file
-        if (containsJpegHeader && outptr != NULL)
-        {
-            fclose(outptr);
-            imageCount++;
-        }
-
-        // if we found a JPEG, we need to open the file for writing
-        if (containsJpegHeader)
-        {
-            sprintf(filename, "%03i.jpg", imageCount);
-            outptr = fopen(filename, "w");
-        }
-
-        // write anytime we have an open file
-        if (outptr != NULL)
-        {
-            fwrite(buffer, sizeof(BYTE), bytesRead, outptr);
-        }
-    }
-
-    // close last jpeg file
-    fclose(outptr);
-
-    // close infile
-    fclose(inptr);
-
-    // success
-    return 0;
-}
-     *
-     */ 
-    /*
-    // START SCALPEL CARVING TEST...
-    scalpelState* scalpstate = NULL;
-    scalpelState scalpoptions;
-    scalpoptions.generateHeaderFooterDatabase = FALSE;
-    scalpoptions.handleEmbedded = FALSE;
-    scalpoptions.organizeSubdirectories = FALSE;
-    scalpoptions.previewMode = FALSE;
-    scalpoptions.carveWithMissingFooters = TRUE;
-    scalpoptions.noSearchOverlap = FALSE;
-    char* argv[3];
-    // GENERATE A TMP SCALPEL.CONF FROM MY SELECTED CARVING OPTIONS....
-    // UPDATE LOG WITH OPTIONS...
-    argv[0] = (char*)"../scalpel/scalpel.conf";
-    scalpstate = new scalpelState(scalpoptions);
-    initializeState(&argv[0], scalpstate);
-    // call digImageFile() should generate the list of files found, then i just need to figure out how to access it....
-    // call whatever libscalpel_finalize(&scalpstate) calls...
-    */
-    /*
-    char* conffile = (char*)"../scalpel/scalpel.conf";
-    char* outdir = (char*)"../out/";
-    if(libscalpel_initialize(&scalpstate, conffile, outdir, scalpoptions) != SCALPEL_OK)
-    {
-	qDebug() << "libscalpel initialization failed.";
-    }
-    else
-	qDebug() << "libscalpel initialized successfully.";
-    libscalpel_finalize(&scalpstate);
-    */
-    // END SCALPEL CARVING TEST...
-    // THIS WORKS, BUT IT CARVES TO A FOLDER, SO I WILL HAVE TO EDIT THIS TO ONLY CARVE AND PROVIDE
-    // THE INFO I NEED...
-
-
-    // START REVIT CARVING TEST...
-    //definitions_list_element_t* definitions_list = NULL;
-    //char* configuration_file = (char*)"/home/pasquale/Projects/revit07-20070804/etc/file_types.conf";
-    /*
-    if(read_definitions_from_file(configuration_file, &definitions_list) != 1)
-    {
-	qDebug() << "error in configuration file";
-    }
-    */
-    // WILL HAVE TO POPULATE ABOVE LIST ON MY OWN...
-    //input_handler_t* input_handler = NULL;
-    // WILL HAVE TO IMPLEMENT THE HANDLER STUFF ON MY OWN...
-    // END REVIT CARVING TEST...
-    //emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
 }
 
 void GenerateThumbnails(QString thumbid)
@@ -5831,7 +5733,10 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                 //if(fsfile->meta != NULL)
                 //    treeout << QString::number(fsfile->meta->type); // file type - 12
                 //else
-                treeout << QString::number(fsfile->name->type); // file type - 12
+                if(QString(fsfile->name->name).contains("$OrphanFiles"))
+                    treeout << "11"; // file type - 12
+                else
+                    treeout << QString::number(fsfile->name->type); // file type - 12
                 if(fsfile->name->meta_addr == 0 && strcmp(fsfile->name->name, "$MFT") != 0)
                 {
                     treeout << "1"; // orphan - 13
@@ -5861,8 +5766,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                         }
                     }
                 }
-                if(QString(fsfile->name->name).contains("$OrphanFiles"))
-                    qDebug() << treeout;
+                //if(QString(fsfile->name->name).contains("$OrphanFiles"))
+                    //qDebug() << treeout;
                 QList<QVariant> nodedata;
                 nodedata.clear();
                 for(int i=0; i < 12; i++)

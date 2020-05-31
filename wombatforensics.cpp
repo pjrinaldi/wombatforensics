@@ -1377,8 +1377,8 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
             hexfile.write(carvebuffer);
         hexfile.close();
     }
-    else
-        qDebug() << "generatehex isn't setup for:" << curindex.sibling(curindex.row(), 11).data().toString() << "types yet.";
+    //else
+    //    qDebug() << "generatehex isn't setup for:" << curindex.sibling(curindex.row(), 11).data().toString() << "types yet.";
 }
 
 void WombatForensics::LoadHexContents()
@@ -1638,8 +1638,8 @@ void WombatForensics::LoadHexContents()
 	    }
         }
     }
-    else
-        qDebug() << "count for nodeid:" << nodeid.split("-").count();
+    //else
+    //    qDebug() << "count for nodeid:" << nodeid.split("-").count();
     ui->hexview->ensureVisible();
 }
 
