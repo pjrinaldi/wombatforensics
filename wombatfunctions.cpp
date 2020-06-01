@@ -586,6 +586,7 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
             compresseddata[i] = pfcontent.at(8+1);
         libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, uncompresseddata, &uncompressedsize, &fwnterror);
         // NEED TO FIGURE OUT WHAT I HAVE, THEN OPERATE ACCORDINGLY...
+	// WRITE TO TMP FILE TO SEE WHAT THE UNCOMPRESSED DATA IS....
     }
     else // SCCA format, reget header value
     {
