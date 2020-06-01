@@ -573,7 +573,7 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     QString pfheader = QString::fromStdString(pfcontent.left(4).toStdString());
     if(pfheader.startsWith("MAM")) // WIN10
     {
-        htmlstr += "<tr class=odd><td colspan=2>STILL NEED TO IMPLEMENT WIN10 PREFETCH PARSER</td></tr>";
+        //htmlstr += "<tr class=odd><td colspan=2>STILL NEED TO IMPLEMENT WIN10 PREFETCH PARSER</td></tr>";
         uint32_t datasize = qFromLittleEndian<uint32_t>(pfcontent.mid(4, 4));
         size_t compressedsize = pfcontent.count() - 8;
         size_t uncompressedsize = datasize;
@@ -583,18 +583,16 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
         uint8_t uncompresseddata[uncompressedsize];
         //compresseddata = (uint8_t*)(pfcontent.mid(8, compressedsize).data());
         for(uint i=0; i < compressedsize; i++)
-            compresseddata[i] = pfcontent.at(8+1);
+            compresseddata[i] = pfcontent.at(8+i);
+	// libfwnt decompresses the data, and then i can just store that as the new pfcontent and then run the below to display it... 
         libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, uncompresseddata, &uncompressedsize, &fwnterror);
-        // NEED TO FIGURE OUT WHAT I HAVE, THEN OPERATE ACCORDINGLY...
-	// WRITE TO TMP FILE TO SEE WHAT THE UNCOMPRESSED DATA IS....
-	QFile tmpfile(wombatvariable.tmpfilepath + pfid + ".tmp");
-	tmpfile.open(QIODevice::WriteOnly);
-        QDataStream tmpbuf(&tmpfile);
-	tmpbuf.writeRawData(reinterpret_cast<const char*>(uncompresseddata), uncompressedsize);
-	tmpfile.close();
+	pfcontent.clear();
+	for(uint i=0; i < uncompressedsize; i++)
+	    pfcontent.append(uncompresseddata[i]);
+	//qDebug() << "new pfcontent:" << QString::fromStdString(pfcontent.mid(4, 4).toStdString()); 
     }
-    else // SCCA format, reget header value
-    {
+//    else // SCCA format, reget header value
+//    {
         pfheader = QString::fromStdString(pfcontent.mid(4, 4).toStdString());
         if(pfheader.contains("SCCA")) // Earlier Windows
         {
@@ -703,7 +701,7 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
                 htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
             }
         }
-    }
+//    }
     htmlstr += "</table></body></html>";
 
     return htmlstr;
