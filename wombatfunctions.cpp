@@ -587,6 +587,11 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
         libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, uncompresseddata, &uncompressedsize, &fwnterror);
         // NEED TO FIGURE OUT WHAT I HAVE, THEN OPERATE ACCORDINGLY...
 	// WRITE TO TMP FILE TO SEE WHAT THE UNCOMPRESSED DATA IS....
+	QFile tmpfile(wombatvariable.tmpfilepath + pfid + ".tmp");
+	tmpfile.open(QIODevice::WriteOnly);
+        QDataStream tmpbuf(&tmpfile);
+	tmpbuf.writeRawData(reinterpret_cast<const char*>(uncompresseddata), uncompressedsize);
+	tmpfile.close();
     }
     else // SCCA format, reget header value
     {
@@ -1741,6 +1746,8 @@ void GenerateArchiveExpansion(QString objectid)
 		    else if(filename.startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02))
 			mimestr = "Windows System/Recycle.Bin";
 		    else if(filename.endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
+			mimestr = "Windows System/Prefetch";
+		    else if(filename.endsWith(".pf") && tmparray.at(0) == 0x4d && tmparray.at(1) == 0x41 && tmparray.at(2) == 0x4d)
 			mimestr = "Windows System/Prefetch";
 		    //else if(astring.contains("fa"
 		}
@@ -5432,7 +5439,7 @@ void TransferFiles(QString thumbid, QString reppath)
                     QString idollarstr = ParseIDollarArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
                     tmpfile.write(idollarstr.toStdString().c_str());
                 }
-		else if(curnode->Data(9).toString().contains("Prefectch"))
+		else if(curnode->Data(9).toString().contains("Prefetch"))
 		{
 		    QString pfstr = ParsePrefetchArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
 		    tmpfile.write(pfstr.toStdString().c_str());
@@ -5719,6 +5726,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
                             mimestr = "Windows System/Recycle.Bin";
 			else if(QString::fromStdString(fsfile->name->name).endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
 			    mimestr = "Windows System/Prefetch";
+			else if(QString::fromStdString(fsfile->name->name).endsWith(".pf") && tmparray.at(0) == 0x4d && tmparray.at(1) == 0x41 && tmparray.at(2) == 0x4d)
+			    mimestr = "Windows System/Prefetch";
                     }
                     //qDebug() << "mimestr:" << mimestr;
                     delete[] magicbuffer;
@@ -5945,6 +5954,8 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                         else if(QString::fromStdString(fsfile->name->name).startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02)) // $I recycle bin file
                             mimestr = "Windows System/Recycle.Bin";
 			else if(QString::fromStdString(fsfile->name->name).endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
+			    mimestr = "Windows System/Prefetch";
+			else if(QString::fromStdString(fsfile->name->name).endsWith(".pf") && tmparray.at(0) == 0x4d && tmparray.at(1) == 0x41 && tmparray.at(2) == 0x4d)
 			    mimestr = "Windows System/Prefetch";
                     }
                     delete[] magicbuffer;
