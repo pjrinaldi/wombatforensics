@@ -569,19 +569,15 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
         pfcontent = pffile.readAll();
     pffile.close();
     uint32_t tmpuint32 = 0;
-    //uint64_t tmpuint64 = 0;
     QString pfheader = QString::fromStdString(pfcontent.left(4).toStdString());
     if(pfheader.startsWith("MAM")) // WIN10
     {
-        //htmlstr += "<tr class=odd><td colspan=2>STILL NEED TO IMPLEMENT WIN10 PREFETCH PARSER</td></tr>";
         uint32_t datasize = qFromLittleEndian<uint32_t>(pfcontent.mid(4, 4));
         size_t compressedsize = pfcontent.count() - 8;
         size_t uncompressedsize = datasize;
-        //qDebug() << "datsize:" << datasize;
         libfwnt_error_t* fwnterror = NULL;
         uint8_t compresseddata[compressedsize];
         uint8_t uncompresseddata[uncompressedsize];
-        //compresseddata = (uint8_t*)(pfcontent.mid(8, compressedsize).data());
         for(uint i=0; i < compressedsize; i++)
             compresseddata[i] = pfcontent.at(8+i);
 	// libfwnt decompresses the data, and then i can just store that as the new pfcontent and then run the below to display it... 
@@ -589,119 +585,120 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 	pfcontent.clear();
 	for(uint i=0; i < uncompressedsize; i++)
 	    pfcontent.append(uncompresseddata[i]);
-	//qDebug() << "new pfcontent:" << QString::fromStdString(pfcontent.mid(4, 4).toStdString()); 
     }
-//    else // SCCA format, reget header value
-//    {
-        pfheader = QString::fromStdString(pfcontent.mid(4, 4).toStdString());
-        if(pfheader.contains("SCCA")) // Earlier Windows
-        {
-            uint32_t pfversion = qFromLittleEndian<uint32_t>(pfcontent.left(4));
-            htmlstr += "<tr class=odd><td class=aval>Format Version:</td><td>" + QString::number(pfversion) + "</td></tr>";
-            QString filenamestring = "";
-            for(int i=16; i < 76; i++)
-            {
-                if(i % 2 == 0)
-                {
-                    if(pfcontent.at(i) == '\u0000')
-                        break;
-                    filenamestring.append(pfcontent.at(i));
-                }
-            }
-            htmlstr += "<tr class=even><td class=aval>Executable File Name:</td><td>" + filenamestring + "</td></tr>";
-            tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(76, 4));
-            htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
-            tmpuint32 = 0;
-            uint32_t fnamestringsoffset = 0;
-            uint32_t fnamestringssize = 0;
-            uint32_t volinfooffset = 0;
-            uint32_t volinfosize = 0;
-            uint32_t volinfocount = 0;
-            //uint32_t runcount = 0;
-            uint32_t metricsoffset = 0;
-            QByteArray fileinformation;
-            QByteArray filenamestrings;
-            QByteArray volinfocontent;
-            fileinformation.clear();
-            metricsoffset = qFromLittleEndian<uint32_t>(pfcontent.mid(84, 4));
-            if(pfversion == 17) // WINXP, WIN2003
-                fileinformation = pfcontent.mid(84, 68);
-            else if(pfversion == 23) // VISTA, WIN7
-                fileinformation = pfcontent.mid(84, 156);
-            else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130))
-                fileinformation = pfcontent.mid(84, 224);
-            else if(pfversion == 30 && metricsoffset == 0x128)
-                fileinformation = pfcontent.mid(84, 216);
-            fnamestringsoffset = qFromLittleEndian<uint32_t>(fileinformation.mid(16, 4));
-            fnamestringssize = qFromLittleEndian<uint32_t>(fileinformation.mid(20, 4));
-            volinfooffset = qFromLittleEndian<uint32_t>(fileinformation.mid(24, 4));
-            volinfocount = qFromLittleEndian<uint32_t>(fileinformation.mid(28, 4));
-            volinfosize = qFromLittleEndian<uint32_t>(fileinformation.mid(32, 4));
-            if(pfversion == 17)
-                htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(60, 4))) + "</td></tr>";
-            else if(pfversion == 23)
-                htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(68, 4))) + "</td></tr>";
-            else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130))
-                htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(124, 4))) + "</td></tr>";
-            else if(pfversion == 30 && metricsoffset == 0x128)
-                htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(116, 4))) + "</td></tr>";
-            if(pfversion == 17)
-                htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(36, 8))) + "</td></tr>";
-            else if(pfversion == 23)
-                htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(44, 8))) + "</td></tr>";
-            else if(pfversion == 26 || pfversion == 30)
-            {
-                for(int i=0; i < 8; i++)
-                    htmlstr += "<tr class=odd><td class=aval>Last Run Time" + QString::number(i+1) + "</td><td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(44+(i*8), 8))) + "</td></tr>";
-            }
-            filenamestrings.clear();
-            filenamestrings = pfcontent.mid(fnamestringsoffset, fnamestringssize);
-            QStringList tmpstrlist;
-            tmpstrlist.clear();
-            QString tmpstr = "";
-            for(uint i=0; i < fnamestringssize; i++)
-            {
-                if(i % 2 == 0)
-                {
-                    if(filenamestrings.at(i) == '\u0000')
-                    {
-                        tmpstrlist.append(tmpstr);
-                        tmpstr = "";
-                    }
-                    else
-                        tmpstr += filenamestrings.at(i);
-                }
-            }
-            for(int i=0; i < tmpstrlist.count(); i++)
-                htmlstr += "<tr class=even><td class=aval>File Name " + QString::number(i+1) + ":</td><td>" + tmpstrlist.at(i) + "</td></tr>";
-            volinfocontent.clear();
-            volinfocontent = pfcontent.mid(volinfooffset, volinfosize);
-            int curpos = 0;
-            for(uint i=0; i < volinfocount; i++)
-            {
-                if(pfversion == 17)
-                    curpos = 40*i;
-                else if(pfversion == 23 || pfversion == 26)
-                    curpos = 104*i;
-                else if(pfversion == 30)
-                    curpos = 96*i;
-                uint32_t volpathoffset = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos, 4));
-                uint32_t volpathsize = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+4, 4));
-                QByteArray volpath = volinfocontent.mid(curpos + volpathoffset, volpathsize*2);
-                QString volpathstr = "";
-                for(int j=0; j < volpath.count(); j++)
-                {
-                    if(j % 2 == 0)
-                        volpathstr += volpath.at(j);
-                }
-                uint64_t tmpuint64 = qFromLittleEndian<uint64_t>(volinfocontent.mid(curpos+8, 8));
-                uint32_t volserial = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+16, 4));
-                htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Path:</td><td>" + volpathstr + "</td></tr>";
-                htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Serial Number:</td><td>0x" + QString::number(volserial, 16) + "</td></tr>";
-                htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
-            }
-        }
-//    }
+    pfheader = QString::fromStdString(pfcontent.mid(4, 4).toStdString());
+    if(pfheader.contains("SCCA"))
+    {
+	uint32_t pfversion = qFromLittleEndian<uint32_t>(pfcontent.left(4));
+	htmlstr += "<tr class=odd><td class=aval>Format Version:</td><td>" + QString::number(pfversion) + "</td></tr>";
+	QString filenamestring = "";
+	for(int i=16; i < 76; i++)
+	{
+	    if(i % 2 == 0)
+	    {
+		if(pfcontent.at(i) == '\u0000')
+		    break;
+		filenamestring.append(pfcontent.at(i));
+	    }
+	}
+	htmlstr += "<tr class=even><td class=aval>Executable File Name:</td><td>" + filenamestring + "</td></tr>";
+	tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(76, 4));
+	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
+	tmpuint32 = 0;
+	uint32_t fnamestringsoffset = 0;
+	uint32_t fnamestringssize = 0;
+	uint32_t volinfooffset = 0;
+	uint32_t volinfosize = 0;
+	uint32_t volinfocount = 0;
+	uint32_t metricsoffset = 0;
+	QByteArray fileinformation;
+	QByteArray filenamestrings;
+	QByteArray volinfocontent;
+	fileinformation.clear();
+	metricsoffset = qFromLittleEndian<uint32_t>(pfcontent.mid(84, 4));
+	if(pfversion == 17) // WINXP, WIN2003
+	    fileinformation = pfcontent.mid(84, 68);
+	else if(pfversion == 23) // VISTA, WIN7
+	    fileinformation = pfcontent.mid(84, 156);
+	else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130)) // WIN8.1/WIN10
+	    fileinformation = pfcontent.mid(84, 224);
+	else if(pfversion == 30 && metricsoffset == 0x128) // WIN10
+	    fileinformation = pfcontent.mid(84, 216);
+	fnamestringsoffset = qFromLittleEndian<uint32_t>(fileinformation.mid(16, 4));
+	fnamestringssize = qFromLittleEndian<uint32_t>(fileinformation.mid(20, 4));
+	volinfooffset = qFromLittleEndian<uint32_t>(fileinformation.mid(24, 4));
+	volinfocount = qFromLittleEndian<uint32_t>(fileinformation.mid(28, 4));
+	volinfosize = qFromLittleEndian<uint32_t>(fileinformation.mid(32, 4));
+	if(pfversion == 17)
+	    htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(60, 4))) + "</td></tr>";
+	else if(pfversion == 23)
+	    htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(68, 4))) + "</td></tr>";
+	else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130))
+	    htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(124, 4))) + "</td></tr>";
+	else if(pfversion == 30 && metricsoffset == 0x128)
+	    htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(116, 4))) + "</td></tr>";
+	if(pfversion == 17)
+	    htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(36, 8))) + "</td></tr>";
+	else if(pfversion == 23)
+	    htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(44, 8))) + "</td></tr>";
+	else if(pfversion == 26 || pfversion == 30)
+	{
+	    for(int i=0; i < 8; i++)
+	    {
+		uint64_t lastruntime = qFromLittleEndian<uint64_t>(fileinformation.mid(44+(i*8), 8));
+		if(lastruntime == 0)
+		    htmlstr += "<tr class=odd><td class=aval>Last Run Time" + QString::number(i+1) + "</td><td>Not Set (0)</td></tr>";
+		else
+		    htmlstr += "<tr class=odd><td class=aval>Last Run Time" + QString::number(i+1) + "</td><td>" + ConvertWindowsTimeToUnixTime(lastruntime) + "</td></tr>";
+	    }
+	}
+	filenamestrings.clear();
+	filenamestrings = pfcontent.mid(fnamestringsoffset, fnamestringssize);
+	QStringList tmpstrlist;
+	tmpstrlist.clear();
+	QString tmpstr = "";
+	for(uint i=0; i < fnamestringssize; i++)
+	{
+	    if(i % 2 == 0)
+	    {
+		if(filenamestrings.at(i) == '\u0000')
+		{
+		    tmpstrlist.append(tmpstr);
+		    tmpstr = "";
+		}
+		else
+		    tmpstr += filenamestrings.at(i);
+	    }
+	}
+	for(int i=0; i < tmpstrlist.count(); i++)
+	    htmlstr += "<tr class=even><td class=aval>File Name " + QString::number(i+1) + ":</td><td>" + tmpstrlist.at(i) + "</td></tr>";
+	volinfocontent.clear();
+	volinfocontent = pfcontent.mid(volinfooffset, volinfosize);
+	int curpos = 0;
+	for(uint i=0; i < volinfocount; i++)
+	{
+	    if(pfversion == 17)
+		curpos = 40*i;
+	    else if(pfversion == 23 || pfversion == 26)
+		curpos = 104*i;
+	    else if(pfversion == 30)
+		curpos = 96*i;
+	    uint32_t volpathoffset = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos, 4));
+	    uint32_t volpathsize = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+4, 4));
+	    QByteArray volpath = volinfocontent.mid(curpos + volpathoffset, volpathsize*2);
+	    QString volpathstr = "";
+	    for(int j=0; j < volpath.count(); j++)
+	    {
+		if(j % 2 == 0)
+		    volpathstr += volpath.at(j);
+	    }
+	    uint64_t tmpuint64 = qFromLittleEndian<uint64_t>(volinfocontent.mid(curpos+8, 8));
+	    uint32_t volserial = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+16, 4));
+	    htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Path:</td><td>" + volpathstr + "</td></tr>";
+	    htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Serial Number:</td><td>0x" + QString::number(volserial, 16) + "</td></tr>";
+	    htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
+	}
+    }
     htmlstr += "</table></body></html>";
 
     return htmlstr;
