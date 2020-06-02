@@ -1935,6 +1935,8 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 
 void WombatForensics::StartCarving(QStringList plist, QStringList flist)
 {
+    qInfo() << "Carving Started...";
+    StatusUpdate("Carving Started...");
     QFuture<void> tmpfuture = QtConcurrent::run(TestCarving, plist, flist);
     carvewatcher.setFuture(tmpfuture);
     //or should i qtconcurrent::run(plist,qlist) and then loop over every plist and qtconcurrentmap the carving methodology...
@@ -2381,8 +2383,9 @@ void WombatForensics::FinishPreDigging()
 
 void WombatForensics::FinishCarve()
 {
-    qInfo() << "Carving complete.";
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
+    qInfo() << "Carving Completed";
+    StatusUpdate("Carving Completed");
 }
 
 void WombatForensics::FinishDigging()

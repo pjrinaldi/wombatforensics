@@ -2305,7 +2305,7 @@ void TestCarving(QStringList plist, QStringList flist)
             // loop over the blocks...
         }
         qint64 partoffset = partlist.at(4).toLongLong();
-        qint64 blocksize = evidlist.at(2).toULongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
+        qint64 blocksize = evidlist.at(2).toLongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
         //qint64 blocksize = partlist.at(6).toLongLong(); // FS CLUSTER SIZE
         qint64 partsize = partlist.at(1).toLongLong() - partoffset;
         qint64 blockcount = partsize / blocksize;
@@ -2379,6 +2379,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 }
             }
         }
+	qInfo() << blocklist.count() << "Headers found. Starting footer search...";
         // FOR EACH CLAIMED BLOCK, APPLY THE headhash value...
         for(int j=0; j < blocklist.count(); j++)
         {
@@ -2467,6 +2468,8 @@ void TestCarving(QStringList plist, QStringList flist)
                 listeditems.append(QString(estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount)));
                 carvedcount++;
             }
+	    else
+		qDebug() << "Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split("-").at(4).toLower() << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) << "not a valid file type.";
             /*
              * TEST FILE DUMP WORKS...
             QByteArray tmparray = footerarray.left(lastfooterpos + footer.count());
