@@ -2418,10 +2418,12 @@ void TestCarving(QStringList plist, QStringList flist)
             }
             // TRY TO DETERMINE IF IT IS A VALID IMAGE....
             bool isvalidfile = false;
+	    qDebug() << "curtypestr:" << curtypestr.split(",").at(1);
             if(curtypestr.split(",").at(1).contains("JPEG")) // validity check for jpeg
             {
 	        Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
 	        Magick::Image master(blob);
+		qDebug() << "magick jpg:" << QString::fromStdString(master.magick());
                 if(QString::fromStdString(master.magick()).contains("JPEG"))
                     isvalidfile = true;
             }
@@ -2429,7 +2431,7 @@ void TestCarving(QStringList plist, QStringList flist)
             {
 	        Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
 	        Magick::Image master(blob);
-                //qDebug() << QString::fromStdString(master.magick());
+		qDebug() << "magick jpg:" << QString::fromStdString(master.magick());
                 if(QString::fromStdString(master.magick()).contains("PNG"))
                     isvalidfile = true;
             }
@@ -2437,11 +2439,13 @@ void TestCarving(QStringList plist, QStringList flist)
             {
 	        Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
 	        Magick::Image master(blob);
+                //qDebug() << QString::fromStdString(master.magick());
                 if(QString::fromStdString(master.magick()).contains("GIF"))
                     isvalidfile = true;
             }
             else
             {
+		qDebug() << "not there, process curtypestr:" << curtypestr;
                 // smart carving check doesn't exist for file type yet... so process it anyway...
                 isvalidfile = true;
             }
