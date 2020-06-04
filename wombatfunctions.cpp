@@ -2408,9 +2408,13 @@ void TestCarving(QStringList plist, QStringList flist)
             else // no footer defined, just use arraysize as size
                 carvedstringsize = arraysize;
             // TRY TO DETERMINE IF IT IS A VALID FILE....
+	    qDebug() << "Qt Supported Image Formats:" << QImageReader::supportedImageFormats();
             bool isvalidfile = false;
+	    QImage testimg;
             if(curtypestr.split(",").at(1).contains("JPEG")) // validity check for jpeg
             {
+		isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "jpg");
+		/*
 		try
 		{
 		    Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
@@ -2423,9 +2427,12 @@ void TestCarving(QStringList plist, QStringList flist)
 		    isvalidfile = false;
 		    //qDebug() << "magick: error:" << merr.what();
 		}
+		*/
             }
             else if(curtypestr.split(",").at(1).contains("PNG")) // validity check for png
             {
+		isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "png");
+	    /*
 		try
 		{
 		    Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
@@ -2438,9 +2445,12 @@ void TestCarving(QStringList plist, QStringList flist)
 		    isvalidfile = false;
 		    //qDebug() << "magick error:" << merr.what();
 		}
+		*/
             }
             else if(curtypestr.split(",").at(1).contains("GIF")) // validity check for gif
             {
+		isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "gif");
+		/*
 		try
 		{
 		    Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
@@ -2453,6 +2463,7 @@ void TestCarving(QStringList plist, QStringList flist)
 		    isvalidfile = false;
 		    //qDebug() << "magick error:" << merr.what();
 		}
+		*/
             }
 	    QString parstr = estring + "-" + vstring + "-" + pstring + "-";
             if(isvalidfile)
