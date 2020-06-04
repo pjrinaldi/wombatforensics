@@ -2420,6 +2420,7 @@ void TestCarving(QStringList plist, QStringList flist)
 		}
 		catch(Magick::Exception &merr)
 		{
+		    isvalidfile = false;
 		    //qDebug() << "magick: error:" << merr.what();
 		}
             }
@@ -2434,6 +2435,7 @@ void TestCarving(QStringList plist, QStringList flist)
 		}
 		catch(Magick::Exception &merr)
 		{
+		    isvalidfile = false;
 		    //qDebug() << "magick error:" << merr.what();
 		}
             }
@@ -2448,6 +2450,7 @@ void TestCarving(QStringList plist, QStringList flist)
 		}
 		catch(Magick::Exception &merr)
 		{
+		    isvalidfile = false;
 		    //qDebug() << "magick error:" << merr.what();
 		}
             }
