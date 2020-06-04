@@ -2466,7 +2466,6 @@ void TestCarving(QStringList plist, QStringList flist)
                 //qDebug() << "valid image:" << "Carved" + QString::number(blocklist.at(j)) << carvedcount;
                 // DO STAT/TREENODE here and everything else everywhere else to make it work.
                 QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
-
                 QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
                 if(!cfile.isOpen())
                     cfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -2675,6 +2674,7 @@ void PopulateCarvedFiles(QString cfilestr)
         treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-").first() + "-mc"), 15, 0);
     else
         treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-pc"), 15, 0);
+    // NEED TO FIGURE OUT HOW TO TELL THE DIFFERENCE BETWEEN -PC AND -UC????? MIGHT ADD -PC OR -UC TO THE END OF THE STAT FILE...
     //treenodemodel->AddNode(nodedata, QString(slist.at(12)).split("-").first(), 15, 0);
     mutex.unlock();
     listeditems.append(slist.at(12));
