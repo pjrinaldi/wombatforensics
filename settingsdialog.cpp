@@ -1,6 +1,6 @@
 #include "settingsdialog.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent), ui(new Ui::SettingsDialog)
@@ -66,7 +66,7 @@ void SettingsDialog::CancelChanges()
 void SettingsDialog::LoadSettings()
 {
     settingsfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QStringList tmplist = QString(settingsfile.readLine()).split(",", QString::SkipEmptyParts);
+    QStringList tmplist = QString(settingsfile.readLine()).split(",", Qt::SkipEmptyParts);
     settingsfile.close();
     for(int i = 0; i < tmplist.count(); i++)
     {

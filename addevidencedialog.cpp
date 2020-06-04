@@ -105,7 +105,7 @@ void AddEvidenceDialog::SelectEvidence()
                                 // NEED TO STORE IN HASH, ALSO POSSIBLY ALLOW IT TO BE CHANGED SOMEHOW...
                                 //qDebug() << "encrypted POOL VOLUME: prompt for password...";
 				//qDebug() << evidfilename << "v0" << "p" << i;
-                                QString curitem = evidfilename.split("/", QString::SkipEmptyParts).last() + "-v0" + "-p" + QString::number(i);
+                                QString curitem = evidfilename.split("/", Qt::SkipEmptyParts).last() + "-v0" + "-p" + QString::number(i);
                                 bool ok;
                                 QString text = QInputDialog::getText(this, QString("Encrypted File System"), QString(curitem + "\nEnter Password:"), QLineEdit::Normal, "", &ok);
                                 if (ok)
@@ -182,7 +182,7 @@ void AddEvidenceDialog::SelectEvidence()
 						//qDebug() << "prompt here and store password...";
 						//qDebug() << "check password, if fs == null, then it didn't work...";
 						//qDebug() << "if it worked, store in passwordhash.";
-                                                QString curitem = evidfilename.split("/", QString::SkipEmptyParts).last() + "-v0" + "-p" + QString::number(i + j);
+                                                QString curitem = evidfilename.split("/", Qt::SkipEmptyParts).last() + "-v0" + "-p" + QString::number(i + j);
                                                 bool ok;
                                                 QString text = QInputDialog::getText(this, QString("Encrypted File System"), QString(curitem + "\nEnter Password:"), QLineEdit::Normal, "", &ok);
                                                 if (ok)

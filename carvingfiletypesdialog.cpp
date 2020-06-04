@@ -1,6 +1,6 @@
 #include "carvingfiletypesdialog.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 CarvingFileTypesDialog::CarvingFileTypesDialog(QWidget* parent) : QDialog(parent), ui(new Ui::CarvingFileTypesDialog)
@@ -81,7 +81,7 @@ void CarvingFileTypesDialog::Save()
         for(int i=0; i < ui->filetypestablewidget->rowCount(); i++)
         {
             if(ui->filetypestablewidget->item(i,0))
-                out << ui->filetypestablewidget->item(i, 0)->text() << "," << ui->filetypestablewidget->item(i, 1)->text() << "," << ui->filetypestablewidget->item(i, 2)->text() << "," << ui->filetypestablewidget->item(i, 3)->text() << "," << ui->filetypestablewidget->item(i, 4)->text() << "," << ui->filetypestablewidget->item(i, 5)->text() << endl;
+                out << ui->filetypestablewidget->item(i, 0)->text() << "," << ui->filetypestablewidget->item(i, 1)->text() << "," << ui->filetypestablewidget->item(i, 2)->text() << "," << ui->filetypestablewidget->item(i, 3)->text() << "," << ui->filetypestablewidget->item(i, 4)->text() << "," << ui->filetypestablewidget->item(i, 5)->text() << Qt::endl;
         }
     }
     //else

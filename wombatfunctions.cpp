@@ -6,18 +6,7 @@
 // LIBFFMPEG THUMBNAILER HEADERS
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
-/*
-// SCALPEL HEADER
-#include <scalpel.h>
-// REVIT HEADERS
-#include <libdefinitions_parser.h>
-#include <libinput_analyzer.h>
-#include <libinput_handler.h>
-#include <libmedia_access.h>
-#include <libnotify.h>
-#include <liboutput_handler.h>
-#include <libstate_hierarchy.h>
-*/
+
 // Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
@@ -2402,10 +2391,16 @@ void TestCarving(QStringList plist, QStringList flist)
                 blockdifference = (blockcount - blocklist.at(j)) * blocksize;
             else
                 blockdifference = (blocklist.at(j+1) - blocklist.at(j)) * blocksize;
-            if(blockdifference < curmaxsize)
-                arraysize = blockdifference;
-            else
-                arraysize = curmaxsize;
+	    // I THINK I SHOULD USE BLOCKDIFFERENCE REGARDLESS TO LOOK FOR FOOTERS IF NO FOOTER, THEN GO WITH CURMAXSIZE IF J == BLOCKLIST.COUNT() - 1.
+	    if(curfooter.isEmpty() && j == (blocklist.count() - 1))
+	    {
+		if(blockdifference < curmaxsize)
+		    arraysize = blockdifference;
+		else
+		    arraysize = curmaxsize;
+	    }
+	    else
+		arraysize = blockdifference;
             QByteArray footerarray;
             footerarray.clear();
             if(!curfooter.isEmpty()) // if footer exists
@@ -2461,28 +2456,33 @@ void TestCarving(QStringList plist, QStringList flist)
             }
 	    //qDebug() << "blocklist.at(j):" << blocklist.at(j);
 	    //qDebug() << "is vlaid file:" << isvalidfile;
+	    QString parstr = estring + "-" + vstring + "-" + pstring + "-";
             if(isvalidfile)
-            {
+		parstr += "pc";
+	    else
+		parstr += "uc";
+
                 //qDebug() << "valid image:" << "Carved" + QString::number(blocklist.at(j)) << carvedcount;
                 // DO STAT/TREENODE here and everything else everywhere else to make it work.
-                QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
-                QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
-                if(!cfile.isOpen())
-                    cfile.open(QIODevice::WriteOnly | QIODevice::Text);
-                if(cfile.isOpen())
-                {
-                    cfile.write(cstr.toStdString().c_str());
-                    cfile.close();
-                }
-                QList<QVariant> nodedata;
-                nodedata.clear();
-                nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
-                mutex.lock();
-                treenodemodel->AddNode(nodedata, QString(estring + "-" + vstring + "-" + pstring + "-pc"), 15, 0);
-                mutex.unlock();
-                listeditems.append(QString(estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount)));
-                carvedcount++;
-            }
+	    QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
+	    QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
+	    if(!cfile.isOpen())
+		cfile.open(QIODevice::WriteOnly | QIODevice::Text);
+	    if(cfile.isOpen())
+	    {
+		cfile.write(cstr.toStdString().c_str());
+		cfile.close();
+	    }
+	    QList<QVariant> nodedata;
+	    nodedata.clear();
+	    nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
+	    mutex.lock();
+	    treenodemodel->AddNode(nodedata, parstr, 15, 0);
+	    //treenodemodel->AddNode(nodedata, QString(estring + "-" + vstring + "-" + pstring + "-pc"), 15, 0);
+	    mutex.unlock();
+	    listeditems.append(QString(estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount)));
+	    carvedcount++;
+            //}
 	    //else
 	    //	qDebug() << "Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split("-").at(4).toLower() << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) << "not a valid file type.";
             /*

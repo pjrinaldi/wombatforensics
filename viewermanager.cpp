@@ -1,6 +1,6 @@
 #include "viewermanager.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 ViewerManager::ViewerManager(QWidget* parent) : QDialog(parent), ui(new Ui::ViewerManager)
@@ -57,7 +57,7 @@ void ViewerManager::RemoveSelected()
     QString selectedviewer = ui->listWidget->currentItem()->text();
     QString tmpstring;
     viewerfile.open(QIODevice::ReadOnly);
-    QStringList tmplist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    QStringList tmplist = QString(viewerfile.readLine()).split(",", Qt::SkipEmptyParts);
     viewerfile.close();
     for(int i=0; i < tmplist.count(); i++)
     {
@@ -86,7 +86,7 @@ void ViewerManager::UpdateList()
     QString debugstr;
     ui->listWidget->clear();
     viewerfile.open(QIODevice::ReadOnly);
-    QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    QStringList itemlist = QString(viewerfile.readLine()).split(",", Qt::SkipEmptyParts);
     itemlist.removeDuplicates();
     viewerfile.close();
     for(int i=0; i < itemlist.count(); i++)

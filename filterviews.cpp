@@ -1,6 +1,6 @@
 #include "filterviews.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 IdFilter::IdFilter(QWidget* parent) : QFrame(parent), ui(new Ui::IdFilter)
@@ -27,7 +27,7 @@ void IdFilter::DisplayFilter()
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     ui->idlabel->setText(filtervalues.idfilter);
-    QStringList tmplist = filtervalues.idfilter.split("-", QString::SkipEmptyParts);
+    QStringList tmplist = filtervalues.idfilter.split("-", Qt::SkipEmptyParts);
     if(tmplist.count() > 0)
     {
         for(int i = 0; i < tmplist.count(); i++)
@@ -439,7 +439,7 @@ void TagFilter::DisplayFilter()
     if(tmpfile.isOpen())
         tmpstr = tmpfile.readLine();
     tmpfile.close();
-    tags = tmpstr.split(",", QString::SkipEmptyParts);
+    tags = tmpstr.split(",", Qt::SkipEmptyParts);
     for(int i=0; i < tags.count(); i++)
         ui->tagcomboBox->addItem(tags.at(i));
     if(filtervalues.tag.compare("") != 0)

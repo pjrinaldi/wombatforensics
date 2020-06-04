@@ -1,6 +1,6 @@
 #include "tagmanager.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 TagManager::TagManager(QWidget* parent) : QDialog(parent), ui(new Ui::TagManager)
@@ -125,7 +125,7 @@ void TagManager::UpdateList()
     bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
-        taglist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+        taglist = QString(bookmarkfile.readLine()).split(",", Qt::SkipEmptyParts);
     bookmarkfile.close();
     //taglist.removeDuplicates();
     for(int i=0; i < taglist.count(); i++)
