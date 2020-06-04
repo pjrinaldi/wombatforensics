@@ -137,7 +137,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     viewmenu = new QMenu();
     viewmenu->setTitle("View With");
     viewmenu->setIcon(QIcon(":/bar/setview"));
-    QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    QStringList itemlist = QString(viewerfile.readLine()).split(",", Qt::SkipEmptyParts);
     itemlist.removeDuplicates();
     viewerfile.close();
     for(int i=0; i < itemlist.count(); i++)
@@ -236,7 +236,7 @@ void WombatForensics::ReadBookmarks()
     bookitemlist.clear();
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
-        bookitemlist = QString(bookmarkfile.readLine()).split(",", QString::SkipEmptyParts);
+        bookitemlist = QString(bookmarkfile.readLine()).split(",", Qt::SkipEmptyParts);
     bookmarkfile.close();
     bookmarkmenu->clear();
     tagcheckedmenu->clear();
@@ -274,10 +274,10 @@ void WombatForensics::RemoveTag()
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
         QString evidencename = evidfiles.first();
-        QString estring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
-        QString vstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
-        QString pstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
-        QString fstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
+        QString estring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(0);
+        QString vstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(1);
+        QString pstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(2);
+        QString fstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(3);
         QStringList partlist;
         partlist.clear();
         QFile partfile(wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/stat");
@@ -305,7 +305,7 @@ void WombatForensics::RemoveTag()
         filefile.close();
         RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
         if(tmpstr.split(",").count() > 15)
-            tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+            tmplist = tmpstr.split(",", Qt::SkipEmptyParts);
         tmplist[15] = "0";
         tmpstr = "";
         for(int i = 0; i < tmplist.count(); i++)
@@ -334,10 +334,10 @@ void WombatForensics::RemoveTag()
                 QDir eviddir = QDir(wombatvariable.tmpmntpath);
                 QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
                 QString evidencename = evidfiles.first();
-                QString estring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(0);
-                QString vstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(1);
-                QString pstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(2);
-                QString fstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", QString::SkipEmptyParts).at(3);
+                QString estring = curindex.sibling(curindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(0);
+                QString vstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(1);
+                QString pstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(2);
+                QString fstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(3);
                 QStringList partlist;
                 partlist.clear();
                 QFile partfile(wombatvariable.tmpmntpath + evidencename + "/" + vstring + "/" + pstring + "/stat");
@@ -365,7 +365,7 @@ void WombatForensics::RemoveTag()
                 filefile.close();
                 RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
                 if(tmpstr.split(",").count() > 15)
-                    tmplist = tmpstr.split(",", QString::SkipEmptyParts);
+                    tmplist = tmpstr.split(",", Qt::SkipEmptyParts);
                 tmplist[15] = "0";
                 tmpstr = "";
                 for(int i = 0; i < tmplist.count(); i++)
@@ -633,7 +633,7 @@ void WombatForensics::HideViewerManager()
     treemenu->clear();
     viewmenu->clear();
     viewerfile.open(QIODevice::ReadOnly);
-    QStringList itemlist = QString(viewerfile.readLine()).split(",", QString::SkipEmptyParts);
+    QStringList itemlist = QString(viewerfile.readLine()).split(",", Qt::SkipEmptyParts);
     viewerfile.close();
     itemlist.removeDuplicates();
     for(int i=0; i < itemlist.count(); i++)
@@ -687,7 +687,7 @@ void WombatForensics::HideSettingsWindow()
 void WombatForensics::ReadSettings()
 {
     settingsfile.open(QIODevice::ReadOnly);
-    QStringList tmplist = QString(settingsfile.readLine()).split(",", QString::SkipEmptyParts);
+    QStringList tmplist = QString(settingsfile.readLine()).split(",", Qt::SkipEmptyParts);
     settingsfile.close();
     // split settings and implement them...
     for(int i = 0; i < tmplist.count(); i++)
@@ -1199,7 +1199,8 @@ void WombatForensics::PrepareEvidenceImage()
             xmntprocess = new QProcess();
             connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
             connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
-            xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them..
+            //xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them..
+            xmntprocess->start(mntstr, QStringList());
         }
         }
     }
@@ -1466,11 +1467,11 @@ void WombatForensics::LoadHexContents()
     }
     else if(nodeid.split("-").count() == 5) // dir/file
     {
-        QString estring = nodeid.split("-", QString::SkipEmptyParts).at(0);
-        QString vstring = nodeid.split("-", QString::SkipEmptyParts).at(1);
-        QString pstring = nodeid.split("-", QString::SkipEmptyParts).at(2);
-        QString fstring = nodeid.split("-", QString::SkipEmptyParts).at(3);
-        QString astring = nodeid.split("-", QString::SkipEmptyParts).at(4);
+        QString estring = nodeid.split("-", Qt::SkipEmptyParts).at(0);
+        QString vstring = nodeid.split("-", Qt::SkipEmptyParts).at(1);
+        QString pstring = nodeid.split("-", Qt::SkipEmptyParts).at(2);
+        QString fstring = nodeid.split("-", Qt::SkipEmptyParts).at(3);
+        QString astring = nodeid.split("-", Qt::SkipEmptyParts).at(4);
         QString paridstr = astring.mid(1);
         QStringList partlist;
         partlist.clear();
@@ -1558,7 +1559,7 @@ void WombatForensics::LoadHexContents()
 		QStringList mftblocklist;
 		mftblocklist.clear();
 		QString mftid = nodeid.split("-").first() + "-" + nodeid.split("-").at(1) + "-" + nodeid.split("-").at(2) + "-f0-a5";
-		mftblocklist = mftblockhash.value(mftid).split("^^", QString::SkipEmptyParts);
+		mftblocklist = mftblockhash.value(mftid).split("^^", Qt::SkipEmptyParts);
                 // NEW RESIDENT OFFSET CALCULATION
                 qint64 residentoffset = 0;
                 if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.
@@ -1708,12 +1709,12 @@ void WombatForensics::CloseCurrentCase()
         if(imgext.contains("e01")) // ewfmount
         {
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
-            QProcess::execute(xunmntstr);
+            QProcess::execute(xunmntstr, QStringList());
         }
         else if(imgext.contains("aff") || imgext.contains("000")) // affuse
         {
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
-            QProcess::execute(xunmntstr);
+            QProcess::execute(xunmntstr, QStringList());
         }
         /*
         else // raw, so nothing to unmount
@@ -2861,9 +2862,9 @@ void WombatForensics::InitializeCheckState()
         hashfile.open(QIODevice::ReadOnly);
         QString tmpstr = hashfile.readLine();
         hashfile.close();
-        QStringList hashlist = tmpstr.split(",", QString::SkipEmptyParts);
+        QStringList hashlist = tmpstr.split(",", Qt::SkipEmptyParts);
         for(int i=0; i < hashlist.count(); i++)
-            checkhash.insert(hashlist.at(i).split("|", QString::SkipEmptyParts).at(0), hashlist.at(i).split("|", QString::SkipEmptyParts).at(1).toInt());
+            checkhash.insert(hashlist.at(i).split("|", Qt::SkipEmptyParts).at(0), hashlist.at(i).split("|", Qt::SkipEmptyParts).at(1).toInt());
     }
 }
 
