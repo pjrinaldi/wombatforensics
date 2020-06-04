@@ -2229,7 +2229,7 @@ void TestCarving(QStringList plist, QStringList flist)
             {
                 if(flist.at(i).contains(tmpstr.split(",").at(1)))
                 {
-		    qDebug() << "initial ctypestr:" << i << tmpstr;
+		    //qDebug() << "initial ctypestr:" << i << tmpstr;
                     ctypelist.append(tmpstr);
                 }
             }
@@ -2245,7 +2245,7 @@ void TestCarving(QStringList plist, QStringList flist)
         headhash.clear();
         QList<int> blocklist;
         blocklist.clear();
-	qDebug() << "original blocklist.count:" << blocklist.count();
+	//qDebug() << "original blocklist.count:" << blocklist.count();
         QString estring = plist.at(i).split("-").first();
         QString vstring = plist.at(i).split("-").at(1);
         QString pstring = plist.at(i).split("-").at(2);
@@ -2299,7 +2299,7 @@ void TestCarving(QStringList plist, QStringList flist)
         qint64 blocksize = evidlist.at(2).toLongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
         //qint64 blocksize = partlist.at(6).toLongLong(); // FS CLUSTER SIZE
         qint64 partsize = partlist.at(1).toLongLong() - partoffset;
-	qDebug() << "partsize:" << partsize;
+	//qDebug() << "partsize:" << partsize;
         qint64 blockcount = partsize / blocksize;
         for(int j=0; j < blockcount; j++)
         {
@@ -2357,7 +2357,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 {
                     if(blockheader.startsWith(curheadstr))
                     {
-			qDebug() << "blockheader without ???s:" << j << blockheader << curheadstr;
+			//qDebug() << "blockheader without ???s:" << j << blockheader << curheadstr;
                         blocklist.append(j);
                         headhash.insert(j, curtypestr);
                     }
@@ -2366,7 +2366,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 {
                     if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
                     {
-			qDebug() << blockheader.left(headleft) << curheadstr.left(headleft) << blockheader.mid(headright+1) << curheadstr.mid(headright+1);
+			//qDebug() << "blockheader with ???s" << j << blockheader.left(headleft) << curheadstr.left(headleft) << blockheader.mid(headright+1) << curheadstr.mid(headright+1);
 			//qDebug() << "blockheader with ???s:" << j << blockheader << curheadstr << headleft << headright;
                         blocklist.append(j);
                         headhash.insert(j, curtypestr);
@@ -2375,12 +2375,14 @@ void TestCarving(QStringList plist, QStringList flist)
             }
         }
 	qInfo() << blocklist.count() << "Headers found. Starting footer search..." << headhash.count();
+	//qDebug() << blocklist << headhash;
         // FOR EACH CLAIMED BLOCK, APPLY THE headhash value...
         for(int j=0; j < blocklist.count(); j++)
         {
+	    //qDebug() << "blocklist.count():" << blocklist.count();
 	    //qDebug() << "blocklist.at(j)" << blocklist.at(j) << "headhash at j:" << headhash.value(blocklist.at(j));
             QString curtypestr = headhash.value(blocklist.at(j));
-	    qDebug() << "curtypestr from headhash:" << curtypestr;
+	    //qDebug() << "curtypestr from headhash:" << curtypestr;
             qint64 blockdifference = 0;
             qint64 curmaxsize = curtypestr.split(",").at(5).toLongLong();
             qint64 arraysize = 0;
@@ -2409,27 +2411,41 @@ void TestCarving(QStringList plist, QStringList flist)
                 if(isseek)
                     footerarray = rawfile.read(arraysize);
                 QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
-		qDebug() << "footerstr head:" << blocklist.at(j) << footerstr.left(11);
                 qint64 lastfooterpos = footerstr.lastIndexOf(curfooter);
                 if(lastfooterpos == -1) // no footer found, use full length
+		{
+		    qDebug() << "header:" << j << "no footer found, should probably be invalid...";
                     carvedstringsize = arraysize;
+		}
                 else // footer found, so use it
+		{
+		    qDebug() << "header:" << j << "footerstr head:" << blocklist.at(j) << footerstr.mid(lastfooterpos, curfooter.count());
                     carvedstringsize = lastfooterpos + curfooter.count();
+		}
             }
             else // no footer defined, just use arraysize as size
             {
+		qDebug() << j << "no footer defined.";
                 carvedstringsize = arraysize;
             }
-            // TRY TO DETERMINE IF IT IS A VALID IMAGE....
+	    qDebug() << j << "carvedstringsize:" << carvedstringsize;
+            // TRY TO DETERMINE IF IT IS A VALID FILE....
             bool isvalidfile = false;
 	    //qDebug() << "curtypestr:" << curtypestr;
             if(curtypestr.split(",").at(1).contains("JPEG")) // validity check for jpeg
             {
-	        Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
-	        Magick::Image master(blob);
-		qDebug() << "magick value:" << QString::fromStdString(master.magick());
-                if(QString::fromStdString(master.magick()).contains("JPEG"))
-                    isvalidfile = true;
+		try
+		{
+		    Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
+        	    Magick::Image master(blob);
+		    qDebug() << j << "magick value:" << QString::fromStdString(master.magick());
+		    if(QString::fromStdString(master.magick()).contains("JPEG"))
+			isvalidfile = true;
+		}
+		catch(Magick::Exception &merr)
+		{
+		    qDebug() << "magick: error:" << merr.what();
+		}
             }
             else if(curtypestr.split(",").at(1).contains("PNG")) // validity check for png
             {
@@ -2450,9 +2466,10 @@ void TestCarving(QStringList plist, QStringList flist)
             }
             else
             {
+		qDebug() << j << "isvalid should be false:" << isvalidfile;
 		//qDebug() << "not there, process curtypestr:" << curtypestr;
                 // smart carving check doesn't exist for file type yet... so process it anyway...
-                isvalidfile = true;
+                //isvalidfile = true;
             }
 	    //qDebug() << "blocklist.at(j):" << blocklist.at(j);
 	    //qDebug() << "is vlaid file:" << isvalidfile;
@@ -2461,7 +2478,7 @@ void TestCarving(QStringList plist, QStringList flist)
 		parstr += "pc";
 	    else
 		parstr += "uc";
-
+	    qDebug() << j << "parstr:" << parstr;
                 //qDebug() << "valid image:" << "Carved" + QString::number(blocklist.at(j)) << carvedcount;
                 // DO STAT/TREENODE here and everything else everywhere else to make it work.
 	    QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
@@ -2478,6 +2495,7 @@ void TestCarving(QStringList plist, QStringList flist)
 	    nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
 	    mutex.lock();
 	    treenodemodel->AddNode(nodedata, parstr, 15, 0);
+	    qDebug() << "treenodemodel->AddNode called:" << j << "times";
 	    //treenodemodel->AddNode(nodedata, QString(estring + "-" + vstring + "-" + pstring + "-pc"), 15, 0);
 	    mutex.unlock();
 	    listeditems.append(QString(estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount)));
