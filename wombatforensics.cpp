@@ -945,7 +945,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     previewfile.setFileName(wombatvariable.tmpmntpath + "previewreport.html");
     if(!FileExists(QString(wombatvariable.tmpmntpath + "previewreport.html").toStdString()))
         InitializePreviewReport();
-    qInfo() << "Bookmarks File Created";
+    //qInfo() << "Bookmarks File Created";
     ReadBookmarks();
     logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);

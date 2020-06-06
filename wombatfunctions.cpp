@@ -2296,6 +2296,7 @@ void TestCarving(QStringList plist, QStringList flist)
         //qint64 blocksize = partlist.at(6).toLongLong(); // FS CLUSTER SIZE
         qint64 partsize = partlist.at(1).toLongLong() - partoffset;
         qint64 blockcount = partsize / blocksize;
+        // GET ALREADY CARVED FILES
         for(int j=0; j < blockcount; j++)
         {
             // CHECK FOR WOMBATVARIABLE.TMPMNTPATH + CARVED/*.STAT EXIST WHICH MATCHES, E0-V0-P#-C(BLOCK#).STAT
@@ -2367,6 +2368,7 @@ void TestCarving(QStringList plist, QStringList flist)
             }
         }
 	qInfo() << blocklist.count() << "Headers found. Starting footer search..." << headhash.count();
+	qDebug() << "Qt Supported Image Formats:" << QImageReader::supportedImageFormats();
         // FOR EACH CLAIMED BLOCK, APPLY THE headhash value...
         for(int j=0; j < blocklist.count(); j++)
         {
@@ -2408,70 +2410,23 @@ void TestCarving(QStringList plist, QStringList flist)
             else // no footer defined, just use arraysize as size
                 carvedstringsize = arraysize;
             // TRY TO DETERMINE IF IT IS A VALID FILE....
-	    qDebug() << "Qt Supported Image Formats:" << QImageReader::supportedImageFormats();
             bool isvalidfile = false;
 	    QImage testimg;
             if(curtypestr.split(",").at(1).contains("JPEG")) // validity check for jpeg
-            {
 		isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "jpg");
-		/*
-		try
-		{
-		    Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
-        	    Magick::Image master(blob);
-		    if(QString::fromStdString(master.magick()).contains("JPEG"))
-			isvalidfile = true;
-		}
-		catch(Magick::Exception &merr)
-		{
-		    isvalidfile = false;
-		    //qDebug() << "magick: error:" << merr.what();
-		}
-		*/
-            }
             else if(curtypestr.split(",").at(1).contains("PNG")) // validity check for png
-            {
 		isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "png");
-	    /*
-		try
-		{
-		    Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
-		    Magick::Image master(blob);
-		    if(QString::fromStdString(master.magick()).contains("PNG"))
-			isvalidfile = true;
-		}
-		catch(Magick::Exception &merr)
-		{
-		    isvalidfile = false;
-		    //qDebug() << "magick error:" << merr.what();
-		}
-		*/
-            }
             else if(curtypestr.split(",").at(1).contains("GIF")) // validity check for gif
-            {
 		isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "gif");
-		/*
-		try
-		{
-		    Magick::Blob blob(static_cast<const void*>(footerarray.left(carvedstringsize).data()), carvedstringsize);
-		    Magick::Image master(blob);
-		    if(QString::fromStdString(master.magick()).contains("GIF"))
-			isvalidfile = true;
-		}
-		catch(Magick::Exception &merr)
-		{
-		    isvalidfile = false;
-		    //qDebug() << "magick error:" << merr.what();
-		}
-		*/
-            }
 	    QString parstr = estring + "-" + vstring + "-" + pstring + "-";
+            QString vtype = "";
             if(isvalidfile)
-		parstr += "pc";
+		vtype = "pc";
 	    else
-		parstr += "uc";
+		vtype = "uc";
+            parstr += vtype;
             // DO STAT/TREENODE here and everything else everywhere else to make it work.
-	    QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize); //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset ;
+	    QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize) + "," + vtype; //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset,validtype ;
 	    QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
 	    if(!cfile.isOpen())
 		cfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -2676,12 +2631,9 @@ void PopulateCarvedFiles(QString cfilestr)
     if(slist.at(12).split("-").count() == 2)
         treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-").first() + "-mc"), 15, 0);
     else
-        treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-pc"), 15, 0);
-    // NEED TO FIGURE OUT HOW TO TELL THE DIFFERENCE BETWEEN -PC AND -UC????? MIGHT ADD -PC OR -UC TO THE END OF THE STAT FILE...
-    //treenodemodel->AddNode(nodedata, QString(slist.at(12)).split("-").first(), 15, 0);
+        treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-" + slist.at(17)), 15, 0);
     mutex.unlock();
     listeditems.append(slist.at(12));
-    // concurrent map() to read files, populate nodedata and addtreenode...
 }
 
 void PopulateTreeModel(QString evidstring)
