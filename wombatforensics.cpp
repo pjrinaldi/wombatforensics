@@ -431,7 +431,7 @@ void WombatForensics::CreateNewTag()
 
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
 {
-    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
+    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
     {
         QTimeZone tmpzone = QTimeZone(reporttimezone);
         taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
@@ -472,10 +472,14 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         AddFileItem(tagname, filestr);
         emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     }
+    /*
     else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
     {
-        qDebug() << "process carved file";
+        QTimeZone tmpzone = QTimeZone(reporttimezone);
+        taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
+        treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
     }
+    */
     else
         qInfo() << "Can only tag files and directories, not evidence images, volumes or partitions.";
 }
@@ -999,8 +1003,9 @@ void WombatForensics::OpenUpdate()
     QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
     if(!cfiles.isEmpty())
     {
-        QtConcurrent::map(cfiles, PopulateCarvedFiles);
+        QFuture<void> tmpfuture = QtConcurrent::map(cfiles, PopulateCarvedFiles);
         carvedcount = cfiles.count() + 1;
+        tmpfuture.waitForFinished();
     }
     QDir adir = QDir(wombatvariable.tmpmntpath + "archives/");
     QStringList afiles = adir.entryList(QStringList("*fz*.stat"), QDir::NoSymLinks | QDir::Files);
