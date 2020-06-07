@@ -472,6 +472,10 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         AddFileItem(tagname, filestr);
         emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     }
+    else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
+    {
+        qDebug() << "process carved file";
+    }
     else
         qInfo() << "Can only tag files and directories, not evidence images, volumes or partitions.";
 }
