@@ -1461,8 +1461,6 @@ void ProcessExport(QString objectid)
     if(objectid.contains("-c"))
     {
         QString estring = objectid.split("-").at(0);
-        QString vstring = objectid.split("-").at(1);
-        QString pstring = objectid.split("-").at(2);
         QDir eviddir = QDir(wombatvariable.tmpmntpath);
         QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
         QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
