@@ -1735,6 +1735,9 @@ void GenerateArchiveExpansion(QString objectid)
 {
     if(!isclosing)
     {
+        // SHOULD JUST HAVE TO IF/ELSE IF CONTAINS "-" 2 FOR COUNT FOR MANUAL COUNT OTHERWISE EXPANSION SEEMS LIKE IT WILL WORK FOR PROCESSED CARVED
+        // NEED TO LINK THE FZ BACK TO THE CORRECT PARENT, SO I'LL NEED MORE THAN JUST THE COUNT OF 2, MIGHT NEED A SEPARATE BIT FOR CARVED ALLTOGETHER.
+        // I THINK THIS CURRENT EXPANSION ONLY WORKS FOR SELECTED AND NOT ALL LISTED OR CHECKED... NEED TO TEST THIS...
         QString estring = objectid.split("-").first();
         QString vstring = objectid.split("-").at(1);
         QString pstring = objectid.split("-").at(2);
