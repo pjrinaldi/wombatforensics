@@ -1735,26 +1735,37 @@ void GenerateArchiveExpansion(QString objectid)
 {
     if(!isclosing)
     {
-        QString estring = "";
-        QString vstring = "";
-        QString pstring = "";
+        //QString estring = "";
+        //QString vstring = "";
+        //QString pstring = "";
         QString astring = "";
         QString idstring = "";
+        QString parstr = "";
         // SHOULD JUST HAVE TO IF/ELSE IF CONTAINS "-" 2 FOR COUNT FOR MANUAL COUNT OTHERWISE EXPANSION SEEMS LIKE IT WILL WORK FOR PROCESSED CARVED
         // NEED TO LINK THE FZ BACK TO THE CORRECT PARENT, SO I'LL NEED MORE THAN JUST THE COUNT OF 2, MIGHT NEED A SEPARATE BIT FOR CARVED ALLTOGETHER.
         if(objectid.split("-").count() == 2)
         {
-            estring = objectid.split("-").at(0);
+            idstring = objectid.split("-").at(0);
             astring = objectid.split("-").at(1);
-            idstring = estring;
+            parstr = objectid;
+            //idstring = estring;
+        }
+        else if(objectid.split("-").count() == 4)
+        {
+            idstring = objectid.split("-c").at(0);
+            astring = objectid.split("-").at(3);
+            parstr = objectid;
+            //estring = objectid.split("-").at(0);
         }
         else
         {
-            estring = objectid.split("-").at(0);
-            vstring = objectid.split("-").at(1);
-            pstring = objectid.split("-").at(2);
+            idstring = objectid.split("-f").at(0);
+            //estring = objectid.split("-").at(0);
+            //vstring = objectid.split("-").at(1);
+            //pstring = objectid.split("-").at(2);
             astring = objectid.split("-").at(3);
-            idstring = estring + "-" + vstring + "-" + pstring;
+            parstr = objectid.split("-a").first();
+            //idstring = estring + "-" + vstring + "-" + pstring;
         }
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
@@ -1846,7 +1857,7 @@ void GenerateArchiveExpansion(QString objectid)
 		if(!QFile::exists(statstr))
 		{
 		    mutex.lock();
-		    treenodemodel->AddNode(nodedata, objectid.split("-a").first(), 1, 0); 
+		    treenodemodel->AddNode(nodedata, parstr, 1, 0); 
 		    mutex.unlock();
 		    filesfound++;
 		    listeditems.append(treeout.at(11));
