@@ -2017,7 +2017,7 @@ void GenerateArchiveExpansion(QString objectid)
 void GenerateHash(QString objectid)
 {
     // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
-    if(objectid.split("-").count() == 5 && !isclosing)
+    if((objectid.split("-").count() == 5 || objectid.contains("-c")) && !isclosing)
     {
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         QString objectname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
@@ -6434,6 +6434,7 @@ void SaveTaggedList(void)
 
 QByteArray ReturnFileContent(QString objectid)
 {
+    qDebug() << "objectid:" << objectid;
     if(objectid.contains("-c"))
     {
         qDebug() << "carved file for digging";
