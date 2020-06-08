@@ -1735,12 +1735,27 @@ void GenerateArchiveExpansion(QString objectid)
 {
     if(!isclosing)
     {
+        QString estring = "";
+        QString vstring = "";
+        QString pstring = "";
+        QString astring = "";
+        QString idstring = "";
         // SHOULD JUST HAVE TO IF/ELSE IF CONTAINS "-" 2 FOR COUNT FOR MANUAL COUNT OTHERWISE EXPANSION SEEMS LIKE IT WILL WORK FOR PROCESSED CARVED
         // NEED TO LINK THE FZ BACK TO THE CORRECT PARENT, SO I'LL NEED MORE THAN JUST THE COUNT OF 2, MIGHT NEED A SEPARATE BIT FOR CARVED ALLTOGETHER.
-        QString estring = objectid.split("-").first();
-        QString vstring = objectid.split("-").at(1);
-        QString pstring = objectid.split("-").at(2);
-        QString astring = objectid.split("-").at(3);
+        if(objectid.split("-").count() == 2)
+        {
+            estring = objectid.split("-").at(0);
+            astring = objectid.split("-").at(1);
+            idstring = estring;
+        }
+        else
+        {
+            estring = objectid.split("-").at(0);
+            vstring = objectid.split("-").at(1);
+            pstring = objectid.split("-").at(2);
+            astring = objectid.split("-").at(3);
+            idstring = estring + "-" + vstring + "-" + pstring;
+        }
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
         QString filepath = indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
@@ -1764,8 +1779,8 @@ void GenerateArchiveExpansion(QString objectid)
             //QString newzipid = estring + "-" + vstring + "-" + pstring + "-" + "-fz" + QString::number(i) + "-a" + astring.mid(1);
             // CURRENT METHOD DOESN'T ACCOUNT FOR DIRECTORIES IN ARCHIVES, JUST LEAVES THEM AS THE PATH...
             // ALSO DOESN'T ACCOUNT FOR ENCRYPTED ZIP..
-            QString statstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
-            QString propstr = wombatvariable.tmpmntpath + "archives/" + estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".prop";
+            QString statstr = wombatvariable.tmpmntpath + "archives/" + idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
+            QString propstr = wombatvariable.tmpmntpath + "archives/" + idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".prop";
 	    if(!QFile::exists(statstr) || !QFile::exists(propstr))
 	    {
 		struct zip_stat zipstat;
@@ -1820,10 +1835,10 @@ void GenerateArchiveExpansion(QString objectid)
 		QByteArray ba2;
 		ba2.clear();
 		ba2.append(QString(filepath + filename + "/"));
-		QString outstr = ba.toBase64() + ",5," + astring.mid(1) + "," + ba2.toBase64() + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
+		QString outstr = ba.toBase64() + ",5," + astring.mid(1) + "," + ba2.toBase64() + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
 		QStringList treeout;
 		treeout.clear();
-		treeout << ba.toBase64() << ba2.toBase64() << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").first() << mimestr.split("/").last() << "0" << QString(estring + "-" + vstring + "-" + pstring + "-fz" + QString::number(i) + "-a" + astring.mid(1));
+		treeout << ba.toBase64() << ba2.toBase64() << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").first() << mimestr.split("/").last() << "0" << QString(idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1));
 		QList<QVariant> nodedata;
 		nodedata.clear();
 		for(int i=0; i < 12; i++)
@@ -6408,6 +6423,10 @@ void SaveTaggedList(void)
 
 QByteArray ReturnFileContent(QString objectid)
 {
+    if(objectid.contains("-c"))
+    {
+        qDebug() << "carved file for digging";
+    }
     // TSK FREE METHOD IMPLEMENTATION
     QString zipid = "";
     if(objectid.contains("z")) // exporting a child of a zip file
