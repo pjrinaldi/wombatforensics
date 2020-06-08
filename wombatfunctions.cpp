@@ -6434,11 +6434,6 @@ void SaveTaggedList(void)
 
 QByteArray ReturnFileContent(QString objectid)
 {
-    if(objectid.contains("-c"))
-    {
-        qDebug() << "objectid:" << objectid;
-        qDebug() << "carved file for digging";
-    }
     // TSK FREE METHOD IMPLEMENTATION
     QString zipid = "";
     if(objectid.contains("z")) // exporting a child of a zip file
@@ -6504,7 +6499,6 @@ QByteArray ReturnFileContent(QString objectid)
         mftaddress = fstring.mid(2).toInt();
     else
         mftaddress = fstring.mid(1).toInt();
-    // if not carved
     if(!objectid.contains("-c"))
     {
         QFile fileprop(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".prop");
