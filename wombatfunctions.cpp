@@ -1737,17 +1737,26 @@ void GenerateArchiveExpansion(QString objectid)
     {
         // SHOULD JUST HAVE TO IF/ELSE IF CONTAINS "-" 2 FOR COUNT FOR MANUAL COUNT OTHERWISE EXPANSION SEEMS LIKE IT WILL WORK FOR PROCESSED CARVED
         // NEED TO LINK THE FZ BACK TO THE CORRECT PARENT, SO I'LL NEED MORE THAN JUST THE COUNT OF 2, MIGHT NEED A SEPARATE BIT FOR CARVED ALLTOGETHER.
-        // I THINK THIS CURRENT EXPANSION ONLY WORKS FOR SELECTED AND NOT ALL LISTED OR CHECKED... NEED TO TEST THIS...
         QString estring = objectid.split("-").first();
         QString vstring = objectid.split("-").at(1);
         QString pstring = objectid.split("-").at(2);
         QString astring = objectid.split("-").at(3);
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        //TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
         QString filepath = indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
         int err = 0;
+	QByteArray filebytes;
+	filebytes.clear();
+        filebytes = ReturnFileContent(objectid);
         QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
+        QFile tmpfile(fnamestr);
+        if(!tmpfile.isOpen())
+            tmpfile.open(QIODevice::WriteOnly);
+        if(tmpfile.isOpen())
+        {
+            tmpfile.write(filebytes);
+            tmpfile.close();
+        }
         zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
         qint64 zipentrycount = zip_get_num_entries(curzip, 0);
         for(int i=0; i < zipentrycount; i++)
@@ -1969,22 +1978,9 @@ void GenerateArchiveExpansion(QString objectid)
 		    }
 		}
             }
-            //filepropfile.open(QIODevice::WriteOnly | QIODevice::Text);
-            //QTextStream proplist(&filepropfile);
-            // HERE IS WHERE I CAN BUILD THE STAT FILE, TREENODE AND ADD THEM TO THE TREE...
             // FILE STAT CONTENTS - filename, filetype, par addr, dir path, atime, ctime, crtime, mtime, size, addr, mime cat/sig, 0, ID, hash, deleted, bookmark
             // FILE PROP CONTENTS - block address of parent, maybe zip properties i display in html double click for zip parent...
             // TREENODE CONTENTS - name, path, size, crtime, atime, mtime, ctime, md5, category, signature, tag, id
-            //isvid = category.contains("Video");
-            //isimg = category.contains("Image");
-            /*
-            if(hashash && !isclosing)
-                GenerateHash(newzipid);
-            if(hasvid && mimestr.contains("Video") && !isclosing)
-                GenerateVidThumbnails(newzipid);
-            if(hasimg && mimestr.contains("Image") && !isclosing)
-                GenerateThumbnails(newzipid);
-            */
         }
         zip_close(curzip);
         digarchivecount++;
