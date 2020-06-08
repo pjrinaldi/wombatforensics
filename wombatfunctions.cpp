@@ -6434,9 +6434,9 @@ void SaveTaggedList(void)
 
 QByteArray ReturnFileContent(QString objectid)
 {
-    qDebug() << "objectid:" << objectid;
     if(objectid.contains("-c"))
     {
+        qDebug() << "objectid:" << objectid;
         qDebug() << "carved file for digging";
     }
     // TSK FREE METHOD IMPLEMENTATION
@@ -6451,7 +6451,9 @@ QByteArray ReturnFileContent(QString objectid)
     QString vstring = objectid.split("-", Qt::SkipEmptyParts).at(1);
     QString pstring = objectid.split("-", Qt::SkipEmptyParts).at(2);
     QString fstring = objectid.split("-", Qt::SkipEmptyParts).at(3);
-    QString astring = objectid.split("-", Qt::SkipEmptyParts).at(4);
+    QString astring = "";
+    if(!objectid.contains("-c"))
+        astring = objectid.split("-", Qt::SkipEmptyParts).at(4);
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
     qint64 filesize = curnode->Data(2).toLongLong();
@@ -6490,6 +6492,7 @@ QByteArray ReturnFileContent(QString objectid)
     int fstype = partlist.at(0).toInt();
     partlist.clear();
     int mftaddress = 0;
+    bool isresident = false;
     QString blockstring = "";
     QString residentstring = "";
     QString bytestring = "";
@@ -6501,26 +6504,30 @@ QByteArray ReturnFileContent(QString objectid)
         mftaddress = fstring.mid(2).toInt();
     else
         mftaddress = fstring.mid(1).toInt();
-    QFile fileprop(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".prop");
-    if(!fileprop.isOpen())
-	fileprop.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(fileprop.isOpen())
+    // if not carved
+    if(!objectid.contains("-c"))
     {
-	while(!fileprop.atEnd())
+        QFile fileprop(wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/" + fstring + "." + astring + ".prop");
+        if(!fileprop.isOpen())
+            fileprop.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(fileprop.isOpen())
         {
-	    QString tmpstring = fileprop.readLine();
-            if(tmpstring.contains("Block Address"))
-		blockstring = tmpstring.split("||").at(1);
-	    else if(tmpstring.contains("Byte Offset"))
-    	        bytestring = tmpstring.split("||").at(1);
-            else if(tmpstring.contains("Data Attribute"))
-                residentstring = tmpstring.split("||").at(1);
-	}
+            while(!fileprop.atEnd())
+            {
+                QString tmpstring = fileprop.readLine();
+                if(tmpstring.contains("Block Address"))
+                    blockstring = tmpstring.split("||").at(1);
+                else if(tmpstring.contains("Byte Offset"))
+                    bytestring = tmpstring.split("||").at(1);
+                else if(tmpstring.contains("Data Attribute"))
+                    residentstring = tmpstring.split("||").at(1);
+            }
+        }
+        isresident = true;
+        if(residentstring.contains("Non"))
+            isresident = false;
+        fileprop.close();
     }
-    bool isresident = true;
-    if(residentstring.contains("Non"))
-        isresident = false;
-    fileprop.close();
     QByteArray filebytes;
     filebytes.clear();
     QFile imgfile(datastring);
@@ -6530,6 +6537,9 @@ QByteArray ReturnFileContent(QString objectid)
     bool isntfs = false;
     bool isads = false;
     bool isdir = false;
+    bool iscarved = false;
+    if(objectid.contains("-c"))
+        iscarved = true;
     if(fstype == TSK_FS_TYPE_NTFS_DETECT)
 	isntfs = true;
     if(fstring.contains("a"))
@@ -6537,7 +6547,7 @@ QByteArray ReturnFileContent(QString objectid)
     if(curnode->itemtype == 2 || curnode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	isdir = true;
 
-    if(isntfs && isres) // NTFS & RESIDENT
+    if(isntfs && isres && !iscarved) // NTFS & RESIDENT
     {
     	unsigned int curoffset = 0;
         uint8_t mftoffset[2];
@@ -6623,6 +6633,25 @@ QByteArray ReturnFileContent(QString objectid)
             mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
             resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
 	    filebytes.append(resbuffer.mid(curoffset + resoffset, contentlength));
+        }
+    }
+    else if(iscarved)
+    {
+        QString tmpstr;
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + objectid + ".stat");
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+            tmpstr = cfile.readLine();
+        cfile.close();
+        if(!imgfile.isOpen())
+            imgfile.open(QIODevice::ReadOnly);
+        if(imgfile.isOpen())
+        {
+            bool isseek = imgfile.seek(tmpstr.split(",").at(16).toLongLong());
+            if(isseek)
+                filebytes = imgfile.read(tmpstr.split(",").at(8).toLongLong());
+            imgfile.close();
         }
     }
     else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
