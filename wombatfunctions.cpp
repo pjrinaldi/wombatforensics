@@ -2404,8 +2404,6 @@ void TestCarving(QStringList plist, QStringList flist)
         }
         for(int j=0; j < blockcount; j++)
         {
-            // CHECK FOR WOMBATVARIABLE.TMPMNTPATH + CARVED/*.STAT EXIST WHICH MATCHES, E0-V0-P#-C(BLOCK#).STAT
-            // IF EXISTS, SKIP BLOCK CAUSE ALREADY CARVED FOR SOME TYPE...
             // MIGHT USE HEADHASH AS A VARIABLE GENERATED AT START TIME, BUT I'LL FIGURE IT OUT.
             //QString curkey = pstring + "-b" + QString::number(j);
             if(!headhash.contains(j))
@@ -2480,7 +2478,7 @@ void TestCarving(QStringList plist, QStringList flist)
         for(int j=0; j < blocklist.count(); j++)
         {
             QString curtypestr = headhash.value(blocklist.at(j));
-            if(!curtypestr.isEmpty())
+            if(!curtypestr.isEmpty()) // this shouldn't matter since blocklist.at(j) shouldn't be called for zero values...
             {
                 qint64 blockdifference = 0;
                 qint64 curmaxsize = curtypestr.split(",").at(5).toLongLong();
