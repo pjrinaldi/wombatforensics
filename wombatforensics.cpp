@@ -19,6 +19,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
     digcountlabel = new QLabel(this);
+    carvestatuslabel = new QLabel(this);
     statuslabel = new StatusLabel();
     StatusUpdate("");
     vline1 = new QFrame(this);
@@ -41,6 +42,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     this->statusBar()->addWidget(filtercountlabel, 0);
     this->statusBar()->addWidget(vline2, 0);
     this->statusBar()->addWidget(digcountlabel, 0);
+    this->statusBar()->addWidget(carvestatuslabel, 0);
     this->statusBar()->addPermanentWidget(vline3, 0);
     this->statusBar()->addPermanentWidget(statuslabel, 0);
     QWidget* spacer = new QWidget();
@@ -89,6 +91,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
+    //connect(isignals, SIGNAL(CarveUpdate()), this, SLOT(UpdateCarve()), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
     bookmarkmenu->setTitle("Tag Selected As");
@@ -205,8 +208,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treenodemodel = new TreeNodeModel();
     autosavetimer = new QTimer(this);
     digrotatetimer = new QTimer(this);
+    carverotatetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
     connect(digrotatetimer, SIGNAL(timeout()), this, SLOT(RotateDig()));
+    connect(carverotatetimer, SIGNAL(timeout()), this, SLOT(RotateCarve()));
 }
 
 void WombatForensics::UnCheckChecked()
@@ -1004,7 +1009,8 @@ void WombatForensics::OpenUpdate()
     if(!cfiles.isEmpty())
     {
         QFuture<void> tmpfuture = QtConcurrent::map(cfiles, PopulateCarvedFiles);
-        carvedcount = cfiles.count() + 1;
+        carvedcount = cfiles.count();
+	filesfound = filesfound + carvedcount;
         tmpfuture.waitForFinished();
     }
     QDir adir = QDir(wombatvariable.tmpmntpath + "archives/");
@@ -1708,6 +1714,7 @@ void WombatForensics::CloseCurrentCase()
     setWindowTitle("WombatForensics");
     filesfound = 0;
     fileschecked = 0;
+    carvedcount = 0;
     filtercountlabel->setText("Filtered: 0");
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
@@ -1950,14 +1957,9 @@ void WombatForensics::StartCarving(QStringList plist, QStringList flist)
     QFuture<void> tmpfuture = QtConcurrent::run(TestCarving, plist, flist);
     carvewatcher.setFuture(tmpfuture);
     //or should i qtconcurrent::run(plist,qlist) and then loop over every plist and qtconcurrentmap the carving methodology...
-    //let's start off with a qtconcurrent run method to test calling scalpel and revit...
     //this would be a QtConcurrent::map(plist); so it goes over every list...
-    // with these lists, i need to use plist to search through the partitions...
-    // need to use flist to open file, and get the information that i am using to search through plist.
-    // then i need to determine the best concurrent methodology to make it happen....
+    // if i want to map, all or 1 of the variables in the run  would be global...
     // also need to implement some kind of status information in the status bar (p#: type# carved, loop over parititons...)
-    // also need to implement the system by which i will store the carved file information, add to tree somewhere, and then
-    // implement the framework to find it in the hex, when selected in the treeview.
 }
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)

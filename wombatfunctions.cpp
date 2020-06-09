@@ -2550,6 +2550,8 @@ void TestCarving(QStringList plist, QStringList flist)
                 mutex.unlock();
                 listeditems.append(QString(estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount)));
                 carvedcount++;
+		filesfound++;
+                isignals->ProgUpd();
             }
             /*
              * TEST FILE DUMP WORKS...

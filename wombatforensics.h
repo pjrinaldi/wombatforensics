@@ -134,6 +134,7 @@ private slots:
     void UpdateProgress(qint64 count);
     void UpdateExport(void);
     void UpdateDig(int digstateid, int digcount);
+    //void UpdateCarve();
     void OpenUpdate(void);
     void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
@@ -266,6 +267,7 @@ private:
     QLabel* filtercountlabel;
     QLabel* checkedcountlabel;
     QLabel* digcountlabel;
+    QLabel* carvestatuslabel;
     StatusLabel* statuslabel;
     QFrame* vline1;
     QFrame* vline2;
@@ -282,6 +284,7 @@ private:
     QShortcut* showitem;
     QTimer* autosavetimer;
     QTimer* digrotatetimer; 
+    QTimer* carverotatetimer;
     TreeNode* actionitem;
     QWidget* cancelwidget;
     qint64 digimgthumbtotal = 0;
