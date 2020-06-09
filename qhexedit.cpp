@@ -1281,7 +1281,7 @@ void QHexEdit::updateCursor()
 void QHexEdit::SetColorInformation(qint64 fsoff, qint64 blksize, QString blockstring, QString residentstring, QString bytestring, qint64 flength, int dataoff)
 {
     blocklist.clear();
-    blocklist = blockstring.split("^^", QString::SkipEmptyParts);
+    blocklist = blockstring.split("^^", Qt::SkipEmptyParts);
     fsoffset = fsoff;
     blocksize = blksize;
     residentoffset = residentstring.toLongLong();
