@@ -25,6 +25,18 @@ std::string GetTime()
     return timeStr;
 }
 
+// Sleep for 'ms' milliseconds without freezing the UI
+void SleepLoop(const int ms)
+{
+    QEventLoop idleloop;
+    QTimer timer;
+    timer.setSingleShot(true);
+    QObject::connect(&timer, &QTimer::timeout, &idleloop, &QEventLoop::quit);
+    QObject::connect(qApp, &QCoreApplication::aboutToQuit, &idleloop, &QEventLoop::quit);
+    timer.start(ms);
+    idleloop.exec();
+}
+
 QString ParseLnkArtifact(QString lnkname, QString lnkid)
 {
     QString htmlstr = "";
@@ -2299,6 +2311,12 @@ void GenerateDigging(QString thumbid)
     //    GenerateArchiveExpansion(thumbid);
 }
 
+void GenerateCarving(QString pid)
+{
+    qDebug() << "qpid:" << pid;
+    qDebug() << carvedtypeslist;
+}
+
 void TestCarving(QStringList plist, QStringList flist)
 {
     QString hpath = QDir::homePath();
@@ -2552,6 +2570,7 @@ void TestCarving(QStringList plist, QStringList flist)
                 carvedcount++;
 		filesfound++;
                 isignals->ProgUpd();
+		isignals->CarveUpd(plist.at(i), carvedcount);
             }
             /*
              * TEST FILE DUMP WORKS...

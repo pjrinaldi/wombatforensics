@@ -44,6 +44,7 @@ extern QStringList listeditems; // contains checked or all list of files for a c
 extern QStringList existingevidence; // contains the list of existing evidence
 extern QStringList newevidence; // contains the list of new evidence items
 extern QStringList partitionlist; // contains the list of partitions for file carving
+extern QStringList carvedtypeslist; // contains the user selected list of file carving types
 extern QString exportpath; // path to export files to
 extern bool originalpath; // whether to include original file path or not
 extern bool hashash; // whether we are calculating the hash for the item
@@ -145,14 +146,14 @@ public:
     void ExportUpd(void) { emit(ExportUpdate()); }
     void DigUpd(int digid, int digcnt) { emit(DigUpdate(digid, digcnt)); }
     void ActivateReload(void) { emit(ReloadPreview()); }
-    //void CarveUpd() { emit(CarveUpdate()); }
+    void CarveUpd(QString pid, int carvecnt) { emit(CarveUpdate(pid, carvecnt)); }
 
 signals:
     void ProgressUpdate(qint64 filecount);
     void ExportUpdate(void);
     void DigUpdate(int digid, int digcnt);
     void ReloadPreview(void);
-    //void CarveUpdate()
+    void CarveUpdate(QString pid, int carvecnt);
 
 };
 

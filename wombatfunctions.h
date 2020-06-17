@@ -20,6 +20,7 @@ QString ParseIDollarArtifact(QString idollarname, QString idollarid);
 QString ParsePrefetchArtifact(QString pfname, QString pfid);
 QString ParseArchiveArtifact(QString archivename, QString archiveid);
 
+void SleepLoop(const int ms);
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
 
@@ -48,7 +49,7 @@ void GenerateArchiveExpansion(QString thumbid);
 void GenerateDigging(QString thumbid);
 void GeneratePreDigging(QString thumbid);
 void TestCarving(QStringList plist, QStringList flist);
-//void GenerateCarving(QString partid);
+void GenerateCarving(QString partid);
 void LoadImagesHash(void);
 void SaveImagesHash(void);
 void PopulateTreeModel(QString evidstring);

@@ -134,7 +134,7 @@ private slots:
     void UpdateProgress(qint64 count);
     void UpdateExport(void);
     void UpdateDig(int digstateid, int digcount);
-    //void UpdateCarve();
+    void UpdateCarve(QString partid, int carvecount);
     void OpenUpdate(void);
     void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
@@ -194,6 +194,7 @@ private slots:
     void PublishResults(void);
     void AutoSaveState(void);
     void RotateDig(void);
+    void RotateCarve(void);
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
     void PrepareEvidenceImage(void);
     void SetHexOffset(void);
@@ -275,6 +276,7 @@ private:
     int exporttype;
     int digtype;
     int digtimercounter = 0;
+    //int carvetimercounter = 0;
     bool isvidthumb = false;
     bool isimgthumb = false;
     bool isreport = false;
@@ -298,6 +300,7 @@ private:
     QString digarchivecountstring = "";
     QString digtotalcountstring = "";
     QString currentreportpath = "";
+    QHash<QString, int>carvecounthash;
 };
 
 #endif // WOMBATFORENSICS_H

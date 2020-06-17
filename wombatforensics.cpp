@@ -91,7 +91,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
-    //connect(isignals, SIGNAL(CarveUpdate()), this, SLOT(UpdateCarve()), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(CarveUpdate(QString, int)), this, SLOT(UpdateCarve(QString, int)), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
     bookmarkmenu->setTitle("Tag Selected As");
@@ -205,6 +205,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     listeditems.clear();
     existingevidence.clear();
     partitionlist.clear();
+    carvecounthash.clear();
     treenodemodel = new TreeNodeModel();
     autosavetimer = new QTimer(this);
     digrotatetimer = new QTimer(this);
@@ -1739,6 +1740,8 @@ void WombatForensics::CloseCurrentCase()
         */
     }
     qInfo() << "Forensic Image unmounted";
+    carvecounthash.clear();
+    partitionlist.clear();
     existingevidence.clear();
     newevidence.clear();
     // BEGIN TAR METHOD
@@ -1952,9 +1955,13 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 
 void WombatForensics::StartCarving(QStringList plist, QStringList flist)
 {
+    carvedtypeslist.clear();
+    carvedtypeslist = flist;
+    qDebug() << "global carved types list test:" << carvedtypeslist;
     qInfo() << "Carving Started...";
     StatusUpdate("Carving Started...");
     QFuture<void> tmpfuture = QtConcurrent::run(TestCarving, plist, flist);
+    //QFuture<void> tmpfuture = QtConcurrent::map(plist, GenerateCarving);
     carvewatcher.setFuture(tmpfuture);
     //or should i qtconcurrent::run(plist,qlist) and then loop over every plist and qtconcurrentmap the carving methodology...
     //this would be a QtConcurrent::map(plist); so it goes over every list...
@@ -2106,6 +2113,15 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digrotatetimer->start(1500);
 }
 
+void WombatForensics::UpdateCarve(QString pid, int carvecnt)
+{
+    carvecounthash.insert(pid, carvecnt);
+    qDebug() << "carvecounthash updated:" << carvecounthash;
+    //SleepLoop(1500);
+    carvestatuslabel->setText("Partition: " + pid + " Carved: " + QString::number(carvecnt));
+    // have values for QHash<QString partitionid, int carvecount>carvecounthash;
+}
+
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
     if(digid == 0)
@@ -2126,6 +2142,7 @@ void WombatForensics::UpdateDig(int digid, int digcnt)
     }
     digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount + digarchivecount) + " of " + QString::number(digtotalcount);
 }
+
 void WombatForensics::UpdateExport()
 {
     int curprogress = (int)((((float)exportcount)/(float)exportlist.count())*100);
@@ -2133,6 +2150,7 @@ void WombatForensics::UpdateExport()
     //LogMessage(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
     StatusUpdate(QString("Exported " + QString::number(exportcount) + " of " + QString::number(exportlist.count()) + " " + QString::number(curprogress) + "%"));
 }
+
 void WombatForensics::UpdateProgress(qint64 filecount)
 {
     filecountlabel->setText("Found: " + QString::number(filecount));
@@ -2928,6 +2946,29 @@ void WombatForensics::AutoSaveState()
     SaveState(); // send to another thread and then send the finish to spit out the saved log info and update the status..
 }
 
+void WombatForensics::RotateCarve()
+{
+    /*
+    QHashIterator<QString, int> i(carvecounthash);
+    while (i.hasNext())
+    {
+	i.next();
+	carvestatuslabel->setText("Partition: " + i.key() + " Carved: " + QString::number(i.value()));
+    }
+    */
+    /*
+    if(carvetimercounter == 0)
+    {
+    }
+    else if(carvetimercounter == 1)
+    {
+    }
+    */
+    /*
+     * while(carvetimercounter < carvecounthash.count();
+     */ 
+}
+
 void WombatForensics::RotateDig()
 {
     if(digtimercounter == 0 && digimgthumbtotal > 0)
@@ -2961,7 +3002,14 @@ void WombatForensics::RotateDig()
     else
     {
 	digcountlabel->setText(digtotalcountstring);
-	digtimercounter = 0;
+	if(digimgthumbtotal > 0)
+	    digtimercounter = 0;
+	else if(dighashtotal > 0)
+	    digtimercounter = 1;
+	else if(digvidthumbtotal > 0)
+	    digtimercounter = 2;
+	else if(digarchivetotal > 0)
+	    digtimercounter = 3;
     }
     //if(digtotalcount == (digvidthumbcount + digimgthumbcount + dighashcount))
 	//digrotatetimer->stop();
