@@ -1178,46 +1178,46 @@ void WombatForensics::PrepareEvidenceImage()
         evidfile.close();
         if(!tmpstr.isEmpty())
         {
-        int imgtype = tmpstr.split(",").at(0).toInt();
-        QString imagefile = tmpstr.split(",").at(3);
-        if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
-        {
-            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
-        }
-        else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
-        {
-            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
-            {
-                QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
-                QDir dir;
-                dir.mkpath(tmpstring);
-                mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
-            }
-        }
-        else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
-        {
-            QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
-            if(imgext.contains(".000"))
-            {
-                if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
-            }
-            else
-                mntstr = "";
-        }
-        else
-        {
-            qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
-        }
-        if(!mntstr.isEmpty())
-        {
-            xmntprocess = new QProcess();
-            connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
-            connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
-            //xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them..
-            xmntprocess->start(mntstr, QStringList());
-        }
+	    int imgtype = tmpstr.split(",").at(0).toInt();
+	    QString imagefile = tmpstr.split(",").at(3);
+	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
+	    {
+		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
+		    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+	    }
+	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
+	    {
+		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
+		{
+		    QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
+		    QDir dir;
+		    dir.mkpath(tmpstring);
+		    mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
+		}
+	    }
+	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
+	    {
+		QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+		if(imgext.contains(".000"))
+		{
+		    if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
+			mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+		}
+		else
+		    mntstr = "";
+	    }
+	    else
+	    {
+		qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
+	    }
+	    if(!mntstr.isEmpty())
+	    {
+		xmntprocess = new QProcess();
+		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
+		connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
+		xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them..
+		//xmntprocess->start(mntstr, QStringList());
+	    }
         }
     }
 }
