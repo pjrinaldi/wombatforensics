@@ -1960,6 +1960,7 @@ void WombatForensics::StartCarving(QStringList plist, QStringList flist)
     qDebug() << "global carved types list test:" << carvedtypeslist;
     qInfo() << "Carving Started...";
     StatusUpdate("Carving Started...");
+    carvestatuslabel->setText("Initiating Header(s) Search...");
     QFuture<void> tmpfuture = QtConcurrent::run(TestCarving, plist, flist);
     //QFuture<void> tmpfuture = QtConcurrent::map(plist, GenerateCarving);
     carvewatcher.setFuture(tmpfuture);
