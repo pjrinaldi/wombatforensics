@@ -8,6 +8,8 @@ PdfViewer::PdfViewer(QWidget* parent) : QDialog(parent), ui(new Ui::PdfViewer)
     ui->setupUi(this);
     pdfdoc = NULL;
     pdfpage = NULL;
+    connect(ui->nextbutton, SIGNAL(clicked()), this, SLOT(NextPage()));
+    connect(ui->prevbutton, SIGNAL(clicked()), this, SLOT(PrevPage()));
 }
 
 PdfViewer::~PdfViewer()
@@ -29,10 +31,48 @@ void PdfViewer::ShowPdf(QString objectid)
     QString pdffilename = wombatvariable.tmpfilepath + objectid + "-fhex";
     pdfdoc = Poppler::Document::load(pdffilename);
     //if(!document || document == 0) { error };
+    pagecount = pdfdoc->numPages();
     pdfpage = pdfdoc->page(0); // load initial page
+    pagenumber = 0;
+    ui->pagelineedit->setText("1");
+    ui->maxlineedit->setText(QString::number(pagecount));
+    if(pagenumber == 0)
+	ui->prevbutton->setEnabled(false);
+    if(pagenumber == pagecount - 1)
+	ui->nextbutton->setEnabled(false);
     QImage curimage = pdfpage->renderToImage();
     ui->label->setPixmap(QPixmap::fromImage(curimage));
     this->show();
+}
+
+void PdfViewer::NextPage()
+{
+    if(pagenumber < pagecount - 1)
+    {
+	pdfpage = pdfdoc->page(pagenumber + 1);
+	pagenumber++;
+	QImage curimage = pdfpage->renderToImage();
+	ui->label->setPixmap(QPixmap::fromImage(curimage));
+	ui->pagelineedit->setText(QString::number(pagenumber + 1));
+	ui->prevbutton->setEnabled(true);
+	if(pagenumber == pagecount - 1)
+	    ui->nextbutton->setEnabled(false);
+    }
+}
+
+void PdfViewer::PrevPage()
+{
+    if(pagenumber > 0)
+    {
+	pdfpage = pdfdoc->page(pagenumber - 1);
+	pagenumber--;
+	QImage curimage = pdfpage->renderToImage();
+	ui->label->setPixmap(QPixmap::fromImage(curimage));
+	ui->pagelineedit->setText(QString::number(pagenumber + 1));
+	ui->nextbutton->setEnabled(true);
+	if(pagenumber == 0)
+	    ui->prevbutton->setEnabled(false);
+    }
 }
 
 /*

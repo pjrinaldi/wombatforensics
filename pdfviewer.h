@@ -29,6 +29,8 @@ public:
     //void GetImage(QString objid);
 private slots:
     //void ShowImage();
+    void NextPage();
+    void PrevPage();
     //void SwitchScale(bool swsc);
 
 private:
@@ -36,6 +38,8 @@ private:
 protected:
     Poppler::Document* pdfdoc;
     Poppler::Page* pdfpage;
+    int pagenumber = 0;
+    int pagecount = 0;
     void mousePressEvent(QMouseEvent* event);
 };
 

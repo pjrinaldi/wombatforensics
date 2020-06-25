@@ -15,6 +15,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpacerItem>
@@ -30,6 +31,10 @@ public:
     QHBoxLayout *horizontalLayout;
     QPushButton *prevbutton;
     QPushButton *nextbutton;
+    QLabel *label_2;
+    QLineEdit *pagelineedit;
+    QLabel *label_3;
+    QLineEdit *maxlineedit;
     QSpacerItem *horizontalSpacer;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
@@ -63,6 +68,38 @@ public:
 
         horizontalLayout->addWidget(nextbutton);
 
+        label_2 = new QLabel(PdfViewer);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        horizontalLayout->addWidget(label_2);
+
+        pagelineedit = new QLineEdit(PdfViewer);
+        pagelineedit->setObjectName(QString::fromUtf8("pagelineedit"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(pagelineedit->sizePolicy().hasHeightForWidth());
+        pagelineedit->setSizePolicy(sizePolicy);
+        pagelineedit->setMaximumSize(QSize(50, 16777215));
+        pagelineedit->setMaxLength(200);
+        pagelineedit->setAlignment(Qt::AlignCenter);
+        pagelineedit->setReadOnly(true);
+
+        horizontalLayout->addWidget(pagelineedit);
+
+        label_3 = new QLabel(PdfViewer);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        horizontalLayout->addWidget(label_3);
+
+        maxlineedit = new QLineEdit(PdfViewer);
+        maxlineedit->setObjectName(QString::fromUtf8("maxlineedit"));
+        maxlineedit->setMaximumSize(QSize(50, 16777215));
+        maxlineedit->setAlignment(Qt::AlignCenter);
+        maxlineedit->setReadOnly(true);
+
+        horizontalLayout->addWidget(maxlineedit);
+
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
@@ -82,11 +119,11 @@ public:
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(scrollAreaWidgetContents);
         label->setObjectName(QString::fromUtf8("label"));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy1);
         label->setLineWidth(0);
         label->setScaledContents(false);
         label->setAlignment(Qt::AlignCenter);
@@ -109,6 +146,10 @@ public:
         PdfViewer->setWindowTitle(QCoreApplication::translate("PdfViewer", "View PDF", nullptr));
         prevbutton->setText(QString());
         nextbutton->setText(QString());
+        label_2->setText(QCoreApplication::translate("PdfViewer", "Page:", nullptr));
+        pagelineedit->setText(QCoreApplication::translate("PdfViewer", "1", nullptr));
+        label_3->setText(QCoreApplication::translate("PdfViewer", "of", nullptr));
+        maxlineedit->setText(QCoreApplication::translate("PdfViewer", "10", nullptr));
         label->setText(QCoreApplication::translate("PdfViewer", "Loading...", nullptr));
     } // retranslateUi
 
