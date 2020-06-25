@@ -7,6 +7,7 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "wombatfunctions.h"
+#include <poppler-qt5.h>
 #include "ui_pdfviewer.h"
 //#include "ui_imagewindow.h"
 #include "videoviewer.h"

@@ -29,6 +29,7 @@
 #include "searchdialog.h"
 #include "carvedialog.h"
 #include "filecarvingdialog.h"
+#include "pdfviewer.h"
 
 class StatusLabel : public QLabel
 {
@@ -100,6 +101,7 @@ public:
     TagManager* tagmanage;
     CarveDialog* carvedialog;
     FileCarvingDialog* filecarvedialog;
+    PdfViewer* pdfviewer;
 
 signals:
     void CancelCurrentThread();
