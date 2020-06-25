@@ -1959,7 +1959,7 @@ void WombatForensics::StartCarving(QStringList plist, QStringList flist)
 {
     carvedtypeslist.clear();
     carvedtypeslist = flist;
-    qDebug() << "global carved types list test:" << carvedtypeslist;
+    //qDebug() << "global carved types list test:" << carvedtypeslist;
     qInfo() << "Carving Started...";
     StatusUpdate("Carving Started...");
     carvestatuslabel->setText("Initiating Header(s) Search...");
@@ -2114,7 +2114,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 void WombatForensics::UpdateCarve(QString pid, int carvecnt)
 {
     carvecounthash.insert(pid, carvecnt);
-    qDebug() << "carvecounthash updated:" << carvecounthash;
+    // DO I WANT TO PUSH EVERY CARVED ITEM TO AN INFO ???? NOT RIGHT NOW.
+    //qDebug() << "carvecounthash updated:" << carvecounthash;
     //SleepLoop(1500);
     carvestatuslabel->setText("Partition: " + pid + " Carved: " + QString::number(carvecnt));
     // have values for QHash<QString partitionid, int carvecount>carvecounthash;

@@ -2485,7 +2485,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
             }
         }
 	qInfo() << blocklist.count() << "Headers found. Starting footer search...";
-	qDebug() << "Qt Supported Image Formats:" << QImageReader::supportedImageFormats();
+	//qDebug() << "Qt Supported Image Formats:" << QImageReader::supportedImageFormats();
         // FOR EACH CLAIMED BLOCK, APPLY THE headhash value...
         for(int j=0; j < blocklist.count(); j++)
         {
