@@ -6,10 +6,14 @@
 PdfViewer::PdfViewer(QWidget* parent) : QDialog(parent), ui(new Ui::PdfViewer)
 {
     ui->setupUi(this);
+    pdfdoc = NULL;
+    pdfpage = NULL;
 }
 
 PdfViewer::~PdfViewer()
 {
+    delete pdfpage;
+    delete pdfdoc;
     this->close();
 }
 void PdfViewer::mousePressEvent(QMouseEvent* e)
@@ -19,6 +23,18 @@ void PdfViewer::mousePressEvent(QMouseEvent* e)
 	this->close();
     }
 }
+
+void PdfViewer::ShowPdf(QString objectid)
+{
+    QString pdffilename = wombatvariable.tmpfilepath + objectid + "-fhex";
+    pdfdoc = Poppler::Document::load(pdffilename);
+    //if(!document || document == 0) { error };
+    pdfpage = pdfdoc->page(0); // load initial page
+    QImage curimage = pdfpage->renderToImage();
+    ui->label->setPixmap(QPixmap::fromImage(curimage));
+    this->show();
+}
+
 /*
 ImageWindow::ImageWindow(QWidget* parent) : QDialog(parent), ui(new Ui::ImageWindow)
 {

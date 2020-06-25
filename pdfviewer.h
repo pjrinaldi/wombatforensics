@@ -25,6 +25,7 @@ class PdfViewer : public QDialog
 public:
     PdfViewer(QWidget* parent = 0);
     ~PdfViewer();
+    void ShowPdf(QString objid);
     //void GetImage(QString objid);
 private slots:
     //void ShowImage();
@@ -33,6 +34,8 @@ private slots:
 private:
     Ui::PdfViewer* ui;
 protected:
+    Poppler::Document* pdfdoc;
+    Poppler::Page* pdfpage;
     void mousePressEvent(QMouseEvent* event);
 };
 

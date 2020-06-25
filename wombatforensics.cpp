@@ -618,6 +618,13 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setWindowTitle("Archive Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
         htmlviewer->ShowArtifact(5, index); // Archive
     }
+    else if(index.sibling(index.row(), 9).data().toString().startsWith("PDF"))
+    {
+	pdfviewer = new PdfViewer();
+	pdfviewer->setAttribute(Qt::WA_DeleteOnClose);
+	pdfviewer->setWindowTitle("PDF Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+	pdfviewer->ShowPdf(index.sibling(index.row(), 11).data().toString());
+    }
     else
     {
         QApplication::restoreOverrideCursor();
