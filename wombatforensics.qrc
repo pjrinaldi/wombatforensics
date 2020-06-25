@@ -42,6 +42,8 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="next">Resources/go-next.png</file>
+    <file alias="previous">Resources/go-previous.png</file>
     <file alias="xchomppng">Resources/xchomp.png</file>
     <file alias="carvetofile">Resources/PossibleGraphics/pie_chart_003.png</file>
     <file alias="publish">Resources/PossibleGraphics/publish/paperairplane2.png</file>
