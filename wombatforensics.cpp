@@ -1964,8 +1964,8 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
 
 void WombatForensics::StartCarving(QStringList plist, QStringList flist)
 {
-    carvedtypeslist.clear();
-    carvedtypeslist = flist;
+    //carvedtypeslist.clear();
+    //carvedtypeslist = flist;
     //qDebug() << "global carved types list test:" << carvedtypeslist;
     qInfo() << "Carving Started...";
     StatusUpdate("Carving Started...");

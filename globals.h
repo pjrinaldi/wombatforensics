@@ -44,7 +44,7 @@ extern QStringList listeditems; // contains checked or all list of files for a c
 extern QStringList existingevidence; // contains the list of existing evidence
 extern QStringList newevidence; // contains the list of new evidence items
 extern QStringList partitionlist; // contains the list of partitions for file carving
-extern QStringList carvedtypeslist; // contains the user selected list of file carving types
+//extern QStringList carvedtypeslist; // contains the user selected list of file carving types
 extern QString exportpath; // path to export files to
 extern bool originalpath; // whether to include original file path or not
 extern bool hashash; // whether we are calculating the hash for the item

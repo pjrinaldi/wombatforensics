@@ -6,6 +6,8 @@
 // LIBFFMPEG THUMBNAILER HEADERS
 #include <filmstripfilter.h>
 #include <videothumbnailer.h>
+// LIBPOPPLER-QT5 HEADER
+#include <poppler-qt5.h>
 
 // Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -2335,6 +2337,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
         ctypes.close();
     }
     // add current carving settings to log somehow...
+    qInfo() << "Carving for:" << ctypelist;
 
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
     for(int i=0; i < plist.count(); i++)
@@ -2537,6 +2540,23 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "png");
                 else if(curtypestr.split(",").at(1).contains("GIF")) // validity check for gif
                     isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "gif");
+		else if(curtypestr.split(",").at(1).contains("PDF")) // validity check for pdf
+		{
+		    Poppler::Document* tmpdoc = NULL;
+		    tmpdoc = Poppler::Document::loadFromData(footerarray.left(carvedstringsize));
+		    if(tmpdoc != NULL)
+		    {
+			Poppler::Page* tmppage = NULL;
+			tmppage = tmpdoc->page(0); // load initial page
+			if(tmppage != NULL)
+			{
+			    QImage curimage = tmppage->renderToImage();
+			    isvalidfile = curimage.isNull();
+			}
+			delete tmppage;
+		    }
+		    delete tmpdoc;
+		}
                 QString parstr = estring + "-" + vstring + "-" + pstring + "-";
                 QString vtype = "";
                 if(isvalidfile)

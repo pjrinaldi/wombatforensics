@@ -8,6 +8,8 @@ PdfViewer::PdfViewer(QWidget* parent) : QDialog(parent), ui(new Ui::PdfViewer)
     ui->setupUi(this);
     pdfdoc = NULL;
     pdfpage = NULL;
+    ui->pagelineedit->setText("0");
+    ui->maxlineedit->setText("0");
     connect(ui->nextbutton, SIGNAL(clicked()), this, SLOT(NextPage()));
     connect(ui->prevbutton, SIGNAL(clicked()), this, SLOT(PrevPage()));
 }
@@ -30,9 +32,13 @@ void PdfViewer::ShowPdf(QString objectid)
 {
     QString pdffilename = wombatvariable.tmpfilepath + objectid + "-fhex";
     pdfdoc = Poppler::Document::load(pdffilename);
+    if(pdfdoc != NULL)
+    {
     //if(!document || document == 0) { error };
     pagecount = pdfdoc->numPages();
     pdfpage = pdfdoc->page(0); // load initial page
+    if(pdfpage != NULL)
+    {
     pagenumber = 0;
     ui->pagelineedit->setText("1");
     ui->maxlineedit->setText(QString::number(pagecount));
@@ -42,6 +48,12 @@ void PdfViewer::ShowPdf(QString objectid)
 	ui->nextbutton->setEnabled(false);
     QImage curimage = pdfpage->renderToImage();
     ui->label->setPixmap(QPixmap::fromImage(curimage));
+    }
+    else
+	ui->label->setText("Invalid PDF and can't be displayed.");
+    }
+    else
+	ui->label->setText("Invald PDF and can't be displayed.");
     this->show();
 }
 
