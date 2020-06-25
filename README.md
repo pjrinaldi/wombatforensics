@@ -31,9 +31,11 @@ Comparison with Other Forensic Suites
 Reasoning
 --
 
-I didn't want to reinvent the wheel, so I am making use of the sleuthkit's library of c functions. Why is user friendly so important?
+I wanted to learn improve my general forensic knowledge and understanding of what the existing tools are doing as well as learn more about specific artifacts. One way to do that is to build a forensic tool. This will give me better knowledge of how the black box tools are working. I didn't want to reinvent the wheel, so I am making use of as many open source libraries and tools as possible, to include the sleuthkit, libaff, libewf, liblnk, libmagick, and so on.
 
-If you've ever used AD Lab, you have experienced GUI freezes all over the place which is annoying and interrupts workflow and train of thought. If you've ever used X-Ways, some of the options are very confusing and not explained very well or intuitive as to their meaning. AD Lab has too many options available to the user. For instance, on a given view, there are about 4 sets of tabs. I shouldn't have 3 ways to do the same thing. A program can be robust, but provide a sensible set of features/options to a user.
+Why is user friendly so important?
+
+When I started this project, there were no GUI forensic tools for linux, and so I would be working with the major GUI forensic tools in Windows. I don't like Windows very much, and all the existing GUI forensic tools have issues that bothered me. They would experience GUI freezes or GUI tearing and redrawing issues which is annoying and interrupts my workflow and train of thought. Some of the tools have too m any ways to do the same thing or options that are very confusing and not explained very well or intuitive as to their meaning. I shouldn't have 3 ways to do the same thing, it is overkill and poor design. A program can be robust, but provide a sensible set of features/options to a user.
 
 Wombat Forensics is user oriented in its design. You can select an item or check multiple items. The program is multithreaded. The GUI is always responsive because resource intensive tasks are done on different threads. Large files will not slow down the application. The hex viewer was designed to load portions of a file at a time, therefore it is always fast to view and does not eat up RAM.
 
