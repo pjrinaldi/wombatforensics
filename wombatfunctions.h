@@ -49,8 +49,6 @@ void GenerateArchiveExpansion(QString thumbid);
 void GenerateDigging(QString thumbid);
 void GeneratePreDigging(QString thumbid);
 void GenerateCarving(QStringList plist, QStringList flist);
-//void TestCarving(QStringList plist, QStringList flist);
-//void GenerateCarving(QString partid);
 void LoadImagesHash(void);
 void SaveImagesHash(void);
 void PopulateTreeModel(QString evidstring);

@@ -2311,18 +2311,6 @@ void GenerateDigging(QString thumbid)
     //    GenerateArchiveExpansion(thumbid);
 }
 
-/*
-void GenerateCarving(QString pid)
-{
-    mutex.lock();
-    qInfo() << "start generate carving here...";
-    qDebug() << "qpid:" << pid;
-    qDebug() << carvedtypeslist;
-    mutex.unlock();
-}
-*/
-
-//void TestCarving(QStringList plist, QStringList flist)
 void GenerateCarving(QStringList plist, QStringList flist)
 {
     QString hpath = QDir::homePath();

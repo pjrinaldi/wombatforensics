@@ -1215,7 +1215,9 @@ void WombatForensics::PrepareEvidenceImage()
 		xmntprocess = new QProcess();
 		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
 		connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
-		xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them.. NEED TO FIX
+		xmntprocess->setProgram(mntstr);
+		xmntprocess->start();
+		//xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them.. NEED TO FIX
 		//xmntprocess->start(mntstr, QStringList());
 	    }
         }
@@ -1961,14 +1963,8 @@ void WombatForensics::StartCarving(QStringList plist, QStringList flist)
     qInfo() << "Carving Started...";
     StatusUpdate("Carving Started...");
     carvestatuslabel->setText("Initiating Header(s) Search...");
-    //QFuture<void> tmpfuture = QtConcurrent::run(TestCarving, plist, flist);
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateCarving, plist, flist);
-    //QFuture<void> tmpfuture = QtConcurrent::map(plist, GenerateCarving);
     carvewatcher.setFuture(tmpfuture);
-    //or should i qtconcurrent::run(plist,qlist) and then loop over every plist and qtconcurrentmap the carving methodology...
-    //this would be a QtConcurrent::map(plist); so it goes over every list...
-    // if i want to map, all or 1 of the variables in the run  would be global...
-    // also need to implement some kind of status information in the status bar (p#: type# carved, loop over parititons...)
 }
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
