@@ -12,6 +12,7 @@ VideoViewer::VideoViewer(QWidget* parent) : QDialog(parent), ui(new Ui::VideoVie
     vplayer = new AVPlayer(this);
     voutput = new VideoOutput(this);
     vplayer->setRenderer(voutput);
+    vplayer->setAsyncLoad(true);
     ui->horizontalLayout->addWidget(voutput->widget());
     connect(ui->horizontalSlider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
     connect(ui->horizontalSlider, SIGNAL(sliderPressed()), this, SLOT(SeekBySlider()));
