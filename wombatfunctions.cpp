@@ -2557,6 +2557,12 @@ void GenerateCarving(QStringList plist, QStringList flist)
 		    }
 		    delete tmpdoc;
 		}
+                else if(curtypestr.split(",").at(1).contains("MPG"))
+                {
+                    // NEED TO ATTEMPT TO LOAD THE VIDEO, AND SEE IF IT LOADED SUCCESSFULLY IN A PLAYER, THEN CHECK AND SEE IF THERE IS ANOTHER
+                    // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
+                    qDebug() << "semi smart carving for mpg here...";
+                }
                 QString parstr = estring + "-" + vstring + "-" + pstring + "-";
                 QString vtype = "";
                 if(isvalidfile)
