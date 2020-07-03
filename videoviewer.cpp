@@ -42,6 +42,12 @@ VideoViewer::~VideoViewer()
     this->close();
 }
 
+bool VideoViewer::LoadFile(QString filename)
+{
+    qDebug() << "filename:" << filename;
+    return true;
+}
+
 void VideoViewer::Seek(int pos)
 {
     if(!vplayer->isPlaying())

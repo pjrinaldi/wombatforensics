@@ -9,6 +9,11 @@
 // LIBPOPPLER-QT5 HEADER
 #include <poppler-qt5.h>
 
+#include "videoviewer.h"
+// QTAV HEADERS
+//#include <QtAV>
+//#include <QtAVWidgets>
+
 // Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
@@ -2559,6 +2564,9 @@ void GenerateCarving(QStringList plist, QStringList flist)
 		}
                 else if(curtypestr.split(",").at(1).contains("MPG"))
                 {
+                    VideoViewer* tmpvid = new VideoViewer();
+                    tmpvid->LoadFile("Ladida");
+                    //QtAV::AVPlayer* tmpplayer = new QtAV::AVPlayer(this);
                     // NEED TO ATTEMPT TO LOAD THE VIDEO, AND SEE IF IT LOADED SUCCESSFULLY IN A PLAYER, THEN CHECK AND SEE IF THERE IS ANOTHER
                     // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
                     qDebug() << "semi smart carving for mpg here...";

@@ -32,6 +32,7 @@ class VideoViewer : public QDialog
 public:
     VideoViewer(QWidget* parent = 0);
     ~VideoViewer();
+    bool LoadFile(QString filename);
 
 public slots:
     void ShowVideo(const QModelIndex &index);
