@@ -2562,14 +2562,26 @@ void GenerateCarving(QStringList plist, QStringList flist)
 		    }
 		    delete tmpdoc;
 		}
-                else if(curtypestr.split(",").at(1).contains("MPG"))
+                else if(curtypestr.split(",").at(1).contains("MPEG"))
                 {
-                    VideoViewer* tmpvid = new VideoViewer();
-                    tmpvid->LoadFile("Ladida");
                     //QtAV::AVPlayer* tmpplayer = new QtAV::AVPlayer(this);
                     // NEED TO ATTEMPT TO LOAD THE VIDEO, AND SEE IF IT LOADED SUCCESSFULLY IN A PLAYER, THEN CHECK AND SEE IF THERE IS ANOTHER
                     // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
+                    QByteArray tmparray = footerarray.left(carvedstringsize);
+                    QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
+                    qDebug() << "tmpfstr:" << tmpfstr;
+                    //qDebug() << "tmparray size:" << tmparray.count();
+                    //QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
+                    QFile tfile(tmpfstr);
+                    tfile.open(QIODevice::WriteOnly);
+                    QDataStream otbuf(&tfile);
+                    otbuf.writeRawData(tmparray, tmparray.count());
+                    tfile.close();
                     qDebug() << "semi smart carving for mpg here...";
+                    VideoViewer* tmpvid = new VideoViewer();
+                    isvalidfile = tmpvid->LoadFile(tmpfstr);
+                    //bool isvalidload = tmpvid->LoadFile(tmpfstr);
+                    //qDebug() << "isvalidload:" << isvalidload;
                 }
                 QString parstr = estring + "-" + vstring + "-" + pstring + "-";
                 QString vtype = "";
