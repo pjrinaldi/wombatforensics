@@ -2578,8 +2578,9 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     otbuf.writeRawData(tmparray, tmparray.count());
                     tfile.close();
                     qDebug() << "semi smart carving for mpg here...";
-                    VideoViewer* tmpvid = new VideoViewer();
-                    isvalidfile = tmpvid->LoadFile(tmpfstr);
+                    //VideoViewer* tmpvid = new VideoViewer();
+                    //isvalidfile = tmpvid->LoadFile(tmpfstr);
+                    // NEED TO LOOK INTO POSSIBLY USING LIBMPEG2 TO VALIDATE.. OR JUST NOT VALIDATE AT ALL...
                     //bool isvalidload = tmpvid->LoadFile(tmpfstr);
                     //qDebug() << "isvalidload:" << isvalidload;
                 }
