@@ -2564,6 +2564,9 @@ void GenerateCarving(QStringList plist, QStringList flist)
 		}
                 else if(curtypestr.split(",").at(1).contains("MPEG"))
                 {
+                    // MPG NEEDS TO BE FOUND A DIFFERENT WAY BECAUSE THE HEADER SHOWS UP EVERYWHERE...
+                    // I THINK THE SIMPLEST APPROACH IS TO LOOK FOR THE FOOTER AND THEN GO BACKWARDS FOR THE HEADER BETWEEN FOOTERS...
+                    // IF THIS WORKS, THIS WILL SAVE ME LEARNING ALL ABOUT VIDEO FORMATS, TO CARVE THESE A DIFFERENT WAY...
                     //QtAV::AVPlayer* tmpplayer = new QtAV::AVPlayer(this);
                     // NEED TO ATTEMPT TO LOAD THE VIDEO, AND SEE IF IT LOADED SUCCESSFULLY IN A PLAYER, THEN CHECK AND SEE IF THERE IS ANOTHER
                     // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
