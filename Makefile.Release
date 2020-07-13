@@ -80,7 +80,8 @@ SOURCES       = main.cpp \
 		carvedialog.cpp \
 		filecarvingdialog.cpp \
 		carvingfiletypesdialog.cpp \
-		pdfviewer.cpp release/qrc_wombatforensics.cpp \
+		pdfviewer.cpp \
+		carving.cpp release/qrc_wombatforensics.cpp \
 		release/moc_wombatforensics.cpp \
 		release/moc_exportdialog.cpp \
 		release/moc_globals.cpp \
@@ -138,6 +139,7 @@ OBJECTS       = release/main.o \
 		release/filecarvingdialog.o \
 		release/carvingfiletypesdialog.o \
 		release/pdfviewer.o \
+		release/carving.o \
 		release/qrc_wombatforensics.o \
 		release/moc_wombatforensics.o \
 		release/moc_exportdialog.o \
@@ -413,7 +415,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		carvedialog.h \
 		filecarvingdialog.h \
 		carvingfiletypesdialog.h \
-		pdfviewer.h main.cpp \
+		pdfviewer.h \
+		carving.h main.cpp \
 		wombatforensics.cpp \
 		wombatfunctions.cpp \
 		exportdialog.cpp \
@@ -442,7 +445,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		carvedialog.cpp \
 		filecarvingdialog.cpp \
 		carvingfiletypesdialog.cpp \
-		pdfviewer.cpp
+		pdfviewer.cpp \
+		carving.cpp
 QMAKE_TARGET  = wombatforensics
 DESTDIR       = release/
 TARGET        = release/wombatforensics
@@ -471,8 +475,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents wombatforensics.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp pdfviewer.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp pdfviewer.cpp carving.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui filecarvingdialog.ui carvingfiletypesdialog.ui pdfviewer.ui $(DISTDIR)/
 
 
@@ -583,6 +587,7 @@ release/moc_wombatforensics.cpp: wombatforensics.h \
 		wombatfunctions.h \
 		globals.h \
 		tskcpp.h \
+		carving.h \
 		ui_wombatforensics.h \
 		qhexedit.h \
 		chunks.h \
@@ -1105,6 +1110,7 @@ release/main.o: main.cpp wombatinclude.h \
 		wombatfunctions.h \
 		globals.h \
 		tskcpp.h \
+		carving.h \
 		ui_wombatforensics.h \
 		qhexedit.h \
 		chunks.h \
@@ -1172,6 +1178,7 @@ release/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		wombatfunctions.h \
 		globals.h \
 		tskcpp.h \
+		carving.h \
 		ui_wombatforensics.h \
 		qhexedit.h \
 		chunks.h \
@@ -1468,6 +1475,13 @@ release/pdfviewer.o: pdfviewer.cpp pdfviewer.h \
 		videoviewer.h \
 		ui_videoviewer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/pdfviewer.o pdfviewer.cpp
+
+release/carving.o: carving.cpp carving.h \
+		globals.h \
+		wombatinclude.h \
+		wombatvariable.h \
+		tskcpp.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/carving.o carving.cpp
 
 release/qrc_wombatforensics.o: release/qrc_wombatforensics.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/qrc_wombatforensics.o release/qrc_wombatforensics.cpp

@@ -7,6 +7,7 @@
 #include "wombatinclude.h"
 #include "wombatvariable.h"
 #include "wombatfunctions.h"
+#include "carving.h"
 #include "ui_wombatforensics.h"
 #include "propertieswindow.h"
 #include "exportdialog.h"

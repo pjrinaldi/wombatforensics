@@ -2318,6 +2318,7 @@ void GenerateDigging(QString thumbid)
     //    GenerateArchiveExpansion(thumbid);
 }
 
+/*
 void GenerateCarving(QStringList plist, QStringList flist)
 {
     QString hpath = QDir::homePath();
@@ -2627,10 +2628,11 @@ void GenerateCarving(QStringList plist, QStringList flist)
             otbuf.writeRawData(tmparray, tmparray.count());
             tfile.close();
             */
-        }
+/*        }
         rawfile.close();
     }
 }
+*/
 
 void GenerateThumbnails(QString thumbid)
 {
@@ -2773,7 +2775,7 @@ void PopulateArchiveFiles(QString afilestr)
     mutex.unlock();
     listeditems.append(slist.at(12));
 }
-
+/*
 void PopulateCarvedFiles(QString cfilestr)
 {
     // NEED TO GENERATE THE BLOCKLIST OF USED BLOCKS SO I DON'T RECARVE THE SAME ONES....
@@ -2808,7 +2810,7 @@ void PopulateCarvedFiles(QString cfilestr)
     mutex.unlock();
     listeditems.append(slist.at(12));
 }
-
+*/
 void PopulateTreeModel(QString evidstring)
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
