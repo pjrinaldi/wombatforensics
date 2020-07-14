@@ -7,6 +7,9 @@
 #include <liblnk.h>
 #include <zip.h>
 
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2
+
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
 

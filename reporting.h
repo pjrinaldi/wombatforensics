@@ -7,6 +7,9 @@
 #include <liblnk.h>
 #include <zip.h>
 
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2
+
 int UpdateBookmarkItems(QString tagname);
 void UpdateEvidenceList(void);
 void AddItem(QString content, QString section);

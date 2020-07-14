@@ -6,9 +6,9 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
+#include "artifactparser.h"
 #include "wombatfunctions.h"
 #include "ui_htmlviewer.h"
-#include "artifactparser.h"
 
 namespace Ui
 {

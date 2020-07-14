@@ -12,6 +12,8 @@
 #include "artifactparser.h"
 #include "reporting.h"
 #include "digging.h"
+#include "exporting.h"
+#include "properties.h"
 
 /*
 #define TICKS_PER_SECOND 10000000
@@ -63,16 +65,18 @@ void PopulateTreeModel(QString evidstring);
 void FileRecurse(QString partitionpath, QString paraddr, QString rootinum);
 void AddFileData(QString file, QString partpath, QString rootinum);
 QString GetBlockList(TSK_FS_FILE* tmpfile);
+/*
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QString imgfullpath);
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath);
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString attrid, QString partpath, bool isres);
+*/
 //void LogMessage(QString message);
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr);
 QString GetFilePermissions(TSK_FS_META* tmpmeta);
 QString ConvertGmtHours(int gmtvar);
-void ProcessExport(QString curid);
+//void ProcessExport(QString curid);
 void InitializeEvidenceStructure(QString evidstring);
 int SegmentDigits(int);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);

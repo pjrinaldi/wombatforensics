@@ -1476,7 +1476,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
         tmpstring.replace(9, 1, "x");
     return tmpstring;
 }
-
+/*
 void ProcessExport(QString objectid)
 {
     if(objectid.contains("-c"))
@@ -1718,6 +1718,7 @@ void ProcessExport(QString objectid)
     exportcount++;
     isignals->ExportUpd();
 }
+*/
 
 void SaveImagesHash()
 {
@@ -1751,6 +1752,7 @@ void LoadImagesHash()
     for(int i = 0; i < tmpstr.split(",", Qt::SkipEmptyParts).count(); i++)
         imageshash.insert(tmpstr.split(",", Qt::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", Qt::SkipEmptyParts).at(i).split("|").at(1));
 }
+
 /*
 void GenerateArchiveExpansion(QString objectid)
 {
@@ -3804,7 +3806,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
     
     return blkstring;
 }
-
+/*
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString attrid, QString partpath, bool isres)
 {
     QString curblockstring = "";
@@ -5227,7 +5229,7 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QSt
     proplist.flush();
     epropfile.close();
 }
-
+*/
 QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
 {
     char asc[512];

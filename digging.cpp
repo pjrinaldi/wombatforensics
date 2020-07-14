@@ -8,6 +8,9 @@
 // LIBPOPPLER-QT5 HEADER
 #include <poppler-qt5.h>
 
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2
+
 void GenerateArchiveExpansion(QString objectid)
 {
     if(!isclosing)
