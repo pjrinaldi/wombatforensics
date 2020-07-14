@@ -3703,6 +3703,7 @@ void InitializeEvidenceStructure(QString evidname)
     tsk_img_close(imginfo);
 }
 
+/*
 QString GetAdsBlockList(TSK_FS_FILE* tmpfile, qint64 attrid)
 {
     QString blkstring = "";
@@ -3808,6 +3809,7 @@ QString GetBlockList(TSK_FS_FILE* tmpfile)
     
     return blkstring;
 }
+*/
 /*
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString attrid, QString partpath, bool isres)
 {
@@ -5368,6 +5370,7 @@ QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
     }
     return "";
 }
+*/
 
 QString ConvertGmtHours(int gmtvar)
 {
@@ -5384,7 +5387,6 @@ QString ConvertGmtHours(int gmtvar)
     return tmpstring;
 
 }
-*/
 /*
 QString GenerateCategorySignature(const QMimeType mimetype)
 {

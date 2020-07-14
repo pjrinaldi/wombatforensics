@@ -5,7 +5,7 @@
 #include "globals.h"
 #include "tskcpp.h"
 #include <zip.h>
-#include "wombatfunctions.h"
+//#include "wombatfunctions.h"
 
 QString GetBlockList(TSK_FS_FILE* tmpfile);
 QString GetAdsBlockList(TSK_FS_FILE* tmpfile, qint64 attrid);
