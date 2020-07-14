@@ -5,7 +5,6 @@
 #include "globals.h"
 #include "tskcpp.h"
 #include <zip.h>
-//#include "wombatfunctions.h"
 
 QString GetBlockList(TSK_FS_FILE* tmpfile);
 QString GetAdsBlockList(TSK_FS_FILE* tmpfile, qint64 attrid);
@@ -18,5 +17,7 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath);
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString attrid, QString partpath, bool isres);
+
+QString ConvertGmtHours(int gmtvar);
 
 #endif // properties.h

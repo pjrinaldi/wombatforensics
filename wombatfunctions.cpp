@@ -1721,7 +1721,7 @@ void ProcessExport(QString objectid)
     isignals->ExportUpd();
 }
 */
-
+/*
 void SaveImagesHash()
 {
     QFile thumbfile;
@@ -1754,7 +1754,7 @@ void LoadImagesHash()
     for(int i = 0; i < tmpstr.split(",", Qt::SkipEmptyParts).count(); i++)
         imageshash.insert(tmpstr.split(",", Qt::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", Qt::SkipEmptyParts).at(i).split("|").at(1));
 }
-
+*/
 /*
 void GenerateArchiveExpansion(QString objectid)
 {
@@ -2751,7 +2751,7 @@ int SegmentDigits(int number)
     }
     return count;
 }
-
+/*
 void PopulateArchiveFiles(QString afilestr)
 {
     afilestr = wombatvariable.tmpmntpath + "archives/" + afilestr;
@@ -2783,6 +2783,7 @@ void PopulateArchiveFiles(QString afilestr)
     mutex.unlock();
     listeditems.append(slist.at(12));
 }
+*/
 /*
 void PopulateCarvedFiles(QString cfilestr)
 {
@@ -2819,6 +2820,7 @@ void PopulateCarvedFiles(QString cfilestr)
     listeditems.append(slist.at(12));
 }
 */
+/*
 void PopulateTreeModel(QString evidstring)
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -3107,7 +3109,8 @@ void PopulateTreeModel(QString evidstring)
     //InitializeHashList();
     //InitializeTaggedList();
 }
-
+*/
+/*
 void InitializeEvidenceStructure(QString evidname)
 {
     int evidcnt = 0;
@@ -3702,6 +3705,7 @@ void InitializeEvidenceStructure(QString evidname)
     tsk_vs_close(vsinfo);
     tsk_img_close(imginfo);
 }
+*/
 
 /*
 QString GetAdsBlockList(TSK_FS_FILE* tmpfile, qint64 attrid)
@@ -5371,7 +5375,7 @@ QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
     return "";
 }
 */
-
+/*
 QString ConvertGmtHours(int gmtvar)
 {
     int tmpmin = gmtvar - 48;
@@ -5387,6 +5391,7 @@ QString ConvertGmtHours(int gmtvar)
     return tmpstring;
 
 }
+*/
 /*
 QString GenerateCategorySignature(const QMimeType mimetype)
 {
@@ -5936,7 +5941,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
         //qDebug() << "extract zip content here...";
     }
 }
-
+/*
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partpath)
 {
     TSK_FS_DIR* fsdir = NULL;
@@ -6167,7 +6172,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
     }
     tsk_fs_dir_close(fsdir);
 }
-
+*/
+/*
 void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath)
 {
     int pathcount = partitionpath.split("/", Qt::SkipEmptyParts).count();
@@ -6397,7 +6403,8 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
     }
     tsk_fs_dir_close(fsdir);
 }
-
+*/
+/*
 void InitializeHashList(void)
 {
     hashlist.clear();
@@ -6421,6 +6428,7 @@ void InitializeHashList(void)
         treenodemodel->UpdateNode(i.key(), 7, i.value());
     }
 }
+*/
 
 void InitializePasswordList(void)
 {
@@ -6444,7 +6452,7 @@ void InitializePasswordList(void)
         }
     }
 }
-
+/*
 void InitializeTaggedList(void)
 {
     taggedhash.clear();
@@ -6468,7 +6476,7 @@ void InitializeTaggedList(void)
         treenodemodel->UpdateNode(i.key(), 10, i.value());
     }
 }
-
+*/
 void SavePasswordList(void)
 {
     QFile hfile(wombatvariable.tmpmntpath + "passlist");
@@ -6490,7 +6498,7 @@ void SavePasswordList(void)
     }
     hfile.close();
 }
-
+/*
 void SaveHashList(void)
 {
     QFile hfile(wombatvariable.tmpmntpath + "hashlist");
@@ -6510,7 +6518,8 @@ void SaveHashList(void)
     }
     hfile.close();
 }
-
+*/
+/*
 void SaveTaggedList(void)
 {
     QFile hfile(wombatvariable.tmpmntpath + "taggedlist");
@@ -6530,6 +6539,7 @@ void SaveTaggedList(void)
     }
     hfile.close();
 }
+*/
 /*
 QByteArray ReturnFileContent(QString objectid)
 {
@@ -6806,3 +6816,94 @@ QByteArray ReturnFileContent(QString objectid)
     return filebytes;
 }
 */
+
+QString GenerateCategorySignature(const QMimeType mimetype)
+{
+    QString geniconstr = mimetype.genericIconName();
+    QString mimesignature = mimetype.comment();
+    QString mimecategory = "";
+    if(geniconstr.contains("document")) // Document
+        mimecategory = "Document";
+    else if(geniconstr.contains("video")) // Video
+        if(mimesignature.contains("WPL"))
+            mimecategory = "HTML";
+        else
+            mimecategory = "Video";
+    else if(geniconstr.contains("image")) // Image
+        mimecategory = "Image";
+    else if(geniconstr.contains("package")) // Archive
+        mimecategory = "Archive";
+    else if(geniconstr.contains("font")) // Font
+        mimecategory = "Font";
+    else if(geniconstr.contains("text")) // Text
+        if(mimesignature.contains("email") || mimesignature.contains("mail") || mimesignature.contains("reference to remote file"))
+            mimecategory = "Email";
+        else if(mimesignature.contains("html", Qt::CaseInsensitive))
+            mimecategory = "HTML";
+        else
+            mimecategory = "Text";
+    else if(geniconstr.contains("audio")) // Audio
+        mimecategory = "Audio";
+    else if(geniconstr.contains("spreadsheet")) // Office Spreadsheet
+        mimecategory = "Spreadsheet";
+    else if(geniconstr.contains("presentation")) // Office Presentation
+        mimecategory = "Presentation";
+    else if(geniconstr.contains("multipart")) // MultiPart
+        mimecategory = "MultiPart";
+    else if(geniconstr.contains("inode")) // Inode
+        mimecategory = "Inode";
+    else if(geniconstr.contains("model")) // Binary
+        mimecategory = "Binary";
+    else if(geniconstr.contains("application-x")) // Try iconName() database, java, document, text, image, executable, certificate, bytecode, library, Data, Trash, zerosize, 
+    {
+       if(mimesignature.contains("certificate") || mimesignature.contains("private key") || mimesignature.contains("keystore")) 
+            mimecategory = "Certificate";
+       else if(mimesignature.contains("Metafile") || mimesignature.contains("profile"))
+            mimecategory = "Metafile";
+       else if(mimesignature.contains("video"))
+           mimecategory = "Video";
+       else if(mimesignature.contains("TNEF message") || mimesignature.contains("email"))
+           mimecategory = "Email";
+       else if(mimesignature.contains("Microsoft Word Document") || mimesignature.contains("OpenDocument Master Document Template") || mimesignature.contains("MIF"))
+           mimecategory = "Document";
+       else if(mimesignature.contains("ROM") || mimesignature.contains("Atari") || mimesignature.contains("Thomson"))
+           mimecategory = "ROM";
+       else if(mimesignature.contains("database") || mimesignature.contains("Database") || mimesignature.contains("SQL"))
+           mimecategory = "Database";
+       else if(mimesignature.contains("filesystem") || mimesignature.contains("disk image") || mimesignature.contains("AppImage") || mimesignature.contains("WiiWare"))
+           mimecategory = "Disk Image";
+       else if(mimesignature.contains("executable") || mimesignature.contains("Windows Intaller") || mimesignature.contains("library"))
+           mimecategory = "Executable";
+       else if(mimesignature.contains("Internet shortcut") || mimesignature.contains("backup file") || mimesignature.contains("VBScript") || mimesignature.contains("RDF") || mimesignature.contains("Streaming playlist") || mimesignature.contains("cache file") || mimesignature.contains("Remmina") || mimesignature.contains("GML") || mimesignature.contains("GPX") || mimesignature.contains("MathML") || mimesignature.contains("Metalink") || mimesignature.contains("XML") || mimesignature.contains("RDF") || mimesignature.contains("KML") || mimesignature.contains("FictionBook") || mimesignature.contains("NewzBin"))
+           mimecategory = "Text";
+       else if(mimesignature.contains("Windows animated cursor"))
+           mimecategory = "Image";
+       else if(mimesignature.contains("SPSS") || mimesignature.contains("MHTML"))
+           mimecategory = "Archive";
+       else if(mimesignature.contains("empty"))
+           mimecategory = "Empty File";
+       else
+           mimecategory = "Binary";
+    }
+    else if(geniconstr.contains("x-content-x-generic")) 
+    {
+        if(mimesignature.contains("audio"))
+            mimecategory = "Audio";
+        else if(mimesignature.contains("blank"))
+            mimecategory = "Disk Image";
+        else if(mimesignature.contains("e-book"))
+            mimecategory = "Document";
+        else if(mimesignature.contains("photos") || mimesignature.contains("Picture"))
+            mimecategory = "Image";
+        else if(mimesignature.contains("software"))
+            mimecategory = "Executable";
+        else if(mimesignature.contains("video") || mimesignature.contains("Video"))
+            mimecategory = "Video";
+    }
+    if(mimesignature.contains("unknown"))
+        mimesignature = "Unknown";
+
+    return QString(mimecategory + "/" + mimesignature);
+}
+
+

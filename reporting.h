@@ -26,4 +26,7 @@ void UpdateTagItem(int tagid, QString oldname, QString tagname);
 void AddFileItem(QString tagname, QString content);
 void RemoveFileItem(QString fileid);
 
+void InitializeTaggedList(void);
+void SaveTaggedList(void);
+
 #endif // reporting.h

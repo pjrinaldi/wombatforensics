@@ -450,3 +450,48 @@ void RemoveTagItem(QString tagname)
     previewfile.close();
     isignals->ActivateReload();
 }
+
+void InitializeTaggedList(void)
+{
+    taggedhash.clear();
+    QString tmpstr = "";
+    QFile hashfile(wombatvariable.tmpmntpath + "taggedlist");
+    if(hashfile.exists())
+    {
+        if(!hashfile.isOpen())
+            hashfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(hashfile.isOpen())
+            tmpstr = hashfile.readLine();
+        QStringList hlist = tmpstr.split(",", Qt::SkipEmptyParts);
+        for(int i=0; i < hlist.count(); i++)
+            taggedhash.insert(hlist.at(i).split("|", Qt::SkipEmptyParts).at(0), hlist.at(i).split("|", Qt::SkipEmptyParts).at(1));
+        hashfile.close();
+    }
+    QHashIterator<QString, QString> i(taggedhash);
+    while(i.hasNext())
+    {
+        i.next();
+        treenodemodel->UpdateNode(i.key(), 10, i.value());
+    }
+}
+
+void SaveTaggedList(void)
+{
+    QFile hfile(wombatvariable.tmpmntpath + "taggedlist");
+    if(!hfile.isOpen())
+        hfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(hfile.isOpen())
+    {
+        QHashIterator<QString, QString> i(taggedhash);
+        while(i.hasNext())
+        {
+            i.next();
+            hfile.write(i.key().toStdString().c_str());
+            hfile.write("|");
+            hfile.write(i.value().toStdString().c_str());
+            hfile.write(",");
+        }
+    }
+    hfile.close();
+}
+

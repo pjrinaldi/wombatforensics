@@ -19,7 +19,14 @@ void GenerateVidThumbnails(QString thumbid);
 void GenerateArchiveExpansion(QString thumbid);
 void GenerateDigging(QString thumbid);
 void GeneratePreDigging(QString thumbid);
-QString GenerateCategorySignature(const QMimeType mimetype);
 QByteArray ReturnFileContent(QString objectid);
+
+void LoadImagesHash(void);
+void SaveImagesHash(void);
+
+void SaveHashList(void);
+void InitializeHashList(void);
+
+void PopulateArchiveFiles(QString afile);
 
 #endif // digging.h

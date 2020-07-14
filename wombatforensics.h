@@ -34,6 +34,13 @@
 #include "carvedialog.h"
 #include "filecarvingdialog.h"
 #include "pdfviewer.h"
+#include "properties.h"
+#include "artifactparser.h"
+#include "digging.h"
+#include "carving.h"
+#include "exporting.h"
+#include "newcase.h"
+#include "opencase.h"
 
 class StatusLabel : public QLabel
 {

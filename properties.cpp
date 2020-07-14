@@ -1771,3 +1771,19 @@ QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
     return "";
 }
 
+QString ConvertGmtHours(int gmtvar)
+{
+    int tmpmin = gmtvar - 48;
+    int gmthr = tmpmin / 4;
+    int gmtmin = (tmpmin % 4)*15;
+    QString tmpstring = " GMT ";
+    if(abs(gmthr) < 10)
+        tmpstring += "0";
+    tmpstring += QString::number(gmthr) + QString::number(gmtmin);
+    if(gmtmin == 0)
+        tmpstring += "0";
+
+    return tmpstring;
+
+}
+

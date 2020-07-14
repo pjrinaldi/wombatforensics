@@ -8,12 +8,14 @@
 #include "globals.h"
 #include "tskcpp.h"
 //#include <liblnk.h>
-//#include <zip.h>
-#include "artifactparser.h"
-#include "reporting.h"
-#include "digging.h"
-#include "exporting.h"
-#include "properties.h"
+#include <zip.h>
+//#include "artifactparser.h"
+//#include "reporting.h"
+//#include "digging.h"
+//#include "exporting.h"
+//#include "properties.h"
+//#include "newcase.h"
+//#include "opencase.h"
 
 /*
 #define TICKS_PER_SECOND 10000000
@@ -33,9 +35,19 @@ qint64 GetChildCount(QString filefilter);
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
 
-QString ConvertGmtHours(int gmtvar);
+//QString ConvertGmtHours(int gmtvar);
 
 int SegmentDigits(int);
+
+//void FileRecurse(QString partitionpath, QString paraddr, QString rootinum);
+//void AddFileData(QString file, QString partpath, QString rootinum);
+
+void TransferThumbnails(QString thumbid, QString reppath);
+void TransferFiles(QString thumbid, QString reppath);
+void GenerateWombatCaseFile(void);
+void RewriteSelectedIdContent(QModelIndex selectedid);
+
+QString GenerateCategorySignature(const QMimeType mimetype);
 
 /*
 int UpdateBookmarkItems(QString tagname);
@@ -64,11 +76,13 @@ void GenerateDigging(QString thumbid);
 void GeneratePreDigging(QString thumbid);
 */
 //void GenerateCarving(QStringList plist, QStringList flist);
+/*
 void LoadImagesHash(void);
 void SaveImagesHash(void);
-void PopulateTreeModel(QString evidstring);
-void FileRecurse(QString partitionpath, QString paraddr, QString rootinum);
-void AddFileData(QString file, QString partpath, QString rootinum);
+*/
+
+//void InitializeEvidenceStructure(QString evidstring);
+//void PopulateTreeModel(QString evidstring);
 
 /*
 QString GetBlockList(TSK_FS_FILE* tmpfile);
@@ -87,21 +101,19 @@ void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsnam
 */
 //void LogMessage(QString message);
 //void ProcessExport(QString curid);
-void InitializeEvidenceStructure(QString evidstring);
 //void PopulateCarvedFiles(QString cfile);
-void PopulateArchiveFiles(QString afile);
+//void PopulateArchiveFiles(QString afile);
 //QString GenerateCategorySignature(const QMimeType mimetype);
-void TransferThumbnails(QString thumbid, QString reppath);
-void TransferFiles(QString thumbid, QString reppath);
-void GenerateWombatCaseFile(void);
-void RewriteSelectedIdContent(QModelIndex selectedid);
-void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
-void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath);
+
+//void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
+//void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath);
+
 //QByteArray ReturnFileContent(QString objectid);
-void InitializeHashList(void);
-void InitializeTaggedList(void);
-void SaveHashList(void);
-void SaveTaggedList(void);
+//void InitializeHashList(void);
+//void InitializeTaggedList(void);
+//void SaveHashList(void);
+//void SaveTaggedList(void);
+
 void SavePasswordList(void);
 void InitializePasswordList(void);
 

@@ -675,7 +675,7 @@ void GenerateThumbnails(QString thumbid)
         isignals->DigUpd(0, digimgthumbcount);
     }
 }
-
+/*
 QString GenerateCategorySignature(const QMimeType mimetype)
 {
     QString geniconstr = mimetype.genericIconName();
@@ -763,7 +763,7 @@ QString GenerateCategorySignature(const QMimeType mimetype)
         mimesignature = "Unknown";
 
     return QString(mimecategory + "/" + mimesignature);
-}
+}*/
 
 QByteArray ReturnFileContent(QString objectid)
 {
@@ -1039,3 +1039,113 @@ QByteArray ReturnFileContent(QString objectid)
     }
     return filebytes;
 }
+
+void SaveHashList(void)
+{
+    QFile hfile(wombatvariable.tmpmntpath + "hashlist");
+    if(!hfile.isOpen())
+        hfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(hfile.isOpen())
+    {
+        QHashIterator<QString, QString> i(hashlist);
+        while(i.hasNext())
+        {
+            i.next();
+            hfile.write(i.key().toStdString().c_str());
+            hfile.write("|");
+            hfile.write(i.value().toStdString().c_str());
+            hfile.write(",");
+        }
+    }
+    hfile.close();
+}
+
+void InitializeHashList(void)
+{
+    hashlist.clear();
+    QString tmpstr = "";
+    QFile hashfile(wombatvariable.tmpmntpath + "hashlist");
+    if(hashfile.exists())
+    {
+        if(!hashfile.isOpen())
+            hashfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(hashfile.isOpen())
+            tmpstr = hashfile.readLine();
+        hashfile.close();
+        QStringList hlist = tmpstr.split(",", Qt::SkipEmptyParts);
+        for(int i=0; i < hlist.count(); i++)
+            hashlist.insert(hlist.at(i).split("|", Qt::SkipEmptyParts).at(0), hlist.at(i).split("|", Qt::SkipEmptyParts).at(1));
+    }
+    QHashIterator<QString, QString> i(hashlist);
+    while(i.hasNext())
+    {
+        i.next();
+        treenodemodel->UpdateNode(i.key(), 7, i.value());
+    }
+}
+
+void PopulateArchiveFiles(QString afilestr)
+{
+    afilestr = wombatvariable.tmpmntpath + "archives/" + afilestr;
+    QFile afile(afilestr);
+    QString tmpstr;
+    if(!afile.isOpen())
+        afile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(afile.isOpen())
+        tmpstr = afile.readLine();
+    afile.close();
+    QStringList slist = tmpstr.split(",");
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << slist.at(0); // name
+    nodedata << slist.at(3); // path
+    nodedata << slist.at(8); // size
+    nodedata << slist.at(6); // crtime
+    nodedata << slist.at(4); // atime
+    nodedata << slist.at(7); // mtime
+    nodedata << slist.at(5); // ctime
+    nodedata << slist.at(13); // hash
+    nodedata << QString(slist.at(10)).split("/").first(); // category
+    nodedata << QString(slist.at(10)).split("/").last(); // signature
+    nodedata << slist.at(15); // tag
+    nodedata << slist.at(12); // id
+    QString parentstr = afilestr.split("/").last().split("-fz").first() + "-f" + afilestr.split("/").last().split("-a").last().split(".stat").first();
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, parentstr, 1, 0);
+    mutex.unlock();
+    listeditems.append(slist.at(12));
+}
+
+void SaveImagesHash()
+{
+    QFile thumbfile;
+    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
+    thumbfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(thumbfile.isOpen())
+    {
+        QHashIterator<QString, QString> i(imageshash);
+        while(i.hasNext())
+        {
+            i.next();
+            thumbfile.write(i.key().toStdString().c_str());
+            thumbfile.write("|");
+            thumbfile.write(i.value().toStdString().c_str());
+            thumbfile.write(",");
+        }
+    }
+    thumbfile.close();
+}
+
+void LoadImagesHash()
+{
+    QFile thumbfile;
+    QString tmpstr = "";
+    thumbfile.setFileName(wombatvariable.tmpmntpath + "thumbs/thumbpathlist");
+    thumbfile.open(QIODevice::ReadOnly);
+    if(thumbfile.isOpen())
+        tmpstr = thumbfile.readLine();
+    thumbfile.close();
+    for(int i = 0; i < tmpstr.split(",", Qt::SkipEmptyParts).count(); i++)
+        imageshash.insert(tmpstr.split(",", Qt::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", Qt::SkipEmptyParts).at(i).split("|").at(1));
+}
+
