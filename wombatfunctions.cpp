@@ -43,7 +43,7 @@ void SleepLoop(const int ms)
     timer.start(ms);
     idleloop.exec();
 }
-
+/*
 QString ParseLnkArtifact(QString lnkname, QString lnkid)
 {
     QString htmlstr = "";
@@ -286,7 +286,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                                         }
                                     }
                                     */
-                                    if(fsattr->type == 160) // $INDEX_ALLOCATION
+/*                                    if(fsattr->type == 160) // $INDEX_ALLOCATION
                                     {
                                         fscontent = new char[fsattr->size];
                                         fslength = tsk_fs_attr_read(fsattr, 0, fscontent, fsattr->size, TSK_FS_FILE_READ_FLAG_SLACK);
@@ -468,7 +468,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
 	        liblnk_file_get_utf8_working_directory(lnkobj, workdir, tmpsize, &error);
 	        htmlstr += "<tr class='even'><td class='aval'>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
              */ 
-        }
+/*        }
     }
     htmlstr += "</table></body></html>";
     
@@ -845,7 +845,7 @@ QString ParseArchiveArtifact(QString archivename, QString archiveid)
                 htmlstr += "RC4 ENCRYPTED";
                 break;
             */
-            case ZIP_EM_AES_128:
+/*            case ZIP_EM_AES_128:
                 htmlstr += "AES 128 ENCRYPTED";
                 break;
             case ZIP_EM_AES_192:
@@ -880,7 +880,7 @@ QString ConvertWindowsTimeToUnixTime(uint64_t input)
 
     return timestr;
 }
-
+*/
 /*
 void LogMessage(QString logmsg)
 {
@@ -896,6 +896,7 @@ void LogMessage(QString logmsg)
 }
 */
 
+/*
 int UpdateBookmarkItems(QString tagname)
 {
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -1343,6 +1344,7 @@ void RemoveTagItem(QString tagname)
     previewfile.close();
     isignals->ActivateReload();
 }
+*/
 
 qint64 GetChildCount(QString filefilter)
 {
@@ -1749,7 +1751,7 @@ void LoadImagesHash()
     for(int i = 0; i < tmpstr.split(",", Qt::SkipEmptyParts).count(); i++)
         imageshash.insert(tmpstr.split(",", Qt::SkipEmptyParts).at(i).split("|").at(0), tmpstr.split(",", Qt::SkipEmptyParts).at(i).split("|").at(1));
 }
-
+/*
 void GenerateArchiveExpansion(QString objectid)
 {
     if(!isclosing)
@@ -2001,7 +2003,7 @@ void GenerateArchiveExpansion(QString objectid)
 				htmlstr += "RC4 ENCRYPTED";
 				break;
 			    */
-			    case ZIP_EM_AES_128:
+/*			    case ZIP_EM_AES_128:
 				proplist << "AES 128 ENCRYPTED";
 				break;
 			    case ZIP_EM_AES_192:
@@ -2317,6 +2319,7 @@ void GenerateDigging(QString thumbid)
     //if(hasarchive && !isclosing)
     //    GenerateArchiveExpansion(thumbid);
 }
+*/
 
 /*
 void GenerateCarving(QStringList plist, QStringList flist)
@@ -2633,7 +2636,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
     }
 }
 */
-
+/*
 void GenerateThumbnails(QString thumbid)
 {
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -2730,6 +2733,7 @@ void GenerateThumbnails(QString thumbid)
         isignals->DigUpd(0, digimgthumbcount);
     }
 }
+*/
 
 int SegmentDigits(int number)
 {
@@ -5375,7 +5379,7 @@ QString ConvertGmtHours(int gmtvar)
     return tmpstring;
 
 }
-
+/*
 QString GenerateCategorySignature(const QMimeType mimetype)
 {
     QString geniconstr = mimetype.genericIconName();
@@ -5464,6 +5468,7 @@ QString GenerateCategorySignature(const QMimeType mimetype)
 
     return QString(mimecategory + "/" + mimesignature);
 }
+*/
 
 void TransferThumbnails(QString thumbid, QString reppath)
 {
@@ -6517,7 +6522,7 @@ void SaveTaggedList(void)
     }
     hfile.close();
 }
-
+/*
 QByteArray ReturnFileContent(QString objectid)
 {
     // TSK FREE METHOD IMPLEMENTATION
@@ -6792,3 +6797,4 @@ QByteArray ReturnFileContent(QString objectid)
     }
     return filebytes;
 }
+*/

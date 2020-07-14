@@ -7,9 +7,13 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "tskcpp.h"
-#include <liblnk.h>
+//#include <liblnk.h>
 #include <zip.h>
+#include "artifactparser.h"
+#include "reporting.h"
+#include "digging.h"
 
+/*
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
 QString ConvertWindowsTimeToUnixTime(uint64_t input);
@@ -19,11 +23,12 @@ QString ParseInfo2Artifact(QString info2name, QString info2id);
 QString ParseIDollarArtifact(QString idollarname, QString idollarid);
 QString ParsePrefetchArtifact(QString pfname, QString pfid);
 QString ParseArchiveArtifact(QString archivename, QString archiveid);
-
+*/
 void SleepLoop(const int ms);
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
 
+/*
 int UpdateBookmarkItems(QString tagname);
 void UpdateEvidenceList(void);
 
@@ -40,14 +45,17 @@ void UpdateTLinkItem(int tagid, QString oldname, QString tagname);
 void UpdateTagItem(int tagid, QString oldname, QString tagname);
 void AddFileItem(QString tagname, QString content);
 void RemoveFileItem(QString fileid);
+*/
 QStringList GetChildFiles(QString filefilter);
 bool FileExists(const std::string& filename);
+/*
 void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void GenerateVidThumbnails(QString thumbid);
 void GenerateArchiveExpansion(QString thumbid);
 void GenerateDigging(QString thumbid);
 void GeneratePreDigging(QString thumbid);
+*/
 //void GenerateCarving(QStringList plist, QStringList flist);
 void LoadImagesHash(void);
 void SaveImagesHash(void);
@@ -70,14 +78,14 @@ int SegmentDigits(int);
 QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
 //void PopulateCarvedFiles(QString cfile);
 void PopulateArchiveFiles(QString afile);
-QString GenerateCategorySignature(const QMimeType mimetype);
+//QString GenerateCategorySignature(const QMimeType mimetype);
 void TransferThumbnails(QString thumbid, QString reppath);
 void TransferFiles(QString thumbid, QString reppath);
 void GenerateWombatCaseFile(void);
 void RewriteSelectedIdContent(QModelIndex selectedid);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath);
-QByteArray ReturnFileContent(QString objectid);
+//QByteArray ReturnFileContent(QString objectid);
 void InitializeHashList(void);
 void InitializeTaggedList(void);
 void SaveHashList(void);
