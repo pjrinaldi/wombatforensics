@@ -8,3 +8,5 @@ qrc*.cpp
 moc*.cpp
 wombatforensics
 *.swp
+debug/
+release/

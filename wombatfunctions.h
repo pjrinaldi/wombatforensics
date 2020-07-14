@@ -8,7 +8,7 @@
 #include "globals.h"
 #include "tskcpp.h"
 //#include <liblnk.h>
-#include <zip.h>
+//#include <zip.h>
 #include "artifactparser.h"
 #include "reporting.h"
 #include "digging.h"
@@ -30,6 +30,13 @@ void SleepLoop(const int ms);
 std::string GetTime(void);
 qint64 GetChildCount(QString filefilter);
 
+QStringList GetChildFiles(QString filefilter);
+bool FileExists(const std::string& filename);
+
+QString ConvertGmtHours(int gmtvar);
+
+int SegmentDigits(int);
+
 /*
 int UpdateBookmarkItems(QString tagname);
 void UpdateEvidenceList(void);
@@ -48,8 +55,6 @@ void UpdateTagItem(int tagid, QString oldname, QString tagname);
 void AddFileItem(QString tagname, QString content);
 void RemoveFileItem(QString fileid);
 */
-QStringList GetChildFiles(QString filefilter);
-bool FileExists(const std::string& filename);
 /*
 void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
@@ -64,7 +69,15 @@ void SaveImagesHash(void);
 void PopulateTreeModel(QString evidstring);
 void FileRecurse(QString partitionpath, QString paraddr, QString rootinum);
 void AddFileData(QString file, QString partpath, QString rootinum);
+
+/*
 QString GetBlockList(TSK_FS_FILE* tmpfile);
+QString GetAdsBlockList(TSK_FS_FILE* tmpfile, qint64 attrid);
+TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr);
+QString GetFilePermissions(TSK_FS_META* tmpmeta);
+QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
+*/
+
 /*
 void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QString imgfullpath);
 void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);
@@ -73,13 +86,8 @@ void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath);
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString attrid, QString partpath, bool isres);
 */
 //void LogMessage(QString message);
-TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr);
-QString GetFilePermissions(TSK_FS_META* tmpmeta);
-QString ConvertGmtHours(int gmtvar);
 //void ProcessExport(QString curid);
 void InitializeEvidenceStructure(QString evidstring);
-int SegmentDigits(int);
-QString GetFileSystemLabel(TSK_FS_INFO* fsinfo);
 //void PopulateCarvedFiles(QString cfile);
 void PopulateArchiveFiles(QString afile);
 //QString GenerateCategorySignature(const QMimeType mimetype);

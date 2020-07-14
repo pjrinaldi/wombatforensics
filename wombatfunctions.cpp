@@ -1,15 +1,16 @@
 #include "wombatfunctions.h"
-#include <QtEndian>
-#include <libfwnt.h>
+//#include <QtEndian>
+//#include <libfwnt.h>
 // IMAGEMAGICK HEADER
-#include <Magick++.h>
+//#include <Magick++.h>
 // LIBFFMPEG THUMBNAILER HEADERS
-#include <filmstripfilter.h>
-#include <videothumbnailer.h>
+//#include <filmstripfilter.h>
+//#include <videothumbnailer.h>
 // LIBPOPPLER-QT5 HEADER
-#include <poppler-qt5.h>
+//#include <poppler-qt5.h>
 
-#include "videoviewer.h"
+//#include "videoviewer.h"
+
 // QTAV HEADERS
 //#include <QtAV>
 //#include <QtAVWidgets>
@@ -1370,7 +1371,7 @@ bool FileExists(const std::string& filename)
     }
     return false;
 }
-
+/*
 TSK_WALK_RET_ENUM GetBlockAddress(TSK_FS_FILE* tmpfile, TSK_OFF_T off, TSK_DADDR_T addr, char* buf, size_t size, TSK_FS_BLOCK_FLAG_ENUM flags, void *ptr)
 {
     if(off < 0)
@@ -1476,6 +1477,7 @@ QString GetFilePermissions(TSK_FS_META* tmpmeta)
         tmpstring.replace(9, 1, "x");
     return tmpstring;
 }
+*/
 /*
 void ProcessExport(QString objectid)
 {
@@ -5230,6 +5232,7 @@ void WriteEvidenceProperties(TSK_IMG_INFO* curimginfo, QString evidencepath, QSt
     epropfile.close();
 }
 */
+/*
 QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
 {
     char asc[512];
@@ -5381,6 +5384,7 @@ QString ConvertGmtHours(int gmtvar)
     return tmpstring;
 
 }
+*/
 /*
 QString GenerateCategorySignature(const QMimeType mimetype)
 {
