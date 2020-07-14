@@ -1,5 +1,8 @@
 #include "properties.h"
 
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2
+
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString attrid, QString partpath, bool isres)
 {
     QString curblockstring = "";
@@ -1769,21 +1772,5 @@ QString GetFileSystemLabel(TSK_FS_INFO* curinfo)
         return "";
     }
     return "";
-}
-
-QString ConvertGmtHours(int gmtvar)
-{
-    int tmpmin = gmtvar - 48;
-    int gmthr = tmpmin / 4;
-    int gmtmin = (tmpmin % 4)*15;
-    QString tmpstring = " GMT ";
-    if(abs(gmthr) < 10)
-        tmpstring += "0";
-    tmpstring += QString::number(gmthr) + QString::number(gmtmin);
-    if(gmtmin == 0)
-        tmpstring += "0";
-
-    return tmpstring;
-
 }
 

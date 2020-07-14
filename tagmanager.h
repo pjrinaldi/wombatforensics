@@ -7,6 +7,7 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "wombatfunctions.h"
+#include "reporting.h"
 #include "ui_tagmanager.h"
 
 namespace Ui

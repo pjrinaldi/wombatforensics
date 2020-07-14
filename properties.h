@@ -2,9 +2,13 @@
 #define PROPERTIES_H
 
 #include "wombatinclude.h"
+#include "wombatfunctions.h"
 #include "globals.h"
 #include "tskcpp.h"
 #include <zip.h>
+
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Distrubted under the terms of the GNU General Public License version 2
 
 QString GetBlockList(TSK_FS_FILE* tmpfile);
 QString GetAdsBlockList(TSK_FS_FILE* tmpfile, qint64 attrid);
@@ -17,7 +21,5 @@ void WriteVolumeProperties(TSK_VS_INFO* curvolinfo, QString volumepath);
 void WriteFileSystemProperties(TSK_FS_INFO* curfsinfo, QString partitionpath);
 void WriteFileProperties(TSK_FS_FILE* curfileinfo, QString partpath);
 void WriteAlternateDataStreamProperties(TSK_FS_FILE* curfileinfo, QString adsname, QString attrid, QString partpath, bool isres);
-
-QString ConvertGmtHours(int gmtvar);
 
 #endif // properties.h
