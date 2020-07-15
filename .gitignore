@@ -10,3 +10,8 @@ wombatforensics
 *.swp
 debug/
 release/
+Makefile.Debug
+Makefile.Release
+*.Debug
+*.Release
+Makefile.*
