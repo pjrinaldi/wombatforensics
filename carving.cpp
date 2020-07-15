@@ -223,6 +223,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
                         }
                         curtypestr = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
                     }
+                    /*
 		    QString curcomparestr = "";
 		    int headleft = -1;
 		    int headright = -1;
@@ -240,14 +241,15 @@ void GenerateCarving(QStringList plist, QStringList flist)
 			headright = curfootstr.lastIndexOf("?");
 			curcomparestr = curfootstr;
 		    }
+                    */
                     // COMPARE BLOCK HEADER TO THE CURHEADSTR FOR MATCH...
-                    //int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
-                    //int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
+                    int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
+                    int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
                     
 		    if(headleft == -1 && headright == -1) // header without ???'s
                     {
-                        //if(blockheader.startsWith(curheadstr))
-                        if(blockheader.startsWith(curcomparestr))
+                        //if(blockheader.startsWith(curcomparestr))
+                        if(blockheader.startsWith(curheadstr))
                         {
                             blocklist.append(j);
                             headhash.insert(j, curtypestr);
@@ -255,8 +257,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     }
                     else // header with ???'s
                     {
-                        //if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
-                        if(blockheader.left(headleft).contains(curcomparestr.left(headleft)) && blockheader.mid(headright+1).contains(curcomparestr.mid(headright+1)))
+                        //if(blockheader.left(headleft).contains(curcomparestr.left(headleft)) && blockheader.mid(headright+1).contains(curcomparestr.mid(headright+1)))
+                        if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
                         {
                             blocklist.append(j);
                             headhash.insert(j, curtypestr);
@@ -278,6 +280,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
                 qint64 curmaxsize = curtypestr.split(",").at(5).toLongLong();
                 qint64 arraysize = 0;
                 qint64 carvedstringsize = 0;
+                /*
 		QString curfooter = "";
 		bool isfooter = true;
 		if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
@@ -289,7 +292,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
 		    curfooter = curtypestr.split(",").at(2); // find headers to match...
 		    isfooter = false;
 		}
-                //QString curfooter = curtypestr.split(",").at(3);
+                */
+                QString curfooter = curtypestr.split(",").at(3);
                 // GENERATE BLOCKLISTSTRING BELOW FOR THE PROPERTY FILE...
                 if(j == (blocklist.count()-1))
                     blockdifference = (blockcount - blocklist.at(j)) * blocksize;
@@ -307,24 +311,27 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     arraysize = blockdifference;
                 QByteArray footerarray;
                 footerarray.clear();
-		qint64 lastfooterpos = -1;
+		//qint64 lastfooterpos = -1;
                 if(!curfooter.isEmpty()) // if footer exists
                 {
                     bool isseek = rawfile.seek(partoffset + (blocklist.at(j) * blocksize));
                     if(isseek)
                         footerarray = rawfile.read(arraysize);
                     QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
+                    qint64 lastfooterpos = footerstr.lastIndexOf(curfooter);
+                    /*
 		    if(isfooter)
 			lastfooterpos = footerstr.lastIndexOf(curfooter);
 		    else if(!isfooter)
 			lastfooterpos = footerstr.indexOf(curfooter);
+                    */
                     if(lastfooterpos == -1) // no footer found, use full length
                         carvedstringsize = arraysize;
                     else // footer found, so use it
 		    {
-			if(isfooter)
+			//if(isfooter)
 			    carvedstringsize = lastfooterpos + curfooter.count();
-			else if(!isfooter)
+			//else if(!isfooter)
 			    carvedstringsize = arraysize - lastfooterpos;
 		    }
                 }
@@ -366,12 +373,14 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
                     
 		    // FINDING FOOTER THEN HEADER, MEANS WE GO FROM lastfooterpos and carve carvedstringsize worth...
-		    //QByteArray tmparray = footerarray.left(carvedstringsize);
+		    QByteArray tmparray = footerarray.left(carvedstringsize);
+                    /*
 		    QByteArray tmparray;
 		    if(lastfooterpos != -1)
 			tmparray = footerarray.mid(lastfooterpos, carvedstringsize);
 		    else
 		       tmparray = footerarray.left(carvedstringsize);
+                    */
                     QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
                     qDebug() << "tmpfstr:" << tmpfstr;
                     //qDebug() << "tmparray size:" << tmparray.count();
