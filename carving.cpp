@@ -1,7 +1,7 @@
 #include "carving.h"
 
-// LIBPOPPLER-QT5 HEADER
-#include <poppler-qt5.h>
+// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Distributed under the terms of the GNU General Public License version 2
 
 void HeaderSearch()
 {
@@ -172,7 +172,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
 			footersearch = false;
 		    else if(curheadnam.contains("MPEG"))
 			footersearch = true;
-		    //qDebug() << "footer search is:" << footersearch;
+		    if(footersearch)
+			curheadstr = ctypelist.at(k).split(",").at(3); // footer string instead...
 
                     int bytecount = curheadstr.count() / 2;
                     if(curheadnam.contains("JPEG"))
@@ -181,7 +182,6 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     }
 		    if(footersearch)
 			bytecount = blocksize;
-		    qDebug() << "bytecount:" << bytecount;
                     QByteArray headerarray;
                     headerarray.clear();
                     bool isseek = rawfile.seek(partoffset + (j * blocksize));
@@ -210,6 +210,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
                         }
                         curtypestr = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
                     }
+		    /*
 		    int headleft = -1;
 		    int headright = -1;
 		    if(!footersearch)
@@ -219,29 +220,55 @@ void GenerateCarving(QStringList plist, QStringList flist)
 		    }
 		    else if(footersearch)
 		    {
+			qDebug() << "footerstr:" << curfootstr;
 			headleft = curfootstr.indexOf("?");
 			headright = curfootstr.lastIndexOf("?");
 		    }
-		    /*
+		    */
                     // COMPARE BLOCK HEADER TO THE CURHEADSTR FOR MATCH...
                     int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
                     int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
-                    */
+		    
 		    if(headleft == -1 && headright == -1) // header without ???'s
                     {
-                        if(blockheader.startsWith(curheadstr))
-                        {
-                            blocklist.append(j);
-                            headhash.insert(j, curtypestr);
-                        }
+			/*
+			if(!footersearch)
+			{
+                            if(blockheader.startsWith(curheadstr))
+	                    {
+	                        blocklist.append(j);
+		                headhash.insert(j, curtypestr);
+		            }
+			}
+			else if(footersearch)
+			{*/
+			    //if(blockheader.contains(curfootstr))
+			    if(blockheader.contains(curheadstr))
+			    {
+				blocklist.append(j);
+				headhash.insert(j, curtypestr);
+			    }
+			//}
                     }
                     else // header with ???'s
                     {
-                        if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
-                        {
-                            blocklist.append(j);
-                            headhash.insert(j, curtypestr);
-                        }
+			/*
+			if(!footersearch)
+			{*/
+                            if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
+	                    {
+	                        blocklist.append(j);
+		                headhash.insert(j, curtypestr);
+		            }
+			/*}
+			else if(footersearch)
+			{
+			    if(blockheader.left(headleft).contains(curfootstr.left(headleft)) && blockheader.mid(headright+1).contains(curfootstr.mid(headright+1)))
+			    {
+				blocklist.append(j);
+				headhash.insert(j, curtypestr);
+			    }
+			}*/
                     }
                 }
             }
@@ -352,16 +379,15 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     qDebug() << "tmpfstr:" << tmpfstr;
                     //qDebug() << "tmparray size:" << tmparray.count();
                     //QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
-		    /*
                     QFile tfile(tmpfstr);
                     tfile.open(QIODevice::WriteOnly);
                     QDataStream otbuf(&tfile);
                     otbuf.writeRawData(tmparray, tmparray.count());
                     tfile.close();
-		    */
                     qDebug() << "semi smart carving for mpg here...";
-                    //VideoViewer* tmpvid = new VideoViewer();
-                    //isvalidfile = tmpvid->LoadFile(tmpfstr);
+                    VideoViewer* tmpvid = new VideoViewer();
+                    isvalidfile = tmpvid->LoadFile(tmpfstr);
+		    delete tmpvid;
                     // NEED TO LOOK INTO POSSIBLY USING LIBMPEG2 TO VALIDATE.. OR JUST NOT VALIDATE AT ALL...
                     //bool isvalidload = tmpvid->LoadFile(tmpfstr);
                     //qDebug() << "isvalidload:" << isvalidload;
