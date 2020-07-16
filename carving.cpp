@@ -69,40 +69,153 @@ void PopulateCarvedFiles(QString cfilestr)
     listeditems.append(slist.at(12));
 }
 
+void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid)
+{
+    QString estring = curpartid.split("-").first();
+    QString vstring = curpartid.split("-").at(1);
+    QString pstring = curpartid.split("-").at(2);
+    // get offset and length to find within the mounted raw image file...
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
+    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
+    QStringList evidlist;
+    evidlist.clear();
+    if(!evidfile.isOpen())
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+    {
+        evidlist = QString(evidfile.readLine()).split(",", Qt::SkipEmptyParts);
+        evidfile.close();
+    }
+    QString rawevidencepath = wombatvariable.imgdatapath;
+    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
+        rawevidencepath += evidlist.at(3).split("/").last() + ".raw";
+    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
+        rawevidencepath += evidlist.at(3).split("/").last() + "/ewf1";
+    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
+    {
+        QString imgext = evidlist.at(3).split("/").last().split("/").last();
+        if(imgext.contains("000"))
+            rawevidencepath += evidlist.at(3).split("/").last() + ".raw";
+        else
+            rawevidencepath = evidlist.at(3);
+    }
+    QString evidencename = evidfiles.at(0).split(".e").first();
+    QString partstr = wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat";
+    QFile partfile(partstr);
+    QStringList partlist;
+    partlist.clear();
+    if(!partfile.isOpen())
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(partfile.isOpen())
+    {
+        QString tmpstr = partfile.readLine();
+        partlist = tmpstr.split(",");
+        partfile.close();
+    }
+    //QFile rawfile(rawevidencepath);
+    rawfile.setFileName(rawevidencepath);
+    if(!rawfile.isOpen())
+        rawfile.open(QIODevice::ReadOnly);
+	/*
+        if(rawfile.isOpen())
+        {
+            // loop over the blocks...
+        }
+	*/
+    partoffset = partlist.at(4).toLongLong();
+    blocksize = evidlist.at(2).toLongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
+    partsize = partlist.at(1).toLongLong() - partoffset;
+    //blockcount = partsize / blocksize;
+
+}
+
+void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize)
+{
+    QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
+    QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
+    if(!cfiles.isEmpty())
+    {
+	for(int j=0; j < cfiles.count(); j++)
+	{
+	    qint64 byteoffset = 0;
+	    QFile cfile(wombatvariable.tmpmntpath + "carved/" + cfiles.at(j));
+	    if(!cfile.isOpen())
+		cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	    if(cfile.isOpen())
+		byteoffset = QString(cfile.readLine()).split(",").at(16).toLongLong();
+	    qint64 curblock = byteoffset / blocksize;
+	    headhash.insert(curblock, "");
+	}
+    }
+}
+
+void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile)
+{
+    for(int i=0; i < blockcount; i++)
+    {
+	if(!headhash.contains(i))
+	{
+	    for(int j=0; j < ctypelist.count(); j++)
+	    {
+		QString curheadnam = ctypelist.at(j).split(",").at(1);
+		if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
+		    HeaderSearch(i, ctypelist.at(j), rawfile);
+        	else if(curheadnam.contains("MPEG"))
+		    FooterSearch(i, ctypelist.at(j), rawfile);
+	    }
+	}
+    }
+}
+
+void HeaderSearch(int& j, QString carvetype, QFile& rawfile)
+{
+}
+
+void FooterSearch(int& j, QString carvetype, QFile& rawfile)
+{
+}
+
 void GenerateCarving(QStringList plist, QStringList flist)
 {
-    // CURRENT CARVING METHOD IS TOO COMPLICATED FOR THE BOOLEAN SWITCHER FOR HEADER TO FOOTER VS FOOTER TO HEADER...
-    // NEED TO BREAK IT UP INTO HEADER SEARCH AND FOOTER SEARCH FUNCTIONS WHICH I THEN CALL...
-   
     // DETERMINE WHAT I AM CARVING FOR
     QStringList ctypelist;
     ctypelist.clear();
     GetCarvers(ctypelist, flist);
-    /*
-    QString hpath = QDir::homePath();
-    QStringList ctypelist;
-    ctypelist.clear();
-    hpath += "/.local/share/wombatforensics/";
-    QFile ctypes(hpath + "carvetypes");
-    if(!ctypes.isOpen())
-        ctypes.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(ctypes.isOpen())
-    {
-        QTextStream in(&ctypes);
-        while(!in.atEnd())
-        {
-            QString tmpstr = in.readLine();
-            for(int i=0; i < flist.count(); i++)
-            {
-                if(flist.at(i).contains(tmpstr.split(",").at(1)))
-                    ctypelist.append(tmpstr);
-            }
-        }
-        ctypes.close();
-    }
     // add current carving settings to log somehow...
-    */
     qInfo() << "Carving for:" << ctypelist;
+    for(int i=0; i < plist.count(); i++) // for each partition start carving process...
+    {
+	qint64 partoffset = 0; // partition offset
+	qint64 blocksize = 512; // sector size
+	qint64 partsize = 0; // partition size
+	QFile rawfile; // rawfile dd to pull content from
+	GetPartitionValues(partoffset, blocksize, partsize, rawfile, plist.at(i));
+	qint64 blockcount = partsize / blocksize;
+
+	QHash<int, QString> headhash;
+	headhash.clear();
+	GetExistingCarvedFiles(headhash, blocksize);
+
+	QList<int> blocklist;
+	blocklist.clear();
+	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile);
+	//SecondCarve();
+	//ValidateCarvedFile();
+	//WriteCarvedFile();
+	/*
+	for(int j=0; j < blockcount; j++) // loop over each partition's block
+	{
+	    if(!headhash.contains(j)) // if block already wasn't used by a carved file
+	    {
+		for(int k=0; k < ctypelist.count(); k++) // loop over each carving type for each partition's block
+		{
+		    //FirstCarve(j, ctypelist.at(k), blocklist, headhash, rawfile);
+		}
+	    }
+	}
+	*/
+    }
 
 /*
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
