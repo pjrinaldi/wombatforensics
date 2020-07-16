@@ -397,6 +397,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
                 else
                     vtype = "uc";
                 parstr += vtype;
+		// NEED TO FIX THE CARVEOFFSET FOR MPG SO IT STARTS AT HEADER AND NOT FOOTER...
+		// PROBABLY RECORD HEADER BLOCK FROM FOOTER SEARCH SO I CAN REFERENCE IT BELOW...
                 // DO STAT/TREENODE here and everything else everywhere else to make it work.
                 QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize) + "," + vtype; //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset,validtype ;
                 QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
