@@ -13,6 +13,11 @@ void FooterSearch()
 
 void PopulateCarvedFiles(QString cfilestr)
 {
+    // CURRENT CARVING METHOD IS TOO COMPLICATED FOR THE BOOLEAN SWITCHER FOR HEADER TO FOOTER VS FOOTER TO HEADER...
+    // NEED TO BREAK IT UP INTO HEADER SEARCH AND FOOTER SEARCH FUNCTIONS WHICH I THEN CALL...
+
+
+
     // NEED TO GENERATE THE BLOCKLIST OF USED BLOCKS SO I DON'T RECARVE THE SAME ONES....
     cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
     QString tmpstr = "";
@@ -399,6 +404,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
                 parstr += vtype;
 		// NEED TO FIX THE CARVEOFFSET FOR MPG SO IT STARTS AT HEADER AND NOT FOOTER...
 		// PROBABLY RECORD HEADER BLOCK FROM FOOTER SEARCH SO I CAN REFERENCE IT BELOW...
+		// CARVEOFFSET is block # * blocksize, need to get it from footer find for the header...
                 // DO STAT/TREENODE here and everything else everywhere else to make it work.
                 QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize) + "," + vtype; //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset,validtype ;
                 QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
