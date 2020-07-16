@@ -45,10 +45,10 @@ VideoViewer::~VideoViewer()
 bool VideoViewer::LoadFile(QString filename)
 {
     qDebug() << "filename:" << filename;
-    //vplayer->setFile(filename);
-    //bool tmpbool = vplayer->load();
-    //if(tmpbool)
-    //    return true;
+    vplayer->setFile(filename);
+    bool tmpbool = vplayer->load();
+    if(tmpbool)
+        return true;
     return false;
 }
 

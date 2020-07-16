@@ -365,18 +365,15 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
                     
 		    // FINDING FOOTER THEN HEADER, MEANS WE GO FROM lastfooterpos and carve carvedstringsize worth...
+
 		    QByteArray tmparray = footerarray.left(carvedstringsize);
 		    if(footersearch)
 			tmparray = footerarray.mid(lastfooterpos, carvedstringsize);
-                    /*
-		    QByteArray tmparray;
-		    if(lastfooterpos != -1)
-			tmparray = footerarray.mid(lastfooterpos, carvedstringsize);
-		    else
-		       tmparray = footerarray.left(carvedstringsize);
-                    */
+
+		    /* Using QtAV to check currently fails, so I need to come up with a different way... */
+
                     QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
-                    qDebug() << "tmpfstr:" << tmpfstr;
+                    //qDebug() << "tmpfstr:" << tmpfstr;
                     //qDebug() << "tmparray size:" << tmparray.count();
                     //QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
                     QFile tfile(tmpfstr);
@@ -384,9 +381,10 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     QDataStream otbuf(&tfile);
                     otbuf.writeRawData(tmparray, tmparray.count());
                     tfile.close();
-                    qDebug() << "semi smart carving for mpg here...";
+                    //qDebug() << "semi smart carving for mpg here...";
                     VideoViewer* tmpvid = new VideoViewer();
                     isvalidfile = tmpvid->LoadFile(tmpfstr);
+		    qDebug() << "isvaldifile:" << tmpfstr << isvalidfile;
 		    delete tmpvid;
                     // NEED TO LOOK INTO POSSIBLY USING LIBMPEG2 TO VALIDATE.. OR JUST NOT VALIDATE AT ALL...
                     //bool isvalidload = tmpvid->LoadFile(tmpfstr);
