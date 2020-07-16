@@ -151,6 +151,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
                 headhash.insert(curblock, "");
             }
         }
+	bool footersearch = false;
         for(int j=0; j < blockcount; j++)
         {
 	    /*
@@ -190,11 +191,19 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     QString curfootstr = ctypelist.at(k).split(",").at(3);
                     QString curextstr = ctypelist.at(k).split(",").at(4);
                     QString curmaxsize = ctypelist.at(k).split(",").at(5);
+
+		    if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
+			footersearch = false;
+		    else if(curheadnam.contains("MPEG"))
+			footersearch = true;
+
                     int bytecount = curheadstr.count() / 2;
                     if(curheadnam.contains("JPEG"))
                     {
                         bytecount = 11;
                     }
+		    if(footersearch)
+			bytecount = blocksize;
                     QByteArray headerarray;
                     headerarray.clear();
                     bool isseek = rawfile.seek(partoffset + (j * blocksize));
@@ -223,32 +232,25 @@ void GenerateCarving(QStringList plist, QStringList flist)
                         }
                         curtypestr = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
                     }
-                    /*
-		    QString curcomparestr = "";
 		    int headleft = -1;
 		    int headright = -1;
-		    if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
+		    if(!footersearch)
 		    {
-			// header search here...
-			headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
-                        headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
-			curcomparestr = curheadstr;
+			headleft = curheadstr.indexOf("?");
+			headright = curheadstr.lastIndexOf("?");
 		    }
-		    else if(curheadnam.contains("MPEG"))
+		    else if(footersearch)
 		    {
-			// footer search here...
 			headleft = curfootstr.indexOf("?");
 			headright = curfootstr.lastIndexOf("?");
-			curcomparestr = curfootstr;
 		    }
-                    */
+		    /*
                     // COMPARE BLOCK HEADER TO THE CURHEADSTR FOR MATCH...
                     int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
                     int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
-                    
+                    */
 		    if(headleft == -1 && headright == -1) // header without ???'s
                     {
-                        //if(blockheader.startsWith(curcomparestr))
                         if(blockheader.startsWith(curheadstr))
                         {
                             blocklist.append(j);
@@ -257,7 +259,6 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     }
                     else // header with ???'s
                     {
-                        //if(blockheader.left(headleft).contains(curcomparestr.left(headleft)) && blockheader.mid(headright+1).contains(curcomparestr.mid(headright+1)))
                         if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
                         {
                             blocklist.append(j);
@@ -280,20 +281,9 @@ void GenerateCarving(QStringList plist, QStringList flist)
                 qint64 curmaxsize = curtypestr.split(",").at(5).toLongLong();
                 qint64 arraysize = 0;
                 qint64 carvedstringsize = 0;
-                /*
-		QString curfooter = "";
-		bool isfooter = true;
-		if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-		{
-		    curfooter = curtypestr.split(",").at(3);
-		}
-		else if(curheadnam.contains("MPEG"))
-		{
-		    curfooter = curtypestr.split(",").at(2); // find headers to match...
-		    isfooter = false;
-		}
-                */
-                QString curfooter = curtypestr.split(",").at(3);
+                QString curfooter = curtypestr.split(",").at(3); // find footers
+		if(footersearch)
+		    curfooter = curtypestr.split(",").at(2); // find headers
                 // GENERATE BLOCKLISTSTRING BELOW FOR THE PROPERTY FILE...
                 if(j == (blocklist.count()-1))
                     blockdifference = (blockcount - blocklist.at(j)) * blocksize;
@@ -311,27 +301,24 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     arraysize = blockdifference;
                 QByteArray footerarray;
                 footerarray.clear();
-		//qint64 lastfooterpos = -1;
+		qint64 lastfooterpos = -1;
                 if(!curfooter.isEmpty()) // if footer exists
                 {
                     bool isseek = rawfile.seek(partoffset + (blocklist.at(j) * blocksize));
                     if(isseek)
                         footerarray = rawfile.read(arraysize);
                     QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
-                    qint64 lastfooterpos = footerstr.lastIndexOf(curfooter);
-                    /*
-		    if(isfooter)
-			lastfooterpos = footerstr.lastIndexOf(curfooter);
-		    else if(!isfooter)
+
+                    lastfooterpos = footerstr.lastIndexOf(curfooter);
+		    if(footersearch)
 			lastfooterpos = footerstr.indexOf(curfooter);
-                    */
+
                     if(lastfooterpos == -1) // no footer found, use full length
                         carvedstringsize = arraysize;
                     else // footer found, so use it
 		    {
-			//if(isfooter)
-			    carvedstringsize = lastfooterpos + curfooter.count();
-			//else if(!isfooter)
+			carvedstringsize = lastfooterpos + curfooter.count();
+			if(footersearch)
 			    carvedstringsize = arraysize - lastfooterpos;
 		    }
                 }
@@ -374,6 +361,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     
 		    // FINDING FOOTER THEN HEADER, MEANS WE GO FROM lastfooterpos and carve carvedstringsize worth...
 		    QByteArray tmparray = footerarray.left(carvedstringsize);
+		    if(footersearch)
+			tmparray = footerarray.mid(lastfooterpos, carvedstringsize);
                     /*
 		    QByteArray tmparray;
 		    if(lastfooterpos != -1)
