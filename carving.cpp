@@ -11,13 +11,31 @@ void FooterSearch()
 {
 }
 
+void GetCarvers(QStringList& ctypelist, QStringList flist) 
+{
+    QString hpath = QDir::homePath();
+    hpath += "/.local/share/wombatforensics/";
+    QFile ctypes(hpath + "carvetypes");
+    if(!ctypes.isOpen())
+	ctypes.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(ctypes.isOpen())
+    {
+        QTextStream in(&ctypes);
+        while(!in.atEnd())
+        {
+            QString tmpstr = in.readLine();
+            for(int i=0; i < flist.count(); i++)
+            {
+                if(flist.at(i).contains(tmpstr.split(",").at(1)))
+                    ctypelist.append(tmpstr);
+            }
+        }
+        ctypes.close();
+    }
+}
+
 void PopulateCarvedFiles(QString cfilestr)
 {
-    // CURRENT CARVING METHOD IS TOO COMPLICATED FOR THE BOOLEAN SWITCHER FOR HEADER TO FOOTER VS FOOTER TO HEADER...
-    // NEED TO BREAK IT UP INTO HEADER SEARCH AND FOOTER SEARCH FUNCTIONS WHICH I THEN CALL...
-
-
-
     // NEED TO GENERATE THE BLOCKLIST OF USED BLOCKS SO I DON'T RECARVE THE SAME ONES....
     cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
     QString tmpstr = "";
@@ -53,6 +71,14 @@ void PopulateCarvedFiles(QString cfilestr)
 
 void GenerateCarving(QStringList plist, QStringList flist)
 {
+    // CURRENT CARVING METHOD IS TOO COMPLICATED FOR THE BOOLEAN SWITCHER FOR HEADER TO FOOTER VS FOOTER TO HEADER...
+    // NEED TO BREAK IT UP INTO HEADER SEARCH AND FOOTER SEARCH FUNCTIONS WHICH I THEN CALL...
+   
+    // DETERMINE WHAT I AM CARVING FOR
+    QStringList ctypelist;
+    ctypelist.clear();
+    GetCarvers(ctypelist, flist);
+    /*
     QString hpath = QDir::homePath();
     QStringList ctypelist;
     ctypelist.clear();
@@ -75,9 +101,10 @@ void GenerateCarving(QStringList plist, QStringList flist)
         ctypes.close();
     }
     // add current carving settings to log somehow...
+    */
     qInfo() << "Carving for:" << ctypelist;
 
-
+/*
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
     for(int i=0; i < plist.count(); i++)
     {
@@ -130,16 +157,19 @@ void GenerateCarving(QStringList plist, QStringList flist)
         QFile rawfile(rawevidencepath);
         if(!rawfile.isOpen())
             rawfile.open(QIODevice::ReadOnly);
+	/*
         if(rawfile.isOpen())
         {
             // loop over the blocks...
         }
-        qint64 partoffset = partlist.at(4).toLongLong();
+	*/
+/*        qint64 partoffset = partlist.at(4).toLongLong();
         qint64 blocksize = evidlist.at(2).toLongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
         //qint64 blocksize = partlist.at(6).toLongLong(); // FS CLUSTER SIZE
         qint64 partsize = partlist.at(1).toLongLong() - partoffset;
         qint64 blockcount = partsize / blocksize;
-        // GET ALREADY CARVED FILES
+        
+	// GET ALREADY CARVED FILES
         QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
         QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
         if(!cfiles.isEmpty())
@@ -156,6 +186,10 @@ void GenerateCarving(QStringList plist, QStringList flist)
                 headhash.insert(curblock, "");
             }
         }
+	//HeaderSearch(&headhash, blockcount, partoffset, &ctypelist, rawfile)
+	// OR FUNCTION EVERYTHING INCLUDING RAWFILE, HEADHASH, ETC...
+	// OR IS THERE A WAY TO DO EACH PART SEPARATE, SUCH AS FIND BLOCKS, SKIP EXISTING, ETC...
+	// MIGRATE EVERYTHING BELOW INTO THE HEADERSEARCH() AND FOOTERSEARCH() FUNCTIONS
 	bool footersearch = false;
         for(int j=0; j < blockcount; j++)
         {
@@ -165,6 +199,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
             {
                 for(int k=0; k < ctypelist.count(); k++)
                 {
+		    //HeaderSearch(j, ctypelist.at(k), &rawfile);
+		    //FooterSearch(j, ctypelist.at(k), &rawfile);
                     QString curtypestr = ctypelist.at(k);
                     QString curheadcat = ctypelist.at(k).split(",").at(0);
                     QString curheadnam = ctypelist.at(k).split(",").at(1);
@@ -231,7 +267,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 		    }
 		    */
                     // COMPARE BLOCK HEADER TO THE CURHEADSTR FOR MATCH...
-                    int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
+/*                    int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
                     int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
 		    
 		    if(headleft == -1 && headright == -1) // header without ???'s
@@ -248,7 +284,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 			else if(footersearch)
 			{*/
 			    //if(blockheader.contains(curfootstr))
-			    if(blockheader.contains(curheadstr))
+/*			    if(blockheader.contains(curheadstr))
 			    {
 				blocklist.append(j);
 				headhash.insert(j, curtypestr);
@@ -260,7 +296,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 			/*
 			if(!footersearch)
 			{*/
-                            if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
+/*                            if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
 	                    {
 	                        blocklist.append(j);
 		                headhash.insert(j, curtypestr);
@@ -274,7 +310,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 				headhash.insert(j, curtypestr);
 			    }
 			}*/
-                    }
+/*                    }
                 }
             }
         }
@@ -377,7 +413,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 
 		    /* Using QtAV to check currently fails, so I need to come up with a different way... */
 
-                    QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
+/*                    QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
                     //qDebug() << "tmpfstr:" << tmpfstr;
                     //qDebug() << "tmparray size:" << tmparray.count();
                     //QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
@@ -438,7 +474,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
             otbuf.writeRawData(tmparray, tmparray.count());
             tfile.close();
             */
-        }
+/*        }
         rawfile.close();
     }
+*/
 }
