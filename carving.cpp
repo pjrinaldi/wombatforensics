@@ -154,30 +154,6 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	bool footersearch = false;
         for(int j=0; j < blockcount; j++)
         {
-	    /*
-	     * CALL HEADERSEARCH OR FOOTERSEARCH HERE...
-	    if(curtypestr.split(",").at(1).contains("JPEG")) // jpeg carving
-	    {
-		//HeaderSearch(curblock, &headhash);
-	    }
-	    else if(curtypestr.split(",").at(1).contains("PNG")) // png carving
-	    {
-		//HeaderSearch();
-	    }
-	    else if(curtypestr.split(",").at(1).contains("GIF")) // gif carving
-	    {
-		//HeaderSearch();
-	    }
-	    else if(curtypestr.split(",").at(1).contains("PDF")) // pdf carving
-	    {
-		//HeaderSearch();
-	    }
-	    else if(curtypestr.split(",").at(1).contains("MPEG")) // mpeg carving
-	    {
-		//FooterSearch();
-	    }
-	    */
-
             // MIGHT USE HEADHASH AS A VARIABLE GENERATED AT START TIME, BUT I'LL FIGURE IT OUT.
             //QString curkey = pstring + "-b" + QString::number(j);
             if(!headhash.contains(j))
@@ -196,6 +172,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 			footersearch = false;
 		    else if(curheadnam.contains("MPEG"))
 			footersearch = true;
+		    //qDebug() << "footer search is:" << footersearch;
 
                     int bytecount = curheadstr.count() / 2;
                     if(curheadnam.contains("JPEG"))
@@ -204,6 +181,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
                     }
 		    if(footersearch)
 			bytecount = blocksize;
+		    qDebug() << "bytecount:" << bytecount;
                     QByteArray headerarray;
                     headerarray.clear();
                     bool isseek = rawfile.seek(partoffset + (j * blocksize));
