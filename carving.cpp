@@ -185,6 +185,7 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
 
 void HeaderSearch(int& j, QString carvetype, QFile& rawfile)
 {
+    /*
     QString curtypestr = ctypelist.at(k);
     QString curheadcat = ctypelist.at(k).split(",").at(0);
     QString curheadnam = ctypelist.at(k).split(",").at(1);
@@ -295,7 +296,7 @@ void HeaderSearch(int& j, QString carvetype, QFile& rawfile)
             }
         }*/
 /*                    }
-
+*/
 }
 
 void FooterSearch(int& j, QString carvetype, QFile& rawfile)
