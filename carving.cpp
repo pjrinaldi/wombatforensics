@@ -3,14 +3,6 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distributed under the terms of the GNU General Public License version 2
 
-void HeaderSearch()
-{
-}
-
-void FooterSearch()
-{
-}
-
 void GetCarvers(QStringList& ctypelist, QStringList flist) 
 {
     QString hpath = QDir::homePath();
@@ -67,6 +59,29 @@ void PopulateCarvedFiles(QString cfilestr)
         treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-" + slist.at(17)), 15, 0);
     mutex.unlock();
     listeditems.append(slist.at(12));
+}
+
+void GetCarvers(QStringList& ctypelist, QStringList flist) 
+{
+    QString hpath = QDir::homePath();
+    hpath += "/.local/share/wombatforensics/";
+    QFile ctypes(hpath + "carvetypes");
+    if(!ctypes.isOpen())
+	ctypes.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(ctypes.isOpen())
+    {
+        QTextStream in(&ctypes);
+        while(!in.atEnd())
+        {
+            QString tmpstr = in.readLine();
+            for(int i=0; i < flist.count(); i++)
+            {
+                if(flist.at(i).contains(tmpstr.split(",").at(1)))
+                    ctypelist.append(tmpstr);
+            }
+        }
+        ctypes.close();
+    }
 }
 
 void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid)
@@ -170,6 +185,117 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
 
 void HeaderSearch(int& j, QString carvetype, QFile& rawfile)
 {
+    QString curtypestr = ctypelist.at(k);
+    QString curheadcat = ctypelist.at(k).split(",").at(0);
+    QString curheadnam = ctypelist.at(k).split(",").at(1);
+    QString curheadstr = ctypelist.at(k).split(",").at(2);
+    QString curfootstr = ctypelist.at(k).split(",").at(3);
+    QString curextstr = ctypelist.at(k).split(",").at(4);
+    QString curmaxsize = ctypelist.at(k).split(",").at(5);
+
+    if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
+        footersearch = false;
+    else if(curheadnam.contains("MPEG"))
+        footersearch = true;
+    if(footersearch)
+        curheadstr = ctypelist.at(k).split(",").at(3); // footer string instead...
+
+    int bytecount = curheadstr.count() / 2;
+    if(curheadnam.contains("JPEG"))
+    {
+        bytecount = 11;
+    }
+    if(footersearch)
+        bytecount = blocksize;
+    QByteArray headerarray;
+    headerarray.clear();
+    bool isseek = rawfile.seek(partoffset + (j * blocksize));
+    if(isseek)
+        headerarray = rawfile.read(bytecount);
+    QString blockheader = QString::fromStdString(headerarray.toHex(0).toStdString()).toUpper();
+    if(curheadnam.contains("JPEG"))
+    {
+        QString exifjpghdr = "FFD8FFE1????45786966";
+        QString spifjpghdr = "FFD8FFE8????5350494646";
+        QString jfifjpghdr = "FFD8FFE0????4A464946";
+        if(blockheader.contains("FFD8FFE1") && blockheader.contains("45786966")) // EXIF JPEG
+        {
+            curheadnam = "EXIF JPEG";
+            curheadstr = exifjpghdr;
+        }
+        else if(blockheader.contains("FFD8FFE8") && blockheader.contains("5350494646")) // SPIFF JPEG
+        {
+            curheadnam = "SPIFF JPEG";
+            curheadstr = spifjpghdr;
+        }
+        else if(blockheader.contains("FFD8FFE0") && blockheader.contains("4A464946")) // JFIF JPEG
+        {
+            curheadnam = "JFIF JPEG";
+            curheadstr = jfifjpghdr;
+        }
+        curtypestr = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
+    }
+    /*
+    int headleft = -1;
+    int headright = -1;
+    if(!footersearch)
+    {
+        headleft = curheadstr.indexOf("?");
+        headright = curheadstr.lastIndexOf("?");
+    }
+    else if(footersearch)
+    {
+        qDebug() << "footerstr:" << curfootstr;
+        headleft = curfootstr.indexOf("?");
+        headright = curfootstr.lastIndexOf("?");
+    }
+    */
+    // COMPARE BLOCK HEADER TO THE CURHEADSTR FOR MATCH...
+/*                    int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
+    int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
+    
+    if(headleft == -1 && headright == -1) // header without ???'s
+    {
+        /*
+        if(!footersearch)
+        {
+            if(blockheader.startsWith(curheadstr))
+            {
+                blocklist.append(j);
+                headhash.insert(j, curtypestr);
+            }
+        }
+        else if(footersearch)
+        {*/
+            //if(blockheader.contains(curfootstr))
+/*			    if(blockheader.contains(curheadstr))
+            {
+                blocklist.append(j);
+                headhash.insert(j, curtypestr);
+            }
+        //}
+    }
+    else // header with ???'s
+    {
+        /*
+        if(!footersearch)
+        {*/
+/*                            if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
+            {
+                blocklist.append(j);
+                headhash.insert(j, curtypestr);
+            }
+        /*}
+        else if(footersearch)
+        {
+            if(blockheader.left(headleft).contains(curfootstr.left(headleft)) && blockheader.mid(headright+1).contains(curfootstr.mid(headright+1)))
+            {
+                blocklist.append(j);
+                headhash.insert(j, curtypestr);
+            }
+        }*/
+/*                    }
+
 }
 
 void FooterSearch(int& j, QString carvetype, QFile& rawfile)

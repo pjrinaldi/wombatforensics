@@ -4,7 +4,6 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distributed under the terms of the GNU General Public License version 2
 
-
 #include "globals.h"
 #include "videoviewer.h"
 // LIBPOPPLER-QT5 HEADER
@@ -12,8 +11,6 @@
 
 void GenerateCarving(QStringList plist, QStringList flist);
 void PopulateCarvedFiles(QString cfile);
-void HeaderSearch();
-void FooterSearch();
 void GetCarvers(QStringList& ctypelist, QStringList flist); 
 void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid);
 void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize);
