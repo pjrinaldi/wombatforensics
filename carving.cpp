@@ -3,31 +3,6 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distributed under the terms of the GNU General Public License version 2
 
-/*
-void GetCarvers(QStringList& ctypelist, QStringList flist) 
-{
-    QString hpath = QDir::homePath();
-    hpath += "/.local/share/wombatforensics/";
-    QFile ctypes(hpath + "carvetypes");
-    if(!ctypes.isOpen())
-	ctypes.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(ctypes.isOpen())
-    {
-        QTextStream in(&ctypes);
-        while(!in.atEnd())
-        {
-            QString tmpstr = in.readLine();
-            for(int i=0; i < flist.count(); i++)
-            {
-                if(flist.at(i).contains(tmpstr.split(",").at(1)))
-                    ctypelist.append(tmpstr);
-            }
-        }
-        ctypes.close();
-    }
-}
-*/
-
 void PopulateCarvedFiles(QString cfilestr)
 {
     // NEED TO GENERATE THE BLOCKLIST OF USED BLOCKS SO I DON'T RECARVE THE SAME ONES....
