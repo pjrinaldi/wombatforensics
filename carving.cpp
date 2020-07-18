@@ -201,10 +201,6 @@ void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, 
     bool isseek = rawfile.seek(partoffset + (j * blocksize));
     if(isseek)
         headerarray = rawfile.read(bytecount);
-    /*
-    bool isseek = rawfile.seek(partoffset + (j * blocksize));
-    if(isseek)
-        headerarray = rawfile.read(bytecount);
     QString blockheader = QString::fromStdString(headerarray.toHex(0).toStdString()).toUpper();
     if(curheadnam.contains("JPEG"))
     {
@@ -226,7 +222,7 @@ void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, 
             curheadnam = "JFIF JPEG";
             curheadstr = jfifjpghdr;
         }
-        curtypestr = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
+        carvetype = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
     }
     /*
     int headleft = -1;
