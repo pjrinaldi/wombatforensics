@@ -13,9 +13,9 @@ void GenerateCarving(QStringList plist, QStringList flist);
 void PopulateCarvedFiles(QString cfile);
 void GetCarvers(QStringList& ctypelist, QStringList flist); 
 void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid);
-void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize);
-void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile);
-void HeaderSearch(int& j, QString carvetype, QFile& rawfile);
+void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize, qint64& partoffset);
+void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile, qint64& blocksize, qint64& partoffset);
+void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset);
 void FooterSearch(int& j, QString carvetype, QFile& rawfile);
 
 #endif // carving.h

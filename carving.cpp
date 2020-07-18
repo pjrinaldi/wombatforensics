@@ -3,6 +3,7 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distributed under the terms of the GNU General Public License version 2
 
+/*
 void GetCarvers(QStringList& ctypelist, QStringList flist) 
 {
     QString hpath = QDir::homePath();
@@ -25,6 +26,7 @@ void GetCarvers(QStringList& ctypelist, QStringList flist)
         ctypes.close();
     }
 }
+*/
 
 void PopulateCarvedFiles(QString cfilestr)
 {
@@ -165,7 +167,7 @@ void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize)
     }
 }
 
-void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile)
+void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile, qint64& blocksize, qint64& partoffset)
 {
     for(int i=0; i < blockcount; i++)
     {
@@ -175,7 +177,7 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
 	    {
 		QString curheadnam = ctypelist.at(j).split(",").at(1);
 		if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-		    HeaderSearch(i, ctypelist.at(j), rawfile);
+		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset);
         	else if(curheadnam.contains("MPEG"))
 		    FooterSearch(i, ctypelist.at(j), rawfile);
 	    }
@@ -183,33 +185,23 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
     }
 }
 
-void HeaderSearch(int& j, QString carvetype, QFile& rawfile)
+void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset)
 {
-    /*
-    QString curtypestr = ctypelist.at(k);
-    QString curheadcat = ctypelist.at(k).split(",").at(0);
-    QString curheadnam = ctypelist.at(k).split(",").at(1);
-    QString curheadstr = ctypelist.at(k).split(",").at(2);
-    QString curfootstr = ctypelist.at(k).split(",").at(3);
-    QString curextstr = ctypelist.at(k).split(",").at(4);
-    QString curmaxsize = ctypelist.at(k).split(",").at(5);
-
-    if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-        footersearch = false;
-    else if(curheadnam.contains("MPEG"))
-        footersearch = true;
-    if(footersearch)
-        curheadstr = ctypelist.at(k).split(",").at(3); // footer string instead...
-
+    QString curheadcat = carvetype.split(",").at(0);
+    QString curheadnam = carvetype.split(",").at(1);
+    QString curheadstr = carvetype.split(",").at(2);
+    QString curfootstr = carvetype.split(",").at(3);
+    QString curextstr = carvetype.split(",").at(4);
+    QString curmaxsize = carvetype.split(",").at(5);
     int bytecount = curheadstr.count() / 2;
     if(curheadnam.contains("JPEG"))
-    {
         bytecount = 11;
-    }
-    if(footersearch)
-        bytecount = blocksize;
     QByteArray headerarray;
     headerarray.clear();
+    bool isseek = rawfile.seek(partoffset + (j * blocksize));
+    if(isseek)
+        headerarray = rawfile.read(bytecount);
+    /*
     bool isseek = rawfile.seek(partoffset + (j * blocksize));
     if(isseek)
         headerarray = rawfile.read(bytecount);
@@ -326,7 +318,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 
 	QList<int> blocklist;
 	blocklist.clear();
-	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile);
+	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	//SecondCarve();
 	//ValidateCarvedFile();
 	//WriteCarvedFile();
