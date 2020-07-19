@@ -17,7 +17,7 @@ void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize, qi
 void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile, qint64& blocksize, qint64& partoffset);
 void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset, QList<int>& blocklist, QHash<int, QString>& headhash);
 void FooterSearch(int& j, QString carvetype, QFile& rawfile);
-void HeaderFooterSearch(QString& carvetype, int& blocklistcount, int& j);
-void FooterHeaderSearch(QString& carvetype, int& blocklistcount, int& j);
+void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j);
+void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j);
 
 #endif // carving.h
