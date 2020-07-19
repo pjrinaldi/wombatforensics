@@ -248,6 +248,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	QList<int> blocklist;
 	blocklist.clear();
 	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
+	qInfo() << blocklist.count() << "Headers found. Starting footer search...";
 	//SecondCarve();
 	//ValidateCarvedFile();
 	//WriteCarvedFile();
