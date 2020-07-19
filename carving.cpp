@@ -164,18 +164,13 @@ void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash)
 {
     for(int i=0; i < blocklist.count(); i++)
     {
+        int blocklistcount = blocklist.count();
         QString curtypestr = headhash.value(blocklist.at(i));
         QString curheadnam = curtypestr.split(",").at(1);
         if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-        {
-            int blocklistcount = blocklist.count();
             HeaderFooterSearch(curtypestr, blocklistcount, i);
-            //HeaderFooterSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
-        }
         else if(curheadnam.contains("MPEG"))
-        {
-            //FooterHeaderSearch(i, ctypelist.at(j), rawfile);
-        }
+            FooterHeaderSearch(curtypestr, blocklistcount, i);
     }
 }
 
@@ -304,6 +299,10 @@ void HeaderFooterSearch(QString& carvetype, int& blocklistcount, int& j)
 
 }
 
+void FooterHeaderSearch(QString& carvetype, int& blocklistcount, int& j)
+{
+}
+
 void GenerateCarving(QStringList plist, QStringList flist)
 {
     // DETERMINE WHAT I AM CARVING FOR
@@ -329,7 +328,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	blocklist.clear();
 	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	qInfo() << blocklist.count() << "Headers found. Starting footer search...";
-	//SecondCarve();
+        SecondCarve(blocklist, headhash);
 	//ValidateCarvedFile();
 	//WriteCarvedFile();
 	/*
