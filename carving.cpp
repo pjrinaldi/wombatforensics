@@ -160,14 +160,14 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
     }
 }
 
-void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash)
+void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount)
 {
     for(int i=0; i < blocklist.count(); i++)
     {
         QString curtypestr = headhash.value(blocklist.at(i));
         QString curheadnam = curtypestr.split(",").at(1);
         if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-            HeaderFooterSearch(curtypestr, blocklist, i);
+            HeaderFooterSearch(curtypestr, blocklist, i, blocksize, rawfile, partoffset, blockcount);
         else if(curheadnam.contains("MPEG"))
             FooterHeaderSearch(curtypestr, blocklist, i);
     }
@@ -237,20 +237,17 @@ void FooterSearch(int& j, QString carvetype, QFile& rawfile)
 {
 }
 
-void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j)
+void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount)
 {
     qint64 blockdifference = 0;
     qint64 curmaxsize = carvetype.split(",").at(5).toLongLong();
     qint64 arraysize = 0;
     qint64 carvedstringsize = 0;
     QString curfooter = carvetype.split(",").at(3); // find footers
-    /*
-    // GENERATE BLOCKLISTSTRING BELOW FOR THE PROPERTY FILE...
-    if(j == (blocklistcount-1))
-        blockdifference = (blockcount - blocklist.at(j)) * blocksize;
+    if(j == (blocklist.count() - 1))
+        blockdifference = (blocklist.count() - blocklist.at(j)) * blocksize;
     else
         blockdifference = (blocklist.at(j+1) - blocklist.at(j)) * blocksize;
-    // I THINK I SHOULD USE BLOCKDIFFERENCE REGARDLESS TO LOOK FOR FOOTERS IF NO FOOTER, THEN GO WITH CURMAXSIZE IF J == BLOCKLIST.COUNT() - 1.
     if(curfooter.isEmpty() && j == (blocklist.count() - 1))
     {
         if(blockdifference < curmaxsize)
@@ -271,22 +268,13 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j)
         QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
 
         lastfooterpos = footerstr.lastIndexOf(curfooter);
-        if(footersearch)
-            lastfooterpos = footerstr.indexOf(curfooter);
-
         if(lastfooterpos == -1) // no footer found, use full length
             carvedstringsize = arraysize;
         else // footer found, so use it
-        {
             carvedstringsize = lastfooterpos + curfooter.count();
-            if(footersearch)
-                carvedstringsize = arraysize - lastfooterpos;
-        }
     }
     else // no footer defined, just use arraysize as size
         carvedstringsize = arraysize;
-    */
-
 }
 
 void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j)
@@ -318,7 +306,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	blocklist.clear();
 	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	qInfo() << blocklist.count() << "Headers found. Starting footer search...";
-        SecondCarve(blocklist, headhash);
+        SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount);
 	//ValidateCarvedFile();
 	//WriteCarvedFile();
 	/*
