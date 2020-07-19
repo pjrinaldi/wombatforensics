@@ -152,7 +152,7 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
 	    {
 		QString curheadnam = ctypelist.at(j).split(",").at(1);
 		if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset);
+		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
         	else if(curheadnam.contains("MPEG"))
 		    FooterSearch(i, ctypelist.at(j), rawfile);
 	    }
@@ -160,7 +160,7 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
     }
 }
 
-void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset)
+void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset, QList<int>& blocklist, QHash<int, QString>& headhash)
 {
     QString curheadcat = carvetype.split(",").at(0);
     QString curheadnam = carvetype.split(",").at(1);
@@ -199,67 +199,25 @@ void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, 
         }
         carvetype = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
     }
-    /*
-    int headleft = -1;
-    int headright = -1;
-    if(!footersearch)
-    {
-        headleft = curheadstr.indexOf("?");
-        headright = curheadstr.lastIndexOf("?");
-    }
-    else if(footersearch)
-    {
-        qDebug() << "footerstr:" << curfootstr;
-        headleft = curfootstr.indexOf("?");
-        headright = curfootstr.lastIndexOf("?");
-    }
-    */
     // COMPARE BLOCK HEADER TO THE CURHEADSTR FOR MATCH...
-/*                    int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
-    int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
-    
+    int headleft = curheadstr.indexOf("?");
+    int headright = curheadstr.lastIndexOf("?");
     if(headleft == -1 && headright == -1) // header without ???'s
     {
-        /*
-        if(!footersearch)
+        if(blockheader.startsWith(curheadstr))
         {
-            if(blockheader.startsWith(curheadstr))
-            {
-                blocklist.append(j);
-                headhash.insert(j, curtypestr);
-            }
+            blocklist.append(j);
+            headhash.insert(j, carvetype);
         }
-        else if(footersearch)
-        {*/
-            //if(blockheader.contains(curfootstr))
-/*			    if(blockheader.contains(curheadstr))
-            {
-                blocklist.append(j);
-                headhash.insert(j, curtypestr);
-            }
-        //}
     }
     else // header with ???'s
     {
-        /*
-        if(!footersearch)
-        {*/
-/*                            if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
-            {
-                blocklist.append(j);
-                headhash.insert(j, curtypestr);
-            }
-        /*}
-        else if(footersearch)
+        if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
         {
-            if(blockheader.left(headleft).contains(curfootstr.left(headleft)) && blockheader.mid(headright+1).contains(curfootstr.mid(headright+1)))
-            {
-                blocklist.append(j);
-                headhash.insert(j, curtypestr);
-            }
-        }*/
-/*                    }
-*/
+            blocklist.append(j);
+            headhash.insert(j, carvetype);
+        }
+    }
 }
 
 void FooterSearch(int& j, QString carvetype, QFile& rawfile)
