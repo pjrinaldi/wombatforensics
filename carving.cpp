@@ -160,14 +160,14 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
     }
 }
 
-void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount)
+void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray)
 {
     for(int i=0; i < blocklist.count(); i++)
     {
         QString curtypestr = headhash.value(blocklist.at(i));
         QString curheadnam = curtypestr.split(",").at(1);
         if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-            HeaderFooterSearch(curtypestr, blocklist, i, blocksize, rawfile, partoffset, blockcount);
+            HeaderFooterSearch(curtypestr, blocklist, i, blocksize, rawfile, partoffset, blockcount, footerarray);
         else if(curheadnam.contains("MPEG"))
             FooterHeaderSearch(curtypestr, blocklist, i);
     }
@@ -237,7 +237,7 @@ void FooterSearch(int& j, QString carvetype, QFile& rawfile)
 {
 }
 
-void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount)
+void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray)
 {
     qint64 blockdifference = 0;
     qint64 curmaxsize = carvetype.split(",").at(5).toLongLong();
@@ -257,8 +257,8 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
     }
     else
         arraysize = blockdifference;
-    QByteArray footerarray;
-    footerarray.clear();
+    //QByteArray footerarray;
+    //footerarray.clear();
     qint64 lastfooterpos = -1;
     if(!curfooter.isEmpty()) // if footer exists
     {
@@ -279,6 +279,70 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
 
 void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j)
 {
+}
+
+void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray)
+{
+    QImage testimg;
+    if(curtypestr.split(",").at(1).contains("JPEG")) // validity check for jpeg
+        isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "jpg");
+    else if(curtypestr.split(",").at(1).contains("PNG")) // validity check for png
+        isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "png");
+    else if(curtypestr.split(",").at(1).contains("GIF")) // validity check for gif
+        isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "gif");
+    else if(curtypestr.split(",").at(1).contains("PDF")) // validity check for pdf
+    {
+        Poppler::Document* tmpdoc = NULL;
+        tmpdoc = Poppler::Document::loadFromData(footerarray.left(carvedstringsize));
+        if(tmpdoc != NULL)
+        {
+            Poppler::Page* tmppage = NULL;
+            tmppage = tmpdoc->page(0); // load initial page
+            if(tmppage != NULL)
+            {
+                QImage curimage = tmppage->renderToImage();
+                isvalidfile = curimage.isNull();
+            }
+            delete tmppage;
+        }
+        delete tmpdoc;
+    }
+    else if(curtypestr.split(",").at(1).contains("MPEG"))
+    {
+        // MPG NEEDS TO BE FOUND A DIFFERENT WAY BECAUSE THE HEADER SHOWS UP EVERYWHERE...
+        // I THINK THE SIMPLEST APPROACH IS TO LOOK FOR THE FOOTER AND THEN GO BACKWARDS FOR THE HEADER BETWEEN FOOTERS...
+        // IF THIS WORKS, THIS WILL SAVE ME LEARNING ALL ABOUT VIDEO FORMATS, TO CARVE THESE A DIFFERENT WAY...
+        //QtAV::AVPlayer* tmpplayer = new QtAV::AVPlayer(this);
+        // NEED TO ATTEMPT TO LOAD THE VIDEO, AND SEE IF IT LOADED SUCCESSFULLY IN A PLAYER, THEN CHECK AND SEE IF THERE IS ANOTHER
+        // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
+        
+        // FINDING FOOTER THEN HEADER, MEANS WE GO FROM lastfooterpos and carve carvedstringsize worth...
+
+        QByteArray tmparray = footerarray.left(carvedstringsize);
+        if(footersearch)
+            tmparray = footerarray.mid(lastfooterpos, carvedstringsize);
+
+        /* Using QtAV to check currently fails, so I need to come up with a different way... */
+
+        QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
+        //qDebug() << "tmpfstr:" << tmpfstr;
+        //qDebug() << "tmparray size:" << tmparray.count();
+        //QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
+        QFile tfile(tmpfstr);
+        tfile.open(QIODevice::WriteOnly);
+        QDataStream otbuf(&tfile);
+        otbuf.writeRawData(tmparray, tmparray.count());
+        tfile.close();
+        //qDebug() << "semi smart carving for mpg here...";
+        VideoViewer* tmpvid = new VideoViewer();
+        isvalidfile = tmpvid->LoadFile(tmpfstr);
+        qDebug() << "isvaldifile:" << tmpfstr << isvalidfile;
+        delete tmpvid;
+        // NEED TO LOOK INTO POSSIBLY USING LIBMPEG2 TO VALIDATE.. OR JUST NOT VALIDATE AT ALL...
+        //bool isvalidload = tmpvid->LoadFile(tmpfstr);
+        //qDebug() << "isvalidload:" << isvalidload;
+    }
+
 }
 
 void GenerateCarving(QStringList plist, QStringList flist)
@@ -306,21 +370,12 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	blocklist.clear();
 	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	qInfo() << blocklist.count() << "Headers found. Starting footer search...";
-        SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount);
-	//ValidateCarvedFile();
+        QByteArray footerarray;
+        footerarray.clear();
+        SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray);
+        bool isvalidfile = false;
+	ValidateCarvedFile(isvalidfile, footerarray);
 	//WriteCarvedFile();
-	/*
-	for(int j=0; j < blockcount; j++) // loop over each partition's block
-	{
-	    if(!headhash.contains(j)) // if block already wasn't used by a carved file
-	    {
-		for(int k=0; k < ctypelist.count(); k++) // loop over each carving type for each partition's block
-		{
-		    //FirstCarve(j, ctypelist.at(k), blocklist, headhash, rawfile);
-		}
-	    }
-	}
-	*/
     }
 
 /*
