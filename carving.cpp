@@ -8,37 +8,36 @@ void PopulateCarvedFiles(QString cfilestr)
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(cfilestr.split(".").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap));
     if(indexlist.count() == 0)
     {
-    // NEED TO GENERATE THE BLOCKLIST OF USED BLOCKS SO I DON'T RECARVE THE SAME ONES....
-    cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
-    QString tmpstr = "";
-    QFile cfile(cfilestr);
-    if(!cfile.isOpen())
-        cfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(cfile.isOpen())
-        tmpstr = cfile.readLine();
-    cfile.close();
-    QStringList slist = tmpstr.split(",");
-    QList<QVariant> nodedata;
-    nodedata.clear();
-    nodedata << slist.at(0); // name
-    nodedata << slist.at(3); // path
-    nodedata << slist.at(8); // size
-    nodedata << slist.at(6); // crtime
-    nodedata << slist.at(4); // atime
-    nodedata << slist.at(7); // mtime
-    nodedata << slist.at(5); // ctime
-    nodedata << slist.at(13); // hash
-    nodedata << QString(slist.at(10)).split("/").first(); // category
-    nodedata << QString(slist.at(10)).split("/").last(); // signature
-    nodedata << slist.at(15); // tag
-    nodedata << slist.at(12); // id
-    mutex.lock();
-    if(slist.at(12).split("-").count() == 2)
-        treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-").first() + "-mc"), 15, 0);
-    else
-        treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-" + slist.at(17)), 15, 0);
-    mutex.unlock();
-    listeditems.append(slist.at(12));
+	cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
+	QString tmpstr = "";
+	QFile cfile(cfilestr);
+	if(!cfile.isOpen())
+	    cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	if(cfile.isOpen())
+	    tmpstr = cfile.readLine();
+	cfile.close();
+	QStringList slist = tmpstr.split(",");
+	QList<QVariant> nodedata;
+	nodedata.clear();
+	nodedata << slist.at(0); // name
+	nodedata << slist.at(3); // path
+	nodedata << slist.at(8); // size
+	nodedata << slist.at(6); // crtime
+	nodedata << slist.at(4); // atime
+	nodedata << slist.at(7); // mtime
+	nodedata << slist.at(5); // ctime
+	nodedata << slist.at(13); // hash
+	nodedata << QString(slist.at(10)).split("/").first(); // category
+	nodedata << QString(slist.at(10)).split("/").last(); // signature
+	nodedata << slist.at(15); // tag
+	nodedata << slist.at(12); // id
+	mutex.lock();
+	if(slist.at(12).split("-").count() == 2)
+	    treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-").first() + "-mc"), 15, 0);
+	else
+	    treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-" + slist.at(17)), 15, 0);
+	mutex.unlock();
+	listeditems.append(slist.at(12));
     }
 }
 
@@ -109,20 +108,12 @@ void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize,
         partlist = tmpstr.split(",");
         partfile.close();
     }
-    //QFile rawfile(rawevidencepath);
     rawfile.setFileName(rawevidencepath);
     if(!rawfile.isOpen())
         rawfile.open(QIODevice::ReadOnly);
-	/*
-        if(rawfile.isOpen())
-        {
-            // loop over the blocks...
-        }
-	*/
     partoffset = partlist.at(4).toLongLong();
     blocksize = evidlist.at(2).toLongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
     partsize = partlist.at(1).toLongLong() - partoffset;
-    //blockcount = partsize / blocksize;
 
 }
 
@@ -253,7 +244,6 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
     qint64 blockdifference = 0;
     qint64 curmaxsize = carvetype.split(",").at(5).toLongLong();
     qint64 arraysize = 0;
-    //qint64 carvedstringsize = 0;
     QString curfooter = carvetype.split(",").at(3); // find footers
     if(j == (blocklist.count() - 1))
         blockdifference = (blockcount - blocklist.at(j)) * blocksize;
@@ -268,8 +258,6 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
     }
     else
         arraysize = blockdifference;
-    //QByteArray footerarray;
-    //footerarray.clear();
     qint64 lastfooterpos = -1;
     if(!curfooter.isEmpty()) // if footer exists
     {
@@ -381,12 +369,6 @@ void WriteCarvedFile(QString& curplist, qint64& carvedstringsize, qint64& blocks
     QList<QVariant> nodedata;
     nodedata.clear();
     nodedata << QByteArray(QString("Carved" + QString::number(curblock) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(curblock*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << curplist + "-c" + QString::number(carvedcount);
-    /*
-     * NEED TO MOVE THIS PIECE BACK TO GENERATE CARVING MAIN FUNCTION... MAYBE OPEN ALL OPEN CARVED FILES... LIKE WHEN I REOPEN A CASE... CALL POPULATECARVEDFILES...
-    mutex.lock();
-    treenodemodel->AddNode(nodedata, parstr, 15, 0);
-    mutex.unlock();
-    */
     listeditems.append(QString(curplist + "-c" + QString::number(carvedcount)));
     isignals->ProgUpd();
     isignals->CarveUpd(curplist, carvedcount);
@@ -396,8 +378,6 @@ void WriteCarvedFile(QString& curplist, qint64& carvedstringsize, qint64& blocks
 
 void GenerateCarving(QStringList plist, QStringList flist)
 {
-    //QList<QList<QVariant> >nodelist;
-
     // DETERMINE WHAT I AM CARVING FOR
     QStringList ctypelist;
     ctypelist.clear();
@@ -427,8 +407,6 @@ void GenerateCarving(QStringList plist, QStringList flist)
         SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray, curplist);
 	if(rawfile.isOpen())
 	    rawfile.close();
-	// this method will add the files to the tree, but on recarve, it will add them again. so i need to make use of getexisting somehow to not double add...
-	// I MIGHT BE ABLE TO GET QMODELINDEX FOR THE RESPECTIVE ID AND SEE IF IT EXISTS...
 	QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
 	QStringList cfiles = cdir.entryList(QStringList(plist.at(i) + "-c*"), QDir::NoSymLinks | QDir::Files);
 	if(!cfiles.isEmpty())
@@ -440,6 +418,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 }
 
 /*
+ * USE AS A GUIDE FOR START OF FOOTER TO HEADER CARVING, THEN I CAN DELETE ALL OF THIS...
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
     for(int i=0; i < plist.count(); i++)
     {
