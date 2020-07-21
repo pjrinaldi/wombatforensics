@@ -174,7 +174,9 @@ void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& b
         else if(curheadnam.contains("MPEG"))
             FooterHeaderSearch(curtypestr, blocklist, i);
 	ValidateCarvedFile(isvalidfile, footerarray, curtypestr, carvedstringsize, curplist);
+	qInfo() << "Validation Complete" << i;
 	WriteCarvedFile(curplist, carvedstringsize, blocksize, curblock, curtypestr, isvalidfile);
+	qInfo() << "Writing Complete" << i;
     }
 }
 
@@ -250,7 +252,7 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
     //qint64 carvedstringsize = 0;
     QString curfooter = carvetype.split(",").at(3); // find footers
     if(j == (blocklist.count() - 1))
-        blockdifference = (blocklist.count() - blocklist.at(j)) * blocksize;
+        blockdifference = (blockcount - blocklist.at(j)) * blocksize;
     else
         blockdifference = (blocklist.at(j+1) - blocklist.at(j)) * blocksize;
     if(curfooter.isEmpty() && j == (blocklist.count() - 1))
