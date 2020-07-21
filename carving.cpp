@@ -160,16 +160,21 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
     }
 }
 
-void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray)
+void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, QString& curplist)
 {
     for(int i=0; i < blocklist.count(); i++)
     {
+	qint64 carvedstringsize = 0;
+	int curblock = blocklist.at(i);
+	bool isvalidfile = false;
         QString curtypestr = headhash.value(blocklist.at(i));
         QString curheadnam = curtypestr.split(",").at(1);
         if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-            HeaderFooterSearch(curtypestr, blocklist, i, blocksize, rawfile, partoffset, blockcount, footerarray);
+            HeaderFooterSearch(curtypestr, blocklist, i, blocksize, rawfile, partoffset, blockcount, footerarray, carvedstringsize);
         else if(curheadnam.contains("MPEG"))
             FooterHeaderSearch(curtypestr, blocklist, i);
+	ValidateCarvedFile(isvalidfile, footerarray, curtypestr, carvedstringsize, curplist);
+	WriteCarvedFile(curplist, carvedstringsize, blocksize, curblock, curtypestr, isvalidfile);
     }
 }
 
@@ -237,12 +242,12 @@ void FooterSearch(int& j, QString carvetype, QFile& rawfile)
 {
 }
 
-void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray)
+void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize)
 {
     qint64 blockdifference = 0;
     qint64 curmaxsize = carvetype.split(",").at(5).toLongLong();
     qint64 arraysize = 0;
-    qint64 carvedstringsize = 0;
+    //qint64 carvedstringsize = 0;
     QString curfooter = carvetype.split(",").at(3); // find footers
     if(j == (blocklist.count() - 1))
         blockdifference = (blocklist.count() - blocklist.at(j)) * blocksize;
@@ -281,16 +286,16 @@ void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j)
 {
 }
 
-void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray)
+void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray, QString& carvetype, qint64& carvedstringsize, QString& curplist)
 {
     QImage testimg;
-    if(curtypestr.split(",").at(1).contains("JPEG")) // validity check for jpeg
+    if(carvetype.split(",").at(1).contains("JPEG")) // validity check for jpeg
         isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "jpg");
-    else if(curtypestr.split(",").at(1).contains("PNG")) // validity check for png
+    else if(carvetype.split(",").at(1).contains("PNG")) // validity check for png
         isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "png");
-    else if(curtypestr.split(",").at(1).contains("GIF")) // validity check for gif
+    else if(carvetype.split(",").at(1).contains("GIF")) // validity check for gif
         isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "gif");
-    else if(curtypestr.split(",").at(1).contains("PDF")) // validity check for pdf
+    else if(carvetype.split(",").at(1).contains("PDF")) // validity check for pdf
     {
         Poppler::Document* tmpdoc = NULL;
         tmpdoc = Poppler::Document::loadFromData(footerarray.left(carvedstringsize));
@@ -307,7 +312,7 @@ void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray)
         }
         delete tmpdoc;
     }
-    else if(curtypestr.split(",").at(1).contains("MPEG"))
+    else if(carvetype.split(",").at(1).contains("MPEG"))
     {
         // MPG NEEDS TO BE FOUND A DIFFERENT WAY BECAUSE THE HEADER SHOWS UP EVERYWHERE...
         // I THINK THE SIMPLEST APPROACH IS TO LOOK FOR THE FOOTER AND THEN GO BACKWARDS FOR THE HEADER BETWEEN FOOTERS...
@@ -319,11 +324,12 @@ void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray)
         // FINDING FOOTER THEN HEADER, MEANS WE GO FROM lastfooterpos and carve carvedstringsize worth...
 
         QByteArray tmparray = footerarray.left(carvedstringsize);
-        if(footersearch)
-            tmparray = footerarray.mid(lastfooterpos, carvedstringsize);
 
         /* Using QtAV to check currently fails, so I need to come up with a different way... */
 
+	QString estring = curplist.split("-").at(0);
+	QString vstring = curplist.split("-").at(1);
+	QString pstring = curplist.split("-").at(2);
         QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
         //qDebug() << "tmpfstr:" << tmpfstr;
         //qDebug() << "tmparray size:" << tmparray.count();
@@ -344,9 +350,48 @@ void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray)
     }
 
 }
+void WriteCarvedFile(QString curplist, qint64 carvedstringsize, qint64 blocksize, int curblock, QString curtypestr, bool isvalidfile)
+{
+    QString parstr = curplist;
+    QString vtype = "";
+    if(isvalidfile)
+	vtype = "pc";
+    else
+	vtype = "uc";
+    parstr += vtype;
+    // NEED TO FIX THE CARVEOFFSET FOR MPG SO IT STARTS AT HEADER AND NOT FOOTER...
+    // PROBABLY RECORD HEADER BLOCK FROM FOOTER SEARCH SO I CAN REFERENCE IT BELOW...
+    // CARVEOFFSET is block # * blocksize, need to get it from footer find for the header...
+    // DO STAT/TREENODE here and everything else everywhere else to make it work.
+    QString cstr = QByteArray(QString("Carved" + QString::number(curblock) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(curblock*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + curplist + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(curblock*blocksize) + "," + vtype; //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset,validtype ;
+    QFile cfile(wombatvariable.tmpmntpath + "carved/" + curplist + "-c" + QString::number(carvedcount) + ".stat");
+    if(!cfile.isOpen())
+	cfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(cfile.isOpen())
+    {
+	cfile.write(cstr.toStdString().c_str());
+	cfile.close();
+    }
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << QByteArray(QString("Carved" + QString::number(curblock) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(curblock*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << curplist + "-c" + QString::number(carvedcount);
+    /*
+     * NEED TO MOVE THIS PIECE BACK TO GENERATE CARVING MAIN FUNCTION... MAYBE OPEN ALL OPEN CARVED FILES... LIKE WHEN I REOPEN A CASE... CALL POPULATECARVEDFILES...
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, parstr, 15, 0);
+    mutex.unlock();
+    */
+    listeditems.append(QString(curplist + "-c" + QString::number(carvedcount)));
+    isignals->ProgUpd();
+    isignals->CarveUpd(curplist, carvedcount);
+    carvedcount++;
+    filesfound++;
+}
 
 void GenerateCarving(QStringList plist, QStringList flist)
 {
+    //QList<QList<QVariant> >nodelist;
+
     // DETERMINE WHAT I AM CARVING FOR
     QStringList ctypelist;
     ctypelist.clear();
@@ -372,11 +417,12 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	qInfo() << blocklist.count() << "Headers found. Starting footer search...";
         QByteArray footerarray;
         footerarray.clear();
-        SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray);
-        bool isvalidfile = false;
-	ValidateCarvedFile(isvalidfile, footerarray);
-	//WriteCarvedFile();
+	QString curplist = plist.at(i);
+        SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray, curplist);
+	if(rawfile.isOpen())
+	    rawfile.close();
     }
+}
 
 /*
     // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
@@ -751,5 +797,5 @@ void GenerateCarving(QStringList plist, QStringList flist)
 /*        }
         rawfile.close();
     }
-*/
 }
+*/
