@@ -5,6 +5,9 @@
 
 void PopulateCarvedFiles(QString cfilestr)
 {
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(cfilestr.split(".").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap));
+    if(indexlist.count() == 0)
+    {
     // NEED TO GENERATE THE BLOCKLIST OF USED BLOCKS SO I DON'T RECARVE THE SAME ONES....
     cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
     QString tmpstr = "";
@@ -36,6 +39,7 @@ void PopulateCarvedFiles(QString cfilestr)
         treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-" + slist.at(17)), 15, 0);
     mutex.unlock();
     listeditems.append(slist.at(12));
+    }
 }
 
 void GetCarvers(QStringList& ctypelist, QStringList flist) 
@@ -424,6 +428,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	if(rawfile.isOpen())
 	    rawfile.close();
 	// this method will add the files to the tree, but on recarve, it will add them again. so i need to make use of getexisting somehow to not double add...
+	// I MIGHT BE ABLE TO GET QMODELINDEX FOR THE RESPECTIVE ID AND SEE IF IT EXISTS...
 	QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
 	QStringList cfiles = cdir.entryList(QStringList(plist.at(i) + "-c*"), QDir::NoSymLinks | QDir::Files);
 	if(!cfiles.isEmpty())
