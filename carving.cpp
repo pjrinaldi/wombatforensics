@@ -423,6 +423,14 @@ void GenerateCarving(QStringList plist, QStringList flist)
         SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray, curplist);
 	if(rawfile.isOpen())
 	    rawfile.close();
+	// this method will add the files to the tree, but on recarve, it will add them again. so i need to make use of getexisting somehow to not double add...
+	QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
+	QStringList cfiles = cdir.entryList(QStringList(plist.at(i) + "-c*"), QDir::NoSymLinks | QDir::Files);
+	if(!cfiles.isEmpty())
+	{
+	    QFuture<void> tmpfuture = QtConcurrent::map(cfiles, PopulateCarvedFiles);
+	    tmpfuture.waitForFinished();
+	}
     }
 }
 
