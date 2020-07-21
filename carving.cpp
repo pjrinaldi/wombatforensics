@@ -350,7 +350,7 @@ void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray, QString& car
     }
 
 }
-void WriteCarvedFile(QString curplist, qint64 carvedstringsize, qint64 blocksize, int curblock, QString curtypestr, bool isvalidfile)
+void WriteCarvedFile(QString& curplist, qint64& carvedstringsize, qint64& blocksize, int& curblock, QString& curtypestr, bool& isvalidfile)
 {
     QString parstr = curplist;
     QString vtype = "";

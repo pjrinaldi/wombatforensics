@@ -21,6 +21,6 @@ void FooterSearch(int& j, QString carvetype, QFile& rawfile);
 void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize);
 void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j);
 void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray, QString& carvetype, qint64& carvedstringsize, QString& curplist);
-void WriteCarvedFile(QString curplist, qint64 carvedstringsize, qint64 blocksize, int curblock, QString curtypestr, bool isvalidfile);
+void WriteCarvedFile(QString& curplist, qint64& carvedstringsize, qint64& blocksize, int& curblock, QString& curtypestr, bool& isvalidfile);
 
 #endif // carving.h
