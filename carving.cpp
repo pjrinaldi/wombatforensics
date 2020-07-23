@@ -317,24 +317,35 @@ void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
     qint64 curmaxsize = carvetype.split(",").at(5).toLongLong();
     qint64 arraysize = 0;
     QString curheader = carvetype.split(",").at(2); // find headers
+    qDebug() << "curheader:" << curheader;
     qDebug() << "blocklist.at(j):" << j << blocklist.at(j);
+    qint64 seekstart = partoffset;
     if(j == 0)
-	blockdifference = blocklist.at(j) * blocksize;
+	blockdifference = (blocklist.at(j) * blocksize) + blocksize;
     else
-	blockdifference = (blocklist.at(j) - blocklist.at(j-1)) * blocksize;
+    {
+	qDebug() << "j:" << blocklist.at(j) << blocklist.at(j) * blocksize << "j-1:" << blocklist.at(j-1) << blocklist.at(j-1) * blocksize;
+	blockdifference = ((blocklist.at(j) - blocklist.at(j-1)) * blocksize) - blocksize;
+	seekstart = blocklist.at(j-1) * blocksize + partoffset + blocksize;
+    }
     qDebug() << "blockdifference:" << blockdifference;
     //else if(j == (blocklist.count() - 1))
 	//blockdifference = (blockcount - blocklist.at(j)) * blocksize;
     arraysize = blockdifference;
     qint64 firstheaderpos = -1;
-    qDebug() << "seek start:" << partoffset + (blocklist.at(j) * blocksize) - blockdifference;
-    bool isseek = rawfile.seek(partoffset + blocklist.at(j) * blocksize - blockdifference);
+    //qint64 seekstart = partoffset + (blocklist.at(j) * blocksize) - blockdifference + blocksize;
+    qDebug() << "seek start:" << seekstart;
+    bool isseek = rawfile.seek(seekstart);
     if(isseek)
 	footerarray = rawfile.read(arraysize);
     QString headerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
+    //qDebug() << "headerstr init:" << headerstr.mid(0, 10);
+    //qDebug() << "headerstr mid 0:" << headerstr.mid(24064, 10);
+    //qDebug() << "headerstr mid 1:" << headerstr.mid(695808, 10);
     firstheaderpos = headerstr.indexOf(curheader);
-    qDebug() << "firstheaderpos:" << firstheaderpos;
-    qDebug() << "seekstart + firstheaderpos:" << partoffset + (blocklist.at(j) * blocksize) - blockdifference + firstheaderpos;
+    //qDebug() << "firstheaderpos:" << firstheaderpos << "firstheaderpos/2:" << firstheaderpos /2;
+    //qDebug() << "headerstr mid:" << headerstr.mid(firstheaderpos, 10);
+    qDebug() << "seekstart + firstheaderpos:" << seekstart + firstheaderpos / 2;
     //qDebug() << "firstheaderpos:" << firstheaderpos << "firstheaderpos / blocksize:" << firstheaderpos / blocksize;
     if(firstheaderpos == -1) // no header found, use full length
     {
@@ -342,10 +353,12 @@ void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
     }
     else
     {
-	carvedstringsize = arraysize - firstheaderpos;
+	//qDebug() << "array size:" << arraysize << "firstheaderpos:" << firstheaderpos/2 << "string size:" << arraysize - firstheaderpos / 2;
+	// should we add seekstart to here... probably not since it's a size and not an offset.
+	carvedstringsize = arraysize - firstheaderpos / 2;
     }
     // THIS IS DIFFERENT THAN VALUES FROM ABOVE....
-    qDebug() << "arraysize - firstheaderpos / blocksize:" << (arraysize - firstheaderpos) / blocksize;
+    //qDebug() << "arraysize - firstheaderpos / blocksize:" << (arraysize - firstheaderpos/2);
     // ALSO NEED TO STORE THE BLOCK WHICH CONTAINS THIS HEADER LOCATION.... HOW TO FIND IT???
 }
 
@@ -472,7 +485,6 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	blocklist.clear();
 	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	qInfo() << blocklist.count() << "Headers found. Starting Footer search...";
-	qDebug() << "Head Hash Results:" << headhash;
         QByteArray footerarray;
         footerarray.clear();
 	QString curplist = plist.at(i);
