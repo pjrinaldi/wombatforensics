@@ -172,9 +172,7 @@ void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& b
 	if(byteoffset != 0) // for reverse search, fix curblock so it uses header and not initial footer block which was found
 	    curblock = byteoffset / blocksize;
 	ValidateCarvedFile(isvalidfile, footerarray, curtypestr, carvedstringsize, curplist);
-	//qInfo() << "Validation Complete" << i;
 	WriteCarvedFile(curplist, carvedstringsize, blocksize, curblock, curtypestr, isvalidfile);
-	//qInfo() << "Writing Complete" << i;
     }
 }
 
@@ -317,51 +315,30 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
 void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize, qint64& byteoffset)
 {
     qint64 blockdifference = 0;
-    //qint64 curmaxsize = carvetype.split(",").at(5).toLongLong();
     qint64 arraysize = 0;
     QString curheader = carvetype.split(",").at(2); // find headers
-    //qDebug() << "curheader:" << curheader;
-    //qDebug() << "blocklist.at(j):" << j << blocklist.at(j);
     qint64 seekstart = partoffset;
     if(j == 0)
 	blockdifference = (blocklist.at(j) * blocksize) + blocksize;
     else
     {
-	qDebug() << "j:" << blocklist.at(j) << blocklist.at(j) * blocksize << "j-1:" << blocklist.at(j-1) << blocklist.at(j-1) * blocksize;
 	blockdifference = ((blocklist.at(j) - blocklist.at(j-1)) * blocksize) - blocksize;
 	seekstart = blocklist.at(j-1) * blocksize + partoffset + blocksize;
     }
-    //qDebug() << "blockdifference:" << blockdifference;
     arraysize = blockdifference;
     qint64 firstheaderpos = -1;
-    //qint64 seekstart = partoffset + (blocklist.at(j) * blocksize) - blockdifference + blocksize;
-    //qDebug() << "seek start:" << seekstart;
     bool isseek = rawfile.seek(seekstart);
     if(isseek)
 	footerarray = rawfile.read(arraysize);
     QString headerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
-    //qDebug() << "headerstr init:" << headerstr.mid(0, 10);
-    //qDebug() << "headerstr mid 0:" << headerstr.mid(24064, 10);
-    //qDebug() << "headerstr mid 1:" << headerstr.mid(695808, 10);
     firstheaderpos = headerstr.indexOf(curheader);
-    //qDebug() << "firstheaderpos:" << firstheaderpos << "firstheaderpos/2:" << firstheaderpos /2;
-    //qDebug() << "headerstr mid:" << headerstr.mid(firstheaderpos, 10);
-    //qDebug() << "seekstart + firstheaderpos:" << seekstart + firstheaderpos / 2;
     byteoffset = seekstart + firstheaderpos / 2;
-    //qDebug() << "firstheaderpos:" << firstheaderpos << "firstheaderpos / blocksize:" << firstheaderpos / blocksize;
     if(firstheaderpos == -1) // no header found, use full length
     {
 	carvedstringsize = arraysize;
     }
     else
-    {
-	//qDebug() << "array size:" << arraysize << "firstheaderpos:" << firstheaderpos/2 << "string size:" << arraysize - firstheaderpos / 2;
-	// should we add seekstart to here... probably not since it's a size and not an offset.
 	carvedstringsize = arraysize - firstheaderpos / 2;
-    }
-    // THIS IS DIFFERENT THAN VALUES FROM ABOVE....
-    //qDebug() << "arraysize - firstheaderpos / blocksize:" << (arraysize - firstheaderpos/2);
-    // ALSO NEED TO STORE THE BLOCK WHICH CONTAINS THIS HEADER LOCATION.... HOW TO FIND IT???
 }
 
 void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray, QString& carvetype, qint64& carvedstringsize, QString& curplist)
@@ -392,41 +369,21 @@ void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray, QString& car
     }
     else if(carvetype.split(",").at(1).contains("MPEG"))
     {
-        // MPG NEEDS TO BE FOUND A DIFFERENT WAY BECAUSE THE HEADER SHOWS UP EVERYWHERE...
-        // I THINK THE SIMPLEST APPROACH IS TO LOOK FOR THE FOOTER AND THEN GO BACKWARDS FOR THE HEADER BETWEEN FOOTERS...
-        // IF THIS WORKS, THIS WILL SAVE ME LEARNING ALL ABOUT VIDEO FORMATS, TO CARVE THESE A DIFFERENT WAY...
-        //QtAV::AVPlayer* tmpplayer = new QtAV::AVPlayer(this);
-        // NEED TO ATTEMPT TO LOAD THE VIDEO, AND SEE IF IT LOADED SUCCESSFULLY IN A PLAYER, THEN CHECK AND SEE IF THERE IS ANOTHER
-        // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
-        
-        // FINDING FOOTER THEN HEADER, MEANS WE GO FROM lastfooterpos and carve carvedstringsize worth...
-
         QByteArray tmparray = footerarray.left(carvedstringsize);
-	//if(footersearch)
-	    //tmparray = footerarray.mid(firstheaderpos, carvedstringsize);
-
-        /* Using QtAV to check currently fails, so I need to come up with a different way... */
 
 	QString estring = curplist.split("-").at(0);
 	QString vstring = curplist.split("-").at(1);
 	QString pstring = curplist.split("-").at(2);
         QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
-        //qDebug() << "tmpfstr:" << tmpfstr;
-        //qDebug() << "tmparray size:" << tmparray.count();
-        //QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
         QFile tfile(tmpfstr);
         tfile.open(QIODevice::WriteOnly);
         QDataStream otbuf(&tfile);
         otbuf.writeRawData(tmparray, tmparray.count());
         tfile.close();
-        //qDebug() << "semi smart carving for mpg here...";
         VideoViewer* tmpvid = new VideoViewer();
         isvalidfile = tmpvid->LoadFile(tmpfstr);
-        //qDebug() << "isvaldifile:" << tmpfstr << isvalidfile;
         delete tmpvid;
         // NEED TO LOOK INTO POSSIBLY USING LIBMPEG2 TO VALIDATE.. OR JUST NOT VALIDATE AT ALL...
-        //bool isvalidload = tmpvid->LoadFile(tmpfstr);
-        //qDebug() << "isvalidload:" << isvalidload;
     }
 
 }
@@ -500,380 +457,3 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	}
     }
 }
-
-/*
- * USE AS A GUIDE FOR START OF FOOTER TO HEADER CARVING, THEN I CAN DELETE ALL OF THIS...
-    // DETERMINE partition information. to carve it, I would need the offset and the length of the partition, along with which evidence item
-    for(int i=0; i < plist.count(); i++)
-    {
-        QHash<int, QString> headhash;
-        headhash.clear();
-        QList<int> blocklist;
-        blocklist.clear();
-        QString estring = plist.at(i).split("-").first();
-        QString vstring = plist.at(i).split("-").at(1);
-        QString pstring = plist.at(i).split("-").at(2);
-        // get offset and length to find within the mounted raw image file...
-        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
-        QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
-        QStringList evidlist;
-        evidlist.clear();
-        if(!evidfile.isOpen())
-            evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(evidfile.isOpen())
-        {
-            evidlist = QString(evidfile.readLine()).split(",", Qt::SkipEmptyParts);
-            evidfile.close();
-        }
-        QString rawevidencepath = wombatvariable.imgdatapath;
-        if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
-            rawevidencepath += evidlist.at(3).split("/").last() + ".raw";
-        else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
-            rawevidencepath += evidlist.at(3).split("/").last() + "/ewf1";
-        else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
-        {
-            QString imgext = evidlist.at(3).split("/").last().split("/").last();
-            if(imgext.contains("000"))
-                rawevidencepath += evidlist.at(3).split("/").last() + ".raw";
-            else
-                rawevidencepath = evidlist.at(3);
-        }
-        QString evidencename = evidfiles.at(0).split(".e").first();
-        QString partstr = wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat";
-        QFile partfile(partstr);
-        QStringList partlist;
-        partlist.clear();
-        if(!partfile.isOpen())
-            partfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(partfile.isOpen())
-        {
-            QString tmpstr = partfile.readLine();
-            partlist = tmpstr.split(",");
-            partfile.close();
-        }
-        QFile rawfile(rawevidencepath);
-        if(!rawfile.isOpen())
-            rawfile.open(QIODevice::ReadOnly);
-	/*
-        if(rawfile.isOpen())
-        {
-            // loop over the blocks...
-        }
-	*/
-/*        qint64 partoffset = partlist.at(4).toLongLong();
-        qint64 blocksize = evidlist.at(2).toLongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
-        //qint64 blocksize = partlist.at(6).toLongLong(); // FS CLUSTER SIZE
-        qint64 partsize = partlist.at(1).toLongLong() - partoffset;
-        qint64 blockcount = partsize / blocksize;
-        
-	// GET ALREADY CARVED FILES
-        QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
-        QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
-        if(!cfiles.isEmpty())
-        {
-            for(int j=0; j < cfiles.count(); j++)
-            {
-                qint64 byteoffset = 0;
-                QFile cfile(wombatvariable.tmpmntpath + "carved/" + cfiles.at(j));
-                if(!cfile.isOpen())
-                    cfile.open(QIODevice::ReadOnly | QIODevice::Text);
-                if(cfile.isOpen())
-                    byteoffset = QString(cfile.readLine()).split(",").at(16).toLongLong();
-                qint64 curblock = byteoffset / blocksize;
-                headhash.insert(curblock, "");
-            }
-        }
-	//HeaderSearch(&headhash, blockcount, partoffset, &ctypelist, rawfile)
-	// OR FUNCTION EVERYTHING INCLUDING RAWFILE, HEADHASH, ETC...
-	// OR IS THERE A WAY TO DO EACH PART SEPARATE, SUCH AS FIND BLOCKS, SKIP EXISTING, ETC...
-	// MIGRATE EVERYTHING BELOW INTO THE HEADERSEARCH() AND FOOTERSEARCH() FUNCTIONS
-	bool footersearch = false;
-        for(int j=0; j < blockcount; j++)
-        {
-            // MIGHT USE HEADHASH AS A VARIABLE GENERATED AT START TIME, BUT I'LL FIGURE IT OUT.
-            //QString curkey = pstring + "-b" + QString::number(j);
-            if(!headhash.contains(j))
-            {
-                for(int k=0; k < ctypelist.count(); k++)
-                {
-		    //HeaderSearch(j, ctypelist.at(k), &rawfile);
-		    //FooterSearch(j, ctypelist.at(k), &rawfile);
-                    QString curtypestr = ctypelist.at(k);
-                    QString curheadcat = ctypelist.at(k).split(",").at(0);
-                    QString curheadnam = ctypelist.at(k).split(",").at(1);
-                    QString curheadstr = ctypelist.at(k).split(",").at(2);
-                    QString curfootstr = ctypelist.at(k).split(",").at(3);
-                    QString curextstr = ctypelist.at(k).split(",").at(4);
-                    QString curmaxsize = ctypelist.at(k).split(",").at(5);
-
-		    if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
-			footersearch = false;
-		    else if(curheadnam.contains("MPEG"))
-			footersearch = true;
-		    if(footersearch)
-			curheadstr = ctypelist.at(k).split(",").at(3); // footer string instead...
-
-                    int bytecount = curheadstr.count() / 2;
-                    if(curheadnam.contains("JPEG"))
-                    {
-                        bytecount = 11;
-                    }
-		    if(footersearch)
-			bytecount = blocksize;
-                    QByteArray headerarray;
-                    headerarray.clear();
-                    bool isseek = rawfile.seek(partoffset + (j * blocksize));
-                    if(isseek)
-                        headerarray = rawfile.read(bytecount);
-                    QString blockheader = QString::fromStdString(headerarray.toHex(0).toStdString()).toUpper();
-                    if(curheadnam.contains("JPEG"))
-                    {
-                        QString exifjpghdr = "FFD8FFE1????45786966";
-                        QString spifjpghdr = "FFD8FFE8????5350494646";
-                        QString jfifjpghdr = "FFD8FFE0????4A464946";
-                        if(blockheader.contains("FFD8FFE1") && blockheader.contains("45786966")) // EXIF JPEG
-                        {
-                            curheadnam = "EXIF JPEG";
-                            curheadstr = exifjpghdr;
-                        }
-                        else if(blockheader.contains("FFD8FFE8") && blockheader.contains("5350494646")) // SPIFF JPEG
-                        {
-                            curheadnam = "SPIFF JPEG";
-                            curheadstr = spifjpghdr;
-                        }
-                        else if(blockheader.contains("FFD8FFE0") && blockheader.contains("4A464946")) // JFIF JPEG
-                        {
-                            curheadnam = "JFIF JPEG";
-                            curheadstr = jfifjpghdr;
-                        }
-                        curtypestr = curheadcat + "," + curheadnam + "," + curheadstr + "," + curfootstr + "," + curextstr + "," + curmaxsize;
-                    }
-		    /*
-		    int headleft = -1;
-		    int headright = -1;
-		    if(!footersearch)
-		    {
-			headleft = curheadstr.indexOf("?");
-			headright = curheadstr.lastIndexOf("?");
-		    }
-		    else if(footersearch)
-		    {
-			qDebug() << "footerstr:" << curfootstr;
-			headleft = curfootstr.indexOf("?");
-			headright = curfootstr.lastIndexOf("?");
-		    }
-		    */
-                    // COMPARE BLOCK HEADER TO THE CURHEADSTR FOR MATCH...
-/*                    int headleft = curheadstr.indexOf("?"); // might be moving to own filecarvers.cpp
-                    int headright = curheadstr.lastIndexOf("?"); // might be moving to own filecarvers.cpp
-		    
-		    if(headleft == -1 && headright == -1) // header without ???'s
-                    {
-			/*
-			if(!footersearch)
-			{
-                            if(blockheader.startsWith(curheadstr))
-	                    {
-	                        blocklist.append(j);
-		                headhash.insert(j, curtypestr);
-		            }
-			}
-			else if(footersearch)
-			{*/
-			    //if(blockheader.contains(curfootstr))
-/*			    if(blockheader.contains(curheadstr))
-			    {
-				blocklist.append(j);
-				headhash.insert(j, curtypestr);
-			    }
-			//}
-                    }
-                    else // header with ???'s
-                    {
-			/*
-			if(!footersearch)
-			{*/
-/*                            if(blockheader.left(headleft).contains(curheadstr.left(headleft)) && blockheader.mid(headright+1).contains(curheadstr.mid(headright+1)))
-	                    {
-	                        blocklist.append(j);
-		                headhash.insert(j, curtypestr);
-		            }
-			/*}
-			else if(footersearch)
-			{
-			    if(blockheader.left(headleft).contains(curfootstr.left(headleft)) && blockheader.mid(headright+1).contains(curfootstr.mid(headright+1)))
-			    {
-				blocklist.append(j);
-				headhash.insert(j, curtypestr);
-			    }
-			}*/
-/*                    }
-                }
-            }
-        }
-	qInfo() << blocklist.count() << "Headers found. Starting footer search...";
-	//qDebug() << "Qt Supported Image Formats:" << QImageReader::supportedImageFormats();
-        // FOR EACH CLAIMED BLOCK, APPLY THE headhash value...
-        for(int j=0; j < blocklist.count(); j++)
-        {
-            QString curtypestr = headhash.value(blocklist.at(j));
-	    QString curheadnam = curtypestr.split(",").at(1);
-            if(!curtypestr.isEmpty()) // this shouldn't matter since blocklist.at(j) shouldn't be called for zero values...
-            {
-                qint64 blockdifference = 0;
-                qint64 curmaxsize = curtypestr.split(",").at(5).toLongLong();
-                qint64 arraysize = 0;
-                qint64 carvedstringsize = 0;
-                QString curfooter = curtypestr.split(",").at(3); // find footers
-		if(footersearch)
-		    curfooter = curtypestr.split(",").at(2); // find headers
-                // GENERATE BLOCKLISTSTRING BELOW FOR THE PROPERTY FILE...
-                if(j == (blocklist.count()-1))
-                    blockdifference = (blockcount - blocklist.at(j)) * blocksize;
-                else
-                    blockdifference = (blocklist.at(j+1) - blocklist.at(j)) * blocksize;
-                // I THINK I SHOULD USE BLOCKDIFFERENCE REGARDLESS TO LOOK FOR FOOTERS IF NO FOOTER, THEN GO WITH CURMAXSIZE IF J == BLOCKLIST.COUNT() - 1.
-                if(curfooter.isEmpty() && j == (blocklist.count() - 1))
-                {
-                    if(blockdifference < curmaxsize)
-                        arraysize = blockdifference;
-                    else
-                        arraysize = curmaxsize;
-                }
-                else
-                    arraysize = blockdifference;
-                QByteArray footerarray;
-                footerarray.clear();
-		qint64 lastfooterpos = -1;
-                if(!curfooter.isEmpty()) // if footer exists
-                {
-                    bool isseek = rawfile.seek(partoffset + (blocklist.at(j) * blocksize));
-                    if(isseek)
-                        footerarray = rawfile.read(arraysize);
-                    QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
-
-                    lastfooterpos = footerstr.lastIndexOf(curfooter);
-		    if(footersearch)
-			lastfooterpos = footerstr.indexOf(curfooter);
-
-                    if(lastfooterpos == -1) // no footer found, use full length
-                        carvedstringsize = arraysize;
-                    else // footer found, so use it
-		    {
-			carvedstringsize = lastfooterpos + curfooter.count();
-			if(footersearch)
-			    carvedstringsize = arraysize - lastfooterpos;
-		    }
-                }
-                else // no footer defined, just use arraysize as size
-                    carvedstringsize = arraysize;
-                // TRY TO DETERMINE IF IT IS A VALID FILE....
-                bool isvalidfile = false;
-                QImage testimg;
-                if(curtypestr.split(",").at(1).contains("JPEG")) // validity check for jpeg
-                    isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "jpg");
-                else if(curtypestr.split(",").at(1).contains("PNG")) // validity check for png
-                    isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "png");
-                else if(curtypestr.split(",").at(1).contains("GIF")) // validity check for gif
-                    isvalidfile = testimg.loadFromData(footerarray.left(carvedstringsize), "gif");
-		else if(curtypestr.split(",").at(1).contains("PDF")) // validity check for pdf
-		{
-		    Poppler::Document* tmpdoc = NULL;
-		    tmpdoc = Poppler::Document::loadFromData(footerarray.left(carvedstringsize));
-		    if(tmpdoc != NULL)
-		    {
-			Poppler::Page* tmppage = NULL;
-			tmppage = tmpdoc->page(0); // load initial page
-			if(tmppage != NULL)
-			{
-			    QImage curimage = tmppage->renderToImage();
-			    isvalidfile = curimage.isNull();
-			}
-			delete tmppage;
-		    }
-		    delete tmpdoc;
-		}
-                else if(curtypestr.split(",").at(1).contains("MPEG"))
-                {
-                    // MPG NEEDS TO BE FOUND A DIFFERENT WAY BECAUSE THE HEADER SHOWS UP EVERYWHERE...
-                    // I THINK THE SIMPLEST APPROACH IS TO LOOK FOR THE FOOTER AND THEN GO BACKWARDS FOR THE HEADER BETWEEN FOOTERS...
-                    // IF THIS WORKS, THIS WILL SAVE ME LEARNING ALL ABOUT VIDEO FORMATS, TO CARVE THESE A DIFFERENT WAY...
-                    //QtAV::AVPlayer* tmpplayer = new QtAV::AVPlayer(this);
-                    // NEED TO ATTEMPT TO LOAD THE VIDEO, AND SEE IF IT LOADED SUCCESSFULLY IN A PLAYER, THEN CHECK AND SEE IF THERE IS ANOTHER
-                    // CONTAINER THAT ISN'T A PLAYER TO TEST IF IT IS VALID
-                    
-		    // FINDING FOOTER THEN HEADER, MEANS WE GO FROM lastfooterpos and carve carvedstringsize worth...
-
-		    QByteArray tmparray = footerarray.left(carvedstringsize);
-		    if(footersearch)
-			tmparray = footerarray.mid(lastfooterpos, carvedstringsize);
-
-		    /* Using QtAV to check currently fails, so I need to come up with a different way... */
-
-/*                    QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
-                    //qDebug() << "tmpfstr:" << tmpfstr;
-                    //qDebug() << "tmparray size:" << tmparray.count();
-                    //QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
-                    QFile tfile(tmpfstr);
-                    tfile.open(QIODevice::WriteOnly);
-                    QDataStream otbuf(&tfile);
-                    otbuf.writeRawData(tmparray, tmparray.count());
-                    tfile.close();
-                    //qDebug() << "semi smart carving for mpg here...";
-                    VideoViewer* tmpvid = new VideoViewer();
-                    isvalidfile = tmpvid->LoadFile(tmpfstr);
-		    qDebug() << "isvaldifile:" << tmpfstr << isvalidfile;
-		    delete tmpvid;
-                    // NEED TO LOOK INTO POSSIBLY USING LIBMPEG2 TO VALIDATE.. OR JUST NOT VALIDATE AT ALL...
-                    //bool isvalidload = tmpvid->LoadFile(tmpfstr);
-                    //qDebug() << "isvalidload:" << isvalidload;
-                }
-                QString parstr = estring + "-" + vstring + "-" + pstring + "-";
-                QString vtype = "";
-                if(isvalidfile)
-                    vtype = "pc";
-                else
-                    vtype = "uc";
-                parstr += vtype;
-		// NEED TO FIX THE CARVEOFFSET FOR MPG SO IT STARTS AT HEADER AND NOT FOOTER...
-		// PROBABLY RECORD HEADER BLOCK FROM FOOTER SEARCH SO I CAN REFERENCE IT BELOW...
-		// CARVEOFFSET is block # * blocksize, need to get it from footer find for the header...
-                // DO STAT/TREENODE here and everything else everywhere else to make it work.
-                QString cstr = QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() + ",5,0," + QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() + ",0,0,0,0," + QString::number(carvedstringsize) + "," + QString::number(carvedcount) + "," + curtypestr.split(",").at(0) + "/" + curtypestr.split(",").at(1) + ",0," + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ",0,0,0," + QString::number(blocklist.at(j)*blocksize) + "," + vtype; //,addr,mime/cat,id,hash,deleted,bookmark,carveoffset,validtype ;
-                QFile cfile(wombatvariable.tmpmntpath + "carved/" + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".stat");
-                if(!cfile.isOpen())
-                    cfile.open(QIODevice::WriteOnly | QIODevice::Text);
-                if(cfile.isOpen())
-                {
-                    cfile.write(cstr.toStdString().c_str());
-                    cfile.close();
-                }
-                QList<QVariant> nodedata;
-                nodedata.clear();
-                nodedata << QByteArray(QString("Carved" + QString::number(blocklist.at(j)) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(blocklist.at(j)*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount);
-                mutex.lock();
-                treenodemodel->AddNode(nodedata, parstr, 15, 0);
-                mutex.unlock();
-                listeditems.append(QString(estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount)));
-                carvedcount++;
-		filesfound++;
-                isignals->ProgUpd();
-		isignals->CarveUpd(plist.at(i), carvedcount);
-            }
-            /*
-             * TEST FILE DUMP WORKS...
-            QByteArray tmparray = footerarray.left(lastfooterpos + footer.count());
-            qDebug() << "tmparray size:" << tmparray.count();
-            QString tmpfstr = wombatvariable.tmpfilepath + pbkey + ".jpg";
-            QFile tfile(tmpfstr);
-            tfile.open(QIODevice::WriteOnly);
-            QDataStream otbuf(&tfile);
-            otbuf.writeRawData(tmparray, tmparray.count());
-            tfile.close();
-            */
-/*        }
-        rawfile.close();
-    }
-}
-*/
