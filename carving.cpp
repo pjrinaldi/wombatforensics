@@ -472,6 +472,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	blocklist.clear();
 	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	qInfo() << blocklist.count() << "Headers found. Starting Footer search...";
+	qDebug() << "Head Hash Results:" << headhash;
         QByteArray footerarray;
         footerarray.clear();
 	QString curplist = plist.at(i);
