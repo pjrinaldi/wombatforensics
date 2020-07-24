@@ -150,6 +150,8 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
 		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
         	else if(curheadnam.contains("MPEG"))
 		    FooterSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
+		else
+		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
 	    }
 	}
     }
@@ -169,6 +171,8 @@ void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& b
             HeaderFooterSearch(curtypestr, blocklist, i, blocksize, rawfile, partoffset, blockcount, footerarray, carvedstringsize);
         else if(curheadnam.contains("MPEG"))
             FooterHeaderSearch(curtypestr, blocklist, i, blocksize, rawfile, partoffset, blockcount, footerarray, carvedstringsize, byteoffset);
+	else
+	    HeaderFooterSearch(curtypestr, blocklist, i, blocksize, rawfile, partoffset, blockcount, footerarray, carvedstringsize);
 	if(byteoffset != 0) // for reverse search, fix curblock so it uses header and not initial footer block which was found
 	    curblock = byteoffset / blocksize;
 	ValidateCarvedFile(isvalidfile, footerarray, curtypestr, carvedstringsize, curplist);
