@@ -1566,17 +1566,14 @@ void WombatForensics::LoadHexContents()
                 isntfs = true;
             if(fstring.contains("a"))
 	        isads = true;
-            if(selectednode->itemtype == 2 || selectednode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
+            if(selectednode->itemtype == 3 || selectednode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	        isdir = true;
 
 	    // ADD APFS FEATURES HERE...
             if(isntfs && isres) // NTFS & RESIDENT
             {
     	        unsigned int curoffset = 0;
-	        uint8_t mftoffset[2];
-        	uint8_t nextattrid[2];
-	        uint8_t mftlen[4];
-	        uint8_t attrtype[4];
+		uint16_t mftoffset = 0;
 	        uint32_t atrtype = 0;
 	        uint8_t namelength = 0;
 	        uint32_t attrlength = 0;
@@ -1601,25 +1598,15 @@ void WombatForensics::LoadHexContents()
 	        if(resbuffer.count() > 0)
 	        {
                     curoffset = 0;
-                    mftoffset[0] = (uint8_t)resbuffer.at(20);
-                    mftoffset[1] = (uint8_t)resbuffer.at(21);
-                    nextattrid[0] = (uint8_t)resbuffer.at(40);
-                    nextattrid[1] = (uint8_t)resbuffer.at(41);
-                    curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-                    int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
-                    for(int i = 0; i < attrcnt; i++)
+		    mftoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(20, 2)); // offset to first attribute
+		    uint16_t attrcnt = qFromLittleEndian<uint16_t>(resbuffer.mid(40, 2)); // next attribute id
+		    curoffset += mftoffset;
+		    // Loop over attributes...
+                    for(uint i = 0; i < attrcnt; i++)
                     {
-                        attrtype[0] = (uint8_t)resbuffer.at(curoffset); // ERRORS HERE... outside scope... probably with new if/else
-                        attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                        attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                        attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                        atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                        namelength = (uint8_t)resbuffer.at(curoffset + 9);
-                        mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                        mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                        mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                        mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                        attrlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+			atrtype = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset, 4)); // attribute type
+			namelength = qFromLittleEndian<uint8_t>(resbuffer.mid(curoffset + 9, 1)); // length of name
+			attrlength = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset + 4, 4)); // attribute length
 		        if(isdir && atrtype == 144)
                         {
 			    break;
@@ -1639,13 +1626,7 @@ void WombatForensics::LoadHexContents()
                         }
                         curoffset += attrlength;
                     }
-		    mftlen[0] = (uint8_t)resbuffer.at(curoffset + 16);
-		    mftlen[1] = (uint8_t)resbuffer.at(curoffset + 17);
-		    mftlen[2] = (uint8_t)resbuffer.at(curoffset + 18);
-		    mftlen[3] = (uint8_t)resbuffer.at(curoffset + 19);
-                    mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-                    mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-                    resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+		    resoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(curoffset + 20, 2)); // resident attribute content offset
                     ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
                     ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
                 }
@@ -2557,25 +2538,17 @@ void WombatForensics::HexSelectionChanged()
 void WombatForensics::UpdateSelectValue()
 {
     QByteArray selectionbytes = ui->hexview->selectionToByteArray();
-    QDataStream ds8(selectionbytes);
-    ds8.setByteOrder(QDataStream::LittleEndian);
-    int8_t asint8;
-    ds8 >> asint8;
-    QDataStream ds16(selectionbytes);
-    ds16.setByteOrder(QDataStream::LittleEndian);
-    int16_t asint16;
-    ds16 >> asint16;
-    QDataStream ds32(selectionbytes);
-    ds32.setByteOrder(QDataStream::LittleEndian);
-    int32_t asint32;
-    ds32 >> asint32;
     QString tmptext = "Length: " + QString::number(selectionbytes.size());
     QString bytetext = "";
     selectedhex->setText(tmptext);
     bytetext += "<table border=0 width='100%' cellpadding=5>";
-    bytetext += "<tr><td>8-bit Signed Integer:</td><td align=right>" + QString::number(asint8) + "</td></tr>";
-    bytetext += "<tr><td>16-bit Signed Integer:</td><td align=right>" + QString::number(asint16) + "</td></tr>";
-    bytetext += "<tr><td>32-bit Signed Integer:</td><td align=right>" + QString::number(asint32) + "</td></tr>";
+    bytetext += "<tr><th>Format</th><th>Little Endian</th><th>Big Endian</th></tr>";
+    bytetext += "<tr><td>8-bit Signed Integer:</td><td align=right>" + QString::number(qFromLittleEndian<int8_t>(selectionbytes.mid(0, 1))) + "</td><td align=right>" + QString::number(qFromBigEndian<int8_t>(selectionbytes.mid(0, 1))) + "</td></tr>";
+    bytetext += "<tr><td>8-bit Unsigned Integer:</td><td align=right>" + QString::number(qFromLittleEndian<uint8_t>(selectionbytes.mid(0, 1))) + "</td><td align=right>" + QString::number(qFromBigEndian<uint8_t>(selectionbytes.mid(0, 1))) + "</td></tr>";
+    bytetext += "<tr><td>16-bit Signed Integer:</td><td align=right>" + QString::number(qFromLittleEndian<int16_t>(selectionbytes.mid(0, 2))) + "</td><td align=right>" + QString::number(qFromBigEndian<int16_t>(selectionbytes.mid(0, 2))) + "</td></tr>";
+    bytetext += "<tr><td>16-bit Unsigned Integer:</td><td align=right>" + QString::number(qFromLittleEndian<uint16_t>(selectionbytes.mid(0, 2))) + "</td><td align=right>" + QString::number(qFromBigEndian<uint16_t>(selectionbytes.mid(0, 2))) + "</td></tr>";
+    bytetext += "<tr><td>32-bit Signed Integer:</td><td align=right>" + QString::number(qFromLittleEndian<int32_t>(selectionbytes.mid(0, 4))) + "</td><td align=right>" + QString::number(qFromBigEndian<int32_t>(selectionbytes.mid(0, 4))) + "</td></tr>";
+    bytetext += "<tr><td>32-bit Unsigned Integer:</td><td align=right>" + QString::number(qFromLittleEndian<uint32_t>(selectionbytes.mid(0, 4))) + "</td><td align=right>" + QString::number(qFromBigEndian<uint32_t>(selectionbytes.mid(0, 4))) + "</td></tr>";
     bytetext += "</table>";
     byteviewer->SetText(bytetext);
 
