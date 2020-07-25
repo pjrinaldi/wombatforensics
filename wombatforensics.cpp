@@ -2551,15 +2551,8 @@ void WombatForensics::UpdateSelectValue()
     bytetext += "<tr><td>32-bit Unsigned Integer:</td><td align=right>" + QString::number(qFromLittleEndian<uint32_t>(selectionbytes.mid(0, 4))) + "</td><td align=right>" + QString::number(qFromBigEndian<uint32_t>(selectionbytes.mid(0, 4))) + "</td></tr>";
     bytetext += "<tr><td>64-bit Signed Integer:</td><td colspan=2 align=right>" + QString::number(qFromLittleEndian<int64_t>(selectionbytes.mid(0, 8))) + "</td></tr>";
     bytetext += "<tr><td>64-bit Unsigned Integer:</td><td colspan=2 align=right>" + QString::number(qFromLittleEndian<uint64_t>(selectionbytes.mid(0, 8))) + "</td></tr>";
-    bytetext += "<tr><td>Windows 64-bit Timestamp:</td><td colspan=2 align=right>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(selectionbytes.mid(0, 8))) + "</td></tr>";
-    //bytetext += "<tr><td>Unix 32-bit Timestamp:</td><td align=right>" + 
-
-    /*
-     *
-    QDateTime tmpdt = QDateTime::fromSecsSinceEpoch(itemnode->Data(index.column()).toInt(), QTimeZone::utc());
-    QString tmpstr = tmpdt.toString("MM/dd/yyyy hh:mm:ss AP");
-    return tmpstr;
-     */ 
+    bytetext += "<tr><td>Windows 64-bit Timestamp:</td><td colspan=2 align=right>" + ConvertWindowsTimeToUnixTimeUTC(qFromLittleEndian<uint64_t>(selectionbytes.mid(0, 8))) + "</td></tr>";
+    bytetext += "<tr><td>Unix 32-bit Timestamp:</td><td colspan=2 align=right>" + ConvertUnixTimeToString(qFromLittleEndian<uint32_t>(selectionbytes.mid(0, 4))) + "</td></tr>";
     bytetext += "</table>";
     byteviewer->SetText(bytetext);
 

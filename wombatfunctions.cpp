@@ -443,18 +443,24 @@ QString ConvertWindowsTimeToUnixTime(uint64_t input)
     return timestr;
 }
 
-QString ConvertUnixTimeToString(uint32_t input)
+QString ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
 {
-    QTimeZone tmpzone = QTimeZone(reporttimezone);
-    time_t crtimet = (time_t)input;
-    QString timestr = QDateTime::fromSecsSinceEpoch(crtimet, tmpzone).toString("MM/dd/yyyy hh:mm:ss AP");
+    //QTimeZone tmpzone = QTimeZone(reporttimezone);
+    uint64_t temp;
+    temp = input / TICKS_PER_SECOND; //convert from 100ns intervals to seconds;
+    temp = temp - EPOCH_DIFFERENCE;  //subtract number of seconds between epochs
+    time_t crtimet = (time_t)temp;
+    QString timestr = "";
+    timestr = QDateTime::fromSecsSinceEpoch(crtimet, QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
 
     return timestr;
 }
 
-QString ConvertUnixTimeToString(uint64_t input)
+QString ConvertUnixTimeToString(uint32_t input)
 {
-    QTimeZone tmpzone = QTimeZone(reporttimezone);
+    //QTimeZone tmpzone = QTimeZone(reporttimezone);
     time_t crtimet = (time_t)input;
-    QString timestr = QDateTime::fromSecsSinceEpoch(crtimet, tmpzone).toString("MM/dd/yyyy hh:mm:ss AP");
+    QString timestr = QDateTime::fromSecsSinceEpoch(crtimet, QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
+
+    return timestr;
 }
