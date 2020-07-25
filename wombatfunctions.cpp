@@ -443,3 +443,18 @@ QString ConvertWindowsTimeToUnixTime(uint64_t input)
     return timestr;
 }
 
+QString ConvertUnixTimeToString(uint32_t input)
+{
+    QTimeZone tmpzone = QTimeZone(reporttimezone);
+    time_t crtimet = (time_t)input;
+    QString timestr = QDateTime::fromSecsSinceEpoch(crtimet, tmpzone).toString("MM/dd/yyyy hh:mm:ss AP");
+
+    return timestr;
+}
+
+QString ConvertUnixTimeToString(uint64_t input)
+{
+    QTimeZone tmpzone = QTimeZone(reporttimezone);
+    time_t crtimet = (time_t)input;
+    QString timestr = QDateTime::fromSecsSinceEpoch(crtimet, tmpzone).toString("MM/dd/yyyy hh:mm:ss AP");
+}

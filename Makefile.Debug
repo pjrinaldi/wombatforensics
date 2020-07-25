@@ -563,6 +563,8 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 		globals.h \
 		tskcpp.h \
 		carving.h \
+		videoviewer.h \
+		ui_videoviewer.h \
 		artifactparser.h \
 		reporting.h \
 		digging.h \
@@ -595,8 +597,6 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 		imageviewer.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
-		videoviewer.h \
-		ui_videoviewer.h \
 		viewermanager.h \
 		ui_viewermanager.h \
 		textviewer.h \
@@ -1095,6 +1095,8 @@ debug/main.o: main.cpp wombatinclude.h \
 		globals.h \
 		tskcpp.h \
 		carving.h \
+		videoviewer.h \
+		ui_videoviewer.h \
 		artifactparser.h \
 		reporting.h \
 		digging.h \
@@ -1127,8 +1129,6 @@ debug/main.o: main.cpp wombatinclude.h \
 		imageviewer.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
-		videoviewer.h \
-		ui_videoviewer.h \
 		viewermanager.h \
 		ui_viewermanager.h \
 		textviewer.h \
@@ -1170,6 +1170,8 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		globals.h \
 		tskcpp.h \
 		carving.h \
+		videoviewer.h \
+		ui_videoviewer.h \
 		artifactparser.h \
 		reporting.h \
 		digging.h \
@@ -1202,8 +1204,6 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		imageviewer.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
-		videoviewer.h \
-		ui_videoviewer.h \
 		viewermanager.h \
 		ui_viewermanager.h \
 		textviewer.h \
@@ -1478,7 +1478,8 @@ debug/carving.o: carving.cpp carving.h \
 		globals.h \
 		wombatinclude.h \
 		wombatvariable.h \
-		tskcpp.h
+		videoviewer.h \
+		ui_videoviewer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/carving.o carving.cpp
 
 debug/digging.o: digging.cpp digging.h \

@@ -32,5 +32,7 @@ QString ConvertGmtHours(int gmtvar);
 #define EPOCH_DIFFERENCE 11644473600LL
 
 QString ConvertWindowsTimeToUnixTime(uint64_t input);
+QString ConvertUnixTimeToString(uint32_t input);
+QString ConvertUnixTimeToString(uint64_t input);
 
 #endif // wombatfunctions.h
