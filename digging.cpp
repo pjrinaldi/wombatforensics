@@ -13,6 +13,7 @@
 
 void GenerateArchiveExpansion(QString objectid)
 {
+    // NEED TO DISTINGUISH BETWEEN ZIP AND OTHER ARCHIVE FORMATS AND PROCESS ACCORDINGLY...
     if(!isclosing)
     {
         //QString estring = "";
@@ -550,7 +551,18 @@ void GenerateVidThumbnails(QString thumbid)
 
 void GeneratePreDigging(QString thumbid)
 {
-    if(hasarchive && !isclosing)
+    TreeNode* curitem = NULL;
+    QModelIndexList indxlist;
+    QString category = "";
+    if(!isclosing)
+    {
+        indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        category = curitem->Data(8).toString();
+    }
+    bool isarchive = false;
+    isarchive = category.contains("Archive");
+    if(hasarchive && isarchive && !isclosing)
         GenerateArchiveExpansion(thumbid);
 }
 
@@ -695,6 +707,7 @@ QByteArray ReturnFileContent(QString objectid)
         astring = objectid.split("-", Qt::SkipEmptyParts).at(4);
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
+    QString fname = indexlist.first().sibling(indexlist.first().row(), 0).data().toString();
     qint64 filesize = curnode->Data(2).toLongLong();
     QString tmpstr = "";
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -782,21 +795,20 @@ QByteArray ReturnFileContent(QString objectid)
 	isntfs = true;
     if(fstring.contains("a"))
         isads = true;
-    if(curnode->itemtype == 2 || curnode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
+    if(curnode->itemtype == 3 || curnode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
 	isdir = true;
+    if(fname.contains("$OrphanFiles"))
+        isres = false;
 
     if(isntfs && isres && !iscarved) // NTFS & RESIDENT
     {
     	unsigned int curoffset = 0;
-        uint8_t mftoffset[2];
-        uint8_t nextattrid[2];
-	uint8_t mftlen[4];
-        uint8_t attrtype[4];
-	uint32_t atrtype = 0;
+        uint16_t mftoffset = 0;
+        uint32_t atrtype = 0;
         uint8_t namelength = 0;
-	uint32_t attrlength = 0;
-	uint32_t contentlength = 0;
+        uint32_t attrlength = 0;
         uint16_t resoffset = 0;
+	uint32_t contentlength = 0;
 	QStringList mftblocklist;
         mftblocklist.clear();
 	QString mftid = objectid.split("-").first() + "-" + objectid.split("-").at(1) + "-" + objectid.split("-").at(2) + "-f0-a5";
@@ -805,6 +817,15 @@ QByteArray ReturnFileContent(QString objectid)
         qint64 residentoffset = 0;
         if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.
         {
+            //float mftblock = mftaddress * 1024.0/blocksize;
+            //int mftblockint = floor(mftblock);
+            /*
+            qDebug() << "mftid:" << mftid;
+            qDebug() << "mftblocklist count:" << mftblocklist.count();
+            qDebug() << "objectid:" << objectid;
+            qDebug() << "mftaddress * 1024 / blocksize:" << mftaddress << mftaddress * 1024/blocksize;
+            */
+            //residentoffset = (mftblocklist.at(mftblockint).toLongLong() * blocksize) + fsoffset + (blocksize * (mftblock - mftblockint));
             residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
         }
         else // odd number, get starting block and jump the fractional amount to get to the correct entry.
@@ -825,25 +846,14 @@ QByteArray ReturnFileContent(QString objectid)
 	if(resbuffer.count() > 0)
 	{
             curoffset = 0;
-            mftoffset[0] = (uint8_t)resbuffer.at(20);
-            mftoffset[1] = (uint8_t)resbuffer.at(21);
-            nextattrid[0] = (uint8_t)resbuffer.at(40);
-            nextattrid[1] = (uint8_t)resbuffer.at(41);
-            curoffset += tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
-            int attrcnt = tsk_getu16(TSK_LIT_ENDIAN, nextattrid);
+            mftoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(20, 2)); // offset to first attribute
+            uint16_t attrcnt = qFromLittleEndian<uint16_t>(resbuffer.mid(40, 2)); // next attribute id
+            curoffset += mftoffset;
             for(int i = 0; i < attrcnt; i++)
             {
-                attrtype[0] = (uint8_t)resbuffer.at(curoffset); // ERRORS HERE... outside scope... probably with new if/else
-                attrtype[1] = (uint8_t)resbuffer.at(curoffset + 1);
-                attrtype[2] = (uint8_t)resbuffer.at(curoffset + 2);
-                attrtype[3] = (uint8_t)resbuffer.at(curoffset + 3);
-                atrtype = tsk_getu32(TSK_LIT_ENDIAN, attrtype);
-                namelength = (uint8_t)resbuffer.at(curoffset + 9);
-                mftlen[0] = (uint8_t)resbuffer.at(curoffset + 4);
-                mftlen[1] = (uint8_t)resbuffer.at(curoffset + 5);
-                mftlen[2] = (uint8_t)resbuffer.at(curoffset + 6);
-                mftlen[3] = (uint8_t)resbuffer.at(curoffset + 7);
-                attrlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
+                atrtype = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset, 4)); // attribute type
+                namelength = qFromLittleEndian<uint8_t>(resbuffer.mid(curoffset + 9, 1)); // length of name
+                attrlength = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset + 4, 4)); // attribute length
 		if(isdir && atrtype == 144)
                 {
 		    break;
@@ -862,14 +872,7 @@ QByteArray ReturnFileContent(QString objectid)
                 }
                 curoffset += attrlength;
             }
-            mftlen[0] = (uint8_t)resbuffer.at(curoffset + 16);
-	    mftlen[1] = (uint8_t)resbuffer.at(curoffset + 17);
-	    mftlen[2] = (uint8_t)resbuffer.at(curoffset + 18);
-	    mftlen[3] = (uint8_t)resbuffer.at(curoffset + 19);
-	    contentlength = tsk_getu32(TSK_LIT_ENDIAN, mftlen);
-            mftoffset[0] = (uint8_t)resbuffer.at(curoffset + 20);
-            mftoffset[1] = (uint8_t)resbuffer.at(curoffset + 21);
-            resoffset = tsk_getu16(TSK_LIT_ENDIAN, mftoffset);
+	    resoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(curoffset + 20, 2)); // resident attribute content offset
 	    filebytes.append(resbuffer.mid(curoffset + resoffset, contentlength));
         }
     }
@@ -928,6 +931,7 @@ QByteArray ReturnFileContent(QString objectid)
         zip* zfile = zip_open(zipstr.toStdString().c_str(), ZIP_RDONLY, &err);
         struct zip_stat zstat;
         zip_stat_init(&zstat);
+        // zip issue at below line, start to debug this...
         zip_stat_index(zfile, zipid.split("-").at(3).mid(2).toLongLong(), 0, &zstat);
         zip_file_t* curfile = NULL;
         if(zstat.encryption_method == ZIP_EM_NONE)

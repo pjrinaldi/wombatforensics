@@ -1893,8 +1893,10 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
     else if(filelisttype == 6) // Generate list for Archive category
     {
         QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant(("Archive")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
+        qDebug() << "archives found: indexlist count:" << indexlist.count();
         foreach(QModelIndex index, indexlist)
             tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
+        qDebug() << "archive tmplist value:" << tmplist.count();
         return tmplist;
     }
     return tmplist;
@@ -2064,6 +2066,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             if(dtype == 2) // all files, only get images...
             {
                 digarchivetotal = GetFileLists(6).count(); // archives only
+                qDebug() << "digarchivetotal:" << digarchivetotal;
             }
             else if(dtype == 1 || dtype == 3) // checked files, only get images...
             {
@@ -2392,7 +2395,7 @@ void WombatForensics::FinishPreDigging()
 {
     //if(digtype == 0) // selected
     //else if(digtype == 1) // checked
-    if(hasarchive && !isclosing && digtype == 2) // all items (now including expanded archives.
+    if(hasarchive && !isclosing && digtype == 2) // all items (now including expanded archives.)
         digfilelist = GetFileLists(2);
     digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
     digwatcher.setFuture(digfuture);
@@ -2961,6 +2964,8 @@ void WombatForensics::RotateDig()
 	    digtimercounter = 1;
 	else if(digvidthumbtotal > 0)
 	    digtimercounter = 2;
+        else if(digarchivetotal > 0)
+            digtimercounter = 3;
 	else
 	    digtimercounter = 50;
     }
@@ -2969,12 +2974,16 @@ void WombatForensics::RotateDig()
 	digcountlabel->setText(dighashcountstring);
 	if(digvidthumbtotal > 0)
 	    digtimercounter = 2;
+        else if(digarchivetotal > 0)
+            digtimercounter = 3;
 	else
 	    digtimercounter = 50;
     }
     else if(digtimercounter == 2 && digvidthumbtotal > 0)
     {
 	digcountlabel->setText(digvidcountstring);
+        if(digarchivetotal > 0)
+            digtimercounter = 3;
 	digtimercounter = 50;
     }
     else if(digtimercounter == 3 && digarchivetotal > 0)
