@@ -156,8 +156,8 @@ QString ParseI30Artifact(QString i30name, QString i30id)
     if(indxrootfile.isOpen())
         indxrootba = indxrootfile.readAll();
     indxrootfile.close();
-    uint32_t leroothdr = qFromLittleEndian<uint32_t>(indxrootba.left(4)); // uint 4 bytes
-    if(leroothdr == 0x30)
+    uint32_t leroothdr = qFromLittleEndian<uint32_t>(indxrootba.left(4)); // uint 4 bytes (0-3)
+    if(leroothdr == 0x30) // $FILE_NAME attribute (48)
     {
         // bytes 4-7 are collation sorting rule, which enforces filename sorting and not needed to parse.
 	uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxrootba.mid(8, 4)); // INDEX RECORD SIZE
@@ -332,6 +332,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
          }
         else // 0x00 NO $INDEX_ALLOCATION
         {
+            qDebug() << "no index allocation...";
             // bytes 29-31 are often blank, always unused. bytes 32 starts the 1st index entry...
             // byte 32 because header started at byte 16, and offset to 1st index entry was 16, 16+16=32
             uint curpos = 32;
@@ -357,7 +358,8 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                 uint64_t accessedtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(32, 8));
                 uint64_t logicalsize = qFromLittleEndian<uint64_t>(filenameattribute.mid(40, 8));
                 uint64_t physicalsize = qFromLittleEndian<uint64_t>(filenameattribute.mid(48, 8));
-                //uint64_t filenameflags = qFromLittleEndian<uint64_t>(filenameattribute.mid(56, 8));
+                //uint64_t filenameflags = qFromLittleEndian<uint64_t>(filenameattribute.mid(56, 4));
+                // 60-63 is reparse value
                 uint8_t fnamelength = qFromLittleEndian<uint8_t>(filenameattribute.mid(64, 1));
                 //uint8_t filenamespace = qFromLittleEndian<uint8_t>(filenameattribute.mid(65, 1));
                 if(indxentrylength == 0 || filenamelength == 0)
@@ -377,7 +379,8 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                 htmlstr += "<td>" + QString::number(physicalsize) + "</td>";
                 htmlstr += "<td>&nbsp;</td>";
                 htmlstr += "</tr>";
-                curpos = curpos + 16 + indxentrylength;
+                curpos = curpos + indxentrylength;
+                //curpos = curpos + 16 + indxentrylength;
                 a++;
             }
             /*
