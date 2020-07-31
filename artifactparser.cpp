@@ -1032,6 +1032,7 @@ void TransferFiles(QString thumbid, QString reppath)
         QString tmppath = reppath + "files/";
         if(curnode->itemtype == 2 || curnode->itemtype == 11) // directory
         {
+            //if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
             // EXPORT I30 PARSED CONTENT TO THE NEW PATH AS WELL.
             QDir dir;
             bool tmpdir = dir.mkpath(QString(tmppath + thumbid));
@@ -1041,14 +1042,17 @@ void TransferFiles(QString thumbid, QString reppath)
                 //LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
                 errorcount++;
             }
-            QString i30str = ParseI30Artifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
-            QFile tmpfile(tmppath + thumbid);
-            if(!tmpfile.isOpen())
-                tmpfile.open(QIODevice::WriteOnly);
-            if(tmpfile.isOpen())
+            if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
             {
-                tmpfile.write(i30str.toStdString().c_str());
-                tmpfile.close();
+                QString i30str = ParseI30Artifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                QFile tmpfile(tmppath + thumbid);
+                if(!tmpfile.isOpen())
+                    tmpfile.open(QIODevice::WriteOnly);
+                if(tmpfile.isOpen())
+                {
+                    tmpfile.write(i30str.toStdString().c_str());
+                    tmpfile.close();
+                }
             }
         }
         else

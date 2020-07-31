@@ -1893,10 +1893,10 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
     else if(filelisttype == 6) // Generate list for Archive category
     {
         QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant(("Archive")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
-        qDebug() << "archives found: indexlist count:" << indexlist.count();
+        //qDebug() << "archives found: indexlist count:" << indexlist.count();
         foreach(QModelIndex index, indexlist)
             tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
-        qDebug() << "archive tmplist value:" << tmplist.count();
+        //qDebug() << "archive tmplist value:" << tmplist.count();
         return tmplist;
     }
     return tmplist;

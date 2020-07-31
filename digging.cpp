@@ -929,6 +929,7 @@ QByteArray ReturnFileContent(QString objectid)
         }
         int err = 0;
         zip* zfile = zip_open(zipstr.toStdString().c_str(), ZIP_RDONLY, &err);
+        qDebug() << "zipstr:" << zipstr;
         struct zip_stat zstat;
         zip_stat_init(&zstat);
         // zip issue at below line, start to debug this...
