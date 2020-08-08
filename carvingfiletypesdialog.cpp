@@ -52,6 +52,7 @@ void CarvingFileTypesDialog::ShowText()
             for(int i=0; i < linelist.count(); i++)
             {
                 ui->filetypestablewidget->setItem(rowcount, i, new QTableWidgetItem(linelist.at(i)));
+                ui->filetypestablewidget->item(rowcount, i)->setFlags(ui->filetypestablewidget->item(rowcount, i)->flags() ^ Qt::ItemIsEditable);
             }
             //qDebug() << "rowcount:" << rowcount;
             rowcount++;
