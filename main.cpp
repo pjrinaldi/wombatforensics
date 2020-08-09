@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     Magick::InitializeMagick(*argv);
     //a.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
     WombatForensics w;
-    //qInstallMessageHandler(MyMessageOutput); // comment out to view debug statements in terminal
+    qInstallMessageHandler(MyMessageOutput); // comment out to view debug statements in terminal
     w.show();
     
     return a.exec();
