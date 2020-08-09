@@ -659,7 +659,8 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
 		    mutex.unlock();
                     tmparray = QByteArray::fromRawData(magicbuffer, charsize);
                     QMimeDatabase mimedb;
-                    const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                    //const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                    const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(QString::fromStdString(fsfile->name->name), tmparray);
                     QString mimestr = GenerateCategorySignature(mimetype);
                     if(mimestr.contains("Unknown")) // generate further analysis
                     {

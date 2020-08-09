@@ -351,7 +351,8 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                     tsk_fs_file_read(fsfile, 0, magicbuffer, 1024, TSK_FS_FILE_READ_FLAG_NONE);
                     tmparray = QByteArray::fromRawData(magicbuffer, 1024);
                     QMimeDatabase mimedb;
-                    const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+                    const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(QString::fromStdString(fsfile->name->name), tmparray);
+                    //const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
                     QString mimestr = GenerateCategorySignature(mimetype);
                     if(mimestr.contains("Unknown")) // generate further analysis
                     {
