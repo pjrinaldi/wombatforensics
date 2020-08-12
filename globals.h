@@ -439,7 +439,11 @@ public:
                 }
             }
             else if(index.column() == 2) // used to be 3
-                return itemnode->Data(index.column());
+	    {
+		QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+		return QString("%L1").arg(itemnode->Data(index.column()).toLongLong());
+                //return itemnode->Data(index.column());
+	    }
             else if(index.column() >= 3 && index.column() <= 6) // used to be >= 4 <= 7
             {
                 if(itemnode->Data(index.column()).toString().compare("0") == 0)
