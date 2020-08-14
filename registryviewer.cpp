@@ -74,7 +74,13 @@ void RegistryDialog::LoadRegistryFile(QString regid)
     libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
     libregf_key_t* rootkey = NULL;
     libregf_file_get_root_key(regfile, &rootkey, &regerr);
-    //libregf_key_get_number_of_sub_keys()
+    int rootsubkeycnt = 0;
+    libregf_key_get_number_of_sub_keys(rootkey, &rootsubkeycnt, &regerr);
+    qDebug() << "root subkey count:" << rootsubkeycnt;
+    libregf_error_fprint(regerr, stderr);
+    uint64_t rootfiletime = 0;
+    libregf_key_get_last_written_time(rootkey, &rootfiletime, &regerr);
+    qDebug() << "root filetime:" << rootfiletime;
     libregf_key_free(&rootkey, &regerr);
     libregf_file_close(regfile, &regerr);
     libregf_file_free(&regfile, &regerr);
