@@ -6,6 +6,8 @@
 RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegistryDialog)
 {
     ui->setupUi(this);
+    regfile = NULL;
+    regerr = NULL;
     /*
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
@@ -61,5 +63,17 @@ void RegistryDialog::UpdateList()
 
 void RegistryDialog::closeEvent(QCloseEvent* e)
 {
+    libregf_file_close(regfile, &regerr);
+    libregf_file_free(&regfile, &regerr);
+    libregf_error_free(&regerr);
     e->accept();
+}
+
+void RegistryDialog::LoadRegistryFile(QString regid)
+{
+    qDebug() << "regid:" << regid;
+    libregf_file_initialize(&regfile, &regerr);
+    QString regfilestr = wombatvariable.tmpfilepath + regid + "-fhex";
+    libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
+    this->show();
 }

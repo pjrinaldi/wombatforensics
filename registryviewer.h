@@ -22,6 +22,7 @@ class RegistryDialog : public QDialog
 public:
     RegistryDialog(QWidget* parent = 0);
     ~RegistryDialog();
+    void LoadRegistryFile(QString regid);
 
 private slots:
     void HideClicked();
@@ -35,6 +36,8 @@ protected:
 
 private:
     Ui::RegistryDialog* ui;
+    libregf_file_t* regfile;
+    libregf_error_t* regerr;
     //QFile bookmarkfile;
     //QStringList taglist;
 };

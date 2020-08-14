@@ -625,6 +625,13 @@ void WombatForensics::ShowFile(const QModelIndex &index)
 	pdfviewer->setWindowTitle("PDF Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
 	pdfviewer->ShowPdf(index.sibling(index.row(), 11).data().toString());
     }
+    else if(index.sibling(index.row(), 9).data().toString().startsWith("Registry"))
+    {
+        regviewer = new RegistryDialog();
+        regviewer->setAttribute(Qt::WA_DeleteOnClose);
+        regviewer->setWindowTitle("Registry Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        regviewer->LoadRegistryFile(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+    }
     else
     {
         QApplication::restoreOverrideCursor();
