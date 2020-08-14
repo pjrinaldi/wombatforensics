@@ -36,8 +36,6 @@ protected:
 
 private:
     Ui::RegistryDialog* ui;
-    //libregf_file_t* regfile;
-    //libregf_error_t* regerr;
     //QFile bookmarkfile;
     //QStringList taglist;
 };
