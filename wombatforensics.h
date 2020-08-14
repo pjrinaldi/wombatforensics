@@ -42,6 +42,7 @@
 #include "exporting.h"
 #include "newcase.h"
 #include "opencase.h"
+#include "registryviewer.h"
 
 class StatusLabel : public QLabel
 {
@@ -114,6 +115,7 @@ public:
     CarveDialog* carvedialog;
     FileCarvingDialog* filecarvedialog;
     PdfViewer* pdfviewer;
+    RegistryDialog* regviewer;
 
 signals:
     void CancelCurrentThread();

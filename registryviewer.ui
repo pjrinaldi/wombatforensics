@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RegistryViewerDialog</class>
- <widget class="QDialog" name="RegistryViewerDialog">
+ <class>RegistryDialog</class>
+ <widget class="QDialog" name="RegistryDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
