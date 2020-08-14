@@ -18,7 +18,8 @@ Current Features
 * Semi-Smart Carving for JPG's, GIF's, PNG's, PDF's, MPG1/2's, as well as the ability for the end user to enter carving information for simple header/footer file size carving. The semi-smart carving uses block information for other carved headers to restrict the file's. It isn't the best carver, but it is better than basic and is a good start. (v0.3+)
 * $I30 Parser, Lnk Parser, PreFetch Parser, Recycle Bin (INFO2, $I) Artifact Parser, Zip Archive Parser (v0.3+)
 * Zip File Extraction added to "Digging Deeper" capability (v0.3+)
-
+* HFS/HFS+ support (v0.3+)
+* Rudimentary APFS support, can not handle encrypted apfs volumes yet. (v0.3+)
 Current Viewers
 --
 * Image (v0.1+)
