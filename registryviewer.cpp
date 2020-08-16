@@ -95,10 +95,24 @@ void RegistryDialog::LoadRegistryFile(QString regid)
     QTreeWidgetItem* rootitem = new QTreeWidgetItem(ui->treeWidget);
     rootitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
     ui->treeWidget->addTopLevelItem(rootitem);
-    //ui->treeWidget->addTopLevelItem(new QTreeWidgetItem(
+    PopulateChildKeys(rootkey, rootitem, regerr);
     libregf_key_free(&rootkey, &regerr);
     libregf_file_close(regfile, &regerr);
     libregf_file_free(&regfile, &regerr);
     libregf_error_free(&regerr);
     this->show();
+}
+
+void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* curitem, libregf_error_t* regerr)
+{
+    uint64_t lasttime = 0;
+    libregf_key_get_last_written_time(curkey, &lasttime, &regerr);
+    qDebug() << "last time:" << ConvertWindowsTimeToUnixTimeUTC(lasttime);
+    qDebug() << "curitemtext:" << curitem->text(0);
+    // get sub key count
+    // loop over sub keys...
+    // populate to tree..
+    // will probably need a storage method for this, so when i select on it, it display value where i need it...
+    // if key has its own subkeys, then PopulateChildKeys(curkey, curitem, regerr);
+    // libregf_key_free(curkey, &regerr);
 }

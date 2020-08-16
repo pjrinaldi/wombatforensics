@@ -36,6 +36,7 @@ protected:
 
 private:
     Ui::RegistryDialog* ui;
+    void PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* curitem, libregf_error_t* curerr);
     //QFile bookmarkfile;
     //QStringList taglist;
 };
