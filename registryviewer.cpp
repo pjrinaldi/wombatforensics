@@ -66,14 +66,21 @@ void RegistryDialog::closeEvent(QCloseEvent* e)
 
 void RegistryDialog::LoadRegistryFile(QString regid)
 {
+    int retval = 0;
     qDebug() << "regid:" << regid;
     libregf_file_t* regfile = NULL;
     libregf_error_t* regerr = NULL;
     libregf_file_initialize(&regfile, &regerr);
     QString regfilestr = wombatvariable.tmpfilepath + regid + "-fhex";
-    libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
+    retval = 0;
+    retval = libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
+    qDebug() << "open registry file retval:" << retval;
+    libregf_error_fprint(regerr, stderr);
+    /*
     libregf_key_t* rootkey = NULL;
-    libregf_file_get_root_key(regfile, &rootkey, &regerr);
+    retval = libregf_file_get_root_key(regfile, &rootkey, &regerr);
+    qDebug() << "Get root key return value:" << retval;
+    libregf_error_fprint(regerr, stderr);
     int rootsubkeycnt = 0;
     libregf_key_get_number_of_sub_keys(rootkey, &rootsubkeycnt, &regerr);
     qDebug() << "root subkey count:" << rootsubkeycnt;
@@ -82,6 +89,7 @@ void RegistryDialog::LoadRegistryFile(QString regid)
     libregf_key_get_last_written_time(rootkey, &rootfiletime, &regerr);
     qDebug() << "root filetime:" << rootfiletime;
     libregf_key_free(&rootkey, &regerr);
+    */
     libregf_file_close(regfile, &regerr);
     libregf_file_free(&regfile, &regerr);
     libregf_error_free(&regerr);
