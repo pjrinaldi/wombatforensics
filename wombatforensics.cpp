@@ -1115,7 +1115,11 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     if(curitem.indexes().count() > 0)
     {
         selectedindex = curitem.indexes().at(0);
-        if(selectedindex.sibling(selectedindex.row(), 2).data().toLongLong() > 0) // file size
+	bool boolok;
+	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
+    	qint64 sizeval = clocale.toLongLong(selectedindex.sibling(selectedindex.row(), 2).data().toString(), &boolok);
+        //if(selectedindex.sibling(selectedindex.row(), 2).data().toLongLong() > 0) // file size
+	if(sizeval > 0)
             ui->actionView_File->setEnabled(true);
         else
             ui->actionView_File->setEnabled(false);
@@ -1381,7 +1385,11 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
     {
-        if(curindex.sibling(curindex.row(), 2).data().toLongLong() > 0)
+	bool boolok;
+	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
+    	qint64 sizeval = clocale.toLongLong(curindex.sibling(curindex.row(), 2).data().toString(), &boolok);
+        //if(curindex.sibling(curindex.row(), 2).data().toLongLong() > 0)
+	if(sizeval > 0)
             RewriteSelectedIdContent(curindex);
     }
     else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
