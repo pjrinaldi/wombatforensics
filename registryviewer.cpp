@@ -87,6 +87,15 @@ void RegistryDialog::LoadRegistryFile(QString regid)
     uint64_t rootfiletime = 0;
     libregf_key_get_last_written_time(rootkey, &rootfiletime, &regerr);
     qDebug() << "root filetime:" << rootfiletime << ConvertWindowsTimeToUnixTimeUTC(rootfiletime);
+    size_t namesize = 0;
+    uint8_t name[namesize];
+    libregf_key_get_name_size(rootkey, &namesize, &regerr);
+    libregf_key_get_name(rootkey, name, namesize, &regerr);
+    qDebug() << "key name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
+    QTreeWidgetItem* rootitem = new QTreeWidgetItem(ui->treeWidget);
+    rootitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
+    ui->treeWidget->addTopLevelItem(rootitem);
+    //ui->treeWidget->addTopLevelItem(new QTreeWidgetItem(
     libregf_key_free(&rootkey, &regerr);
     libregf_file_close(regfile, &regerr);
     libregf_file_free(&regfile, &regerr);
