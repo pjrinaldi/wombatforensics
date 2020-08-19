@@ -76,6 +76,9 @@
          <verstretch>1</verstretch>
         </sizepolicy>
        </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectItems</enum>
+       </property>
        <column>
         <property name="text">
          <string notr="true">1</string>

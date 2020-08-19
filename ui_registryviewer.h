@@ -80,6 +80,7 @@ public:
         sizePolicy2.setVerticalStretch(1);
         sizePolicy2.setHeightForWidth(treeWidget->sizePolicy().hasHeightForWidth());
         treeWidget->setSizePolicy(sizePolicy2);
+        treeWidget->setSelectionBehavior(QAbstractItemView::SelectItems);
         splitter->addWidget(treeWidget);
         splitter_3->addWidget(splitter);
         splitter_2 = new QSplitter(splitter_3);
