@@ -6,6 +6,8 @@
 RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegistryDialog)
 {
     ui->setupUi(this);
+    connect(ui->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(KeySelected(QTreeWidgetItem*, int)), Qt::DirectConnection);
+    //connect(ui->treeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     /*
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
@@ -59,6 +61,49 @@ void RegistryDialog::UpdateList()
     */
 }
 
+void RegistryDialog::KeySelected(QTreeWidgetItem* curitem, int itemindex)
+{
+    bool toplevel = false;
+    QStringList pathitems;
+    pathitems.clear();
+    pathitems.append(curitem->text(itemindex));
+    QTreeWidgetItem* parent;
+    QTreeWidgetItem* child;
+    child = curitem;
+    while(toplevel == false)
+    {
+	parent = child->parent();
+	if(parent == nullptr)
+	    toplevel = true;
+	else
+	{
+	    pathitems.append(parent->text(itemindex));
+	    child = parent;
+	}
+    }
+    qDebug() << "reverse path items:" << pathitems;
+    // build path
+    QString keypath = "";
+    for(int i = pathitems.count() - 1; i > -1; i--)
+    {
+	keypath += "/" + pathitems.at(i);
+	//qDebug() << "cur path item:" << pathitems.at(i);
+    }
+    //qDebug() << "keypath:" << keypath;
+    keypath.replace("/", "\\");
+    qDebug() << "keypath:" << keypath;
+    // attempt to open by path...
+    libregf_file_t* regfile = NULL;
+    libregf_error_t* regerr = NULL;
+    libregf_file_initialize(&regfile, &regerr);
+    libregf_file_open(regfile, regfilepath.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
+    libregf_key_t* curkey = NULL;
+    libregf_file_get_key_by_utf8_path(regfile, (uint8_t*)(keypath.toUtf8().data()), keypath.toUtf8().size(), &curkey, &regerr);
+    libregf_key_free(&curkey, &regerr);
+    libregf_file_close(regfile, &regerr);
+    libregf_file_free(&regfile, &regerr);
+    libregf_error_free(&regerr);
+}
 void RegistryDialog::closeEvent(QCloseEvent* e)
 {
     e->accept();
@@ -72,13 +117,14 @@ void RegistryDialog::LoadRegistryFile(QString regid)
     libregf_error_t* regerr = NULL;
     libregf_file_initialize(&regfile, &regerr);
     QString regfilestr = wombatvariable.tmpfilepath + regid + "-fhex";
+    regfilepath = regfilestr;
     retval = 0;
     retval = libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
-    qDebug() << "open registry file retval:" << retval;
+    //qDebug() << "open registry file retval:" << retval;
     libregf_error_fprint(regerr, stderr);
     libregf_key_t* rootkey = NULL;
     retval = libregf_file_get_root_key(regfile, &rootkey, &regerr);
-    qDebug() << "Get root key return value:" << retval;
+    //qDebug() << "Get root key return value:" << retval;
     libregf_error_fprint(regerr, stderr);
     int rootsubkeycnt = 0;
     libregf_key_get_number_of_sub_keys(rootkey, &rootsubkeycnt, &regerr);
@@ -113,7 +159,7 @@ void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* c
     libregf_key_get_number_of_sub_keys(curkey, &subkeycount, &regerr);
     if(subkeycount > 0)
     {
-	qDebug() << "subkeycount:" << subkeycount;
+	//qDebug() << "subkeycount:" << subkeycount;
 	for(int i=0; i < subkeycount; i++)
 	{
 	    libregf_key_t* cursubkey = NULL;

@@ -29,6 +29,7 @@ private slots:
     void Assign();
     void UpdateList();
     void UpdateAssign();
+    void KeySelected(QTreeWidgetItem* curitem, int itemindex);
 signals:
     //void TagCarved(QString ctitle, QString ctag);
 protected:
@@ -37,6 +38,7 @@ protected:
 private:
     Ui::RegistryDialog* ui;
     void PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* curitem, libregf_error_t* curerr);
+    QString regfilepath;
     //QFile bookmarkfile;
     //QStringList taglist;
 };
