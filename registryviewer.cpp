@@ -84,14 +84,17 @@ void RegistryDialog::KeySelected(QTreeWidgetItem* curitem, int itemindex)
     qDebug() << "reverse path items:" << pathitems;
     // build path
     QString keypath = "";
-    for(int i = pathitems.count() - 1; i > -1; i--)
+    QChar sepchar = QChar(92);
+    for(int i = pathitems.count() - 2; i > -1; i--)
     {
 	keypath += "/" + pathitems.at(i);
 	//qDebug() << "cur path item:" << pathitems.at(i);
     }
+    //qDebug() << "sepchar:" << sepchar;
     //qDebug() << "keypath:" << keypath;
-    keypath.replace("/", "\\");
-    qDebug() << "keypath:" << keypath;
+    keypath.replace("/", sepchar);
+    //ui->plainTextEdit->setPlainText(keypath);
+    //qDebug() << "keypath:" << keypath;
     // attempt to open by path...
     libregf_file_t* regfile = NULL;
     libregf_error_t* regerr = NULL;
@@ -99,6 +102,18 @@ void RegistryDialog::KeySelected(QTreeWidgetItem* curitem, int itemindex)
     libregf_file_open(regfile, regfilepath.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
     libregf_key_t* curkey = NULL;
     libregf_file_get_key_by_utf8_path(regfile, (uint8_t*)(keypath.toUtf8().data()), keypath.toUtf8().size(), &curkey, &regerr);
+    // valid key, get values...
+    int valuecount = 0;
+    libregf_key_get_number_of_values(curkey, &valuecount, &regerr);
+    qDebug() << "value count:" << valuecount;
+    //libregf_error_fprint(regerr, stderr);
+    //size_t namesize = 0;
+    //libregf_key_get_utf8_name_size(curkey, &namesize, &regerr);
+    //libregf_error_fprint(regerr, stderr);
+    //uint8_t name[namesize];
+    //libregf_key_get_utf8_name(curkey, name, namesize, &regerr);
+    //libregf_error_fprint(regerr, stderr);
+    //qDebug() << "key name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
     libregf_key_free(&curkey, &regerr);
     libregf_file_close(regfile, &regerr);
     libregf_file_free(&regfile, &regerr);
