@@ -143,6 +143,7 @@ void RegistryDialog::KeySelected(void)
     int valuecount = 0;
     libregf_key_get_number_of_values(curkey, &valuecount, &regerr);
     ui->tableWidget->clear();
+    ui->plainTextEdit->setPlainText("");
     ui->tableWidget->setRowCount(valuecount);
     for(int i=0; i < valuecount; i++)
     {
@@ -165,10 +166,62 @@ void RegistryDialog::KeySelected(void)
 	}
 	else
 	{
+            QString valuetypestr = "";
 	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value Type"});
 	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::fromUtf8(reinterpret_cast<char*>(name))));
-	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(type)));
+            if(type == 0x00) // none
+            {
+            }
+            else if(type == 0x01) // reg_sz
+            {
+                valuetypestr = "REG_SZ";
+            }
+            else if(type == 0x02) // reg_expand_sz
+            {
+                valuetypestr = "REG_EXPAND_SZ";
+            }
+            else if(type == 0x03) // reg_binary
+            {
+                valuetypestr = "REG_BINARY";
+            }
+            else if(type == 0x04) // reg_dword reg_dword_little_endian (4 bytes)
+            {
+                valuetypestr = "REG_DWORD";
+            }
+            else if(type == 0x05) // reg_dword_big_endian (4 bytes)
+            {
+                valuetypestr = "REG_DWORD_BIG_ENDIAN";
+            }
+            else if(type == 0x06) // reg_link
+            {
+                valuetypestr = "REG_LINK";
+            }
+            else if(type == 0x07) // reg_multi_sz
+            {
+                valuetypestr = "REG_MULTI_SZ";
+            }
+            else if(type == 0x08) // reg_resource_list
+            {
+                valuetypestr = "REG_RESOURCE_LIST";
+            }
+            else if(type == 0x09) // reg_full_resource_descriptor
+            {
+                valuetypestr = "REG_FULL_RESOURCE_DESCRIPTOR";
+            }
+            else if(type == 0x0a) // reg_resource_requirements_list
+            {
+                valuetypestr = "REG_RESOURCE_REQUIREMENTS_LIST";
+            }
+            else if(type == 0x0b) // reg_qword_little_endian (8 bytes)
+            {
+                valuetypestr = "REG_QWORD";
+            }
+            else
+            {
+            }
+	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(valuetypestr));
 	}
+        ui->tableWidget->setCurrentCell(0, 0);
 	libregf_value_free(&curval, &regerr);
     }
     //qDebug() << "value count:" << valuecount;
