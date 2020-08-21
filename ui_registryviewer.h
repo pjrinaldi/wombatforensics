@@ -65,7 +65,7 @@ public:
         splitter = new QSplitter(splitter_3);
         splitter->setObjectName(QString::fromUtf8("splitter"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Ignored);
-        sizePolicy1.setHorizontalStretch(1);
+        sizePolicy1.setHorizontalStretch(2);
         sizePolicy1.setVerticalStretch(1);
         sizePolicy1.setHeightForWidth(splitter->sizePolicy().hasHeightForWidth());
         splitter->setSizePolicy(sizePolicy1);
@@ -78,7 +78,7 @@ public:
         treeWidget->setHeaderItem(__qtreewidgetitem);
         treeWidget->setObjectName(QString::fromUtf8("treeWidget"));
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy2.setHorizontalStretch(1);
+        sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(1);
         sizePolicy2.setHeightForWidth(treeWidget->sizePolicy().hasHeightForWidth());
         treeWidget->setSizePolicy(sizePolicy2);
@@ -87,6 +87,11 @@ public:
         splitter_3->addWidget(splitter);
         splitter_2 = new QSplitter(splitter_3);
         splitter_2->setObjectName(QString::fromUtf8("splitter_2"));
+        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        sizePolicy3.setHorizontalStretch(2);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(splitter_2->sizePolicy().hasHeightForWidth());
+        splitter_2->setSizePolicy(sizePolicy3);
         splitter_2->setOrientation(Qt::Vertical);
         tableWidget = new QTableWidget(splitter_2);
         if (tableWidget->columnCount() < 2)
@@ -108,6 +113,8 @@ public:
         splitter_2->addWidget(plainTextEdit);
         hexEdit = new QHexEdit(splitter_2);
         hexEdit->setObjectName(QString::fromUtf8("hexEdit"));
+        sizePolicy2.setHeightForWidth(hexEdit->sizePolicy().hasHeightForWidth());
+        hexEdit->setSizePolicy(sizePolicy2);
         hexEdit->setHexCaps(true);
         hexEdit->setDynamicBytesPerLine(true);
         hexEdit->setReadOnly(true);

@@ -56,7 +56,7 @@
      <widget class="QSplitter" name="splitter">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
-        <horstretch>1</horstretch>
+        <horstretch>2</horstretch>
         <verstretch>1</verstretch>
        </sizepolicy>
       </property>
@@ -72,7 +72,7 @@
       <widget class="QTreeWidget" name="treeWidget">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>1</horstretch>
+         <horstretch>0</horstretch>
          <verstretch>1</verstretch>
         </sizepolicy>
        </property>
@@ -87,6 +87,12 @@
       </widget>
      </widget>
      <widget class="QSplitter" name="splitter_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>2</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
@@ -126,6 +132,12 @@
        </property>
       </widget>
       <widget class="QHexEdit" name="hexEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
        <property name="toolTip">
         <string>QHexEditWidget</string>
        </property>
