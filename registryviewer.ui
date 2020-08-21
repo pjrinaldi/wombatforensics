@@ -125,6 +125,23 @@
         <string/>
        </property>
       </widget>
+      <widget class="QHexEdit" name="hexEdit">
+       <property name="toolTip">
+        <string>QHexEditWidget</string>
+       </property>
+       <property name="whatsThis">
+        <string>QHexEdit widget allow to edit the data in hex view.</string>
+       </property>
+       <property name="hexCaps">
+        <bool>true</bool>
+       </property>
+       <property name="dynamicBytesPerLine">
+        <bool>true</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>
@@ -149,6 +166,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QHexEdit</class>
+   <extends>QFrame</extends>
+   <header>qhexedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

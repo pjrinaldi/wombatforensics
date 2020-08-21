@@ -20,6 +20,7 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
+#include "qhexedit.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -34,6 +35,7 @@ public:
     QSplitter *splitter_2;
     QTableWidget *tableWidget;
     QPlainTextEdit *plainTextEdit;
+    QHexEdit *hexEdit;
     QLabel *label;
 
     void setupUi(QDialog *RegistryDialog)
@@ -104,6 +106,12 @@ public:
         font.setFamily(QString::fromUtf8("Source Code Pro"));
         plainTextEdit->setFont(font);
         splitter_2->addWidget(plainTextEdit);
+        hexEdit = new QHexEdit(splitter_2);
+        hexEdit->setObjectName(QString::fromUtf8("hexEdit"));
+        hexEdit->setHexCaps(true);
+        hexEdit->setDynamicBytesPerLine(true);
+        hexEdit->setReadOnly(true);
+        splitter_2->addWidget(hexEdit);
         splitter_3->addWidget(splitter_2);
 
         verticalLayout->addWidget(splitter_3);
@@ -128,6 +136,12 @@ public:
         RegistryDialog->setWindowTitle(QCoreApplication::translate("RegistryDialog", "Registry Viewer", nullptr));
         toolButton->setText(QCoreApplication::translate("RegistryDialog", "...", nullptr));
         plainTextEdit->setPlaceholderText(QString());
+#if QT_CONFIG(tooltip)
+        hexEdit->setToolTip(QCoreApplication::translate("RegistryDialog", "QHexEditWidget", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        hexEdit->setWhatsThis(QCoreApplication::translate("RegistryDialog", "QHexEdit widget allow to edit the data in hex view.", nullptr));
+#endif // QT_CONFIG(whatsthis)
         label->setText(QCoreApplication::translate("RegistryDialog", "TextLabel", nullptr));
     } // retranslateUi
 
