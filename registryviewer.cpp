@@ -88,8 +88,9 @@ void RegistryDialog::ValueSelected(void)
 	    libregf_value_get_value_data_size(curval, &datasize, &regerr);
 	    uint8_t data[datasize];
 	    libregf_value_get_value_data(curval, data, datasize, &regerr);
-	    valuedata += "Data\n----\n";
-	    valuedata += QString::fromStdString(QByteArray::fromRawData((char*)data, datasize).toHex().toStdString());
+	    //valuedata += "Data\n----\n";
+	    //valuedata += QString::fromStdString(QByteArray::fromRawData((char*)data, datasize).toHex().toStdString());
+            ui->hexEdit->setData(QByteArray::fromRawData((char*)data, datasize));
 	}
 	ui->plainTextEdit->setPlainText(valuedata);
     }
@@ -144,6 +145,8 @@ void RegistryDialog::KeySelected(void)
     libregf_key_get_number_of_values(curkey, &valuecount, &regerr);
     ui->tableWidget->clear();
     ui->plainTextEdit->setPlainText("");
+    ui->hexEdit->BypassColor(true);
+    ui->hexEdit->setData("");
     ui->tableWidget->setRowCount(valuecount);
     for(int i=0; i < valuecount; i++)
     {
@@ -155,8 +158,8 @@ void RegistryDialog::KeySelected(void)
 	libregf_value_get_utf8_name(curval, name, namesize, &regerr);
 	uint32_t type = 0;
 	libregf_value_get_value_type(curval, &type, &regerr);
-	size_t datasize = 0;
-	libregf_value_get_value_data_size(curval, &datasize, &regerr);
+	//size_t datasize = 0;
+	//libregf_value_get_value_data_size(curval, &datasize, &regerr);
 	//qDebug() << "name size:" << namesize << "value name:" << QString::fromUtf8(reinterpret_cast<char*>(name)) << "value type:" << type << "data size:" << datasize;
 	if(namesize == 0)
 	{
