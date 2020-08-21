@@ -76,14 +76,41 @@ void RegistryDialog::ValueSelected(void)
 	libregf_value_t* curval = NULL;
 	libregf_key_get_value(curkey, valueindex, &curval, &regerr);
 	QString valuedata = "Name:\t" + ui->tableWidget->selectedItems().first()->text() + "\n";
-	valuedata += "Content\n-------\n\n";
 	if(ui->tableWidget->selectedItems().first()->text().contains("(unnamed)"))
 	{
+	    valuedata += "Content\n-------\n\n";
 	    valuedata += "Hex:\t0x" + ui->tableWidget->selectedItems().last()->text() + "\n";
 	    valuedata += "Integer:\t" + QString::number(ui->tableWidget->selectedItems().last()->text().toInt(nullptr, 16)) + "\n";
 	}
 	else
 	{
+            valuedata += "Content:\t";
+            QString valuetype = ui->tableWidget->selectedItems().last()->text();
+            //qDebug() << "valuetype:" << valuetype;
+            if(valuetype.contains("REG_SZ"))
+            {
+            }
+            else if(valuetype.contains("REG_EXPAND_SZ"))
+            {
+            }
+            else if(valuetype.contains("REG_BINARY"))
+            {
+            }
+            else if(valuetype.contains("REG_DWORD"))
+            {
+            }
+            else if(valuetype.contains("REG_DWORD_BIG_ENDIAN"))
+            {
+            }
+            else if(valuetype.contains("REG_LINK"))
+            {
+            }
+            else if(valuetype.contains("REG_MULTI_SZ"))
+            {
+            }
+            else if(valuetype.contains("REG_RESOURCE_LiST"))
+            {
+            }
 	    size_t datasize = 0;
 	    libregf_value_get_value_data_size(curval, &datasize, &regerr);
 	    uint8_t data[datasize];
