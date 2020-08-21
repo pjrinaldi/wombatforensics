@@ -67,7 +67,7 @@ void RegistryDialog::closeEvent(QCloseEvent* e)
 void RegistryDialog::LoadRegistryFile(QString regid)
 {
     int retval = 0;
-    qDebug() << "regid:" << regid;
+    //qDebug() << "regid:" << regid;
     libregf_file_t* regfile = NULL;
     libregf_error_t* regerr = NULL;
     libregf_file_initialize(&regfile, &regerr);
@@ -82,16 +82,16 @@ void RegistryDialog::LoadRegistryFile(QString regid)
     libregf_error_fprint(regerr, stderr);
     int rootsubkeycnt = 0;
     libregf_key_get_number_of_sub_keys(rootkey, &rootsubkeycnt, &regerr);
-    qDebug() << "root subkey count:" << rootsubkeycnt;
+    //qDebug() << "root subkey count:" << rootsubkeycnt;
     libregf_error_fprint(regerr, stderr);
     uint64_t rootfiletime = 0;
     libregf_key_get_last_written_time(rootkey, &rootfiletime, &regerr);
-    qDebug() << "root filetime:" << rootfiletime << ConvertWindowsTimeToUnixTimeUTC(rootfiletime);
+    //qDebug() << "root filetime:" << rootfiletime << ConvertWindowsTimeToUnixTimeUTC(rootfiletime);
     size_t namesize = 0;
-    libregf_key_get_name_size(rootkey, &namesize, &regerr);
+    libregf_key_get_utf8_name_size(rootkey, &namesize, &regerr);
     uint8_t name[namesize];
-    libregf_key_get_name(rootkey, name, namesize, &regerr);
-    qDebug() << "key name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
+    libregf_key_get_utf8_name(rootkey, name, namesize, &regerr);
+    //qDebug() << "key name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
     QTreeWidgetItem* rootitem = new QTreeWidgetItem(ui->treeWidget);
     rootitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
     ui->treeWidget->addTopLevelItem(rootitem);
@@ -108,8 +108,8 @@ void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* c
     uint64_t lasttime = 0;
     int subkeycount = 0;
     libregf_key_get_last_written_time(curkey, &lasttime, &regerr);
-    qDebug() << "last time:" << ConvertWindowsTimeToUnixTimeUTC(lasttime);
-    qDebug() << "curitemtext:" << curitem->text(0);
+    //qDebug() << "last time:" << ConvertWindowsTimeToUnixTimeUTC(lasttime);
+    //qDebug() << "curitemtext:" << curitem->text(0);
     libregf_key_get_number_of_sub_keys(curkey, &subkeycount, &regerr);
     if(subkeycount > 0)
     {
@@ -119,10 +119,10 @@ void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* c
 	    libregf_key_t* cursubkey = NULL;
 	    libregf_key_get_sub_key(curkey, i, &cursubkey, &regerr);
 	    size_t namesize = 0;
-	    libregf_key_get_name_size(cursubkey, &namesize, &regerr);
+	    libregf_key_get_utf8_name_size(cursubkey, &namesize, &regerr);
 	    uint8_t name[namesize];
-	    libregf_key_get_name(cursubkey, name, namesize, &regerr);
-	    qDebug() << "subkey" << i << " name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
+	    libregf_key_get_utf8_name(cursubkey, name, namesize, &regerr);
+	    //qDebug() << "subkey" << i << " name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
 	    QTreeWidgetItem* subitem = new QTreeWidgetItem(curitem);
 	    subitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
 	    curitem->addChild(subitem);
@@ -130,7 +130,7 @@ void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* c
 	    libregf_key_get_number_of_sub_keys(cursubkey, &subsubkeycount, &regerr);
 	    if(subsubkeycount > 0)
 	    {
-		qDebug() << "get child keys for current subkey";
+		//qDebug() << "get child keys for current subkey";
 		PopulateChildKeys(cursubkey, subitem, regerr);
 	    }
 	    //QTreeWidgetItem* curitem = new QTreeWidgetItem(curitem);
