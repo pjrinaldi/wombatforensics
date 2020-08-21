@@ -81,7 +81,7 @@ void RegistryDialog::KeySelected(QTreeWidgetItem* curitem, int itemindex)
 	    child = parent;
 	}
     }
-    qDebug() << "reverse path items:" << pathitems;
+    //qDebug() << "reverse path items:" << pathitems;
     // build path
     QString keypath = "";
     QChar sepchar = QChar(92);
@@ -96,6 +96,7 @@ void RegistryDialog::KeySelected(QTreeWidgetItem* curitem, int itemindex)
     //ui->plainTextEdit->setPlainText(keypath);
     //qDebug() << "keypath:" << keypath;
     // attempt to open by path...
+    ui->label->setText(keypath);
     libregf_file_t* regfile = NULL;
     libregf_error_t* regerr = NULL;
     libregf_file_initialize(&regfile, &regerr);
@@ -105,7 +106,35 @@ void RegistryDialog::KeySelected(QTreeWidgetItem* curitem, int itemindex)
     // valid key, get values...
     int valuecount = 0;
     libregf_key_get_number_of_values(curkey, &valuecount, &regerr);
-    qDebug() << "value count:" << valuecount;
+    ui->tableWidget->setRowCount(valuecount);
+    for(int i=0; i < valuecount; i++)
+    {
+	libregf_value_t* curval = NULL;
+	libregf_key_get_value(curkey, i, &curval, &regerr);
+	size_t namesize = 0;
+	libregf_value_get_utf8_name_size(curval, &namesize, &regerr);
+	uint8_t name[namesize];
+	libregf_value_get_utf8_name(curval, name, namesize, &regerr);
+	uint32_t type = 0;
+	libregf_value_get_value_type(curval, &type, &regerr);
+	size_t datasize = 0;
+	libregf_value_get_value_data_size(curval, &datasize, &regerr);
+	//qDebug() << "name size:" << namesize << "value name:" << QString::fromUtf8(reinterpret_cast<char*>(name)) << "value type:" << type << "data size:" << datasize;
+	if(namesize == 0)
+	{
+	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value"});
+	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem("(unnamed)"));
+	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(type, 16)));
+	}
+	else
+	{
+	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value Type"});
+	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::fromUtf8(reinterpret_cast<char*>(name))));
+	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(type)));
+	}
+	libregf_value_free(&curval, &regerr);
+    }
+    //qDebug() << "value count:" << valuecount;
     //libregf_error_fprint(regerr, stderr);
     //size_t namesize = 0;
     //libregf_key_get_utf8_name_size(curkey, &namesize, &regerr);

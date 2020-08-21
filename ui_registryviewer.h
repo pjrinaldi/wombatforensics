@@ -90,10 +90,13 @@ public:
         if (tableWidget->columnCount() < 2)
             tableWidget->setColumnCount(2);
         tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
+        tableWidget->setRowCount(0);
         tableWidget->setColumnCount(2);
         splitter_2->addWidget(tableWidget);
+        tableWidget->horizontalHeader()->setVisible(true);
         tableWidget->horizontalHeader()->setCascadingSectionResizes(false);
         tableWidget->horizontalHeader()->setStretchLastSection(true);
+        tableWidget->verticalHeader()->setVisible(false);
         plainTextEdit = new QPlainTextEdit(splitter_2);
         plainTextEdit->setObjectName(QString::fromUtf8("plainTextEdit"));
         splitter_2->addWidget(plainTextEdit);
