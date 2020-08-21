@@ -89,27 +89,41 @@ void RegistryDialog::ValueSelected(void)
             //qDebug() << "valuetype:" << valuetype;
             if(valuetype.contains("REG_SZ"))
             {
+                //libregf_value_get_value_utf8_string_size(
+                //libregf_value_get_value_utf8_string(
             }
             else if(valuetype.contains("REG_EXPAND_SZ"))
             {
+                //libregf_value_get_value_utf8_string_size(
+                //libregf_value_get_value_utf8_string(
             }
             else if(valuetype.contains("REG_BINARY"))
             {
+                //libregf_value_get_value_binary_data_size(
+                //libregf_value_get_value_binary_data(
             }
             else if(valuetype.contains("REG_DWORD"))
             {
+                //libregf_value_get_value_32bit(
             }
             else if(valuetype.contains("REG_DWORD_BIG_ENDIAN"))
             {
-            }
-            else if(valuetype.contains("REG_LINK"))
-            {
+                //libregf_value_get_value_32bit(
             }
             else if(valuetype.contains("REG_MULTI_SZ"))
             {
+                /*int libregf_value_get_value_multi_string(
+                libregf_value_t *value,
+                libregf_multi_string_t **multi_string,
+                libregf_error_t **error );*/
+                //int libregf_multi_string_free(libregf_multi_string_t **multi_string,libregf_error_t **error );
+                //int libregf_multi_string_get_number_of_strings(libregf_multi_string_t *multi_string,int *number_of_strings,libregf_error_t **error );
+                //int libregf_multi_string_get_utf8_string_size(libregf_multi_string_t *multi_string,int string_index,size_t *utf8_string_size,libregf_error_t **error );
+                //int libregf_multi_string_get_utf8_string(libregf_multi_string_t *multi_string,int string_index,uint8_t *utf8_string,size_t utf8_string_size,libregf_error_t **error );
             }
-            else if(valuetype.contains("REG_RESOURCE_LiST"))
+            else if(valuetype.contains("REG_QWORD"))
             {
+                //libregf_value_get_value_64bit(
             }
 	    size_t datasize = 0;
 	    libregf_value_get_value_data_size(curval, &datasize, &regerr);
