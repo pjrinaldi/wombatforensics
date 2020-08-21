@@ -90,6 +90,7 @@ public:
         if (tableWidget->columnCount() < 2)
             tableWidget->setColumnCount(2);
         tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
+        tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
         tableWidget->setRowCount(0);
         tableWidget->setColumnCount(2);
         splitter_2->addWidget(tableWidget);
@@ -99,6 +100,9 @@ public:
         tableWidget->verticalHeader()->setVisible(false);
         plainTextEdit = new QPlainTextEdit(splitter_2);
         plainTextEdit->setObjectName(QString::fromUtf8("plainTextEdit"));
+        QFont font;
+        font.setFamily(QString::fromUtf8("Source Code Pro"));
+        plainTextEdit->setFont(font);
         splitter_2->addWidget(plainTextEdit);
         splitter_3->addWidget(splitter_2);
 
@@ -123,6 +127,7 @@ public:
     {
         RegistryDialog->setWindowTitle(QCoreApplication::translate("RegistryDialog", "Registry Viewer", nullptr));
         toolButton->setText(QCoreApplication::translate("RegistryDialog", "...", nullptr));
+        plainTextEdit->setPlaceholderText(QString());
         label->setText(QCoreApplication::translate("RegistryDialog", "TextLabel", nullptr));
     } // retranslateUi
 

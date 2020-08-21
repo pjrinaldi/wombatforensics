@@ -6,8 +6,8 @@
 RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegistryDialog)
 {
     ui->setupUi(this);
-    connect(ui->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(KeySelected(QTreeWidgetItem*, int)), Qt::DirectConnection);
-    //connect(ui->treeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
+    connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
+    connect(ui->tableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(ValueSelected()), Qt::DirectConnection);
     /*
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
@@ -61,8 +61,44 @@ void RegistryDialog::UpdateList()
     */
 }
 
-void RegistryDialog::KeySelected(QTreeWidgetItem* curitem, int itemindex)
+void RegistryDialog::ValueSelected(void)
 {
+    if(ui->tableWidget->selectedItems().count() > 0)
+    {
+	int valueindex = ui->tableWidget->selectedItems().first()->row();
+	QString keypath = ui->label->text();
+	libregf_file_t* regfile = NULL;
+	libregf_error_t* regerr = NULL;
+	libregf_file_initialize(&regfile, &regerr);
+	libregf_file_open(regfile, regfilepath.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
+	libregf_key_t* curkey = NULL;
+	libregf_file_get_key_by_utf8_path(regfile, (uint8_t*)(keypath.toUtf8().data()), keypath.toUtf8().size(), &curkey, &regerr);
+	libregf_value_t* curval = NULL;
+	libregf_key_get_value(curkey, valueindex, &curval, &regerr);
+	QString valuedata = "Name:\t" + ui->tableWidget->selectedItems().first()->text() + "\n";
+	valuedata += "Content\n-------\n\n";
+	if(ui->tableWidget->selectedItems().first()->text().contains("(unnamed)"))
+	{
+	    valuedata += "Hex:\t0x" + ui->tableWidget->selectedItems().last()->text() + "\n";
+	    valuedata += "Integer:\t" + QString::number(ui->tableWidget->selectedItems().last()->text().toInt(nullptr, 16)) + "\n";
+	}
+	else
+	{
+	    size_t datasize = 0;
+	    libregf_value_get_value_data_size(curval, &datasize, &regerr);
+	    uint8_t data[datasize];
+	    libregf_value_get_value_data(curval, data, datasize, &regerr);
+	    valuedata += "Data\n----\n";
+	    valuedata += QString::fromStdString(QByteArray::fromRawData((char*)data, datasize).toHex().toStdString());
+	}
+	ui->plainTextEdit->setPlainText(valuedata);
+    }
+}
+
+void RegistryDialog::KeySelected(void)
+{
+    int itemindex = 0;
+    QTreeWidgetItem* curitem = ui->treeWidget->selectedItems().first();
     bool toplevel = false;
     QStringList pathitems;
     pathitems.clear();
@@ -106,6 +142,7 @@ void RegistryDialog::KeySelected(QTreeWidgetItem* curitem, int itemindex)
     // valid key, get values...
     int valuecount = 0;
     libregf_key_get_number_of_values(curkey, &valuecount, &regerr);
+    ui->tableWidget->clear();
     ui->tableWidget->setRowCount(valuecount);
     for(int i=0; i < valuecount; i++)
     {
@@ -155,19 +192,19 @@ void RegistryDialog::closeEvent(QCloseEvent* e)
 
 void RegistryDialog::LoadRegistryFile(QString regid)
 {
-    int retval = 0;
+    //int retval = 0;
     //qDebug() << "regid:" << regid;
     libregf_file_t* regfile = NULL;
     libregf_error_t* regerr = NULL;
     libregf_file_initialize(&regfile, &regerr);
     QString regfilestr = wombatvariable.tmpfilepath + regid + "-fhex";
     regfilepath = regfilestr;
-    retval = 0;
-    retval = libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
+    //retval = 0;
+    libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
     //qDebug() << "open registry file retval:" << retval;
     libregf_error_fprint(regerr, stderr);
     libregf_key_t* rootkey = NULL;
-    retval = libregf_file_get_root_key(regfile, &rootkey, &regerr);
+    libregf_file_get_root_key(regfile, &rootkey, &regerr);
     //qDebug() << "Get root key return value:" << retval;
     libregf_error_fprint(regerr, stderr);
     int rootsubkeycnt = 0;

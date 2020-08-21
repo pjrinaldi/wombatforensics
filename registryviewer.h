@@ -29,7 +29,8 @@ private slots:
     void Assign();
     void UpdateList();
     void UpdateAssign();
-    void KeySelected(QTreeWidgetItem* curitem, int itemindex);
+    void KeySelected(void);
+    void ValueSelected(void);
 signals:
     //void TagCarved(QString ctitle, QString ctag);
 protected:

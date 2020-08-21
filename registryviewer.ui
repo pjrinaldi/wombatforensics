@@ -91,6 +91,9 @@
        <enum>Qt::Vertical</enum>
       </property>
       <widget class="QTableWidget" name="tableWidget">
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
        <property name="rowCount">
         <number>0</number>
        </property>
@@ -112,7 +115,16 @@
        <column/>
        <column/>
       </widget>
-      <widget class="QPlainTextEdit" name="plainTextEdit"/>
+      <widget class="QPlainTextEdit" name="plainTextEdit">
+       <property name="font">
+        <font>
+         <family>Source Code Pro</family>
+        </font>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>
