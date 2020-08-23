@@ -89,6 +89,11 @@ void RegistryDialog::ValueSelected(void)
             //qDebug() << "valuetype:" << valuetype;
             if(valuetype.contains("REG_SZ"))
             {
+                size_t strsize = 0;
+                libregf_value_get_value_utf8_string_size(curval, &strsize, &regerr);
+                uint8_t valstr[strsize];
+                libregf_value_get_value_utf8_string(curval, valstr, strsize, &regerr);
+                valuedata += QString::fromUtf8(reinterpret_cast<char*>(valstr));
                 //libregf_value_get_value_utf8_string_size(
                 //libregf_value_get_value_utf8_string(
             }
