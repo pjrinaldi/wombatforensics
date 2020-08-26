@@ -84,23 +84,16 @@ void RegistryDialog::ValueSelected(void)
 	}
 	else
 	{
-            valuedata += "Content:\t";
             QString valuetype = ui->tableWidget->selectedItems().last()->text();
             //qDebug() << "valuetype:" << valuetype;
-            if(valuetype.contains("REG_SZ"))
+            if(valuetype.contains("REG_SZ") || valuetype.contains("REG_EXPAND_SZ"))
             {
+                valuedata += "Content:\t";
                 size_t strsize = 0;
                 libregf_value_get_value_utf8_string_size(curval, &strsize, &regerr);
                 uint8_t valstr[strsize];
                 libregf_value_get_value_utf8_string(curval, valstr, strsize, &regerr);
                 valuedata += QString::fromUtf8(reinterpret_cast<char*>(valstr));
-                //libregf_value_get_value_utf8_string_size(
-                //libregf_value_get_value_utf8_string(
-            }
-            else if(valuetype.contains("REG_EXPAND_SZ"))
-            {
-                //libregf_value_get_value_utf8_string_size(
-                //libregf_value_get_value_utf8_string(
             }
             else if(valuetype.contains("REG_BINARY"))
             {
@@ -109,14 +102,23 @@ void RegistryDialog::ValueSelected(void)
             }
             else if(valuetype.contains("REG_DWORD"))
             {
+                valuedata += "Content:\t";
+                uint32_t dwordvalue = 0;
+                libregf_value_get_value_32bit(curval, &dwordvalue, &regerr);
+                if(ui->tableWidget->selectedItems().first()->text().toLower().contains("date"))
+                    valuedata += ConvertUnixTimeToString(dwordvalue);
+                else
+                    valuedata += QString::number(dwordvalue);
                 //libregf_value_get_value_32bit(
             }
             else if(valuetype.contains("REG_DWORD_BIG_ENDIAN"))
             {
+                valuedata += "Content:\t";
                 //libregf_value_get_value_32bit(
             }
             else if(valuetype.contains("REG_MULTI_SZ"))
             {
+                valuedata += "Content:\t";
                 /*int libregf_value_get_value_multi_string(
                 libregf_value_t *value,
                 libregf_multi_string_t **multi_string,
@@ -128,8 +130,10 @@ void RegistryDialog::ValueSelected(void)
             }
             else if(valuetype.contains("REG_QWORD"))
             {
+                valuedata += "Content:\t";
                 //libregf_value_get_value_64bit(
             }
+            /*
 	    size_t datasize = 0;
 	    libregf_value_get_value_data_size(curval, &datasize, &regerr);
 	    uint8_t data[datasize];
@@ -137,8 +141,21 @@ void RegistryDialog::ValueSelected(void)
 	    //valuedata += "Data\n----\n";
 	    //valuedata += QString::fromStdString(QByteArray::fromRawData((char*)data, datasize).toHex().toStdString());
             ui->hexEdit->setData(QByteArray::fromRawData((char*)data, datasize));
+            */
 	}
+        size_t datasize = 0;
+        libregf_value_get_value_data_size(curval, &datasize, &regerr);
+        uint8_t data[datasize];
+        libregf_value_get_value_data(curval, data, datasize, &regerr);
+        //valuedata += "Data\n----\n";
+        //valuedata += QString::fromStdString(QByteArray::fromRawData((char*)data, datasize).toHex().toStdString());
+        ui->hexEdit->setData(QByteArray::fromRawData((char*)data, datasize));
 	ui->plainTextEdit->setPlainText(valuedata);
+        libregf_value_free(&curval, &regerr);
+        libregf_key_free(&curkey, &regerr);
+        libregf_file_close(regfile, &regerr);
+        libregf_file_free(&regfile, &regerr);
+        libregf_error_free(&regerr);
     }
 }
 
