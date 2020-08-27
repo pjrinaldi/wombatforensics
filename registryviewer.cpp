@@ -75,7 +75,11 @@ void RegistryDialog::ValueSelected(void)
 	libregf_file_get_key_by_utf8_path(regfile, (uint8_t*)(keypath.toUtf8().data()), keypath.toUtf8().size(), &curkey, &regerr);
 	libregf_value_t* curval = NULL;
 	libregf_key_get_value(curkey, valueindex, &curval, &regerr);
-	QString valuedata = "Name:\t" + ui->tableWidget->selectedItems().first()->text() + "\n";
+        uint64_t lastwritetime = 0;
+        libregf_key_get_last_written_time(curkey, &lastwritetime, &regerr);
+        QString valuedata = "Last Written Time:\t" + ConvertWindowsTimeToUnixTimeUTC(lastwritetime) + " UTC\n\n";
+        //qDebug() << "root filetime:" << rootfiletime << ConvertWindowsTimeToUnixTimeUTC(rootfiletime);
+	valuedata += "Name:\t" + ui->tableWidget->selectedItems().first()->text() + "\n\n";
 	if(ui->tableWidget->selectedItems().first()->text().contains("(unnamed)"))
 	{
 	    valuedata += "Content\n-------\n\n";
@@ -109,16 +113,31 @@ void RegistryDialog::ValueSelected(void)
                     valuedata += ConvertUnixTimeToString(dwordvalue);
                 else
                     valuedata += QString::number(dwordvalue);
-                //libregf_value_get_value_32bit(
             }
             else if(valuetype.contains("REG_DWORD_BIG_ENDIAN"))
             {
                 valuedata += "Content:\t";
-                //libregf_value_get_value_32bit(
+                uint32_t dwordvalue = 0;
+                libregf_value_get_value_32bit(curval, &dwordvalue, &regerr);
+                valuedata += QString::number(qFromBigEndian<uint32_t>(dwordvalue));
             }
             else if(valuetype.contains("REG_MULTI_SZ"))
             {
-                valuedata += "Content:\t";
+                valuedata += "Content\n";
+                valuedata += "-------\n";
+                libregf_multi_string_t* multistring = NULL;
+                libregf_value_get_value_multi_string(curval, &multistring, &regerr);
+                int strcnt = 0;
+                libregf_multi_string_get_number_of_strings(multistring, &strcnt, &regerr);
+                for(int i=0; i < strcnt; i++)
+                {
+                    size_t strsize = 0;
+                    libregf_multi_string_get_utf8_string_size(multistring, i, &strsize, &regerr);
+                    uint8_t valstr[strsize];
+                    libregf_multi_string_get_utf8_string(multistring, i, valstr, strsize, &regerr);
+                    valuedata += QString::fromUtf8(reinterpret_cast<char*>(valstr)) + "\n";
+                }
+                libregf_multi_string_free(&multistring, &regerr);
                 /*int libregf_value_get_value_multi_string(
                 libregf_value_t *value,
                 libregf_multi_string_t **multi_string,
@@ -131,6 +150,9 @@ void RegistryDialog::ValueSelected(void)
             else if(valuetype.contains("REG_QWORD"))
             {
                 valuedata += "Content:\t";
+                uint64_t qwordvalue = 0;
+                libregf_value_get_value_64bit(curval, &qwordvalue, &regerr);
+                valuedata += QString::number(qwordvalue);
                 //libregf_value_get_value_64bit(
             }
             /*
@@ -287,6 +309,7 @@ void RegistryDialog::KeySelected(void)
             }
 	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(valuetypestr));
 	}
+        ui->tableWidget->resizeColumnToContents(0);
         ui->tableWidget->setCurrentCell(0, 0);
 	libregf_value_free(&curval, &regerr);
     }
@@ -309,7 +332,7 @@ void RegistryDialog::closeEvent(QCloseEvent* e)
     e->accept();
 }
 
-void RegistryDialog::LoadRegistryFile(QString regid)
+void RegistryDialog::LoadRegistryFile(QString regid, QString regname)
 {
     //int retval = 0;
     //qDebug() << "regid:" << regid;
@@ -330,16 +353,19 @@ void RegistryDialog::LoadRegistryFile(QString regid)
     libregf_key_get_number_of_sub_keys(rootkey, &rootsubkeycnt, &regerr);
     //qDebug() << "root subkey count:" << rootsubkeycnt;
     libregf_error_fprint(regerr, stderr);
-    uint64_t rootfiletime = 0;
-    libregf_key_get_last_written_time(rootkey, &rootfiletime, &regerr);
+    //uint64_t rootfiletime = 0;
+    //libregf_key_get_last_written_time(rootkey, &rootfiletime, &regerr);
     //qDebug() << "root filetime:" << rootfiletime << ConvertWindowsTimeToUnixTimeUTC(rootfiletime);
+    /*
     size_t namesize = 0;
     libregf_key_get_utf8_name_size(rootkey, &namesize, &regerr);
     uint8_t name[namesize];
     libregf_key_get_utf8_name(rootkey, name, namesize, &regerr);
+    */
     //qDebug() << "key name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
     QTreeWidgetItem* rootitem = new QTreeWidgetItem(ui->treeWidget);
-    rootitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
+    rootitem->setText(0, regname.toUpper());
+    //rootitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
     ui->treeWidget->addTopLevelItem(rootitem);
     PopulateChildKeys(rootkey, rootitem, regerr);
     libregf_key_free(&rootkey, &regerr);
@@ -351,9 +377,9 @@ void RegistryDialog::LoadRegistryFile(QString regid)
 
 void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* curitem, libregf_error_t* regerr)
 {
-    uint64_t lasttime = 0;
+    //uint64_t lasttime = 0;
     int subkeycount = 0;
-    libregf_key_get_last_written_time(curkey, &lasttime, &regerr);
+    //libregf_key_get_last_written_time(curkey, &lasttime, &regerr);
     //qDebug() << "last time:" << ConvertWindowsTimeToUnixTimeUTC(lasttime);
     //qDebug() << "curitemtext:" << curitem->text(0);
     libregf_key_get_number_of_sub_keys(curkey, &subkeycount, &regerr);

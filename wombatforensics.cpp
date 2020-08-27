@@ -630,7 +630,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         regviewer = new RegistryDialog();
         regviewer->setAttribute(Qt::WA_DeleteOnClose);
         regviewer->setWindowTitle("Registry Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
-        regviewer->LoadRegistryFile(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        regviewer->LoadRegistryFile(selectedindex.sibling(selectedindex.row(), 11).data().toString(), selectedindex.sibling(selectedindex.row(), 0).data().toString());
     }
     else
     {

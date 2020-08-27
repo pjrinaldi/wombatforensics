@@ -22,7 +22,7 @@ class RegistryDialog : public QDialog
 public:
     RegistryDialog(QWidget* parent = 0);
     ~RegistryDialog();
-    void LoadRegistryFile(QString regid);
+    void LoadRegistryFile(QString regid, QString regname);
 
 private slots:
     void HideClicked();
