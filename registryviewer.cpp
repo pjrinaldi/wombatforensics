@@ -114,13 +114,16 @@ void RegistryDialog::ValueSelected(void)
                     libregf_value_get_value_data(curval, data, datasize, &regerr);
                     QByteArray farray = QByteArray::fromRawData((char*)data, datasize);
                     valuedata += "Account Expiration:\t\t";
-                    if(farray.at(32) == 0xff)
-                        valuedata += "No Expiration\n";
+                    qDebug() << "farray at 32:" << farray.mid(32, 1).toHex();
+                    if(farray.mid(32,1).toHex() == "ff")
+                    {
+                        valuedata += "No Expiration is Set\n";
+                    }
                     else
                         valuedata += ConvertWindowsTimeToUnixTimeUTC(qFromLittleEndian<uint64_t>(farray.mid(32, 8))) + " UTC\n";
                     valuedata += "Last Logon Time:\t\t" + ConvertWindowsTimeToUnixTimeUTC(qFromLittleEndian<uint64_t>(farray.mid(8, 8))) + " UTC\n";
                     valuedata += "Last Failed Login:\t\t" + ConvertWindowsTimeToUnixTimeUTC(qFromLittleEndian<uint64_t>(farray.mid(40, 8))) + " UTC\n";
-                    valuedata += "Last Time Password Changed:\t\t" + ConvertWindowsTimeToUnixTimeUTC(qFromLittleEndian<uint64_t>(farray.mid(24, 8))) + " UTC";
+                    valuedata += "Last Time Password Changed:\t" + ConvertWindowsTimeToUnixTimeUTC(qFromLittleEndian<uint64_t>(farray.mid(24, 8))) + " UTC";
 	            //QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 3, 260).toStdString().c_str(), -1).toStdString());
                 }
                 else if(keypath.contains("SAM") && ui->tableWidget->selectedItems().first()->text().count() == 1 && ui->tableWidget->selectedItems().first()->text().startsWith("V"))
