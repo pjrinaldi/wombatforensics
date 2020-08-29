@@ -6,6 +6,7 @@
 RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegistryDialog)
 {
     ui->setupUi(this);
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
     connect(ui->tableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(ValueSelected()), Qt::DirectConnection);
     /*
@@ -114,7 +115,6 @@ void RegistryDialog::ValueSelected(void)
                     libregf_value_get_value_data(curval, data, datasize, &regerr);
                     QByteArray farray = QByteArray::fromRawData((char*)data, datasize);
                     valuedata += "Account Expiration:\t\t";
-                    qDebug() << "farray at 32:" << farray.mid(32, 1).toHex();
                     if(farray.mid(32,1).toHex() == "ff")
                     {
                         valuedata += "No Expiration is Set\n";
@@ -126,6 +126,16 @@ void RegistryDialog::ValueSelected(void)
                     valuedata += "Last Time Password Changed:\t" + ConvertWindowsTimeToUnixTimeUTC(qFromLittleEndian<uint64_t>(farray.mid(24, 8))) + " UTC";
 	            //QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 3, 260).toStdString().c_str(), -1).toStdString());
                 }
+                else if(ui->tableWidget->selectedItems().first()->text().startsWith("ShutdownTime"))
+                {
+                    size_t datasize = 0;
+                    libregf_value_get_value_data_size(curval, &datasize, &regerr);
+                    uint8_t data[datasize];
+                    libregf_value_get_value_data(curval, data, datasize, &regerr);
+                    QByteArray valarray = QByteArray::fromRawData((char*)data, datasize);
+                    valuedata += "Shutdown Time:\t" + ConvertWindowsTimeToUnixTimeUTC(qFromLittleEndian<uint64_t>(valarray)) + " UTC";
+                }
+                /*
                 else if(keypath.contains("SAM") && ui->tableWidget->selectedItems().first()->text().count() == 1 && ui->tableWidget->selectedItems().first()->text().startsWith("V"))
                 {
                     size_t datasize = 0;
@@ -133,7 +143,9 @@ void RegistryDialog::ValueSelected(void)
                     uint8_t data[datasize];
                     libregf_value_get_value_data(curval, data, datasize, &regerr);
                     QByteArray varray = QByteArray::fromRawData((char*)data, datasize);
+                    valuedata += "Machine SID Location:\t" + varray.right(12).toHex();
                 }
+                */
             }
             else if(valuetype.contains("REG_DWORD"))
             {
