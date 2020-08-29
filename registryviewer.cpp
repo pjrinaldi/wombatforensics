@@ -99,7 +99,7 @@ void RegistryDialog::ValueSelected(void)
             }
             else if(valuetype.contains("REG_BINARY"))
             {
-                if(keypath.contains("UserAssist") && (keypath.contains("{750") || keypath.contains("{F4E")))
+                if(keypath.contains("UserAssist") && (keypath.contains("{750") || keypath.contains("{F4E") || keypath.contains("{5E6")))
                 {
                     //valuedata += "Content:\t";
                     //valuedata += ui->tableWidget->selectedItems().first()->text();
