@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>807</width>
-    <height>684</height>
+    <width>1400</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
      </property>
      <widget class="QSplitter" name="splitter">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Ignored">
         <horstretch>2</horstretch>
         <verstretch>1</verstretch>
        </sizepolicy>
@@ -71,7 +71,7 @@
       </property>
       <widget class="QTreeWidget" name="treeWidget">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>1</verstretch>
         </sizepolicy>

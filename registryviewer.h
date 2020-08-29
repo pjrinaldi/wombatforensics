@@ -39,6 +39,8 @@ protected:
 private:
     Ui::RegistryDialog* ui;
     void PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* curitem, libregf_error_t* curerr);
+    QString DecryptRot13(QString encstr);
+    QChar Rot13Char(QChar curchar);
     QString regfilepath;
     //QFile bookmarkfile;
     //QStringList taglist;

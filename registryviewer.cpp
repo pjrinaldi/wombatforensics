@@ -78,7 +78,6 @@ void RegistryDialog::ValueSelected(void)
         uint64_t lastwritetime = 0;
         libregf_key_get_last_written_time(curkey, &lastwritetime, &regerr);
         QString valuedata = "Last Written Time:\t" + ConvertWindowsTimeToUnixTimeUTC(lastwritetime) + " UTC\n\n";
-        //qDebug() << "root filetime:" << rootfiletime << ConvertWindowsTimeToUnixTimeUTC(rootfiletime);
 	valuedata += "Name:\t" + ui->tableWidget->selectedItems().first()->text() + "\n\n";
 	if(ui->tableWidget->selectedItems().first()->text().contains("(unnamed)"))
 	{
@@ -89,7 +88,6 @@ void RegistryDialog::ValueSelected(void)
 	else
 	{
             QString valuetype = ui->tableWidget->selectedItems().last()->text();
-            //qDebug() << "valuetype:" << valuetype;
             if(valuetype.contains("REG_SZ") || valuetype.contains("REG_EXPAND_SZ"))
             {
                 valuedata += "Content:\t";
@@ -101,8 +99,13 @@ void RegistryDialog::ValueSelected(void)
             }
             else if(valuetype.contains("REG_BINARY"))
             {
-                //libregf_value_get_value_binary_data_size(
-                //libregf_value_get_value_binary_data(
+                if(keypath.contains("UserAssist") && (keypath.contains("{750") || keypath.contains("{F4E")))
+                {
+                    //valuedata += "Content:\t";
+                    //valuedata += ui->tableWidget->selectedItems().first()->text();
+                    valuedata += "ROT13 Decrypted Content:\t";
+                    valuedata += DecryptRot13(ui->tableWidget->selectedItems().first()->text()) + "\n";
+                }
             }
             else if(valuetype.contains("REG_DWORD"))
             {
@@ -138,14 +141,6 @@ void RegistryDialog::ValueSelected(void)
                     valuedata += QString::fromUtf8(reinterpret_cast<char*>(valstr)) + "\n";
                 }
                 libregf_multi_string_free(&multistring, &regerr);
-                /*int libregf_value_get_value_multi_string(
-                libregf_value_t *value,
-                libregf_multi_string_t **multi_string,
-                libregf_error_t **error );*/
-                //int libregf_multi_string_free(libregf_multi_string_t **multi_string,libregf_error_t **error );
-                //int libregf_multi_string_get_number_of_strings(libregf_multi_string_t *multi_string,int *number_of_strings,libregf_error_t **error );
-                //int libregf_multi_string_get_utf8_string_size(libregf_multi_string_t *multi_string,int string_index,size_t *utf8_string_size,libregf_error_t **error );
-                //int libregf_multi_string_get_utf8_string(libregf_multi_string_t *multi_string,int string_index,uint8_t *utf8_string,size_t utf8_string_size,libregf_error_t **error );
             }
             else if(valuetype.contains("REG_QWORD"))
             {
@@ -153,24 +148,12 @@ void RegistryDialog::ValueSelected(void)
                 uint64_t qwordvalue = 0;
                 libregf_value_get_value_64bit(curval, &qwordvalue, &regerr);
                 valuedata += QString::number(qwordvalue);
-                //libregf_value_get_value_64bit(
             }
-            /*
-	    size_t datasize = 0;
-	    libregf_value_get_value_data_size(curval, &datasize, &regerr);
-	    uint8_t data[datasize];
-	    libregf_value_get_value_data(curval, data, datasize, &regerr);
-	    //valuedata += "Data\n----\n";
-	    //valuedata += QString::fromStdString(QByteArray::fromRawData((char*)data, datasize).toHex().toStdString());
-            ui->hexEdit->setData(QByteArray::fromRawData((char*)data, datasize));
-            */
 	}
         size_t datasize = 0;
         libregf_value_get_value_data_size(curval, &datasize, &regerr);
         uint8_t data[datasize];
         libregf_value_get_value_data(curval, data, datasize, &regerr);
-        //valuedata += "Data\n----\n";
-        //valuedata += QString::fromStdString(QByteArray::fromRawData((char*)data, datasize).toHex().toStdString());
         ui->hexEdit->setData(QByteArray::fromRawData((char*)data, datasize));
 	ui->plainTextEdit->setPlainText(valuedata);
         libregf_value_free(&curval, &regerr);
@@ -417,4 +400,38 @@ void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* c
     // will probably need a storage method for this, so when i select on it, it display value where i need it...
     // if key has its own subkeys, then PopulateChildKeys(curkey, curitem, regerr);
     // libregf_key_free(curkey, &regerr);
+}
+
+QString RegistryDialog::DecryptRot13(QString encstr)
+{
+    QString decstr = "";
+    int i = 0;
+    int strlength = 0;
+    strlength = encstr.count();
+    decstr = encstr;
+    for(i = 0; i < strlength; i++)
+    {
+        decstr[i] = Rot13Char(decstr.at(i));
+    }
+    return decstr;
+}
+
+QChar RegistryDialog::Rot13Char(QChar curchar)
+{
+    QChar rot13char;
+    if('0' <= curchar && curchar <= '4')
+        rot13char = QChar(curchar.unicode() + 5);
+    else if('5' <= curchar && curchar <= '9')
+        rot13char = QChar(curchar.unicode() - 5);
+    else if('A' <= curchar && curchar <= 'M')
+        rot13char = QChar(curchar.unicode() + 13);
+    else if('N' <= curchar && curchar <= 'Z')
+        rot13char = QChar(curchar.unicode() - 13);
+    else if('a' <= curchar && curchar <= 'm')
+        rot13char = QChar(curchar.unicode() + 13);
+    else if('n' <= curchar && curchar <= 'z')
+        rot13char = QChar(curchar.unicode() - 13);
+    else
+        rot13char = curchar;
+    return rot13char;
 }

@@ -43,7 +43,7 @@ public:
         if (RegistryDialog->objectName().isEmpty())
             RegistryDialog->setObjectName(QString::fromUtf8("RegistryDialog"));
         RegistryDialog->setWindowModality(Qt::ApplicationModal);
-        RegistryDialog->resize(807, 684);
+        RegistryDialog->resize(1400, 720);
         RegistryDialog->setSizeGripEnabled(true);
         RegistryDialog->setModal(true);
         verticalLayout = new QVBoxLayout(RegistryDialog);
@@ -64,7 +64,7 @@ public:
         splitter_3->setOrientation(Qt::Horizontal);
         splitter = new QSplitter(splitter_3);
         splitter->setObjectName(QString::fromUtf8("splitter"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Ignored);
+        QSizePolicy sizePolicy1(QSizePolicy::MinimumExpanding, QSizePolicy::Ignored);
         sizePolicy1.setHorizontalStretch(2);
         sizePolicy1.setVerticalStretch(1);
         sizePolicy1.setHeightForWidth(splitter->sizePolicy().hasHeightForWidth());
@@ -77,7 +77,7 @@ public:
         __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
         treeWidget->setHeaderItem(__qtreewidgetitem);
         treeWidget->setObjectName(QString::fromUtf8("treeWidget"));
-        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(1);
         sizePolicy2.setHeightForWidth(treeWidget->sizePolicy().hasHeightForWidth());
@@ -113,8 +113,11 @@ public:
         splitter_2->addWidget(plainTextEdit);
         hexEdit = new QHexEdit(splitter_2);
         hexEdit->setObjectName(QString::fromUtf8("hexEdit"));
-        sizePolicy2.setHeightForWidth(hexEdit->sizePolicy().hasHeightForWidth());
-        hexEdit->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(1);
+        sizePolicy4.setHeightForWidth(hexEdit->sizePolicy().hasHeightForWidth());
+        hexEdit->setSizePolicy(sizePolicy4);
         hexEdit->setHexCaps(true);
         hexEdit->setDynamicBytesPerLine(true);
         hexEdit->setReadOnly(true);
