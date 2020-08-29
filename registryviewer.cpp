@@ -106,6 +106,25 @@ void RegistryDialog::ValueSelected(void)
                     valuedata += "ROT13 Decrypted Content:\t";
                     valuedata += DecryptRot13(ui->tableWidget->selectedItems().first()->text()) + "\n";
                 }
+                else if(keypath.contains("SAM") && ui->tableWidget->selectedItems().first()->text().count() == 1 && ui->tableWidget->selectedItems().first()->text().startsWith("F"))
+                {
+                    size_t datasize = 0;
+                    libregf_value_get_value_data_size(curval, &datasize, &regerr);
+                    uint8_t data[datasize];
+                    libregf_value_get_value_data(curval, data, datasize, &regerr);
+                    QByteArray farray = QByteArray::fromRawData((char*)data, datasize);
+                    //uint64_t createdtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(8, 8));
+	            //QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 3, 260).toStdString().c_str(), -1).toStdString());
+	            //htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(36, 8))) + "</td></tr>";
+                }
+                else if(keypath.contains("SAM") && ui->tableWidget->selectedItems().first()->text().count() == 1 && ui->tableWidget->selectedItems().first()->text().startsWith("V"))
+                {
+                    size_t datasize = 0;
+                    libregf_value_get_value_data_size(curval, &datasize, &regerr);
+                    uint8_t data[datasize];
+                    libregf_value_get_value_data(curval, data, datasize, &regerr);
+                    QByteArray varray = QByteArray::fromRawData((char*)data, datasize);
+                }
             }
             else if(valuetype.contains("REG_DWORD"))
             {
