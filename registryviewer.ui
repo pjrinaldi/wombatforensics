@@ -185,6 +185,8 @@
    <header>qhexedit.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="wombatforensics.qrc"/>
+ </resources>
  <connections/>
 </ui>

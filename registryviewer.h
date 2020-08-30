@@ -31,6 +31,9 @@ private slots:
     void UpdateAssign();
     void KeySelected(void);
     void ValueSelected(void);
+    void TagMenu(const QPoint &point);
+    //void DoubleClick(QTableWidgetItem* curitem);
+    //void ImgHexMenu(const QPoint &point);
 signals:
     //void TagCarved(QString ctitle, QString ctag);
 protected:
@@ -42,6 +45,7 @@ private:
     QString DecryptRot13(QString encstr);
     QChar Rot13Char(QChar curchar);
     QString regfilepath;
+    QMenu* tagmenu;
     //QFile bookmarkfile;
     //QStringList taglist;
 };

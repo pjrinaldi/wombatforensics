@@ -9,6 +9,16 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
     connect(ui->tableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(ValueSelected()), Qt::DirectConnection);
+    //connect(ui->tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(DoubleClick(QTableWidgetItem*)), Qt::DirectConnection);
+    // NEED TO POPULATE THE MENU USING STUFF SIMILAR TO READBOOKMARKS CODE...
+    tagmenu = new QMenu(ui->tableWidget);
+    //tagmenu->addSeparator();
+    QAction* newtagaction = new QAction("New Tag", tagmenu);
+    newtagaction->setIcon(QIcon(":/bar/newtag"));
+    tagmenu->addAction(newtagaction);
+    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
+    //connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
     /*
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
@@ -475,3 +485,38 @@ QChar RegistryDialog::Rot13Char(QChar curchar)
         rot13char = curchar;
     return rot13char;
 }
+
+/*
+void RegistryDialog::DoubleClick(QTableWidgetItem* curitem)
+{
+    qDebug() << "Double click...";
+}
+*/
+
+void RegistryDialog::TagMenu(const QPoint &pt)
+{
+    QTableWidgetItem* curitem = ui->tableWidget->itemAt(pt);
+    qDebug() << "cur item:" << curitem->text();
+    tagmenu->exec(ui->tableWidget->mapToGlobal(pt));
+}
+/*
+void WombatForensics::TreeContextMenu(const QPoint &pt)
+{
+    QModelIndex index = ui->dirTreeView->indexAt(pt);
+    if(index.isValid())
+    {
+        actionitem = static_cast<TreeNode*>(index.internalPointer());
+        if(!actionitem->IsChecked())
+        {
+            ui->actionCheck->setText("Check Selected");
+            ui->actionCheck->setIcon(QIcon(":/echeck"));
+        }
+        else
+        {
+            ui->actionCheck->setText("UnCheck Selected");
+            ui->actionCheck->setIcon(QIcon(":/remcheck"));
+        }
+        treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
+    }
+}
+*/
