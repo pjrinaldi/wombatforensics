@@ -10,15 +10,28 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
     connect(ui->tableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(ValueSelected()), Qt::DirectConnection);
     //connect(ui->tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(DoubleClick(QTableWidgetItem*)), Qt::DirectConnection);
-    // NEED TO POPULATE THE MENU USING STUFF SIMILAR TO READBOOKMARKS CODE...
+    QStringList taglist;
+    taglist.clear();
     tagmenu = new QMenu(ui->tableWidget);
-    //tagmenu->addSeparator();
+    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(bookmarkfile.isOpen())
+	taglist = QString(bookmarkfile.readLine()).split(",", Qt::SkipEmptyParts);
+    bookmarkfile.close();
     QAction* newtagaction = new QAction("New Tag", tagmenu);
     newtagaction->setIcon(QIcon(":/bar/newtag"));
+    connect(newtagaction, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     tagmenu->addAction(newtagaction);
+    tagmenu->addSeparator();
+    for(int i=0; i < taglist.count(); i++)
+    {
+	QAction* tmpaction = new QAction(taglist.at(i), tagmenu);
+	tmpaction->setIcon(QIcon(":/bar/addtotag"));
+	tmpaction->setData(QVariant("t" + QString::number(i)));
+	connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetTag()));
+	tagmenu->addAction(tmpaction);
+    }
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
-    //connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));
     /*
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
@@ -38,12 +51,22 @@ void RegistryDialog::HideClicked()
     this->close();
 }
 
+void RegistryDialog::CreateNewTag()
+{
+    qDebug() << "create new tag";
+}
+
+void RegistryDialog::SetTag()
+{
+    qDebug() << "set tag";
+}
+
 void RegistryDialog::Assign()
 {
     //qDebug() << ui->tagcombobox->currentText();
     //qDebug() << ui->titlelineedit->text();
     //emit TagCarved(ui->titlelineedit->text(), ui->tagcombobox->currentText());
-    this->close();
+    //this->close();
 }
 
 void RegistryDialog::UpdateAssign()
