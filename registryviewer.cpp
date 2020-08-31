@@ -65,6 +65,12 @@ void RegistryDialog::CreateNewTag()
 void RegistryDialog::SetTag()
 {
     qDebug() << "set tag";
+    // NEED TO FIGURE OUT HOW TO RECORD TAG VALUE BETWEEN REGISTRY OPEN/CLOSES...
+    // REGISTRY TEXT FILE WHICH CONTAINS: ID,KEYPATH,VALUE,TAG
+    // ARE THESE VALUES AVAILABLE WHEN I POPULATE REGISTRY TO READ THIS FILE IN....
+    //
+    // ALSO MIGHT TRY TO ABSTRACT TAG CALLS SO I HAVE A TAGGING CLASS WHICH CAN BE USED
+    // FOR EITHER REGULAR TAGGING OR REGISTRY TAGGING OR VSS,MBOX,PST,ETC TAGGING
 }
 
 void RegistryDialog::RemoveTag()
@@ -317,14 +323,15 @@ void RegistryDialog::KeySelected(void)
 	//qDebug() << "name size:" << namesize << "value name:" << QString::fromUtf8(reinterpret_cast<char*>(name)) << "value type:" << type << "data size:" << datasize;
 	if(namesize == 0)
 	{
-	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value"});
+	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value", "Tag"});
 	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem("(unnamed)"));
 	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(type, 16)));
+	    ui->tableWidget->setItem(i, 2, new QTableWidgetItem(""));
 	}
 	else
 	{
             QString valuetypestr = "";
-	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value Type"});
+	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value Type", "Tag"});
 	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::fromUtf8(reinterpret_cast<char*>(name))));
             if(type == 0x00) // none
             {
@@ -377,6 +384,7 @@ void RegistryDialog::KeySelected(void)
             {
             }
 	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(valuetypestr));
+	    ui->tableWidget->setItem(i, 2, new QTableWidgetItem(""));
 	}
         ui->tableWidget->resizeColumnToContents(0);
         ui->tableWidget->setCurrentCell(0, 0);

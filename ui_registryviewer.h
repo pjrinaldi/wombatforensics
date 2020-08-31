@@ -94,15 +94,16 @@ public:
         splitter_2->setSizePolicy(sizePolicy3);
         splitter_2->setOrientation(Qt::Vertical);
         tableWidget = new QTableWidget(splitter_2);
-        if (tableWidget->columnCount() < 2)
-            tableWidget->setColumnCount(2);
+        if (tableWidget->columnCount() < 3)
+            tableWidget->setColumnCount(3);
         tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
+        tableWidget->setAlternatingRowColors(true);
         tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
         tableWidget->setRowCount(0);
-        tableWidget->setColumnCount(2);
+        tableWidget->setColumnCount(3);
         splitter_2->addWidget(tableWidget);
         tableWidget->horizontalHeader()->setVisible(true);
-        tableWidget->horizontalHeader()->setCascadingSectionResizes(false);
+        tableWidget->horizontalHeader()->setCascadingSectionResizes(true);
         tableWidget->horizontalHeader()->setStretchLastSection(true);
         tableWidget->verticalHeader()->setVisible(false);
         plainTextEdit = new QPlainTextEdit(splitter_2);
@@ -118,9 +119,9 @@ public:
         sizePolicy4.setVerticalStretch(1);
         sizePolicy4.setHeightForWidth(hexEdit->sizePolicy().hasHeightForWidth());
         hexEdit->setSizePolicy(sizePolicy4);
-        hexEdit->setHexCaps(true);
-        hexEdit->setDynamicBytesPerLine(true);
-        hexEdit->setReadOnly(true);
+        hexEdit->setProperty("hexCaps", QVariant(true));
+        hexEdit->setProperty("dynamicBytesPerLine", QVariant(true));
+        hexEdit->setProperty("readOnly", QVariant(true));
         splitter_2->addWidget(hexEdit);
         splitter_3->addWidget(splitter_2);
 
