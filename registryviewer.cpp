@@ -7,6 +7,7 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
 {
     ui->setupUi(this);
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->label->setText("");
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
     connect(ui->tableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(ValueSelected()), Qt::DirectConnection);
     //connect(ui->tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(DoubleClick(QTableWidgetItem*)), Qt::DirectConnection);
@@ -30,6 +31,11 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
 	connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetTag()));
 	tagmenu->addAction(tmpaction);
     }
+    tagmenu->addSeparator();
+    QAction* remtagaction = new QAction("Remove Tag", tagmenu);
+    remtagaction->setIcon(QIcon(":/bar/tag-rem"));
+    connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
+    tagmenu->addAction(remtagaction);
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
     /*
@@ -59,6 +65,13 @@ void RegistryDialog::CreateNewTag()
 void RegistryDialog::SetTag()
 {
     qDebug() << "set tag";
+}
+
+void RegistryDialog::RemoveTag()
+{
+    qDebug() << "remove tag";
+    //QAction* tagaction = qobject_cast<QAction*>(sender());
+    //if(QString(tagaction->iconText()).contains("Selected")) // single file
 }
 
 void RegistryDialog::Assign()
@@ -518,8 +531,9 @@ void RegistryDialog::DoubleClick(QTableWidgetItem* curitem)
 
 void RegistryDialog::TagMenu(const QPoint &pt)
 {
-    QTableWidgetItem* curitem = ui->tableWidget->itemAt(pt);
-    qDebug() << "cur item:" << curitem->text();
+    // when i need the current value for the right click, i can use a class variable defined in .h so i can access it in the SetTag and CreateNewTag right click menu options...
+    //QTableWidgetItem* curitem = ui->tableWidget->itemAt(pt);
+    //qDebug() << "cur item:" << ui->tableWidget->item(curitem->row(), 0)->text();
     tagmenu->exec(ui->tableWidget->mapToGlobal(pt));
 }
 /*

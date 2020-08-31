@@ -34,6 +34,7 @@ private slots:
     void TagMenu(const QPoint &point);
     void SetTag(void);
     void CreateNewTag(void);
+    void RemoveTag(void);
     //void DoubleClick(QTableWidgetItem* curitem);
     //void ImgHexMenu(const QPoint &point);
 signals:
