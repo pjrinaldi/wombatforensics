@@ -135,12 +135,12 @@ void RegistryDialog::ValueSelected(void)
 	if(ui->tableWidget->selectedItems().first()->text().contains("(unnamed)"))
 	{
 	    valuedata += "Content\n-------\n\n";
-	    valuedata += "Hex:\t0x" + ui->tableWidget->selectedItems().last()->text() + "\n";
-	    valuedata += "Integer:\t" + QString::number(ui->tableWidget->selectedItems().last()->text().toInt(nullptr, 16)) + "\n";
+	    valuedata += "Hex:\t0x" + ui->tableWidget->selectedItems().at(1)->text() + "\n";
+	    valuedata += "Integer:\t" + QString::number(ui->tableWidget->selectedItems().at(1)->text().toInt(nullptr, 16)) + "\n";
 	}
 	else
 	{
-            QString valuetype = ui->tableWidget->selectedItems().last()->text();
+            QString valuetype = ui->tableWidget->selectedItems().at(1)->text();
             if(valuetype.contains("REG_SZ") || valuetype.contains("REG_EXPAND_SZ"))
             {
                 valuedata += "Content:\t";
