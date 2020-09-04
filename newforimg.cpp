@@ -52,6 +52,19 @@ void ForImgDialog::CreateImage()
     }
     else if(ui->sfsradio->isChecked())
     {
+        ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
+        Verify(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
+        QString sqshcmd = "mksquashfs " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".sfs";
+        //QString sqshcmd = "mksquashfs " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".log " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".sfs";
+        //qDebug() << "squashcmd:" << sqshcmd;
+        // add image and log to squashfs
+        system(sqshcmd.toStdString().c_str());
+        // WOULD NEED TO CAPTURE OUTPUT...IN A FILENAME.log WHICH I HAVEN'T CREATED YET... WILL WORK ON LATER...
+
+        std::remove(QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString().c_str());
+        std::remove(QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".log").toStdString().c_str());
+        printf("Squashfs'd Forensic Image Finished Successfully.\n");
+        //int fd = open("destfilepath", O_CREAT | O_TRUNC | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
         //qDebug() << "image type:" << "sfs image";
     }
     // ensure values are valid and filled in/selected otherwise popup error and don't close...
