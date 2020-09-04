@@ -1,4 +1,5 @@
 #include "newforimg.h"
+#include "imagefunctions.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -6,7 +7,6 @@
 ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImgDialog)
 {
     ui->setupUi(this);
-    // DEVICE LISTING FOR IMAGING...
     devicelist.clear();
     ped_device_probe_all();
     PedDevice* tmpdevice = ped_device_get_next(NULL);
@@ -17,51 +17,9 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
         if(tmpdevice != NULL)
             ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->path)));
     }
-    // END DEVICE LISTING...
-
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()), Qt::DirectConnection);
     connect(ui->createbutton, SIGNAL(clicked()), this, SLOT(CreateImage()), Qt::DirectConnection);
     connect(ui->browsebutton, SIGNAL(clicked()), this, SLOT(GetFolder()), Qt::DirectConnection);
-    /*
-    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->label->setText("");
-    connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
-    connect(ui->tableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(ValueSelected()), Qt::DirectConnection);
-    //connect(ui->tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(DoubleClick(QTableWidgetItem*)), Qt::DirectConnection);
-    QStringList taglist;
-    taglist.clear();
-    tagmenu = new QMenu(ui->tableWidget);
-    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(bookmarkfile.isOpen())
-	taglist = QString(bookmarkfile.readLine()).split(",", Qt::SkipEmptyParts);
-    bookmarkfile.close();
-    QAction* newtagaction = new QAction("New Tag", tagmenu);
-    newtagaction->setIcon(QIcon(":/bar/newtag"));
-    connect(newtagaction, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
-    tagmenu->addAction(newtagaction);
-    tagmenu->addSeparator();
-    for(int i=0; i < taglist.count(); i++)
-    {
-	QAction* tmpaction = new QAction(taglist.at(i), tagmenu);
-	tmpaction->setIcon(QIcon(":/bar/addtotag"));
-	tmpaction->setData(QVariant("t" + QString::number(i)));
-	connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetTag()));
-	tagmenu->addAction(tmpaction);
-    }
-    tagmenu->addSeparator();
-    QAction* remtagaction = new QAction("Remove Tag", tagmenu);
-    remtagaction->setIcon(QIcon(":/bar/tag-rem"));
-    connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
-    tagmenu->addAction(remtagaction);
-    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
-    /*
-    connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
-    connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
-    connect(ui->titlelineedit, SIGNAL(editingFinished()), this, SLOT(UpdateAssign()));
-    ui->carvebutton->setEnabled(false);
-    UpdateList();
-    */
 }
 
 ForImgDialog::~ForImgDialog()
@@ -76,23 +34,68 @@ void ForImgDialog::HideClicked()
 
 void ForImgDialog::CreateImage()
 {
-    qDebug() << "image name:" << ui->nameedit->text();
-    qDebug() << "image path:" << ui->pathedit->text();
-    qDebug() << "source device:" << ui->sourcecombo->currentText();
     if(ui->rawradio->isChecked())
     {
-        qDebug() << "raw image selected:" << QString("dc3dd if=" + ui->sourcecombo->currentText() + " hash=md5 log=" + ui->nameedit->text() + ".log" + " of=" + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd");
-        qDebug() << "image type:" << "raw image";
+	//unsigned long long curpos = 0;
+	unsigned long long totalbytes = 0;
+	totalbytes = GetTotalBytes(ui->sourcecombo->currentText().toStdString());
+	ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
+	qDebug() << "totalbytes:" << totalbytes;
+	/*
+	QFile infile(ui->sourcecombo->currentText());
+	infile.open(QIODevice::ReadOnly);
+	infile.seek(0);
+	//QByteArray tmparray;
+	//QByteArray tmparray = infile.read(8);
+	//qDebug() << "1st 8 bytes:" << tmparray.toHex();
+	QFile outfile(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd");
+	outfile.open(QIODevice::Append);
+	while(curpos <= totalbytes)
+	{
+	    //tmparray.clear();
+	    infile.seek(curpos);
+	    //tmparray = infile.read(4096);
+	    outfile.write(infile.read(4096));
+	    curpos = curpos + 4096;
+	    qDebug() << "percent complete:" << (curpos/totalbytes) * 100.0;
+	}
+	infile.close();
+	outfile.close();
+	*/
+	/*
+	QFile infile(ui->sourcecombo->currentText());
+	isopen = infile.open(QIODevice::ReadOnly);
+	qDebug() << "is open:" << isopen;
+	qint64 totalbytes = infile.size();
+	qDebug() << "totalbytes:" << totalbytes;
+	infile.close();
+	*/
+	/*
+        QString rawstr = QString("dc3dd if=" + ui->sourcecombo->currentText() + " hash=md5 log=" + ui->nameedit->text() + ".log" + " of=" + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd");
+	qDebug() << "rawstr:" << rawstr;
+	//QProcess::execute(rawstr);
+	QProcess* rawimg = new QProcess(this);
+	rawimg->start(rawstr);
+	//rawimg->start("dc3dd", QStringList() << QString("if=" + ui->sourcecombo->currentText()) << "hash=md5" << QString("log=" + ui->nameedit->text() + ".log") << QString("of=" + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd"));
+	//*/
+	/*
+	if(!rawimg->waitForFinished())
+	    qDebug() << "failed:" << rawimg->errorString();
+	else
+	    qDebug() << "finished:" << rawimg->readAll();
+	*/
+
+        //qDebug() << "image type:" << "raw image";
     }
     else if(ui->aff4radio->isChecked())
     {
-        qDebug() << "image type:" << "aff4 image";
+        //qDebug() << "image type:" << "aff4 image";
     }
     else if(ui->sfsradio->isChecked())
     {
-        qDebug() << "image type:" << "sfs image";
+        //qDebug() << "image type:" << "sfs image";
     }
-    //qDebug() << "get entered values and launch forensic image external process here...";
+    // ensure values are valid and filled in/selected otherwise popup error and don't close...
     this->close();
 }
 
