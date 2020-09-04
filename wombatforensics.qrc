@@ -42,6 +42,7 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="newforimg">Resources/createforensicimg.png.svg</file>
     <file alias="next">Resources/go-next.png</file>
     <file alias="previous">Resources/go-previous.png</file>
     <file alias="xchomppng">Resources/xchomp.png</file>

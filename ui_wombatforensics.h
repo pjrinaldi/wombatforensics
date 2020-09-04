@@ -59,6 +59,7 @@ public:
     QAction *actionpublishresults;
     QAction *actionchomp;
     QAction *actionCarve;
+    QAction *actionCreateForensicImage;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -238,6 +239,11 @@ public:
         actionCarve = new QAction(WombatForensics);
         actionCarve->setObjectName(QString::fromUtf8("actionCarve"));
         actionCarve->setIcon(icon12);
+        actionCreateForensicImage = new QAction(WombatForensics);
+        actionCreateForensicImage->setObjectName(QString::fromUtf8("actionCreateForensicImage"));
+        QIcon icon28;
+        icon28.addFile(QString::fromUtf8(":/bar/newforimg"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCreateForensicImage->setIcon(icon28);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -266,10 +272,10 @@ public:
         hexview = new QHexEdit(splitter);
         hexview->setObjectName(QString::fromUtf8("hexview"));
         hexview->setToolTipDuration(0);
-        hexview->setProperty("bytesPerLine", QVariant(49));
-        hexview->setProperty("hexCaps", QVariant(true));
-        hexview->setProperty("dynamicBytesPerLine", QVariant(true));
-        hexview->setProperty("readOnly", QVariant(true));
+        hexview->setBytesPerLine(49);
+        hexview->setHexCaps(true);
+        hexview->setDynamicBytesPerLine(true);
+        hexview->setReadOnly(true);
         splitter->addWidget(hexview);
 
         horizontalLayout->addWidget(splitter);
@@ -319,6 +325,8 @@ public:
         analysisToolBar->addAction(actionBookmark_Manager);
         analysisToolBar->addAction(actionpreviewreport);
         analysisToolBar->addAction(actionpublishresults);
+        analysisToolBar->addSeparator();
+        analysisToolBar->addAction(actionCreateForensicImage);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionRemove_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(RemEvidence()));
@@ -428,6 +436,10 @@ public:
         actionchomp->setToolTip(QCoreApplication::translate("WombatForensics", "Play xchomp While  You Wait", nullptr));
 #endif // QT_CONFIG(tooltip)
         actionCarve->setText(QCoreApplication::translate("WombatForensics", "File Carving", nullptr));
+        actionCreateForensicImage->setText(QCoreApplication::translate("WombatForensics", "Create Forensic Image", nullptr));
+#if QT_CONFIG(tooltip)
+        actionCreateForensicImage->setToolTip(QCoreApplication::translate("WombatForensics", "Create Forensic Image", nullptr));
+#endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());
 #endif // QT_CONFIG(tooltip)

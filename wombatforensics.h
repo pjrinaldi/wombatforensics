@@ -43,6 +43,7 @@
 #include "newcase.h"
 #include "opencase.h"
 #include "registryviewer.h"
+#include "newforimg.h"
 
 class StatusLabel : public QLabel
 {
@@ -116,6 +117,7 @@ public:
     FileCarvingDialog* filecarvedialog;
     PdfViewer* pdfviewer;
     RegistryDialog* regviewer;
+    ForImgDialog* forimgdialog;
 
 signals:
     void CancelCurrentThread();
@@ -162,6 +164,7 @@ private slots:
     void HideByteViewer(bool checkstate);
     void HidePreviewReport(bool checkstate);
     void ShowExternalViewer();
+    void ShowForImgDialog();
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
     void ResizeViewColumns(const QModelIndex &index)

@@ -77,16 +77,16 @@
        <property name="whatsThis">
         <string>QHexEdit widget allow to edit the data in hex view.</string>
        </property>
-       <property name="bytesPerLine" stdset="0">
+       <property name="bytesPerLine">
         <number>49</number>
        </property>
-       <property name="hexCaps" stdset="0">
+       <property name="hexCaps">
         <bool>true</bool>
        </property>
-       <property name="dynamicBytesPerLine" stdset="0">
+       <property name="dynamicBytesPerLine">
         <bool>true</bool>
        </property>
-       <property name="readOnly" stdset="0">
+       <property name="readOnly">
         <bool>true</bool>
        </property>
       </widget>
@@ -162,6 +162,8 @@
    <addaction name="actionBookmark_Manager"/>
    <addaction name="actionpreviewreport"/>
    <addaction name="actionpublishresults"/>
+   <addaction name="separator"/>
+   <addaction name="actionCreateForensicImage"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
    <property name="styleSheet">
@@ -561,6 +563,18 @@
    </property>
    <property name="text">
     <string>File Carving</string>
+   </property>
+  </action>
+  <action name="actionCreateForensicImage">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/newforimg</normaloff>:/bar/newforimg</iconset>
+   </property>
+   <property name="text">
+    <string>Create Forensic Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Forensic Image</string>
    </property>
   </action>
  </widget>
