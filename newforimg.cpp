@@ -41,9 +41,9 @@ void ForImgDialog::CreateImage()
 	// char* imgbuf = new char[0];
 	// imgbuf = new char[fsfile->meta->size];
 	// delete[] imgbuf;
-
 	unsigned long long totalbytes = 0;
 	ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
+        //std::string imgmd5 = Verify(ui->sourcecombo->currentText().toStdString());
 	Verify(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
     }
     else if(ui->aff4radio->isChecked())

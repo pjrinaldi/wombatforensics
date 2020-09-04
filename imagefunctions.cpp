@@ -34,6 +34,47 @@ void ReadBytes(std::string instr, std::string outstr)
     close(outfile);
 }
 
+std::string Verify(std::string instr)
+{
+    std::string inmd5;
+    /*
+    FILE* infile = fopen(instr.c_str(), "rb");
+    EVP_MD_CTX *mdctx;
+    const EVP_MD *md;
+    //char mess1[] = "Test Message\n";
+    //char mess2[] = "Hello World\n";
+    unsigned char md_value[EVP_MAX_MD_SIZE];
+    int md_len, i;
+
+    OpenSSL_add_all_digests();
+
+    md = EVP_md5();
+    //md = EVP_get_digestbyname(argv[1]); // will be md = EVP_MD5();
+    // may switch to input if the user wants to calculate md5, sha1, or sha256
+
+
+    mdctx = EVP_MD_CTX_create();
+    EVP_DigestInit_ex(mdctx, md, NULL);
+    while((bytes = fread(data, 1, 1024, instr.c_str())) != 0)
+    {
+        EVP_DigestUpdate(mdctx, data, bytes);
+    }
+    //EVP_DigestUpdate(mdctx, mess1, strlen(mess1));
+    //EVP_DigestUpdate(mdctx, mess2, strlen(mess2));
+    EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+    EVP_MD_CTX_destroy(mdctx);
+
+    printf("Digest is: ");
+    for(i = 0; i < md_len; i++)
+        printf("%02x", md_value[i]);
+    printf("\n");
+
+    // Call this once before exit.
+    EVP_cleanup();
+    */
+    return inmd5;
+}
+
 void Verify(std::string instr, std::string outstr)
 {
     // char* imgbuf = new char[0];
@@ -49,8 +90,8 @@ void Verify(std::string instr, std::string outstr)
     MD5_CTX outcontext;
     int bytes;
     int obytes;
-    unsigned char data[512];
-    unsigned char odata[512];
+    unsigned char data[1024];
+    unsigned char odata[1024];
     MD5_Init(&mdcontext);
     MD5_Init(&outcontext);
     while((bytes = fread(data, 1, 1024, infile)) != 0)
