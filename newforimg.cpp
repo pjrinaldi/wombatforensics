@@ -38,9 +38,10 @@ void ForImgDialog::CreateImage()
     {
 	//unsigned long long curpos = 0;
 	unsigned long long totalbytes = 0;
-	totalbytes = GetTotalBytes(ui->sourcecombo->currentText().toStdString());
+	//totalbytes = GetTotalBytes(ui->sourcecombo->currentText().toStdString());
 	ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
-	qDebug() << "totalbytes:" << totalbytes;
+	Verify(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
+	//qDebug() << "totalbytes:" << totalbytes;
 	/*
 	QFile infile(ui->sourcecombo->currentText());
 	infile.open(QIODevice::ReadOnly);
