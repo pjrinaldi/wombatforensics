@@ -7,6 +7,8 @@
 #include <errno.h>
 #include <stdio.h>
 #include <openssl/md5.h>
+#include <cstring>
+#include <sstream>
 
 unsigned long long GetTotalBytes(std::string infile);
 void ReadBytes(std::string infile, std::string outfile);

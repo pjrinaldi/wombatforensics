@@ -36,57 +36,15 @@ void ForImgDialog::CreateImage()
 {
     if(ui->rawradio->isChecked())
     {
-	//unsigned long long curpos = 0;
+	// NEED TO MOVE TO ANOTHER THREAD... AND IMPLEMENT VERIFICATION SO I CAN DO BOTH THE IMAGE AND THE SOURCE AT ONCE...
+	// MODIFY VERIFY FUNCTION SO IT VERIFIES ONE ITEM ONLY, AND WE CAN STORE THE MD5 VALUE IN THE CHAR ARRAY I PASS...
+	// char* imgbuf = new char[0];
+	// imgbuf = new char[fsfile->meta->size];
+	// delete[] imgbuf;
+
 	unsigned long long totalbytes = 0;
-	//totalbytes = GetTotalBytes(ui->sourcecombo->currentText().toStdString());
 	ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
 	Verify(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
-	//qDebug() << "totalbytes:" << totalbytes;
-	/*
-	QFile infile(ui->sourcecombo->currentText());
-	infile.open(QIODevice::ReadOnly);
-	infile.seek(0);
-	//QByteArray tmparray;
-	//QByteArray tmparray = infile.read(8);
-	//qDebug() << "1st 8 bytes:" << tmparray.toHex();
-	QFile outfile(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd");
-	outfile.open(QIODevice::Append);
-	while(curpos <= totalbytes)
-	{
-	    //tmparray.clear();
-	    infile.seek(curpos);
-	    //tmparray = infile.read(4096);
-	    outfile.write(infile.read(4096));
-	    curpos = curpos + 4096;
-	    qDebug() << "percent complete:" << (curpos/totalbytes) * 100.0;
-	}
-	infile.close();
-	outfile.close();
-	*/
-	/*
-	QFile infile(ui->sourcecombo->currentText());
-	isopen = infile.open(QIODevice::ReadOnly);
-	qDebug() << "is open:" << isopen;
-	qint64 totalbytes = infile.size();
-	qDebug() << "totalbytes:" << totalbytes;
-	infile.close();
-	*/
-	/*
-        QString rawstr = QString("dc3dd if=" + ui->sourcecombo->currentText() + " hash=md5 log=" + ui->nameedit->text() + ".log" + " of=" + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd");
-	qDebug() << "rawstr:" << rawstr;
-	//QProcess::execute(rawstr);
-	QProcess* rawimg = new QProcess(this);
-	rawimg->start(rawstr);
-	//rawimg->start("dc3dd", QStringList() << QString("if=" + ui->sourcecombo->currentText()) << "hash=md5" << QString("log=" + ui->nameedit->text() + ".log") << QString("of=" + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd"));
-	//*/
-	/*
-	if(!rawimg->waitForFinished())
-	    qDebug() << "failed:" << rawimg->errorString();
-	else
-	    qDebug() << "finished:" << rawimg->readAll();
-	*/
-
-        //qDebug() << "image type:" << "raw image";
     }
     else if(ui->aff4radio->isChecked())
     {
