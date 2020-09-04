@@ -69,13 +69,13 @@ void Verify(std::string instr, std::string outstr)
     for(i = 0; i < MD5_DIGEST_LENGTH; i++)
     {
 	srcstr << printf("%02x", c[i]);
-	printf("%02x", c[i]);
+	//printf("%02x", c[i]);
     }
     printf(" - MD5 Source Device\n");
     for(i = 0; i < MD5_DIGEST_LENGTH; i++)
     {
 	imgstr << printf("%02x", o[i]);
-	printf("%02x", o[i]);
+	//printf("%02x", o[i]);
     }
     printf(" - MD5 Forensic Image\n");
     std::string srcmd5 = "";
