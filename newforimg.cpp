@@ -48,6 +48,19 @@ void ForImgDialog::CreateImage()
     }
     else if(ui->aff4radio->isChecked())
     {
+        ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
+        Verify(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
+        QString aff4cmd = QDir::homePath() + "/.local/share/wombatforensics/linpmem";
+        aff4cmd += " -i " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd -o " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".aff4";
+        system(aff4cmd.toStdString().c_str());
+        std::remove(QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString().c_str());
+        // AFF4 HAS NO FUSE RIGHT NOW, SO I WOULD EITHER NEED TO MOUNT IT OR EXPORT THE DD FILE
+        /*
+        QString xchompstr = QDir::homePath();
+        xchompstr += "/.local/share/wombatforensics/xchomp";
+        QProcess* process = new QProcess(this);
+        process->startDetached(xchompstr, QStringList());
+        */
         //qDebug() << "image type:" << "aff4 image";
     }
     else if(ui->sfsradio->isChecked())
@@ -66,6 +79,8 @@ void ForImgDialog::CreateImage()
         printf("Squashfs'd Forensic Image Finished Successfully.\n");
         //int fd = open("destfilepath", O_CREAT | O_TRUNC | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
         //qDebug() << "image type:" << "sfs image";
+        // SFS WOULD BE UNSQUASHFS TO GET RAW .DD FILE IN A TMP LOCATION AND THEN PARSE IT...
+        // OR I COULD MOUNT SQUASHFS TO A TMP LOCATION AND THEN PARSE IT THAT WAY
     }
     // ensure values are valid and filled in/selected otherwise popup error and don't close...
     this->close();

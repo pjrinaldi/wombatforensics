@@ -505,6 +505,7 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/archive-manager.svg \
 		Resources/xchomp \
 		Resources/text-x-makefile.svg \
+		Resources/linpmem-v3.3-rc3.3-rc2 \
 		Resources/multimedia-video-player.svg \
 		Resources/system-search.png \
 		Resources/dialog-information.svg \
