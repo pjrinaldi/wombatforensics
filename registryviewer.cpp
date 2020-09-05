@@ -445,6 +445,7 @@ void RegistryDialog::LoadRegistryFile(QString regid, QString regname)
     //rootitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
     ui->treeWidget->addTopLevelItem(rootitem);
     PopulateChildKeys(rootkey, rootitem, regerr);
+    ui->treeWidget->expandItem(rootitem);
     libregf_key_free(&rootkey, &regerr);
     libregf_file_close(regfile, &regerr);
     libregf_file_free(&regfile, &regerr);

@@ -36,8 +36,13 @@ void AddEvidenceDialog::SelectEvidence()
     }
     if(alreadyadded == false)
     {
-        if(evidfilename.toLower().contains(".dd") || evidfilename.toLower().contains(".e01") || evidfilename.toLower().contains(".000") || evidfilename.toLower().contains(".001") || evidfilename.toLower().contains(".aff") || evidfilename.toLower().contains(".image") || evidfilename.toLower().contains(".dmg"))
+        if(evidfilename.toLower().endsWith(".dd") || evidfilename.toLower().endsWith(".e01") || evidfilename.toLower().endsWith(".000") || evidfilename.toLower().endsWith(".001") || evidfilename.toLower().endsWith(".aff") || evidfilename.toLower().endsWith(".image") || evidfilename.toLower().endsWith(".dmg") || evidfilename.toLower().endsWith(".sfs"))
         {
+            if(evidfilename.toLower().endsWith(".sfs"))
+            {
+                // need to mount and provide access to the raw dd file...
+                qDebug() << "squashfuse here and provide access to the raw image path...";
+            }
             // it's an evidence image so process...
             ui->evidencelist->addItem(evidfilename);
             ui->startbutton->setEnabled(true);

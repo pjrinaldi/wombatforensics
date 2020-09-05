@@ -25,7 +25,7 @@ makepkg -si
 cd ../wombatforensics
 
 # install all the other prerequisites (when given the choice of packages, I always select the default=all)
-sudo pacman -S qt5 qtav ffmpegthumbnailer imagemagick libewf sleuthkit libtar gst-libav gst-transcoder vlc mplayer gst-plugins-bad gst-plugins-ugly gdb libzip poppler-qt5
+sudo pacman -S qt5 qtav ffmpegthumbnailer imagemagick libewf sleuthkit libtar gst-libav gst-transcoder vlc mplayer gst-plugins-bad gst-plugins-ugly gdb libzip poppler-qt5 openssl
 
 # optional archive and image formats
 sudo pacman -S zip unzip p7zip libheif
@@ -41,12 +41,22 @@ makepkg -si
 # cd back into wombatforensics directory
 cd ../wombatforensics
 
-# donwload libfwnt source
+# download libfwnt source
 curl -O https://github.com/libyal/libfwnt/releases/download/20191222/libfwnt-alpha-20191222.tar.gz
 # extract the libfwnt archive
 tar -xzf libfwnt-alpha-20191222.tar.gz
 # cd into the libfwnt directory
 cd libfwnt-20191222
+# run configure make make install
+./configure && make && sudo make install
+# cd back into wombat forensics directory
+cd ../wombatforensics
+# download libregf source
+curl -O https://github.com/libyal/libregf/releases/download/20200805/libregf-alpha-20200805.tar.gz
+# extract the libregf archive
+tar -xzf libregf-alpha-20200805.tar.gz
+# cd into the libregf directory
+cd libregf-20200805
 # run configure make make install
 ./configure && make && sudo make install
 # cd back into wombat forensics directory
