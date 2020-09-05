@@ -39,8 +39,6 @@ void ForImgDialog::CreateImage()
     if(ui->sourcecombo->currentText().contains("Select Source Drive") || ui->pathedit->text().isEmpty() || ui->nameedit->text().isEmpty() || (!ui->aff4radio->isChecked() && !ui->rawradio->isChecked( ) && !ui->sfsradio->isChecked()))
     {
         QMessageBox::critical(this, "Can't Create Image", "All Required Fields haven't been filled out.", QMessageBox::Ok);
-        //int ret = QMessageBox::warning(this, tr("My Application"), tr("The document has been modified.\nDo you want to save your changes?"), QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
-        qDebug() << "there are issues with the fields not filled out...";
     }
     else
     {
