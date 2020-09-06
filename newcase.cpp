@@ -15,7 +15,10 @@ void InitializeEvidenceStructure(QString evidname)
     const TSK_TCHAR** images;
     std::vector<std::string> fullpathvector;
     fullpathvector.clear();
-    fullpathvector.push_back(evidname.toStdString());
+    if(evidname.endsWith(".sfs"))
+        fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split(".sfs").first() + ".dd").toStdString());
+    else
+        fullpathvector.push_back(evidname.toStdString());
     images = (const char**)malloc(fullpathvector.size()*sizeof(char*));
     for(uint i=0; i < fullpathvector.size(); i++)
     {
