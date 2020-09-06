@@ -41,6 +41,10 @@ void StartImaging(std::string instr, std::string outpath, std::string outstr, in
 
 void ReadBytes(std::string instr, std::string outstr)
 {
+    std::ofstream logfile;
+    printf("\noutstr: %s\n", outstr.c_str());
+    logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
+    logfile.close();
     unsigned long long totalbytes = 0;
     unsigned long long curpos = 0;
     int infile = open(instr.c_str(), O_RDONLY);

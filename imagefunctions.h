@@ -10,6 +10,8 @@
 #include <openssl/evp.h>
 #include <cstring>
 #include <sstream>
+//#include <ofstream>
+#include <fstream>
 
 unsigned long long GetTotalBytes(std::string infile);
 void ReadBytes(std::string infile, std::string outfile);

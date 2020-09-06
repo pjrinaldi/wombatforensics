@@ -36,7 +36,7 @@ void ForImgDialog::HideClicked()
 
 void ForImgDialog::FinishImaging()
 {
-    QMessageBox::information(this, "Imaging Finished", "Imaging finished successfully.", QMessageBox::Ok);
+    QMessageBox::information(this, "Finished", " Forensic Imaging completed.", QMessageBox::Ok);
 }
 
 void ForImgDialog::CreateImage()
@@ -44,7 +44,7 @@ void ForImgDialog::CreateImage()
     // NEED TO CHECK VALUES PRIOR TO LAUNCHING THIS AND POPUP A DIALOG WITH WHAT IS MISSING...
     if(ui->sourcecombo->currentText().contains("Select Source Drive") || ui->pathedit->text().isEmpty() || ui->nameedit->text().isEmpty() || (!ui->aff4radio->isChecked() && !ui->rawradio->isChecked( ) && !ui->sfsradio->isChecked()))
     {
-        QMessageBox::critical(this, "Can't Create Image", "All Required Fields haven't been filled out.", QMessageBox::Ok);
+        QMessageBox::critical(this, "Can't Create Forensic Image", "All Required Fields haven't been filled out.", QMessageBox::Ok);
     }
     else
     {
