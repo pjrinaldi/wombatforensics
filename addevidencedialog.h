@@ -27,11 +27,15 @@ private slots:
     void Cancel();
     void StartProcess();
     void UpdateButtons();
+    void ReadXMountOut(void);
+    void ReadXMountErr(void);
 private:
     Ui::AddEvidenceDialog* ui;
 protected:
     void dragEnterEvent(QDragEnterEvent* e);
     void dropEvent(QDropEvent* e);
+    
+    QProcess* xmntprocess;
 };
 
 Q_DECLARE_METATYPE(AddEvidenceDialog*)

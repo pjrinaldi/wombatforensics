@@ -41,7 +41,15 @@ void AddEvidenceDialog::SelectEvidence()
             if(evidfilename.toLower().endsWith(".sfs"))
             {
                 // need to mount and provide access to the raw dd file...
-                qDebug() << "squashfuse here and provide access to the raw image path...";
+                QString mntstr = "squashfuse " + evidfilename + " " + wombatvariable.imgdatapath;
+                qDebug() << "mntstr:" << mntstr;
+		xmntprocess = new QProcess();
+		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
+		connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
+		xmntprocess->setProgram(mntstr);
+		xmntprocess->start();
+                evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last().split(".sfs").first() + ".sfs.dd";
+                qDebug() << "evidfilename:" << evidfilename;
             }
             // it's an evidence image so process...
             ui->evidencelist->addItem(evidfilename);
@@ -288,4 +296,13 @@ void AddEvidenceDialog::dropEvent(QDropEvent* e)
             ui->startbutton->setEnabled(true);
         }
     }
+}
+void AddEvidenceDialog::ReadXMountOut()
+{
+    qWarning() << xmntprocess->readAllStandardOutput();
+}
+
+void AddEvidenceDialog::ReadXMountErr()
+{
+    qWarning() << xmntprocess->readAllStandardError();
 }
