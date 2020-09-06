@@ -112,6 +112,10 @@ void Verify(std::string instr, std::string outstr)
     // char* imgbuf = new char[0];
     // imgbuf = new char[fsfile->meta->size];
     // delete[] imgbuf;
+    unsigned long long totalbytes = 0;
+    int infile1 = open(instr.c_str(), O_RDONLY);
+    ioctl(infile1, BLKGETSIZE64, &totalbytes);
+    close(infile1);
     printf("\nStarting Image Verification...\n");
     unsigned char c[MD5_DIGEST_LENGTH];
     unsigned char o[MD5_DIGEST_LENGTH];
@@ -126,16 +130,24 @@ void Verify(std::string instr, std::string outstr)
     unsigned char odata[1024];
     MD5_Init(&mdcontext);
     MD5_Init(&outcontext);
+    unsigned long long curpos = 0;
     while((bytes = fread(data, 1, 1024, infile)) != 0)
     {
+        curpos = curpos + 1024;
 	MD5_Update(&mdcontext, data, bytes);
+        obytes = fread(odata, 1, 1024, outfile);
+        MD5_Update(&outcontext, odata, obytes);
+        printf("Bytes Read: %lld/%lld\r", curpos, totalbytes);
+        fflush(stdout);
     }
     MD5_Final(c, &mdcontext);
+    /*
     while((obytes = fread(odata, 1, 1024, outfile)) != 0)
     {
 	//printf("Forensic Image Bytes Read: %d\r", obytes);
 	MD5_Update(&outcontext, odata, obytes);
     }
+    */
     MD5_Final(o, &outcontext);
     std::stringstream srcstr;
     std::stringstream imgstr;
