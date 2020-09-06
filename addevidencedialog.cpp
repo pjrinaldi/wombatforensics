@@ -38,22 +38,25 @@ void AddEvidenceDialog::SelectEvidence()
     {
         if(evidfilename.toLower().endsWith(".dd") || evidfilename.toLower().endsWith(".e01") || evidfilename.toLower().endsWith(".000") || evidfilename.toLower().endsWith(".001") || evidfilename.toLower().endsWith(".aff") || evidfilename.toLower().endsWith(".image") || evidfilename.toLower().endsWith(".dmg") || evidfilename.toLower().endsWith(".sfs"))
         {
+            // it's an evidence image so process...
+            ui->evidencelist->addItem(evidfilename);
             if(evidfilename.toLower().endsWith(".sfs"))
             {
                 // need to mount and provide access to the raw dd file...
                 QString mntstr = "squashfuse " + evidfilename + " " + wombatvariable.imgdatapath;
-                qDebug() << "mntstr:" << mntstr;
+                //qDebug() << "mntstr:" << mntstr;
 		xmntprocess = new QProcess();
 		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
 		connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
-		xmntprocess->setProgram(mntstr);
-		xmntprocess->start();
-                evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last().split(".sfs").first() + ".sfs.dd";
-                qDebug() << "evidfilename:" << evidfilename;
+		//xmntprocess->setProgram(mntstr);
+		xmntprocess->start(mntstr);
+                //evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last();
+                //qDebug() << "evidfilename:" << evidfilename;
+                evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last().split(".sfs").first() + ".dd";
+                xmntprocess->waitForFinished(-1);
             }
-            // it's an evidence image so process...
-            ui->evidencelist->addItem(evidfilename);
             ui->startbutton->setEnabled(true);
+            //qDebug() << "evidfilename:" << evidfilename;
             // POPUP HERE FOR EVID ITEM WOULD BE GOOD....
             // LET's TEST IT OUT...
             // IF I DON'T WRITE THE STAT/PROP FILE'S HERE, WHERE I WILL STORE PASSWORDS FOR MULTIPLE EVIDENCE ITEMS WITH MULTIPLE ENCRYPTED POOL'S/FS'S
@@ -69,7 +72,9 @@ void AddEvidenceDialog::SelectEvidence()
             TSK_IMG_INFO* imginfo = NULL;
             imginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
             if(imginfo == NULL)
-                qDebug() << "imginfo is null...";
+                qDebug() << "imginfo is null..." << tsk_error_get_errstr();
+            //else
+            //    qDebug() << "The waitforfinished works...";
             free(images);
             TSK_VS_INFO* vsinfo = NULL;
             const TSK_POOL_INFO* poolinfo = nullptr;

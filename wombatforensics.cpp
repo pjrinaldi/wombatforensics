@@ -1743,6 +1743,7 @@ void WombatForensics::CloseCurrentCase()
     for(int i=0; i < existingevidence.count(); i++)
     {
         QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
+        qDebug() << "imgext:" << imgext;
         if(imgext.contains("e01")) // ewfmount
         {
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
@@ -1753,13 +1754,25 @@ void WombatForensics::CloseCurrentCase()
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
             QProcess::execute(xunmntstr, QStringList());
         }
+        else if(imgext.contains("sfs")) // squashfuse
+        {
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
+            QProcess* unmnt = new QProcess();
+            unmnt->start(xunmntstr);
+            unmnt->waitForFinished(-1);
+	    //xmntprocess = new QProcess();
+	    //xmntprocess->start(mntstr);
+            //QProcess::execute(xunmntstr, QStringList());
+            //QProcess::waitForFinished(-1);
+            //xmntprocess->waitForFinished(-1);
+        }
         /*
         else // raw, so nothing to unmount
         {
         }
         */
     }
-    qInfo() << "Forensic Image unmounted";
+    qInfo() << "Forensic Image(s) unmounted";
     carvecounthash.clear();
     partitionlist.clear();
     existingevidence.clear();
