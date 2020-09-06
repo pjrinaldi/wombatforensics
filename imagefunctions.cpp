@@ -9,6 +9,36 @@ unsigned long long GetTotalBytes(std::string instr)
     return totbyt;
 }
 
+void StartImaging(std::string instr, std::string outpath, std::string outstr, int radio) 
+{
+    if(radio == 0)
+    {
+        ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
+        Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
+        printf("Raw Forensic Image Finished Successfully.\n");
+    }
+    else if(radio == 1)
+    {
+        ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
+        Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
+        std::string aff4cmd = std::string(getenv("HOME")) + std::string("/.local/share/wombatforensics/linpmem");
+        aff4cmd += " -i " + outpath + "/" + outstr + ".dd -o " + outpath + "/" + outstr + ".aff4";
+        system(aff4cmd.c_str());
+        std::remove(std::string(outpath + "/" + outstr + ".dd").c_str());
+        printf("AFF4'd Forensic Image Finished Successfully.\n");
+    }
+    else if(radio == 2)
+    {
+        ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
+        Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
+        std::string sqshcmd = "mksquashfs " + outpath + "/" + outstr + ".dd " + outpath + "/" + outstr + ".sfs";
+        system(sqshcmd.c_str());
+        std::remove(std::string(outpath + "/" + outstr + ".dd").c_str());
+        std::remove(std::string(outpath + "/" + outstr + ".log").c_str());
+        printf("Squashfs'd Forensic Image Finished Successfully.\n");
+    }
+}
+
 void ReadBytes(std::string instr, std::string outstr)
 {
     unsigned long long totalbytes = 0;
@@ -23,6 +53,8 @@ void ReadBytes(std::string instr, std::string outstr)
         char bytebuf[512];
 	ssize_t bytesread = read(infile, bytebuf, 512);
 	ssize_t byteswrite = write(outfile, bytebuf, 512);
+        if(bytesread == -1)
+            perror("Read Error:");
 	if(byteswrite == -1)
 	    perror("Write Error:");
 	curpos = curpos + 512;
@@ -36,7 +68,7 @@ void ReadBytes(std::string instr, std::string outstr)
 
 std::string Verify(std::string instr)
 {
-    std::string inmd5;
+    std::string inmd5 = instr;
     /*
     FILE* infile = fopen(instr.c_str(), "rb");
     EVP_MD_CTX *mdctx;

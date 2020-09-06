@@ -20,6 +20,7 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()), Qt::DirectConnection);
     connect(ui->createbutton, SIGNAL(clicked()), this, SLOT(CreateImage()), Qt::DirectConnection);
     connect(ui->browsebutton, SIGNAL(clicked()), this, SLOT(GetFolder()), Qt::DirectConnection);
+    connect(&imgwatcher, SIGNAL(finished()), this, SLOT(FinishImaging()), Qt::QueuedConnection);
     ui->aff4radio->setEnabled(false); // disabled until i get a way to fuse/tsk view/extract aff4 image.
 }
 
@@ -33,6 +34,11 @@ void ForImgDialog::HideClicked()
     this->close();
 }
 
+void ForImgDialog::FinishImaging()
+{
+    QMessageBox::information(this, "Imaging Finished", "Imaging finished successfully.", QMessageBox::Ok);
+}
+
 void ForImgDialog::CreateImage()
 {
     // NEED TO CHECK VALUES PRIOR TO LAUNCHING THIS AND POPUP A DIALOG WITH WHAT IS MISSING...
@@ -42,6 +48,21 @@ void ForImgDialog::CreateImage()
     }
     else
     {
+        int radio = 0;
+        if(ui->rawradio->isChecked())
+            radio = 0;
+        else if(ui->aff4radio->isChecked())
+            radio = 1;
+        else if(ui->sfsradio->isChecked())
+            radio = 2;
+        //emit StartImaging() function to pass values so i can initiate carving from main gui and update what i need to...
+        QFuture<void> tmpfuture = QtConcurrent::run(StartImaging, ui->sourcecombo->currentText().toStdString(), ui->pathedit->text().toStdString(), ui->nameedit->text().toStdString(), radio);
+        imgwatcher.setFuture(tmpfuture);
+        /*
+        //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
+        //sqlwatcher.setFuture(tmpfuture);
+        //QFuture<void> tmpfuture = QtConcurrent::run(GenerateCarving, plist, flist);
+        //carvewatcher.setFuture(tmpfuture);
         if(ui->rawradio->isChecked())
         {
             // NEED TO MOVE TO ANOTHER THREAD... AND IMPLEMENT VERIFICATION SO I CAN DO BOTH THE IMAGE AND THE SOURCE AT ONCE...
@@ -70,7 +91,7 @@ void ForImgDialog::CreateImage()
             process->startDetached(xchompstr, QStringList());
             */
             //qDebug() << "image type:" << "aff4 image";
-        }
+        /*}
         else if(ui->sfsradio->isChecked())
         {
             ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
@@ -91,6 +112,7 @@ void ForImgDialog::CreateImage()
             // OR I COULD MOUNT SQUASHFS TO A TMP LOCATION AND THEN PARSE IT THAT WAY
         }
         // ensure values are valid and filled in/selected otherwise popup error and don't close...
+        */
         this->close();
     }
 }
