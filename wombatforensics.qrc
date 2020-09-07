@@ -1,6 +1,6 @@
 <RCC>
   <qresource prefix="/">
-    <file alias="linpmem">Resources/linpmem-v3.3-rc3.3-rc2</file>
+    <file alias="aff4imager">Resources/aff4imager</file>
     <file alias="about">Resources/aboutwombat.png</file>
     <file alias="videoerror">Resources/videoerror.png</file>
     <file alias="xchomp">Resources/xchomp</file>

@@ -177,28 +177,32 @@ void Verify(std::string instr, std::string outstr)
     std::stringstream imgstr;
     for(i = 0; i < MD5_DIGEST_LENGTH; i++)
     {
-        logfile << sprintf("%02x", c[i]);
-	srcstr << printf("%02x", c[i]);
-	//printf("%02x", c[i]);
+        srcstr << std::hex << (int)c[i];
+        //logfile << printf("%02x", c[i]);
+	//srcstr << printf("%02x", c[i]);
+	printf("%02x", c[i]);
     }
-    logfile << " - MD5 Source Device\n";
+    //logfile << " - MD5 Source Device\n";
     printf(" - MD5 Source Device\n");
     for(i = 0; i < MD5_DIGEST_LENGTH; i++)
     {
-        logfile << sprintf("%02x", o[i]);
-	imgstr << printf("%02x", o[i]);
-	//printf("%02x", o[i]);
+        imgstr << std::hex << (int)o[i];
+        //logfile << printf("%02x", o[i]);
+	//imgstr << printf("%02x", o[i]);
+	printf("%02x", o[i]);
     }
-    logfile << " - MD5 Forensic Image\n";
+    //logfile << " - MD5 Forensic Image\n";
     printf(" - MD5 Forensic Image\n");
     std::string srcmd5 = "";
     std::string imgmd5 = "";
     srcmd5 = srcstr.str();
     imgmd5 = imgstr.str();
-    // not working correctly......
-    //logfile << srcmd5 << " - MD5 Source Device\n";
-    //logfile << imgmd5 << " - MD5 Forensic Image\n";
-    //if(strcmp((const char*)c, (const char*)o) == 0)
+    logfile << srcmd5 << " - MD5 Source Device\n";
+    logfile << imgmd5 << " - MD5 Forensic Image\n";
+    //if(strcmp(reinterpret_cast<const char*>(c), reinterpret_cast<const char*>(o)) == 0)
+    //    printf("verify");
+    //else
+    //    printf("fail");
     if(srcmd5.compare(imgmd5) == 0)
     {
 	printf("Verification Successful\n");
