@@ -6,6 +6,7 @@
 RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegistryDialog)
 {
     ui->setupUi(this);
+    //ui->hexEdit->setVisible(false);
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->label->setText("");
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
@@ -152,6 +153,7 @@ void RegistryDialog::ValueSelected(void)
             }
             else if(valuetype.contains("REG_BINARY"))
             {
+                valuedata += "Content\n-------\n\n";
                 if(keypath.contains("UserAssist") && (keypath.contains("{750") || keypath.contains("{F4E") || keypath.contains("{5E6")))
                 {
                     //valuedata += "Content:\t";
@@ -246,8 +248,32 @@ void RegistryDialog::ValueSelected(void)
         libregf_value_get_value_data_size(curval, &datasize, &regerr);
         uint8_t data[datasize];
         libregf_value_get_value_data(curval, data, datasize, &regerr);
-        ui->hexEdit->setData(QByteArray::fromRawData((char*)data, datasize));
+        QByteArray dataarray = QByteArray::fromRawData((char*)data, datasize);
+        //ui->hexEdit->setData(QByteArray::fromRawData((char*)data, datasize));
+        //QString valuestr = QString::fromUtf8(reinterpret_cast<char*>(data));
+        valuedata += "\n\nBinary Content\n--------------\n\n";
+        int linecount = datasize / 16;
+        //int remainder = datasize % 16;
+        for(int i=0; i < linecount; i++)
+        {
+            valuedata += QString::number(i * 16, 16).rightJustified(8, '0') + "\t";
+            for(int j=0; j < 16; j++)
+            {
+                valuedata += QString("%1").arg(data[j+i*16], 2, 16, QChar('0')).toUpper() + " ";
+            }
+            for(int j=0; j < 16; j++)
+            {
+                if(!QChar(dataarray.at(j+i*16)).isPrint())
+                {
+                    valuedata += ".";
+                }
+                else
+                    valuedata += QString("%1").arg(dataarray.at(j+i*16));
+            }
+            valuedata += "\n";
+        }
 	ui->plainTextEdit->setPlainText(valuedata);
+        
         libregf_value_free(&curval, &regerr);
         libregf_key_free(&curkey, &regerr);
         libregf_file_close(regfile, &regerr);
@@ -305,8 +331,8 @@ void RegistryDialog::KeySelected(void)
     libregf_key_get_number_of_values(curkey, &valuecount, &regerr);
     ui->tableWidget->clear();
     ui->plainTextEdit->setPlainText("");
-    ui->hexEdit->BypassColor(true);
-    ui->hexEdit->setData("");
+    //ui->hexEdit->BypassColor(true);
+    //ui->hexEdit->setData("");
     ui->tableWidget->setRowCount(valuecount);
     for(int i=0; i < valuecount; i++)
     {

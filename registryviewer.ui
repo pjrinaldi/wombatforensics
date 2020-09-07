@@ -131,34 +131,11 @@
          <family>Source Code Pro</family>
         </font>
        </property>
-       <property name="placeholderText">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QHexEdit" name="hexEdit">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>1</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>QHexEditWidget</string>
-       </property>
-       <property name="whatsThis">
-        <string>QHexEdit widget allow to edit the data in hex view.</string>
-       </property>
-       <property name="hexCaps">
-        <bool>true</bool>
-       </property>
-       <property name="dynamicBytesPerLine">
-        <bool>true</bool>
-       </property>
-       <property name="overwriteMode">
-        <bool>false</bool>
-       </property>
        <property name="readOnly">
         <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string/>
        </property>
       </widget>
      </widget>
@@ -185,14 +162,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QHexEdit</class>
-   <extends>QFrame</extends>
-   <header>qhexedit.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="wombatforensics.qrc"/>
  </resources>
