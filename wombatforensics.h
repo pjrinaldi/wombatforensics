@@ -173,6 +173,8 @@ private slots:
             ResizeColumns();
     };
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
+    //void ExportToForensicImage(int exporttype, bool originalpath, QString exportpath);
+    void ExportForensicImage(void);
     void DigFiles(int digtype, QVector<int> digoptions);
     void StartCarving(QStringList plist, QStringList flist);
     void SetOffsetLabel(qint64 pos);

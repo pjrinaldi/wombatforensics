@@ -566,6 +566,7 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/go-previous.png \
 		Resources/list-add.svg \
 		Resources/window-new.png \
+		Resources/exportfilestoimage.png.svg \
 		Resources/carvetypes
 	/usr/bin/rcc -name wombatforensics wombatforensics.qrc -o debug/qrc_wombatforensics.cpp
 
@@ -939,9 +940,6 @@ debug/moc_registryviewer.cpp: registryviewer.h \
 		wombatfunctions.h \
 		tskcpp.h \
 		ui_registryviewer.h \
-		qhexedit.h \
-		chunks.h \
-		commands.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/include/parted -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include registryviewer.h -o debug/moc_registryviewer.cpp
@@ -1130,13 +1128,7 @@ ui_pdfviewer.h: pdfviewer.ui \
 	/usr/bin/uic pdfviewer.ui -o ui_pdfviewer.h
 
 ui_registryviewer.h: registryviewer.ui \
-		/usr/bin/uic \
-		qhexedit.h \
-		chunks.h \
-		commands.h \
-		globals.h \
-		wombatinclude.h \
-		wombatvariable.h
+		/usr/bin/uic
 	/usr/bin/uic registryviewer.ui -o ui_registryviewer.h
 
 ui_newforimg.h: newforimg.ui \
@@ -1617,10 +1609,7 @@ debug/registryviewer.o: registryviewer.cpp registryviewer.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		tskcpp.h \
-		ui_registryviewer.h \
-		qhexedit.h \
-		chunks.h \
-		commands.h
+		ui_registryviewer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/registryviewer.o registryviewer.cpp
 
 debug/newforimg.o: newforimg.cpp newforimg.h \

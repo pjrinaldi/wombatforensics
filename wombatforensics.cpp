@@ -121,6 +121,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionpublishresults, SIGNAL(triggered()), this, SLOT(PublishResults()), Qt::DirectConnection);
     connect(ui->actionchomp, SIGNAL(triggered()), this, SLOT(LaunchChomp()), Qt::DirectConnection);
     connect(ui->actionCreateForensicImage, SIGNAL(triggered()), this, SLOT(ShowForImgDialog()), Qt::DirectConnection);
+    connect(ui->actionExportForensicImage, SIGNAL(triggered()), this, SLOT(ExportForensicImage()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
@@ -169,6 +170,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addSeparator();
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
+    treemenu->addAction(ui->actionExportForensicImage);
 
     ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
     ui->dirTreeView->setUniformRowHeights(true);
@@ -527,6 +529,11 @@ void WombatForensics::ShowForImgDialog()
     forimgdialog->show();
 }
 
+void WombatForensics::ExportForensicImage()
+{
+    qDebug() << "popup export dialog here...";
+}
+
 void WombatForensics::ShowExternalViewer()
 {
     QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "-fhex";
@@ -691,6 +698,7 @@ void WombatForensics::HideViewerManager()
     treemenu->addSeparator();
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
+    treemenu->addAction(ui->actionExportForensicImage);
 }
 
 void WombatForensics::HideTagManager()
@@ -712,6 +720,7 @@ void WombatForensics::HideTagManager()
     treemenu->addSeparator();
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
+    treemenu->addAction(ui->actionExportForensicImage);
 }
 
 void WombatForensics::HideSettingsWindow()
@@ -849,6 +858,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionsearchhex->setEnabled(false);
     ui->actionpublishresults->setEnabled(false);
     ui->actionCarve->setEnabled(false);
+    ui->actionExportForensicImage->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -1150,6 +1160,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionView_Image_Gallery->setEnabled(true);
         ui->actionTextViewer->setEnabled(true);
         ui->actionExport_Evidence->setEnabled(true);
+        ui->actionExportForensicImage->setEnabled(true);
         ui->actionByteConverter->setEnabled(true);
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);

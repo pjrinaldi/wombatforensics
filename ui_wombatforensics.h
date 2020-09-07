@@ -60,6 +60,7 @@ public:
     QAction *actionchomp;
     QAction *actionCarve;
     QAction *actionCreateForensicImage;
+    QAction *actionExportForensicImage;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -244,6 +245,11 @@ public:
         QIcon icon28;
         icon28.addFile(QString::fromUtf8(":/bar/newforimg"), QSize(), QIcon::Normal, QIcon::Off);
         actionCreateForensicImage->setIcon(icon28);
+        actionExportForensicImage = new QAction(WombatForensics);
+        actionExportForensicImage->setObjectName(QString::fromUtf8("actionExportForensicImage"));
+        QIcon icon29;
+        icon29.addFile(QString::fromUtf8(":/bar/exportforimg"), QSize(), QIcon::Normal, QIcon::Off);
+        actionExportForensicImage->setIcon(icon29);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -321,6 +327,7 @@ public:
         analysisToolBar->addAction(actionCopy_Selection_To);
         analysisToolBar->addAction(actionCarve);
         analysisToolBar->addAction(actionExport_Evidence);
+        analysisToolBar->addAction(actionExportForensicImage);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionBookmark_Manager);
         analysisToolBar->addAction(actionpreviewreport);
@@ -355,7 +362,10 @@ public:
 #if QT_CONFIG(shortcut)
         actionRemove_Evidence->setShortcut(QCoreApplication::translate("WombatForensics", "Ctrl+D", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actionExport_Evidence->setText(QCoreApplication::translate("WombatForensics", "Export Evidence", nullptr));
+        actionExport_Evidence->setText(QCoreApplication::translate("WombatForensics", "Export Files", nullptr));
+#if QT_CONFIG(tooltip)
+        actionExport_Evidence->setToolTip(QCoreApplication::translate("WombatForensics", "Export Files to Directory", nullptr));
+#endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(shortcut)
         actionExport_Evidence->setShortcut(QCoreApplication::translate("WombatForensics", "Ctrl+E", nullptr));
 #endif // QT_CONFIG(shortcut)
@@ -402,7 +412,10 @@ public:
         actionByteConverter->setToolTip(QCoreApplication::translate("WombatForensics", "Byte Converter", nullptr));
 #endif // QT_CONFIG(tooltip)
         actionCheck->setText(QCoreApplication::translate("WombatForensics", "(Un)Check Selected", nullptr));
-        actionExport->setText(QCoreApplication::translate("WombatForensics", "Export...", nullptr));
+        actionExport->setText(QCoreApplication::translate("WombatForensics", "Export Files", nullptr));
+#if QT_CONFIG(tooltip)
+        actionExport->setToolTip(QCoreApplication::translate("WombatForensics", "Export Files to Directory", nullptr));
+#endif // QT_CONFIG(tooltip)
         actionSaveState->setText(QCoreApplication::translate("WombatForensics", "Save State", nullptr));
 #if QT_CONFIG(tooltip)
         actionSaveState->setToolTip(QCoreApplication::translate("WombatForensics", "Save State", nullptr));
@@ -440,6 +453,7 @@ public:
 #if QT_CONFIG(tooltip)
         actionCreateForensicImage->setToolTip(QCoreApplication::translate("WombatForensics", "Create Forensic Image", nullptr));
 #endif // QT_CONFIG(tooltip)
+        actionExportForensicImage->setText(QCoreApplication::translate("WombatForensics", "Export Files to Forensic Image", nullptr));
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());
 #endif // QT_CONFIG(tooltip)

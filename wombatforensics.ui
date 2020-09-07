@@ -158,6 +158,7 @@
    <addaction name="actionCopy_Selection_To"/>
    <addaction name="actionCarve"/>
    <addaction name="actionExport_Evidence"/>
+   <addaction name="actionExportForensicImage"/>
    <addaction name="separator"/>
    <addaction name="actionBookmark_Manager"/>
    <addaction name="actionpreviewreport"/>
@@ -227,7 +228,10 @@
      <normaloff>:/eexport</normaloff>:/eexport</iconset>
    </property>
    <property name="text">
-    <string>Export Evidence</string>
+    <string>Export Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Export Files to Directory</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
@@ -454,7 +458,10 @@
      <normaloff>:/eexport</normaloff>:/eexport</iconset>
    </property>
    <property name="text">
-    <string>Export...</string>
+    <string>Export Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Export Files to Directory</string>
    </property>
   </action>
   <action name="actionSaveState">
@@ -575,6 +582,15 @@
    </property>
    <property name="toolTip">
     <string>Create Forensic Image</string>
+   </property>
+  </action>
+  <action name="actionExportForensicImage">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/exportforimg</normaloff>:/bar/exportforimg</iconset>
+   </property>
+   <property name="text">
+    <string>Export Files to Forensic Image</string>
    </property>
   </action>
  </widget>
