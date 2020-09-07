@@ -60,10 +60,14 @@ void RegistryDialog::CreateNewTag()
 
 void RegistryDialog::SetTag()
 {
-    qDebug() << "set tag";
+    QString regstring = "";
     QAction* tagaction = qobject_cast<QAction*>(sender());
-    //qDebug() << tagaction->iconText();
-    AddTag("registry", tagaction->iconText());
+    regstring += this->windowTitle().mid(16) + "|"; // file id
+    regstring += ui->label->text() + "\\"; // key
+    regstring += ui->tableWidget->selectedItems().first()->text() + "|";
+    regstring += tagaction->iconText() + ",";
+    ui->tableWidget->selectedItems().last()->setText(tagaction->iconText());
+    AddTag("registry", regstring);
     // NEED TO FIGURE OUT HOW TO RECORD TAG VALUE BETWEEN REGISTRY OPEN/CLOSES...
     // REGISTRY TEXT FILE WHICH CONTAINS: ID,KEYPATH,VALUE,TAG
     // ARE THESE VALUES AVAILABLE WHEN I POPULATE REGISTRY TO READ THIS FILE IN....
@@ -75,7 +79,13 @@ void RegistryDialog::SetTag()
 void RegistryDialog::RemoveTag()
 {
     qDebug() << "remove tag";
+    QString regstring = "";
     QAction* tagaction = qobject_cast<QAction*>(sender());
+    regstring += this->windowTitle().mid(16) + "|"; // file id
+    regstring += ui->label->text() + "\\"; // key
+    regstring += ui->tableWidget->selectedItems().first()->text() + "|";
+    regstring += tagaction->iconText() + ",";
+    ui->tableWidget->selectedItems().last()->setText("");
     RemTag("registry", tagaction->iconText());
     //QAction* tagaction = qobject_cast<QAction*>(sender());
     //if(QString(tagaction->iconText()).contains("Selected")) // single file
@@ -288,6 +298,10 @@ void RegistryDialog::KeySelected(void)
     ui->tableWidget->clear();
     ui->plainTextEdit->setPlainText("");
     ui->tableWidget->setRowCount(valuecount);
+    // READ REGISTRY TAG FILE HERE AND POPULATE REGISTRY STRINGLIST WITH ID|KEY\VALUE|TAG
+    // READ FILE AND POPULATE STRING LIST WITH ONLY ITEMS WHICH ARE FROM CURRENT ID [THIS->WINDOWTITLE->TEXT().MID(16)]
+    // IF THE READ ROW HAS THAT, THEN WE MATCH KEY\\VALUE WITH CURRENT CURKEY\\CURVALUENAME AND THEN GET APPLY THE TAG
+    // DOWN IN SETITEM(I, 2, NEW QTABLEWIDGETITEM(TAG VALUE))
     for(int i=0; i < valuecount; i++)
     {
 	libregf_value_t* curval = NULL;
