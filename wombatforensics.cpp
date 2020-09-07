@@ -815,10 +815,10 @@ void WombatForensics::InitializeAppStructure()
         QFile chompfile(homepath + "xchomp");
         chompfile.setPermissions(QFileDevice::ExeOwner);
     }
-    if(!FileExists(QString(homepath + "linpmem").toStdString()))
+    if(!FileExists(QString(homepath + "aff4imager").toStdString()))
     {
-        QFile::copy(":/linpmem", homepath + "linpmem");
-        QFile aff4file(homepath + "linpmem");
+        QFile::copy(":/aff4imager", homepath + "aff4imager");
+        QFile aff4file(homepath + "aff4imager");
         aff4file.setPermissions(QFileDevice::ExeOwner);
     }
     QFile ctypes(homepath + "carvetypes");

@@ -119,9 +119,10 @@ public:
         sizePolicy4.setVerticalStretch(1);
         sizePolicy4.setHeightForWidth(hexEdit->sizePolicy().hasHeightForWidth());
         hexEdit->setSizePolicy(sizePolicy4);
-        hexEdit->setProperty("hexCaps", QVariant(true));
-        hexEdit->setProperty("dynamicBytesPerLine", QVariant(true));
-        hexEdit->setProperty("readOnly", QVariant(true));
+        hexEdit->setHexCaps(true);
+        hexEdit->setDynamicBytesPerLine(true);
+        hexEdit->setOverwriteMode(false);
+        hexEdit->setReadOnly(true);
         splitter_2->addWidget(hexEdit);
         splitter_3->addWidget(splitter_2);
 

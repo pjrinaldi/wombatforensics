@@ -509,7 +509,6 @@ release/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/archive-manager.svg \
 		Resources/xchomp \
 		Resources/text-x-makefile.svg \
-		Resources/linpmem-v3.3-rc3.3-rc2 \
 		Resources/multimedia-video-player.svg \
 		Resources/system-search.png \
 		Resources/dialog-information.svg \
@@ -522,6 +521,7 @@ release/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/multimedia-photo-manager.svg \
 		Resources/utilities-terminal.svg \
 		Resources/edit-copy.svg \
+		Resources/aff4imager \
 		Resources/videoerror.png \
 		Resources/document-export.svg \
 		Resources/artfiactprep.html \

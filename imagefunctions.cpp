@@ -21,7 +21,7 @@ void StartImaging(std::string instr, std::string outpath, std::string outstr, in
     {
         ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
         Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
-        std::string aff4cmd = std::string(getenv("HOME")) + std::string("/.local/share/wombatforensics/linpmem");
+        std::string aff4cmd = std::string(getenv("HOME")) + std::string("/.local/share/wombatforensics/aff4imager");
         aff4cmd += " -i " + outpath + "/" + outstr + ".dd -i " + outpath + "/" + outstr + ".dd.log -o " + outpath + "/" + outstr + ".aff4";
         system(aff4cmd.c_str());
         std::remove(std::string(outpath + "/" + outstr + ".dd").c_str());
@@ -129,10 +129,6 @@ void Verify(std::string instr, std::string outstr)
     char buff[35];
     logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
     logfile << "Starting Image Verification at " << GetDateTime(buff) << "\n";
-    //logfile << "Wombat Forensics v0.3 Forensic Image started at: " << GetDateTime(buff) << "\n";
-    // char* imgbuf = new char[0];
-    // imgbuf = new char[fsfile->meta->size];
-    // delete[] imgbuf;
     unsigned long long totalbytes = 0;
     unsigned int sectorsize = 512;
     int infile1 = open(instr.c_str(), O_RDONLY);
@@ -165,33 +161,20 @@ void Verify(std::string instr, std::string outstr)
     }
     logfile << "Bytes Read: " << curpos << "/" << totalbytes << "\n";
     MD5_Final(c, &mdcontext);
-    /*
-    while((obytes = fread(odata, 1, 1024, outfile)) != 0)
-    {
-	//printf("Forensic Image Bytes Read: %d\r", obytes);
-	MD5_Update(&outcontext, odata, obytes);
-    }
-    */
     MD5_Final(o, &outcontext);
     std::stringstream srcstr;
     std::stringstream imgstr;
     for(i = 0; i < MD5_DIGEST_LENGTH; i++)
     {
         srcstr << std::hex << (int)c[i];
-        //logfile << printf("%02x", c[i]);
-	//srcstr << printf("%02x", c[i]);
 	printf("%02x", c[i]);
     }
-    //logfile << " - MD5 Source Device\n";
     printf(" - MD5 Source Device\n");
     for(i = 0; i < MD5_DIGEST_LENGTH; i++)
     {
         imgstr << std::hex << (int)o[i];
-        //logfile << printf("%02x", o[i]);
-	//imgstr << printf("%02x", o[i]);
 	printf("%02x", o[i]);
     }
-    //logfile << " - MD5 Forensic Image\n";
     printf(" - MD5 Forensic Image\n");
     std::string srcmd5 = "";
     std::string imgmd5 = "";
@@ -199,10 +182,6 @@ void Verify(std::string instr, std::string outstr)
     imgmd5 = imgstr.str();
     logfile << srcmd5 << " - MD5 Source Device\n";
     logfile << imgmd5 << " - MD5 Forensic Image\n";
-    //if(strcmp(reinterpret_cast<const char*>(c), reinterpret_cast<const char*>(o)) == 0)
-    //    printf("verify");
-    //else
-    //    printf("fail");
     if(srcmd5.compare(imgmd5) == 0)
     {
 	printf("Verification Successful\n");

@@ -55,64 +55,8 @@ void ForImgDialog::CreateImage()
             radio = 1;
         else if(ui->sfsradio->isChecked())
             radio = 2;
-        //emit StartImaging() function to pass values so i can initiate carving from main gui and update what i need to...
         QFuture<void> tmpfuture = QtConcurrent::run(StartImaging, ui->sourcecombo->currentText().toStdString(), ui->pathedit->text().toStdString(), ui->nameedit->text().toStdString(), radio);
         imgwatcher.setFuture(tmpfuture);
-        /*
-        //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
-        //sqlwatcher.setFuture(tmpfuture);
-        //QFuture<void> tmpfuture = QtConcurrent::run(GenerateCarving, plist, flist);
-        //carvewatcher.setFuture(tmpfuture);
-        if(ui->rawradio->isChecked())
-        {
-            // NEED TO MOVE TO ANOTHER THREAD... AND IMPLEMENT VERIFICATION SO I CAN DO BOTH THE IMAGE AND THE SOURCE AT ONCE...
-            // MODIFY VERIFY FUNCTION SO IT VERIFIES ONE ITEM ONLY, AND WE CAN STORE THE MD5 VALUE IN THE CHAR ARRAY I PASS...
-            // char* imgbuf = new char[0];
-            // imgbuf = new char[fsfile->meta->size];
-            // delete[] imgbuf;
-            unsigned long long totalbytes = 0;
-            ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
-            //std::string imgmd5 = Verify(ui->sourcecombo->currentText().toStdString());
-            Verify(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
-        }
-        else if(ui->aff4radio->isChecked())
-        {
-            ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
-            Verify(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
-            QString aff4cmd = QDir::homePath() + "/.local/share/wombatforensics/linpmem";
-            aff4cmd += " -i " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd -o " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".aff4";
-            system(aff4cmd.toStdString().c_str());
-            std::remove(QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString().c_str());
-            // AFF4 HAS NO FUSE RIGHT NOW, SO I WOULD EITHER NEED TO MOUNT IT OR EXPORT THE DD FILE
-            /*
-            QString xchompstr = QDir::homePath();
-            xchompstr += "/.local/share/wombatforensics/xchomp";
-            QProcess* process = new QProcess(this);
-            process->startDetached(xchompstr, QStringList());
-            */
-            //qDebug() << "image type:" << "aff4 image";
-        /*}
-        else if(ui->sfsradio->isChecked())
-        {
-            ReadBytes(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
-            Verify(ui->sourcecombo->currentText().toStdString(), QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString());
-            QString sqshcmd = "mksquashfs " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".sfs";
-            //QString sqshcmd = "mksquashfs " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".log " + ui->pathedit->text() + "/" + ui->nameedit->text() + ".sfs";
-            //qDebug() << "squashcmd:" << sqshcmd;
-            // add image and log to squashfs
-            system(sqshcmd.toStdString().c_str());
-            // WOULD NEED TO CAPTURE OUTPUT...IN A FILENAME.log WHICH I HAVEN'T CREATED YET... WILL WORK ON LATER...
-
-            std::remove(QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".dd").toStdString().c_str());
-            std::remove(QString(ui->pathedit->text() + "/" + ui->nameedit->text() + ".log").toStdString().c_str());
-            printf("Squashfs'd Forensic Image Finished Successfully.\n");
-            //int fd = open("destfilepath", O_CREAT | O_TRUNC | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-            //qDebug() << "image type:" << "sfs image";
-            // SFS WOULD BE UNSQUASHFS TO GET RAW .DD FILE IN A TMP LOCATION AND THEN PARSE IT...
-            // OR I COULD MOUNT SQUASHFS TO A TMP LOCATION AND THEN PARSE IT THAT WAY
-        }
-        // ensure values are valid and filled in/selected otherwise popup error and don't close...
-        */
         this->close();
     }
 }
