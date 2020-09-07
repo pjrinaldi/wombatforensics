@@ -6,12 +6,10 @@
 RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegistryDialog)
 {
     ui->setupUi(this);
-    //ui->hexEdit->setVisible(false);
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->label->setText("");
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
     connect(ui->tableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(ValueSelected()), Qt::DirectConnection);
-    //connect(ui->tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(DoubleClick(QTableWidgetItem*)), Qt::DirectConnection);
     QStringList taglist;
     taglist.clear();
     tagmenu = new QMenu(ui->tableWidget);
@@ -19,11 +17,13 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     if(bookmarkfile.isOpen())
 	taglist = QString(bookmarkfile.readLine()).split(",", Qt::SkipEmptyParts);
     bookmarkfile.close();
+    /*
     QAction* newtagaction = new QAction("New Tag", tagmenu);
     newtagaction->setIcon(QIcon(":/bar/newtag"));
     connect(newtagaction, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     tagmenu->addAction(newtagaction);
     tagmenu->addSeparator();
+    */
     for(int i=0; i < taglist.count(); i++)
     {
 	QAction* tmpaction = new QAction(taglist.at(i), tagmenu);
@@ -39,13 +39,6 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     tagmenu->addAction(remtagaction);
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
-    /*
-    connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()));
-    connect(ui->carvebutton, SIGNAL(clicked()), this, SLOT(Assign()));
-    connect(ui->titlelineedit, SIGNAL(editingFinished()), this, SLOT(UpdateAssign()));
-    ui->carvebutton->setEnabled(false);
-    UpdateList();
-    */
 }
 
 RegistryDialog::~RegistryDialog()
@@ -58,14 +51,19 @@ void RegistryDialog::HideClicked()
     this->close();
 }
 
+/*
 void RegistryDialog::CreateNewTag()
 {
     qDebug() << "create new tag";
 }
+*/
 
 void RegistryDialog::SetTag()
 {
     qDebug() << "set tag";
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    //qDebug() << tagaction->iconText();
+    AddTag("registry", tagaction->iconText());
     // NEED TO FIGURE OUT HOW TO RECORD TAG VALUE BETWEEN REGISTRY OPEN/CLOSES...
     // REGISTRY TEXT FILE WHICH CONTAINS: ID,KEYPATH,VALUE,TAG
     // ARE THESE VALUES AVAILABLE WHEN I POPULATE REGISTRY TO READ THIS FILE IN....
@@ -77,42 +75,10 @@ void RegistryDialog::SetTag()
 void RegistryDialog::RemoveTag()
 {
     qDebug() << "remove tag";
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    RemTag("registry", tagaction->iconText());
     //QAction* tagaction = qobject_cast<QAction*>(sender());
     //if(QString(tagaction->iconText()).contains("Selected")) // single file
-}
-
-void RegistryDialog::Assign()
-{
-    //qDebug() << ui->tagcombobox->currentText();
-    //qDebug() << ui->titlelineedit->text();
-    //emit TagCarved(ui->titlelineedit->text(), ui->tagcombobox->currentText());
-    //this->close();
-}
-
-void RegistryDialog::UpdateAssign()
-{
-    /*
-    if(ui->titlelineedit->text().isEmpty())
-        ui->carvebutton->setEnabled(false);
-    else
-        ui->carvebutton->setEnabled(true);
-    */
-}
-
-void RegistryDialog::UpdateList()
-{
-    /*
-    taglist.clear();
-    bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
-    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(bookmarkfile.isOpen())
-        taglist = QString(bookmarkfile.readLine()).split(",", Qt::SkipEmptyParts);
-    bookmarkfile.close();
-    for(int i=0; i < taglist.count(); i++)
-    {
-        ui->tagcombobox->addItem(taglist.at(i));
-    }
-    */
 }
 
 void RegistryDialog::ValueSelected(void)
@@ -156,8 +122,6 @@ void RegistryDialog::ValueSelected(void)
                 valuedata += "Content\n-------\n\n";
                 if(keypath.contains("UserAssist") && (keypath.contains("{750") || keypath.contains("{F4E") || keypath.contains("{5E6")))
                 {
-                    //valuedata += "Content:\t";
-                    //valuedata += ui->tableWidget->selectedItems().first()->text();
                     valuedata += "ROT13 Decrypted Content:\t";
                     valuedata += DecryptRot13(ui->tableWidget->selectedItems().first()->text()) + "\n";
                 }
@@ -249,8 +213,6 @@ void RegistryDialog::ValueSelected(void)
         uint8_t data[datasize];
         libregf_value_get_value_data(curval, data, datasize, &regerr);
         QByteArray dataarray = QByteArray::fromRawData((char*)data, datasize);
-        //ui->hexEdit->setData(QByteArray::fromRawData((char*)data, datasize));
-        //QString valuestr = QString::fromUtf8(reinterpret_cast<char*>(data));
         valuedata += "\n\nBinary Content\n--------------\n\n";
         int linecount = datasize / 16;
         //int remainder = datasize % 16;
@@ -304,20 +266,14 @@ void RegistryDialog::KeySelected(void)
 	    child = parent;
 	}
     }
-    //qDebug() << "reverse path items:" << pathitems;
     // build path
     QString keypath = "";
     QChar sepchar = QChar(92);
     for(int i = pathitems.count() - 2; i > -1; i--)
     {
 	keypath += "/" + pathitems.at(i);
-	//qDebug() << "cur path item:" << pathitems.at(i);
     }
-    //qDebug() << "sepchar:" << sepchar;
-    //qDebug() << "keypath:" << keypath;
     keypath.replace("/", sepchar);
-    //ui->plainTextEdit->setPlainText(keypath);
-    //qDebug() << "keypath:" << keypath;
     // attempt to open by path...
     ui->label->setText(keypath);
     libregf_file_t* regfile = NULL;
@@ -331,8 +287,6 @@ void RegistryDialog::KeySelected(void)
     libregf_key_get_number_of_values(curkey, &valuecount, &regerr);
     ui->tableWidget->clear();
     ui->plainTextEdit->setPlainText("");
-    //ui->hexEdit->BypassColor(true);
-    //ui->hexEdit->setData("");
     ui->tableWidget->setRowCount(valuecount);
     for(int i=0; i < valuecount; i++)
     {
@@ -344,9 +298,6 @@ void RegistryDialog::KeySelected(void)
 	libregf_value_get_utf8_name(curval, name, namesize, &regerr);
 	uint32_t type = 0;
 	libregf_value_get_value_type(curval, &type, &regerr);
-	//size_t datasize = 0;
-	//libregf_value_get_value_data_size(curval, &datasize, &regerr);
-	//qDebug() << "name size:" << namesize << "value name:" << QString::fromUtf8(reinterpret_cast<char*>(name)) << "value type:" << type << "data size:" << datasize;
 	if(namesize == 0)
 	{
 	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value", "Tag"});
@@ -416,15 +367,6 @@ void RegistryDialog::KeySelected(void)
         ui->tableWidget->setCurrentCell(0, 0);
 	libregf_value_free(&curval, &regerr);
     }
-    //qDebug() << "value count:" << valuecount;
-    //libregf_error_fprint(regerr, stderr);
-    //size_t namesize = 0;
-    //libregf_key_get_utf8_name_size(curkey, &namesize, &regerr);
-    //libregf_error_fprint(regerr, stderr);
-    //uint8_t name[namesize];
-    //libregf_key_get_utf8_name(curkey, name, namesize, &regerr);
-    //libregf_error_fprint(regerr, stderr);
-    //qDebug() << "key name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
     libregf_key_free(&curkey, &regerr);
     libregf_file_close(regfile, &regerr);
     libregf_file_free(&regfile, &regerr);
@@ -437,38 +379,21 @@ void RegistryDialog::closeEvent(QCloseEvent* e)
 
 void RegistryDialog::LoadRegistryFile(QString regid, QString regname)
 {
-    //int retval = 0;
-    //qDebug() << "regid:" << regid;
     libregf_file_t* regfile = NULL;
     libregf_error_t* regerr = NULL;
     libregf_file_initialize(&regfile, &regerr);
     QString regfilestr = wombatvariable.tmpfilepath + regid + "-fhex";
     regfilepath = regfilestr;
-    //retval = 0;
     libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
-    //qDebug() << "open registry file retval:" << retval;
     libregf_error_fprint(regerr, stderr);
     libregf_key_t* rootkey = NULL;
     libregf_file_get_root_key(regfile, &rootkey, &regerr);
-    //qDebug() << "Get root key return value:" << retval;
     libregf_error_fprint(regerr, stderr);
     int rootsubkeycnt = 0;
     libregf_key_get_number_of_sub_keys(rootkey, &rootsubkeycnt, &regerr);
-    //qDebug() << "root subkey count:" << rootsubkeycnt;
     libregf_error_fprint(regerr, stderr);
-    //uint64_t rootfiletime = 0;
-    //libregf_key_get_last_written_time(rootkey, &rootfiletime, &regerr);
-    //qDebug() << "root filetime:" << rootfiletime << ConvertWindowsTimeToUnixTimeUTC(rootfiletime);
-    /*
-    size_t namesize = 0;
-    libregf_key_get_utf8_name_size(rootkey, &namesize, &regerr);
-    uint8_t name[namesize];
-    libregf_key_get_utf8_name(rootkey, name, namesize, &regerr);
-    */
-    //qDebug() << "key name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
-    QTreeWidgetItem* rootitem = new QTreeWidgetItem(ui->treeWidget);
+        QTreeWidgetItem* rootitem = new QTreeWidgetItem(ui->treeWidget);
     rootitem->setText(0, regname.toUpper());
-    //rootitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
     ui->treeWidget->addTopLevelItem(rootitem);
     PopulateChildKeys(rootkey, rootitem, regerr);
     ui->treeWidget->expandItem(rootitem);
@@ -481,15 +406,10 @@ void RegistryDialog::LoadRegistryFile(QString regid, QString regname)
 
 void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* curitem, libregf_error_t* regerr)
 {
-    //uint64_t lasttime = 0;
     int subkeycount = 0;
-    //libregf_key_get_last_written_time(curkey, &lasttime, &regerr);
-    //qDebug() << "last time:" << ConvertWindowsTimeToUnixTimeUTC(lasttime);
-    //qDebug() << "curitemtext:" << curitem->text(0);
     libregf_key_get_number_of_sub_keys(curkey, &subkeycount, &regerr);
     if(subkeycount > 0)
     {
-	//qDebug() << "subkeycount:" << subkeycount;
 	for(int i=0; i < subkeycount; i++)
 	{
 	    libregf_key_t* cursubkey = NULL;
@@ -498,7 +418,6 @@ void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* c
 	    libregf_key_get_utf8_name_size(cursubkey, &namesize, &regerr);
 	    uint8_t name[namesize];
 	    libregf_key_get_utf8_name(cursubkey, name, namesize, &regerr);
-	    //qDebug() << "subkey" << i << " name:" << QString::fromUtf8(reinterpret_cast<char*>(name));
 	    QTreeWidgetItem* subitem = new QTreeWidgetItem(curitem);
 	    subitem->setText(0, QString::fromUtf8(reinterpret_cast<char*>(name)));
 	    curitem->addChild(subitem);
@@ -506,21 +425,11 @@ void RegistryDialog::PopulateChildKeys(libregf_key_t* curkey, QTreeWidgetItem* c
 	    libregf_key_get_number_of_sub_keys(cursubkey, &subsubkeycount, &regerr);
 	    if(subsubkeycount > 0)
 	    {
-		//qDebug() << "get child keys for current subkey";
 		PopulateChildKeys(cursubkey, subitem, regerr);
 	    }
-	    //QTreeWidgetItem* curitem = new QTreeWidgetItem(curitem);
-	    //ui->treeWidget->
-	    //curitem
 	    libregf_key_free(&cursubkey, &regerr);
 	}
     }
-    // get sub key count
-    // loop over sub keys...
-    // populate to tree..
-    // will probably need a storage method for this, so when i select on it, it display value where i need it...
-    // if key has its own subkeys, then PopulateChildKeys(curkey, curitem, regerr);
-    // libregf_key_free(curkey, &regerr);
 }
 
 QString RegistryDialog::DecryptRot13(QString encstr)

@@ -9,6 +9,7 @@
 #include "wombatfunctions.h"
 #include "ui_registryviewer.h"
 #include "libregf.h"
+#include "tagging.h"
 
 namespace Ui
 {
@@ -26,14 +27,11 @@ public:
 
 private slots:
     void HideClicked();
-    void Assign();
-    void UpdateList();
-    void UpdateAssign();
     void KeySelected(void);
     void ValueSelected(void);
     void TagMenu(const QPoint &point);
     void SetTag(void);
-    void CreateNewTag(void);
+    //void CreateNewTag(void);
     void RemoveTag(void);
     //void DoubleClick(QTableWidgetItem* curitem);
     //void ImgHexMenu(const QPoint &point);

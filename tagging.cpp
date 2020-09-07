@@ -5,7 +5,9 @@
 
 void AddTag(QString artifact, QString tagstring)
 {
+    qDebug() << "artifact:" << artifact << "tagstring:" << tagstring;
 }
 void RemTag(QString artifact, QString tagstring)
 {
+    qDebug() << "artifact:" << artifact << "tagstring:" << tagstring;
 }
