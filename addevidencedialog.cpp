@@ -70,7 +70,7 @@ void AddEvidenceDialog::SelectEvidence()
             for(uint i=0; i < fullpathvector.size(); i++)
                 images[i] = fullpathvector[i].c_str();
             TSK_IMG_INFO* imginfo = NULL;
-            imginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
+	    imginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
             if(imginfo == NULL)
                 qDebug() << "imginfo is null..." << tsk_error_get_errstr();
             //else
