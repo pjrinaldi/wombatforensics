@@ -80,7 +80,7 @@ void RegistryDialog::SetTag()
     //qDebug() << "curtag to remove:" << curtag;
     if(!curtag.isEmpty())
 	RemTag("registry", curtag);
-    AddTag("registry", regstring);
+    AddTag("registry", regstring); // add htmlentry and htmlvalue to this function...
     // ADD TO PREVIEW REPORT
 }
 
@@ -120,7 +120,6 @@ void RegistryDialog::ValueSelected(void)
 	*/
 
 	htmlentry = "";
-	htmlvalue = "";
 	htmlentry += "<td class='fitem' id='" + this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text() + "'>";
 	htmlentry += "<table width='300px'><tr><th colspan='2'>" + ui->tableWidget->selectedItems().first()->text() + "</th></tr>";
 	htmlentry += "<tr class='odd vtop'><td class='pvalue'>Path:</td><td class='property'><span style='word-wrap:break-word;'>" + ui->label->text() + "</span></td></tr>";
@@ -278,7 +277,19 @@ void RegistryDialog::ValueSelected(void)
             valuedata += "\n";
         }
 	ui->plainTextEdit->setPlainText(valuedata);
-        
+
+    	htmlvalue = "";
+	QFile initfile(":/html/artifactprephtml");
+	initfile.open(QIODevice::ReadOnly);
+	if(initfile.isOpen())
+	    htmlvalue = initfile.readAll();
+	initfile.close();
+	htmlvalue += "<div id='infotitle'>Registry Analysis</div><br/>";
+	htmlvalue += "<pre>";
+	htmlvalue += valuedata;
+	htmlvalue += "</pre>";
+	htmlvalue += "</table></body></html>";
+
         libregf_value_free(&curval, &regerr);
         libregf_key_free(&curkey, &regerr);
         libregf_file_close(regfile, &regerr);

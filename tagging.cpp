@@ -24,6 +24,8 @@ void AddTag(QString artifact, QString tagstring)
     if(artifactfile.isOpen())
 	artifactfile.write(artifactstring.toStdString().c_str());
     artifactfile.close();
+    // add htmlentry to preview report.
+    // write htmlvalue to tmpmntpath + "artifact/" converted tagstring |->. and \\->-
 }
 void RemTag(QString artifact, QString tagstring)
 {
@@ -48,6 +50,7 @@ void RemTag(QString artifact, QString tagstring)
     if(artifactfile.isOpen())
 	artifactfile.write(artifactstring.toStdString().c_str());
     artifactfile.close();
+    // convert tagstring to filename and remove file from tmpmntpath + "/artifact/filename"
 }
 
 /*
