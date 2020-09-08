@@ -46,7 +46,6 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     if(registryfile.isOpen())
 	registrytaglist = QString(registryfile.readLine()).split(",", Qt::SkipEmptyParts);
     registryfile.close();
-    qDebug() << "registry tag list:" << registrytaglist;
 }
 
 RegistryDialog::~RegistryDialog()
@@ -68,25 +67,26 @@ void RegistryDialog::CreateNewTag()
 
 void RegistryDialog::SetTag()
 {
+    QString curtag = "";
     QString regstring = "";
     QAction* tagaction = qobject_cast<QAction*>(sender());
     regstring += this->windowTitle().mid(16) + "|"; // file id
     regstring += ui->label->text() + "\\"; // key
     regstring += ui->tableWidget->selectedItems().first()->text() + "|";
+    if(!ui->tableWidget->selectedItems().last()->text().isEmpty())
+	curtag = regstring + ui->tableWidget->selectedItems().last()->text();
     regstring += tagaction->iconText();
     ui->tableWidget->selectedItems().last()->setText(tagaction->iconText());
+    //qDebug() << "curtag to remove:" << curtag;
+    if(!curtag.isEmpty())
+	RemTag("registry", curtag);
     AddTag("registry", regstring);
-    // NEED TO FIGURE OUT HOW TO RECORD TAG VALUE BETWEEN REGISTRY OPEN/CLOSES...
-    // REGISTRY TEXT FILE WHICH CONTAINS: ID,KEYPATH,VALUE,TAG
-    // ARE THESE VALUES AVAILABLE WHEN I POPULATE REGISTRY TO READ THIS FILE IN....
-    //
-    // ALSO MIGHT TRY TO ABSTRACT TAG CALLS SO I HAVE A TAGGING CLASS WHICH CAN BE USED
-    // FOR EITHER REGULAR TAGGING OR REGISTRY TAGGING OR VSS,MBOX,PST,ETC TAGGING
+    // ADD TO PREVIEW REPORT
 }
 
 void RegistryDialog::RemoveTag()
 {
-    qDebug() << "remove tag";
+    //qDebug() << "remove tag";
     QString regstring = "";
     QAction* tagaction = qobject_cast<QAction*>(sender());
     regstring += this->windowTitle().mid(16) + "|"; // file id
@@ -95,6 +95,7 @@ void RegistryDialog::RemoveTag()
     regstring += tagaction->iconText() + ",";
     ui->tableWidget->selectedItems().last()->setText("");
     RemTag("registry", tagaction->iconText());
+    // REMOVE FROM PREVIEW REPORT
     //QAction* tagaction = qobject_cast<QAction*>(sender());
     //if(QString(tagaction->iconText()).contains("Selected")) // single file
 }
@@ -306,11 +307,6 @@ void RegistryDialog::KeySelected(void)
     ui->tableWidget->clear();
     ui->plainTextEdit->setPlainText("");
     ui->tableWidget->setRowCount(valuecount);
-    // READ REGISTRY TAG FILE HERE AND POPULATE REGISTRY STRINGLIST WITH ID|KEY\VALUE|TAG
-    // READ FILE AND POPULATE STRING LIST WITH ONLY ITEMS WHICH ARE FROM CURRENT ID [THIS->WINDOWTITLE->TEXT().MID(16)]
-    // IF THE READ ROW HAS THAT, THEN WE MATCH KEY\\VALUE WITH CURRENT CURKEY\\CURVALUENAME AND THEN GET APPLY THE TAG
-    // DOWN IN SETITEM(I, 2, NEW QTABLEWIDGETITEM(TAG VALUE))
-    //qDebug() << "key\\value" << keypath + "\\" + QString::fromUtf8(reinterpret_cast<char*>(name));
     for(int i=0; i < valuecount; i++)
     {
 	libregf_value_t* curval = NULL;
@@ -321,15 +317,18 @@ void RegistryDialog::KeySelected(void)
 	libregf_value_get_utf8_name(curval, name, namesize, &regerr);
 	uint32_t type = 0;
 	libregf_value_get_value_type(curval, &type, &regerr);
+	QString curtagvalue = this->windowTitle().mid(16) + "|" + keypath + "\\";
 	if(namesize == 0)
 	{
+	    curtagvalue += "(unnamed)";
 	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value", "Tag"});
 	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem("(unnamed)"));
 	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(type, 16)));
-	    ui->tableWidget->setItem(i, 2, new QTableWidgetItem(""));
+	    //ui->tableWidget->setItem(i, 2, new QTableWidgetItem(""));
 	}
 	else
 	{
+	    curtagvalue += QString::fromUtf8(reinterpret_cast<char*>(name));
             QString valuetypestr = "";
 	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value Type", "Tag"});
 	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::fromUtf8(reinterpret_cast<char*>(name))));
@@ -384,8 +383,18 @@ void RegistryDialog::KeySelected(void)
             {
             }
 	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(valuetypestr));
-	    ui->tableWidget->setItem(i, 2, new QTableWidgetItem(""));
+	    //ui->tableWidget->setItem(i, 2, new QTableWidgetItem(""));
 	}
+	//qDebug() << "curtagvalue:" << curtagvalue;
+	QString tagstr = "";
+	for(int j=0; j < registrytaglist.count(); j++)
+	{
+	    //qDebug() << "registry tag list at(" << j << ") :" << registrytaglist.at(j);
+	    if(registrytaglist.at(j).contains(curtagvalue))
+		tagstr = registrytaglist.at(j).split("|", Qt::SkipEmptyParts).last();
+	}
+	//qDebug() << "tagstr:" << tagstr;
+	ui->tableWidget->setItem(i, 2, new QTableWidgetItem(tagstr));
         ui->tableWidget->resizeColumnToContents(0);
         ui->tableWidget->setCurrentCell(0, 0);
 	libregf_value_free(&curval, &regerr);
