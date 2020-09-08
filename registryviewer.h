@@ -47,6 +47,7 @@ private:
     QChar Rot13Char(QChar curchar);
     QString regfilepath;
     QMenu* tagmenu;
+    QStringList registrytaglist;
     //QFile bookmarkfile;
     //QStringList taglist;
 };

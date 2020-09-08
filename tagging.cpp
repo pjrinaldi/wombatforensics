@@ -7,6 +7,7 @@ void AddTag(QString artifact, QString tagstring)
 {
     QFile artifactfile;
     QStringList artifactlist;
+    QString artifactstring = "";
     artifactfile.setFileName(wombatvariable.tmpmntpath + artifact);
     if(!FileExists(QString(wombatvariable.tmpmntpath + artifact).toStdString()))
     {
@@ -16,8 +17,22 @@ void AddTag(QString artifact, QString tagstring)
     artifactlist.clear();
     artifactfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(artifactfile.isOpen())
-        artifactlist = QString(artifactfile.readLine()).split(",", Qt::SkipEmptyParts);
+    {
+	artifactstring = artifactfile.readLine();
+        //artifactlist = QString(artifactfile.readLine()).split(",", Qt::SkipEmptyParts);
+    }
     artifactfile.close();
+    artifactstring += tagstring + ",";
+    artifactfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(artifactfile.isOpen())
+	artifactfile.write(artifactstring.toStdString().c_str());
+    artifactfile.close();
+    /*
+    for(int i=0; i < artifactlist.count(); i++)
+    {
+	//if(artifactlist.at(i).contains(
+    }
+    */
     /*
     QStringList bookitemlist;
     bookitemlist.clear();

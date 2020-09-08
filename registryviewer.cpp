@@ -39,6 +39,14 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     tagmenu->addAction(remtagaction);
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
+    QFile registryfile;
+    registryfile.setFileName(wombatvariable.tmpmntpath + "registry");
+    registryfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    registrytaglist.clear();
+    if(registryfile.isOpen())
+	registrytaglist = QString(registryfile.readLine()).split(",", Qt::SkipEmptyParts);
+    registryfile.close();
+    qDebug() << "registry tag list:" << registrytaglist;
 }
 
 RegistryDialog::~RegistryDialog()
@@ -65,7 +73,7 @@ void RegistryDialog::SetTag()
     regstring += this->windowTitle().mid(16) + "|"; // file id
     regstring += ui->label->text() + "\\"; // key
     regstring += ui->tableWidget->selectedItems().first()->text() + "|";
-    regstring += tagaction->iconText() + ",";
+    regstring += tagaction->iconText();
     ui->tableWidget->selectedItems().last()->setText(tagaction->iconText());
     AddTag("registry", regstring);
     // NEED TO FIGURE OUT HOW TO RECORD TAG VALUE BETWEEN REGISTRY OPEN/CLOSES...
@@ -302,6 +310,7 @@ void RegistryDialog::KeySelected(void)
     // READ FILE AND POPULATE STRING LIST WITH ONLY ITEMS WHICH ARE FROM CURRENT ID [THIS->WINDOWTITLE->TEXT().MID(16)]
     // IF THE READ ROW HAS THAT, THEN WE MATCH KEY\\VALUE WITH CURRENT CURKEY\\CURVALUENAME AND THEN GET APPLY THE TAG
     // DOWN IN SETITEM(I, 2, NEW QTABLEWIDGETITEM(TAG VALUE))
+    //qDebug() << "key\\value" << keypath + "\\" + QString::fromUtf8(reinterpret_cast<char*>(name));
     for(int i=0; i < valuecount; i++)
     {
 	libregf_value_t* curval = NULL;
