@@ -82,6 +82,9 @@ void RegistryDialog::SetTag()
 	RemTag("registry", curtag);
     AddTag("registry", regstring); // add htmlentry and htmlvalue to this function...
     // ADD TO PREVIEW REPORT
+    //RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
+    //AddFileItem(tagname, filestr);
+    //CreateArtifactFile("registry", curtag, htmlvalue);
 }
 
 void RegistryDialog::RemoveTag()
@@ -96,15 +99,14 @@ void RegistryDialog::RemoveTag()
     ui->tableWidget->selectedItems().last()->setText("");
     RemTag("registry", tagaction->iconText());
     // REMOVE FROM PREVIEW REPORT
-    //QAction* tagaction = qobject_cast<QAction*>(sender());
-    //if(QString(tagaction->iconText()).contains("Selected")) // single file
+    //RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
 }
 
 void RegistryDialog::ValueSelected(void)
 {
     if(ui->tableWidget->selectedItems().count() > 0)
     {
-        QTimeZone tmpzone = QTimeZone(reporttimezone);
+        //QTimeZone tmpzone = QTimeZone(reporttimezone);
 	/*
         QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
         filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
