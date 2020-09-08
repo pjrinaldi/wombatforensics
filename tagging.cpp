@@ -69,6 +69,17 @@ void CreateArtifactFile(QString artifact, QString idkeyvalue, QString htmlconten
     //qDebug() << artifact << idkeyvalue << htmlcontent;
 }
 
+void RemoveArtifactFile(QString artifact, QString idkeyvalue)
+{
+    QDir tdir = QDir(wombatvariable.tmpmntpath + artifact + "/");
+    tdir.remove(idkeyvalue.replace("|", ".").replace("\\", "-"));
+    //QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
+    //tdir.remove(tfiles.at(j));
+    //QString filepath = wombatvariable.tmpmntpath + artifact + "/" + idkeyvalue.replace("|", ".").replace("\\", "-");
+
+    qDebug() << artifact << idkeyvalue;
+}
+
 /*
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
 {

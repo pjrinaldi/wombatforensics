@@ -105,6 +105,7 @@ void RegistryDialog::RemoveTag()
     RemTag("registry", tagaction->iconText());
     // REMOVE FROM PREVIEW REPORT
     RemoveFileItem(idkeyvalue);
+    RemoveArtifactFile("registry", idkeyvalue);
     //RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
 }
 
