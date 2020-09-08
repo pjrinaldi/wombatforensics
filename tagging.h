@@ -12,8 +12,8 @@
 void AddTag(QString artifact, QString tagstring);
 void RemTag(QString artifact, QString tagstring);
 
-QFile artifactfile;
-QStringList artifactlist;
+//QFile artifactfile;
+//QStringList artifactlist;
 // RemoveTag();
 // CreateNewTag();
 // TagFile()

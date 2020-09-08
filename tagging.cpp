@@ -5,6 +5,8 @@
 
 void AddTag(QString artifact, QString tagstring)
 {
+    QFile artifactfile;
+    QStringList artifactlist;
     artifactfile.setFileName(wombatvariable.tmpmntpath + artifact);
     if(!FileExists(QString(wombatvariable.tmpmntpath + artifact).toStdString()))
     {
