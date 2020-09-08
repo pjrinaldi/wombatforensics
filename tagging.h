@@ -11,6 +11,7 @@
 
 void AddTag(QString artifact, QString tagstring);
 void RemTag(QString artifact, QString tagstring);
+void CreateArtifactFile(QString artifact, QString idkeyvalue, QString htmlcontent);
 
 //QFile artifactfile;
 //QStringList artifactlist;

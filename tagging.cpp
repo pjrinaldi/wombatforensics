@@ -27,6 +27,7 @@ void AddTag(QString artifact, QString tagstring)
     // add htmlentry to preview report.
     // write htmlvalue to tmpmntpath + "artifact/" converted tagstring |->. and \\->-
 }
+
 void RemTag(QString artifact, QString tagstring)
 {
     QFile artifactfile;
@@ -51,6 +52,21 @@ void RemTag(QString artifact, QString tagstring)
 	artifactfile.write(artifactstring.toStdString().c_str());
     artifactfile.close();
     // convert tagstring to filename and remove file from tmpmntpath + "/artifact/filename"
+}
+
+void CreateArtifactFile(QString artifact, QString idkeyvalue, QString htmlcontent)
+{
+    QDir pdir;
+    pdir.mkpath(wombatvariable.tmpmntpath + artifact);
+    QString filepath = wombatvariable.tmpmntpath + artifact + "/" + idkeyvalue.replace("|", ".").replace("\\", "-");
+    QFile artfile;
+    artfile.setFileName(filepath);
+    artfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(artfile.isOpen())
+        artfile.write(htmlcontent.toStdString().c_str());
+    artfile.close();
+    //QString filename
+    //qDebug() << artifact << idkeyvalue << htmlcontent;
 }
 
 /*

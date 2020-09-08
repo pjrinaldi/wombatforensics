@@ -40,10 +40,10 @@ public:
     {
         if (RegistryDialog->objectName().isEmpty())
             RegistryDialog->setObjectName(QString::fromUtf8("RegistryDialog"));
-        RegistryDialog->setWindowModality(Qt::ApplicationModal);
+        RegistryDialog->setWindowModality(Qt::NonModal);
         RegistryDialog->resize(1400, 720);
         RegistryDialog->setSizeGripEnabled(true);
-        RegistryDialog->setModal(true);
+        RegistryDialog->setModal(false);
         verticalLayout = new QVBoxLayout(RegistryDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(1, 1, 1, 1);

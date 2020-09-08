@@ -76,11 +76,15 @@ void RegistryDialog::SetTag()
     if(!ui->tableWidget->selectedItems().last()->text().isEmpty())
 	curtag = regstring + ui->tableWidget->selectedItems().last()->text();
     regstring += tagaction->iconText();
+    QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text();
     ui->tableWidget->selectedItems().last()->setText(tagaction->iconText());
     //qDebug() << "curtag to remove:" << curtag;
     if(!curtag.isEmpty())
 	RemTag("registry", curtag);
     AddTag("registry", regstring); // add htmlentry and htmlvalue to this function...
+    RemoveFileItem(idkeyvalue);
+    AddFileItem(tagaction->iconText(), htmlentry);
+    CreateArtifactFile("registry", idkeyvalue, htmlvalue);
     // ADD TO PREVIEW REPORT
     //RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
     //AddFileItem(tagname, filestr);
@@ -96,9 +100,11 @@ void RegistryDialog::RemoveTag()
     regstring += ui->label->text() + "\\"; // key
     regstring += ui->tableWidget->selectedItems().first()->text() + "|";
     regstring += tagaction->iconText() + ",";
+    QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text();
     ui->tableWidget->selectedItems().last()->setText("");
     RemTag("registry", tagaction->iconText());
     // REMOVE FROM PREVIEW REPORT
+    RemoveFileItem(idkeyvalue);
     //RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
 }
 
@@ -139,8 +145,8 @@ void RegistryDialog::ValueSelected(void)
         libregf_key_get_last_written_time(curkey, &lastwritetime, &regerr);
 	htmlentry += "<tr class='even'><td class='pvalue'>Last Modified:</td><td class=;property'>" + ConvertWindowsTimeToUnixTime(lastwritetime) + "</td></tr>";
 	htmlentry += "<tr class='odd'><td class='pvalue'>ID:</td><td class='property'>" + this->windowTitle().mid(16) + "</td></tr>";
-        htmlentry += "<tr class='even'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text() + "\")'>Link</a></td></tr>";
-	htmlentry += "</table>/td>";
+        htmlentry += "<tr class='even'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./registry/" + this->windowTitle().mid(16) + "." + ui->label->text().replace("\\", "-") + "-" + ui->tableWidget->selectedItems().first()->text() + "\")'>Link</a></td></tr>";
+	htmlentry += "</table></td>";
         QString valuedata = "Last Written Time:\t" + ConvertWindowsTimeToUnixTimeUTC(lastwritetime) + " UTC\n\n";
 	valuedata += "Name:\t" + ui->tableWidget->selectedItems().first()->text() + "\n\n";
 	if(ui->tableWidget->selectedItems().first()->text().contains("(unnamed)"))

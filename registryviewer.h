@@ -10,6 +10,7 @@
 #include "ui_registryviewer.h"
 #include "libregf.h"
 #include "tagging.h"
+#include "reporting.h"
 
 namespace Ui
 {
