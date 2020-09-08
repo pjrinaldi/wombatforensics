@@ -104,6 +104,26 @@ void RegistryDialog::ValueSelected(void)
 {
     if(ui->tableWidget->selectedItems().count() > 0)
     {
+        QTimeZone tmpzone = QTimeZone(reporttimezone);
+	/*
+        QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
+        filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
+        filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
+        filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
+        if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 3).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
+        filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'>Link</a></td></tr>";
+        filestr += "</table></td>";
+        RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
+        AddFileItem(tagname, filestr);
+	*/
+
+	htmlentry = "";
+	htmlvalue = "";
+	htmlentry += "<td class='fitem' id='" + this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text() + "'>";
+	htmlentry += "<table width='300px'><tr><th colspan='2'>" + ui->tableWidget->selectedItems().first()->text() + "</th></tr>";
+	htmlentry += "<tr class='odd vtop'><td class='pvalue'>Path:</td><td class='property'><span style='word-wrap:break-word;'>" + ui->label->text() + "</span></td></tr>";
 	int valueindex = ui->tableWidget->selectedItems().first()->row();
 	QString keypath = ui->label->text();
 	libregf_file_t* regfile = NULL;
@@ -116,6 +136,10 @@ void RegistryDialog::ValueSelected(void)
 	libregf_key_get_value(curkey, valueindex, &curval, &regerr);
         uint64_t lastwritetime = 0;
         libregf_key_get_last_written_time(curkey, &lastwritetime, &regerr);
+	htmlentry += "<tr class='even'><td class='pvalue'>Last Modified:</td><td class=;property'>" + ConvertWindowsTimeToUnixTime(lastwritetime) + "</td></tr>";
+	htmlentry += "<tr class='odd'><td class='pvalue'>ID:</td><td class='property'>" + this->windowTitle().mid(16) + "</td></tr>";
+        htmlentry += "<tr class='even'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text() + "\")'>Link</a></td></tr>";
+	htmlentry += "</table>/td>";
         QString valuedata = "Last Written Time:\t" + ConvertWindowsTimeToUnixTimeUTC(lastwritetime) + " UTC\n\n";
 	valuedata += "Name:\t" + ui->tableWidget->selectedItems().first()->text() + "\n\n";
 	if(ui->tableWidget->selectedItems().first()->text().contains("(unnamed)"))

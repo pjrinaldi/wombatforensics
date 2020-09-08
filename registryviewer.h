@@ -48,6 +48,8 @@ private:
     QString regfilepath;
     QMenu* tagmenu;
     QStringList registrytaglist;
+    QString htmlentry;
+    QString htmlvalue;
     //QFile bookmarkfile;
     //QStringList taglist;
 };
