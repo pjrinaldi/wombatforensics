@@ -40,7 +40,7 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
     QFile registryfile;
-    registryfile.setFileName(wombatvariable.tmpmntpath + "registry");
+    registryfile.setFileName(wombatvariable.tmpmntpath + "registrytags");
     registryfile.open(QIODevice::ReadOnly | QIODevice::Text);
     registrytaglist.clear();
     if(registryfile.isOpen())

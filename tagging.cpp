@@ -8,8 +8,8 @@ void AddTag(QString artifact, QString tagstring)
     QFile artifactfile;
     QStringList artifactlist;
     QString artifactstring = "";
-    artifactfile.setFileName(wombatvariable.tmpmntpath + artifact);
-    if(!FileExists(QString(wombatvariable.tmpmntpath + artifact).toStdString()))
+    artifactfile.setFileName(wombatvariable.tmpmntpath + artifact + "tags");
+    if(!FileExists(QString(wombatvariable.tmpmntpath + artifact + "tags").toStdString()))
     {
         artifactfile.open(QIODevice::WriteOnly | QIODevice::Text);
         artifactfile.close();
@@ -33,7 +33,7 @@ void RemTag(QString artifact, QString tagstring)
     QFile artifactfile;
     QStringList artifactlist;
     QString artifactstring = "";
-    artifactfile.setFileName(wombatvariable.tmpmntpath + artifact);
+    artifactfile.setFileName(wombatvariable.tmpmntpath + artifact + "tags");
     artifactlist.clear();
     artifactfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(artifactfile.isOpen())
