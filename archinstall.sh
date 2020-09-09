@@ -43,6 +43,8 @@ makepkg -si
 # cd back into wombatforensics directory
 cd ../wombatforensics
 
+# move up a directory from wombatforensics clone
+cd ../
 # download libfwnt source
 curl -O https://github.com/libyal/libfwnt/releases/download/20191222/libfwnt-alpha-20191222.tar.gz
 # extract the libfwnt archive
@@ -52,7 +54,10 @@ cd libfwnt-20191222
 # run configure make make install
 ./configure && make && sudo make install
 # cd back into wombat forensics directory
-cd ..
+cd ../wombatforensics
+
+# move up a directory from wombatforensics clone
+cd ../
 # download libregf source
 curl -O https://github.com/libyal/libregf/releases/download/20200805/libregf-alpha-20200805.tar.gz
 # extract the libregf archive
@@ -62,7 +67,7 @@ cd libregf-20200805
 # run configure make make install
 ./configure && make && sudo make install
 # cd back into wombat forensics directory
-cd ..
+cd ../wombatforensics
 
 # cp the tsk*.h files into their respective directories
 sudo cp ./tskextra/tsk_base_i.h /usr/include/tsk/base/
