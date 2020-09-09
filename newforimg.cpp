@@ -11,12 +11,13 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
     ped_device_probe_all();
     PedDevice* tmpdevice = ped_device_get_next(NULL);
     //qDebug() << "ped device model:" << QString::fromStdString(std::string(tmpdevice->model));
-    ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->path)));
+    ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->model)) + " (" + QString::fromStdString(std::string(tmpdevice->path) + ")"));
     while(tmpdevice != NULL)
     {
         tmpdevice = tmpdevice->next;
         if(tmpdevice != NULL)
-            ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->path)));
+            ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->model)) + " (" + QString::fromStdString(std::string(tmpdevice->path) + ")"));
+            //ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->path)));
     }
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()), Qt::DirectConnection);
     connect(ui->createbutton, SIGNAL(clicked()), this, SLOT(CreateImage()), Qt::DirectConnection);
