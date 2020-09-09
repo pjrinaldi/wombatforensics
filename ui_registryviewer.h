@@ -17,7 +17,6 @@
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QTableWidget>
-#include <QtWidgets/QToolButton>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
 
@@ -27,7 +26,6 @@ class Ui_RegistryDialog
 {
 public:
     QVBoxLayout *verticalLayout;
-    QToolButton *toolButton;
     QSplitter *splitter_3;
     QSplitter *splitter;
     QTreeWidget *treeWidget;
@@ -47,11 +45,6 @@ public:
         verticalLayout = new QVBoxLayout(RegistryDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(1, 1, 1, 1);
-        toolButton = new QToolButton(RegistryDialog);
-        toolButton->setObjectName(QString::fromUtf8("toolButton"));
-
-        verticalLayout->addWidget(toolButton);
-
         splitter_3 = new QSplitter(RegistryDialog);
         splitter_3->setObjectName(QString::fromUtf8("splitter_3"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -133,7 +126,6 @@ public:
     void retranslateUi(QDialog *RegistryDialog)
     {
         RegistryDialog->setWindowTitle(QCoreApplication::translate("RegistryDialog", "Registry Viewer", nullptr));
-        toolButton->setText(QCoreApplication::translate("RegistryDialog", "...", nullptr));
         plainTextEdit->setPlaceholderText(QString());
         label->setText(QCoreApplication::translate("RegistryDialog", "TextLabel", nullptr));
     } // retranslateUi

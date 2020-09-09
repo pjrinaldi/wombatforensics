@@ -1,5 +1,6 @@
 #include <fcntl.h>
 #include <linux/fs.h>
+#include <linux/hdreg.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <unistd.h>

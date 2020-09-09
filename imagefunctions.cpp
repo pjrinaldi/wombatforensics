@@ -11,13 +11,13 @@ unsigned long long GetTotalBytes(std::string instr)
 
 void StartImaging(std::string instr, std::string outpath, std::string outstr, int radio) 
 {
-    if(radio == 0)
+    if(radio == 0) // RAW
     {
         ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
         Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
         printf("Raw Forensic Image Finished Successfully.\n");
     }
-    else if(radio == 1)
+    else if(radio == 1) // AFF4
     {
         ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
         Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
@@ -27,7 +27,7 @@ void StartImaging(std::string instr, std::string outpath, std::string outstr, in
         std::remove(std::string(outpath + "/" + outstr + ".dd").c_str());
         printf("AFF4'd Forensic Image Finished Successfully.\n");
     }
-    else if(radio == 2)
+    else if(radio == 2) // SFS
     {
         ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
         Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
@@ -42,6 +42,7 @@ void StartImaging(std::string instr, std::string outpath, std::string outstr, in
 void ReadBytes(std::string instr, std::string outstr)
 {
     std::ofstream logfile;
+    static struct hd_driveid hd;
     time_t starttime = time(NULL);
     logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
     char buff[35];
@@ -53,6 +54,8 @@ void ReadBytes(std::string instr, std::string outstr)
     int outfile = open(outstr.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, S_IRWXU);
     ioctl(infile, BLKGETSIZE64, &totalbytes);
     ioctl(infile, BLKSSZGET, &sectorsize);
+    ioctl(infile, HDIO_GET_IDENTITY, &hd);
+    printf("hard drive serial number: %20s\n", hd.serial_no);
     logfile << "Source Device: " << instr << " Size: " << totalbytes << " bytes\n";
     logfile << "Source Device: " << instr << " Block Size: " << sectorsize << " bytes\n";
     lseek(infile, 0, SEEK_SET);

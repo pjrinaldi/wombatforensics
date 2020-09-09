@@ -36,13 +36,6 @@
     <number>1</number>
    </property>
    <item>
-    <widget class="QToolButton" name="toolButton">
-     <property name="text">
-      <string>...</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QSplitter" name="splitter_3">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">

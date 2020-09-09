@@ -10,6 +10,7 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
     devicelist.clear();
     ped_device_probe_all();
     PedDevice* tmpdevice = ped_device_get_next(NULL);
+    //qDebug() << "ped device model:" << QString::fromStdString(std::string(tmpdevice->model));
     ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->path)));
     while(tmpdevice != NULL)
     {
