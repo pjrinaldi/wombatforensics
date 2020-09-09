@@ -42,17 +42,17 @@ makepkg -si
 cd ../wombatforensics
 
 # download libfwnt source
-curl -O https://github.com/libyal/libfwnt/releases/download/20191222/libfwnt-alpha-20191222.tar.gz
+wget https://github.com/libyal/libfwnt/releases/download/20200723/libfwnt-alpha-20200723.tar.gz
 # extract the libfwnt archive
-tar -xzf libfwnt-alpha-20191222.tar.gz
+tar -xzf libfwnt-alpha-20200723.tar.gz
 # cd into the libfwnt directory
-cd libfwnt-20191222
+cd libfwnt-20200723
 # run configure make make install
 ./configure && make && sudo make install
 # cd back into wombat forensics directory
 cd ../wombatforensics
 # download libregf source
-curl -O https://github.com/libyal/libregf/releases/download/20200805/libregf-alpha-20200805.tar.gz
+wget https://github.com/libyal/libregf/releases/download/20200805/libregf-alpha-20200805.tar.gz
 # extract the libregf archive
 tar -xzf libregf-alpha-20200805.tar.gz
 # cd into the libregf directory
