@@ -1099,3 +1099,19 @@ void TransferFiles(QString thumbid, QString reppath)
     }
 }
 
+void TransferArtifacts(QString artifact, QString reppath)
+{
+    QDir pdir;
+    pdir.mkpath(reppath + "/" + artifact + "/");
+    QDir artdir = QDir(wombatvariable.tmpmntpath + artifact + "/");
+
+    //QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    //QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
+    QStringList filelist = artdir.entryList(QDir::NoSymLinks | QDir::Files);
+    for(int i=0; i < filelist.count(); i++)
+    {
+        //qDebug() << "filelist.at(" << i << "):" << filelist.at(i);
+        QFile::copy(wombatvariable.tmpmntpath + artifact + "/" + filelist.at(i), reppath + "/" + artifact + "/" + filelist.at(i));
+        //QFile::copy(wombatvariable.tmpmntpath + "thumbs/" + thumbid + ".png", reppath + "thumbs/" + thumbid + ".png");
+    }
+}

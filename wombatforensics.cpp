@@ -2495,6 +2495,7 @@ void WombatForensics::FinishDigging()
             TransferThumbnails(id, currentreportpath);
             TransferFiles(id, currentreportpath);
         }
+        TransferArtifacts("registry", currentreportpath);
         QApplication::restoreOverrideCursor();
         isreport = false;
     }
@@ -2879,6 +2880,7 @@ void WombatForensics::PublishResults()
             TransferThumbnails(id, currentreportpath);
             TransferFiles(id, currentreportpath);
         }
+        TransferArtifacts("registry", currentreportpath);
         QApplication::restoreOverrideCursor();
     }
     else

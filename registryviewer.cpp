@@ -83,6 +83,7 @@ void RegistryDialog::SetTag()
 	RemTag("registry", curtag);
     AddTag("registry", regstring); // add htmlentry and htmlvalue to this function...
     RemoveFileItem(idkeyvalue);
+    RemoveArtifactFile("registry", idkeyvalue);
     AddFileItem(tagaction->iconText(), htmlentry);
     CreateArtifactFile("registry", idkeyvalue, htmlvalue);
     // ADD TO PREVIEW REPORT
@@ -102,7 +103,7 @@ void RegistryDialog::RemoveTag()
     regstring += tagaction->iconText() + ",";
     QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text();
     ui->tableWidget->selectedItems().last()->setText("");
-    RemTag("registry", tagaction->iconText());
+    RemTag("registry", idkeyvalue + "|" + ui->tableWidget->selectedItems().last()->text());
     // REMOVE FROM PREVIEW REPORT
     RemoveFileItem(idkeyvalue);
     RemoveArtifactFile("registry", idkeyvalue);

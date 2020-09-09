@@ -20,5 +20,6 @@ QString ParseArchiveArtifact(QString archivename, QString archiveid);
 
 void TransferThumbnails(QString thumbid, QString reppath);
 void TransferFiles(QString thumbid, QString reppath);
+void TransferArtifacts(QString artifact, QString reppath);
 
 #endif // artifactparser.h

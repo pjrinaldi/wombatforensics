@@ -39,11 +39,15 @@ void RemTag(QString artifact, QString tagstring)
     if(artifactfile.isOpen())
 	artifactlist = QString(artifactfile.readLine()).split(",", Qt::SkipEmptyParts);
     artifactfile.close();
-    artifactlist = artifactstring.split(",", Qt::SkipEmptyParts);
+    //qDebug() << "artifactlist count:" << artifactlist.count();
+    //qDebug() << "tagstring:" << tagstring;
     for(int i=0; i < artifactlist.count(); i++)
     {
 	if(artifactlist.at(i).contains(tagstring))
+        {
+            //qDebug() << artifactlist.at(i) << tagstring;
 	    artifactlist.removeAt(i);
+        }
     }
     for(int i=0; i < artifactlist.count(); i++)
 	artifactstring += artifactlist.at(i) + ",";
@@ -73,11 +77,12 @@ void RemoveArtifactFile(QString artifact, QString idkeyvalue)
 {
     QDir tdir = QDir(wombatvariable.tmpmntpath + artifact + "/");
     tdir.remove(idkeyvalue.replace("|", ".").replace("\\", "-"));
+    //qDebug() << wombatvariable.tmpmntpath + artifact + "/" << idkeyvalue.replace("|", ".").replace("\\", "-");
     //QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
     //tdir.remove(tfiles.at(j));
     //QString filepath = wombatvariable.tmpmntpath + artifact + "/" + idkeyvalue.replace("|", ".").replace("\\", "-");
 
-    qDebug() << artifact << idkeyvalue;
+    //qDebug() << artifact << idkeyvalue;
 }
 
 /*
