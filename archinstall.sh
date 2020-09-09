@@ -30,6 +30,8 @@ sudo pacman -S qt5 qtav ffmpegthumbnailer imagemagick libewf sleuthkit libtar gs
 # optional archive and image formats
 sudo pacman -S zip unzip p7zip libheif
 
+# move up a directory from wombatforensics clone
+cd ../
 # download AUR snapshot
 curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/liblnk-git.tar.gz
 # extract the liblnk-git PKGBUILD
@@ -41,6 +43,8 @@ makepkg -si
 # cd back into wombatforensics directory
 cd ../wombatforensics
 
+# move up a directory from wombatforensics clone
+cd ../
 # download libfwnt source
 wget https://github.com/libyal/libfwnt/releases/download/20200723/libfwnt-alpha-20200723.tar.gz
 # extract the libfwnt archive
@@ -51,6 +55,9 @@ cd libfwnt-20200723
 ./configure && make && sudo make install
 # cd back into wombat forensics directory
 cd ../wombatforensics
+
+# move up a directory from wombatforensics clone
+cd ../
 # download libregf source
 wget https://github.com/libyal/libregf/releases/download/20200805/libregf-alpha-20200805.tar.gz
 # extract the libregf archive
