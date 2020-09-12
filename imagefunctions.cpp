@@ -59,8 +59,8 @@ void ReadBytes(std::string instr, std::string outstr)
     //int outfile = open(outstr.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, S_IRWXU);
     ioctl(infile, BLKGETSIZE64, &totalbytes);
     ioctl(infile, BLKSSZGET, &sectorsize);
-    ioctl(infile, HDIO_GET_IDENTITY, &hd);
-    printf("hard drive serial number: %.20s\n", hd.serial_no);
+    //ioctl(infile, HDIO_GET_IDENTITY, &hd);
+    //printf("hard drive serial number: %.20s\n", hd.serial_no);
     logfile << "Source Device: " << instr << " Size: " << totalbytes << " bytes\n";
     logfile << "Source Device: " << instr << " Block Size: " << sectorsize << " bytes\n";
     lseek(infile, 0, SEEK_SET);
@@ -75,6 +75,7 @@ void ReadBytes(std::string instr, std::string outstr)
     while (curpos < totalbytes)
     {
         char bytebuf[sectorsize];
+        char imgbuf[sectorsize];
 	ssize_t bytesread = read(infile, bytebuf, sectorsize);
 	ssize_t byteswrite = write(outfile, bytebuf, sectorsize);
         if(bytesread == -1)
@@ -82,8 +83,10 @@ void ReadBytes(std::string instr, std::string outstr)
 	if(byteswrite == -1)
 	    perror("Write Error:");
         MD5_Update(&mdcontext, bytebuf, bytesread);
+        ssize_t byteswrote = pread(outfile, imgbuf, sectorsize, curpos);
         //ssize_t byteswrote = pread(outfile, bytebuf, sectorsize, lseek(outfile, -sectorsize, SEEK_CUR));
-        MD5_Update(&outcontext, bytebuf, byteswrite);
+        MD5_Update(&outcontext, imgbuf, byteswrote);
+        //MD5_Update(&outcontext, bytebuf, byteswrite);
 	//MD5_Update(&mdcontext, data, bytes);
         //MD5_Update(&outcontext, odata, obytes);
 	curpos = curpos + sectorsize;
@@ -135,6 +138,7 @@ void ReadBytes(std::string instr, std::string outstr)
     close(outfile);
 }
 
+/*
 std::string Verify(std::string instr)
 {
     std::string inmd5 = instr;
@@ -173,10 +177,11 @@ std::string Verify(std::string instr)
     // Call this once before exit.
     EVP_cleanup();
     */
-    return inmd5;
-}
+//    return inmd5;
+//}
 
-void Verify(std::string instr, std::string outstr)
+//void Verify(std::string instr, std::string outstr)
+std::string Verify(std::string outstr)
 {
     std::ofstream logfile;
     time_t starttime = time(NULL);
@@ -185,57 +190,58 @@ void Verify(std::string instr, std::string outstr)
     logfile << "Starting Image Verification at " << GetDateTime(buff) << "\n";
     unsigned long long totalbytes = 0;
     unsigned int sectorsize = 512;
-    int infile1 = open(instr.c_str(), O_RDONLY);
-    ioctl(infile1, BLKGETSIZE64, &totalbytes);
-    ioctl(infile1, BLKSSZGET, &sectorsize);
-    close(infile1);
-    printf("\nStarting Image Verification...\n");
+    //int infile1 = open(instr.c_str(), O_RDONLY);
+    //ioctl(infile1, BLKGETSIZE64, &totalbytes);
+    //ioctl(infile1, BLKSSZGET, &sectorsize);
+    //close(infile1);
+    //printf("\nStarting Image Verification...\n");
     unsigned char c[MD5_DIGEST_LENGTH];
     unsigned char o[MD5_DIGEST_LENGTH];
     int i;
-    FILE* infile = fopen(instr.c_str(), "rb");
+    //FILE* infile = fopen(instr.c_str(), "rb");
     FILE* outfile = fopen(outstr.c_str(), "rb");
-    MD5_CTX mdcontext;
+    //MD5_CTX mdcontext;
     MD5_CTX outcontext;
-    int bytes;
+    //int bytes;
     int obytes;
-    unsigned char data[sectorsize];
+    //unsigned char data[sectorsize];
     unsigned char odata[sectorsize];
-    MD5_Init(&mdcontext);
+    //MD5_Init(&mdcontext);
     MD5_Init(&outcontext);
     unsigned long long curpos = 0;
-    while((bytes = fread(data, 1, sectorsize, infile)) != 0)
+    while((obytes = fread(odata, 1, sectorsize, outfile)) != 0)
     {
         curpos = curpos + sectorsize;
-	MD5_Update(&mdcontext, data, bytes);
-        obytes = fread(odata, 1, sectorsize, outfile);
+	//MD5_Update(&mdcontext, data, bytes);
+        //obytes = fread(odata, 1, sectorsize, outfile);
         MD5_Update(&outcontext, odata, obytes);
         printf("Bytes Read: %lld/%lld\r", curpos, totalbytes);
         fflush(stdout);
     }
     logfile << "Bytes Read: " << curpos << "/" << totalbytes << "\n";
-    MD5_Final(c, &mdcontext);
+    //MD5_Final(c, &mdcontext);
     MD5_Final(o, &outcontext);
-    std::stringstream srcstr;
+    //std::stringstream srcstr;
     std::stringstream imgstr;
-    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
-    {
-        srcstr << std::hex << (int)c[i];
-	printf("%02x", c[i]);
-    }
-    printf(" - MD5 Source Device\n");
+    //for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+    //{
+    //    srcstr << std::hex << (int)c[i];
+    //    printf("%02x", c[i]);
+    //}
+    //printf(" - MD5 Source Device\n");
     for(i = 0; i < MD5_DIGEST_LENGTH; i++)
     {
         imgstr << std::hex << (int)o[i];
 	printf("%02x", o[i]);
     }
     printf(" - MD5 Forensic Image\n");
-    std::string srcmd5 = "";
+    //std::string srcmd5 = "";
     std::string imgmd5 = "";
-    srcmd5 = srcstr.str();
+    //srcmd5 = srcstr.str();
     imgmd5 = imgstr.str();
-    logfile << srcmd5 << " - MD5 Source Device\n";
+    //logfile << srcmd5 << " - MD5 Source Device\n";
     logfile << imgmd5 << " - MD5 Forensic Image\n";
+    /*
     if(srcmd5.compare(imgmd5) == 0)
     {
 	printf("Verification Successful\n");
@@ -252,6 +258,7 @@ void Verify(std::string instr, std::string outstr)
     logfile.close();
     fclose(infile);
     fclose(outfile);
+    */
 }
 /*
  *#include <stdio.h>
