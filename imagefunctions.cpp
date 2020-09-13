@@ -54,7 +54,7 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
 void ReadBytes(std::string instr, std::string outstr)
 {
     std::ofstream logfile;
-    static struct hd_driveid hd;
+    //static struct hd_driveid hd;
     time_t starttime = time(NULL);
     logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
     char buff[35];
@@ -204,7 +204,7 @@ std::string Verify(std::string outstr)
     //ioctl(infile1, BLKSSZGET, &sectorsize);
     //close(infile1);
     //printf("\nStarting Image Verification...\n");
-    unsigned char c[MD5_DIGEST_LENGTH];
+    //unsigned char c[MD5_DIGEST_LENGTH];
     unsigned char o[MD5_DIGEST_LENGTH];
     int i;
     //FILE* infile = fopen(instr.c_str(), "rb");

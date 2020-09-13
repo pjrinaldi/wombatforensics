@@ -12,7 +12,7 @@
 #include <cstring>
 #include <sstream>
 #include <fstream>
-#include <QTextStream>
+//#include <QTextStream>
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
