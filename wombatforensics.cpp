@@ -1829,7 +1829,11 @@ void WombatForensics::RemEvidence()
 
 void WombatForensics::VerifyEvidence(QStringList verevidlist)
 {
-    qDebug() << "verify evidence here...";
+    for(int i=0; i < verevidlist.count(); i++)
+    {
+        qDebug() << "verify evidence here...";
+        std::string verifystr = Verify(verevidlist.at(i).toStdString());
+    }
 }
 
 void WombatForensics::RemoveEvidence(QStringList remevidlist)
