@@ -1832,7 +1832,9 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
     for(int i=0; i < verevidlist.count(); i++)
     {
         qDebug() << "verify evidence here...";
-        std::string verifystr = Verify(verevidlist.at(i).toStdString());
+        // NEED TO DETERMINE IF IT IS AFF, EWF, SFS, OR RAW AND THEN DO FUSE MOUNTING SO I CAN MD5 THE RAW IMAGE...
+        // ALSO NEED TO GET MD5 FROM IMAGE TO COMPARE TO...
+        //std::string verifystr = Verify(verevidlist.at(i).toStdString());
     }
 }
 
