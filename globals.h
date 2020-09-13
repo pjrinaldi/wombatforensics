@@ -147,6 +147,7 @@ public:
     void DigUpd(int digid, int digcnt) { emit(DigUpdate(digid, digcnt)); }
     void ActivateReload(void) { emit(ReloadPreview()); }
     void CarveUpd(QString pid, int carvecnt) { emit(CarveUpdate(pid, carvecnt)); }
+    //void ImageUpd(void) { emit(ImageUpdate()); }
 
 signals:
     void ProgressUpdate(qint64 filecount);
@@ -154,6 +155,7 @@ signals:
     void DigUpdate(int digid, int digcnt);
     void ReloadPreview(void);
     void CarveUpdate(QString pid, int carvecnt);
+    //void ImageUpdate(void);
 
 };
 

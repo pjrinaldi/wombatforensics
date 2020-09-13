@@ -558,6 +558,7 @@ release/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/text-x-hex.png \
 		Resources/folder-open.svg \
 		Resources/text-x-install.svg \
+		Resources/reverifyforimg.png.svg \
 		Resources/document-new.svg \
 		Resources/managetags.png \
 		Resources/createforensicimg.png.svg \

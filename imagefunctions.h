@@ -11,8 +11,8 @@
 #include <openssl/evp.h>
 #include <cstring>
 #include <sstream>
-//#include <ofstream>
 #include <fstream>
+#include <QTextStream>
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35

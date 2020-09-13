@@ -1,5 +1,13 @@
 #include "imagefunctions.h"
 
+/*
+QTextStream& qStdOut()
+{
+    static QTextStream ts( stdout );
+    return ts;
+}
+*/
+
 unsigned long long GetTotalBytes(std::string instr)
 {
     unsigned long long totbyt = 0;
@@ -91,6 +99,7 @@ void ReadBytes(std::string instr, std::string outstr)
         //MD5_Update(&outcontext, odata, obytes);
 	curpos = curpos + sectorsize;
 	printf("Wrote %lld out of %lld bytes\r", curpos, totalbytes);
+	//qStdOut() << "Wrote" << curpos << "out of" << totalbytes << "bytes\r";
 	fflush(stdout);
     }
     MD5_Final(c, &mdcontext);
@@ -241,6 +250,8 @@ std::string Verify(std::string outstr)
     imgmd5 = imgstr.str();
     //logfile << srcmd5 << " - MD5 Source Device\n";
     logfile << imgmd5 << " - MD5 Forensic Image\n";
+    
+    return imgmd5;
     /*
     if(srcmd5.compare(imgmd5) == 0)
     {

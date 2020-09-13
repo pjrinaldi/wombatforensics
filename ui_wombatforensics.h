@@ -61,6 +61,7 @@ public:
     QAction *actionCarve;
     QAction *actionCreateForensicImage;
     QAction *actionExportForensicImage;
+    QAction *actionVerifyForensicImage;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -250,6 +251,11 @@ public:
         QIcon icon29;
         icon29.addFile(QString::fromUtf8(":/bar/exportforimg"), QSize(), QIcon::Normal, QIcon::Off);
         actionExportForensicImage->setIcon(icon29);
+        actionVerifyForensicImage = new QAction(WombatForensics);
+        actionVerifyForensicImage->setObjectName(QString::fromUtf8("actionVerifyForensicImage"));
+        QIcon icon30;
+        icon30.addFile(QString::fromUtf8(":/bar/reverify"), QSize(), QIcon::Normal, QIcon::Off);
+        actionVerifyForensicImage->setIcon(icon30);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -334,6 +340,7 @@ public:
         analysisToolBar->addAction(actionpublishresults);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionCreateForensicImage);
+        analysisToolBar->addAction(actionVerifyForensicImage);
 
         retranslateUi(WombatForensics);
         QObject::connect(actionRemove_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(RemEvidence()));
@@ -454,6 +461,10 @@ public:
         actionCreateForensicImage->setToolTip(QCoreApplication::translate("WombatForensics", "Create Forensic Image", nullptr));
 #endif // QT_CONFIG(tooltip)
         actionExportForensicImage->setText(QCoreApplication::translate("WombatForensics", "Export Files to Forensic Image", nullptr));
+        actionVerifyForensicImage->setText(QCoreApplication::translate("WombatForensics", "Verify Forensic Image", nullptr));
+#if QT_CONFIG(tooltip)
+        actionVerifyForensicImage->setToolTip(QCoreApplication::translate("WombatForensics", "Verify Forensic Image", nullptr));
+#endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());
 #endif // QT_CONFIG(tooltip)

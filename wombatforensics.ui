@@ -165,6 +165,7 @@
    <addaction name="actionpublishresults"/>
    <addaction name="separator"/>
    <addaction name="actionCreateForensicImage"/>
+   <addaction name="actionVerifyForensicImage"/>
   </widget>
   <widget class="QStatusBar" name="mainStatusBar">
    <property name="styleSheet">
@@ -591,6 +592,18 @@
    </property>
    <property name="text">
     <string>Export Files to Forensic Image</string>
+   </property>
+  </action>
+  <action name="actionVerifyForensicImage">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/reverify</normaloff>:/bar/reverify</iconset>
+   </property>
+   <property name="text">
+    <string>Verify Forensic Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Verify Forensic Image</string>
    </property>
   </action>
  </widget>
