@@ -1832,9 +1832,75 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
     for(int i=0; i < verevidlist.count(); i++)
     {
         qDebug() << "verify evidence here...";
+        /*
+        int imgtype = tmpstr.split(",").at(0).toInt();
+        QString imagefile = tmpstr.split(",").at(3);
+        if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
+        {
+            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
+                mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+        }
+        else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
+        {
+            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
+            {
+                QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
+                QDir dir;
+                dir.mkpath(tmpstring);
+                mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
+            }
+        }
+        else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
+        {
+            QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+            if(imgext.contains(".000"))
+            {
+                if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
+                    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+            }
+            else
+                mntstr = "";
+        }
+        else
+        {
+            qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
+        }
+        if(!mntstr.isEmpty())
+        {
+            xmntprocess = new QProcess();
+            connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
+            connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
+            xmntprocess->setProgram(mntstr);
+            xmntprocess->start();
+        }
+        */
         // NEED TO DETERMINE IF IT IS AFF, EWF, SFS, OR RAW AND THEN DO FUSE MOUNTING SO I CAN MD5 THE RAW IMAGE...
         // ALSO NEED TO GET MD5 FROM IMAGE TO COMPARE TO...
         //std::string verifystr = Verify(verevidlist.at(i).toStdString());
+        
+        /*
+        QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
+        if(imgext.contains("e01")) // ewfmount
+        {
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
+            QProcess::execute(xunmntstr, QStringList());
+        }
+        else if(imgext.contains("aff") || imgext.contains("000")) // affuse
+        {
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
+            QProcess::execute(xunmntstr, QStringList());
+        }
+        else if(imgext.contains("sfs")) // squashfuse
+        {
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
+            QProcess* unmnt = new QProcess();
+            unmnt->start(xunmntstr);
+            unmnt->waitForFinished(-1);
+        }
+        else // raw, so nothing to unmount
+        {
+        }
+        */
     }
 }
 
