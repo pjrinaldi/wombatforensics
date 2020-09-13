@@ -44,6 +44,7 @@
 #include "opencase.h"
 #include "registryviewer.h"
 #include "newforimg.h"
+#include "verevidencedialog.h"
 
 class StatusLabel : public QLabel
 {
@@ -118,6 +119,7 @@ public:
     PdfViewer* pdfviewer;
     RegistryDialog* regviewer;
     ForImgDialog* forimgdialog;
+    VerEvidenceDialog* verevidencedialog;
 
 signals:
     void CancelCurrentThread();
@@ -126,7 +128,9 @@ signals:
 private slots:
     void AddEvidence();
     void RemEvidence();
+    void VerEvidence();
     void RemoveEvidence(QStringList remlist);
+    void VerifyEvidence(QStringList verlist);
     void ExportEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
@@ -175,6 +179,7 @@ private slots:
     void ExportFiles(int exporttype, bool originalpath, QString exportpath);
     //void ExportToForensicImage(int exporttype, bool originalpath, QString exportpath);
     void ExportForensicImage(void);
+    //void VerifyForensicImage(void);
     void DigFiles(int digtype, QVector<int> digoptions);
     void StartCarving(QStringList plist, QStringList flist);
     void SetOffsetLabel(qint64 pos);

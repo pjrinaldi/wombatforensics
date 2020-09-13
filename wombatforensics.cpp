@@ -122,6 +122,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionchomp, SIGNAL(triggered()), this, SLOT(LaunchChomp()), Qt::DirectConnection);
     connect(ui->actionCreateForensicImage, SIGNAL(triggered()), this, SLOT(ShowForImgDialog()), Qt::DirectConnection);
     connect(ui->actionExportForensicImage, SIGNAL(triggered()), this, SLOT(ExportForensicImage()), Qt::DirectConnection);
+    connect(ui->actionVerifyForensicImage, SIGNAL(triggered()), this, SLOT(VerEvidence()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
@@ -532,6 +533,13 @@ void WombatForensics::ShowForImgDialog()
 void WombatForensics::ExportForensicImage()
 {
     qDebug() << "popup export dialog here...";
+}
+
+void WombatForensics::VerEvidence()
+{
+    verevidencedialog = new VerEvidenceDialog(this);
+    connect(verevidencedialog, SIGNAL(VerEvid(QStringList)), this, SLOT(VerifyEvidence(QStringList)));
+    verevidencedialog->exec();
 }
 
 void WombatForensics::ShowExternalViewer()
@@ -1817,6 +1825,11 @@ void WombatForensics::RemEvidence()
     remevidencedialog = new RemEvidenceDialog(this);
     connect(remevidencedialog, SIGNAL(RemEvid(QStringList)), this, SLOT(RemoveEvidence(QStringList)));
     remevidencedialog->exec();
+}
+
+void WombatForensics::VerifyEvidence(QStringList verevidlist)
+{
+    qDebug() << "verify evidence here...";
 }
 
 void WombatForensics::RemoveEvidence(QStringList remevidlist)
