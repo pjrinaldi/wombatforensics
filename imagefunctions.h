@@ -1,6 +1,6 @@
 #include <fcntl.h>
 #include <linux/fs.h>
-#include <linux/hdreg.h>
+//#include <linux/hdreg.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -13,6 +13,7 @@
 #include <sstream>
 #include <fstream>
 //#include <QTextStream>
+#include <libudev.h>
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
