@@ -54,6 +54,9 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
 void ReadBytes(std::string instr, std::string outstr)
 {
     std::ofstream logfile;
+    // COMMAND GETS WHAT I WANT ISH W/O ROOT ACCESS: ls -l /dev/disk/by-id/ | grep -v part | awk '{print $NF " " $(NF-2)}' | sed 's|../../||g' | sed 's/scsi-...._//g'
+    // UDEVADM info /dev/device gets what i need, so maybe there is a library call for it to get DEVNAME, ID_VENDOR, ID_MODEL, ID_SERIAL_SHORT...
+    // this requires root, i.e. geteuid() == 0
     //static struct hd_driveid hd;
     time_t starttime = time(NULL);
     logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
