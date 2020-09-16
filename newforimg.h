@@ -7,7 +7,8 @@
 #include "globals.h"
 #include "wombatfunctions.h"
 #include "ui_newforimg.h"
-#include <parted.h>
+#include <libudev.h>
+//#include <parted.h>
 
 namespace Ui
 {
@@ -59,4 +60,4 @@ private:
 
 Q_DECLARE_METATYPE(ForImgDialog*);
 
-#endif // REGISTRYVIEWER_H
+#endif // NEWFORIMG_H

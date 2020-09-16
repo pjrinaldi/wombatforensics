@@ -13,7 +13,7 @@
 #include <sstream>
 #include <fstream>
 //#include <QTextStream>
-#include <libudev.h>
+//#include <libudev.h>
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35

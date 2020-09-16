@@ -54,6 +54,7 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
 void ReadBytes(std::string instr, std::string outstr)
 {
     std::ofstream logfile;
+    /*
     struct udev* udev;
     struct udev_device* dev;
     struct udev_enumerate* enumerate;
@@ -102,11 +103,8 @@ void ReadBytes(std::string instr, std::string outstr)
     }
     udev_enumerate_unref(enumerate);
     udev_unref(udev);
+    */
 
-    // COMMAND GETS WHAT I WANT ISH W/O ROOT ACCESS: ls -l /dev/disk/by-id/ | grep -v part | awk '{print $NF " " $(NF-2)}' | sed 's|../../||g' | sed 's/scsi-...._//g'
-    // UDEVADM info /dev/device gets what i need, so maybe there is a library call for it to get DEVNAME, ID_VENDOR, ID_MODEL, ID_SERIAL_SHORT...
-    // this requires root, i.e. geteuid() == 0
-    //static struct hd_driveid hd;
     time_t starttime = time(NULL);
     logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
     char buff[35];
@@ -119,8 +117,6 @@ void ReadBytes(std::string instr, std::string outstr)
     //int outfile = open(outstr.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, S_IRWXU);
     ioctl(infile, BLKGETSIZE64, &totalbytes);
     ioctl(infile, BLKSSZGET, &sectorsize);
-    //ioctl(infile, HDIO_GET_IDENTITY, &hd);
-    //printf("hard drive serial number: %.20s\n", hd.serial_no);
     logfile << "Source Device: " << instr << " Size: " << totalbytes << " bytes\n";
     logfile << "Source Device: " << instr << " Block Size: " << sectorsize << " bytes\n";
     lseek(infile, 0, SEEK_SET);

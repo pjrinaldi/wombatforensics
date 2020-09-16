@@ -8,15 +8,72 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
 {
     ui->setupUi(this);
     devicelist.clear();
-    ped_device_probe_all();
-    PedDevice* tmpdevice = ped_device_get_next(NULL);
-    ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->model)) + " (" + QString::fromStdString(std::string(tmpdevice->path) + ")"));
+    struct udev* udev;
+    struct udev_device* dev;
+    struct udev_enumerate* enumerate;
+    struct udev_list_entry* devices;
+    struct udev_list_entry* devlistentry;
+    udev = udev_new();
+    enumerate = udev_enumerate_new(udev);
+    udev_enumerate_add_match_subsystem(enumerate, "block");
+    udev_enumerate_scan_devices(enumerate);
+    devices = udev_enumerate_get_list_entry(enumerate);
+    udev_list_entry_foreach(devlistentry, devices)
+    {
+        QString tmpdevice = "";
+        const char* path;
+        const char* tmp;
+        unsigned long long disksize = 0;
+        unsigned short int blocksize = 512;
+        path = udev_list_entry_get_name(devlistentry);
+        dev = udev_device_new_from_syspath(udev, path);
+        if(strncmp(udev_device_get_devtype(dev), "partition", 9) != 0 && strncmp(udev_device_get_sysname(dev), "loop", 4) != 0)
+        {
+            tmp = udev_device_get_sysattr_value(dev, "size");
+            if(tmp)
+                disksize = strtoull(tmp, NULL, 10);
+            tmp = udev_device_get_sysattr_value(dev, "queue/logical_block_size");
+            if(tmp)
+                blocksize = atoi(tmp);
+            unsigned long long disktotal = disksize * blocksize;
+            int diskdigitcount = int(log10(disktotal) + 1);
+            if(diskdigitcount > 9)
+                tmpdevice += QString::number(disktotal / 1000000000) + " GB ";
+            else if(diskdigitcount < 9)
+                tmpdevice += QString::number(disktotal / 1000000) + " MB ";
+            tmp = udev_device_get_property_value(dev, "ID_VENDOR");
+            if(tmp)
+                tmpdevice += QString::fromStdString(std::string(tmp)) + " ";
+            tmp = udev_device_get_property_value(dev, "ID_MODEL");
+            if(tmp)
+                tmpdevice += QString::fromStdString(std::string(tmp));
+            tmp = udev_device_get_property_value(dev, "ID_NAME");
+            if(tmp)
+                tmpdevice += QString::fromStdString(std::string(tmp)) + " ";
+            tmp = udev_device_get_property_value(dev, "ID_SERIAL_SHORT");
+            if(tmp)
+                tmpdevice += "[" + QString::fromStdString(std::string(tmp)) + "] ";
+            tmp = udev_device_get_devnode(dev);
+            if(tmp)
+                tmpdevice += "(" + QString::fromStdString(std::string(tmp)) + ")";
+            ui->sourcecombo->addItem(tmpdevice);
+        }
+        udev_device_unref(dev);
+    }
+    udev_enumerate_unref(enumerate);
+    udev_unref(udev);
+
+    //ped_device_probe_all();
+    //PedDevice* tmpdevice = ped_device_get_next(NULL);
+    //ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->model)) + " (" + QString::fromStdString(std::string(tmpdevice->path) + ")"));
+    /*
     while(tmpdevice != NULL)
     {
         tmpdevice = tmpdevice->next;
         if(tmpdevice != NULL)
             ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->model)) + " (" + QString::fromStdString(std::string(tmpdevice->path) + ")"));
     }
+    */
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()), Qt::DirectConnection);
     connect(ui->createbutton, SIGNAL(clicked()), this, SLOT(CreateImage()), Qt::DirectConnection);
     connect(ui->browsebutton, SIGNAL(clicked()), this, SLOT(GetFolder()), Qt::DirectConnection);
