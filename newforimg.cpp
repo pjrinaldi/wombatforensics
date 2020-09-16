@@ -46,7 +46,7 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
                 tmpdevice += QString::fromStdString(std::string(tmp)) + " ";
             tmp = udev_device_get_property_value(dev, "ID_MODEL");
             if(tmp)
-                tmpdevice += QString::fromStdString(std::string(tmp));
+                tmpdevice += QString::fromStdString(std::string(tmp)) + " ";
             tmp = udev_device_get_property_value(dev, "ID_NAME");
             if(tmp)
                 tmpdevice += QString::fromStdString(std::string(tmp)) + " ";

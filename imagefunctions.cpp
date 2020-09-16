@@ -19,6 +19,8 @@ unsigned long long GetTotalBytes(std::string instr)
 
 void StartImaging(std::string instring, std::string outpath, std::string outstr, int radio) 
 {
+    //printf("instring: %s\n", instring.c_str());
+    //qDebug() << "instring:" << QString::fromStdString(instring);
     std::size_t lpar = instring.find("(");
     std::size_t rpar = instring.find(")");
     std::string instr = instring.substr(lpar+1, rpar-lpar-1);
