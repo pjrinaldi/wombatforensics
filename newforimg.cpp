@@ -52,7 +52,7 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
                 tmpdevice += QString::fromStdString(std::string(tmp)) + " ";
             tmp = udev_device_get_property_value(dev, "ID_SERIAL_SHORT");
             if(tmp)
-                tmpdevice += "[" + QString::fromStdString(std::string(tmp)) + "] ";
+                tmpdevice += "[S/N: " + QString::fromStdString(std::string(tmp)) + "] ";
             tmp = udev_device_get_devnode(dev);
             if(tmp)
                 tmpdevice += "(" + QString::fromStdString(std::string(tmp)) + ")";
