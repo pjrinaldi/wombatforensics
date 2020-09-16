@@ -54,6 +54,55 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
 void ReadBytes(std::string instr, std::string outstr)
 {
     std::ofstream logfile;
+    struct udev* udev;
+    struct udev_device* dev;
+    struct udev_enumerate* enumerate;
+    struct udev_list_entry* devices;
+    struct udev_list_entry* devlistentry;
+    udev = udev_new();
+    enumerate = udev_enumerate_new(udev);
+    udev_enumerate_add_match_subsystem(enumerate, "block");
+    udev_enumerate_scan_devices(enumerate);
+    devices = udev_enumerate_get_list_entry(enumerate);
+    udev_list_entry_foreach(devlistentry, devices)
+    {
+        const char* path;
+        const char* tmp;
+        unsigned long long disksize = 0;
+        unsigned short int blocksize = 512;
+        path = udev_list_entry_get_name(devlistentry);
+        dev = udev_device_new_from_syspath(udev, path);
+        if(strncmp(udev_device_get_devtype(dev), "partition", 9) != 0 && strncmp(udev_device_get_sysname(dev), "loop", 4) != 0)
+        {
+            printf("DEVNODE=%s\n", udev_device_get_devnode(dev));
+            tmp = udev_device_get_property_value(dev, "ID_SERIAL_SHORT");
+            printf("SERIAL=%s\n", tmp);
+            tmp = udev_device_get_sysattr_value(dev, "size");
+            if(tmp)
+                disksize = strtoull(tmp, NULL, 10);
+            tmp = udev_device_get_sysattr_value(dev, "queue/logical_block_size");
+            if(tmp)
+                blocksize = atoi(tmp);
+            printf("DEVSIZE=");
+            if(strncmp(udev_device_get_sysname(dev), "sr", 2) != 0)
+                printf("%lld GB\n", (disksize * blocksize) / 1000000000);
+            else
+                printf("n/a\n");
+            tmp = udev_device_get_property_value(dev, "ID_VENDOR");
+            if(tmp)
+                printf("VENDOR=%s\n", tmp);
+            tmp = udev_device_get_property_value(dev, "ID_MODEL");
+            if(tmp)
+                printf("MODEL=%s\n", tmp);
+            tmp = udev_device_get_property_value(dev, "ID_NAME");
+            if(tmp)
+                printf("NAME=%s\n", tmp);
+        }
+        udev_device_unref(dev);
+    }
+    udev_enumerate_unref(enumerate);
+    udev_unref(udev);
+
     // COMMAND GETS WHAT I WANT ISH W/O ROOT ACCESS: ls -l /dev/disk/by-id/ | grep -v part | awk '{print $NF " " $(NF-2)}' | sed 's|../../||g' | sed 's/scsi-...._//g'
     // UDEVADM info /dev/device gets what i need, so maybe there is a library call for it to get DEVNAME, ID_VENDOR, ID_MODEL, ID_SERIAL_SHORT...
     // this requires root, i.e. geteuid() == 0
