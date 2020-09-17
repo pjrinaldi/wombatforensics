@@ -19,20 +19,25 @@ unsigned long long GetTotalBytes(std::string instr)
 
 void StartImaging(std::string instring, std::string outpath, std::string outstr, int radio) 
 {
+    
     //printf("instring: %s\n", instring.c_str());
     //qDebug() << "instring:" << QString::fromStdString(instring);
+    /*
     std::size_t lpar = instring.find("(");
     std::size_t rpar = instring.find(")");
     std::string instr = instring.substr(lpar+1, rpar-lpar-1);
+    */
     if(radio == 0) // RAW
     {
-        ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
+        ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"));
+        //ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
         //Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
         printf("Raw Forensic Image Finished Successfully.\n");
     }
     else if(radio == 1) // AFF4
     {
-        ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
+        ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"));
+        //ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
         //Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
         std::string aff4cmd = std::string(getenv("HOME")) + std::string("/.local/share/wombatforensics/aff4imager");
         aff4cmd += " -i " + outpath + "/" + outstr + ".dd -i " + outpath + "/" + outstr + ".dd.log -o " + outpath + "/" + outstr + ".aff4";
@@ -42,7 +47,8 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
     }
     else if(radio == 2) // SFS
     {
-        ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
+        ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"));
+        //ReadBytes(instr, std::string(outpath + "/" + outstr + ".dd"));
         //Verify(instr, std::string(outpath + "/" + outstr + ".dd"));
         std::string sqshcmd = "mksquashfs " + outpath + "/" + outstr + ".dd " + outpath + "/" + outstr + ".dd.log " + outpath + "/" + outstr + ".sfs";
         system(sqshcmd.c_str());
@@ -53,9 +59,19 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
 }
 
 
-void ReadBytes(std::string instr, std::string outstr)
+void ReadBytes(std::string instring, std::string outstr)
 {
     std::ofstream logfile;
+    std::size_t lpar = instring.find("(");
+    std::size_t rpar = instring.find(")");
+    std::string instr = instring.substr(lpar+1, rpar-lpar-1);
+    lpar = instring.find("[");
+    rpar = instring.find("]");
+    std::string serialnumber = instring.substr(lpar+6, rpar-lpar-6);
+    //printf("serial number: %s\n", serialnumber.c_str());
+    lpar = instring.find("[");
+    std::string deviceinfo = instring.substr(0, lpar-1);
+    //printf("device info: %s\n", deviceinfo.c_str());
     /*
     struct udev* udev;
     struct udev_device* dev;
@@ -119,8 +135,15 @@ void ReadBytes(std::string instr, std::string outstr)
     //int outfile = open(outstr.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_APPEND, S_IRWXU);
     ioctl(infile, BLKGETSIZE64, &totalbytes);
     ioctl(infile, BLKSSZGET, &sectorsize);
-    logfile << "Source Device: " << instr << " Size: " << totalbytes << " bytes\n";
-    logfile << "Source Device: " << instr << " Block Size: " << sectorsize << " bytes\n";
+    logfile << "\nSource Device\n";
+    logfile << "-------------\n";
+    logfile << "Device: " << deviceinfo << "\n";
+    logfile << "Device Path: " << instr << "\n";
+    logfile << "Serial Number: " << serialnumber << "\n";
+    logfile << "Size: " << totalbytes << " bytes\n";
+    logfile << "Block Size: " << sectorsize << " bytes\n";
+    //logfile << "Source Device: " << instr << " Size: " << totalbytes << " bytes\n";
+    //logfile << "Source Device: " << instr << " Block Size: " << sectorsize << " bytes\n";
     lseek(infile, 0, SEEK_SET);
     lseek(outfile, 0, SEEK_SET);
     unsigned char c[MD5_DIGEST_LENGTH];
@@ -158,7 +181,7 @@ void ReadBytes(std::string instr, std::string outstr)
     logfile << "Wrote " << curpos << " out of " << totalbytes << " bytes\n";
     logfile << "Forensic Image: " << outstr << "\n";
     logfile << "Forensic Image finished at: " << GetDateTime(buff) << "\n";
-    logfile << "Forensic Image created in: " << difftime(endtime, starttime) << " seconds\n";
+    logfile << "Forensic Image created in: " << difftime(endtime, starttime) << " seconds\n\n";
     printf("\nForensic Image Creation Finished!\n");
     std::stringstream srcstr;
     std::stringstream imgstr;
@@ -183,14 +206,14 @@ void ReadBytes(std::string instr, std::string outstr)
     if(srcmd5.compare(imgmd5) == 0)
     {
 	printf("Verification Successful\n");
-        logfile << "Verification Successful\n";
+        logfile << "\nVerification Successful\n";
     }
     else
     {
 	printf("Verification Failed\n");
         logfile << "Verification Failed\n";
     }
-    logfile << "Finished Forensic Image Verification at " << GetDateTime(buff) << "\n";
+    logfile << "\nFinished Forensic Image Verification at " << GetDateTime(buff) << "\n";
     logfile << "Finished Forensic Image Verification in: " << difftime(endtime, starttime) << " seconds\n";
     logfile.close();
     close(infile);
@@ -201,7 +224,7 @@ void ReadBytes(std::string instr, std::string outstr)
 std::string Verify(std::string instr)
 {
     std::string inmd5 = instr;
-    /*
+    *//*
     FILE* infile = fopen(instr.c_str(), "rb");
     EVP_MD_CTX *mdctx;
     const EVP_MD *md;
@@ -242,12 +265,30 @@ std::string Verify(std::string instr)
 //void Verify(std::string instr, std::string outstr)
 std::string Verify(std::string outstr)
 {
+    std::size_t rfound = outstr.rfind("/");
+    std::string imgname = outstr.substr(rfound+1);
+    //printf("out string: %s\n", outstr.c_str());
+    //FILE* infile = fopen(std::string(outstr + ".log").c_str(), "rb");
+    std::ifstream infile(outstr + ".log");
+    std::string md5hash = "";
+    std::string curstr = "";
+    while(std::getline(infile, curstr))
+    {
+        std::size_t found = curstr.find(" - MD5 Forensic Image");
+        if(found != std::string::npos)
+            md5hash = curstr.substr(0, found);
+    }
+    //printf("original md5: %s\n", md5hash.c_str());
+    infile.close();
+    unsigned long long totalbytes = 0;
+    int ofile = open(outstr.c_str(), O_RDONLY);
+    ioctl(ofile, BLKGETSIZE64, &totalbytes);
+    close(ofile);
     std::ofstream logfile;
     time_t starttime = time(NULL);
     char buff[35];
     logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
-    logfile << "Starting Image Verification at " << GetDateTime(buff) << "\n";
-    unsigned long long totalbytes = 0;
+    logfile << "\nStarting Image Verification at " << GetDateTime(buff) << "\n";
     unsigned int sectorsize = 512;
     //int infile1 = open(instr.c_str(), O_RDONLY);
     //ioctl(infile1, BLKGETSIZE64, &totalbytes);
@@ -277,7 +318,7 @@ std::string Verify(std::string outstr)
         printf("Bytes Read: %lld/%lld\r", curpos, totalbytes);
         fflush(stdout);
     }
-    logfile << "Bytes Read: " << curpos << "/" << totalbytes << "\n";
+    logfile << "Bytes Read: " << curpos << "/" << totalbytes << "\n\n";
     //MD5_Final(c, &mdcontext);
     MD5_Final(o, &outcontext);
     //std::stringstream srcstr;
@@ -299,27 +340,39 @@ std::string Verify(std::string outstr)
     //srcmd5 = srcstr.str();
     imgmd5 = imgstr.str();
     //logfile << srcmd5 << " - MD5 Source Device\n";
-    logfile << imgmd5 << " - MD5 Forensic Image\n";
+    logfile << imgmd5 << " - MD5 Forensic Image\n\n";
     
-    return imgmd5;
-    /*
-    if(srcmd5.compare(imgmd5) == 0)
+    //return imgmd5;
+    imgname += " Verification ";
+    if(md5hash.compare(imgmd5) == 0)
     {
 	printf("Verification Successful\n");
         logfile << "Verification Successful\n";
+        imgname += "Successful";
+        //return imgname + " Verification Successful";
+    }
+    else if(md5hash.empty())
+    {
+        printf("Verification Comparison Undefined\n");
+        logfile << "Verification Comparison Undefined\n";
+        imgname += "Undefined";
+        //return imgname + " Verification Undefined";
     }
     else
     {
 	printf("Verification Failed\n");
         logfile << "Verification Failed\n";
+        imgname += "Failed";
+        
+        //return imgname + " Verification Failed";
     }
     time_t endtime = time(NULL);
-    logfile << "Finished Forensic Image Verification at " << GetDateTime(buff) << "\n";
+    logfile << "\nFinished Forensic Image Verification at " << GetDateTime(buff) << "\n";
     logfile << "Finished Forensic Image Verification in: " << difftime(endtime, starttime) << " seconds\n";
     logfile.close();
-    fclose(infile);
     fclose(outfile);
-    */
+
+    return imgname;
 }
 /*
  *#include <stdio.h>

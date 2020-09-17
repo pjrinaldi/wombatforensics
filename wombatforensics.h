@@ -235,6 +235,7 @@ private slots:
     void LaunchChomp(void);
     void UpdateTimeZone(QString newtz);
     void FinishWombatCaseFile(void);
+    void FinishVerify(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -278,6 +279,8 @@ private:
     QFuture<void> openfuture;
     QFutureWatcher<void> openwatcher;
     QFutureWatcher<void> savewcfwatcher;
+    QFuture<std::string> verfuture;
+    QFutureWatcher<std::string> verifywatcher;
 
     QProcess* xmntprocess;
 

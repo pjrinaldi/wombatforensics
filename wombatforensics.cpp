@@ -1827,11 +1827,43 @@ void WombatForensics::RemEvidence()
     remevidencedialog->exec();
 }
 
+void WombatForensics::FinishVerify()
+{
+    //qDebug() << "verfuture result count:" << verfuture.resultCount();
+    QString resultstring = "";
+    for(int i=0; i < verfuture.resultCount(); i++)
+    {
+        resultstring += QString::fromStdString(verfuture.resultAt(i)) + "\n";
+        //qDebug() << "verfuture result:" << QString::fromStdString(verfuture.resultAt(i));
+        //resultstring += "Forensic Image
+    }
+    //QMessageBox::information(this, "Finished", " Forensic Image (" + verevidlist.at(i).split("/").last() + ") Verification " + QString::fromStdString(retstr), QMessageBox::Ok);
+    QMessageBox::information(this, "Finished", " " + resultstring, QMessageBox::Ok);
+}
+
 void WombatForensics::VerifyEvidence(QStringList verevidlist)
 {
+    QList<std::string> verlist;
+    verlist.clear();
     for(int i=0; i < verevidlist.count(); i++)
-    {
-        qDebug() << "verify evidence here...";
+        verlist.append(verevidlist.at(i).toStdString());
+
+    connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
+    verfuture = QtConcurrent::mapped(verlist, Verify);
+    verifywatcher.setFuture(verfuture);
+    // QFuture<std::string> verfuture = QtConcurrent::mapped(vervidelist, Verify);
+    //connect(&imgwatcher, SIGNAL(finished()), this, SLOT(FinishImaging()), Qt::QueuedConnection);
+    //for(int i=0; i < verevidlist.count(); i++)
+    //{
+        //qDebug() << "verify evidence here..." << verevidlist.at(i);
+        /*
+        QFuture<void> tmpfuture = QtConcurrent::run(StartImaging, ui->sourcecombo->currentText().toStdString(), ui->pathedit->text().toStdString(), ui->nameedit->text().toStdString(), radio);
+        imgwatcher.setFuture(tmpfuture);
+        this->close();
+         */ 
+        //std::string retstr = Verify(verevidlist.at(i).toStdString());
+        //QMessageBox::information(this, "Finished", " Forensic Image (" + verevidlist.at(i).split("/").last() + ") Verification " + QString::fromStdString(retstr), QMessageBox::Ok);
+        //QMessageBox::information(this, "Finished", " Forensic Imaging completed.", QMessageBox::Ok);
         /*
         int imgtype = tmpstr.split(",").at(0).toInt();
         QString imagefile = tmpstr.split(",").at(3);
@@ -1901,7 +1933,7 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
         {
         }
         */
-    }
+    //}
 }
 
 void WombatForensics::RemoveEvidence(QStringList remevidlist)
