@@ -1834,6 +1834,7 @@ void WombatForensics::FinishVerify()
     for(int i=0; i < verfuture.resultCount(); i++)
     {
         resultstring += QString::fromStdString(verfuture.resultAt(i)) + "\n";
+        // NEED TO UNMOUNT WHAT WAS MOUNTED HERE....
         //qDebug() << "verfuture result:" << QString::fromStdString(verfuture.resultAt(i));
         //resultstring += "Forensic Image
     }
@@ -1843,28 +1844,67 @@ void WombatForensics::FinishVerify()
 
 void WombatForensics::VerifyEvidence(QStringList verevidlist)
 {
+    // prior to verifying evidence list, I need to mount each of them in the for loop unless it is a raw image.
     QList<std::string> verlist;
     verlist.clear();
     for(int i=0; i < verevidlist.count(); i++)
+    {
+        // PROBABLY SHOULD MOUNT EACH IMAGE IN ITS OWN DIR SO THEY DON'T CONFLICT WHILE VERIFYING.
+        QString mntstr = "";
+        // call different fuse mounts here and adjust the outstring that get's added to the QList<std::string> so it points to the right forensic image
+        // might have to include the path to the log since it varies for affuse, e01, raw, and sfs...
+        if(verevidlist.at(i).endsWith(".sfs"))
+        {
+            mntstr = "squashfuse " + verevidlist.at(i) + " " + wombatvariable.imgdatapath;
+            qDebug() << "sfs image";
+        }
+        else if(verevidlist.at(i).endsWith(".e01"))
+        {
+            /*
+            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
+            {
+                QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
+                QDir dir;
+                dir.mkpath(tmpstring);
+                mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
+            }
+            */
+            qDebug() << "e01 image";
+        }
+        else if(verevidlist.at(i).endsWith("aff") || verevidlist.at(i).endsWith(".000") || verevidlist.at(i).endsWith(".001"))
+        {
+            //if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
+            //    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+            qDebug() << "affuse image";
+        }
+        else
+            qDebug() << "raw image, don't think i have to anything.";
         verlist.append(verevidlist.at(i).toStdString());
+    }
 
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
     verfuture = QtConcurrent::mapped(verlist, Verify);
     verifywatcher.setFuture(verfuture);
-    // QFuture<std::string> verfuture = QtConcurrent::mapped(vervidelist, Verify);
-    //connect(&imgwatcher, SIGNAL(finished()), this, SLOT(FinishImaging()), Qt::QueuedConnection);
-    //for(int i=0; i < verevidlist.count(); i++)
-    //{
-        //qDebug() << "verify evidence here..." << verevidlist.at(i);
         /*
-        QFuture<void> tmpfuture = QtConcurrent::run(StartImaging, ui->sourcecombo->currentText().toStdString(), ui->pathedit->text().toStdString(), ui->nameedit->text().toStdString(), radio);
-        imgwatcher.setFuture(tmpfuture);
-        this->close();
-         */ 
-        //std::string retstr = Verify(verevidlist.at(i).toStdString());
-        //QMessageBox::information(this, "Finished", " Forensic Image (" + verevidlist.at(i).split("/").last() + ") Verification " + QString::fromStdString(retstr), QMessageBox::Ok);
-        //QMessageBox::information(this, "Finished", " Forensic Imaging completed.", QMessageBox::Ok);
-        /*
+         *
+         *  ui->evidencelist->addItem(evidfilename);
+            if(evidfilename.toLower().endsWith(".sfs"))
+            {
+                // need to mount and provide access to the raw dd file...
+                QString mntstr = "squashfuse " + evidfilename + " " + wombatvariable.imgdatapath;
+                //qDebug() << "mntstr:" << mntstr;
+		xmntprocess = new QProcess();
+		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
+		connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
+		//xmntprocess->setProgram(mntstr);
+		xmntprocess->start(mntstr);
+                //evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last();
+                //qDebug() << "evidfilename:" << evidfilename;
+                evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last().split(".sfs").first() + ".dd";
+                xmntprocess->waitForFinished(-1);
+            }
+
+        //if(evidfilename.toLower().endsWith(".sfs"))
         int imgtype = tmpstr.split(",").at(0).toInt();
         QString imagefile = tmpstr.split(",").at(3);
         if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
