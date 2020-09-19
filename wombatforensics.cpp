@@ -1341,7 +1341,7 @@ void WombatForensics::AddEvidence()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
-    qDebug() << "newevidence:" << newevidence;
+    //qDebug() << "newevidence:" << newevidence;
     for(int i=0; i < newevidence.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
@@ -1764,7 +1764,9 @@ void WombatForensics::CloseCurrentCase()
     // UNMOUNT EVIDENCEIMAGEDATAFILE
     for(int i=0; i < existingevidence.count(); i++)
     {
+        //qDebug() << "existing evidence:" << existingevidence.at(i);
         QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
+        //qDebug() << "imgext:" << imgext;
         if(imgext.contains("e01")) // ewfmount
         {
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
@@ -1778,9 +1780,10 @@ void WombatForensics::CloseCurrentCase()
         else if(imgext.contains("sfs")) // squashfuse
         {
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
-            QProcess* unmnt = new QProcess();
-            unmnt->start(xunmntstr);
-            unmnt->waitForFinished(-1);
+            QProcess::execute(xunmntstr, QStringList());
+            //QProcess* unmnt = new QProcess();
+            //unmnt->start(xunmntstr);
+            //unmnt->waitForFinished(-1);
         }
         /*
         else // raw, so nothing to unmount
