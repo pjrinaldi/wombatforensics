@@ -20,13 +20,13 @@ void PopulateTreeModel(QString evidstring)
     evidfile.close();
     if(elist.at(3).endsWith(".sfs"))
     {
-        QString mntstr = "squashfuse -s " + elist.at(3) + " " + wombatvariable.imgdatapath;
-        QProcess::execute(mntstr, QStringList());
-        //QProcess* xmntprocess = new QProcess();
+        QString mntstr = "squashfuse " + elist.at(3) + " " + wombatvariable.imgdatapath;
+        //QProcess::execute(mntstr, QStringList());
+        QProcess* xmntprocess = new QProcess();
         //connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
         //connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErrr()), Qt::QueuedConnection);
-        //xmntprocess->start(mntstr);
-        //xmntprocess->waitForFinished(-1);
+        xmntprocess->start(mntstr);
+        xmntprocess->waitForFinished(-1);
     }
     std::vector<std::string> pathvector;
     pathvector.clear();
