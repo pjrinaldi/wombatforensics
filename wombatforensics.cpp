@@ -1851,12 +1851,23 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
     {
         // PROBABLY SHOULD MOUNT EACH IMAGE IN ITS OWN DIR SO THEY DON'T CONFLICT WHILE VERIFYING.
         QString mntstr = "";
+        QString unsqshfs = "";
+        QString sqshfs = "";
         // call different fuse mounts here and adjust the outstring that get's added to the QList<std::string> so it points to the right forensic image
         // might have to include the path to the log since it varies for affuse, e01, raw, and sfs...
         if(verevidlist.at(i).endsWith(".sfs"))
         {
             mntstr = "squashfuse " + verevidlist.at(i) + " " + wombatvariable.imgdatapath;
-            qDebug() << "sfs image";
+            qDebug() << "mntstr:" << mntstr;
+            qDebug() << "dd image:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".dd";
+            unsqshfs = "unsquashfs -d " + wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".dd.log " + verevidlist.at(i);
+            sqshfs = "mksquashfs " + wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".dd.log " + verevidlist.at(i);
+            //std::string sqshcmd = "mksquashfs " + outpath + "/" + outstr + ".dd " + outpath + "/" + outstr + ".dd.log " + outpath + "/" + outstr + ".sfs";
+
+            qDebug() << "log unsquash:" << unsqshfs;
+            qDebug() << "log mksquash:" << sqshfs;
+            //qDebug() << "log file:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".log";
+            //qDebug() << "sfs image";
         }
         else if(verevidlist.at(i).endsWith(".e01"))
         {
@@ -2445,9 +2456,14 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     previewreport->close();
     aboutbox->close();
     settingsdialog->close();
-    forimgdialog->close();
-    verevidencedialog->close();
-    regviewer->close();
+    /*
+    if(forimgdialog->isVisible())
+        forimgdialog->close();
+    if(verevidencedialog->isVisible())
+        verevidencedialog->close();
+    if(regviewer->isVisible())
+        regviewer->close();
+    */
     RemoveTmpFiles();
     event->accept();
     //msglog->clear();
