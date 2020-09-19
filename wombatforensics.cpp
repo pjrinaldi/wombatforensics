@@ -1779,8 +1779,15 @@ void WombatForensics::CloseCurrentCase()
         }
         else if(imgext.contains("sfs")) // squashfuse
         {
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
-            QProcess::execute(xunmntstr, QStringList());
+            QString umntstr = "fusermount";
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + "/";
+            QStringList strlist;
+            strlist.clear();
+            strlist.append("-u");
+            strlist.append(wombatvariable.imgdatapath);
+            int ecode = QProcess::execute(umntstr, strlist);
+            //int ecode = QProcess::execute(xunmntstr, QStringList());
+            qDebug() << "ecode:" << ecode;
             //QProcess* unmnt = new QProcess();
             //unmnt->start(xunmntstr);
             //unmnt->waitForFinished(-1);
