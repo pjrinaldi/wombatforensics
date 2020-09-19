@@ -66,7 +66,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     previewreport = new HtmlViewer(this);
     aboutbox = new AboutBox(this);
     searchdialog = new SearchDialog(ui->hexview, this);
-    forimgdialog = new ForImgDialog(this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
@@ -527,6 +526,7 @@ void WombatForensics::ShowSearchDialog()
 
 void WombatForensics::ShowForImgDialog()
 {
+    forimgdialog = new ForImgDialog(this);
     forimgdialog->show();
 }
 
@@ -2445,6 +2445,9 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     previewreport->close();
     aboutbox->close();
     settingsdialog->close();
+    forimgdialog->close();
+    verevidencedialog->close();
+    regviewer->close();
     RemoveTmpFiles();
     event->accept();
     //msglog->clear();
