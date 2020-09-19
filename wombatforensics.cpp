@@ -1779,8 +1779,17 @@ void WombatForensics::CloseCurrentCase()
         }
         else if(imgext.contains("sfs")) // squashfuse
         {
+            QProcess builder;
+            builder.setProcessChannelMode(QProcess::MergedChannels);
+            builder.start("fusermount", QStringList() << "-u" << wombatvariable.imgdatapath);
+            //builder.start("squashfuse", QStringList() << elist.at(3) << wombatvariable.imgdatapath);
+            if(!builder.waitForFinished())
+                qDebug() << "fuse failed:" << builder.errorString();
+            else
+                qDebug() << "fuse output:" << builder.readAll();
+            /*
             QString umntstr = "fusermount";
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + "/";
+            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
             QStringList strlist;
             strlist.clear();
             strlist.append("-u");
@@ -1791,6 +1800,7 @@ void WombatForensics::CloseCurrentCase()
             //QProcess* unmnt = new QProcess();
             //unmnt->start(xunmntstr);
             //unmnt->waitForFinished(-1);
+            */
         }
         /*
         else // raw, so nothing to unmount

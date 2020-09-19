@@ -20,6 +20,14 @@ void PopulateTreeModel(QString evidstring)
     evidfile.close();
     if(elist.at(3).endsWith(".sfs"))
     {
+        QProcess builder;
+        builder.setProcessChannelMode(QProcess::MergedChannels);
+        builder.start("squashfuse", QStringList() << elist.at(3) << wombatvariable.imgdatapath);
+        if(!builder.waitForFinished())
+            qDebug() << "fuse failed:" << builder.errorString();
+        else
+            qDebug() << "fuse output:" << builder.readAll();
+        /*
         QString mstr = "squashfuse";
         QStringList mstrlist;
         mstrlist.clear();
@@ -33,6 +41,17 @@ void PopulateTreeModel(QString evidstring)
         //xmntprocess->start(mntstr);
         xmntprocess->start(mstr, mstrlist);
         xmntprocess->waitForFinished(-1);
+        */
+        /*
+         * + "/"QProcess builder;
+builder.setProcessChannelMode(QProcess::MergedChannels);
+builder.start("make", QStringList() << "-j2");
+
+if (!builder.waitForFinished())
+    qDebug() << "Make failed:" << builder.errorString();
+else
+    qDebug() << "Make output:" << builder.readAll();
+         */ 
     }
     std::vector<std::string> pathvector;
     pathvector.clear();
