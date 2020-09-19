@@ -28,23 +28,6 @@ void PopulateTreeModel(QString evidstring)
         //xmntprocess->start(mntstr);
         //xmntprocess->waitForFinished(-1);
     }
-    /*
-    if(evidfilename.toLower().endsWith(".sfs"))
-    {
-        // need to mount and provide access to the raw dd file...
-        QString mntstr = "squashfuse " + evidfilename + " " + wombatvariable.imgdatapath;
-        //qDebug() << "mntstr:" << mntstr;
-        xmntprocess = new QProcess();
-        connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
-        connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
-        //xmntprocess->setProgram(mntstr);
-        xmntprocess->start(mntstr);
-        //evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last();
-        //qDebug() << "evidfilename:" << evidfilename;
-        evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last().split(".sfs").first() + ".dd";
-        xmntprocess->waitForFinished(-1);
-    }
-    */
     std::vector<std::string> pathvector;
     pathvector.clear();
     if(elist.at(3).endsWith(".sfs"))
