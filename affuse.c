@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
-#ifdef USE_FUSE
+#define FUSE_USE_VERSION 26
+//#ifdef USE_FUSE
 
 /* bool used in afflib.h but not defined within C */
 #ifndef bool
@@ -176,6 +176,10 @@ usage(void)
 /*
 int main(int argc, char **argv)
 {
+*/
+int affusemnt(const char* affimgstr, const char* affmntstr)
+{
+    /*
     char *af_path = NULL, *af_basename = NULL;
     size_t raw_path_len = 0;
     char **fargv = NULL;
@@ -226,7 +230,9 @@ int main(int argc, char **argv)
     raw_size = af_get_imagesize(af_image);
 
     return fuse_main(fargc, fargv, &affuse_oper, NULL);
+    */
 }
+/*
 #else
 int main(int argc,char **argv)
 {

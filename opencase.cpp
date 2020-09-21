@@ -22,7 +22,7 @@ void PopulateTreeModel(QString evidstring)
     {
         QProcess builder;
         builder.setProcessChannelMode(QProcess::MergedChannels);
-        builder.start("squashfuse", QStringList() << elist.at(3) << wombatvariable.imgdatapath);
+        builder.start("squashfuse", QStringList() << "-s" << elist.at(3) << wombatvariable.imgdatapath);
         if(!builder.waitForFinished())
             qDebug() << "fuse failed:" << builder.errorString();
         else

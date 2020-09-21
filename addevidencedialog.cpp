@@ -43,7 +43,7 @@ void AddEvidenceDialog::SelectEvidence()
             if(evidfilename.toLower().endsWith(".sfs"))
             {
                 // need to mount and provide access to the raw dd file...
-                QString mntstr = "squashfuse " + evidfilename + " " + wombatvariable.imgdatapath;
+                QString mntstr = "squashfuse -s " + evidfilename + " " + wombatvariable.imgdatapath;
                 //qDebug() << "mntstr:" << mntstr;
 		xmntprocess = new QProcess();
 		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);

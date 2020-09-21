@@ -1235,7 +1235,69 @@ void WombatForensics::PrepareEvidenceImage()
 	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
 	    {
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-		    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+                {
+		    //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+                    //int retval = affusemnt(tmpstr.split(",").at(3).toStdString().c_str(), wombatvariable.imgdatapath.toStdString().c_str());
+                    //af_image = af_open(tmpstr.split(",").at(3).toStdString().c_str(), O_RDONLY|O_EXCL,0);
+                    //char* af_path = NULL;
+                    //char* af_basename = NULL;
+                    //size_t rawpathlen = 0;
+                    //char** fargv = NULL;
+                    //int fargc = 0;
+                    
+                    /*
+    char *af_path = NULL, *af_basename = NULL;
+    size_t raw_path_len = 0;
+    char **fargv = NULL;
+    int fargc = 0;
+
+    if (argc < 3) {
+        usage();
+	exit(EXIT_FAILURE);
+    }
+
+    // Prepare fuse args, af_image is omitted, but "-s" is added //
+    fargv = XCALLOC(char *, argc); // usually not free'd //
+    fargv[0] = argv[0];
+    fargv[1] = argv[argc - 1];
+    fargc = 2;
+    while (fargc <= (argc - 2)) {
+        fargv[fargc] = argv[fargc - 1];
+	if (strcmp(fargv[fargc], "-h") == 0 ||
+	    strcmp(fargv[fargc], "--help") == 0 ) {
+	    usage();
+	    XFREE(fargv);
+	    exit(EXIT_SUCCESS);
+	}
+	fargc++;
+    }
+    // disable multi-threaded operation
+     // (we don't know if afflib is thread safe!)
+    //
+    fargv[fargc] = "-s";
+    fargc++;
+
+    if ((af_image = af_open(argv[argc - 2], O_RDONLY|O_EXCL, 0)) == NULL) {
+        perror("Can't open image file");
+	XFREE(fargv);
+	exit(EXIT_FAILURE);
+    }
+
+    af_path = xstrdup(argv[argc - 2]);
+    af_basename = basename(af_path);
+    //             "/"       af_basename            raw_ext  "/0"
+    raw_path_len = 1 + strlen(af_basename) + strlen(raw_ext) + 1;
+    raw_path = XCALLOC(char, raw_path_len);
+    raw_path[0] = '/';
+    strcat(raw_path, af_basename);
+    strcat(raw_path, raw_ext);
+    raw_path[raw_path_len -1] = 0;
+    XFREE(af_path);
+    raw_size = af_get_imagesize(af_image);
+
+    return fuse_main(fargc, fargv, &affuse_oper, NULL);
+                     */ 
+                }
 	    }
 	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
 	    {
@@ -1877,7 +1939,7 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
         // might have to include the path to the log since it varies for affuse, e01, raw, and sfs...
         if(verevidlist.at(i).endsWith(".sfs"))
         {
-            mntstr = "squashfuse " + verevidlist.at(i) + " " + wombatvariable.imgdatapath;
+            mntstr = "squashfuse -s " + verevidlist.at(i) + " " + wombatvariable.imgdatapath;
             qDebug() << "mntstr:" << mntstr;
             qDebug() << "dd image:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".dd";
             unsqshfs = "unsquashfs -d " + wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".dd.log " + verevidlist.at(i);
