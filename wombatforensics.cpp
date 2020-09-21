@@ -1235,7 +1235,10 @@ void WombatForensics::PrepareEvidenceImage()
 	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
 	    {
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                {
+		    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+		
+		//if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
+                //{
 		    //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
                     //int retval = affusemnt(tmpstr.split(",").at(3).toStdString().c_str(), wombatvariable.imgdatapath.toStdString().c_str());
                     //af_image = af_open(tmpstr.split(",").at(3).toStdString().c_str(), O_RDONLY|O_EXCL,0);
@@ -1297,7 +1300,7 @@ void WombatForensics::PrepareEvidenceImage()
 
     return fuse_main(fargc, fargv, &affuse_oper, NULL);
                      */ 
-                }
+                //}
 	    }
 	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
 	    {
