@@ -1233,10 +1233,14 @@ void WombatForensics::PrepareEvidenceImage()
         {
 	    int imgtype = tmpstr.split(",").at(0).toInt();
 	    QString imagefile = tmpstr.split(",").at(3);
-	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
+            qDebug() << "imagefile:" << imagefile;
+            qDebug() << "imgtype:" << imgtype;
+	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype) || imagefile.endsWith(".aff")) // AFF
 	    {
+                qDebug() << "is aff";
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
                 {
+                    qDebug() << "doesn't exist, mount";
                     int ret;
                     char* afpath = NULL;
                     char* afbasename = NULL;
@@ -1245,15 +1249,15 @@ void WombatForensics::PrepareEvidenceImage()
 	            fargv = XCALLOC(char *, 3);
                     int fargc = 0;
                     fargv[0] = "affuse";
-                    fargv[1] = (char*)wombatvariable.imgdatapath.toStdString().c_str();
+                    fargv[1] = (char*)(wombatvariable.imgdatapath.toStdString().c_str());
                     fargv[2] = "-s";
                     fargc = 3;
                     for(int i=0; i < fargc; i++)
                         printf("fargv[%d]: %s\n", i, fargv[i]);
-                    afimage = af_open((char*)imagefile.toStdString().c_str(), O_RDONLY|O_EXCL,0);
-                    afpath = xstrdup((char*)wombatvariable.imgdatapath.toStdString().c_str());
+                    afimage = af_open((char*)(imagefile.toStdString().c_str()), O_RDONLY|O_EXCL,0);
+                    afpath = xstrdup((char*)(wombatvariable.imgdatapath.toStdString().c_str()));
 	            printf("afpath: %s\n", afpath);
-                    afbasename = (char*)imagefile.toStdString().c_str();
+                    afbasename = (char*)(imagefile.toStdString().c_str());
                     rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
                     rawpath = XCALLOC(char, rawpathlen);
                     rawpath[0] = '/';
