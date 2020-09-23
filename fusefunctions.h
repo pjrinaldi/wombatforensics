@@ -45,11 +45,13 @@
  * fuse_opt_parse would attempt to free() them when the user specifies
  * different values on the command line.
  */
+/*
 static struct options {
 	const char *filename;
 	const char *mntpt;
 	int show_help;
 } options;
+*/
 
 #define XCALLOC(type, num) ((type *) xcalloc ((num), sizeof(type)))
 #define XMALLOC(type, num) ((type *) xmalloc ((num) * sizeof(type)))
