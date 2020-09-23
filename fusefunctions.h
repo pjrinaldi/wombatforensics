@@ -200,6 +200,7 @@ static const struct fuse_operations hello_oper = {
 	.destroy	= hello_destroy,
 };
 
+/*
 static void show_help(const char *progname)
 {
 	printf("usage: %s [options] <mountpoint>\n\n", progname);
@@ -210,4 +211,5 @@ static void show_help(const char *progname)
 	       "                        (default \"Hello, World!\\n\")\n"
 	       "\n");
 };
+*/
 
