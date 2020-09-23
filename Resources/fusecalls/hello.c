@@ -106,7 +106,7 @@ static int hello_getattr(const char *path, struct stat *stbuf,
 	(void) fi;
 	int res = 0;
 
-	printf("rawpath: %s\n", rawpath);
+	//printf("rawpath: %s\n", rawpath);
 	//} else if (strcmp(path+1, options.filename) == 0) {
 	memset(stbuf, 0, sizeof(struct stat));
 	if (strcmp(path, "/") == 0) {
@@ -211,8 +211,8 @@ static void show_help(const char *progname)
 
 int main(int argc, char *argv[])
 {
-	for(int i=0; i < argc; i++)
-	    printf("argv[%d]: %s\n", i, argv[i]);
+	//for(int i=0; i < argc; i++)
+	//    printf("argv[%d]: %s\n", i, argv[i]);
 	int ret;
 	char* afpath = NULL;
 	char* afbasename = NULL;
@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
 	//afimage = af_open("ntfs1-gen1.aff", O_RDONLY|O_EXCL, 0);
 	//afpath = xstrdup("mntpt");
 	afpath = xstrdup(argv[2]);
-	printf("afpath: %s\n", afpath);
+	//printf("afpath: %s\n", afpath);
 	afbasename = argv[1];
 	rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
 	//rawpath = "/";
@@ -279,9 +279,9 @@ int main(int argc, char *argv[])
 	//strcat(rawpath, afpath);
 	strcat(rawpath, afbasename);
 	strcat(rawpath, rawext);
-	printf("rawpath: %s\n", rawpath);
+	//printf("rawpath: %s\n", rawpath);
 	rawpath[rawpathlen - 1] = 0;
-	printf("rawpath: %s\n", rawpath);
+	//printf("rawpath: %s\n", rawpath);
 	XFREE(afpath);
 	//free(afpath);
 	rawsize = af_get_imagesize(afimage);

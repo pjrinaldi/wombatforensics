@@ -1236,7 +1236,65 @@ void WombatForensics::PrepareEvidenceImage()
 	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
 	    {
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-		    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+                {
+                    int ret;
+                    char* afpath = NULL;
+                    char* afbasename = NULL;
+                    size_t rawpathlen = 0;
+                    char** fargv = NULL;
+	            fargv = XCALLOC(char *, 3);
+                    int fargc = 0;
+                    fargv[0] = "affuse";
+                    fargv[1] = (char*)wombatvariable.imgdatapath.toStdString().c_str();
+                    fargv[2] = "-s";
+                    fargc = 3;
+                    for(int i=0; i < fargc; i++)
+                        printf("fargv[%d]: %s\n", i, fargv[i]);
+                    afimage = af_open((char*)imagefile.toStdString().c_str(), O_RDONLY|O_EXCL,0);
+                    afpath = xstrdup((char*)wombatvariable.imgdatapath.toStdString().c_str());
+	            printf("afpath: %s\n", afpath);
+                    afbasename = (char*)imagefile.toStdString().c_str();
+                    rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
+                    rawpath = XCALLOC(char, rawpathlen);
+                    rawpath[0] = '/';
+                    strcat(rawpath, afbasename);
+                    strcat(rawpath, rawext);
+                    rawpath[rawpathlen - 1] = 0;
+	            printf("rawpath: %s\n", rawpath);
+                    XFREE(afpath);
+                    rawsize = af_get_imagesize(afimage);
+
+                    ret = fuse_main(fargc, fargv, &hello_oper, NULL);
+                    /*
+                     *
+	int ret;
+	char* afpath = NULL;
+	char* afbasename = NULL;
+	size_t rawpathlen = 0;
+	char** fargv = NULL;
+	int fargc = 0;
+	fargv = XCALLOC(char *, argc);
+	fargv[0] = argv[0];
+	fargv[1] = argv[2];
+	fargv[2] = "-s";
+	fargc = 3;
+	afimage = af_open(argv[1], O_RDONLY|O_EXCL, 0);
+	afpath = xstrdup(argv[2]);
+	afbasename = argv[1];
+	rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
+	rawpath = XCALLOC(char, rawpathlen);
+	rawpath[0] = '/';
+	strcat(rawpath, afbasename);
+	strcat(rawpath, rawext);
+	rawpath[rawpathlen - 1] = 0;
+	XFREE(afpath);
+	rawsize = af_get_imagesize(afimage);
+
+	ret = fuse_main(fargc, fargv, &hello_oper, NULL);
+	return ret;
+                    */
+		    //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+                }
 		
 		//if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
                 //{

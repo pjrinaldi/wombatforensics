@@ -30,7 +30,7 @@
 #define FUSE_USE_VERSION 31
 
 #include <afflib/afflib.h>
-#include <fuse.h>
+#include <fuse3/fuse.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -96,21 +96,18 @@ static char* xstrdup(char* string)
     return strcpy((char*)xmalloc(strlen(string) + 1), string);
 };
 
-static void *hello_init(struct fuse_conn_info *conn,
-			struct fuse_config *cfg)
+static void *hello_init(struct fuse_conn_info *conn, struct fuse_config *cfg)
 {
 	(void) conn;
 	cfg->kernel_cache = 1;
 	return NULL;
 };
 
-static int hello_getattr(const char *path, struct stat *stbuf,
-			 struct fuse_file_info *fi)
+static int hello_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
 {
 	(void) fi;
 	int res = 0;
 
-	printf("rawpath: %s\n", rawpath);
 	//} else if (strcmp(path+1, options.filename) == 0) {
 	memset(stbuf, 0, sizeof(struct stat));
 	if (strcmp(path, "/") == 0) {
@@ -127,9 +124,7 @@ static int hello_getattr(const char *path, struct stat *stbuf,
 	return res;
 };
 
-static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-			 off_t offset, struct fuse_file_info *fi,
-			 enum fuse_readdir_flags flags)
+static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags)
 {
 	(void) offset;
 	(void) fi;
@@ -138,9 +133,9 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	if (strcmp(path, "/") != 0)
 		return -ENOENT;
 
-	filler(buf, ".", NULL, 0, 0);
-	filler(buf, "..", NULL, 0, 0);
-	filler(buf, rawpath + 1, NULL, 0, 0);
+	filler(buf, ".", NULL, 0, (fuse_fill_dir_flags)0);
+	filler(buf, "..", NULL, 0, (fuse_fill_dir_flags)0);
+	filler(buf, rawpath + 1, NULL, 0, (fuse_fill_dir_flags)0);
 	//filler(buf, options.filename, NULL, 0, 0);
 
 	return 0;
@@ -159,8 +154,7 @@ static int hello_open(const char *path, struct fuse_file_info *fi)
 	return 0;
 };
 
-static int hello_read(const char *path, char *buf, size_t size, off_t offset,
-		      struct fuse_file_info *fi)
+static int hello_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
 	//size_t len;
 	int res = 0;
@@ -194,11 +188,11 @@ static void hello_destroy(void* param)
 };
 
 static const struct fuse_operations hello_oper = {
-	.init           = hello_init,
 	.getattr	= hello_getattr,
-	.readdir	= hello_readdir,
 	.open		= hello_open,
 	.read		= hello_read,
+	.readdir	= hello_readdir,
+	.init           = hello_init,
 	.destroy	= hello_destroy,
 };
 
