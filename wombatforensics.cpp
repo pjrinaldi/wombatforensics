@@ -1248,19 +1248,26 @@ void WombatForensics::PrepareEvidenceImage()
                     char** fargv = NULL;
 	            fargv = XCALLOC(char *, 3);
                     int fargc = 0;
-                    fargv[0] = "affuse";
-                    fargv[1] = (char*)(wombatvariable.imgdatapath.toStdString().c_str());
+                    char* ipath = new char[wombatvariable.imgdatapath.toStdString().size() + 1];
+                    strcpy(ipath, wombatvariable.imgdatapath.toStdString().c_str());
+                    char* iname = new char[imagefile.toStdString().size() + 1];
+                    strcpy(iname, imagefile.toStdString().c_str());
+                    fargv[0] = "./hello";
+                    fargv[1] = ipath;
                     fargv[2] = "-s";
                     fargc = 3;
                     for(int i=0; i < fargc; i++)
                         printf("fargv[%d]: %s\n", i, fargv[i]);
-                    afimage = af_open((char*)(imagefile.toStdString().c_str()), O_RDONLY|O_EXCL,0);
-                    afpath = xstrdup((char*)(wombatvariable.imgdatapath.toStdString().c_str()));
+                    afimage = af_open(iname, O_RDONLY|O_EXCL,0);
+                    afpath = xstrdup(ipath);
 	            printf("afpath: %s\n", afpath);
-                    afbasename = (char*)(imagefile.toStdString().c_str());
+                    afbasename = basename(iname);
                     rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
+                    //rawpathlen = 1 + strlen(ipath) + strlen(afbasename) + strlen(rawext) + 1;
                     rawpath = XCALLOC(char, rawpathlen);
                     rawpath[0] = '/';
+                    //strcat(rawpath, ipath);
+                    //rawpath[0] = '/';
                     strcat(rawpath, afbasename);
                     strcat(rawpath, rawext);
                     rawpath[rawpathlen - 1] = 0;
@@ -1268,102 +1275,10 @@ void WombatForensics::PrepareEvidenceImage()
                     XFREE(afpath);
                     rawsize = af_get_imagesize(afimage);
 
-                    ret = fuse_main(fargc, fargv, &hello_oper, NULL);
-                    /*
-                     *
-	int ret;
-	char* afpath = NULL;
-	char* afbasename = NULL;
-	size_t rawpathlen = 0;
-	char** fargv = NULL;
-	int fargc = 0;
-	fargv = XCALLOC(char *, argc);
-	fargv[0] = argv[0];
-	fargv[1] = argv[2];
-	fargv[2] = "-s";
-	fargc = 3;
-	afimage = af_open(argv[1], O_RDONLY|O_EXCL, 0);
-	afpath = xstrdup(argv[2]);
-	afbasename = argv[1];
-	rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
-	rawpath = XCALLOC(char, rawpathlen);
-	rawpath[0] = '/';
-	strcat(rawpath, afbasename);
-	strcat(rawpath, rawext);
-	rawpath[rawpathlen - 1] = 0;
-	XFREE(afpath);
-	rawsize = af_get_imagesize(afimage);
-
-	ret = fuse_main(fargc, fargv, &hello_oper, NULL);
-	return ret;
-                    */
-		    //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+                    // fuse_main SEEMS TO RETURN THE PROGRAM... PROBABLY NEED TO CALL A DIFFERENT SET OF FUNCTIONS FROM FUSE.H
+                    // HAVE TO RUN FUSE_NEW, FUSE_MOUNT, FUSE_UNMOUNT, FUSE_DESTROY
+                    //ret = fuse_main(fargc, fargv, &hello_oper, NULL);
                 }
-		
-		//if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                //{
-		    //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
-                    //int retval = affusemnt(tmpstr.split(",").at(3).toStdString().c_str(), wombatvariable.imgdatapath.toStdString().c_str());
-                    //af_image = af_open(tmpstr.split(",").at(3).toStdString().c_str(), O_RDONLY|O_EXCL,0);
-                    //char* af_path = NULL;
-                    //char* af_basename = NULL;
-                    //size_t rawpathlen = 0;
-                    //char** fargv = NULL;
-                    //int fargc = 0;
-                    
-                    /*
-    char *af_path = NULL, *af_basename = NULL;
-    size_t raw_path_len = 0;
-    char **fargv = NULL;
-    int fargc = 0;
-
-    if (argc < 3) {
-        usage();
-	exit(EXIT_FAILURE);
-    }
-
-    // Prepare fuse args, af_image is omitted, but "-s" is added //
-    fargv = XCALLOC(char *, argc); // usually not free'd //
-    fargv[0] = argv[0];
-    fargv[1] = argv[argc - 1];
-    fargc = 2;
-    while (fargc <= (argc - 2)) {
-        fargv[fargc] = argv[fargc - 1];
-	if (strcmp(fargv[fargc], "-h") == 0 ||
-	    strcmp(fargv[fargc], "--help") == 0 ) {
-	    usage();
-	    XFREE(fargv);
-	    exit(EXIT_SUCCESS);
-	}
-	fargc++;
-    }
-    // disable multi-threaded operation
-     // (we don't know if afflib is thread safe!)
-    //
-    fargv[fargc] = "-s";
-    fargc++;
-
-    if ((af_image = af_open(argv[argc - 2], O_RDONLY|O_EXCL, 0)) == NULL) {
-        perror("Can't open image file");
-	XFREE(fargv);
-	exit(EXIT_FAILURE);
-    }
-
-    af_path = xstrdup(argv[argc - 2]);
-    af_basename = basename(af_path);
-    //             "/"       af_basename            raw_ext  "/0"
-    raw_path_len = 1 + strlen(af_basename) + strlen(raw_ext) + 1;
-    raw_path = XCALLOC(char, raw_path_len);
-    raw_path[0] = '/';
-    strcat(raw_path, af_basename);
-    strcat(raw_path, raw_ext);
-    raw_path[raw_path_len -1] = 0;
-    XFREE(af_path);
-    raw_size = af_get_imagesize(af_image);
-
-    return fuse_main(fargc, fargv, &affuse_oper, NULL);
-                     */ 
-                //}
 	    }
 	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
 	    {
@@ -1605,7 +1520,7 @@ void WombatForensics::LoadHexContents()
         tmpstr = evidfile.readLine();
     evidfile.close();
     QString datastring = wombatvariable.imgdatapath;
-    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
         datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
     else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
         datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
@@ -1621,6 +1536,7 @@ void WombatForensics::LoadHexContents()
         qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
     if(datastring.endsWith(".sfs"))
         datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
+    qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->BypassColor(false);
     ui->hexview->setData(casedatafile);
