@@ -1275,6 +1275,15 @@ void WombatForensics::PrepareEvidenceImage()
                     XFREE(afpath);
                     rawsize = af_get_imagesize(afimage);
 
+                    //fuse* affuser = fuse_new(fargv, &hello_oper, fargc, NULL);
+                    
+                    /*
+                     * struct fuse *fuse_new(struct fuse_args *args, const struct fuse_operations *op, size_t op_size, void *private_data);
+                        int fuse_mount(struct fuse *f, const char *mountpoint);
+                        void fuse_unmount(struct fuse *f);
+                    */
+		    
+                    //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
                     // fuse_main SEEMS TO RETURN THE PROGRAM... PROBABLY NEED TO CALL A DIFFERENT SET OF FUNCTIONS FROM FUSE.H
                     // HAVE TO RUN FUSE_NEW, FUSE_MOUNT, FUSE_UNMOUNT, FUSE_DESTROY
                     //ret = fuse_main(fargc, fargv, &hello_oper, NULL);
@@ -1307,6 +1316,7 @@ void WombatForensics::PrepareEvidenceImage()
 	    }
 	    if(!mntstr.isEmpty())
 	    {
+                qDebug() << "call affuse:" << mntstr;
 		xmntprocess = new QProcess();
 		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
 		connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);

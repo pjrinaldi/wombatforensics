@@ -44,13 +44,12 @@ void PopulateTreeModel(QString evidstring)
         */
         /*
          * + "/"QProcess builder;
-builder.setProcessChannelMode(QProcess::MergedChannels);
-builder.start("make", QStringList() << "-j2");
-
-if (!builder.waitForFinished())
-    qDebug() << "Make failed:" << builder.errorString();
-else
-    qDebug() << "Make output:" << builder.readAll();
+        builder.setProcessChannelMode(QProcess::MergedChannels);
+        builder.start("make", QStringList() << "-j2");
+        if (!builder.waitForFinished())
+            qDebug() << "Make failed:" << builder.errorString();
+        else
+            qDebug() << "Make output:" << builder.readAll();
          */ 
     }
     std::vector<std::string> pathvector;
