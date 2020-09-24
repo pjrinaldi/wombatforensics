@@ -1253,9 +1253,9 @@ void WombatForensics::PrepareEvidenceImage()
                     char* iname = new char[imagefile.toStdString().size() + 1];
                     strcpy(iname, imagefile.toStdString().c_str());
                     fargv[0] = "./hello";
-                    fargv[1] = ipath;
-                    fargv[2] = "-s";
-                    fargc = 3;
+                    //fargv[1] = ipath;
+                    //fargv[1] = "-s";
+                    fargc = 1;
                     for(int i=0; i < fargc; i++)
                         printf("fargv[%d]: %s\n", i, fargv[i]);
                     afimage = af_open(iname, O_RDONLY|O_EXCL,0);
@@ -1278,6 +1278,7 @@ void WombatForensics::PrepareEvidenceImage()
 	            struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
                     struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(struct fuse_operations), NULL);
                     ret = fuse_mount(affuser, wombatvariable.imgdatapath.toStdString().c_str());
+                    // getting close....
                     
                     /*
                      * struct fuse *fuse_new(struct fuse_args *args, const struct fuse_operations *op, size_t op_size, void *private_data);
