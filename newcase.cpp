@@ -5,6 +5,7 @@
 
 void InitializeEvidenceStructure(QString evidname)
 {
+    qDebug() << "evidname:" << evidname;
     int evidcnt = 0;
     int volcnt = 0;
     int partint = 0;

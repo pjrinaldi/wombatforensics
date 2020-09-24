@@ -1276,18 +1276,15 @@ void WombatForensics::PrepareEvidenceImage()
                     rawsize = af_get_imagesize(afimage);
 
 	            struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
-                    struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(struct fuse_operations), NULL);
+                    struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
                     ret = fuse_mount(affuser, wombatvariable.imgdatapath.toStdString().c_str());
+                    qDebug() << "fuse mount return:" << ret;
 		    int retd = fuse_daemonize(0);
+                    qDebug() << "fuse daemonize return:" << retd;
 		    int ret2 = fuse_loop(affuser);
+                    qDebug() << "fuse loop return:" << ret2;
                     // getting close....
-                    
-                    /*
-                     * struct fuse *fuse_new(struct fuse_args *args, const struct fuse_operations *op, size_t op_size, void *private_data);
-                        int fuse_mount(struct fuse *f, const char *mountpoint);
-                        void fuse_unmount(struct fuse *f);
-                    */
-		    
+                    mntstr = "";
                     //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
                     // fuse_main SEEMS TO RETURN THE PROGRAM... PROBABLY NEED TO CALL A DIFFERENT SET OF FUNCTIONS FROM FUSE.H
                     // HAVE TO RUN FUSE_NEW, FUSE_MOUNT, FUSE_UNMOUNT, FUSE_DESTROY
@@ -1330,6 +1327,8 @@ void WombatForensics::PrepareEvidenceImage()
 		//xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them.. NEED TO FIX
 		//xmntprocess->start(mntstr, QStringList());
 	    }
+            else
+                qDebug() << "affuse command not called, function call instead..";
         }
     }
 }
@@ -1399,7 +1398,7 @@ void WombatForensics::AddEvidence()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
-    //qDebug() << "newevidence:" << newevidence;
+    qDebug() << "newevidence:" << newevidence;
     for(int i=0; i < newevidence.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
