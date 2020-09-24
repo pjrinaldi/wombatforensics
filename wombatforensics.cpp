@@ -1274,17 +1274,36 @@ void WombatForensics::PrepareEvidenceImage()
 	            printf("rawpath: %s\n", rawpath);
                     XFREE(afpath);
                     rawsize = af_get_imagesize(afimage);
-
+		    
+		    struct fuse_loop_config config;
+		    config.clone_fd = 0;
+		    config.max_idle_threads = 5;
 	            struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
-                    struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
+                    //struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
+                    struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(fuse_operations), NULL);
                     if(affuser == NULL)
                         qDebug() << "affuser new error.";
                     ret = fuse_mount(affuser, wombatvariable.imgdatapath.toStdString().c_str());
                     qDebug() << "fuse mount return:" << ret;
-		    int retd = fuse_daemonize(0);
+		    int retd = fuse_daemonize(1);
                     qDebug() << "fuse daemonize return:" << retd;
-		    int ret2 = fuse_loop(affuser);
-                    qDebug() << "fuse loop return:" << ret2;
+
+		    pthread_t updater;     // Start thread to update file contents
+		    int pret = pthread_create(&updater, NULL, update_fs_loop, (void *) affuser);
+		    if (pret != 0)
+			fprintf(stderr, "pthread_create failed with %s\n", strerror(ret));
+		     
+		    struct fuse_session* se = fuse_get_session(affuser);
+		    int retsh = fuse_set_signal_handlers(se);
+		    qDebug() << "fuse session signal handlers:" << retsh;
+		    pthread_t threadId;
+		    int perr = pthread_create(&threadId, NULL, fuselooper, (void *) affuser);
+		    //int err = pthread_create(&threadId, NULL, &threadFunc, NULL);
+		    //int ret2 = fuse_loop_mt(affuser, &config);
+		    //int ret2 = fuse_loop(affuser);
+                    //qDebug() << "fuse loop return:" << ret2;
+		    //fuse_session_unmount(se);
+		    //fuse_remove_signal_handlers(se);
                     // getting close....
                     mntstr = "";
                     //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;

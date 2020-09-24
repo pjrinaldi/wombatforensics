@@ -27,7 +27,7 @@
 #include <stdint.h>
 #include <errno.h>
 
-#define FUSE_USE_VERSION 31
+#define FUSE_USE_VERSION 35
 
 #include <afflib/afflib.h>
 #include <fuse3/fuse.h>
@@ -37,6 +37,7 @@
 #include <fcntl.h>
 #include <stddef.h>
 #include <assert.h>
+#include <pthread.h>
 
 /*
  * Command line options
@@ -62,6 +63,16 @@ static char* rawpath = NULL;
 static off_t rawsize = 0;
 static const char* rawext = ".raw";
 
+#define NO_TIMEOUT 500000
+
+#define MAX_STR_LEN 128
+#define TIME_FILE_NAME "current_time"
+#define TIME_FILE_INO 2
+#define GROW_FILE_NAME "growing"
+#define GROW_FILE_INO 3
+
+static char time_file_contents[MAX_STR_LEN];
+static size_t grow_file_size;
 /*
 #define OPTION(t, p)                           \
     { t, offsetof(struct options, p), 1 }
@@ -208,4 +219,40 @@ static void show_help(const char *progname)
 	       "\n");
 };
 */
+static void update_fs(void) {
+	static int count = 0;
+	struct tm *now;
+	time_t t;
+	t = time(NULL);
+	now = localtime(&t);
+	//assert(now != NULL);
 
+	int time_file_size = strftime(time_file_contents, MAX_STR_LEN,
+			"The current time is %H:%M:%S\n", now);
+	//assert(time_file_size != 0);
+
+	grow_file_size = count++;
+};
+
+static void* update_fs_loop(void *data) {
+	struct fuse *fuse = (struct fuse*) data;
+
+	while (1) {
+		update_fs();
+		/*
+		if (!options.no_notify) {
+			assert(invalidate(fuse, "/" TIME_FILE_NAME) == 0);
+			assert(invalidate(fuse, "/" GROW_FILE_NAME) == 0);
+		}
+		*/
+		sleep(1);
+	}
+	return NULL;
+};
+
+void* fuselooper(void *data)
+{
+    struct fuse* fuse = (struct fuse*) data;
+    int ret = fuse_loop(fuse);
+    printf("fuse loop return: %d\n", ret);
+};
