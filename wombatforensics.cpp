@@ -1277,6 +1277,8 @@ void WombatForensics::PrepareEvidenceImage()
 
 	            struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
                     struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
+                    if(affuser == NULL)
+                        qDebug() << "affuser new error.";
                     ret = fuse_mount(affuser, wombatvariable.imgdatapath.toStdString().c_str());
                     qDebug() << "fuse mount return:" << ret;
 		    int retd = fuse_daemonize(0);
