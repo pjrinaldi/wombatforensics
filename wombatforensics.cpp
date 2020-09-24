@@ -1275,7 +1275,9 @@ void WombatForensics::PrepareEvidenceImage()
                     XFREE(afpath);
                     rawsize = af_get_imagesize(afimage);
 
-                    //fuse* affuser = fuse_new(fargv, &hello_oper, fargc, NULL);
+	            struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
+                    struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(struct fuse_operations), NULL);
+                    ret = fuse_mount(affuser, wombatvariable.imgdatapath.toStdString().c_str());
                     
                     /*
                      * struct fuse *fuse_new(struct fuse_args *args, const struct fuse_operations *op, size_t op_size, void *private_data);
