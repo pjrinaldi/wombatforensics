@@ -1858,17 +1858,24 @@ void WombatForensics::CloseCurrentCase()
         {
             if(affuser != NULL)
             {
-                fuse_unmount(affuser);
-                fuse_destroy(affuser);
-		int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), 0);
+                //fuse_unmount(affuser);
+                //fuse_destroy(affuser);
+		//int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), MNT_FORCE);
+                //execle("/bin/umount", "/bin/umount", "-i", rel_mnt, NULL, NULL);
 		//int ures = umount2(mnt, lazy ? UMOUNT_DETACH : 0);
-                qDebug() << "ures:" << ures;
+                //qDebug() << "ures:" << ures;
                 qDebug() << "affuser exists and should be unmounting";
             }
             else
             {
-		int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), 0);
-                qDebug() << "ures:" << ures;
+		//setfsuid(getuid());
+		//setfsgid(getgid());
+	        //umask(033);
+		//int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), MNT_FORCE);
+                //execle("/bin/umount", "/bin/umount", "-i", wombatvariable.imgdatapath.toStdString().c_str(), NULL, NULL);
+		//int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), 0);
+                //qDebug() << "ures:" << ures;
+		//fprintf(stderr, "std:error: error releasing lock: %s\n", strerror(errno));
                 qDebug() << "affuser was null";
             }
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
