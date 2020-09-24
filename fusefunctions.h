@@ -63,6 +63,7 @@ static char* rawpath = NULL;
 static off_t rawsize = 0;
 static const char* rawext = ".raw";
 
+/*
 #define NO_TIMEOUT 500000
 
 #define MAX_STR_LEN 128
@@ -70,9 +71,10 @@ static const char* rawext = ".raw";
 #define TIME_FILE_INO 2
 #define GROW_FILE_NAME "growing"
 #define GROW_FILE_INO 3
+*/
+//static char time_file_contents[MAX_STR_LEN];
+//static size_t grow_file_size;
 
-static char time_file_contents[MAX_STR_LEN];
-static size_t grow_file_size;
 /*
 #define OPTION(t, p)                           \
     { t, offsetof(struct options, p), 1 }
@@ -107,14 +109,14 @@ static char* xstrdup(char* string)
     return strcpy((char*)xmalloc(strlen(string) + 1), string);
 };
 
-static void *hello_init(struct fuse_conn_info *conn, struct fuse_config *cfg)
+static void *affuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg)
 {
 	(void) conn;
 	cfg->kernel_cache = 1;
 	return NULL;
 };
 
-static int hello_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
+static int affuse_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
 {
 	(void) fi;
 	int res = 0;
@@ -135,7 +137,7 @@ static int hello_getattr(const char *path, struct stat *stbuf, struct fuse_file_
 	return res;
 };
 
-static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags)
+static int affuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags)
 {
 	(void) offset;
 	(void) fi;
@@ -152,7 +154,7 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 	return 0;
 };
 
-static int hello_open(const char *path, struct fuse_file_info *fi)
+static int affuse_open(const char *path, struct fuse_file_info *fi)
 {
 	//if (strcmp(path+1, options.filename) != 0)
 	if(strcmp(path, rawpath) != 0)
@@ -165,7 +167,7 @@ static int hello_open(const char *path, struct fuse_file_info *fi)
 	return 0;
 };
 
-static int hello_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
+static int affuse_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
 	//size_t len;
 	int res = 0;
@@ -190,7 +192,7 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset, st
 	*/
 };
 
-static void hello_destroy(void* param)
+static void affuse_destroy(void* param)
 {
     af_close(afimage);
     //free(rawpath);
@@ -198,13 +200,13 @@ static void hello_destroy(void* param)
     return;
 };
 
-static const struct fuse_operations hello_oper = {
-	.getattr	= hello_getattr,
-	.open		= hello_open,
-	.read		= hello_read,
-	.readdir	= hello_readdir,
-	.init           = hello_init,
-	.destroy	= hello_destroy,
+static const struct fuse_operations affuse_oper = {
+	.getattr	= affuse_getattr,
+	.open		= affuse_open,
+	.read		= affuse_read,
+	.readdir	= affuse_readdir,
+	.init           = affuse_init,
+	.destroy	= affuse_destroy,
 };
 
 /*
@@ -219,6 +221,7 @@ static void show_help(const char *progname)
 	       "\n");
 };
 */
+/*
 static void update_fs(void) {
 	static int count = 0;
 	struct tm *now;
@@ -245,14 +248,80 @@ static void* update_fs_loop(void *data) {
 			assert(invalidate(fuse, "/" GROW_FILE_NAME) == 0);
 		}
 		*/
-		sleep(1);
+/*		sleep(1);
 	}
 	return NULL;
 };
-
+*/
 void* fuselooper(void *data)
 {
     struct fuse* fuse = (struct fuse*) data;
     int ret = fuse_loop(fuse);
     printf("fuse loop return: %d\n", ret);
+};
+
+struct fuse_args args;
+struct fuse* affuser;
+
+void AffFuser(QString imgpath, QString imgfile)
+{
+    int ret;
+    char* afpath = NULL;
+    char* afbasename = NULL;
+    size_t rawpathlen = 0;
+    char** fargv = NULL;
+    fargv = XCALLOC(char *, 3);
+    int fargc = 0;
+    char* ipath = new char[imgpath.toStdString().size() + 1];
+    strcpy(ipath, imgpath.toStdString().c_str());
+    char* iname = new char[imgfile.toStdString().size() + 1];
+    strcpy(iname, imgfile.toStdString().c_str());
+    //progname = strdup("./affuse");
+    fargv[0] = "./affuse";
+    //fargv[1] = ipath;
+    //fargv[1] = "-s";
+    fargc = 1;
+    for(int i=0; i < fargc; i++)
+        printf("fargv[%d]: %s\n", i, fargv[i]);
+    afimage = af_open(iname, O_RDONLY|O_EXCL,0);
+    afpath = xstrdup(ipath);
+    printf("afpath: %s\n", afpath);
+    afbasename = basename(iname);
+    rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
+    //rawpathlen = 1 + strlen(ipath) + strlen(afbasename) + strlen(rawext) + 1;
+    rawpath = XCALLOC(char, rawpathlen);
+    rawpath[0] = '/';
+    //strcat(rawpath, ipath);
+    //rawpath[0] = '/';
+    strcat(rawpath, afbasename);
+    strcat(rawpath, rawext);
+    rawpath[rawpathlen - 1] = 0;
+    printf("rawpath: %s\n", rawpath);
+    XFREE(afpath);
+    rawsize = af_get_imagesize(afimage);
+    
+    struct fuse_loop_config config;
+    config.clone_fd = 0;
+    config.max_idle_threads = 5;
+    //struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
+    args = FUSE_ARGS_INIT(fargc, fargv);
+    //struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
+    struct fuse* affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
+    if(affuser == NULL)
+        qDebug() << "affuser new error.";
+    ret = fuse_mount(affuser, imgpath.toStdString().c_str());
+    qDebug() << "fuse mount return:" << ret;
+    int retd = fuse_daemonize(1);
+    qDebug() << "fuse daemonize return:" << retd;
+
+    //pthread_t updater;     // Start thread to update file contents
+    //int pret = pthread_create(&updater, NULL, update_fs_loop, (void *) affuser);
+    //if (pret != 0)
+        //fprintf(stderr, "pthread_create failed with %s\n", strerror(ret));
+     
+    struct fuse_session* se = fuse_get_session(affuser);
+    int retsh = fuse_set_signal_handlers(se);
+    qDebug() << "fuse session signal handlers:" << retsh;
+    pthread_t threadId;
+    int perr = pthread_create(&threadId, NULL, fuselooper, (void *) affuser);
 };

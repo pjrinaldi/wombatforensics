@@ -1237,10 +1237,12 @@ void WombatForensics::PrepareEvidenceImage()
             qDebug() << "imgtype:" << imgtype;
 	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype) || imagefile.endsWith(".aff")) // AFF
 	    {
-                qDebug() << "is aff";
+                //qDebug() << "is aff";
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
                 {
-                    qDebug() << "doesn't exist, mount";
+                    AffFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
+                    /*
+                    //qDebug() << "doesn't exist, mount";
                     int ret;
                     char* afpath = NULL;
                     char* afbasename = NULL;
@@ -1280,7 +1282,7 @@ void WombatForensics::PrepareEvidenceImage()
 		    config.max_idle_threads = 5;
 	            struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
                     //struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
-                    struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(fuse_operations), NULL);
+                    struct fuse* affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
                     if(affuser == NULL)
                         qDebug() << "affuser new error.";
                     ret = fuse_mount(affuser, wombatvariable.imgdatapath.toStdString().c_str());
@@ -1288,10 +1290,10 @@ void WombatForensics::PrepareEvidenceImage()
 		    int retd = fuse_daemonize(1);
                     qDebug() << "fuse daemonize return:" << retd;
 
-		    pthread_t updater;     // Start thread to update file contents
-		    int pret = pthread_create(&updater, NULL, update_fs_loop, (void *) affuser);
-		    if (pret != 0)
-			fprintf(stderr, "pthread_create failed with %s\n", strerror(ret));
+		    //pthread_t updater;     // Start thread to update file contents
+		    //int pret = pthread_create(&updater, NULL, update_fs_loop, (void *) affuser);
+		    //if (pret != 0)
+			//fprintf(stderr, "pthread_create failed with %s\n", strerror(ret));
 		     
 		    struct fuse_session* se = fuse_get_session(affuser);
 		    int retsh = fuse_set_signal_handlers(se);
@@ -1310,6 +1312,7 @@ void WombatForensics::PrepareEvidenceImage()
                     // fuse_main SEEMS TO RETURN THE PROGRAM... PROBABLY NEED TO CALL A DIFFERENT SET OF FUNCTIONS FROM FUSE.H
                     // HAVE TO RUN FUSE_NEW, FUSE_MOUNT, FUSE_UNMOUNT, FUSE_DESTROY
                     //ret = fuse_main(fargc, fargv, &hello_oper, NULL);
+                    */
                 }
 	    }
 	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
@@ -1348,8 +1351,8 @@ void WombatForensics::PrepareEvidenceImage()
 		//xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them.. NEED TO FIX
 		//xmntprocess->start(mntstr, QStringList());
 	    }
-            else
-                qDebug() << "affuse command not called, function call instead..";
+            //else
+            //    qDebug() << "affuse command not called, function call instead..";
         }
     }
 }
@@ -1853,7 +1856,23 @@ void WombatForensics::CloseCurrentCase()
         }
         else if(imgext.contains("aff") || imgext.contains("000")) // affuse
         {
+            if(affuser != NULL)
+            {
+                fuse_unmount(affuser);
+                fuse_destroy(affuser);
+		int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), 0);
+		//int ures = umount2(mnt, lazy ? UMOUNT_DETACH : 0);
+                qDebug() << "ures:" << ures;
+                qDebug() << "affuser exists and should be unmounting";
+            }
+            else
+            {
+		int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), 0);
+                qDebug() << "ures:" << ures;
+                qDebug() << "affuser was null";
+            }
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
+            qDebug() << "xunmntstr:" << xunmntstr;
             QProcess::execute(xunmntstr, QStringList());
         }
         else if(imgext.contains("sfs")) // squashfuse
