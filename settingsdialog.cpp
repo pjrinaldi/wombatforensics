@@ -41,9 +41,9 @@ void SettingsDialog::SaveChanges()
     if(reportpath.endsWith("/"))
         reportpath.chop(1);
     QByteArray ba;
-    ba.append(casepath);
+    ba.append(casepath.toUtf8());
     QByteArray ba2;
-    ba2.append(reportpath);
+    ba2.append(reportpath.toUtf8());
     // repeat this process for other variables..
     settingsfile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&settingsfile);
@@ -75,13 +75,13 @@ void SettingsDialog::LoadSettings()
         else if(tmplist.at(i).split(":").at(0) == "casepath")
         {
             QByteArray ba;
-            ba.append(tmplist.at(i).split(":").at(1));
+            ba.append(tmplist.at(i).split(":").at(1).toUtf8());
             ui->casepathlineedit->setText(QByteArray::fromBase64(ba));
         }
         else if(tmplist.at(i).split(":").at(0) == "reportpath")
         {
             QByteArray ba;
-            ba.append(tmplist.at(i).split(":").at(1));
+            ba.append(tmplist.at(i).split(":").at(1).toUtf8());
             ui->reportpathlineedit->setText(QByteArray::fromBase64(ba));
         }
         else if(tmplist.at(i).split(":").at(0) == "video")

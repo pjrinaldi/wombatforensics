@@ -304,14 +304,14 @@ public:
                 if(filtervalues.namebool)
                 {
                     ba.clear();
-                    ba.append(itemnode->Data(0).toString());
+                    ba.append(itemnode->Data(0).toString().toUtf8());
                     if(QString(QByteArray::fromBase64(ba)).contains(filtervalues.namefilter) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.pathbool)
                 {
                     ba.clear();
-                    ba.append(itemnode->Data(1).toString());
+                    ba.append(itemnode->Data(1).toString().toUtf8());
                     if(QString(QByteArray::fromBase64(ba)).contains(filtervalues.pathfilter) == false)
                         return QColor(Qt::lightGray);
                 }
@@ -429,7 +429,7 @@ public:
                 if(nodetype == 5 || nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
                 {
                     ba.clear();
-                    ba.append(itemnode->Data(index.column()).toString());
+                    ba.append(itemnode->Data(index.column()).toString().toUtf8());
                     return QByteArray::fromBase64(ba);
                 }
                 else
@@ -470,7 +470,7 @@ public:
         else if(role == Qt::DecorationRole)
         {
             ba.clear();
-            ba.append(itemnode->Data(0).toString()); // used to be 1
+            ba.append(itemnode->Data(0).toString().toUtf8()); // used to be 1
             QString nodename = QByteArray::fromBase64(ba);
             if(index.column() == 0)
             {

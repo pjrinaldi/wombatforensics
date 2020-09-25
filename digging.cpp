@@ -123,10 +123,10 @@ void GenerateArchiveExpansion(QString objectid)
 		//qDebug() << outstr;
 		QByteArray ba;
 		ba.clear();
-		ba.append(QString::fromStdString(std::string(zipstat.name)));
+		ba.append(QString::fromStdString(std::string(zipstat.name)).toUtf8());
 		QByteArray ba2;
 		ba2.clear();
-		ba2.append(QString(filepath + filename + "/"));
+		ba2.append(QString(filepath + filename + "/").toUtf8());
 		QString outstr = ba.toBase64() + ",5," + astring.mid(1) + "," + ba2.toBase64() + ",0,0,0," + QString::number(zipstat.mtime) + "," + QString::number(zipstat.size) + "," + QString::number(i) + "," + mimestr + ",0," + QString(idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1)) + ",0,0,0";
 		QStringList treeout;
 		treeout.clear();
@@ -385,7 +385,7 @@ void GenerateVidThumbnails(QString thumbid)
 	    QByteArray ba;
 	    QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
 	    ba.clear();
-	    ba.append(fullpath);
+	    ba.append(fullpath.toUtf8());
 	    if(!isclosing)
 		imageshash.insert(thumbid, QString(ba.toBase64()));
 	    QStringList tlist;
@@ -615,7 +615,7 @@ void GenerateThumbnails(QString thumbid)
 	    QByteArray ba;
 	    ba.clear();
 	    QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
-	    ba.append(fullpath);
+	    ba.append(fullpath.toUtf8());
 	    imageshash.insert(thumbid, QString(ba.toBase64()));
 	    try
 	    {

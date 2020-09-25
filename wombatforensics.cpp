@@ -750,13 +750,13 @@ void WombatForensics::ReadSettings()
         else if(tmplist.at(i).split(":").at(0) == "casepath")
         {
             QByteArray ba;
-            ba.append(tmplist.at(i).split(":").at(1));
+            ba.append(tmplist.at(i).split(":").at(1).toUtf8());
             casepath = QByteArray::fromBase64(ba);
         }
         else if(tmplist.at(i).split(":").at(0) == "reportpath")
         {
             QByteArray ba;
-            ba.append(tmplist.at(i).split(":").at(1));
+            ba.append(tmplist.at(i).split(":").at(1).toUtf8());
             reportpath = QByteArray::fromBase64(ba);
         }
         else if(tmplist.at(i).split(":").at(0) == "video")
@@ -3075,10 +3075,10 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     QString mimestr = GenerateCategorySignature(mimetype);
     QByteArray ba;
     ba.clear();
-    ba.append(ctitle);
+    ba.append(ctitle.toUtf8());
     QByteArray ba2;
     ba2.clear();
-    ba2.append(offstr);
+    ba2.append(offstr.toUtf8());
     // HASH INFO
     QString curhash = "0";
     QString hashval = selectedindex.sibling(selectedindex.row(), 7).data().toString();
@@ -3249,7 +3249,7 @@ void WombatForensics::UpdateCheckState()
         if(checkhash.contains(i.key()))
         {
             hasharray.clear();
-            hasharray.append(QString(i.key() + "|" + QString::number(i.value()) + ","));
+            hasharray.append(QString(i.key() + "|" + QString::number(i.value()) + ",").toUtf8());
             hashfile.write(hasharray);
         }
     }
@@ -3274,7 +3274,7 @@ void WombatForensics::UpdateSelectedState(QString id)
     QFile selectfile(wombatvariable.tmpmntpath + "selectedstate");
     selectfile.open(QIODevice::WriteOnly);
     QByteArray selectarray;
-    selectarray.append(id);
+    selectarray.append(id.toUtf8());
     selectfile.write(selectarray);
     selectfile.close();
 }

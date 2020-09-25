@@ -296,7 +296,7 @@ void InitializePasswordList(void)
         for(int i=0; i < hlist.count(); i++)
         {
             ba.clear();
-            ba.append(hlist.at(i).split("|", Qt::SkipEmptyParts).at(1));
+            ba.append(hlist.at(i).split("|", Qt::SkipEmptyParts).at(1).toUtf8());
             passwordhash.insert(hlist.at(i).split("|", Qt::SkipEmptyParts).at(0), QByteArray::fromBase64(ba));
         }
     }
@@ -315,7 +315,7 @@ void SavePasswordList(void)
             QByteArray ba;
             ba.clear();
             i.next();
-            ba.append(i.value());
+            ba.append(i.value().toUtf8());
             hfile.write(i.key().toStdString().c_str());
             hfile.write("|");
             hfile.write(ba.toBase64().toStdString().c_str());

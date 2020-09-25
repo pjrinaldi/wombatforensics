@@ -79,7 +79,7 @@ void ImageViewer::LoadThumbnails()
     {
         QListWidgetItem* tmpitem = new QListWidgetItem(QIcon(wombatvariable.tmpmntpath + "thumbs/" + jpgfiles.at(i)), jpgfiles.at(i).split(".").at(0), ui->listWidget);
         ba.clear();
-        ba.append(imageshash.value(jpgfiles.at(i).split(".").at(0)));
+        ba.append(imageshash.value(jpgfiles.at(i).split(".").at(0)).toUtf8());
         tmpitem->setToolTip(QString(QByteArray::fromBase64(ba)));
     }
     ui->label->setText("Thumbnail Count: " + QString::number(jpgfiles.count()));

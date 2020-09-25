@@ -358,10 +358,10 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                 treeout.clear();
                 QByteArray ba;
                 ba.clear();
-                ba.append(QString(fsfile->name->name));
+                ba.append(QString(fsfile->name->name).toUtf8());
                 treeout << ba.toBase64(); // NAME - 0
                 ba.clear();
-                ba.append(QString::fromStdString(std::string(path)));
+                ba.append(QString::fromStdString(std::string(path)).toUtf8());
                 treeout << ba.toBase64(); // FULL PATH - 1
                 if(fsfile->name->par_addr == fsfile->fs_info->root_inum)
                     parentstr = evalue + "-" + vvalue + "-" + pvalue;
@@ -514,7 +514,7 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
                                     if(mimestr.contains("Unknown"))
                                         mimestr = "Windows System/Alternate Data Stream";
                                     delete[] fbuf;
-                                    adsba.append(QString(fsfile->name->name) + QString(":") + QString(fsattr->name));
+                                    adsba.append(QString(QString(fsfile->name->name) + QString(":") + QString(fsattr->name)).toUtf8());
                                     treeout.clear();
                                     treeout << adsba.toBase64() << ba.toBase64() << QString::number(fsattr->size) << "0" << "0" << "0" << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString(evalue + "-" + vvalue + "-" + pvalue + "-fa" + QString::number(fsattr->id) + "-a" + QString::number(fsfile->name->meta_addr)) << "10" << "0"; // NAME IN FIRST COLUMN
                                     nodedata.clear();
