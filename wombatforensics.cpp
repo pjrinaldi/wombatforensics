@@ -1858,8 +1858,8 @@ void WombatForensics::CloseCurrentCase()
         {
             if(affuser != NULL)
             {
-                //fuse_unmount(affuser);
-                //fuse_destroy(affuser);
+                fuse_unmount(affuser);
+                fuse_destroy(affuser);
 		//int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), MNT_FORCE);
                 //execle("/bin/umount", "/bin/umount", "-i", rel_mnt, NULL, NULL);
 		//int ures = umount2(mnt, lazy ? UMOUNT_DETACH : 0);
@@ -1879,10 +1879,10 @@ void WombatForensics::CloseCurrentCase()
 		//fprintf(stderr, "std:error: error releasing lock: %s\n", strerror(errno));
                 qDebug() << "affuser was null";
             }
-	    fuse_session_unmount(affusersession);
+	    //fuse_session_unmount(affusersession);
 	    //fuse_remove_signal_handlers(se);
-            QString xunmntstr = "fusermount -uz " + wombatvariable.imgdatapath;
-            qDebug() << "xunmntstr:" << xunmntstr;
+            //QString xunmntstr = "fusermount -uz " + wombatvariable.imgdatapath;
+            //qDebug() << "xunmntstr:" << xunmntstr;
             //QProcess::execute(xunmntstr, QStringList());
         }
         else if(imgext.contains("sfs")) // squashfuse

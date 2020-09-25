@@ -32,7 +32,6 @@
 #include <afflib/afflib.h>
 #include <fuse3/fuse.h>
 #include <fuse3/fuse_lowlevel.h>
-//#include "mount_util.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -42,20 +41,6 @@
 #include <pthread.h>
 #include <sys/fsuid.h>
 #include <paths.h>
-/*
- * Command line options
- *
- * We can't set default values for the char* fields here because
- * fuse_opt_parse would attempt to free() them when the user specifies
- * different values on the command line.
- */
-/*
-static struct options {
-	const char *filename;
-	const char *mntpt;
-	int show_help;
-} options;
-*/
 
 #define XCALLOC(type, num) ((type *) xcalloc ((num), sizeof(type)))
 #define XMALLOC(type, num) ((type *) xmalloc ((num) * sizeof(type)))
@@ -65,149 +50,6 @@ static AFFILE* afimage = NULL;
 static char* rawpath = NULL;
 static off_t rawsize = 0;
 static const char* rawext = ".raw";
-
-static uid_t oldfsuid;
-static gid_t oldfsgid;
-
-static void drop_privs(void)
-{
-	if (getuid() != 0) {
-		oldfsuid = setfsuid(getuid());
-		oldfsgid = setfsgid(getgid());
-	}
-}
-
-/*
-#define NO_TIMEOUT 500000
-
-#define MAX_STR_LEN 128
-#define TIME_FILE_NAME "current_time"
-#define TIME_FILE_INO 2
-#define GROW_FILE_NAME "growing"
-#define GROW_FILE_INO 3
-*/
-//static char time_file_contents[MAX_STR_LEN];
-//static size_t grow_file_size;
-
-/*
-#define OPTION(t, p)                           \
-    { t, offsetof(struct options, p), 1 }
-static const struct fuse_opt option_spec[] = {
-	OPTION("--name=%s", filename),
-	OPTION("--mntpt=%s", mntpt),
-	OPTION("-h", show_help),
-	OPTION("--help", show_help),
-	FUSE_OPT_END
-};*/
-
-static int lock_umount(void)
-{
-	const char *mtab_lock = _PATH_MOUNTED ".fuselock";
-	int mtablock;
-	int res;
-	struct stat mtab_stat;
-
-	/* /etc/mtab could be a symlink to /proc/mounts */
-	if (lstat(_PATH_MOUNTED, &mtab_stat) == 0 && S_ISLNK(mtab_stat.st_mode))
-		return -1;
-
-	mtablock = open(mtab_lock, O_RDWR | O_CREAT, 0600);
-	if (mtablock == -1) {
-		fprintf(stderr, "%s: unable to open fuse lock file: %s\n",
-			"affuse", strerror(errno));
-		return -1;
-	}
-	res = lockf(mtablock, F_LOCK, 0);
-	if (res < 0) {
-		fprintf(stderr, "%s: error getting lock: %s\n", "affuse",
-			strerror(errno));
-		close(mtablock);
-		return -1;
-	}
-
-	return mtablock;
-};
-
-static void unlock_umount(int mtablock)
-{
-	if (mtablock >= 0) {
-		int res;
-
-		res = lockf(mtablock, F_ULOCK, 0);
-		if (res < 0) {
-			fprintf(stderr, "%s: error releasing lock: %s\n",
-				"affuse", strerror(errno));
-		}
-		close(mtablock);
-	}
-};
-
-static int unmount_fuse_locked(const char *mnt, int quiet, int lazy)
-{
-	int res;
-	char *copy;
-	const char *last;
-	//int umount_flags = lazy ? UMOUNT_DETACH : 0;
-
-	/*if (getuid() != 0) {
-		res = may_unmount(mnt, quiet);
-		if (res == -1)
-			return -1;
-	}*/
-
-	copy = strdup(mnt);
-	if (copy == NULL) {
-		fprintf(stderr, "%s: failed to allocate memory\n", "affuse");
-		return -1;
-	}
-
-	//drop_privs();
-	//res = chdir_to_parent(copy, &last);
-	//restore_privs();
-	//if (res == -1)
-	//	goto out;
-
-	//if (umount_nofollow_support()) {
-	//	umount_flags |= UMOUNT_NOFOLLOW;
-	//} else {
-	//	res = check_is_mount(last, mnt, NULL);
-	//	if (res == -1)
-	//		goto out;
-	//}
-
-        res = umount2(last, 0);
-	//res = umount2(last, umount_flags);
-	if (res == -1 && !quiet) {
-		fprintf(stderr, "%s: failed to unmount %s: %s\n",
-			"affuse", mnt, strerror(errno));
-	}
-
-/*out:
-	free(copy);
-	if (res == -1)
-		return -1;
-
-	res = chdir("/");
-	if (res == -1) {
-		fprintf(stderr, "%s: failed to chdir to '/'\n", "affuse");
-		return -1;
-	}
-
-	return fuse_mnt_remove_mount("affuse", mnt);*/
-};
-
-static int unmount_fuse(const char *mnt, int quiet, int lazy)
-{
-	int res;
-	int mtablock = lock_umount();
-
-	res = unmount_fuse_locked(mnt, quiet, lazy);
-	unlock_umount(mtablock);
-
-	return res;
-};
-
-
 
 static void* xmalloc(size_t num)
 {
@@ -272,53 +114,36 @@ static int affuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
 	filler(buf, ".", NULL, 0, (fuse_fill_dir_flags)0);
 	filler(buf, "..", NULL, 0, (fuse_fill_dir_flags)0);
 	filler(buf, rawpath + 1, NULL, 0, (fuse_fill_dir_flags)0);
-	//filler(buf, options.filename, NULL, 0, 0);
 
 	return 0;
 };
 
 static int affuse_open(const char *path, struct fuse_file_info *fi)
 {
-	//if (strcmp(path+1, options.filename) != 0)
 	if(strcmp(path, rawpath) != 0)
 		return -ENOENT;
 
 	if ((fi->flags & O_ACCMODE) != O_RDONLY)
 		return -EACCES;
 
-	//af = af_open(options.filename, int flags,int mode);
 	return 0;
 };
 
 static int affuse_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
-	//size_t len;
 	int res = 0;
 	(void) fi;
-	//if(strcmp(path+1, options.filename) != 0)
 	if(strcmp(path, rawpath) != 0)
 		return -ENOENT;
 	af_seek(afimage, (uint64_t)offset, SEEK_SET);
 	errno = 0;
 	res = af_read(afimage, (unsigned char*)buf, (int)size);
 	return res;
-	/*
-	len = strlen(options.contents);
-	if (offset < len) {
-		if (offset + size > len)
-			size = len - offset;
-		memcpy(buf, options.contents + offset, size);
-	} else
-		size = 0;
-
-	return size;
-	*/
 };
 
 static void affuse_destroy(void* param)
 {
     af_close(afimage);
-    //free(rawpath);
     XFREE(rawpath);
     return;
 };
@@ -332,54 +157,11 @@ static const struct fuse_operations affuse_oper = {
 	.destroy	= affuse_destroy,
 };
 
-/*
-static void show_help(const char *progname)
-{
-	printf("usage: %s [options] <mountpoint>\n\n", progname);
-	printf("File-system specific options:\n"
-	       "    --name=<s>          Name of the \"hello\" file\n"
-	       "                        (default: \"hello\")\n"
-	       "    --mntpt=<s>      Contents \"hello\" file\n"
-	       "                        (default \"Hello, World!\\n\")\n"
-	       "\n");
-};
-*/
-/*
-static void update_fs(void) {
-	static int count = 0;
-	struct tm *now;
-	time_t t;
-	t = time(NULL);
-	now = localtime(&t);
-	//assert(now != NULL);
-
-	int time_file_size = strftime(time_file_contents, MAX_STR_LEN,
-			"The current time is %H:%M:%S\n", now);
-	//assert(time_file_size != 0);
-
-	grow_file_size = count++;
-};
-
-static void* update_fs_loop(void *data) {
-	struct fuse *fuse = (struct fuse*) data;
-
-	while (1) {
-		update_fs();
-		/*
-		if (!options.no_notify) {
-			assert(invalidate(fuse, "/" TIME_FILE_NAME) == 0);
-			assert(invalidate(fuse, "/" GROW_FILE_NAME) == 0);
-		}
-		*/
-/*		sleep(1);
-	}
-	return NULL;
-};
-*/
 void* fuselooper(void *data)
 {
     struct fuse* fuse = (struct fuse*) data;
-    int ret = fuse_loop(fuse);
+    fuse_loop(fuse);
+    //int ret = fuse_loop(fuse);
     //printf("fuse loop return: %d\n", ret);
     //pthread_exit(NULL);
 };
@@ -402,12 +184,9 @@ void AffFuser(QString imgpath, QString imgfile)
     strcpy(ipath, imgpath.toStdString().c_str());
     char* iname = new char[imgfile.toStdString().size() + 1];
     strcpy(iname, imgfile.toStdString().c_str());
-    //progname = strdup("./affuse");
     fargv[0] = "./affuse";
     fargv[1] = "-o";
     fargv[2] = "auto_unmount";
-    //fargv[1] = ipath;
-    //fargv[1] = "-s";
     fargc = 3;
     //for(int i=0; i < fargc; i++)
     //    printf("fargv[%d]: %s\n", i, fargv[i]);
@@ -416,25 +195,20 @@ void AffFuser(QString imgpath, QString imgfile)
     printf("afpath: %s\n", afpath);
     afbasename = basename(iname);
     rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
-    //rawpathlen = 1 + strlen(ipath) + strlen(afbasename) + strlen(rawext) + 1;
     rawpath = XCALLOC(char, rawpathlen);
     rawpath[0] = '/';
-    //strcat(rawpath, ipath);
-    //rawpath[0] = '/';
     strcat(rawpath, afbasename);
     strcat(rawpath, rawext);
     rawpath[rawpathlen - 1] = 0;
-    //printf("rawpath: %s\n", rawpath);
     XFREE(afpath);
     rawsize = af_get_imagesize(afimage);
     
     struct fuse_loop_config config;
     config.clone_fd = 0;
     config.max_idle_threads = 5;
-    //struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
     args = FUSE_ARGS_INIT(fargc, fargv);
     //struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
-    struct fuse* affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
+    affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
     if(affuser == NULL)
         qDebug() << "affuser new error.";
     ret = fuse_mount(affuser, imgpath.toStdString().c_str());
