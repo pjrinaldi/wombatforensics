@@ -27,7 +27,9 @@
 
 #define FUSE_USE_VERSION 31
 
-#include <afflib/afflib.h>
+//#include <afflib/afflib.h>
+#include <aff4/aff4.h>
+#include <aff4/aff4-c.h>
 #include <fuse.h>
 #include <stdio.h>
 #include <string.h>
@@ -53,7 +55,8 @@ static struct options {
 #define XMALLOC(type, num) ((type *) xmalloc ((num) * sizeof(type)))
 #define XFREE(stale) do { if(stale) { free ((void*) stale); stale = 0; } } while (0)
 
-static AFFILE* afimage = NULL;
+int aff4handle = 0;
+//static AFFILE* afimage = NULL;
 static char* rawpath = NULL;
 static off_t rawsize = 0;
 static const char* rawext = ".raw";
@@ -134,9 +137,9 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	if (strcmp(path, "/") != 0)
 		return -ENOENT;
 
-	filler(buf, ".", NULL, 0, 0);
-	filler(buf, "..", NULL, 0, 0);
-	filler(buf, rawpath + 1, NULL, 0, 0);
+	filler(buf, ".", NULL, 0, (fuse_fill_dir_flags)0);
+	filler(buf, "..", NULL, 0, (fuse_fill_dir_flags)0);
+	filler(buf, rawpath + 1, NULL, 0, (fuse_fill_dir_flags)0);
 	//filler(buf, options.filename, NULL, 0, 0);
 
 	return 0;
@@ -164,9 +167,12 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
 	//if(strcmp(path+1, options.filename) != 0)
 	if(strcmp(path, rawpath) != 0)
 		return -ENOENT;
-	af_seek(afimage, (uint64_t)offset, SEEK_SET);
+	//af_seek(afimage, (uint64_t)offset, SEEK_SET);
 	errno = 0;
-	res = af_read(afimage, (unsigned char*)buf, (int)size);
+	res = AFF4_read(aff4handle, (uint64_t)offset, (void*)buf, (int)size);
+	//LIBAFF4_API int AFF4_read(int handle, uint64_t offset, void* buffer, int length);
+	//res = af_read(afimage, (unsigned char*)buf, (int)size);
+	printf("read return value: %d", res); 
 	return res;
 	/*
 	len = strlen(options.contents);
@@ -183,18 +189,19 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
 
 static void hello_destroy(void* param)
 {
-    af_close(afimage);
+    AFF4_close(aff4handle);
+    //af_close(afimage);
     //free(rawpath);
     XFREE(rawpath);
     return;
 }
 
 static const struct fuse_operations hello_oper = {
-	.init           = hello_init,
 	.getattr	= hello_getattr,
-	.readdir	= hello_readdir,
 	.open		= hello_open,
 	.read		= hello_read,
+	.readdir	= hello_readdir,
+	.init           = hello_init,
 	.destroy	= hello_destroy,
 };
 
@@ -265,13 +272,15 @@ int main(int argc, char *argv[])
 		//assert(fuse_opt_add_arg(&args, "--help") == 0);
 		//args.argv[0][0] = '\0';
 	}
-
-	afimage = af_open(argv[1], O_RDONLY|O_EXCL, 0);
+	AFF4_init();
+	printf("aff file: %s\n", argv[1]);
+	aff4handle = AFF4_open(argv[1]); 
+	//afimage = af_open(argv[1], O_RDONLY|O_EXCL, 0);
 	//afimage = af_open("ntfs1-gen1.aff", O_RDONLY|O_EXCL, 0);
 	//afpath = xstrdup("mntpt");
 	afpath = xstrdup(argv[2]);
-	//printf("afpath: %s\n", afpath);
-	afbasename = argv[1];
+	printf("afpath: %s\n", afpath);
+	afbasename = basename(argv[1]);
 	rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
 	//rawpath = "/";
 	rawpath = XCALLOC(char, rawpathlen);
@@ -281,10 +290,11 @@ int main(int argc, char *argv[])
 	strcat(rawpath, rawext);
 	//printf("rawpath: %s\n", rawpath);
 	rawpath[rawpathlen - 1] = 0;
-	//printf("rawpath: %s\n", rawpath);
+	printf("rawpath: %s\n", rawpath);
 	XFREE(afpath);
+	rawsize = AFF4_object_size(aff4handle);
 	//free(afpath);
-	rawsize = af_get_imagesize(afimage);
+	//rawsize = af_get_imagesize(afimage);
 
 	ret = fuse_main(fargc, fargv, &hello_oper, NULL);
 	//ret = fuse_main(args.argc, args.argv, &hello_oper, NULL);
