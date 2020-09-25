@@ -4,7 +4,7 @@ linux:CONFIG += debug_and_release debug_and_release_target qt x11 build_all c++1
 DEFINES += MAGICKCORE_HDRI_ENABLE=0
 DEFINES += MAGICKCORE_QUANTUM_DEPTH=16
 DEFINES += _FILE_OFFSET_BITS=64
-PRE_TARGETDEPS += ./libsquashfuse.a
+#PRE_TARGETDEPS += ./libsquashfuse.a
 #linux:CONFIG += release qt x11 build_all c++11
 INCLUDEPATH += /usr/include/tsk/
 INCLUDEPATH += /usr/include/tsk/auto/
@@ -62,7 +62,7 @@ SOURCES = main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp glob
 RESOURCES += wombatforensics.qrc
 release: DESTDIR = release
 debug:   DESTDIR = debug
-linux:LIBS = -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -L./libsquashfuse.a `pkg-config fuse3 --cflags --libs`
+linux:LIBS = -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -lsquashfuse `pkg-config fuse3 --cflags --libs`
 #linux:LIBS = -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -llnk -lfwnt -lzip -ltre -lcrypto -lz -L. -lscalpel -L./revit.a -lafflib
 #linux:LIBS = -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -ltre -L. -lscalpel -L/usr/local/lib/ldefinitions_parser -L/usr/local/lib/linput_analyzer -L/usr/local/lib/linput_handler -L/usr/local/lib/lmedia_access -L/usr/local/lib/loutput_handler -L/usr/local/lib/lstate_hierarchy -L/usr/local/lib/lnotify
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
