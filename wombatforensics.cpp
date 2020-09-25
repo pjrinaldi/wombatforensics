@@ -1868,6 +1868,7 @@ void WombatForensics::CloseCurrentCase()
             }
             else
             {
+		//pthread_cancel(fusethread);
 		//setfsuid(getuid());
 		//setfsgid(getgid());
 	        //umask(033);
@@ -1878,9 +1879,11 @@ void WombatForensics::CloseCurrentCase()
 		//fprintf(stderr, "std:error: error releasing lock: %s\n", strerror(errno));
                 qDebug() << "affuser was null";
             }
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
+	    fuse_session_unmount(affusersession);
+	    //fuse_remove_signal_handlers(se);
+            QString xunmntstr = "fusermount -uz " + wombatvariable.imgdatapath;
             qDebug() << "xunmntstr:" << xunmntstr;
-            QProcess::execute(xunmntstr, QStringList());
+            //QProcess::execute(xunmntstr, QStringList());
         }
         else if(imgext.contains("sfs")) // squashfuse
         {

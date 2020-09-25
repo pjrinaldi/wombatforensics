@@ -31,6 +31,7 @@
 
 #include <afflib/afflib.h>
 #include <fuse3/fuse.h>
+#include <fuse3/fuse_lowlevel.h>
 //#include "mount_util.h"
 #include <stdio.h>
 #include <string.h>
@@ -380,10 +381,13 @@ void* fuselooper(void *data)
     struct fuse* fuse = (struct fuse*) data;
     int ret = fuse_loop(fuse);
     //printf("fuse loop return: %d\n", ret);
+    //pthread_exit(NULL);
 };
 
 struct fuse_args args;
 struct fuse* affuser;
+struct fuse_session* affusersession;
+pthread_t fusethread;
 
 void AffFuser(QString imgpath, QString imgfile)
 {
@@ -400,9 +404,11 @@ void AffFuser(QString imgpath, QString imgfile)
     strcpy(iname, imgfile.toStdString().c_str());
     //progname = strdup("./affuse");
     fargv[0] = "./affuse";
+    fargv[1] = "-o";
+    fargv[2] = "auto_unmount";
     //fargv[1] = ipath;
     //fargv[1] = "-s";
-    fargc = 1;
+    fargc = 3;
     //for(int i=0; i < fargc; i++)
     //    printf("fargv[%d]: %s\n", i, fargv[i]);
     afimage = af_open(iname, O_RDONLY|O_EXCL,0);
@@ -440,10 +446,10 @@ void AffFuser(QString imgpath, QString imgfile)
     //int pret = pthread_create(&updater, NULL, update_fs_loop, (void *) affuser);
     //if (pret != 0)
         //fprintf(stderr, "pthread_create failed with %s\n", strerror(ret));
-     
-    struct fuse_session* se = fuse_get_session(affuser);
-    int retsh = fuse_set_signal_handlers(se);
+    affusersession = fuse_get_session(affuser); 
+    //struct fuse_session* se = fuse_get_session(affuser);
+    //int retsh = fuse_set_signal_handlers(se);
     //qDebug() << "fuse session signal handlers:" << retsh;
-    pthread_t threadId;
-    int perr = pthread_create(&threadId, NULL, fuselooper, (void *) affuser);
+    //pthread_t threadId;
+    int perr = pthread_create(&fusethread, NULL, fuselooper, (void *) affuser);
 };

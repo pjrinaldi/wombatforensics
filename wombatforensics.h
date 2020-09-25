@@ -330,6 +330,7 @@ private:
     QString digtotalcountstring = "";
     QString currentreportpath = "";
     QHash<QString, int>carvecounthash;
+    //pthread_t fusethread;
 };
 
 #endif // WOMBATFORENSICS_H
