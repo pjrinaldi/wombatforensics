@@ -42,6 +42,8 @@ void AddEvidenceDialog::SelectEvidence()
             ui->evidencelist->addItem(evidfilename);
             if(evidfilename.toLower().endsWith(".sfs"))
             {
+                qDebug() << "place squashfuse test stuff here...";
+                /*
                 // need to mount and provide access to the raw dd file...
                 QString mntstr = "squashfuse -s " + evidfilename + " " + wombatvariable.imgdatapath;
                 //qDebug() << "mntstr:" << mntstr;
@@ -54,6 +56,7 @@ void AddEvidenceDialog::SelectEvidence()
                 //qDebug() << "evidfilename:" << evidfilename;
                 evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last().split(".sfs").first() + ".dd";
                 xmntprocess->waitForFinished(-1);
+                */
             }
             ui->startbutton->setEnabled(true);
             //qDebug() << "evidfilename:" << evidfilename;

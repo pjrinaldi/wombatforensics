@@ -168,7 +168,7 @@ void* fuselooper(void *data)
 
 struct fuse_args args;
 struct fuse* affuser;
-struct fuse_session* affusersession;
+//struct fuse_session* affusersession;
 pthread_t fusethread;
 
 void AffFuser(QString imgpath, QString imgfile)
@@ -207,20 +207,13 @@ void AffFuser(QString imgpath, QString imgfile)
     config.clone_fd = 0;
     config.max_idle_threads = 5;
     args = FUSE_ARGS_INIT(fargc, fargv);
-    //struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
     affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
     if(affuser == NULL)
         qDebug() << "affuser new error.";
     ret = fuse_mount(affuser, imgpath.toStdString().c_str());
-    //qDebug() << "fuse mount return:" << ret;
     int retd = fuse_daemonize(1);
-    //qDebug() << "fuse daemonize return:" << retd;
 
-    //pthread_t updater;     // Start thread to update file contents
-    //int pret = pthread_create(&updater, NULL, update_fs_loop, (void *) affuser);
-    //if (pret != 0)
-        //fprintf(stderr, "pthread_create failed with %s\n", strerror(ret));
-    affusersession = fuse_get_session(affuser); 
+    //affusersession = fuse_get_session(affuser); 
     //struct fuse_session* se = fuse_get_session(affuser);
     //int retsh = fuse_set_signal_handlers(se);
     //qDebug() << "fuse session signal handlers:" << retsh;

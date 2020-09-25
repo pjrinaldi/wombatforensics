@@ -28,10 +28,9 @@
  */ 
 
 #include <squashfuse.h>
-//#include "squashfuse.h"
 #include "fuseprivate.h"
 
-#include "nonstd.h"
+#include <nonstd.h>
 
 #include <errno.h>
 #include <stddef.h>
@@ -50,7 +49,7 @@ static sqfs_err sqfs_hl_lookup(sqfs **fs, sqfs_inode *inode,
 		const char *path) {
 	bool found;
 	
-	sqfs_hl *hl = fuse_get_context()->private_data;
+	sqfs_hl *hl = (sqfs_hl*)fuse_get_context()->private_data;
 	*fs = &hl->fs;
 	if (inode)
 		*inode = hl->root; /* copy */
@@ -92,7 +91,7 @@ static int sqfs_hl_op_opendir(const char *path, struct fuse_file_info *fi) {
 	sqfs *fs;
 	sqfs_inode *inode;
 	
-	inode = malloc(sizeof(*inode));
+	inode = (sqfs_inode*)malloc(sizeof(*inode));
 	if (!inode)
 		return -ENOMEM;
 	
@@ -153,7 +152,7 @@ static int sqfs_hl_op_open(const char *path, struct fuse_file_info *fi) {
 	if (fi->flags & (O_WRONLY | O_RDWR))
 		return -EROFS;
 	
-	inode = malloc(sizeof(*inode));
+	inode = (sqfs_inode*)malloc(sizeof(*inode));
 	if (!inode)
 		return -ENOMEM;
 	
@@ -252,7 +251,7 @@ static int sqfs_hl_op_getxattr(const char *path, const char *name,
 static sqfs_hl *sqfs_hl_open(const char *path, size_t offset) {
 	sqfs_hl *hl;
 	
-	hl = malloc(sizeof(*hl));
+	hl = (sqfs_hl*)malloc(sizeof(*hl));
 	if (!hl) {
 		perror("Can't allocate memory");
 	} else {
@@ -320,3 +319,5 @@ int main(int argc, char *argv[]) {
 	fuse_opt_free_args(&args);
 	return ret;
 }*/
+
+//SquashFuse(wombatvariable.imgdatapath, elist.at(3));

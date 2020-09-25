@@ -1,4 +1,5 @@
 #include "opencase.h"
+#include "sqfsfuse.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -20,6 +21,9 @@ void PopulateTreeModel(QString evidstring)
     evidfile.close();
     if(elist.at(3).endsWith(".sfs"))
     {
+        //SquashFuse(wombatvariable.imgdatapath, elist.at(3));
+        qDebug() << "push squashfuse function calls here...";
+        /*
         QProcess builder;
         builder.setProcessChannelMode(QProcess::MergedChannels);
         builder.start("squashfuse", QStringList() << "-s" << elist.at(3) << wombatvariable.imgdatapath);
