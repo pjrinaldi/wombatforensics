@@ -28,6 +28,7 @@
  */ 
 
 #include <squashfuse.h>
+//#include "squashfuse.h"
 #include "fuseprivate.h"
 
 #include "nonstd.h"
@@ -62,18 +63,18 @@ static sqfs_err sqfs_hl_lookup(sqfs **fs, sqfs_inode *inode,
 			return SQFS_ERR;
 	}
 	return SQFS_OK;
-}
+};
 
 
 static void sqfs_hl_op_destroy(void *user_data) {
 	sqfs_hl *hl = (sqfs_hl*)user_data;
 	sqfs_destroy(&hl->fs);
 	free(hl);
-}
+};
 
 static void *sqfs_hl_op_init(struct fuse_conn_info *conn) {
 	return fuse_get_context()->private_data;
-}
+};
 
 static int sqfs_hl_op_getattr(const char *path, struct stat *st) {
 	sqfs *fs;
@@ -85,7 +86,7 @@ static int sqfs_hl_op_getattr(const char *path, struct stat *st) {
 		return -ENOENT;
 	
 	return 0;
-}
+};
 
 static int sqfs_hl_op_opendir(const char *path, struct fuse_file_info *fi) {
 	sqfs *fs;
@@ -107,14 +108,14 @@ static int sqfs_hl_op_opendir(const char *path, struct fuse_file_info *fi) {
 	
 	fi->fh = (intptr_t)inode;
 	return 0;
-}
+};
 
 static int sqfs_hl_op_releasedir(const char *path,
 		struct fuse_file_info *fi) {
 	free((sqfs_inode*)(intptr_t)fi->fh);
 	fi->fh = 0;
 	return 0;
-}
+};
 
 static int sqfs_hl_op_readdir(const char *path, void *buf,
 		fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
@@ -143,7 +144,7 @@ static int sqfs_hl_op_readdir(const char *path, void *buf,
 	if (err)
 		return -EIO;
 	return 0;
-}
+};
 
 static int sqfs_hl_op_open(const char *path, struct fuse_file_info *fi) {
 	sqfs *fs;
@@ -169,17 +170,17 @@ static int sqfs_hl_op_open(const char *path, struct fuse_file_info *fi) {
 	fi->fh = (intptr_t)inode;
 	fi->keep_cache = 1;
 	return 0;
-}
+};
 
 static int sqfs_hl_op_create(const char* unused_path, mode_t unused_mode,
 		struct fuse_file_info *unused_fi) {
 	return -EROFS;
-}
+};
 static int sqfs_hl_op_release(const char *path, struct fuse_file_info *fi) {
 	free((sqfs_inode*)(intptr_t)fi->fh);
 	fi->fh = 0;
 	return 0;
-}
+};
 
 static int sqfs_hl_op_read(const char *path, char *buf, size_t size,
 		off_t off, struct fuse_file_info *fi) {
@@ -191,7 +192,7 @@ static int sqfs_hl_op_read(const char *path, char *buf, size_t size,
 	if (sqfs_read_range(fs, inode, off, &osize, buf))
 		return -EIO;
 	return osize;
-}
+};
 
 static int sqfs_hl_op_readlink(const char *path, char *buf, size_t size) {
 	sqfs *fs;
@@ -205,7 +206,7 @@ static int sqfs_hl_op_readlink(const char *path, char *buf, size_t size) {
 		return -EIO;
 	}	
 	return 0;
-}
+};
 
 static int sqfs_hl_op_listxattr(const char *path, char *buf, size_t size) {
 	sqfs *fs;
@@ -219,7 +220,7 @@ static int sqfs_hl_op_listxattr(const char *path, char *buf, size_t size) {
 	if (ferr)
 		return -ferr;
 	return size;
-}
+};
 
 static int sqfs_hl_op_getxattr(const char *path, const char *name,
 		char *value, size_t size
@@ -246,7 +247,7 @@ static int sqfs_hl_op_getxattr(const char *path, const char *name,
 	if (size != 0 && size < real)
 		return -ERANGE;
 	return real;
-}
+};
 
 static sqfs_hl *sqfs_hl_open(const char *path, size_t offset) {
 	sqfs_hl *hl;
@@ -267,7 +268,7 @@ static sqfs_hl *sqfs_hl_open(const char *path, size_t offset) {
 		free(hl);
 	}
 	return NULL;
-}
+};
 
 /*
 int main(int argc, char *argv[]) {
