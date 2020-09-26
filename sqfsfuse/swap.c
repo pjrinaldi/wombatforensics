@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,41 +22,32 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#include "swap.h"
 
-#include "squashfuse.h"
+#define SWAP(BITS) \
+	void sqfs_swapin##BITS(uint##BITS##_t *v) { \
+		int i; \
+		uint8_t *c = (uint8_t*)v; \
+		uint##BITS##_t r = 0; \
+		for (i = sizeof(*v) - 1; i >= 0; --i) { \
+			r <<= 8; \
+			r += c[i]; \
+		} \
+		*v = r; \
+	}
 
-#include <fuse.h>
+SWAP(16)
+SWAP(32)
+SWAP(64)
+#undef SWAP
 
-#include <sys/stat.h>
+void sqfs_swapin16_internal(__le16 *v) { sqfs_swapin16((uint16_t*)v); }
+void sqfs_swapin32_internal(__le32 *v) { sqfs_swapin32((uint32_t*)v); }
+void sqfs_swapin64_internal(__le64 *v) { sqfs_swapin64((uint64_t*)v); }
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
-/* Common functions for FUSE high- and low-level clients */
-
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
-
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
-
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
-
-/* Parse command-line arguments */
-typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
-
-#if defined( __cplusplus )
+void sqfs_swap16(uint16_t *n) {
+	*n = (*n >> 8) + (*n << 8);
 }
-#endif
-#endif
+
+#include "squashfs_fs.h"
+#include "swap.c.inc"

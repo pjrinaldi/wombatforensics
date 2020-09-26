@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,41 +22,41 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#include "config.h"
 
-#include "squashfuse.h"
-
-#include <fuse.h>
+#define SQFEATURE NONSTD_S_IFSOCK_DEF
+#include "nonstd-internal.h"
 
 #include <sys/stat.h>
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
-/* Common functions for FUSE high- and low-level clients */
+#include "common.h"
+#include "squashfs_fs.h"
 
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
-
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
-
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
-
-/* Parse command-line arguments */
-typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
-
-#if defined( __cplusplus )
+/* S_IF* are not standard */
+sqfs_mode_t sqfs_mode(int inode_type) {
+	switch (inode_type) {
+		case SQUASHFS_DIR_TYPE:
+		case SQUASHFS_LDIR_TYPE:
+			return S_IFDIR;
+		case SQUASHFS_REG_TYPE:
+		case SQUASHFS_LREG_TYPE:
+			return S_IFREG;
+		case SQUASHFS_SYMLINK_TYPE:
+		case SQUASHFS_LSYMLINK_TYPE:
+			return S_IFLNK;
+		case SQUASHFS_BLKDEV_TYPE:
+		case SQUASHFS_LBLKDEV_TYPE:
+			return S_IFBLK;
+		case SQUASHFS_CHRDEV_TYPE:
+		case SQUASHFS_LCHRDEV_TYPE:
+			return S_IFCHR;
+		case SQUASHFS_FIFO_TYPE:
+		case SQUASHFS_LFIFO_TYPE:
+			return S_IFIFO;
+		case SQUASHFS_SOCKET_TYPE:
+		case SQUASHFS_LSOCKET_TYPE:
+			return S_IFSOCK;
+	}
+	return 0;
 }
-#endif
-#endif
+

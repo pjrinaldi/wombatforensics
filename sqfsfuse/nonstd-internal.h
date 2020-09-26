@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,41 +22,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#define CHANGE_XOPEN_SOURCE 1
+#define CHANGE_DARWIN_C_SOURCE 2
+#define CHANGE_BSD_SOURCE 3
+#define CHANGE_GNU_SOURCE 4
+#define CHANGE_POSIX_C_SOURCE 5
+#define CHANGE_NETBSD_SOURCE 6
 
-#include "squashfuse.h"
-
-#include <fuse.h>
-
-#include <sys/stat.h>
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-/* Common functions for FUSE high- and low-level clients */
-
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
-
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
-
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
-
-/* Parse command-line arguments */
-typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
-
-#if defined( __cplusplus )
-}
-#endif
+#if SQFEATURE == CHANGE_XOPEN_SOURCE
+	#define _XOPEN_SOURCE 500
+#elif SQFEATURE == CHANGE_NETBSD_SOURCE
+	#define _NETBSD_SOURCE
+#elif SQFEATURE == CHANGE_DARWIN_C_SOURCE
+	#define _DARWIN_C_SOURCE
+#elif SQFEATURE == CHANGE_BSD_SOURCE
+	#define _BSD_SOURCE
+#elif SQFEATURE == CHANGE_GNU_SOURCE
+	#define _GNU_SOURCE
+#elif SQFEATURE == CHANGE_POSIX_C_SOURCE
+	#undef _POSIX_C_SOURCE
 #endif

@@ -22,39 +22,52 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#ifndef SQFS_TRAVERSE_H
+#define SQFS_TRAVERSE_H
 
-#include "squashfuse.h"
+#include "common.h"
 
-#include <fuse.h>
-
-#include <sys/stat.h>
+#include "dir.h"
+#include "stack.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-/* Common functions for FUSE high- and low-level clients */
-
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
-
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
-
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
-
-/* Parse command-line arguments */
 typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
+	bool dir_end;
+	sqfs_dir_entry entry;
+	char *path;
+	
+	
+	/* private */
+	int state;	
+	sqfs *fs;
+	sqfs_name namebuf;
+	sqfs_stack stack;
+	
+	size_t path_size, path_cap;
+	size_t path_last_size;
+} sqfs_traverse;
+
+/* Begin a recursive traversal of a filesystem tree.
+   Every sub-item of the given inode will be traversed in-order, but not
+   this inode itself. */
+sqfs_err sqfs_traverse_open(sqfs_traverse *trv, sqfs *fs, sqfs_inode_id iid);
+sqfs_err sqfs_traverse_open_inode(sqfs_traverse *trv, sqfs *fs,
+	sqfs_inode *inode);
+
+/* Clean up at any point during or after a traversal */
+void sqfs_traverse_close(sqfs_traverse *trv);
+
+/* Get the next item in the traversal. An item may be:
+   - A directory entry, in which case trv->entry will be filled
+	 - A marker that a directory is finished, in which case trv->dir_end will
+     be true.
+   Returns false if there are no more items. */
+bool sqfs_traverse_next(sqfs_traverse *trv, sqfs_err *err);
+
+/* Don't recurse into the directory just returned. */
+sqfs_err sqfs_traverse_prune(sqfs_traverse *trv);
 
 #if defined( __cplusplus )
 }

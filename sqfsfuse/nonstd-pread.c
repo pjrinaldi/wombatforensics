@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,41 +22,30 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#include "config.h"
 
-#include "squashfuse.h"
+#ifdef _WIN32
+	#include "win32.h"
 
-#include <fuse.h>
+	ssize_t sqfs_pread(HANDLE file, void *buf, size_t count, sqfs_off_t off) {
+		DWORD bread;
+		OVERLAPPED ov = { 0 };
+		ov.Offset = (DWORD)off;
+		ov.OffsetHigh = (DWORD)(off >> 32);
 
-#include <sys/stat.h>
+		if (ReadFile(file, buf, count, &bread, &ov) == FALSE)
+			return -1;
+		return bread;
+	}
+#else
+	#define SQFEATURE NONSTD_PREAD_DEF
+	#include "nonstd-internal.h"
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
-/* Common functions for FUSE high- and low-level clients */
+	#include <unistd.h>
 
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
+	#include "common.h"
 
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
-
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
-
-/* Parse command-line arguments */
-typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
-
-#if defined( __cplusplus )
-}
-#endif
+	ssize_t sqfs_pread(sqfs_fd_t fd, void *buf, size_t count, sqfs_off_t off) {
+		return pread(fd, buf, count, off);
+	}
 #endif

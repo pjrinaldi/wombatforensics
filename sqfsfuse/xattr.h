@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,39 +22,57 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#ifndef SQFS_XATTR_H
+#define SQFS_XATTR_H
 
-#include "squashfuse.h"
+#include "common.h"
 
-#include <fuse.h>
-
-#include <sys/stat.h>
+#include "squashfs_fs.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-/* Common functions for FUSE high- and low-level clients */
 
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
+/* Initialize xattr handling for this fs */
+sqfs_err sqfs_xattr_init(sqfs *fs);
 
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
 
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
-
-/* Parse command-line arguments */
+/* xattr iterator */
 typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
+	sqfs *fs;	
+	int cursors;
+	sqfs_md_cursor c_name, c_vsize, c_val, c_next;
+	
+	size_t remain;
+	struct squashfs_xattr_id info;
+	
+	uint16_t type;
+	bool ool;
+	struct squashfs_xattr_entry entry;
+	struct squashfs_xattr_val val;
+} sqfs_xattr;
+
+/* Get xattr iterator for this inode */
+sqfs_err sqfs_xattr_open(sqfs *fs, sqfs_inode *inode, sqfs_xattr *x);
+
+/* Get new xattr entry. Call while x->remain > 0 */
+sqfs_err sqfs_xattr_read(sqfs_xattr *x);
+
+/* Accessors on xattr entry. No null-termination! */
+size_t sqfs_xattr_name_size(sqfs_xattr *x);
+sqfs_err sqfs_xattr_name(sqfs_xattr *x, char *name, bool prefix);
+sqfs_err sqfs_xattr_value_size(sqfs_xattr *x, size_t *size);
+/* Yield first 'size' bytes */
+sqfs_err sqfs_xattr_value(sqfs_xattr *x, void *buf);
+
+/* Find an xattr entry */
+sqfs_err sqfs_xattr_find(sqfs_xattr *x, const char *name, bool *found);
+
+/* Helper to find an xattr value on an inode.
+   Returns in 'size' the size of the xattr, if found, or zero if not found.
+   Does not touch 'buf' if it's not big enough. */
+sqfs_err sqfs_xattr_lookup(sqfs *fs, sqfs_inode *inode, const char *name,
+	void *buf, size_t *size);
 
 #if defined( __cplusplus )
 }

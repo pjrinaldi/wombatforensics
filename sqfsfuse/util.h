@@ -22,39 +22,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#ifndef SQFS_UTIL_H
+#define SQFS_UTIL_H
 
-#include "squashfuse.h"
+#include "common.h"
 
-#include <fuse.h>
-
-#include <sys/stat.h>
+#include <stdio.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-/* Common functions for FUSE high- and low-level clients */
+/* Open a file, and optionally print a message on failure */
+sqfs_err sqfs_fd_open(const char *path, sqfs_fd_t *fd, bool print);
 
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
+/* Close a file */
+void sqfs_fd_close(sqfs_fd_t fd);
 
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
-
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
-
-/* Parse command-line arguments */
-typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
+/* Open a filesystem and print errors to stderr. */
+sqfs_err sqfs_open_image(sqfs *fs, const char *image, size_t offset);
 
 #if defined( __cplusplus )
 }

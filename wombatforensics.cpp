@@ -1,5 +1,6 @@
 #include "wombatforensics.h"
 #include "fusefunctions.h"
+#include "ewffuse.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -1322,7 +1323,8 @@ void WombatForensics::PrepareEvidenceImage()
 		    QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
 		    QDir dir;
 		    dir.mkpath(tmpstring);
-		    mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
+		    //mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
+                    qDebug() << "should do ewf fuse calls here.";
 		}
 	    }
 	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW

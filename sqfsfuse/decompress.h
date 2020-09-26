@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,39 +22,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#ifndef SQFS_DECOMPRESS_H
+#define SQFS_DECOMPRESS_H
 
-#include "squashfuse.h"
-
-#include <fuse.h>
-
-#include <sys/stat.h>
+#include "common.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-/* Common functions for FUSE high- and low-level clients */
+#define SQFS_COMP_UNKNOWN	0
+#define SQFS_COMP_MAX		16
 
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
+typedef int sqfs_compression_type;
 
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
+char *sqfs_compression_name(sqfs_compression_type type);
 
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
+/* put supported compression types into an array */
+void sqfs_compression_supported(sqfs_compression_type *types);
 
-/* Parse command-line arguments */
-typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
+
+typedef sqfs_err (*sqfs_decompressor)(void *in, size_t insz,
+	void *out, size_t *outsz);
+
+sqfs_decompressor sqfs_decompressor_get(sqfs_compression_type type);
 
 #if defined( __cplusplus )
 }

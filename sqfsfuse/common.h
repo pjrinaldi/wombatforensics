@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,39 +22,53 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#ifndef SQFS_COMMON_H
+#define SQFS_COMMON_H
 
-#include "squashfuse.h"
+#include "config.h"
 
-#include <fuse.h>
-
-#include <sys/stat.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <sys/types.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-/* Common functions for FUSE high- and low-level clients */
 
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
+#ifdef _WIN32
+	#include <win32.h>
+#else
+	typedef mode_t sqfs_mode_t;
+	typedef uid_t sqfs_id_t;
+	typedef off_t sqfs_off_t;
+	typedef int sqfs_fd_t;
+#endif
 
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
+typedef enum {
+	SQFS_OK,
+	SQFS_ERR,
+	SQFS_BADFORMAT,		/* unsupported file format */
+	SQFS_BADVERSION,	/* unsupported squashfs version */
+	SQFS_BADCOMP,		/* unsupported compression method */
+	SQFS_UNSUP			/* unsupported feature */
+} sqfs_err;
 
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
+#define SQFS_INODE_ID_BYTES 6
+typedef uint64_t sqfs_inode_id;
+typedef uint32_t sqfs_inode_num;
 
-/* Parse command-line arguments */
+typedef struct sqfs sqfs;
+typedef struct sqfs_inode sqfs_inode;
+
 typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
+	size_t size;
+	void *data;
+} sqfs_block;
+
+typedef struct {
+	sqfs_off_t block;
 	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
+} sqfs_md_cursor;
 
 #if defined( __cplusplus )
 }

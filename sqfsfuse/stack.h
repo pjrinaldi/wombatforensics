@@ -22,39 +22,37 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_FUSEPRIVATE_H
-#define SQFS_FUSEPRIVATE_H
+#ifndef SQFS_STACK_H
+#define SQFS_STACK_H
 
-#include "squashfuse.h"
-
-#include <fuse.h>
-
-#include <sys/stat.h>
+#include "common.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-/* Common functions for FUSE high- and low-level clients */
+typedef void (*sqfs_stack_free_t)(void *v);
 
-/* Fill in a stat structure. Does not set st_ino */
-sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
-
-/* Populate an xattr list. Return an errno value. */
-int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size);
-
-/* Print a usage string */
-void sqfs_usage(char *progname, bool fuse_usage);
-
-/* Parse command-line arguments */
 typedef struct {
-	char *progname;
-	const char *image;
-	int mountpoint;
-	size_t offset;
-	unsigned int idle_timeout_secs;
-} sqfs_opts;
-int sqfs_opt_proc(void *data, const char *arg, int key,
-	struct fuse_args *outargs);
+	size_t value_size;
+	size_t size;
+	size_t capacity;
+	char *items;
+	sqfs_stack_free_t freer;
+} sqfs_stack;
+
+/* Ensures the struct is in a safe state */
+void sqfs_stack_init(sqfs_stack *s);
+
+sqfs_err sqfs_stack_create(sqfs_stack *s, size_t vsize, size_t initial,
+	sqfs_stack_free_t freer);
+void sqfs_stack_destroy(sqfs_stack *s);
+
+sqfs_err sqfs_stack_push(sqfs_stack *s, void *vout);
+bool sqfs_stack_pop(sqfs_stack *s);
+
+size_t sqfs_stack_size(sqfs_stack *s);
+sqfs_err sqfs_stack_at(sqfs_stack *s, size_t i, void *vout);
+sqfs_err sqfs_stack_top(sqfs_stack *s, void *vout);
 
 #if defined( __cplusplus )
 }
