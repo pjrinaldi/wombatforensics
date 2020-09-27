@@ -185,9 +185,9 @@ void AffFuser(QString imgpath, QString imgfile)
     char* iname = new char[imgfile.toStdString().size() + 1];
     strcpy(iname, imgfile.toStdString().c_str());
     fargv[0] = "./affuse";
-    fargv[1] = "-o";
-    fargv[2] = "auto_unmount";
-    fargc = 3;
+    //fargv[1] = "-o";
+    //fargv[2] = "auto_unmount";
+    fargc = 1;
     //for(int i=0; i < fargc; i++)
     //    printf("fargv[%d]: %s\n", i, fargv[i]);
     afimage = af_open(iname, O_RDONLY|O_EXCL,0);

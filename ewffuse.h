@@ -76,6 +76,9 @@
 #include <dokan.h>
 #endif
 
+#include "mount_fuse.h"
+#include "mount_handle.h"
+
 #include "ewftools_getopt.h"
 #include "ewftools_glob.h"
 #include "ewftools_libcerror.h"
@@ -85,7 +88,6 @@
 #include "ewftools_output.h"
 #include "ewftools_signal.h"
 #include "ewftools_unused.h"
-#include "mount_handle.h"
 
 mount_handle_t *ewfmount_mount_handle = NULL;
 int ewfmount_abort                    = 0;
@@ -3089,6 +3091,48 @@ int __stdcall ewfmount_dokan_Unmount(
 
 #endif
 
+struct fuse_operations ewfmount_fuse_operations;
+struct fuse_chan* ewfmount_fuse_channel = NULL;
+struct fuse* ewfmount_fuse_handle = NULL;
+struct fuse_args ewfmount_fuse_arguments = FUSE_ARGS_INIT(0, NULL);
+libewf_error_t* error = NULL;
+//mount_handle_t* ewfmount_mount_handle = NULL;
+pthread_t efusethread;
+
+void* efuselooper(void *data)
+{
+    struct fuse* fuse = (struct fuse*) data;
+    fuse_loop(fuse);
+};
+
+void EwfFuser(QString imgpath, QString imgfile)
+{
+    char** fargv = NULL;
+    fargv = XCALLOC(char *, 3);
+    fargv[0] = "./ewfmount";
+    int fargc = 1;
+    ewfmount_fuse_arguments = FUSE_ARGS_INIT(fargc, fargv);
+
+    system_character_t* mountpoint = (char*)imgpath.toStdString().c_str();
+    memset(&ewfmount_fuse_operations, 0, sizeof(struct fuse_operations));
+    //memory_set(&ewfmount_fuse_operations, 0, sizeof(struct fuse_operations));
+    ewfmount_fuse_operations.open       = &mount_fuse_open;
+    ewfmount_fuse_operations.read       = &mount_fuse_read;
+    ewfmount_fuse_operations.release    = &mount_fuse_release;
+    ewfmount_fuse_operations.opendir    = &mount_fuse_opendir;
+    ewfmount_fuse_operations.readdir    = &mount_fuse_readdir;
+    ewfmount_fuse_operations.releasedir = &mount_fuse_releasedir;
+    ewfmount_fuse_operations.getattr    = &mount_fuse_getattr;
+    ewfmount_fuse_operations.destroy    = &mount_fuse_destroy;
+    //mount_handle_initialize(&ewfmount_mount_handle, &error); // THIS IS PROBABLY NECESSARY TO REFERENCE THE EWF FORENSIC IMAGE
+    ewfmount_fuse_handle = fuse_new(&ewfmount_fuse_arguments, &ewfmount_fuse_operations, sizeof(struct fuse_operations), ewfmount_mount_handle);
+    //args = FUSE_ARGS_INIT(fargc, fargv);
+    //affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
+    //ret = fuse_mount(affuser, imgpath.toStdString().c_str());
+    //int retd = fuse_daemonize(1);
+    //int perr = pthread_create(&fusethread, NULL, fuselooper, (void *) affuser);
+    
+};
 /* The main program
  */
 /*

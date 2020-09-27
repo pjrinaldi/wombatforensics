@@ -1325,6 +1325,7 @@ void WombatForensics::PrepareEvidenceImage()
 		    dir.mkpath(tmpstring);
 		    //mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
                     qDebug() << "should do ewf fuse calls here.";
+                    //EwfFuser();
 		}
 	    }
 	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
@@ -1576,7 +1577,7 @@ void WombatForensics::LoadHexContents()
         qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
     if(datastring.endsWith(".sfs"))
         datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
-    qDebug() << "datastring:" << datastring;
+    //qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->BypassColor(false);
     ui->hexview->setData(casedatafile);

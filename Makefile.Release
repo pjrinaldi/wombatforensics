@@ -94,7 +94,9 @@ SOURCES       = main.cpp \
 		imagefunctions.cpp \
 		tagging.cpp \
 		verevidencedialog.cpp \
-		sqfsfuse/dir.h release/qrc_wombatforensics.cpp \
+		sqfsfuse/dir.h \
+		mount_handle.c \
+		mount_fuse.c release/qrc_wombatforensics.cpp \
 		release/moc_wombatforensics.cpp \
 		release/moc_exportdialog.cpp \
 		release/moc_globals.cpp \
@@ -169,6 +171,8 @@ OBJECTS       = release/main.o \
 		release/tagging.o \
 		release/verevidencedialog.o \
 		release/dir.o \
+		release/mount_handle.o \
+		release/mount_fuse.o \
 		release/qrc_wombatforensics.o \
 		release/moc_wombatforensics.o \
 		release/moc_exportdialog.o \
@@ -412,7 +416,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		sqfsfuse.h \
 		sqfsfuse/dir.h \
 		ewffuse.h \
-		mount_handle.h main.cpp \
+		mount_handle.h \
+		mount_fuse.h main.cpp \
 		wombatforensics.cpp \
 		wombatfunctions.cpp \
 		exportdialog.cpp \
@@ -455,7 +460,9 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		imagefunctions.cpp \
 		tagging.cpp \
 		verevidencedialog.cpp \
-		sqfsfuse/dir.h
+		sqfsfuse/dir.h \
+		mount_handle.c \
+		mount_fuse.c
 QMAKE_TARGET  = wombatforensics
 DESTDIR       = release/
 TARGET        = release/wombatforensics
@@ -484,8 +491,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents wombatforensics.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h digging.h reporting.h artifactparser.h exporting.h properties.h newcase.h opencase.h registryviewer.h newforimg.h imagefunctions.h tagging.h verevidencedialog.h fusefunctions.h sqfsfuse.h sqfsfuse/dir.h ewffuse.h mount_handle.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp pdfviewer.cpp carving.cpp digging.cpp reporting.cpp artifactparser.cpp exporting.cpp properties.cpp newcase.cpp opencase.cpp registryviewer.cpp newforimg.cpp imagefunctions.cpp tagging.cpp verevidencedialog.cpp sqfsfuse/dir.h $(DISTDIR)/
+	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h digging.h reporting.h artifactparser.h exporting.h properties.h newcase.h opencase.h registryviewer.h newforimg.h imagefunctions.h tagging.h verevidencedialog.h fusefunctions.h sqfsfuse.h sqfsfuse/dir.h ewffuse.h mount_handle.h mount_fuse.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp pdfviewer.cpp carving.cpp digging.cpp reporting.cpp artifactparser.cpp exporting.cpp properties.cpp newcase.cpp opencase.cpp registryviewer.cpp newforimg.cpp imagefunctions.cpp tagging.cpp verevidencedialog.cpp sqfsfuse/dir.h mount_handle.c mount_fuse.c $(DISTDIR)/
 	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui filecarvingdialog.ui carvingfiletypesdialog.ui pdfviewer.ui registryviewer.ui newforimg.ui verifyevidencedialog.ui $(DISTDIR)/
 
 
@@ -1368,7 +1375,10 @@ release/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		common/ewftools_output.h \
 		common/ewftools_signal.h \
 		common/ewftools_unused.h \
-		mount_handle.h
+		mount_handle.h \
+		mount_fuse.h \
+		mount_file_entry.h \
+		mount_file_system.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/wombatforensics.o wombatforensics.cpp
 
 release/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
@@ -1668,9 +1678,7 @@ release/opencase.o: opencase.cpp opencase.h \
 		wombatvariable.h \
 		tskcpp.h \
 		properties.h \
-		wombatfunctions.h \
-		sqfsfuse.h \
-		fuseprivate.h
+		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/opencase.o opencase.cpp
 
 release/registryviewer.o: registryviewer.cpp registryviewer.h \
@@ -1718,6 +1726,41 @@ release/verevidencedialog.o: verevidencedialog.cpp verevidencedialog.h \
 release/dir.o: sqfsfuse/dir.h sqfsfuse/common.h \
 		sqfsfuse/config.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o release/dir.o sqfsfuse/dir.h
+
+release/mount_handle.o: mount_handle.c common/memory.h \
+		common/common.h \
+		common/config.h \
+		common/config_borlandc.h \
+		common/config_msc.h \
+		common/config_winapi.h \
+		common/narrow_string.h \
+		common/types.h \
+		common/system_string.h \
+		common/wide_string.h \
+		common/ewftools_libcerror.h \
+		common/ewftools_libewf.h \
+		mount_handle.h \
+		common/file_stream.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o release/mount_handle.o mount_handle.c
+
+release/mount_fuse.o: mount_fuse.c common/narrow_string.h \
+		common/common.h \
+		common/config.h \
+		common/config_borlandc.h \
+		common/config_msc.h \
+		common/config_winapi.h \
+		common/memory.h \
+		common/types.h \
+		common/ewftools_libcerror.h \
+		common/ewftools_libcnotify.h \
+		common/ewftools_libewf.h \
+		common/ewftools_unused.h \
+		mount_fuse.h \
+		mount_file_entry.h \
+		mount_file_system.h \
+		mount_handle.h \
+		common/file_stream.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o release/mount_fuse.o mount_fuse.c
 
 release/qrc_wombatforensics.o: release/qrc_wombatforensics.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/qrc_wombatforensics.o release/qrc_wombatforensics.cpp
