@@ -1,5 +1,5 @@
 /*
- * Signal handling functions
+ * Compression handling functions
  *
  * Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,55 +19,38 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFTOOLS_SIGNAL_H )
-#define _EWFTOOLS_SIGNAL_H
+#if !defined( _LIBEWF_COMPRESS_H )
+#define _LIBEWF_COMPRESS_H
 
 #include <common.h>
 #include <types.h>
 
-#include "ewftools_libcerror.h"
+#include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#include <signal.h>
-//#if !defined( HAVE_SIGNAL_H ) && !defined( WINAPI )
-//#error missing signal functions
-//#endif
-
-#if defined( WINAPI )
-typedef unsigned long ewftools_signal_t;
-
-#else
-typedef int ewftools_signal_t;
-
-#endif /* defined( WINAPI ) */
-
-#if defined( WINAPI )
-
-BOOL WINAPI ewftools_signal_handler(
-             ewftools_signal_t signal );
-
-#if defined( _MSC_VER )
-
-void ewftools_signal_initialize_memory_debug(
-      void );
-
-#endif /* defined( _MSC_VER ) */
-
-#endif /* defined( WINAPI ) */
-
-int ewftools_signal_attach(
-     void (*signal_handler)( ewftools_signal_t ),
+int libewf_compress_data(
+     uint8_t *compressed_data,
+     size_t *compressed_data_size,
+     uint16_t compression_method,
+     int8_t compression_level,
+     const uint8_t *uncompressed_data,
+     size_t uncompressed_data_size,
      libcerror_error_t **error );
 
-int ewftools_signal_detach(
+int libewf_decompress_data(
+     const uint8_t *compressed_data,
+     size_t compressed_data_size,
+     uint16_t compression_method,
+     uint8_t *uncompressed_data,
+     size_t *uncompressed_data_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _EWFTOOLS_SIGNAL_H ) */
+#endif /* !defined( _LIBEWF_COMPRESS_H ) */
 

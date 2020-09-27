@@ -131,7 +131,7 @@
 #define HAVE_GETCWD 1
 
 /* Define to 1 if you have the `getenv' function. */
-#define HAVE_GETENV 1
+/* #undef HAVE_GETENV */
 
 /* Define to 1 if you have the `getopt' function. */
 #define HAVE_GETOPT 1
@@ -167,10 +167,10 @@
 /* #undef HAVE_IO_H */
 
 /* Define if nl_langinfo has CODESET support. */
-#define HAVE_LANGINFO_CODESET 1
+/* #undef HAVE_LANGINFO_CODESET */
 
 /* Define to 1 if you have the <langinfo.h> header file. */
-#define HAVE_LANGINFO_H 1
+/* #undef HAVE_LANGINFO_H */
 
 /* Define to 1 if you have the `bfio' library (-lbfio). */
 /* #undef HAVE_LIBBFIO */
@@ -200,10 +200,10 @@
 /* #undef HAVE_LIBCDATETIME_H */
 
 /* Define to 1 if you have the `cerror' library (-lcerror). */
-/* #undef HAVE_LIBCERROR */
+#define HAVE_LIBCERROR 1
 
 /* Define to 1 if you have the <libcerror.h> header file. */
-/* #undef HAVE_LIBCERROR_H */
+#define HAVE_LIBCERROR_H 1
 
 /* Define to 1 if you have the `cfile' library (-lcfile). */
 /* #undef HAVE_LIBCFILE */
@@ -212,16 +212,16 @@
 /* #undef HAVE_LIBCFILE_H */
 
 /* Define to 1 if you have the `clocale' library (-lclocale). */
-/* #undef HAVE_LIBCLOCALE */
+#define HAVE_LIBCLOCALE 1
 
 /* Define to 1 if you have the <libclocale.h> header file. */
-/* #undef HAVE_LIBCLOCALE_H */
+#define HAVE_LIBCLOCALE_H 1
 
 /* Define to 1 if you have the `cnotify' library (-lcnotify). */
-/* #undef HAVE_LIBCNOTIFY */
+#define HAVE_LIBCNOTIFY 1
 
 /* Define to 1 if you have the <libcnotify.h> header file. */
-/* #undef HAVE_LIBCNOTIFY_H */
+#define HAVE_LIBCNOTIFY_H 1
 
 /* Define to 1 if you have the `cpath' library (-lcpath). */
 /* #undef HAVE_LIBCPATH */
@@ -335,10 +335,10 @@
 #define HAVE_LINUX_USB_CH9_H 1
 
 /* Define to 1 if you have the `localeconv' function. */
-#define HAVE_LOCALECONV 1
+/* #undef HAVE_LOCALECONV */
 
 /* Define to 1 if you have the <locale.h> header file. */
-#define HAVE_LOCALE_H 1
+/* #undef HAVE_LOCALE_H */
 
 /* Define to 1 if you have the `localtime' function. */
 #define HAVE_LOCALTIME 1
@@ -359,16 +359,16 @@
 #define HAVE_LOCAL_LIBCDATETIME 1
 
 /* Define to 1 if the local version of libcerror is used. */
-#define HAVE_LOCAL_LIBCERROR 1
+/* #undef HAVE_LOCAL_LIBCERROR */
 
 /* Define to 1 if the local version of libcfile is used. */
 #define HAVE_LOCAL_LIBCFILE 1
 
 /* Define to 1 if the local version of libclocale is used. */
-#define HAVE_LOCAL_LIBCLOCALE 1
+/* #undef HAVE_LOCAL_LIBCLOCALE */
 
 /* Define to 1 if the local version of libcnotify is used. */
-#define HAVE_LOCAL_LIBCNOTIFY 1
+/* #undef HAVE_LOCAL_LIBCNOTIFY */
 
 /* Define to 1 if the local version of libcpath is used. */
 #define HAVE_LOCAL_LIBCPATH 1
@@ -443,7 +443,7 @@
 #define HAVE_MULTI_THREAD_SUPPORT 1
 
 /* Define to 1 if you have the `nl_langinfo' function. */
-#define HAVE_NL_LANGINFO 1
+/* #undef HAVE_NL_LANGINFO */
 
 /* Define to 1 if you have the `open' function. */
 #define HAVE_OPEN 1
@@ -509,7 +509,7 @@
 #define HAVE_SCSI_SG_H 1
 
 /* Define to 1 if you have the `setlocale' function. */
-#define HAVE_SETLOCALE 1
+/* #undef HAVE_SETLOCALE */
 
 /* Define to 1 if you have the `setvbuf' function. */
 #define HAVE_SETVBUF 1
