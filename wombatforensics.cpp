@@ -1318,14 +1318,18 @@ void WombatForensics::PrepareEvidenceImage()
 	    }
 	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
 	    {
-		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
+		//if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
+		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
 		{
+                    /*
 		    QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
 		    QDir dir;
 		    dir.mkpath(tmpstring);
 		    //mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
                     qDebug() << "should do ewf fuse calls here.";
+                    */
                     //EwfFuser();
+                    EwfFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
 		}
 	    }
 	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
@@ -1564,7 +1568,10 @@ void WombatForensics::LoadHexContents()
     if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
         datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
     else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
-        datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
+    {
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
+        datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+    }
     else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
     {
         QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
@@ -1854,8 +1861,12 @@ void WombatForensics::CloseCurrentCase()
         //qDebug() << "imgext:" << imgext;
         if(imgext.contains("e01")) // ewfmount
         {
+            fuse_unmount(ewfuser);
+            fuse_destroy(ewfuser);
+            /*
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
             QProcess::execute(xunmntstr, QStringList());
+            */
         }
         else if(imgext.contains("aff") || imgext.contains("000")) // affuse
         {

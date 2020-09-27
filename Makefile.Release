@@ -1340,7 +1340,8 @@ release/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		verevidencedialog.h \
 		ui_verifyevidencedialog.h \
 		imagefunctions.h \
-		fusefunctions.h
+		fusefunctions.h \
+		ewffuse.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/wombatforensics.o wombatforensics.cpp
 
 release/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
