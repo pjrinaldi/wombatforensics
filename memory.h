@@ -23,7 +23,9 @@
 #define _MEMORY_H
 
 #include "common.h"
-
+#include <glib.h>
+#include <stdlib.h>
+#include <string.h>
 #if defined( HAVE_GLIB_H )
 #include <glib.h>
 #endif

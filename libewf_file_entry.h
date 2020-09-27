@@ -24,6 +24,9 @@
 
 #include <common.h>
 #include <types.h>
+#include <memory.h>
+#include "memory.h"
+#include "common.h"
 
 #include "libewf_extern.h"
 #include "libewf_handle.h"

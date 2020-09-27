@@ -20,6 +20,8 @@
  */
 
 #include <common.h>
+#include <glib.h>
+#include <memory.h>
 #include <file_stream.h>
 #include <memory.h>
 #include <narrow_string.h>

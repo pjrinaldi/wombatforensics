@@ -22,6 +22,7 @@
 #include <common.h>
 #include <memory.h>
 #include <types.h>
+#include "memory.h"
 
 #include "libewf_definitions.h"
 #include "libewf_file_entry.h"

@@ -1,6 +1,6 @@
 #include "wombatforensics.h"
 #include "fusefunctions.h"
-#include "ewffuse.h"
+//#include "ewffuse.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
