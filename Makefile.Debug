@@ -16,7 +16,7 @@ CXX           = g++
 DEFINES       = -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -D_FILE_OFFSET_BITS=64 -DQT_MULTIMEDIAWIDGETS_LIB -DQT_WEBENGINEWIDGETS_LIB -DQT_PRINTSUPPORT_LIB -DQT_AVWIDGETS_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_MULTIMEDIA_LIB -DQT_WEBENGINECORE_LIB -DQT_QUICK_LIB -DQT_AV_LIB -DQT_GUI_LIB -DQT_CONCURRENT_LIB -DQT_SQL_LIB -DQT_QMLMODELS_LIB -DQT_WEBCHANNEL_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_POSITIONING_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++1y -D_REENTRANT -Wall -Wextra -fPIC $(DEFINES)
-INCPATH       = -I. -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -Isqfsfuse -Icommon -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -Idebug -I. -I/usr/lib/qt/mkspecs/linux-g++
+INCPATH       = -I. -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -Isqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -Idebug -I. -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -39,7 +39,7 @@ DISTNAME      = wombatforensics1.0.0
 DISTDIR = /home/pasquale/Projects/wombatforensics/debug/wombatforensics1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath-link,/usr/lib
-LIBS          = $(SUBLIBS) -lfvalue -lcerror -lclocale -lcnotify -lbfio -lfcache -lfdata -lcdata -lcdatetime -lhmac -luna -lfguid -lglib-2.0 -lstdc++ -L/usr/local/lib/lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -lsquashfuse `pkg-config fuse3 --cflags --libs` /usr/lib/libQt5MultimediaWidgets.so /usr/lib/libQt5WebEngineWidgets.so /usr/lib/libQt5PrintSupport.so /usr/lib/libQt5OpenGL.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Multimedia.so /usr/lib/libQt5WebEngineCore.so /usr/lib/libQt5Quick.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Concurrent.so /usr/lib/libQt5Sql.so /usr/lib/libQt5QmlModels.so /usr/lib/libQt5WebChannel.so /usr/lib/libQt5Qml.so /usr/lib/libQt5Network.so /usr/lib/libQt5Positioning.so /usr/lib/libQt5Core.so -lGL -lpthread -lXext -lX11 -lm  
+LIBS          = $(SUBLIBS) -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -lsquashfuse `pkg-config fuse3 --cflags --libs` /usr/lib/libQt5MultimediaWidgets.so /usr/lib/libQt5WebEngineWidgets.so /usr/lib/libQt5PrintSupport.so /usr/lib/libQt5OpenGL.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Multimedia.so /usr/lib/libQt5WebEngineCore.so /usr/lib/libQt5Quick.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Concurrent.so /usr/lib/libQt5Sql.so /usr/lib/libQt5QmlModels.so /usr/lib/libQt5WebChannel.so /usr/lib/libQt5Qml.so /usr/lib/libQt5Network.so /usr/lib/libQt5Positioning.so /usr/lib/libQt5Core.so -lGL -lpthread -lXext -lX11 -lm  
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -93,33 +93,7 @@ SOURCES       = main.cpp \
 		newforimg.cpp \
 		imagefunctions.cpp \
 		tagging.cpp \
-		verevidencedialog.cpp \
-		libewf_single_file_tree.c \
-		libewf_file_entry.c \
-		libewf_hash_values.c \
-		libewf_sector_range.c \
-		libewf_chunk_table.c \
-		libewf_support.c \
-		libewf_hash_sections.c \
-		libewf_filename.c \
-		libewf_error.c \
-		libewf_single_files.c \
-		libewf_single_file_entry.c \
-		libewf_segment_table.c \
-		libewf_header_values.c \
-		libewf_segment_file.c \
-		libewf_date_time.c \
-		libewf_date_time_values.c \
-		libewf_header_sections.c \
-		libewf_read_io_handle.c \
-		libewf_chunk_data.c \
-		libewf_media_values.c \
-		libewf_io_handle.c \
-		libewf_write_io_handle.c \
-		libewf_section.c \
-		libewf_handle.c \
-		mount_handle.c \
-		sqfsfuse/dir.h debug/qrc_wombatforensics.cpp \
+		verevidencedialog.cpp debug/qrc_wombatforensics.cpp \
 		debug/moc_wombatforensics.cpp \
 		debug/moc_exportdialog.cpp \
 		debug/moc_globals.cpp \
@@ -193,32 +167,6 @@ OBJECTS       = debug/main.o \
 		debug/imagefunctions.o \
 		debug/tagging.o \
 		debug/verevidencedialog.o \
-		debug/libewf_single_file_tree.o \
-		debug/libewf_file_entry.o \
-		debug/libewf_hash_values.o \
-		debug/libewf_sector_range.o \
-		debug/libewf_chunk_table.o \
-		debug/libewf_support.o \
-		debug/libewf_hash_sections.o \
-		debug/libewf_filename.o \
-		debug/libewf_error.o \
-		debug/libewf_single_files.o \
-		debug/libewf_single_file_entry.o \
-		debug/libewf_segment_table.o \
-		debug/libewf_header_values.o \
-		debug/libewf_segment_file.o \
-		debug/libewf_date_time.o \
-		debug/libewf_date_time_values.o \
-		debug/libewf_header_sections.o \
-		debug/libewf_read_io_handle.o \
-		debug/libewf_chunk_data.o \
-		debug/libewf_media_values.o \
-		debug/libewf_io_handle.o \
-		debug/libewf_write_io_handle.o \
-		debug/libewf_section.o \
-		debug/libewf_handle.o \
-		debug/mount_handle.o \
-		debug/dir.o \
 		debug/qrc_wombatforensics.o \
 		debug/moc_wombatforensics.o \
 		debug/moc_exportdialog.o \
@@ -459,35 +407,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		tagging.h \
 		verevidencedialog.h \
 		fusefunctions.h \
-		sqfsfuse.h \
-		sqfsfuse/dir.h \
-		memory.h \
-		libewf_chunk_data.h \
-		libewf_segment_table.h \
-		libewf_single_files.h \
-		libewf_hash_sections.h \
-		libewf_chunk_table.h \
-		libewf_sector_range.h \
-		libewf_support.h \
-		libewf_filename.h \
-		libewf_hash_values.h \
-		libewf_error.h \
-		libewf_single_file_entry.h \
-		libewf_file_entry.h \
-		libewf_read_io_handle.h \
-		libewf_segment_file.h \
-		libewf_header_values.h \
-		libewf_libfvalue.h \
-		libewf_date_time.h \
-		libewf_date_time_values.h \
-		libewf_header_sections.h \
-		libewf_single_file_tree.h \
-		libewf_media_values.h \
-		libewf_io_handle.h \
-		libewf_write_io_handle.h \
-		libewf_section.h \
-		libewf_handle.h \
-		mount_handle.h \
 		ewffuse.h main.cpp \
 		wombatforensics.cpp \
 		wombatfunctions.cpp \
@@ -530,33 +449,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		newforimg.cpp \
 		imagefunctions.cpp \
 		tagging.cpp \
-		verevidencedialog.cpp \
-		libewf_single_file_tree.c \
-		libewf_file_entry.c \
-		libewf_hash_values.c \
-		libewf_sector_range.c \
-		libewf_chunk_table.c \
-		libewf_support.c \
-		libewf_hash_sections.c \
-		libewf_filename.c \
-		libewf_error.c \
-		libewf_single_files.c \
-		libewf_single_file_entry.c \
-		libewf_segment_table.c \
-		libewf_header_values.c \
-		libewf_segment_file.c \
-		libewf_date_time.c \
-		libewf_date_time_values.c \
-		libewf_header_sections.c \
-		libewf_read_io_handle.c \
-		libewf_chunk_data.c \
-		libewf_media_values.c \
-		libewf_io_handle.c \
-		libewf_write_io_handle.c \
-		libewf_section.c \
-		libewf_handle.c \
-		mount_handle.c \
-		sqfsfuse/dir.h
+		verevidencedialog.cpp
 QMAKE_TARGET  = wombatforensics
 DESTDIR       = debug/
 TARGET        = debug/wombatforensics
@@ -585,8 +478,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents wombatforensics.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h digging.h reporting.h artifactparser.h exporting.h properties.h newcase.h opencase.h registryviewer.h newforimg.h imagefunctions.h tagging.h verevidencedialog.h fusefunctions.h sqfsfuse.h sqfsfuse/dir.h memory.h libewf_chunk_data.h libewf_segment_table.h libewf_single_files.h libewf_hash_sections.h libewf_chunk_table.h libewf_sector_range.h libewf_support.h libewf_filename.h libewf_hash_values.h libewf_error.h libewf_single_file_entry.h libewf_file_entry.h libewf_read_io_handle.h libewf_segment_file.h libewf_header_values.h libewf_libfvalue.h libewf_date_time.h libewf_date_time_values.h libewf_header_sections.h libewf_single_file_tree.h libewf_media_values.h libewf_io_handle.h libewf_write_io_handle.h libewf_section.h libewf_handle.h mount_handle.h ewffuse.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp pdfviewer.cpp carving.cpp digging.cpp reporting.cpp artifactparser.cpp exporting.cpp properties.cpp newcase.cpp opencase.cpp registryviewer.cpp newforimg.cpp imagefunctions.cpp tagging.cpp verevidencedialog.cpp libewf_single_file_tree.c libewf_file_entry.c libewf_hash_values.c libewf_sector_range.c libewf_chunk_table.c libewf_support.c libewf_hash_sections.c libewf_filename.c libewf_error.c libewf_single_files.c libewf_single_file_entry.c libewf_segment_table.c libewf_header_values.c libewf_segment_file.c libewf_date_time.c libewf_date_time_values.c libewf_header_sections.c libewf_read_io_handle.c libewf_chunk_data.c libewf_media_values.c libewf_io_handle.c libewf_write_io_handle.c libewf_section.c libewf_handle.c mount_handle.c sqfsfuse/dir.h $(DISTDIR)/
+	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h digging.h reporting.h artifactparser.h exporting.h properties.h newcase.h opencase.h registryviewer.h newforimg.h imagefunctions.h tagging.h verevidencedialog.h fusefunctions.h ewffuse.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp pdfviewer.cpp carving.cpp digging.cpp reporting.cpp artifactparser.cpp exporting.cpp properties.cpp newcase.cpp opencase.cpp registryviewer.cpp newforimg.cpp imagefunctions.cpp tagging.cpp verevidencedialog.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui filecarvingdialog.ui carvingfiletypesdialog.ui pdfviewer.ui registryviewer.ui newforimg.ui verifyevidencedialog.ui $(DISTDIR)/
 
 
@@ -778,21 +671,21 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 		imagefunctions.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include wombatforensics.h -o debug/moc_wombatforensics.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include wombatforensics.h -o debug/moc_wombatforensics.cpp
 
 debug/moc_exportdialog.cpp: exportdialog.h \
 		wombatinclude.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include exportdialog.h -o debug/moc_exportdialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include exportdialog.h -o debug/moc_exportdialog.cpp
 
 debug/moc_globals.cpp: globals.h \
 		wombatinclude.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include globals.h -o debug/moc_globals.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include globals.h -o debug/moc_globals.cpp
 
 debug/moc_propertieswindow.cpp: propertieswindow.h \
 		wombatinclude.h \
@@ -801,7 +694,7 @@ debug/moc_propertieswindow.cpp: propertieswindow.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include propertieswindow.h -o debug/moc_propertieswindow.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include propertieswindow.h -o debug/moc_propertieswindow.cpp
 
 debug/moc_fileviewer.cpp: fileviewer.h \
 		wombatinclude.h \
@@ -814,7 +707,7 @@ debug/moc_fileviewer.cpp: fileviewer.h \
 		searchdialog.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include fileviewer.h -o debug/moc_fileviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include fileviewer.h -o debug/moc_fileviewer.cpp
 
 debug/moc_filterviews.cpp: filterviews.h \
 		wombatinclude.h \
@@ -837,7 +730,7 @@ debug/moc_filterviews.cpp: filterviews.h \
 		ui_tagfilter.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include filterviews.h -o debug/moc_filterviews.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include filterviews.h -o debug/moc_filterviews.cpp
 
 debug/moc_imageviewer.cpp: imageviewer.h \
 		wombatinclude.h \
@@ -851,7 +744,7 @@ debug/moc_imageviewer.cpp: imageviewer.h \
 		ui_videoviewer.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include imageviewer.h -o debug/moc_imageviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include imageviewer.h -o debug/moc_imageviewer.cpp
 
 debug/moc_videoviewer.cpp: videoviewer.h \
 		wombatinclude.h \
@@ -860,7 +753,7 @@ debug/moc_videoviewer.cpp: videoviewer.h \
 		ui_videoviewer.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include videoviewer.h -o debug/moc_videoviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include videoviewer.h -o debug/moc_videoviewer.cpp
 
 debug/moc_viewermanager.cpp: viewermanager.h \
 		wombatinclude.h \
@@ -869,7 +762,7 @@ debug/moc_viewermanager.cpp: viewermanager.h \
 		ui_viewermanager.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include viewermanager.h -o debug/moc_viewermanager.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include viewermanager.h -o debug/moc_viewermanager.cpp
 
 debug/moc_textviewer.cpp: textviewer.h \
 		wombatinclude.h \
@@ -880,7 +773,7 @@ debug/moc_textviewer.cpp: textviewer.h \
 		tskcpp.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include textviewer.h -o debug/moc_textviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include textviewer.h -o debug/moc_textviewer.cpp
 
 debug/moc_htmlviewer.cpp: htmlviewer.h \
 		wombatinclude.h \
@@ -892,7 +785,7 @@ debug/moc_htmlviewer.cpp: htmlviewer.h \
 		ui_htmlviewer.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include htmlviewer.h -o debug/moc_htmlviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include htmlviewer.h -o debug/moc_htmlviewer.cpp
 
 debug/moc_messageviewer.cpp: messageviewer.h \
 		wombatinclude.h \
@@ -903,7 +796,7 @@ debug/moc_messageviewer.cpp: messageviewer.h \
 		tskcpp.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include messageviewer.h -o debug/moc_messageviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include messageviewer.h -o debug/moc_messageviewer.cpp
 
 debug/moc_byteconverter.cpp: byteconverter.h \
 		wombatinclude.h \
@@ -912,14 +805,14 @@ debug/moc_byteconverter.cpp: byteconverter.h \
 		ui_byteconverter.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include byteconverter.h -o debug/moc_byteconverter.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include byteconverter.h -o debug/moc_byteconverter.cpp
 
 debug/moc_digdeeperdialog.cpp: digdeeperdialog.h \
 		wombatinclude.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include digdeeperdialog.h -o debug/moc_digdeeperdialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include digdeeperdialog.h -o debug/moc_digdeeperdialog.cpp
 
 debug/moc_aboutbox.cpp: aboutbox.h \
 		wombatinclude.h \
@@ -930,7 +823,7 @@ debug/moc_aboutbox.cpp: aboutbox.h \
 		ui_aboutbox.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include aboutbox.h -o debug/moc_aboutbox.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include aboutbox.h -o debug/moc_aboutbox.cpp
 
 debug/moc_qhexedit.cpp: qhexedit.h \
 		chunks.h \
@@ -940,18 +833,18 @@ debug/moc_qhexedit.cpp: qhexedit.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include qhexedit.h -o debug/moc_qhexedit.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include qhexedit.h -o debug/moc_qhexedit.cpp
 
 debug/moc_chunks.cpp: chunks.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include chunks.h -o debug/moc_chunks.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include chunks.h -o debug/moc_chunks.cpp
 
 debug/moc_commands.cpp: commands.h \
 		chunks.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include commands.h -o debug/moc_commands.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include commands.h -o debug/moc_commands.cpp
 
 debug/moc_settingsdialog.cpp: settingsdialog.h \
 		wombatinclude.h \
@@ -964,7 +857,7 @@ debug/moc_settingsdialog.cpp: settingsdialog.h \
 		ui_carvingfiletypesdialog.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include settingsdialog.h -o debug/moc_settingsdialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include settingsdialog.h -o debug/moc_settingsdialog.cpp
 
 debug/moc_addevidencedialog.cpp: addevidencedialog.h \
 		wombatinclude.h \
@@ -975,7 +868,7 @@ debug/moc_addevidencedialog.cpp: addevidencedialog.h \
 		ui_addevidencedialog.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include addevidencedialog.h -o debug/moc_addevidencedialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include addevidencedialog.h -o debug/moc_addevidencedialog.cpp
 
 debug/moc_remevidencedialog.cpp: remevidencedialog.h \
 		wombatinclude.h \
@@ -986,7 +879,7 @@ debug/moc_remevidencedialog.cpp: remevidencedialog.h \
 		ui_remevidencedialog.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include remevidencedialog.h -o debug/moc_remevidencedialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include remevidencedialog.h -o debug/moc_remevidencedialog.cpp
 
 debug/moc_tagmanager.cpp: tagmanager.h \
 		wombatinclude.h \
@@ -998,7 +891,7 @@ debug/moc_tagmanager.cpp: tagmanager.h \
 		ui_tagmanager.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include tagmanager.h -o debug/moc_tagmanager.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include tagmanager.h -o debug/moc_tagmanager.cpp
 
 debug/moc_searchdialog.cpp: searchdialog.h \
 		qhexedit.h \
@@ -1009,7 +902,7 @@ debug/moc_searchdialog.cpp: searchdialog.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include searchdialog.h -o debug/moc_searchdialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include searchdialog.h -o debug/moc_searchdialog.cpp
 
 debug/moc_carvedialog.cpp: carvedialog.h \
 		wombatinclude.h \
@@ -1020,14 +913,14 @@ debug/moc_carvedialog.cpp: carvedialog.h \
 		ui_carvedialog.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include carvedialog.h -o debug/moc_carvedialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include carvedialog.h -o debug/moc_carvedialog.cpp
 
 debug/moc_filecarvingdialog.cpp: filecarvingdialog.h \
 		wombatinclude.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include filecarvingdialog.h -o debug/moc_filecarvingdialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include filecarvingdialog.h -o debug/moc_filecarvingdialog.cpp
 
 debug/moc_carvingfiletypesdialog.cpp: carvingfiletypesdialog.h \
 		wombatinclude.h \
@@ -1038,7 +931,7 @@ debug/moc_carvingfiletypesdialog.cpp: carvingfiletypesdialog.h \
 		tskcpp.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include carvingfiletypesdialog.h -o debug/moc_carvingfiletypesdialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include carvingfiletypesdialog.h -o debug/moc_carvingfiletypesdialog.cpp
 
 debug/moc_pdfviewer.cpp: pdfviewer.h \
 		wombatinclude.h \
@@ -1051,7 +944,7 @@ debug/moc_pdfviewer.cpp: pdfviewer.h \
 		ui_videoviewer.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include pdfviewer.h -o debug/moc_pdfviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include pdfviewer.h -o debug/moc_pdfviewer.cpp
 
 debug/moc_registryviewer.cpp: registryviewer.h \
 		wombatinclude.h \
@@ -1064,7 +957,7 @@ debug/moc_registryviewer.cpp: registryviewer.h \
 		reporting.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include registryviewer.h -o debug/moc_registryviewer.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include registryviewer.h -o debug/moc_registryviewer.cpp
 
 debug/moc_newforimg.cpp: newforimg.h \
 		wombatinclude.h \
@@ -1075,7 +968,7 @@ debug/moc_newforimg.cpp: newforimg.h \
 		ui_newforimg.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include newforimg.h -o debug/moc_newforimg.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include newforimg.h -o debug/moc_newforimg.cpp
 
 debug/moc_verevidencedialog.cpp: verevidencedialog.h \
 		wombatinclude.h \
@@ -1087,7 +980,7 @@ debug/moc_verevidencedialog.cpp: verevidencedialog.h \
 		imagefunctions.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
-	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/home/pasquale/Projects/wombatforensics/common -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include verevidencedialog.h -o debug/moc_verevidencedialog.cpp
+	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/tsk -I/usr/include/tsk/auto -I/usr/include/tsk/base -I/usr/include/tsk/fs -I/usr/include/tsk/hashdb -I/usr/include/tsk/img -I/usr/include/tsk/vs -I/usr/include/tsk/pool -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/squashfuse -I/home/pasquale/Projects/wombatforensics/sqfsfuse -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include verevidencedialog.h -o debug/moc_verevidencedialog.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1791,671 +1684,6 @@ debug/verevidencedialog.o: verevidencedialog.cpp verevidencedialog.h \
 		ui_verifyevidencedialog.h \
 		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/verevidencedialog.o verevidencedialog.cpp
-
-debug/libewf_single_file_tree.o: libewf_single_file_tree.c common/types.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		libewf_libcdata.h \
-		libewf_libcerror.h \
-		libewf_libuna.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_single_file_tree.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_single_file_tree.o libewf_single_file_tree.c
-
-debug/libewf_file_entry.o: libewf_file_entry.c memory.h \
-		common/types.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_file_entry.h \
-		libewf_extern.h \
-		libewf_handle.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libcerror.h \
-		libewf_libbfio.h \
-		libewf_libfcache.h \
-		libewf_chunk_group.h \
-		libewf_section.h \
-		libewf_hash_sections.h \
-		libewf_libfvalue.h \
-		libewf_header_sections.h \
-		libewf_libcdata.h \
-		libewf_media_values.h \
-		libewf_single_files.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h \
-		libewf_chunk_table.h \
-		libewf_segment_file.h \
-		libewf_segment_table.h \
-		libewf_data_chunk.h \
-		libewf_libcthreads.h \
-		libewf_write_io_handle.h \
-		libewf_read_io_handle.h \
-		libewf_libcnotify.h \
-		libewf_single_file_tree.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_file_entry.o libewf_file_entry.c
-
-debug/libewf_hash_values.o: libewf_hash_values.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_hash_values.h \
-		libewf_libcerror.h \
-		libewf_libfvalue.h \
-		libewf_libcnotify.h \
-		libewf_libuna.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_hash_values.o libewf_hash_values.c
-
-debug/libewf_sector_range.o: libewf_sector_range.c memory.h \
-		common/types.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		libewf_libcerror.h \
-		libewf_sector_range.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_sector_range.o libewf_sector_range.c
-
-debug/libewf_chunk_table.o: libewf_chunk_table.c common/byte_stream.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/types.h \
-		memory.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libcerror.h \
-		libewf_libbfio.h \
-		libewf_libfcache.h \
-		libewf_libfdata.h \
-		libewf_chunk_group.h \
-		libewf_section.h \
-		libewf_hash_sections.h \
-		libewf_libfvalue.h \
-		libewf_header_sections.h \
-		libewf_libcdata.h \
-		libewf_media_values.h \
-		libewf_single_files.h \
-		libewf_extern.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h \
-		libewf_chunk_table.h \
-		libewf_segment_file.h \
-		libewf_segment_table.h \
-		libewf_definitions.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_chunk_table.o libewf_chunk_table.c
-
-debug/libewf_support.o: libewf_support.c common/file_stream.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/narrow_string.h \
-		common/memory.h \
-		common/types.h \
-		common/wide_string.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_filename.h \
-		memory.h \
-		libewf_libcerror.h \
-		libewf_error.h \
-		libewf_extern.h \
-		libewf_libbfio.h \
-		libewf_libclocale.h \
-		libewf_libcnotify.h \
-		libewf_segment_file.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libfcache.h \
-		libewf_chunk_group.h \
-		libewf_section.h \
-		libewf_hash_sections.h \
-		libewf_libfvalue.h \
-		libewf_header_sections.h \
-		libewf_libcdata.h \
-		libewf_media_values.h \
-		libewf_single_files.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h \
-		libewf_support.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_support.o libewf_support.c
-
-debug/libewf_hash_sections.o: libewf_hash_sections.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		libewf_libcerror.h \
-		libewf_hash_sections.h \
-		libewf_libfvalue.h \
-		libewf_hash_values.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_hash_sections.o libewf_hash_sections.c
-
-debug/libewf_filename.o: libewf_filename.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		common/system_string.h \
-		common/wide_string.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_filename.h \
-		libewf_libcerror.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_filename.o libewf_filename.c
-
-debug/libewf_error.o: libewf_error.c common/file_stream.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/types.h \
-		libewf_error.h \
-		libewf_extern.h \
-		libewf_libcerror.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_error.o libewf_error.c
-
-debug/libewf_single_files.o: libewf_single_files.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_libcdata.h \
-		libewf_libcerror.h \
-		libewf_libcnotify.h \
-		libewf_libfvalue.h \
-		libewf_libuna.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_single_files.h \
-		libewf_extern.h \
-		libewf_types.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_single_files.o libewf_single_files.c
-
-debug/libewf_single_file_entry.o: libewf_single_file_entry.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		libewf_libcerror.h \
-		libewf_libfvalue.h \
-		libewf_libuna.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_single_file_entry.o libewf_single_file_entry.c
-
-debug/libewf_segment_table.o: libewf_segment_table.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		common/system_string.h \
-		common/wide_string.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_libbfio.h \
-		libewf_libcdata.h \
-		libewf_libcerror.h \
-		libewf_libclocale.h \
-		libewf_libuna.h \
-		libewf_segment_file.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libfcache.h \
-		libewf_chunk_group.h \
-		libewf_section.h \
-		libewf_hash_sections.h \
-		libewf_libfvalue.h \
-		libewf_header_sections.h \
-		libewf_media_values.h \
-		libewf_single_files.h \
-		libewf_extern.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h \
-		libewf_segment_table.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_segment_table.o libewf_segment_table.c
-
-debug/libewf_header_values.o: libewf_header_values.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		libewf_date_time.h \
-		libewf_libcerror.h \
-		libewf_date_time_values.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_header_values.h \
-		libewf_libfvalue.h \
-		libewf_libcnotify.h \
-		libewf_libuna.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_header_values.o libewf_header_values.c
-
-debug/libewf_segment_file.o: libewf_segment_file.c common/byte_stream.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/types.h \
-		memory.h \
-		common/system_string.h \
-		common/narrow_string.h \
-		common/memory.h \
-		common/wide_string.h \
-		libewf_case_data.h \
-		libewf_libcerror.h \
-		libewf_libfvalue.h \
-		libewf_media_values.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libbfio.h \
-		libewf_libfcache.h \
-		libewf_libfdata.h \
-		libewf_debug.h \
-		libewf_definitions.h \
-		libewf_device_information.h \
-		libewf_hash_values.h \
-		libewf_header_values.h \
-		libewf_libcdata.h \
-		libewf_libcnotify.h \
-		libewf_libfguid.h \
-		libewf_section.h \
-		libewf_hash_sections.h \
-		libewf_header_sections.h \
-		libewf_single_files.h \
-		libewf_extern.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h \
-		libewf_segment_file.h \
-		libewf_chunk_group.h \
-		libewf_segment_table.h \
-		libewf_unused.h \
-		ewf_file_header.h \
-		ewf_volume.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_segment_file.o libewf_segment_file.c
-
-debug/libewf_date_time.o: libewf_date_time.c memory.h \
-		common/types.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		libewf_date_time.h \
-		libewf_libcerror.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_date_time.o libewf_date_time.c
-
-debug/libewf_date_time_values.o: libewf_date_time_values.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		libewf_date_time.h \
-		libewf_libcerror.h \
-		libewf_date_time_values.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_libfvalue.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_date_time_values.o libewf_date_time_values.c
-
-debug/libewf_header_sections.o: libewf_header_sections.c memory.h \
-		common/types.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_io_handle.h \
-		libewf_libcerror.h \
-		libewf_header_sections.h \
-		libewf_libfvalue.h \
-		libewf_header_values.h \
-		libewf_libcnotify.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_header_sections.o libewf_header_sections.c
-
-debug/libewf_read_io_handle.o: libewf_read_io_handle.c common/types.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libcerror.h \
-		libewf_libbfio.h \
-		libewf_libfcache.h \
-		libewf_libfdata.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libcdata.h \
-		libewf_libcnotify.h \
-		libewf_media_values.h \
-		memory.h \
-		libewf_read_io_handle.h \
-		libewf_segment_file.h \
-		libewf_chunk_group.h \
-		libewf_section.h \
-		libewf_hash_sections.h \
-		libewf_libfvalue.h \
-		libewf_header_sections.h \
-		libewf_single_files.h \
-		libewf_extern.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_read_io_handle.o libewf_read_io_handle.c
-
-debug/libewf_chunk_data.o: libewf_chunk_data.c common/byte_stream.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/types.h \
-		memory.h \
-		libewf_checksum.h \
-		libewf_deflate.h \
-		libewf_libcerror.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libbfio.h \
-		libewf_libfcache.h \
-		libewf_libfdata.h \
-		libewf_compression.h \
-		libewf_definitions.h \
-		libewf_libcnotify.h \
-		libewf_types.h \
-		libewf_unused.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_chunk_data.o libewf_chunk_data.c
-
-debug/libewf_media_values.o: libewf_media_values.c memory.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/types.h \
-		libewf_libfdata.h \
-		libewf_libcerror.h \
-		libewf_libcnotify.h \
-		libewf_media_values.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_media_values.o libewf_media_values.c
-
-debug/libewf_io_handle.o: libewf_io_handle.c memory.h \
-		common/types.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		libewf_codepage.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_libfdata.h \
-		libewf_io_handle.h \
-		libewf_libcerror.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_io_handle.o libewf_io_handle.c
-
-debug/libewf_write_io_handle.o: libewf_write_io_handle.c common/byte_stream.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/types.h \
-		memory.h \
-		common/system_string.h \
-		common/narrow_string.h \
-		common/memory.h \
-		common/wide_string.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libcerror.h \
-		libewf_libbfio.h \
-		libewf_libfcache.h \
-		libewf_libfdata.h \
-		libewf_chunk_group.h \
-		libewf_section.h \
-		libewf_hash_sections.h \
-		libewf_libfvalue.h \
-		libewf_header_sections.h \
-		libewf_libcdata.h \
-		libewf_media_values.h \
-		libewf_single_files.h \
-		libewf_extern.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h \
-		libewf_chunk_table.h \
-		libewf_segment_file.h \
-		libewf_segment_table.h \
-		libewf_compression.h \
-		libewf_definitions.h \
-		libewf_filename.h \
-		libewf_header_values.h \
-		libewf_libcnotify.h \
-		libewf_read_io_handle.h \
-		libewf_unused.h \
-		libewf_write_io_handle.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_write_io_handle.o libewf_write_io_handle.c
-
-debug/libewf_section.o: libewf_section.c common/byte_stream.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/types.h \
-		memory.h \
-		common/narrow_string.h \
-		common/memory.h \
-		libewf_checksum.h \
-		libewf_deflate.h \
-		libewf_libcerror.h \
-		libewf_compression.h \
-		libewf_debug.h \
-		libewf_definitions.h \
-		libewf_libfdata.h \
-		libewf_hash_sections.h \
-		libewf_libfvalue.h \
-		libewf_header_values.h \
-		libewf_header_sections.h \
-		libewf_io_handle.h \
-		libewf_libbfio.h \
-		libewf_libcdata.h \
-		libewf_libcnotify.h \
-		libewf_libhmac.h \
-		libewf_media_values.h \
-		libewf_section.h \
-		libewf_single_files.h \
-		libewf_extern.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h \
-		libewf_sector_range.h \
-		libewf_unused.h \
-		ewf_digest.h \
-		ewf_error.h \
-		ewf_file_header.h \
-		ewf_hash.h \
-		ewf_ltree.h \
-		ewf_session.h \
-		ewf_volume.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_section.o libewf_section.c
-
-debug/libewf_handle.o: libewf_handle.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		common/wide_string.h \
-		libewf_analytical_data.h \
-		libewf_libcerror.h \
-		libewf_case_data.h \
-		libewf_libfvalue.h \
-		libewf_media_values.h \
-		libewf_chunk_data.h \
-		libewf_io_handle.h \
-		libewf_libbfio.h \
-		libewf_libfcache.h \
-		libewf_libfdata.h \
-		libewf_chunk_table.h \
-		libewf_chunk_group.h \
-		libewf_section.h \
-		libewf_hash_sections.h \
-		libewf_header_sections.h \
-		libewf_libcdata.h \
-		libewf_single_files.h \
-		libewf_extern.h \
-		libewf_single_file_entry.h \
-		libewf_date_time.h \
-		libewf_types.h \
-		ewf_data.h \
-		ewf_section.h \
-		ewf_table.h \
-		libewf_segment_file.h \
-		libewf_segment_table.h \
-		libewf_codepage.h \
-		libewf_compression.h \
-		libewf_data_chunk.h \
-		libewf_libcthreads.h \
-		libewf_write_io_handle.h \
-		libewf_read_io_handle.h \
-		libewf_debug.h \
-		libewf_definitions.h \
-		common/byte_stream.h \
-		libewf_device_information.h \
-		libewf_file_entry.h \
-		libewf_handle.h \
-		libewf_hash_values.h \
-		libewf_header_values.h \
-		libewf_libcnotify.h \
-		libewf_restart_data.h \
-		libewf_sector_range.h \
-		libewf_single_file_tree.h \
-		libewf_unused.h \
-		ewf_file_header.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/libewf_handle.o libewf_handle.c
-
-debug/mount_handle.o: mount_handle.c memory.h \
-		common/narrow_string.h \
-		common/common.h \
-		common/config.h \
-		common/config_borlandc.h \
-		common/config_msc.h \
-		common/config_winapi.h \
-		common/memory.h \
-		common/types.h \
-		common/system_string.h \
-		common/wide_string.h \
-		ewftools_libcerror.h \
-		ewftools_libewf.h \
-		mount_handle.h \
-		common/file_stream.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/mount_handle.o mount_handle.c
-
-debug/dir.o: sqfsfuse/dir.h sqfsfuse/common.h \
-		sqfsfuse/config.h
-	$(CC) -c $(CFLAGS) $(INCPATH) -o debug/dir.o sqfsfuse/dir.h
 
 debug/qrc_wombatforensics.o: debug/qrc_wombatforensics.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/qrc_wombatforensics.o debug/qrc_wombatforensics.cpp
