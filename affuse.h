@@ -45,37 +45,10 @@
 #include <sys/fsuid.h>
 #include <paths.h>
 
-#define XCALLOC(type, num) ((type *) xcalloc ((num), sizeof(type)))
-#define XMALLOC(type, num) ((type *) xmalloc ((num) * sizeof(type)))
-#define XFREE(stale) do { if(stale) { free ((void*) stale); stale = 0; } } while (0)
-
 static AFFILE* afimage = NULL;
 static char* rawpath = NULL;
 static off_t rawsize = 0;
 static const char* rawext = ".raw";
-
-static void* xmalloc(size_t num)
-{
-    void* alloc = malloc(num);
-    if(!alloc)
-    {
-	perror("Memory Exhausted");
-	exit(EXIT_FAILURE);
-    }
-    return alloc;
-};
-
-static void* xcalloc(size_t num, size_t size)
-{
-    void* alloc = xmalloc(num*size);
-    memset(alloc, 0, num*size);
-    return alloc;
-};
-
-static char* xstrdup(char* string)
-{
-    return strcpy((char*)xmalloc(strlen(string) + 1), string);
-};
 
 static void *affuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg)
 {
