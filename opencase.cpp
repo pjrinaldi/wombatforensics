@@ -1,4 +1,5 @@
 #include "opencase.h"
+#include "affuse.h"
 #include "sqfuse.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
