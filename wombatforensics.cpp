@@ -1,6 +1,8 @@
 #include "wombatforensics.h"
+#include "fusefunctions.h"
 #include "affuse.h"
 #include "ewffuse.h"
+#include "sqfuse.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -1021,6 +1023,46 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     UpdateEvidenceList();
     if(existingevidence.count() > 0)
     {
+	qDebug() << "existing evidence:" << existingevidence;
+	// If i run sqfuse stuff here, i avoid issues with multiple definitions.
+    /*if(elist.at(3).endsWith(".sfs"))
+    {
+        //SquashFuser(wombatvariable.imgdatapath, elist.at(3));
+        qDebug() << "push squashfuse function calls here...";
+        /*
+        QProcess builder;
+        builder.setProcessChannelMode(QProcess::MergedChannels);
+        builder.start("squashfuse", QStringList() << "-s" << elist.at(3) << wombatvariable.imgdatapath);
+        if(!builder.waitForFinished())
+            qDebug() << "fuse failed:" << builder.errorString();
+        else
+            qDebug() << "fuse output:" << builder.readAll();
+        /*
+        QString mstr = "squashfuse";
+        QStringList mstrlist;
+        mstrlist.clear();
+        mstrlist.append(elist.at(3));
+        mstrlist.append(wombatvariable.imgdatapath);
+        QString mntstr = "squashfuse " + elist.at(3) + " " + wombatvariable.imgdatapath;
+        //QProcess::execute(mntstr, QStringList());
+        QProcess* xmntprocess = new QProcess();
+        //connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
+        //connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErrr()), Qt::QueuedConnection);
+        //xmntprocess->start(mntstr);
+        xmntprocess->start(mstr, mstrlist);
+        xmntprocess->waitForFinished(-1);
+        */
+        /*
+         * + "/"QProcess builder;
+        builder.setProcessChannelMode(QProcess::MergedChannels);
+        builder.start("make", QStringList() << "-j2");
+        if (!builder.waitForFinished())
+            qDebug() << "Make failed:" << builder.errorString();
+        else
+            qDebug() << "Make output:" << builder.readAll();
+         */ 
+    //}
+
         QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
         openwatcher.setFuture(tmpfuture);
     }
@@ -1331,6 +1373,10 @@ void WombatForensics::PrepareEvidenceImage()
                     //EwfFuser();
                     EwfFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
 		}
+	    }
+	    else if(imagefile.endsWith(".sfs")) // SFS
+	    {
+		qDebug() << "mount sfs fuse here...";
 	    }
 	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
 	    {
