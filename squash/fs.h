@@ -25,21 +25,18 @@
 #ifndef SQFS_FS_H
 #define SQFS_FS_H
 
-#include "common.h"
+#include "squash/common.h"
 
-#include "squashfs_fs.h"
+#include "squash/squashfs_fs.h"
 
-#include "cache.h"
-#include "decompress.h"
-#include "table.h"
+#include "squash/cache.h"
+#include "squash/decompress.h"
+#include "squash/table.h"
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
 struct sqfs {
 	sqfs_fd_t fd;
 	size_t offset;
-	struct squashfs_super_block sb;
+	struct squashfs_super_block *sb;
 	sqfs_table id_table;
 	sqfs_table frag_table;
 	sqfs_table export_table;
@@ -48,16 +45,13 @@ struct sqfs {
 	sqfs_cache frag_cache;
 	sqfs_cache blockidx;
 	sqfs_decompressor decompressor;
-	
-	struct squashfs_xattr_id_table xattr_info;
-	sqfs_table xattr_table;
+        const char *root_alias;
+        const char *root_alias2;
 };
 
-typedef uint32_t sqfs_xattr_idx;
 struct sqfs_inode {
 	struct squashfs_base_inode base;
 	int nlink;
-	sqfs_xattr_idx xattr;
 	
 	sqfs_md_cursor next;
 	
@@ -97,10 +91,10 @@ void sqfs_version(sqfs *fs, int *major, int *minor);
 sqfs_compression_type sqfs_compression(sqfs *fs);
 
 
-void sqfs_md_header(uint16_t hdr, bool *compressed, uint16_t *size);
-void sqfs_data_header(uint32_t hdr, bool *compressed, uint32_t *size);
+void sqfs_md_header(uint16_t hdr, short *compressed, uint16_t *size);
+void sqfs_data_header(uint32_t hdr, short *compressed, uint32_t *size);
 
-sqfs_err sqfs_block_read(sqfs *fs, sqfs_off_t pos, bool compressed, uint32_t size,
+sqfs_err sqfs_block_read(sqfs *fs, sqfs_off_t pos, short compressed, uint32_t size,
 	size_t outsize, sqfs_block **block);
 void sqfs_block_dispose(sqfs_block *block);
 
@@ -135,7 +129,4 @@ sqfs_err sqfs_export_inode(sqfs *fs, sqfs_inode_num n, sqfs_inode_id *i);
 /* Find the root inode */
 sqfs_inode_id sqfs_inode_root(sqfs *fs);
 
-#if defined( __cplusplus )
-}
-#endif
 #endif

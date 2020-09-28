@@ -25,13 +25,10 @@
 #ifndef SQFS_DIR_H
 #define SQFS_DIR_H
 
-#include "common.h"
+#include "squash/common.h"
 
-#include "squashfs_fs.h"
+#include "squash/squashfs_fs.h"
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
 typedef struct {
 	sqfs_md_cursor cur;
 	sqfs_off_t offset, total;
@@ -49,6 +46,8 @@ typedef struct {
 
 typedef char sqfs_name[SQUASHFS_NAME_LEN + 1];
 
+typedef char sqfs_path[SQUASHFS_PATH_LEN + 1];
+
 /* Begin a directory traversal, initializing the dir structure.
    If offset is non-zero, fast-forward to that offset in the directory. */
 sqfs_err 	sqfs_dir_open(sqfs *fs, sqfs_inode *inode, sqfs_dir *dir,
@@ -61,19 +60,21 @@ sqfs_err 	sqfs_dir_open(sqfs *fs, sqfs_inode *inode, sqfs_dir *dir,
 void sqfs_dentry_init(sqfs_dir_entry *entry, char *namebuf);
 
 /* Get the next directory entry, filling in the dir_entry.
-	 Returns false when out of entries, or on error. */
-bool sqfs_dir_next(sqfs *fs, sqfs_dir *dir, sqfs_dir_entry *entry,
+	 Returns 0 when out of entries, or on error. */
+short sqfs_dir_next(sqfs *fs, sqfs_dir *dir, sqfs_dir_entry *entry,
 	sqfs_err *err);
 
 /* Lookup an entry in a directory inode.
 	 The dir_entry must have been initialized with a buffer. */
 sqfs_err sqfs_dir_lookup(sqfs *fs, sqfs_inode *inode,
-	const char *name, size_t namelen, sqfs_dir_entry *entry, bool *found);
+	const char *name, size_t namelen, sqfs_dir_entry *entry, short *found);
 
 /* Lookup a complete path, and replace *inode with the results.
 	 Uses / (slash) as the directory separator. */
+sqfs_err sqfs_lookup_path_inner(sqfs *fs, sqfs_inode *inode, const char *path,
+	short *found, short follow_link);
 sqfs_err sqfs_lookup_path(sqfs *fs, sqfs_inode *inode, const char *path,
-	bool *found);
+	short *found);
 
 
 /* Accessors on sqfs_dir_entry */
@@ -84,13 +85,10 @@ sqfs_mode_t			sqfs_dentry_mode				(sqfs_dir_entry *entry);
 sqfs_inode_id		sqfs_dentry_inode				(sqfs_dir_entry *entry);
 sqfs_inode_num	sqfs_dentry_inode_num		(sqfs_dir_entry *entry);
 size_t					sqfs_dentry_name_size		(sqfs_dir_entry *entry);
-bool						sqfs_dentry_is_dir			(sqfs_dir_entry *entry);
+short						sqfs_dentry_is_dir			(sqfs_dir_entry *entry);
 
 /* Yields the name of this directory entry, or NULL if the dir_entry structure
    was initialized without a name buffer. Name will be nul-terminated. */
 const char *		sqfs_dentry_name				(sqfs_dir_entry *entry);
 
-#if defined( __cplusplus )
-}
-#endif
 #endif

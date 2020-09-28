@@ -21,6 +21,9 @@
  * as a function.
  */
 
+#ifndef SQFUSE_H
+#define SQFUSE_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,8 +32,7 @@
 
 #define FUSE_USE_VERSION 35
 
-//#include <libewf.h>
-//#include <afflib/afflib.h>
+#include "squash.h"
 #include <fuse3/fuse.h>
 #include <fuse3/fuse_lowlevel.h>
 #include <stdio.h>
@@ -255,3 +257,5 @@ void SquashFuser(QString imgpath, QString imgfile)
     //pthread_t threadId;
     //int perr = pthread_create(&fusethread, NULL, fuselooper, (void *) affuser);
 };
+
+#endif // SQFUSE_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,21 +22,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "config.h"
+#ifndef SQFS_UTIL_H
+#define SQFS_UTIL_H
 
-#define SQFEATURE NONSTD_ENOATTR_DEF
-#include "nonstd-internal.h"
+#include "squash/common.h"
 
-#ifdef HAVE_ATTR_XATTR_H
-	#include <sys/types.h>
-	#include <attr/xattr.h>
+#include <stdio.h>
+
+/* Open a file, and optionally print a message on failure */
+sqfs_err sqfs_fd_open(const uint8_t *path, sqfs_fd_t *fd);
+
+/* Close a file */
+void sqfs_fd_close(sqfs_fd_t fd);
+
+/* Open a filesystem and print errors to stderr. */
+sqfs_err sqfs_open_image(sqfs *fs, const uint8_t *image, size_t offset);
+
 #endif
-#include <errno.h>
-
-#ifndef ENOATTR
-	 #define ENOATTR ENODATA
-#endif
-
-int sqfs_enoattr() {
-	return ENOATTR;
-}

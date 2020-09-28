@@ -21,6 +21,9 @@
  * as a function.
  */
 
+#ifndef AFFFUSE_H
+#define AFFFUSE_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -220,3 +223,5 @@ void AffFuser(QString imgpath, QString imgfile)
     //pthread_t threadId;
     int perr = pthread_create(&fusethread, NULL, fuselooper, (void *) affuser);
 };
+
+#endif // AFFUSE_H

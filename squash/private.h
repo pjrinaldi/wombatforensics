@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,26 +22,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_TABLE_H
-#define SQFS_TABLE_H
+#ifndef SQFS_PRIVATE_H
+#define SQFS_PRIVATE_H
 
-#include "common.h"
+#include "squash.h"
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
-typedef struct {
-	size_t each;
-	uint64_t *blocks;
-} sqfs_table;
+#include <sys/stat.h>
 
-sqfs_err sqfs_table_init(sqfs_table *table, sqfs_fd_t fd, sqfs_off_t start, size_t each,
-	size_t count);
-void sqfs_table_destroy(sqfs_table *table);
+/* Fill in a stat structure. Does not set st_ino */
+sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st);
 
-sqfs_err sqfs_table_get(sqfs_table *table, sqfs *fs, size_t idx, void *buf);
-
-#if defined( __cplusplus )
-}
-#endif
 #endif

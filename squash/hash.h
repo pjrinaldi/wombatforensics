@@ -22,41 +22,42 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "config.h"
+#ifndef SQFS_HASH_H
+#define SQFS_HASH_H
 
-#define SQFEATURE NONSTD_S_IFSOCK_DEF
-#include "nonstd-internal.h"
+#include "squash/common.h"
 
-#include <sys/stat.h>
+/* Simple hashtable
+ *	- Keys are integers
+ *	- Values are opaque data
+ *
+ * Implementation
+ *	- Hash function is modulus
+ *	- Chaining for duplicates
+ *	- Sizes are powers of two
+ */
+typedef uint32_t sqfs_hash_key;
+typedef void *sqfs_hash_value;
 
-#include "common.h"
-#include "squashfs_fs.h"
+typedef struct sqfs_hash_bucket {
+	struct sqfs_hash_bucket *next;
+	sqfs_hash_key key;
+	char value[1]; /* extended to size */
+} sqfs_hash_bucket;
 
-/* S_IF* are not standard */
-sqfs_mode_t sqfs_mode(int inode_type) {
-	switch (inode_type) {
-		case SQUASHFS_DIR_TYPE:
-		case SQUASHFS_LDIR_TYPE:
-			return S_IFDIR;
-		case SQUASHFS_REG_TYPE:
-		case SQUASHFS_LREG_TYPE:
-			return S_IFREG;
-		case SQUASHFS_SYMLINK_TYPE:
-		case SQUASHFS_LSYMLINK_TYPE:
-			return S_IFLNK;
-		case SQUASHFS_BLKDEV_TYPE:
-		case SQUASHFS_LBLKDEV_TYPE:
-			return S_IFBLK;
-		case SQUASHFS_CHRDEV_TYPE:
-		case SQUASHFS_LCHRDEV_TYPE:
-			return S_IFCHR;
-		case SQUASHFS_FIFO_TYPE:
-		case SQUASHFS_LFIFO_TYPE:
-			return S_IFIFO;
-		case SQUASHFS_SOCKET_TYPE:
-		case SQUASHFS_LSOCKET_TYPE:
-			return S_IFSOCK;
-	}
-	return 0;
-}
+typedef struct {
+	size_t value_size;
+	size_t capacity;
+	size_t size;
+	sqfs_hash_bucket **buckets;
+} sqfs_hash;
 
+sqfs_err sqfs_hash_init(sqfs_hash *h, size_t vsize, size_t initial);
+void sqfs_hash_destroy(sqfs_hash *h);
+
+sqfs_hash_value sqfs_hash_get(sqfs_hash *h, sqfs_hash_key k);
+
+sqfs_err sqfs_hash_add(sqfs_hash *h, sqfs_hash_key k, sqfs_hash_value v);
+sqfs_err sqfs_hash_remove(sqfs_hash *h, sqfs_hash_key k);
+
+#endif

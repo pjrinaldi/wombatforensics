@@ -94,8 +94,6 @@
 #include <tar.h>
 #include <libtar.h>
 
-#include "fusefunctions.h"
-#include "sqfuse.h"
 //#include <filmstripfilter.h>
 //#include <videothumbnailer.h>
 //#include <Magick++.h>

@@ -25,15 +25,12 @@
 #ifndef SQFS_FILE_H
 #define SQFS_FILE_H
 
-#include "common.h"
+#include "squash/common.h"
 
-#include "squashfs_fs.h"
+#include "squash/squashfs_fs.h"
 
-#include "cache.h"
+#include "squash/cache.h"
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
 sqfs_err sqfs_frag_entry(sqfs *fs, struct squashfs_fragment_entry *frag,
 	uint32_t idx);
 
@@ -45,7 +42,7 @@ typedef struct {
 	sqfs *fs;
 	size_t remain;			/* How many blocks left in the file? */
 	sqfs_md_cursor cur;	/* Points to next blocksize in MD */
-	bool started;
+	short started;
 
 	uint64_t pos;
 	
@@ -74,15 +71,8 @@ typedef struct {
 
 sqfs_err sqfs_blockidx_init(sqfs_cache *cache);
 
-/* Fill *out with all the block-index entries for this file */
-sqfs_err sqfs_blockidx_add(sqfs *fs, sqfs_inode *inode,
-	sqfs_blockidx_entry **out);
-
 /* Get a blocklist fast-forwarded to the correct location */
 sqfs_err sqfs_blockidx_blocklist(sqfs *fs, sqfs_inode *inode,
 	sqfs_blocklist *bl, sqfs_off_t start);
 
-#if defined( __cplusplus )
-}
-#endif
 #endif

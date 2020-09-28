@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,54 +22,47 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_TRAVERSE_H
-#define SQFS_TRAVERSE_H
+#ifndef SQFS_CACHE_H
+#define SQFS_CACHE_H
 
-#include "common.h"
+#include "squash/common.h"
 
-#include "dir.h"
-#include "stack.h"
+/* Really simplistic cache
+ *  - Linear search
+ *  - Linear eviction
+ *  - No thread safety
+ *  - Misses are caller's responsibility
+ */
+#define SQFS_CACHE_IDX_INVALID 0
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
+typedef uint64_t sqfs_cache_idx;
+typedef void (*sqfs_cache_dispose)(void* data);
+
 typedef struct {
-	bool dir_end;
-	sqfs_dir_entry entry;
-	char *path;
+	sqfs_cache_idx *idxs;
+	uint8_t *buf;
 	
+	sqfs_cache_dispose dispose;
 	
-	/* private */
-	int state;	
-	sqfs *fs;
-	sqfs_name namebuf;
-	sqfs_stack stack;
+	size_t size, count;
+	size_t next; /* next block to evict */
 	
-	size_t path_size, path_cap;
-	size_t path_last_size;
-} sqfs_traverse;
+	MUTEX mutex;
+} sqfs_cache;
 
-/* Begin a recursive traversal of a filesystem tree.
-   Every sub-item of the given inode will be traversed in-order, but not
-   this inode itself. */
-sqfs_err sqfs_traverse_open(sqfs_traverse *trv, sqfs *fs, sqfs_inode_id iid);
-sqfs_err sqfs_traverse_open_inode(sqfs_traverse *trv, sqfs *fs,
-	sqfs_inode *inode);
+sqfs_err sqfs_cache_init(sqfs_cache *cache, size_t size, size_t count,
+	sqfs_cache_dispose dispose);
+void sqfs_cache_destroy(sqfs_cache *cache);
 
-/* Clean up at any point during or after a traversal */
-void sqfs_traverse_close(sqfs_traverse *trv);
+void *sqfs_cache_get(sqfs_cache *cache, sqfs_cache_idx idx);
+void *sqfs_cache_add(sqfs_cache *cache, sqfs_cache_idx idx);
 
-/* Get the next item in the traversal. An item may be:
-   - A directory entry, in which case trv->entry will be filled
-	 - A marker that a directory is finished, in which case trv->dir_end will
-     be true.
-   Returns false if there are no more items. */
-bool sqfs_traverse_next(sqfs_traverse *trv, sqfs_err *err);
 
-/* Don't recurse into the directory just returned. */
-sqfs_err sqfs_traverse_prune(sqfs_traverse *trv);
+typedef struct {
+	sqfs_block *block;
+	size_t data_size;
+} sqfs_block_cache_entry;
 
-#if defined( __cplusplus )
-}
-#endif
+sqfs_err sqfs_block_cache_init(sqfs_cache *cache, size_t count);
+
 #endif

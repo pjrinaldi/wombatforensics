@@ -22,26 +22,59 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_SWAP_H
-#define SQFS_SWAP_H
+#ifndef SQFS_COMMON_H
+#define SQFS_COMMON_H
 
-#include "common.h"
+#include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include "squash/mutex.h"
 
-#if defined( __cplusplus )
-extern "C" {
+#ifdef _WIN32
+	#include "squash/windows.h"
+        struct squash_windows_dirent
+        {
+                long d_namlen;
+                ino_t d_ino;
+                char d_name[256 + 1]; // i.e. SQUASHFS_NAME_LEN + 1
+                uint8_t d_type;
+        };
+        #define SQUASH_DIRENT squash_windows_dirent
+#else
+	#include <sys/dir.h>
+	#include <unistd.h>
+	typedef mode_t sqfs_mode_t;
+	typedef uid_t sqfs_id_t;
+	typedef off_t sqfs_off_t;
+        #define SQUASH_DIRENT dirent
 #endif
-#define SQFS_MAGIC_SWAP 0x68737173
+typedef const uint8_t * sqfs_fd_t;
 
-void sqfs_swap16(uint16_t *n);
+typedef enum {
+	SQFS_OK,
+	SQFS_ERR,
+	SQFS_BADFORMAT,		/* unsupported file format */
+	SQFS_BADVERSION,	/* unsupported squashfs version */
+	SQFS_BADCOMP,		/* unsupported compression method */
+	SQFS_UNSUP			/* unsupported feature */
+} sqfs_err;
 
-void sqfs_swapin16(uint16_t *v);
-void sqfs_swapin32(uint32_t *v);
-void sqfs_swapin64(uint64_t *v);
+#define SQFS_INODE_ID_BYTES 6
+typedef uint64_t sqfs_inode_id;
+typedef uint32_t sqfs_inode_num;
 
-#include "squashfs_fs.h"
-#include "swap.h.inc"
+typedef struct sqfs sqfs;
+typedef struct sqfs_inode sqfs_inode;
 
-#if defined( __cplusplus )
-}
-#endif
+typedef struct {
+	size_t size;
+	void *data;
+	short data_need_freeing;
+} sqfs_block;
+
+typedef struct {
+	sqfs_off_t block;
+	size_t offset;
+} sqfs_md_cursor;
+
 #endif

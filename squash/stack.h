@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Dave Vasilevsky <dave@vasilevsky.ca>
+ * Copyright (c) 2014 Dave Vasilevsky <dave@vasilevsky.ca>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,55 +22,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_COMMON_H
-#define SQFS_COMMON_H
+#ifndef SQFS_STACK_H
+#define SQFS_STACK_H
 
-#include "config.h"
+#include "squash/common.h"
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <sys/types.h>
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-#ifdef _WIN32
-	#include <win32.h>
-#else
-	typedef mode_t sqfs_mode_t;
-	typedef uid_t sqfs_id_t;
-	typedef off_t sqfs_off_t;
-	typedef int sqfs_fd_t;
-#endif
-
-typedef enum {
-	SQFS_OK,
-	SQFS_ERR,
-	SQFS_BADFORMAT,		/* unsupported file format */
-	SQFS_BADVERSION,	/* unsupported squashfs version */
-	SQFS_BADCOMP,		/* unsupported compression method */
-	SQFS_UNSUP			/* unsupported feature */
-} sqfs_err;
-
-#define SQFS_INODE_ID_BYTES 6
-typedef uint64_t sqfs_inode_id;
-typedef uint32_t sqfs_inode_num;
-
-typedef struct sqfs sqfs;
-typedef struct sqfs_inode sqfs_inode;
+typedef void (*sqfs_stack_free_t)(void *v);
 
 typedef struct {
+	size_t value_size;
 	size_t size;
-	void *data;
-} sqfs_block;
+	size_t capacity;
+	char *items;
+	sqfs_stack_free_t freer;
+} sqfs_stack;
 
-typedef struct {
-	sqfs_off_t block;
-	size_t offset;
-} sqfs_md_cursor;
+/* Ensures the struct is in a safe state */
+void sqfs_stack_init(sqfs_stack *s);
 
-#if defined( __cplusplus )
-}
-#endif
+sqfs_err sqfs_stack_create(sqfs_stack *s, size_t vsize, size_t initial,
+	sqfs_stack_free_t freer);
+void sqfs_stack_destroy(sqfs_stack *s);
+
+sqfs_err sqfs_stack_push(sqfs_stack *s, void *vout);
+short sqfs_stack_pop(sqfs_stack *s);
+
+size_t sqfs_stack_size(sqfs_stack *s);
+sqfs_err sqfs_stack_at(sqfs_stack *s, size_t i, void *vout);
+sqfs_err sqfs_stack_top(sqfs_stack *s, void *vout);
+
 #endif

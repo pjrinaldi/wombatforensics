@@ -22,54 +22,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef SQFS_CACHE_H
-#define SQFS_CACHE_H
+#ifndef SQFS_TABLE_H
+#define SQFS_TABLE_H
 
-#include "common.h"
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-/* Really simplistic cache
- *  - Linear search
- *  - Linear eviction
- *  - No thread safety
- *  - Misses are caller's responsibility
- */
-#define SQFS_CACHE_IDX_INVALID 0
-
-typedef uint64_t sqfs_cache_idx;
-typedef void (*sqfs_cache_dispose)(void* data);
+#include "squash/common.h"
 
 typedef struct {
-	sqfs_cache_idx *idxs;
-	uint8_t *buf;
-	
-	sqfs_cache_dispose dispose;
-	
-	size_t size, count;
-	size_t next; /* next block to evict */
-} sqfs_cache;
+	size_t each;
+	uint64_t *blocks;
+} sqfs_table;
 
-sqfs_err sqfs_cache_init(sqfs_cache *cache, size_t size, size_t count,
-	sqfs_cache_dispose dispose);
-void sqfs_cache_destroy(sqfs_cache *cache);
+sqfs_err sqfs_table_init(sqfs_table *table, sqfs_fd_t fd, sqfs_off_t start, size_t each,
+	size_t count);
+void sqfs_table_destroy(sqfs_table *table);
 
-void *sqfs_cache_get(sqfs_cache *cache, sqfs_cache_idx idx);
-void *sqfs_cache_add(sqfs_cache *cache, sqfs_cache_idx idx);
-void sqfs_cache_invalidate(sqfs_cache *cache, sqfs_cache_idx idx);
-
-
-typedef struct {
-	sqfs_block *block;
-	size_t data_size;
-} sqfs_block_cache_entry;
-
-sqfs_err sqfs_block_cache_init(sqfs_cache *cache, size_t count);
-
-#if defined( __cplusplus )
-}
-#endif
+sqfs_err sqfs_table_get(sqfs_table *table, sqfs *fs, size_t idx, void *buf);
 
 #endif
