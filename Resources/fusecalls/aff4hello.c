@@ -28,8 +28,8 @@
 #define FUSE_USE_VERSION 31
 
 //#include <afflib/afflib.h>
-#include <aff4/aff4.h>
-#include <aff4/aff4-c.h>
+#include </usr/local/include/aff4/aff4.h>
+#include </usr/local/include/aff4/aff4-c.h>
 #include <fuse.h>
 #include <stdio.h>
 #include <string.h>

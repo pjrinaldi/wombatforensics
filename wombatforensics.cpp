@@ -1,6 +1,7 @@
 #include "wombatforensics.h"
-#include "fusefunctions.h"
+//#include "fusefunctions.h"
 #include "ewffuse.h"
+//#include "sqfuse.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -1901,6 +1902,9 @@ void WombatForensics::CloseCurrentCase()
         }
         else if(imgext.contains("sfs")) // squashfuse
         {
+            fuse_unmount(sqfuser);
+            fuse_destroy(sqfuser);
+            /*
             QProcess builder;
             builder.setProcessChannelMode(QProcess::MergedChannels);
             builder.start("fusermount", QStringList() << "-u" << wombatvariable.imgdatapath);
@@ -1909,6 +1913,7 @@ void WombatForensics::CloseCurrentCase()
                 qDebug() << "fuse failed:" << builder.errorString();
             else
                 qDebug() << "fuse output:" << builder.readAll();
+            */
             /*
             QString umntstr = "fusermount";
             QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;

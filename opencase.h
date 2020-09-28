@@ -3,6 +3,8 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
+//#include "fusefunctions.h"
+//#include "sqfuse.h"
 #include "tskcpp.h"
 #include "properties.h"
 #include "wombatfunctions.h"
