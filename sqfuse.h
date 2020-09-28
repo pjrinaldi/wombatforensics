@@ -1,3 +1,6 @@
+#ifndef SQFUSE_H
+#define SQFUSE_H
+
 /*
   FUSE: Filesystem in Userspace
   Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
@@ -21,8 +24,6 @@
  * as a function.
  */
 
-#ifndef SQFUSE_H
-#define SQFUSE_H
 
 #include <stdio.h>
 #include <stdlib.h>

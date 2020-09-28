@@ -20,7 +20,7 @@ void PopulateTreeModel(QString evidstring)
     evidfile.close();
     if(elist.at(3).endsWith(".sfs"))
     {
-        SquashFuser(wombatvariable.imgdatapath, elist.at(3));
+        //SquashFuser(wombatvariable.imgdatapath, elist.at(3));
         qDebug() << "push squashfuse function calls here...";
         /*
         QProcess builder;

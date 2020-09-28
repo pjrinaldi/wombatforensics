@@ -1901,8 +1901,8 @@ void WombatForensics::CloseCurrentCase()
         }
         else if(imgext.contains("sfs")) // squashfuse
         {
-            fuse_unmount(sqfuser);
-            fuse_destroy(sqfuser);
+            //fuse_unmount(sqfuser);
+            //fuse_destroy(sqfuser);
             /*
             QProcess builder;
             builder.setProcessChannelMode(QProcess::MergedChannels);
