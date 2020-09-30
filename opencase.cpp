@@ -20,6 +20,10 @@ void PopulateTreeModel(QString evidstring)
     evidfile.close();
     if(elist.at(3).endsWith(".sfs"))
     {
+	//static int sqvfd = 0;
+	//static sqfs* squish = NULL;
+	//sqvfd = squash_open(squish, elist.at(3).toStdString().c_str());
+
         //SquashFuser(wombatvariable.imgdatapath, elist.at(3));
         qDebug() << "push squashfuse function calls here...";
         /*

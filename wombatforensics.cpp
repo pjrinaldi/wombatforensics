@@ -1024,12 +1024,25 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     if(existingevidence.count() > 0)
     {
 	qDebug() << "existing evidence:" << existingevidence;
-	// If i run sqfuse stuff here, i avoid issues with multiple definitions.
-    /*if(elist.at(3).endsWith(".sfs"))
+	// If i run sqfuse stuff here, i avoid issues with multiple def    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+	/*
+    QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
+    QString evidid = "." + evidlist.first().split(".").last();
+    QStringList elist;
+    elist.clear();
+    QString evidencename = evidlist.first().split(evidid).first();
+    QString evidencepath = wombatvariable.tmpmntpath + evidencename + evidid + "/";
+    QFile evidfile(evidencepath + "stat");
+    if(!evidfile.isOpen())
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        elist = QString(evidfile.readLine()).split(",");
+    evidfile.close();
+initions.
+    if(elist.at(3).endsWith(".sfs"))
     {
         //SquashFuser(wombatvariable.imgdatapath, elist.at(3));
         qDebug() << "push squashfuse function calls here...";
-        /*
         QProcess builder;
         builder.setProcessChannelMode(QProcess::MergedChannels);
         builder.start("squashfuse", QStringList() << "-s" << elist.at(3) << wombatvariable.imgdatapath);
@@ -1037,7 +1050,6 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             qDebug() << "fuse failed:" << builder.errorString();
         else
             qDebug() << "fuse output:" << builder.readAll();
-        /*
         QString mstr = "squashfuse";
         QStringList mstrlist;
         mstrlist.clear();
@@ -1947,8 +1959,8 @@ void WombatForensics::CloseCurrentCase()
         }
         else if(imgext.contains("sfs")) // squashfuse
         {
-            //fuse_unmount(sqfuser);
-            //fuse_destroy(sqfuser);
+            fuse_unmount(sqfuser);
+            fuse_destroy(sqfuser);
             /*
             QProcess builder;
             builder.setProcessChannelMode(QProcess::MergedChannels);

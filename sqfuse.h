@@ -33,9 +33,9 @@
 
 #define FUSE_USE_VERSION 35
 
-extern "C" {
-#include "squash.h"
-}
+//extern "C" {
+//#include "squash.h"
+//}
 
 #include <fuse3/fuse.h>
 #include <fuse3/fuse_lowlevel.h>
@@ -55,7 +55,7 @@ static sqfs* squish = NULL;
 //libewf_error_t* ewferror = NULL;
 static char* sqrawpath = NULL;
 static off_t sqrawsize = 0;
-static const char* sqrawext = ".raw";
+static const char* sqrawext = ".dd";
 
 /*
 #define XCALLOC(type, num) ((type *) xcalloc ((num), sizeof(type)))
@@ -150,11 +150,15 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 	(void) fi;
 	if(strcmp(path, sqrawpath) != 0)
 		return -ENOENT;
+	res = squash_lseek(sqvfd, offset, SQUASH_SEEK_SET);
+	//off_t squash_lseek(int vfd, off_t offset, int whence);
 	//af_seek(afimage, (uint64_t)offset, SEEK_SET);
         //off64_t libewf_handle_seek_offset(libewf_handle_t *handle, off64_t offset, int whence, libewf_error_t **error );
         //res = libewf_handle_seek_offset(ewfhandle, offset, SEEK_SET, &ewferror);
 
 	errno = 0;
+	res = squash_read(sqvfd, buf, offset);
+	//ssize_t squash_read(int vfd, void *buf, sqfs_off_t nbyte);
 	//res = af_read(afimage, (unsigned char*)buf, (int)size);
         //res = libewf_handle_read_buffer(ewfhandle, buf, size, &ewferror);
         //ssize_t libewf_handle_read_buffer(libewf_handle_t *handle, void *buffer, size_t buffer_size, libewf_error_t **error);
@@ -173,7 +177,7 @@ static void sqfuse_destroy(void* param)
 };
 
 static const struct fuse_operations sqfuse_oper = {
-	.getattr	= sqfuse_getattr,
+	//.getattr	= sqfuse_getattr,
         /*.readlink       = sqfuse_readlink,
         .mknod          = sqfuse_mknod,
         .mkdir          = sqfuse_mkdir,
@@ -245,6 +249,8 @@ void SquashFuser(QString imgpath, QString imgfile)
     //libewf_handle_initialize(&ewfhandle, &ewferror);
     //ibewf_handle_open(ewfhandle, filenames, 1, LIBEWF_OPEN_READ, &ewferror);
     //libewf_handle_open(ewfhandle, (char* const)iname, 1, LIBEWF_OPEN_READ, &ewferror)
+    sqvfd = squash_open(squish, imgfile.toStdString().c_str());
+    //int squash_open(sqfs *fs, const char *path);
     fargv[0] = "./sqfuse";
     //fargv[1] = "-o";
     //fargv[2] = "auto_unmount";

@@ -94,6 +94,9 @@
 #include <tar.h>
 #include <libtar.h>
 
+extern "C" {
+#include "squash.h"
+}
 //#include <filmstripfilter.h>
 //#include <videothumbnailer.h>
 //#include <Magick++.h>
