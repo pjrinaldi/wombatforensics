@@ -160,7 +160,7 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 
 static void sqfuse_destroy(void* param)
 {
-    squash_close(sqvfd);
+    //squash_close(sqvfd);
     //libewf_handle_close(ewfhandle, &ewferror);
     //libewf_handle_free(&ewfhandle, &ewferror);
     //af_close(afimage);
