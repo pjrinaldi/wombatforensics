@@ -39,7 +39,7 @@ DISTNAME      = wombatforensics1.0.0
 DISTDIR = /home/pasquale/Projects/wombatforensics/release/wombatforensics1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath-link,/usr/lib
-LIBS          = $(SUBLIBS) -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -Lsquash `pkg-config fuse3 --cflags --libs` /usr/lib/libQt5MultimediaWidgets.so /usr/lib/libQt5WebEngineWidgets.so /usr/lib/libQt5PrintSupport.so /usr/lib/libQt5OpenGL.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Multimedia.so /usr/lib/libQt5WebEngineCore.so /usr/lib/libQt5Quick.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Concurrent.so /usr/lib/libQt5Sql.so /usr/lib/libQt5QmlModels.so /usr/lib/libQt5WebChannel.so /usr/lib/libQt5Qml.so /usr/lib/libQt5Network.so /usr/lib/libQt5Positioning.so /usr/lib/libQt5Core.so -lGL -lpthread -lXext -lX11 -lm  
+LIBS          = $(SUBLIBS) -lewf -ltsk -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -L./libsquash.a `pkg-config fuse3 --cflags --libs` /usr/lib/libQt5MultimediaWidgets.so /usr/lib/libQt5WebEngineWidgets.so /usr/lib/libQt5PrintSupport.so /usr/lib/libQt5OpenGL.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Multimedia.so /usr/lib/libQt5WebEngineCore.so /usr/lib/libQt5Quick.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Concurrent.so /usr/lib/libQt5Sql.so /usr/lib/libQt5QmlModels.so /usr/lib/libQt5WebChannel.so /usr/lib/libQt5Qml.so /usr/lib/libQt5Network.so /usr/lib/libQt5Positioning.so /usr/lib/libQt5Core.so -lGL -lpthread -lXext -lX11 -lm  
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -207,38 +207,16 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/g++-base.conf \
 		/usr/lib/qt/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt/mkspecs/qconfig.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3drender.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3drender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KIdleTime.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KScreen.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWaylandClient.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWaylandServer.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bodymovin_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts_private.pri \
@@ -246,8 +224,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_designer.pri \
@@ -261,14 +237,11 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fb_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_glx_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_hunspellinputmethod_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_input_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_kms_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
@@ -281,10 +254,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_nfc.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_nfc_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_openglextensions.pri \
@@ -301,8 +270,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_positioningquick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmldebug_private.pri \
@@ -316,30 +283,12 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickshapes_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_repparser.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_repparser_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_script.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_script_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_sensors.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_sensors_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialport.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql_private.pri \
@@ -353,8 +302,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_vulkan_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient_private.pri \
@@ -461,6 +408,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		verevidencedialog.h \
 		affuse.h \
 		ewffuse.h \
+		squash.h \
 		sqfuse.h main.cpp \
 		wombatforensics.cpp \
 		wombatfunctions.cpp \
@@ -512,7 +460,7 @@ TARGET        = release/wombatforensics
 first: all
 ####### Build rules
 
-release/wombatforensics: ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h ui_filecarvingdialog.h ui_carvingfiletypesdialog.h ui_pdfviewer.h ui_registryviewer.h ui_newforimg.h ui_verifyevidencedialog.h $(OBJECTS)  
+release/wombatforensics: ./libsquash.a ui_aboutbox.h ui_accesseddatefilter.h ui_analysistypefilter.h ui_byteconverter.h ui_changeddatefilter.h ui_createddatefilter.h ui_digdeeperdialog.h ui_exportdialog.h ui_filecategoryfilter.h ui_filetypefilter.h ui_fileviewer.h ui_hashcategoryfilter.h ui_htmlviewer.h ui_idfilter.h ui_imageviewer.h ui_imagewindow.h ui_jumpto.h ui_messageviewer.h ui_modifieddatefilter.h ui_namefilter.h ui_pathfilter.h ui_propertieswindow.h ui_settingsdialog.h ui_sizefilter.h ui_textviewer.h ui_videoviewer.h ui_viewermanager.h ui_wombatforensics.h ui_jumphex.h ui_addevidencedialog.h ui_remevidencedialog.h ui_tagfilter.h ui_tagmanager.h ui_searchdialog.h ui_carvedialog.h ui_filecarvingdialog.h ui_carvingfiletypesdialog.h ui_pdfviewer.h ui_registryviewer.h ui_newforimg.h ui_verifyevidencedialog.h $(OBJECTS)  
 	@test -d release/ || mkdir -p release/
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -532,7 +480,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents wombatforensics.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h digging.h reporting.h artifactparser.h exporting.h properties.h newcase.h opencase.h registryviewer.h newforimg.h imagefunctions.h tagging.h verevidencedialog.h affuse.h ewffuse.h sqfuse.h $(DISTDIR)/
+	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h tskvariable.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tskcpp.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h digging.h reporting.h artifactparser.h exporting.h properties.h newcase.h opencase.h registryviewer.h newforimg.h imagefunctions.h tagging.h verevidencedialog.h affuse.h ewffuse.h squash.h sqfuse.h $(DISTDIR)/
 	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tskcpp.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp pdfviewer.cpp carving.cpp digging.cpp reporting.cpp artifactparser.cpp exporting.cpp properties.cpp newcase.cpp opencase.cpp registryviewer.cpp newforimg.cpp imagefunctions.cpp tagging.cpp verevidencedialog.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui filecarvingdialog.ui carvingfiletypesdialog.ui pdfviewer.ui registryviewer.ui newforimg.ui verifyevidencedialog.ui $(DISTDIR)/
 
@@ -1394,10 +1342,27 @@ release/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		verevidencedialog.h \
 		ui_verifyevidencedialog.h \
 		imagefunctions.h \
+		fusefunctions.h \
 		affuse.h \
 		ewffuse.h \
 		sqfuse.h \
-		squash.h
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/wombatforensics.o wombatforensics.cpp
 
 release/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \

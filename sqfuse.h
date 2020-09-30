@@ -46,6 +46,7 @@
 #include <sys/fsuid.h>
 #include <paths.h>
 
+static int sqvfd = 0;
 //libewf_handle_t* ewfhandle = NULL;
 //libewf_error_t* ewferror = NULL;
 static char* sqrawpath = NULL;
@@ -159,6 +160,7 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 
 static void sqfuse_destroy(void* param)
 {
+    squash_close(sqvfd);
     //libewf_handle_close(ewfhandle, &ewferror);
     //libewf_handle_free(&ewfhandle, &ewferror);
     //af_close(afimage);
@@ -168,11 +170,37 @@ static void sqfuse_destroy(void* param)
 
 static const struct fuse_operations sqfuse_oper = {
 	.getattr	= sqfuse_getattr,
+        /*.readlink       = sqfuse_readlink,
+        .mknod          = sqfuse_mknod,
+        .mkdir          = sqfuse_mkdir,
+        .unlink         = sqfuse_unlink,
+        .rmdir          = sqfuse_rmdir,
+        .symlink        = sqfuse_symlink,
+        .rename         = sqfuse_rename,
+        .link           = sqfuse_link,
+        .chmod          = sqfuse_chmod,
+        .chown          = sqfuse_chown,
+        .truncate       = sqfuse_truncate,*/
 	.open		= sqfuse_open,
 	.read		= sqfuse_read,
+        /*.write          = sqfuse_write,
+        .statfs         = sqfuse_statfs,
+        .flush          = sqfuse_flush,
+        .release        = sqfuse_release,
+        .fsync          = sqfuse_fsync,
+        .setxattr       = sqfuse_setxattr,
+        .getxattr       = sqfuse_getxattr,
+        .listxattr      = sqfuse_listxattr,
+        .removexattr    = sqfuse_removexattr,
+        .opendir        = sqfuse_opendir,*/
 	.readdir	= sqfuse_readdir,
+        /*.releasedir     = sqfuse_releasedir,
+        .fsyncdir       = sqfuse_fsyncdir,*/
 	.init           = sqfuse_init,
 	.destroy	= sqfuse_destroy,
+        /*.access         = sqfuse_access,
+        .create         = sqfuse_create,
+        .lock           = sqfuse_lock,*/
 };
 
 void* sqfuselooper(void *data)
