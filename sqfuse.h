@@ -33,9 +33,10 @@
 
 #define FUSE_USE_VERSION 35
 
-//#include <squashfs_fs.h>
-#include "squashfuse.h"
-//#include "squash.h"
+extern "C" {
+#include "squash.h"
+}
+
 #include <fuse3/fuse.h>
 #include <fuse3/fuse_lowlevel.h>
 #include <stdio.h>
@@ -48,8 +49,8 @@
 #include <sys/fsuid.h>
 #include <paths.h>
 
-sqfs* squish = NULL;
 static int sqvfd = 0;
+static sqfs* squish = NULL;
 //libewf_handle_t* ewfhandle = NULL;
 //libewf_error_t* ewferror = NULL;
 static char* sqrawpath = NULL;
@@ -163,8 +164,7 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 
 static void sqfuse_destroy(void* param)
 {
-    //sqfs_destroy(squish);
-    //squash_close(sqvfd);
+    squash_close(sqvfd);
     //libewf_handle_close(ewfhandle, &ewferror);
     //libewf_handle_free(&ewfhandle, &ewferror);
     //af_close(afimage);
