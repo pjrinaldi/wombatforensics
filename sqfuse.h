@@ -103,7 +103,7 @@ static int sqfuse_getattr(const char *path, struct stat *stbuf, struct fuse_file
 
 	//} else if (strcmp(path+1, options.filename) == 0) {
 	memset(stbuf, 0, sizeof(struct stat));
-	if (strcmp(path, "/") == 0) {
+	if (strcmp(path, "/squashfs-root/") == 0) {
 		stbuf->st_mode = S_IFDIR | 0755;
 		stbuf->st_nlink = 2;
 	} else if(strcmp(path, sqrawpath) == 0) {
@@ -123,7 +123,7 @@ static int sqfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
 	(void) fi;
 	(void) flags;
 
-	if (strcmp(path, "/") != 0)
+	if (strcmp(path, "/squashfs-root/") != 0)
 		return -ENOENT;
 
 	filler(buf, ".", NULL, 0, (fuse_fill_dir_flags)0);
@@ -221,7 +221,7 @@ void* sqfuselooper(void *data)
 };
 
 struct fuse_args sqargs;
-struct fuse* sqfuser;
+struct fuse* sqfuser = NULL;
 //struct fuse_session* affusersession;
 pthread_t sqfusethread;
 
@@ -234,10 +234,16 @@ void SquashFuser(QString imgpath, QString imgfile)
     //system_character_t **libewf_filenames = NULL;
     //system_character_t *filenames[ 1 ]    = { NULL };
     //filenames[ 0 ]      = (system_character_t *) filename;
+    QString filebase = imgfile.split(".").at(0);
+    qDebug() << "orig basename:" << filebase;
+    char* imgfilesub = NULL;
+    imgfilesub = new char[filebase.toStdString().size() + 1];
+    strcpy(imgfilesub, filebase.toStdString().c_str());
     int ret;
     char* afpath = NULL;
     char* afbasename = NULL;
     size_t rawpathlen = 0;
+    char* rootpath = "squashfs-root/";
     char** fargv = NULL;
     fargv = XCALLOC(char *, 3);
     int fargc = 0;
@@ -249,7 +255,6 @@ void SquashFuser(QString imgpath, QString imgfile)
     //libewf_handle_initialize(&ewfhandle, &ewferror);
     //ibewf_handle_open(ewfhandle, filenames, 1, LIBEWF_OPEN_READ, &ewferror);
     //libewf_handle_open(ewfhandle, (char* const)iname, 1, LIBEWF_OPEN_READ, &ewferror)
-    sqvfd = squash_open(squish, imgfile.toStdString().c_str());
     //int squash_open(sqfs *fs, const char *path);
     fargv[0] = "./sqfuse";
     //fargv[1] = "-o";
@@ -261,13 +266,17 @@ void SquashFuser(QString imgpath, QString imgfile)
     //afimage = af_open(iname, O_RDONLY|O_EXCL,0);
     afpath = xstrdup(ipath);
     printf("efpath: %s\n", afpath);
-    afbasename = basename(iname);
-    rawpathlen = 1 + strlen(afbasename) + strlen(sqrawext) + 1;
+    afbasename = basename(imgfilesub);
+    //afbasename = basename(iname);
+    printf("afbasename: %s\n", afbasename);
+    rawpathlen = 1 + strlen(rootpath) + strlen(afbasename) + strlen(sqrawext) + 1;
     sqrawpath = XCALLOC(char, rawpathlen);
     sqrawpath[0] = '/';
+    strcat(sqrawpath, rootpath);
     strcat(sqrawpath, afbasename);
     strcat(sqrawpath, sqrawext);
     sqrawpath[rawpathlen - 1] = 0;
+    printf("rawpath: %s", sqrawpath);
     XFREE(afpath);
 
     //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
@@ -275,6 +284,8 @@ void SquashFuser(QString imgpath, QString imgfile)
 
     //rawsize = af_get_imagesize(afimage);
     
+    /*
+    sqvfd = squash_open(squish, imgfile.toStdString().c_str());
     struct fuse_loop_config config;
     config.clone_fd = 0;
     config.max_idle_threads = 5;
@@ -283,6 +294,7 @@ void SquashFuser(QString imgpath, QString imgfile)
     ret = fuse_mount(sqfuser, imgpath.toStdString().c_str());
     fuse_daemonize(1);
     pthread_create(&sqfusethread, NULL, sqfuselooper, (void*) sqfuser);
+    */
     //affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
     //if(affuser == NULL)
     //    qDebug() << "affuser new error.";

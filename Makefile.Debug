@@ -207,38 +207,16 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/g++-base.conf \
 		/usr/lib/qt/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt/mkspecs/qconfig.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3drender.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3drender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KIdleTime.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KScreen.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWaylandClient.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWaylandServer.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bodymovin_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts_private.pri \
@@ -246,8 +224,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_designer.pri \
@@ -261,14 +237,11 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fb_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_glx_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_hunspellinputmethod_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_input_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_kms_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
@@ -281,10 +254,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_nfc.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_nfc_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_openglextensions.pri \
@@ -301,8 +270,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_positioningquick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmldebug_private.pri \
@@ -316,30 +283,12 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickshapes_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_repparser.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_repparser_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_script.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_script_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_sensors.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_sensors_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialport.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql_private.pri \
@@ -353,8 +302,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_vulkan_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient_private.pri \
@@ -644,6 +591,23 @@ compiler_moc_header_clean:
 	-$(DEL_FILE) debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp debug/moc_filecarvingdialog.cpp debug/moc_carvingfiletypesdialog.cpp debug/moc_pdfviewer.cpp debug/moc_registryviewer.cpp debug/moc_newforimg.cpp debug/moc_verevidencedialog.cpp
 debug/moc_wombatforensics.cpp: wombatforensics.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
@@ -729,6 +693,23 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 
 debug/moc_exportdialog.cpp: exportdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -736,6 +717,23 @@ debug/moc_exportdialog.cpp: exportdialog.h \
 
 debug/moc_globals.cpp: globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -743,6 +741,23 @@ debug/moc_globals.cpp: globals.h \
 
 debug/moc_propertieswindow.cpp: propertieswindow.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		ui_propertieswindow.h \
 		globals.h \
 		wombatvariable.h \
@@ -752,6 +767,23 @@ debug/moc_propertieswindow.cpp: propertieswindow.h \
 
 debug/moc_fileviewer.cpp: fileviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		ui_fileviewer.h \
 		qhexedit.h \
 		chunks.h \
@@ -765,6 +797,23 @@ debug/moc_fileviewer.cpp: fileviewer.h \
 
 debug/moc_filterviews.cpp: filterviews.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_accesseddatefilter.h \
@@ -788,6 +837,23 @@ debug/moc_filterviews.cpp: filterviews.h \
 
 debug/moc_imageviewer.cpp: imageviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -802,6 +868,23 @@ debug/moc_imageviewer.cpp: imageviewer.h \
 
 debug/moc_videoviewer.cpp: videoviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_videoviewer.h \
@@ -811,6 +894,23 @@ debug/moc_videoviewer.cpp: videoviewer.h \
 
 debug/moc_viewermanager.cpp: viewermanager.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_viewermanager.h \
@@ -820,6 +920,23 @@ debug/moc_viewermanager.cpp: viewermanager.h \
 
 debug/moc_textviewer.cpp: textviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_textviewer.h \
@@ -831,6 +948,23 @@ debug/moc_textviewer.cpp: textviewer.h \
 
 debug/moc_htmlviewer.cpp: htmlviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		artifactparser.h \
@@ -843,6 +977,23 @@ debug/moc_htmlviewer.cpp: htmlviewer.h \
 
 debug/moc_messageviewer.cpp: messageviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_messageviewer.h \
@@ -854,6 +1005,23 @@ debug/moc_messageviewer.cpp: messageviewer.h \
 
 debug/moc_byteconverter.cpp: byteconverter.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_byteconverter.h \
@@ -863,6 +1031,23 @@ debug/moc_byteconverter.cpp: byteconverter.h \
 
 debug/moc_digdeeperdialog.cpp: digdeeperdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -870,6 +1055,23 @@ debug/moc_digdeeperdialog.cpp: digdeeperdialog.h \
 
 debug/moc_aboutbox.cpp: aboutbox.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -884,6 +1086,23 @@ debug/moc_qhexedit.cpp: qhexedit.h \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -902,6 +1121,23 @@ debug/moc_commands.cpp: commands.h \
 
 debug/moc_settingsdialog.cpp: settingsdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -915,6 +1151,23 @@ debug/moc_settingsdialog.cpp: settingsdialog.h \
 
 debug/moc_addevidencedialog.cpp: addevidencedialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -926,6 +1179,23 @@ debug/moc_addevidencedialog.cpp: addevidencedialog.h \
 
 debug/moc_remevidencedialog.cpp: remevidencedialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -937,6 +1207,23 @@ debug/moc_remevidencedialog.cpp: remevidencedialog.h \
 
 debug/moc_tagmanager.cpp: tagmanager.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -953,6 +1240,23 @@ debug/moc_searchdialog.cpp: searchdialog.h \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -960,6 +1264,23 @@ debug/moc_searchdialog.cpp: searchdialog.h \
 
 debug/moc_carvedialog.cpp: carvedialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -971,6 +1292,23 @@ debug/moc_carvedialog.cpp: carvedialog.h \
 
 debug/moc_filecarvingdialog.cpp: filecarvingdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -978,6 +1316,23 @@ debug/moc_filecarvingdialog.cpp: filecarvingdialog.h \
 
 debug/moc_carvingfiletypesdialog.cpp: carvingfiletypesdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_carvingfiletypesdialog.h \
@@ -989,6 +1344,23 @@ debug/moc_carvingfiletypesdialog.cpp: carvingfiletypesdialog.h \
 
 debug/moc_pdfviewer.cpp: pdfviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1002,6 +1374,23 @@ debug/moc_pdfviewer.cpp: pdfviewer.h \
 
 debug/moc_registryviewer.cpp: registryviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1015,6 +1404,23 @@ debug/moc_registryviewer.cpp: registryviewer.h \
 
 debug/moc_newforimg.cpp: newforimg.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1026,6 +1432,23 @@ debug/moc_newforimg.cpp: newforimg.h \
 
 debug/moc_verevidencedialog.cpp: verevidencedialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1090,6 +1513,23 @@ ui_fileviewer.h: fileviewer.ui \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h
 	/usr/bin/uic fileviewer.ui -o ui_fileviewer.h
 
@@ -1165,6 +1605,23 @@ ui_wombatforensics.h: wombatforensics.ui \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h
 	/usr/bin/uic wombatforensics.ui -o ui_wombatforensics.h
 
@@ -1231,6 +1688,23 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 ####### Compile
 
 debug/main.o: main.cpp wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatforensics.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1315,6 +1789,23 @@ debug/main.o: main.cpp wombatinclude.h \
 
 debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
@@ -1397,7 +1888,11 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		fusefunctions.h \
 		affuse.h \
 		ewffuse.h \
-		sqfuse.h \
+		sqfuse.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/wombatforensics.o wombatforensics.cpp
+
+debug/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
+		wombatinclude.h \
 		squash.h \
 		squash/dir.h \
 		squash/common.h \
@@ -1414,11 +1909,7 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		squash/util.h \
 		squash/private.h \
 		squash/fdtable.h \
-		squash/dirent.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/wombatforensics.o wombatforensics.cpp
-
-debug/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
-		wombatinclude.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		tskcpp.h
@@ -1426,17 +1917,68 @@ debug/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
 
 debug/exportdialog.o: exportdialog.cpp exportdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		ui_exportdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/exportdialog.o exportdialog.cpp
 
 debug/globals.o: globals.cpp globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/globals.o globals.cpp
 
 debug/propertieswindow.o: propertieswindow.cpp propertieswindow.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		ui_propertieswindow.h \
 		globals.h \
 		wombatvariable.h
@@ -1444,6 +1986,23 @@ debug/propertieswindow.o: propertieswindow.cpp propertieswindow.h \
 
 debug/fileviewer.o: fileviewer.cpp fileviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		ui_fileviewer.h \
 		qhexedit.h \
 		chunks.h \
@@ -1455,6 +2014,23 @@ debug/fileviewer.o: fileviewer.cpp fileviewer.h \
 
 debug/filterviews.o: filterviews.cpp filterviews.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_accesseddatefilter.h \
@@ -1476,6 +2052,23 @@ debug/filterviews.o: filterviews.cpp filterviews.h \
 
 debug/imageviewer.o: imageviewer.cpp imageviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1488,6 +2081,23 @@ debug/imageviewer.o: imageviewer.cpp imageviewer.h \
 
 debug/videoviewer.o: videoviewer.cpp videoviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_videoviewer.h
@@ -1495,6 +2105,23 @@ debug/videoviewer.o: videoviewer.cpp videoviewer.h \
 
 debug/viewermanager.o: viewermanager.cpp viewermanager.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_viewermanager.h
@@ -1502,6 +2129,23 @@ debug/viewermanager.o: viewermanager.cpp viewermanager.h \
 
 debug/textviewer.o: textviewer.cpp textviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_textviewer.h \
@@ -1511,6 +2155,23 @@ debug/textviewer.o: textviewer.cpp textviewer.h \
 
 debug/htmlviewer.o: htmlviewer.cpp htmlviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		artifactparser.h \
@@ -1521,6 +2182,23 @@ debug/htmlviewer.o: htmlviewer.cpp htmlviewer.h \
 
 debug/messageviewer.o: messageviewer.cpp messageviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_messageviewer.h \
@@ -1530,6 +2208,23 @@ debug/messageviewer.o: messageviewer.cpp messageviewer.h \
 
 debug/byteconverter.o: byteconverter.cpp byteconverter.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_byteconverter.h
@@ -1537,12 +2232,46 @@ debug/byteconverter.o: byteconverter.cpp byteconverter.h \
 
 debug/digdeeperdialog.o: digdeeperdialog.cpp digdeeperdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		ui_digdeeperdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/digdeeperdialog.o digdeeperdialog.cpp
 
 debug/aboutbox.o: aboutbox.cpp aboutbox.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1555,6 +2284,23 @@ debug/qhexedit.o: qhexedit.cpp qhexedit.h \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/qhexedit.o qhexedit.cpp
 
@@ -1567,6 +2313,23 @@ debug/commands.o: commands.cpp commands.h \
 
 debug/settingsdialog.o: settingsdialog.cpp settingsdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1578,6 +2341,23 @@ debug/settingsdialog.o: settingsdialog.cpp settingsdialog.h \
 
 debug/addevidencedialog.o: addevidencedialog.cpp addevidencedialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1587,6 +2367,23 @@ debug/addevidencedialog.o: addevidencedialog.cpp addevidencedialog.h \
 
 debug/remevidencedialog.o: remevidencedialog.cpp remevidencedialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1595,11 +2392,45 @@ debug/remevidencedialog.o: remevidencedialog.cpp remevidencedialog.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/remevidencedialog.o remevidencedialog.cpp
 
 debug/tskcpp.o: tskcpp.cpp tskcpp.h \
-		wombatinclude.h
+		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/tskcpp.o tskcpp.cpp
 
 debug/tagmanager.o: tagmanager.cpp tagmanager.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1614,12 +2445,46 @@ debug/searchdialog.o: searchdialog.cpp searchdialog.h \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		ui_searchdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/searchdialog.o searchdialog.cpp
 
 debug/carvedialog.o: carvedialog.cpp carvedialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1629,12 +2494,46 @@ debug/carvedialog.o: carvedialog.cpp carvedialog.h \
 
 debug/filecarvingdialog.o: filecarvingdialog.cpp filecarvingdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		ui_filecarvingdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/filecarvingdialog.o filecarvingdialog.cpp
 
 debug/carvingfiletypesdialog.o: carvingfiletypesdialog.cpp carvingfiletypesdialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		ui_carvingfiletypesdialog.h \
@@ -1644,6 +2543,23 @@ debug/carvingfiletypesdialog.o: carvingfiletypesdialog.cpp carvingfiletypesdialo
 
 debug/pdfviewer.o: pdfviewer.cpp pdfviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1656,6 +2572,23 @@ debug/pdfviewer.o: pdfviewer.cpp pdfviewer.h \
 debug/carving.o: carving.cpp carving.h \
 		globals.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatvariable.h \
 		videoviewer.h \
 		ui_videoviewer.h
@@ -1663,6 +2596,23 @@ debug/carving.o: carving.cpp carving.h \
 
 debug/digging.o: digging.cpp digging.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatfunctions.h \
 		globals.h \
 		wombatvariable.h \
@@ -1671,6 +2621,23 @@ debug/digging.o: digging.cpp digging.h \
 
 debug/reporting.o: reporting.cpp reporting.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		tskcpp.h
@@ -1678,6 +2645,23 @@ debug/reporting.o: reporting.cpp reporting.h \
 
 debug/artifactparser.o: artifactparser.cpp artifactparser.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatfunctions.h \
 		globals.h \
 		wombatvariable.h \
@@ -1686,6 +2670,23 @@ debug/artifactparser.o: artifactparser.cpp artifactparser.h \
 
 debug/exporting.o: exporting.cpp exporting.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		tskcpp.h
@@ -1693,6 +2694,23 @@ debug/exporting.o: exporting.cpp exporting.h \
 
 debug/properties.o: properties.cpp properties.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatfunctions.h \
 		globals.h \
 		wombatvariable.h \
@@ -1701,6 +2719,23 @@ debug/properties.o: properties.cpp properties.h \
 
 debug/newcase.o: newcase.cpp newcase.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		tskcpp.h \
@@ -1710,6 +2745,23 @@ debug/newcase.o: newcase.cpp newcase.h \
 
 debug/opencase.o: opencase.cpp opencase.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		tskcpp.h \
@@ -1719,6 +2771,23 @@ debug/opencase.o: opencase.cpp opencase.h \
 
 debug/registryviewer.o: registryviewer.cpp registryviewer.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1730,6 +2799,23 @@ debug/registryviewer.o: registryviewer.cpp registryviewer.h \
 
 debug/newforimg.o: newforimg.cpp newforimg.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1743,6 +2829,23 @@ debug/imagefunctions.o: imagefunctions.cpp imagefunctions.h
 
 debug/tagging.o: tagging.cpp tagging.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		wombatfunctions.h \
 		globals.h \
 		wombatvariable.h \
@@ -1751,6 +2854,23 @@ debug/tagging.o: tagging.cpp tagging.h \
 
 debug/verevidencedialog.o: verevidencedialog.cpp verevidencedialog.h \
 		wombatinclude.h \
+		squash.h \
+		squash/dir.h \
+		squash/common.h \
+		squash/mutex.h \
+		squash/windows.h \
+		squash/squashfs_fs.h \
+		squash/file.h \
+		squash/cache.h \
+		squash/fs.h \
+		squash/decompress.h \
+		squash/table.h \
+		squash/traverse.h \
+		squash/stack.h \
+		squash/util.h \
+		squash/private.h \
+		squash/fdtable.h \
+		squash/dirent.h \
 		globals.h \
 		wombatvariable.h \
 		wombatfunctions.h \

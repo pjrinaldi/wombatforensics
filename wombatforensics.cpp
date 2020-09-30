@@ -1023,7 +1023,12 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     UpdateEvidenceList();
     if(existingevidence.count() > 0)
     {
-	qDebug() << "existing evidence:" << existingevidence;
+        for(int i=0; i < existingevidence.count(); i++)
+        {
+            if(existingevidence.at(i).endsWith(".sfs"))
+                SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
+        }
+	//qDebug() << "existing evidence:" << existingevidence;
 	// If i run sqfuse stuff here, i avoid issues with multiple def    QDir eviddir = QDir(wombatvariable.tmpmntpath);
 	/*
     QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
@@ -1959,8 +1964,11 @@ void WombatForensics::CloseCurrentCase()
         }
         else if(imgext.contains("sfs")) // squashfuse
         {
-            fuse_unmount(sqfuser);
-            fuse_destroy(sqfuser);
+            if(sqfuser != NULL)
+            {
+                fuse_unmount(sqfuser);
+                fuse_destroy(sqfuser);
+            }
             /*
             QProcess builder;
             builder.setProcessChannelMode(QProcess::MergedChannels);
