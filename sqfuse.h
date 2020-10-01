@@ -286,7 +286,9 @@ void SquashFuser(QString imgpath, QString imgfile)
     //rawsize = af_get_imagesize(afimage);
     
     ///*
-    sqvfd = squash_open(squish, imgfile.toStdString().c_str());
+    sqvfd = sqfs_open_image(squish, (const uint8_t*)iname, 0);
+    qDebug() << "sqvfd:" << sqvfd;
+    //sqvfd = squash_open(squish, imgfile.toStdString().c_str());
     struct fuse_loop_config config;
     config.clone_fd = 0;
     config.max_idle_threads = 5;
