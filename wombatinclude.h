@@ -95,7 +95,8 @@
 #include <libtar.h>
 
 extern "C" {
-#include "squash.h"
+//#include "squash.h"
+#include "squashfuse.h"
 }
 //#include <filmstripfilter.h>
 //#include <videothumbnailer.h>

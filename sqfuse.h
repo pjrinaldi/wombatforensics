@@ -49,8 +49,8 @@
 #include <sys/fsuid.h>
 #include <paths.h>
 
-static int sqvfd = 0;
-static sqfs* squish = NULL;
+//static int sqvfd = 0;
+//static sqfs* squish = NULL;
 //libewf_handle_t* ewfhandle = NULL;
 //libewf_error_t* ewferror = NULL;
 static char* sqrawpath = NULL;
@@ -150,14 +150,14 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 	(void) fi;
 	if(strcmp(path, sqrawpath) != 0)
 		return -ENOENT;
-	res = squash_lseek(sqvfd, offset, SQUASH_SEEK_SET);
+	//res = squash_lseek(sqvfd, offset, SQUASH_SEEK_SET);
 	//off_t squash_lseek(int vfd, off_t offset, int whence);
 	//af_seek(afimage, (uint64_t)offset, SEEK_SET);
         //off64_t libewf_handle_seek_offset(libewf_handle_t *handle, off64_t offset, int whence, libewf_error_t **error );
         //res = libewf_handle_seek_offset(ewfhandle, offset, SEEK_SET, &ewferror);
 
 	errno = 0;
-	res = squash_read(sqvfd, buf, offset);
+	//res = squash_read(sqvfd, buf, offset);
 	//ssize_t squash_read(int vfd, void *buf, sqfs_off_t nbyte);
 	//res = af_read(afimage, (unsigned char*)buf, (int)size);
         //res = libewf_handle_read_buffer(ewfhandle, buf, size, &ewferror);
@@ -168,7 +168,7 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 
 static void sqfuse_destroy(void* param)
 {
-    squash_close(sqvfd);
+    //squash_close(sqvfd);
     //libewf_handle_close(ewfhandle, &ewferror);
     //libewf_handle_free(&ewfhandle, &ewferror);
     //af_close(afimage);
@@ -286,8 +286,8 @@ void SquashFuser(QString imgpath, QString imgfile)
     //rawsize = af_get_imagesize(afimage);
     
     ///*
-    sqvfd = sqfs_open_image(squish, (const uint8_t*)iname, 0);
-    qDebug() << "sqvfd:" << sqvfd;
+    //sqvfd = sqfs_open_image(squish, (const uint8_t*)iname, 0);
+    //qDebug() << "sqvfd:" << sqvfd;
     //sqvfd = squash_open(squish, imgfile.toStdString().c_str());
     struct fuse_loop_config config;
     config.clone_fd = 0;
