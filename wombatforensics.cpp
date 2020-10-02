@@ -1079,9 +1079,9 @@ initions.
             qDebug() << "Make output:" << builder.readAll();
          */ 
     //}
-
-        QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
-        openwatcher.setFuture(tmpfuture);
+        
+	//QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
+        //openwatcher.setFuture(tmpfuture);
     }
     else
     {

@@ -33,10 +33,6 @@
 
 #define FUSE_USE_VERSION 35
 
-//extern "C" {
-//#include "squash.h"
-//}
-
 #include <fuse3/fuse.h>
 #include <fuse3/fuse_lowlevel.h>
 #include <stdio.h>
@@ -48,6 +44,16 @@
 #include <pthread.h>
 #include <sys/fsuid.h>
 #include <paths.h>
+
+typedef struct squishfs squishfs;
+struct squishfs {
+    sqfs fs;
+    sqfs_inode root;
+};
+
+squishfs* squish;
+//sqfs squish;
+//sqfs_inode sqroot;
 
 //static int sqvfd = 0;
 //static sqfs* squish = NULL;
@@ -176,39 +182,78 @@ static void sqfuse_destroy(void* param)
     return;
 };
 
+static int sqfuse_opendir(const char* path, struct fuse_file_info* fi)
+{
+    return 0;
+};
+
+static int sqfuse_releasedir(const char* path, struct fuse_file_info* fi)
+{
+    return 0;
+};
+
+static int sqfuse_release(const char* path, struct fuse_file_info* fi)
+{
+    return 0;
+};
+
+static int sqfuse_readlink(const char* path, char* buf, size_t size)
+{
+    return 0;
+};
+
+static int sqfuse_listxattr(const char* path, char* buf, size_t size)
+{
+    return size;
+};
+
+static int sqfuse_getxattr(const char* path, const char* name, char* value, size_t size
+#ifdef FUSE_XATTR_POSITION
+	, uint32_t poisition
+#endif
+	)
+{
+    return 0;
+};
+
+static int sqfuse_statfs(const char* path, struct statvfs* st)
+{
+    return 0;
+};
+
 static const struct fuse_operations sqfuse_oper = {
-	//.getattr	= sqfuse_getattr,
-        /*.readlink       = sqfuse_readlink,
-        .mknod          = sqfuse_mknod,
-        .mkdir          = sqfuse_mkdir,
-        .unlink         = sqfuse_unlink,
-        .rmdir          = sqfuse_rmdir,
-        .symlink        = sqfuse_symlink,
-        .rename         = sqfuse_rename,
-        .link           = sqfuse_link,
-        .chmod          = sqfuse_chmod,
-        .chown          = sqfuse_chown,
-        .truncate       = sqfuse_truncate,*/
+	.getattr	= sqfuse_getattr,
+        .readlink       = sqfuse_readlink,
+        //.mknod          = sqfuse_mknod,
+        //.mkdir          = sqfuse_mkdir,
+        //.unlink         = sqfuse_unlink,
+        //.rmdir          = sqfuse_rmdir,
+        //.symlink        = sqfuse_symlink,
+        //.rename         = sqfuse_rename,
+        //.link           = sqfuse_link,
+        //.chmod          = sqfuse_chmod,
+        //.chown          = sqfuse_chown,
+        //.truncate       = sqfuse_truncate,*/
 	.open		= sqfuse_open,
 	.read		= sqfuse_read,
-        /*.write          = sqfuse_write,
+        //.write          = sqfuse_write,
         .statfs         = sqfuse_statfs,
-        .flush          = sqfuse_flush,
+        //.flush          = sqfuse_flush,
         .release        = sqfuse_release,
-        .fsync          = sqfuse_fsync,
-        .setxattr       = sqfuse_setxattr,
+        //.fsync          = sqfuse_fsync,
+        //.setxattr       = sqfuse_setxattr,
         .getxattr       = sqfuse_getxattr,
         .listxattr      = sqfuse_listxattr,
-        .removexattr    = sqfuse_removexattr,
-        .opendir        = sqfuse_opendir,*/
+        //.removexattr    = sqfuse_removexattr,
+        .opendir        = sqfuse_opendir,
 	.readdir	= sqfuse_readdir,
-        /*.releasedir     = sqfuse_releasedir,
-        .fsyncdir       = sqfuse_fsyncdir,*/
+        .releasedir     = sqfuse_releasedir,
+        //.fsyncdir       = sqfuse_fsyncdir,
 	.init           = sqfuse_init,
 	.destroy	= sqfuse_destroy,
-        /*.access         = sqfuse_access,
-        .create         = sqfuse_create,
-        .lock           = sqfuse_lock,*/
+        //.access         = sqfuse_access,
+        //.create         = sqfuse_create,
+        //.lock           = sqfuse_lock,
 };
 
 void* sqfuselooper(void *data)
