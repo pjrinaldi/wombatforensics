@@ -52,6 +52,24 @@ struct squishfs {
 };
 
 squishfs* squish;
+
+static sqfs_err sqfuse_lookup(sqfs** fs, sqfs_inode* inode, const char* path)
+{
+    bool found;
+    squishfs* squisher = (squishfs*)fuse_get_context()->private_data;
+    *fs = &squisher->fs;
+    if(inode)
+	*inode = squisher->root; /* copy */
+    if(path)
+    {
+	sqfs_err err = sqfs_lookup_path(*fs, inode, path, &found);
+	if(err)
+	    return err;
+	if(!found)
+	    return SQFS_ERR;
+    }
+    return SQFS_OK;
+};
 //sqfs squish;
 //sqfs_inode sqroot;
 
