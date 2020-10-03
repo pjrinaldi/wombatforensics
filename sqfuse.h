@@ -56,10 +56,13 @@ squishfs* squish;
 static sqfs_err sqfuse_lookup(sqfs** fs, sqfs_inode* inode, const char* path)
 {
     bool found;
-    squishfs* squisher = (squishfs*)fuse_get_context()->private_data;
+    //squishfs* squisher = ((squishfs*)(fuse_get_context()->private_data));
+    squishfs* squisher = (squishfs*)(fuse_get_context()->private_data);
     *fs = &squisher->fs;
+    /*
     if(inode)
-	*inode = squisher->root; /* copy */
+	*inode = squisher->root; // copy
+    */
     if(path)
     {
 	sqfs_err err = sqfs_lookup_path(*fs, inode, path, &found);
@@ -91,7 +94,7 @@ sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st) {
 		st->st_size = inode->xtra.symlink_size;
 	}
 	
-	st->st_blksize = fs->sb.block_size; /* seriously? */
+	//st->st_blksize = fs->sb.block_size; /* seriously? */
 	
 	err = sqfs_id_get(fs, inode->base.uid, &id);
 	if (err)
@@ -104,6 +107,62 @@ sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st) {
 	
 	return SQFS_OK;
 };
+dev_t sqfs_makedev(int maj, int min)
+{
+    return makedev(maj, min);
+};
+
+#ifndef ENOATTR
+	 #define ENOATTR ENODATA
+#endif
+
+int sqfs_enoattr() {
+	return ENOATTR;
+};
+
+int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size) {
+	sqfs_xattr x;
+	size_t count = 0;
+	
+	if (sqfs_xattr_open(fs, inode, &x))
+		return -EIO;
+	
+	while (x.remain) {
+		size_t n;
+		if (sqfs_xattr_read(&x))
+			 return EIO;
+		n = sqfs_xattr_name_size(&x);
+		count += n + 1;
+		
+		if (buf) {
+			if (count > *size)
+				return ERANGE;
+			if (sqfs_xattr_name(&x, buf, true))
+				return EIO;
+			buf += n;
+			*buf++ = '\0';
+		}
+	}
+	*size = count;
+	return 0;
+};
+
+int sqfs_statfs(sqfs *sq, struct statvfs *st) {
+	struct squashfs_super_block *sb = &sq->sb;
+
+	st->f_bsize = sb->block_size;
+	st->f_frsize = sb->block_size;
+	st->f_blocks = ((sb->bytes_used - 1) >> sb->block_log) + 1;
+	st->f_bfree = 0;
+	st->f_bavail = 0;
+	st->f_files = sb->inodes;
+	st->f_ffree = 0;
+	st->f_favail = 0;
+	st->f_namemax = SQUASHFS_NAME_LEN;
+
+	return 0;
+};
+
 //sqfs squish;
 //sqfs_inode sqroot;
 
@@ -414,7 +473,7 @@ static int sqfuse_getxattr(const char* path, const char* name, char* value, size
 static int sqfuse_statfs(const char* path, struct statvfs* st)
 {
     squishfs* sqsh = (squishfs*)fuse_get_context()->private_data;
-    return sqfs_statfs(&hl->fs, st);
+    return sqfs_statfs(&sqsh->fs, st);
 };
 
 static int sqfuse_create(const char* unused_path, mode_t unused_mode, struct fuse_file_info* unused_fi)

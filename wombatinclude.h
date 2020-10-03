@@ -98,7 +98,7 @@ extern "C" {
 //#include "squash.h"
 #include "squashfuse.h"
 #include "squashfuse/nonstd.h"
-#include "squashfuse/fuseprivate.h"
+//#include "squashfuse/fuseprivate.h"
 }
 //#include <filmstripfilter.h>
 //#include <videothumbnailer.h>
