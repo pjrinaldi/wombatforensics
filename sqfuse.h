@@ -70,6 +70,40 @@ static sqfs_err sqfuse_lookup(sqfs** fs, sqfs_inode* inode, const char* path)
     }
     return SQFS_OK;
 };
+
+sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st) {
+	sqfs_err err = SQFS_OK;
+	uid_t id;
+	
+	memset(st, 0, sizeof(*st));
+	st->st_mode = inode->base.mode;
+	st->st_nlink = inode->nlink;
+	st->st_mtime = st->st_ctime = st->st_atime = inode->base.mtime;
+	
+	if (S_ISREG(st->st_mode)) {
+		/* FIXME: do symlinks, dirs, etc have a size? */
+		st->st_size = inode->xtra.reg.file_size;
+		st->st_blocks = st->st_size / 512;
+	} else if (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)) {
+		st->st_rdev = sqfs_makedev(inode->xtra.dev.major,
+			inode->xtra.dev.minor);
+	} else if (S_ISLNK(st->st_mode)) {
+		st->st_size = inode->xtra.symlink_size;
+	}
+	
+	st->st_blksize = fs->sb.block_size; /* seriously? */
+	
+	err = sqfs_id_get(fs, inode->base.uid, &id);
+	if (err)
+		return err;
+	st->st_uid = id;
+	err = sqfs_id_get(fs, inode->base.guid, &id);
+	st->st_gid = id;
+	if (err)
+		return err;
+	
+	return SQFS_OK;
+};
 //sqfs squish;
 //sqfs_inode sqroot;
 
@@ -117,11 +151,19 @@ static void* sqfuse_init(struct fuse_conn_info* conn, struct fuse_config* cfg)
 {
     (void) conn;
     cfg->kernel_cache = 1;
-    return NULL;
+    return fuse_get_context()->private_data;
+    //return NULL;
 };
 
 static int sqfuse_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
 {
+    sqfs* fs;
+    sqfs_inode inode;
+    if(sqfuse_lookup(&fs, &inode, path))
+        return -ENOENT;
+    if(sqfs_stat(fs, &inode, stbuf))
+        return -ENOENT;
+    /*
 	(void) fi;
 	int res = 0;
 
@@ -139,10 +181,37 @@ static int sqfuse_getattr(const char *path, struct stat *stbuf, struct fuse_file
 		res = -ENOENT;
 
 	return res;
+    */
+    return 0;
 };
 
 static int sqfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags)
 {
+    sqfs_err err;
+    sqfs* fs;
+    sqfs_inode* inode;
+    sqfs_dir dir;
+    sqfs_name namebuf;
+    sqfs_dir_entry entry;
+    struct stat st;
+    sqfuse_lookup(&fs, NULL, NULL);
+    inode = (sqfs_inode*)(intptr_t)fi->fh;
+    if(sqfs_dir_open(fs, inode, &dir, offset))
+        return -EINVAL;
+
+    memset(&st, 0, sizeof(st));
+    sqfs_dentry_init(&entry, namebuf);
+    while(sqfs_dir_next(fs, &dir, &entry, &err))
+    {
+        sqfs_off_t doff = sqfs_dentry_next_offset(&entry);
+        st.st_mode = sqfs_dentry_mode(&entry);
+        if(filler(buf, sqfs_dentry_name(&entry), &st, doff, (fuse_fill_dir_flags)0))
+            return 0;
+    }
+    if(err)
+        return -EIO;
+    return 0;
+    /*
 	(void) offset;
 	(void) fi;
 	(void) flags;
@@ -155,10 +224,52 @@ static int sqfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
 	filler(buf, sqrawpath + 1, NULL, 0, (fuse_fill_dir_flags)0);
 
 	return 0;
+    */
 };
 
 static int sqfuse_open(const char *path, struct fuse_file_info *fi)
 {
+    /*
+    squishfs* sqsh;
+    sqsh = malloc(size(*sqsh));
+    if(!sqsh)
+        perror("Can't allocate memory");
+    else
+    {
+        memset(sqsh, 0, sizeof(*sqsh));
+        if(sqfs_open_image(&sqsh->fs, path, offset) == SQFS_OK)
+        {
+            if(sqfs_inode_get(&sqsh->fs, &sqsh->root, sqfs_inode_root(&sqsh->fs)))
+                fprintf(stderr, "Can't find the root of the filesystem!\n");
+            else
+                return sqsh;
+            sqfs_destroy(&sqsh->fs);
+        }
+        free(sqsh);
+    }
+    return NULL;
+    */
+    sqfs* fs;
+    sqfs_inode* inode;
+    if(fi->flags & (O_WRONLY | O_RDWR))
+        return -EROFS;
+    inode = (sqfs_inode*)malloc(sizeof(*inode));
+    if(!inode)
+        return -ENOMEM;
+    if(sqfuse_lookup(&fs, inode, path))
+    {
+        free(inode);
+        return -ENOENT;
+    }
+    if(!S_ISREG(inode->base.mode))
+    {
+        free(inode);
+        return -EISDIR;
+    }
+    fi->fh = (intptr_t)inode;
+    fi->keep_cache = 1;
+    return 0;
+    /*
 	if(strcmp(path, sqrawpath) != 0)
 		return -ENOENT;
 
@@ -166,10 +277,20 @@ static int sqfuse_open(const char *path, struct fuse_file_info *fi)
 		return -EACCES;
 
 	return 0;
+    */
 };
 
 static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
+    sqfs* fs;
+    sqfuse_lookup(&fs, NULL, NULL);
+    sqfs_inode* inode = (sqfs_inode*)(intptr_t)fi->fh;
+
+    off_t osize = size;
+    if(sqfs_read_range(fs, inode, offset, &osize, buf))
+        return -EIO;
+    return osize;
+    /*
 	int res = 0;
 	(void) fi;
 	if(strcmp(path, sqrawpath) != 0)
@@ -188,10 +309,14 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
         //ssize_t libewf_handle_read_buffer(libewf_handle_t *handle, void *buffer, size_t buffer_size, libewf_error_t **error);
 
 	return res;
+    */
 };
 
 static void sqfuse_destroy(void* param)
 {
+    squishfs* sqsh = (squishfs*)param;
+    sqfs_destroy(&sqsh->fs);
+    free(sqsh);
     //squash_close(sqvfd);
     //libewf_handle_close(ewfhandle, &ewferror);
     //libewf_handle_free(&ewfhandle, &ewferror);
@@ -202,41 +327,99 @@ static void sqfuse_destroy(void* param)
 
 static int sqfuse_opendir(const char* path, struct fuse_file_info* fi)
 {
+    sqfs* fs;
+    sqfs_inode* inode;
+    inode = (sqfs_inode*)malloc(sizeof(*inode));
+    if(!inode)
+        return -ENOMEM;
+    if(sqfuse_lookup(&fs, inode, path))
+    {
+        free(inode);
+        return -ENOENT;
+    }
+    if(!S_ISDIR(inode->base.mode))
+    {
+        free(inode);
+        return -ENOTDIR;
+    }
+    fi->fh = (intptr_t)inode;
     return 0;
 };
 
 static int sqfuse_releasedir(const char* path, struct fuse_file_info* fi)
 {
+    free((sqfs_inode*)(intptr_t)fi->fh);
+    fi->fh = 0;
     return 0;
 };
 
 static int sqfuse_release(const char* path, struct fuse_file_info* fi)
 {
+    free((sqfs_inode*)(intptr_t)fi->fh);
+    fi->fh = 0;
     return 0;
 };
 
 static int sqfuse_readlink(const char* path, char* buf, size_t size)
 {
+    sqfs* fs;
+    sqfs_inode inode;
+    if(sqfuse_lookup(&fs, &inode, path))
+        return -ENOENT;
+    if(!S_ISLNK(inode.base.mode))
+        return -EINVAL;
+    else if(sqfs_readlink(fs, &inode, buf, &size))
+        return -EIO;
     return 0;
 };
 
 static int sqfuse_listxattr(const char* path, char* buf, size_t size)
 {
+    sqfs* fs;
+    sqfs_inode inode;
+    int ferr;
+    if(sqfuse_lookup(&fs, &inode, path))
+        return -ENOENT;
+    ferr = sqfs_listxattr(fs, &inode, buf, &size);
+    if(ferr)
+        return -ferr;
+
     return size;
 };
 
 static int sqfuse_getxattr(const char* path, const char* name, char* value, size_t size
 #ifdef FUSE_XATTR_POSITION
-	, uint32_t poisition
+	, uint32_t position
 #endif
 	)
 {
-    return 0;
+    sqfs* fs;
+    sqfs_inode inode;
+    size_t real = size;
+#ifdef FUSE_XATTR_POSITION
+    if(position != 0)
+        return -EINVAL;
+#endif
+    if(sqfuse_lookup(&fs, &inode, path))
+        return -ENOENT;
+    if((sqfs_xattr_lookup(fs, &inode, name, value, &real)))
+        return -EIO;
+    if(real == 0)
+        return -sqfs_enoattr();
+    if(size != 0 && size < real)
+        return -ERANGE;
+    return real;
 };
 
 static int sqfuse_statfs(const char* path, struct statvfs* st)
 {
-    return 0;
+    squishfs* sqsh = (squishfs*)fuse_get_context()->private_data;
+    return sqfs_statfs(&hl->fs, st);
+};
+
+static int sqfuse_create(const char* unused_path, mode_t unused_mode, struct fuse_file_info* unused_fi)
+{
+    return -EROFS;
 };
 
 static const struct fuse_operations sqfuse_oper = {
@@ -270,8 +453,30 @@ static const struct fuse_operations sqfuse_oper = {
 	.init           = sqfuse_init,
 	.destroy	= sqfuse_destroy,
         //.access         = sqfuse_access,
-        //.create         = sqfuse_create,
+        .create         = sqfuse_create,
         //.lock           = sqfuse_lock,
+};
+
+static squishfs* squish_open(const char* path, size_t offset)
+{
+    squishfs* sqsh;
+    sqsh = (squishfs*)malloc(sizeof(*sqsh));
+    if(!sqsh)
+        perror("Can't allocate memory");
+    else
+    {
+        memset(sqsh, 0, sizeof(*sqsh));
+        if(sqfs_open_image(&sqsh->fs, path, offset) == SQFS_OK)
+        {
+            if(sqfs_inode_get(&sqsh->fs, &sqsh->root, sqfs_inode_root(&sqsh->fs)))
+                fprintf(stderr, "Can't find the root of the filesystem!\n");
+            else
+                return sqsh;
+            sqfs_destroy(&sqsh->fs);
+        }
+        free(sqsh);
+    }
+    return NULL;
 };
 
 void* sqfuselooper(void *data)
@@ -290,6 +495,8 @@ pthread_t sqfusethread;
 
 void SquashFuser(QString imgpath, QString imgfile)
 {
+    squishfs* squish;
+    squish = squish_open(imgfile.toStdString().c_str(), 0);
     //char** ewffilenames = NULL;
     //char* filenames[1] = {NULL};
     //char* filenames[];

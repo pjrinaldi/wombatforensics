@@ -1080,6 +1080,7 @@ initions.
          */ 
     //}
         
+        // COMMENT OUT FOR TESTING SQUASHFUSE IMPLEMENTATION
 	//QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
         //openwatcher.setFuture(tmpfuture);
     }
