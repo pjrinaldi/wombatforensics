@@ -96,14 +96,14 @@ sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st) {
 	
 	//st->st_blksize = fs->sb.block_size; /* seriously? */
 	
-	err = sqfs_id_get(fs, inode->base.uid, &id);
-	if (err)
-		return err;
+	//err = sqfs_id_get(fs, inode->base.uid, &id);
+	//if (err)
+	//	return err;
 	st->st_uid = id;
-	err = sqfs_id_get(fs, inode->base.guid, &id);
+	//err = sqfs_id_get(fs, inode->base.guid, &id);
 	st->st_gid = id;
-	if (err)
-		return err;
+	//if (err)
+	//	return err;
 	
 	return SQFS_OK;
 };
@@ -374,7 +374,7 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 static void sqfuse_destroy(void* param)
 {
     squishfs* sqsh = (squishfs*)param;
-    sqfs_destroy(&sqsh->fs);
+    //sqfs_destroy(&sqsh->fs);
     free(sqsh);
     //squash_close(sqvfd);
     //libewf_handle_close(ewfhandle, &ewferror);
