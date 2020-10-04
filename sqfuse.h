@@ -125,12 +125,18 @@ int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size) {
 	size_t count = 0;
 	
 	if (sqfs_xattr_open(fs, inode, &x))
+        {
+            qDebug() << "listxattr error";
 		return -EIO;
+        }
 	
 	while (x.remain) {
 		size_t n;
 		if (sqfs_xattr_read(&x))
-			 return EIO;
+                {
+                    qDebug() << "listxattr error 2";
+                    return EIO;
+                }
 		n = sqfs_xattr_name_size(&x);
 		count += n + 1;
 		
@@ -138,7 +144,10 @@ int sqfs_listxattr(sqfs *fs, sqfs_inode *inode, char *buf, size_t *size) {
 			if (count > *size)
 				return ERANGE;
 			if (sqfs_xattr_name(&x, buf, true))
+                        {
+                            qDebug() << "listxattr error 3";
 				return EIO;
+                        }
 			buf += n;
 			*buf++ = '\0';
 		}
@@ -208,8 +217,8 @@ static char* xstrdup(char* string)
 
 static void* sqfuse_init(struct fuse_conn_info* conn, struct fuse_config* cfg)
 {
-    (void) conn;
-    cfg->kernel_cache = 1;
+    //(void) conn;
+    //cfg->kernel_cache = 1;
     return fuse_get_context()->private_data;
     //return NULL;
 };
@@ -268,7 +277,10 @@ static int sqfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
             return 0;
     }
     if(err)
+    {
+        qDebug() << "readdir error";
         return -EIO;
+    }
     return 0;
     /*
 	(void) offset;
@@ -347,7 +359,10 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 
     off_t osize = size;
     if(sqfs_read_range(fs, inode, offset, &osize, buf))
+    {
+        qDebug() << "read error";
         return -EIO;
+    }
     return osize;
     /*
 	int res = 0;
@@ -428,7 +443,10 @@ static int sqfuse_readlink(const char* path, char* buf, size_t size)
     if(!S_ISLNK(inode.base.mode))
         return -EINVAL;
     else if(sqfs_readlink(fs, &inode, buf, &size))
+    {
+        qDebug() << "readlink error";
         return -EIO;
+    }
     return 0;
 };
 
@@ -462,7 +480,10 @@ static int sqfuse_getxattr(const char* path, const char* name, char* value, size
     if(sqfuse_lookup(&fs, &inode, path))
         return -ENOENT;
     if((sqfs_xattr_lookup(fs, &inode, name, value, &real)))
+    {
+        qDebug() << "getxattr error";
         return -EIO;
+    }
     if(real == 0)
         return -sqfs_enoattr();
     if(size != 0 && size < real)
@@ -586,7 +607,7 @@ void SquashFuser(QString imgpath, QString imgfile)
     //libewf_handle_open(ewfhandle, (char* const)iname, 1, LIBEWF_OPEN_READ, &ewferror)
     //int squash_open(sqfs *fs, const char *path);
     fargv[0] = "./sqfuse";
-    //fargv[1] = "-o";
+    //fargv[1] = "-s";
     //fargv[2] = "auto_unmount";
     fargc = 1;
     //for(int i=0; i < fargc; i++)
