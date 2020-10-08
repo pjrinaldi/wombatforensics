@@ -391,7 +391,11 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 {
     qDebug() << "sqfuse_read() run";
     sqfs* fs;
-    sqfuse_lookup(&fs, NULL, NULL);
+    squishfs* squisher = (squishfs*)(fuse_get_context()->private_data);
+    fs = &squisher->fs;
+    //sqfuse_lookup(&fs, NULL, NULL);
+    //squishfs* squisher = (squishfs*)(fuse_get_context()->private_data);
+    //*fs = &squisher->fs;
     sqfs_inode* inode = (sqfs_inode*)(intptr_t)fi->fh;
 
     off_t osize = size;
