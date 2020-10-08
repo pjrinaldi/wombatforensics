@@ -55,14 +55,15 @@ squishfs* squish;
 
 static sqfs_err sqfuse_lookup(sqfs** fs, sqfs_inode* inode, const char* path)
 {
+    qDebug() << "sqfuse_lookup path:" << QString::fromStdString(std::string(path));
     bool found;
-    //squishfs* squisher = ((squishfs*)(fuse_get_context()->private_data));
     squishfs* squisher = (squishfs*)(fuse_get_context()->private_data);
     *fs = &squisher->fs;
-    /*
     if(inode)
+    {
+        qDebug() << "inode dir start block:" << inode->xtra.dir.start_block;
 	*inode = squisher->root; // copy
-    */
+    }
     if(path)
     {
 	sqfs_err err = sqfs_lookup_path(*fs, inode, path, &found);
@@ -94,13 +95,13 @@ sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st) {
 		st->st_size = inode->xtra.symlink_size;
 	}
 	
-	//st->st_blksize = fs->sb.block_size; /* seriously? */
+	st->st_blksize = fs->sb.block_size; /* seriously? */
 	
-	//err = sqfs_id_get(fs, inode->base.uid, &id);
+	err = sqfs_id_get(fs, inode->base.uid, &id);
 	//if (err)
 	//	return err;
 	st->st_uid = id;
-	//err = sqfs_id_get(fs, inode->base.guid, &id);
+	err = sqfs_id_get(fs, inode->base.guid, &id);
 	st->st_gid = id;
 	//if (err)
 	//	return err;
@@ -217,6 +218,7 @@ static char* xstrdup(char* string)
 
 static void* sqfuse_init(struct fuse_conn_info* conn, struct fuse_config* cfg)
 {
+    qDebug() << "sqfuse_init() start";
     //(void) conn;
     //cfg->kernel_cache = 1;
     return fuse_get_context()->private_data;
@@ -225,12 +227,16 @@ static void* sqfuse_init(struct fuse_conn_info* conn, struct fuse_config* cfg)
 
 static int sqfuse_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
 {
+    qDebug() << "sqfuse_getattr() run";
+    qDebug() << "path:" << QString::fromStdString(std::string(path));
     sqfs* fs;
     sqfs_inode inode;
+    /*
     if(sqfuse_lookup(&fs, &inode, path))
         return -ENOENT;
     if(sqfs_stat(fs, &inode, stbuf))
         return -ENOENT;
+    */
     /*
 	(void) fi;
 	int res = 0;
@@ -255,6 +261,7 @@ static int sqfuse_getattr(const char *path, struct stat *stbuf, struct fuse_file
 
 static int sqfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags)
 {
+    qDebug() << "sqfuse_readdir() run";
     sqfs_err err;
     sqfs* fs;
     sqfs_inode* inode;
@@ -300,6 +307,7 @@ static int sqfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
 
 static int sqfuse_open(const char *path, struct fuse_file_info *fi)
 {
+    qDebug() << "sqfuse_open() run";
     /*
     squishfs* sqsh;
     sqsh = malloc(size(*sqsh));
@@ -353,6 +361,7 @@ static int sqfuse_open(const char *path, struct fuse_file_info *fi)
 
 static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
+    qDebug() << "sqfuse_read() run";
     sqfs* fs;
     sqfuse_lookup(&fs, NULL, NULL);
     sqfs_inode* inode = (sqfs_inode*)(intptr_t)fi->fh;
@@ -388,6 +397,7 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 
 static void sqfuse_destroy(void* param)
 {
+    qDebug() << "sqfuse_destroy() run";
     squishfs* sqsh = (squishfs*)param;
     //sqfs_destroy(&sqsh->fs);
     free(sqsh);
@@ -401,6 +411,7 @@ static void sqfuse_destroy(void* param)
 
 static int sqfuse_opendir(const char* path, struct fuse_file_info* fi)
 {
+    qDebug() << "sqfuse_opendir() run";
     sqfs* fs;
     sqfs_inode* inode;
     inode = (sqfs_inode*)malloc(sizeof(*inode));
@@ -422,6 +433,7 @@ static int sqfuse_opendir(const char* path, struct fuse_file_info* fi)
 
 static int sqfuse_releasedir(const char* path, struct fuse_file_info* fi)
 {
+    qDebug() << "sqfuse_releasedir() run";
     free((sqfs_inode*)(intptr_t)fi->fh);
     fi->fh = 0;
     return 0;
@@ -429,6 +441,7 @@ static int sqfuse_releasedir(const char* path, struct fuse_file_info* fi)
 
 static int sqfuse_release(const char* path, struct fuse_file_info* fi)
 {
+    qDebug() << "sqfuse_release() run";
     free((sqfs_inode*)(intptr_t)fi->fh);
     fi->fh = 0;
     return 0;
@@ -436,6 +449,7 @@ static int sqfuse_release(const char* path, struct fuse_file_info* fi)
 
 static int sqfuse_readlink(const char* path, char* buf, size_t size)
 {
+    qDebug() << "sqfuse_readlink() run";
     sqfs* fs;
     sqfs_inode inode;
     if(sqfuse_lookup(&fs, &inode, path))
@@ -452,6 +466,7 @@ static int sqfuse_readlink(const char* path, char* buf, size_t size)
 
 static int sqfuse_listxattr(const char* path, char* buf, size_t size)
 {
+    qDebug() << "sqfuse_listxattr() run";
     sqfs* fs;
     sqfs_inode inode;
     int ferr;
@@ -470,6 +485,7 @@ static int sqfuse_getxattr(const char* path, const char* name, char* value, size
 #endif
 	)
 {
+    qDebug() << "sqfuse_getxattr() run";
     sqfs* fs;
     sqfs_inode inode;
     size_t real = size;
@@ -493,6 +509,7 @@ static int sqfuse_getxattr(const char* path, const char* name, char* value, size
 
 static int sqfuse_statfs(const char* path, struct statvfs* st)
 {
+    qDebug() << "sqfuse_statfs run()";
     squishfs* sqsh = (squishfs*)fuse_get_context()->private_data;
     return sqfs_statfs(&sqsh->fs, st);
 };
@@ -577,6 +594,13 @@ void SquashFuser(QString imgpath, QString imgfile)
 {
     squishfs* squish;
     squish = squish_open(imgfile.toStdString().c_str(), 0);
+    if(squish == NULL)
+        qDebug() << "squish open fails.";
+    else
+    {
+        qDebug() << "squish open works:";
+        qDebug() << "squish inode:" << squish->root.xtra.dir.offset << squish->root.xtra.dir.dir_size << squish->root.xtra.dir.start_block;
+    }
     //char** ewffilenames = NULL;
     //char* filenames[1] = {NULL};
     //char* filenames[];
