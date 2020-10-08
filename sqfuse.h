@@ -62,7 +62,7 @@ static sqfs_err sqfuse_lookup(sqfs** fs, sqfs_inode* inode, const char* path)
     if(inode)
     {
         qDebug() << "inode dir start block:" << inode->xtra.dir.start_block;
-	*inode = squisher->root; // copy
+	//*inode = squisher->root; // copy
     }
     if(path)
     {
@@ -181,7 +181,7 @@ int sqfs_statfs(sqfs *sq, struct statvfs *st) {
 //libewf_handle_t* ewfhandle = NULL;
 //libewf_error_t* ewferror = NULL;
 static char* sqrawpath = NULL;
-static off_t sqrawsize = 0;
+static off_t sqrawsize = 15;
 static const char* sqrawext = ".dd";
 
 /*
@@ -227,10 +227,25 @@ static void* sqfuse_init(struct fuse_conn_info* conn, struct fuse_config* cfg)
 
 static int sqfuse_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi)
 {
+    int res = 0;
     qDebug() << "sqfuse_getattr() run";
     qDebug() << "path:" << QString::fromStdString(std::string(path));
     sqfs* fs;
     sqfs_inode inode;
+    if(strcmp(path, "/") == 0)
+    {
+        stbuf->st_mode = S_IFDIR | 0755;
+        stbuf->st_nlink = 2;
+    }
+    else if(strcmp(path, sqrawpath) == 0)
+    {
+        stbuf->st_mode = S_IFREG | 0444;
+        stbuf->st_nlink = 1;
+        stbuf->st_size = sqrawsize;
+    }
+    else
+        res = -ENOENT;
+    return res;
     /*
     if(sqfuse_lookup(&fs, &inode, path))
         return -ENOENT;
@@ -256,12 +271,13 @@ static int sqfuse_getattr(const char *path, struct stat *stbuf, struct fuse_file
 
 	return res;
     */
-    return 0;
+    //return 0;
 };
 
 static int sqfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags)
 {
     qDebug() << "sqfuse_readdir() run";
+    /*
     sqfs_err err;
     sqfs* fs;
     sqfs_inode* inode;
@@ -288,6 +304,11 @@ static int sqfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
         qDebug() << "readdir error";
         return -EIO;
     }
+    return 0;
+    */
+    if(strcmp(path, "/") != 0)
+        return -ENOENT;
+    filler(buf, sqrawpath + 1, NULL, 0, (fuse_fill_dir_flags)0);
     return 0;
     /*
 	(void) offset;
@@ -328,6 +349,7 @@ static int sqfuse_open(const char *path, struct fuse_file_info *fi)
     }
     return NULL;
     */
+    /*
     sqfs* fs;
     sqfs_inode* inode;
     if(fi->flags & (O_WRONLY | O_RDWR))
@@ -347,6 +369,12 @@ static int sqfuse_open(const char *path, struct fuse_file_info *fi)
     }
     fi->fh = (intptr_t)inode;
     fi->keep_cache = 1;
+    return 0;
+    */
+    if(strcmp(path, sqrawpath) != 0)
+        return -ENOENT;
+    if((fi->flags & O_ACCMODE) != O_RDONLY)
+        return -EACCES;
     return 0;
     /*
 	if(strcmp(path, sqrawpath) != 0)
@@ -521,7 +549,7 @@ static int sqfuse_create(const char* unused_path, mode_t unused_mode, struct fus
 
 static const struct fuse_operations sqfuse_oper = {
 	.getattr	= sqfuse_getattr,
-        .readlink       = sqfuse_readlink,
+        //.readlink       = sqfuse_readlink,
         //.mknod          = sqfuse_mknod,
         //.mkdir          = sqfuse_mkdir,
         //.unlink         = sqfuse_unlink,
@@ -535,22 +563,22 @@ static const struct fuse_operations sqfuse_oper = {
 	.open		= sqfuse_open,
 	.read		= sqfuse_read,
         //.write          = sqfuse_write,
-        .statfs         = sqfuse_statfs,
+        //.statfs         = sqfuse_statfs,
         //.flush          = sqfuse_flush,
-        .release        = sqfuse_release,
+        //.release        = sqfuse_release,
         //.fsync          = sqfuse_fsync,
         //.setxattr       = sqfuse_setxattr,
-        .getxattr       = sqfuse_getxattr,
-        .listxattr      = sqfuse_listxattr,
+        //.getxattr       = sqfuse_getxattr,
+        //.listxattr      = sqfuse_listxattr,
         //.removexattr    = sqfuse_removexattr,
-        .opendir        = sqfuse_opendir,
+        //.opendir        = sqfuse_opendir,
 	.readdir	= sqfuse_readdir,
-        .releasedir     = sqfuse_releasedir,
+        //.releasedir     = sqfuse_releasedir,
         //.fsyncdir       = sqfuse_fsyncdir,
 	.init           = sqfuse_init,
 	.destroy	= sqfuse_destroy,
         //.access         = sqfuse_access,
-        .create         = sqfuse_create,
+        //.create         = sqfuse_create,
         //.lock           = sqfuse_lock,
 };
 
