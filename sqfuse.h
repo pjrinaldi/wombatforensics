@@ -50,19 +50,70 @@ extern "C" {
 #include <iostream>  
 #include <fstream>  
       
-char* ReadFileBytes(const char *name)  
-{  
+uint8_t* ReadFileBytes(const char *name)  
+{
+    qDebug() << "start read file bytes";
+    FILE* pfile;
+    long lsize;
+    uint8_t* retbuf;
+    size_t result;
+    pfile = fopen(name, "rb");
+    fseek(pfile, 0, SEEK_END);
+    lsize = ftell(pfile);
+    qDebug() << "lsize:" << lsize;
+    rewind(pfile);
+    retbuf = (uint8_t*)malloc(sizeof(uint8_t)*lsize);
+    result = fread(retbuf, 1, lsize, pfile);
+    fclose(pfile);
+    qDebug() << "end read file bytes";
+    return retbuf;
+    /*
+     * fread example: read an entire file 
+#include <stdio.h>
+#include <stdlib.h>
+
+int main () {
+  FILE * pFile;
+  long lSize;
+  char * buffer;
+  size_t result;
+
+  pFile = fopen ( "myfile.bin" , "rb" );
+  if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+  // obtain file size:
+  fseek (pFile , 0 , SEEK_END);
+  lSize = ftell (pFile);
+  rewind (pFile);
+
+  // allocate memory to contain the whole file:
+  buffer = (char*) malloc (sizeof(char)*lSize);
+  if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+
+  // copy the file into the buffer:
+  result = fread (buffer,1,lSize,pFile);
+  if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+  // the whole file is now loaded in the memory buffer.
+
+  // terminate
+  fclose (pFile);
+  free (buffer);
+  return 0;
+     */ 
+    /*
     std::ifstream fl(name);  
     fl.seekg( 0, std::ios::end );  
     size_t len = fl.tellg();  
-    char *ret = new char[len];  
+    uint8_t *ret = new uint8_t[len];  
     fl.seekg(0, std::ios::beg);   
-    fl.read(ret, len);  
+    fl.read((char*)ret, len);  
     fl.close();  
     return ret;  
+    */
 }  
 
-int sqvfd = 0;
+//int sqvfd = 0;
 /*
 typedef struct squishfs squishfs;
 struct squishfs {
@@ -426,9 +477,14 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
     }
     return osize;
     */
+    /*
     ssize_t res = 0;
     res = squash_lseek(sqvfd, offset, SQUASH_SEEK_SET);
+    qDebug() << "lseek return code:" << res;
     res = squash_read(sqvfd, buf, offset);
+    qDebug() << "read return code:" << res;
+    */
+
     //ssize_t squash_read(int vfd, void *buf, sqfs_off_t nbyte);
     /*
 	int res = 0;
@@ -458,7 +514,7 @@ static void sqfuse_destroy(void* param)
     //squishfs* sqsh = (squishfs*)param;
     //sqfs_destroy(&sqsh->fs);
     //free(sqsh);
-    squash_close(sqvfd);
+    //squash_close(sqvfd);
     //libewf_handle_close(ewfhandle, &ewferror);
     //libewf_handle_free(&ewfhandle, &ewferror);
     //af_close(afimage);
@@ -652,11 +708,20 @@ pthread_t sqfusethread;
 
 void SquashFuser(QString imgpath, QString imgfile)
 {
-    char* sqfsmem = ReadFileBytes(imgfile.toStdString().c_str());
-    squash_start();
-    sqfs* fs;
-    fs = (sqfs*)calloc(sizeof(sqfs), 1);
-    sqfs_open_image(fs, (uint8_t*)sqfsmem, 0);
+    //extern const uint8_t libsquash_fixture[];
+    //sqfs_err sqerr;
+    //qDebug() << "imgfile:" << imgfile;
+    //const uint8_t* sqfsmem = ReadFileBytes(imgfile.toStdString().c_str());
+    //uint8_t* sqfsmem = ReadFileBytes(imgfile.toStdString().c_str());
+    //squash_start();
+    //sqfs* fs;
+    //sqfs_fd_t* sqfd = imgfile.toStdString().c_str();
+    //fs = (sqfs*)calloc(sizeof(sqfs), 1);sqfs_fd_ope
+    //sqerr = sqfs_init(fs, sqfd, 0);
+    //sqerr = sqfs_open_image(fs, sqfsmem, 0);
+
+
+    //sqfs_open_image(fs, (uint8_t*)sqfsmem, 0);
     //enclose_io_fs = (sqfs *)calloc(sizeof(sqfs), 1);
     //sqfs_open_image(enclose_io_fs, libsquash_fixture, 0);
     /*
@@ -723,11 +788,25 @@ void SquashFuser(QString imgpath, QString imgfile)
     strcat(sqrawpath, afbasename);
     strcat(sqrawpath, sqrawext);
     sqrawpath[rawpathlen - 1] = 0;
+    qDebug() << "rawpath:" << QString::fromStdString(std::string(sqrawpath));
     printf("rawpath: %s", sqrawpath);
     XFREE(afpath);
 
-    sqvfd = squash_open(fs, sqrawpath);
+    // CURRENT ATTEMPT WILL BE TO USE SQUASHFS_FS.H AND SIMPLY READ FILE INTO A FD = OPEN(), AS IN UNSQUASHFS.C
+    // THEN READ IN THE SUPER BLOCK... AS IN READ_SUPER()....
+    // THEN MAYBE I'LL CONTINUE TRYING LIBSQUASH, BUT IT WON'T LOAD SQUASHFS PROPERLY...
 
+
+
+    /*
+    if(sqerr == SQFS_OK)
+    {
+	sqvfd = squash_open(fs, sqrawpath);
+	qDebug() << "it opened sqfs correctly";
+    }
+    else
+	qDebug() << "it failed to open sqfs correctly";
+    */
 
 
     //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
