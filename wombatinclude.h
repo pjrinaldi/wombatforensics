@@ -94,12 +94,14 @@
 #include <tar.h>
 #include <libtar.h>
 
+/*
 extern "C" {
 //#include "squash.h"
 #include "squashfuse.h"
 #include "squashfuse/nonstd.h"
 //#include "squashfuse/fuseprivate.h"
 }
+*/
 //#include <filmstripfilter.h>
 //#include <videothumbnailer.h>
 //#include <Magick++.h>

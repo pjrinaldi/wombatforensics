@@ -44,7 +44,26 @@
 #include <pthread.h>
 #include <sys/fsuid.h>
 #include <paths.h>
+extern "C" {
+#include "squash.h"
+}
+#include <iostream>  
+#include <fstream>  
+      
+char* ReadFileBytes(const char *name)  
+{  
+    std::ifstream fl(name);  
+    fl.seekg( 0, std::ios::end );  
+    size_t len = fl.tellg();  
+    char *ret = new char[len];  
+    fl.seekg(0, std::ios::beg);   
+    fl.read(ret, len);  
+    fl.close();  
+    return ret;  
+}  
 
+int sqvfd = 0;
+/*
 typedef struct squishfs squishfs;
 struct squishfs {
     sqfs fs;
@@ -86,7 +105,7 @@ sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st) {
 	
 	if (S_ISREG(st->st_mode)) {
 		/* FIXME: do symlinks, dirs, etc have a size? */
-		st->st_size = inode->xtra.reg.file_size;
+/*		st->st_size = inode->xtra.reg.file_size;
 		st->st_blocks = st->st_size / 512;
 	} else if (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)) {
 		st->st_rdev = sqfs_makedev(inode->xtra.dev.major,
@@ -97,7 +116,7 @@ sqfs_err sqfs_stat(sqfs *fs, sqfs_inode *inode, struct stat *st) {
 	
 	st->st_blksize = fs->sb.block_size; /* seriously? */
 	
-	err = sqfs_id_get(fs, inode->base.uid, &id);
+/*	err = sqfs_id_get(fs, inode->base.uid, &id);
 	//if (err)
 	//	return err;
 	st->st_uid = id;
@@ -172,7 +191,7 @@ int sqfs_statfs(sqfs *sq, struct statvfs *st) {
 
 	return 0;
 };
-
+*/
 //sqfs squish;
 //sqfs_inode sqroot;
 
@@ -230,8 +249,8 @@ static int sqfuse_getattr(const char *path, struct stat *stbuf, struct fuse_file
     int res = 0;
     qDebug() << "sqfuse_getattr() run";
     qDebug() << "path:" << QString::fromStdString(std::string(path));
-    sqfs* fs;
-    sqfs_inode inode;
+    //sqfs* fs;
+    //sqfs_inode inode;
     if(strcmp(path, "/") == 0)
     {
         stbuf->st_mode = S_IFDIR | 0755;
@@ -389,6 +408,7 @@ static int sqfuse_open(const char *path, struct fuse_file_info *fi)
 
 static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
+    /*
     qDebug() << "sqfuse_read() run";
     sqfs* fs;
     squishfs* squisher = (squishfs*)(fuse_get_context()->private_data);
@@ -405,6 +425,11 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
         return -EIO;
     }
     return osize;
+    */
+    ssize_t res = 0;
+    res = squash_lseek(sqvfd, offset, SQUASH_SEEK_SET);
+    res = squash_read(sqvfd, buf, offset);
+    //ssize_t squash_read(int vfd, void *buf, sqfs_off_t nbyte);
     /*
 	int res = 0;
 	(void) fi;
@@ -430,10 +455,10 @@ static int sqfuse_read(const char *path, char *buf, size_t size, off_t offset, s
 static void sqfuse_destroy(void* param)
 {
     qDebug() << "sqfuse_destroy() run";
-    squishfs* sqsh = (squishfs*)param;
+    //squishfs* sqsh = (squishfs*)param;
     //sqfs_destroy(&sqsh->fs);
-    free(sqsh);
-    //squash_close(sqvfd);
+    //free(sqsh);
+    squash_close(sqvfd);
     //libewf_handle_close(ewfhandle, &ewferror);
     //libewf_handle_free(&ewfhandle, &ewferror);
     //af_close(afimage);
@@ -441,6 +466,7 @@ static void sqfuse_destroy(void* param)
     return;
 };
 
+/*
 static int sqfuse_opendir(const char* path, struct fuse_file_info* fi)
 {
     qDebug() << "sqfuse_opendir() run";
@@ -550,7 +576,7 @@ static int sqfuse_create(const char* unused_path, mode_t unused_mode, struct fus
 {
     return -EROFS;
 };
-
+*/
 static const struct fuse_operations sqfuse_oper = {
 	.getattr	= sqfuse_getattr,
         //.readlink       = sqfuse_readlink,
@@ -586,6 +612,7 @@ static const struct fuse_operations sqfuse_oper = {
         //.lock           = sqfuse_lock,
 };
 
+/*
 static squishfs* squish_open(const char* path, size_t offset)
 {
     squishfs* sqsh;
@@ -607,6 +634,7 @@ static squishfs* squish_open(const char* path, size_t offset)
     }
     return NULL;
 };
+*/
 
 void* sqfuselooper(void *data)
 {
@@ -624,6 +652,14 @@ pthread_t sqfusethread;
 
 void SquashFuser(QString imgpath, QString imgfile)
 {
+    char* sqfsmem = ReadFileBytes(imgfile.toStdString().c_str());
+    squash_start();
+    sqfs* fs;
+    fs = (sqfs*)calloc(sizeof(sqfs), 1);
+    sqfs_open_image(fs, (uint8_t*)sqfsmem, 0);
+    //enclose_io_fs = (sqfs *)calloc(sizeof(sqfs), 1);
+    //sqfs_open_image(enclose_io_fs, libsquash_fixture, 0);
+    /*
     squishfs* squish;
     squish = squish_open(imgfile.toStdString().c_str(), 0);
     if(squish == NULL)
@@ -633,6 +669,7 @@ void SquashFuser(QString imgpath, QString imgfile)
         qDebug() << "squish open works:";
         qDebug() << "squish inode:" << squish->root.xtra.dir.offset << squish->root.xtra.dir.dir_size << squish->root.xtra.dir.start_block;
     }
+    */
     //char** ewffilenames = NULL;
     //char* filenames[1] = {NULL};
     //char* filenames[];
@@ -657,6 +694,9 @@ void SquashFuser(QString imgpath, QString imgfile)
     strcpy(ipath, imgpath.toStdString().c_str());
     char* iname = new char[imgfile.toStdString().size() + 1];
     strcpy(iname, imgfile.toStdString().c_str());
+
+
+
     //filenames[0] = (char*)iname;
     //libewf_handle_initialize(&ewfhandle, &ewferror);
     //ibewf_handle_open(ewfhandle, filenames, 1, LIBEWF_OPEN_READ, &ewferror);
@@ -685,6 +725,10 @@ void SquashFuser(QString imgpath, QString imgfile)
     sqrawpath[rawpathlen - 1] = 0;
     printf("rawpath: %s", sqrawpath);
     XFREE(afpath);
+
+    sqvfd = squash_open(fs, sqrawpath);
+
+
 
     //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
     //libewf_handle_get_media_size(ewfhandle, (size64_t*)&erawsize, &ewferror);
