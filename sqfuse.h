@@ -796,7 +796,24 @@ void SquashFuser(QString imgpath, QString imgfile)
     // THEN READ IN THE SUPER BLOCK... AS IN READ_SUPER()....
     // THEN MAYBE I'LL CONTINUE TRYING LIBSQUASH, BUT IT WON'T LOAD SQUASHFS PROPERLY...
 
-
+    long long bytes = sizeof(struct squashfs_super_block);
+    int fd = open(imgfile.toStdString().c_str(), O_RDONLY);
+    struct squashfs_super_block superblock;
+    int res = 0;
+    int count = 0;
+    lseek(fd, 0, SEEK_SET);
+    for(count = 0; count < bytes; count += res)
+    {
+        res = read(fd, &superblock + count, bytes - count);
+    }
+    qDebug() << "superblock inode cnt:" << superblock.inodes;
+    qDebug() << "superblock root inode:" << superblock.root_inode;
+    qDebug() << "superblock root start_block:" << (superblock.root_inode >> 16);
+    qDebug() << "superblock root offset:" << (superblock.root_inode & 0xffff);
+    //struct inode* rootinode = 
+    //qDebug() << "root inode offset:" << superblock.root_inode;
+    //i = s_ops->read_inode(start_block, offset);
+    //print_filename(pathname, i);
 
     /*
     if(sqerr == SQFS_OK)
