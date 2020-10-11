@@ -1029,7 +1029,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             if(existingevidence.at(i).endsWith(".sfs"))
                 SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
             if(existingevidence.at(i).endsWith(".zmg"))
-                ZmgFuser(wombatvariable.imgdatapath, existingevidence.at(i));
+                ZmgFuser(wombatvariable.imgdatapath.toStdString(), existingevidence.at(i).toStdString());
         }
 	//qDebug() << "existing evidence:" << existingevidence;
 	// If i run sqfuse stuff here, i avoid issues with multiple def    QDir eviddir = QDir(wombatvariable.tmpmntpath);

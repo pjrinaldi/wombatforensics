@@ -1,4 +1,5 @@
 #include "imagefunctions.h"
+//#include "zmgfuse.h"
 
 /*
 QTextStream& qStdOut()
@@ -55,6 +56,12 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
         std::remove(std::string(outpath + "/" + outstr + ".dd").c_str());
         std::remove(std::string(outpath + "/" + outstr + ".dd.log").c_str());
         printf("Squashfs'd Forensic Image Finished Successfully.\n");
+    }
+    else if(radio == 3) // ZMG
+    {
+        ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"));
+        //compress_dir(outpath, outpath + "/" + outstr + ".zmg");
+        //compress_dir(argv[1], argv[2]);
     }
 }
 

@@ -56,7 +56,8 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
             tmp = udev_device_get_devnode(dev);
             if(tmp)
                 tmpdevice += "(" + QString::fromStdString(std::string(tmp)) + ")";
-            ui->sourcecombo->addItem(tmpdevice);
+            if(disktotal > 0)
+                ui->sourcecombo->addItem(tmpdevice);
         }
         udev_device_unref(dev);
     }
@@ -99,7 +100,7 @@ void ForImgDialog::FinishImaging()
 void ForImgDialog::CreateImage()
 {
     // NEED TO CHECK VALUES PRIOR TO LAUNCHING THIS AND POPUP A DIALOG WITH WHAT IS MISSING...
-    if(ui->sourcecombo->currentText().contains("Select Source Drive") || ui->pathedit->text().isEmpty() || ui->nameedit->text().isEmpty() || (!ui->aff4radio->isChecked() && !ui->rawradio->isChecked( ) && !ui->sfsradio->isChecked()))
+    if(ui->sourcecombo->currentText().contains("Select Source Drive") || ui->pathedit->text().isEmpty() || ui->nameedit->text().isEmpty() || (!ui->aff4radio->isChecked() && !ui->rawradio->isChecked( ) && !ui->sfsradio->isChecked() && !ui->zmgradio->isChecked()))
     {
         QMessageBox::critical(this, "Can't Create Forensic Image", "All Required Fields haven't been filled out.", QMessageBox::Ok);
     }
@@ -112,6 +113,8 @@ void ForImgDialog::CreateImage()
             radio = 1;
         else if(ui->sfsradio->isChecked())
             radio = 2;
+        else if(ui->zmgradio->isChecked())
+            radio = 3;
         QFuture<void> tmpfuture = QtConcurrent::run(StartImaging, ui->sourcecombo->currentText().toStdString(), ui->pathedit->text().toStdString(), ui->nameedit->text().toStdString(), radio);
         imgwatcher.setFuture(tmpfuture);
         this->close();

@@ -37,6 +37,7 @@ public:
     QRadioButton *rawradio;
     QRadioButton *aff4radio;
     QRadioButton *sfsradio;
+    QRadioButton *zmgradio;
     QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label_3;
@@ -104,6 +105,11 @@ public:
         sfsradio->setObjectName(QString::fromUtf8("sfsradio"));
 
         horizontalLayout_2->addWidget(sfsradio);
+
+        zmgradio = new QRadioButton(ForImgDialog);
+        zmgradio->setObjectName(QString::fromUtf8("zmgradio"));
+
+        horizontalLayout_2->addWidget(zmgradio);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -191,6 +197,7 @@ public:
         rawradio->setText(QCoreApplication::translate("ForImgDialog", "Raw", nullptr));
         aff4radio->setText(QCoreApplication::translate("ForImgDialog", "AFF4", nullptr));
         sfsradio->setText(QCoreApplication::translate("ForImgDialog", "Squash FS'd Raw", nullptr));
+        zmgradio->setText(QCoreApplication::translate("ForImgDialog", "ZMG FS'd Raw", nullptr));
         label_3->setText(QCoreApplication::translate("ForImgDialog", "Forensic Image Name:", nullptr));
         nameedit->setPlaceholderText(QCoreApplication::translate("ForImgDialog", "Name w/o Extension", nullptr));
         label_4->setText(QCoreApplication::translate("ForImgDialog", "Destination Folder:", nullptr));

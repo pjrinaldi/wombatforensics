@@ -1,8 +1,11 @@
+#ifndef ZMGFUSE_H
+#define ZMGFUSE_H
 //
 // Created by rainm on 17-6-9.
 //
 
 //#define FUSE_USE_VERSION 26
+#define FUSE_USE_VERSION 35
 
 //#include <fuse.h>
 #include <fuse3/fuse.h>
@@ -21,8 +24,9 @@
 #include <pthread.h>
 
 extern "C" {
+#include "utarray.h"
 #include "uthash.h"
-
+#include "utlist.h"
 #include "zmgfs.h"
 }
 
@@ -297,17 +301,25 @@ struct fuse* zmgfuser;
 //struct fuse_session* affusersession;
 pthread_t zmgfusethread;
 
-void ZmgFuser(QString imgpath, QString imgfile)
+void ZmgFuser(std::string imgpath, std::string imgfile)
 {
     char** fargv = NULL;
-    fargv = XCALLOC(char *, 3);
+    fargv = (char**)calloc(3, sizeof(char*));
+    //fargv = XCALLOC(char *, 3);
+    //#define XCALLOC(type, num) ((type *) xcalloc ((num), sizeof(type)))
     fargv[0] = "zmgfuse";
     int fargc = 1;
     int ret = 0;
+    char* ipath = new char[imgpath.size() + 1];
+    strcpy(ipath, imgpath.c_str());
+    char* iname = new char[imgfile.size() + 1];
+    strcpy(iname, imgfile.c_str());
+    /*
     char* ipath = new char[imgpath.toStdString().size() + 1];
     strcpy(ipath, imgpath.toStdString().c_str());
     char* iname = new char[imgfile.toStdString().size() + 1];
     strcpy(iname, imgfile.toStdString().c_str());
+    */
     //zmgfile = (char*)imgfile.toStdString().c_str();
     //mtpt = (char*)imgpath.toStdString().c_str();
     printf("zmgfile: %s mtpt: %s", iname, ipath);
@@ -319,7 +331,8 @@ void ZmgFuser(QString imgpath, QString imgfile)
     zmgmap = (const char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, zmgfd, 0);
     zmgargs = FUSE_ARGS_INIT(fargc, fargv);
     zmgfuser = fuse_new(&zmgargs, &zmgfs_oper, sizeof(fuse_operations), NULL);
-    ret = fuse_mount(zmgfuser, imgpath.toStdString().c_str());
+    ret = fuse_mount(zmgfuser, imgpath.c_str());
+    //ret = fuse_mount(zmgfuser, imgpath.toStdString().c_str());
     int retd = fuse_daemonize(1);
     int perr = pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *) zmgfuser);
     /*
@@ -367,3 +380,5 @@ int main(int argc, char *argv[]) {
     return ret;
 }
 */
+
+#endif // ZMGFUSE_H
