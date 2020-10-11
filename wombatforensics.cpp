@@ -1405,6 +1405,10 @@ void WombatForensics::PrepareEvidenceImage()
 	    {
 		qDebug() << "mount sfs fuse here...";
 	    }
+            else if(imagefile.endsWith(".zmg")) // ZMG
+            {
+                qDebug() << "mount zmg fuse here...";
+            }
 	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
 	    {
 		QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
@@ -1502,14 +1506,14 @@ void WombatForensics::AddEvidence()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
-    qDebug() << "newevidence:" << newevidence;
     for(int i=0; i < newevidence.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
         QDir dir;
         dir.mkpath(evidencepath);
         ecount++;
-        // maybe place the zmg stuff here as i did for open
+        if(newevidence.at(i).endsWith(".zmg"))
+            ZmgFuser(wombatvariable.imgdatapath.toStdString(), newevidence.at(i).toStdString());
     }
     if(newevidence.count() > 0)
     {
@@ -1658,6 +1662,8 @@ void WombatForensics::LoadHexContents()
         qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
     if(datastring.endsWith(".sfs"))
         datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
+    else if(datastring.endsWith(".zmg"))
+        datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
     //qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->BypassColor(false);
@@ -2100,6 +2106,14 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
             //qDebug() << "log file:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".log";
             //qDebug() << "sfs image";
         }
+        else if(verevidlist.at(i).endsWith(".zmg"))
+        {
+            QString zmgdd = wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".zmg").first() + ".dd";
+            qDebug() << "zmg log:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".zmg").first() + ".dd.log";
+            qDebug() << "verify zmg image here and update log somehow...";
+            verlist.append(zmgdd.toStdString());
+            //verlist.append(verevidlist.at(i).toStdString());
+        }
         else if(verevidlist.at(i).endsWith(".e01"))
         {
             /*
@@ -2120,8 +2134,10 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
             qDebug() << "affuse image";
         }
         else
+        {
+            verlist.append(verevidlist.at(i).toStdString());
             qDebug() << "raw image, don't think i have to anything.";
-        verlist.append(verevidlist.at(i).toStdString());
+        }
     }
 
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);

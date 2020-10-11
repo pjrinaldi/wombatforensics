@@ -64,22 +64,14 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
     udev_enumerate_unref(enumerate);
     udev_unref(udev);
 
-    //ped_device_probe_all();
-    //PedDevice* tmpdevice = ped_device_get_next(NULL);
-    //ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->model)) + " (" + QString::fromStdString(std::string(tmpdevice->path) + ")"));
-    /*
-    while(tmpdevice != NULL)
-    {
-        tmpdevice = tmpdevice->next;
-        if(tmpdevice != NULL)
-            ui->sourcecombo->addItem(QString::fromStdString(std::string(tmpdevice->model)) + " (" + QString::fromStdString(std::string(tmpdevice->path) + ")"));
-    }
-    */
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(HideClicked()), Qt::DirectConnection);
     connect(ui->createbutton, SIGNAL(clicked()), this, SLOT(CreateImage()), Qt::DirectConnection);
     connect(ui->browsebutton, SIGNAL(clicked()), this, SLOT(GetFolder()), Qt::DirectConnection);
     connect(&imgwatcher, SIGNAL(finished()), this, SLOT(FinishImaging()), Qt::QueuedConnection);
+    ui->aff4radio->setVisible(false);
     ui->aff4radio->setEnabled(false); // disabled until i get a way to fuse/tsk view/extract aff4 image.
+    ui->sfsradio->setVisible(false);
+    ui->sfsradio->setEnabled(false); // disabled until i get a way fuse functionality working for sfs image
 }
 
 ForImgDialog::~ForImgDialog()

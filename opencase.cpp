@@ -18,47 +18,6 @@ void PopulateTreeModel(QString evidstring)
     if(evidfile.isOpen())
         elist = QString(evidfile.readLine()).split(",");
     evidfile.close();
-    if(elist.at(3).endsWith(".sfs"))
-    {
-	//static int sqvfd = 0;
-	//static sqfs* squish = NULL;
-	//sqvfd = squash_open(squish, elist.at(3).toStdString().c_str());
-
-        //SquashFuser(wombatvariable.imgdatapath, elist.at(3));
-        qDebug() << "push squashfuse function calls here...";
-        /*
-        QProcess builder;
-        builder.setProcessChannelMode(QProcess::MergedChannels);
-        builder.start("squashfuse", QStringList() << "-s" << elist.at(3) << wombatvariable.imgdatapath);
-        if(!builder.waitForFinished())
-            qDebug() << "fuse failed:" << builder.errorString();
-        else
-            qDebug() << "fuse output:" << builder.readAll();
-        /*
-        QString mstr = "squashfuse";
-        QStringList mstrlist;
-        mstrlist.clear();
-        mstrlist.append(elist.at(3));
-        mstrlist.append(wombatvariable.imgdatapath);
-        QString mntstr = "squashfuse " + elist.at(3) + " " + wombatvariable.imgdatapath;
-        //QProcess::execute(mntstr, QStringList());
-        QProcess* xmntprocess = new QProcess();
-        //connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
-        //connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErrr()), Qt::QueuedConnection);
-        //xmntprocess->start(mntstr);
-        xmntprocess->start(mstr, mstrlist);
-        xmntprocess->waitForFinished(-1);
-        */
-        /*
-         * + "/"QProcess builder;
-        builder.setProcessChannelMode(QProcess::MergedChannels);
-        builder.start("make", QStringList() << "-j2");
-        if (!builder.waitForFinished())
-            qDebug() << "Make failed:" << builder.errorString();
-        else
-            qDebug() << "Make output:" << builder.readAll();
-         */ 
-    }
     std::vector<std::string> pathvector;
     pathvector.clear();
     if(elist.at(3).endsWith(".sfs"))

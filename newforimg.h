@@ -8,7 +8,6 @@
 #include "wombatfunctions.h"
 #include "ui_newforimg.h"
 #include <libudev.h>
-//#include <parted.h>
 
 namespace Ui
 {
