@@ -380,5 +380,4 @@ int main(int argc, char *argv[]) {
     return ret;
 }
 */
-
 #endif // ZMGFUSE_H

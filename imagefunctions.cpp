@@ -1,5 +1,5 @@
 #include "imagefunctions.h"
-//#include "zmgfuse.h"
+#include "makezmg.h"
 
 /*
 QTextStream& qStdOut()
@@ -60,8 +60,14 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
     else if(radio == 3) // ZMG
     {
         ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"));
-        //compress_dir(outpath, outpath + "/" + outstr + ".zmg");
-        //compress_dir(argv[1], argv[2]);
+        printf("outpath: %s", outpath.c_str());
+        mkdir(std::string(outpath + "/tmp").c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        rename(std::string(outpath + "/" + outstr + ".dd").c_str(), std::string(outpath + "/tmp/" + outstr + ".dd").c_str());
+        rename(std::string(outpath + "/" + outstr + ".dd.log").c_str(), std::string(outpath + "/tmp/" + outstr + ".dd.log").c_str());
+        MakeZmg(std::string(outpath + "/tmp"), std::string(outpath + "/" + outstr + ".zmg"));
+        std::remove(std::string(outpath + "/tmp/" + outstr + ".dd").c_str());
+        std::remove(std::string(outpath + "/tmp/" + outstr + ".dd.log").c_str());
+        std::remove(std::string(outpath + "/tmp").c_str());
     }
 }
 

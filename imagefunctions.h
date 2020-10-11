@@ -14,7 +14,6 @@
 #include <fstream>
 //#include <QTextStream>
 //#include <libudev.h>
-//#include "zmgfuse.h"
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
