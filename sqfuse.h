@@ -45,6 +45,7 @@
 #include <sys/fsuid.h>
 #include <paths.h>
 extern "C" {
+//#include "unsquashfs.h"
 #include "squash.h"
 }
 #include <iostream>  
@@ -810,6 +811,16 @@ void SquashFuser(QString imgpath, QString imgfile)
     qDebug() << "superblock root inode:" << superblock.root_inode;
     qDebug() << "superblock root start_block:" << (superblock.root_inode >> 16);
     qDebug() << "superblock root offset:" << (superblock.root_inode & 0xffff);
+    sqfs* fs;
+    /*
+    sqerr = sqfs_init(fs, (sqfs_fd_t)fd, 0);
+    if(sqerr == SQFS_OK)
+    {
+        qDebug() << "it works";
+    }
+    */
+    //err = sqfs_init(fs, fd, offset);
+    //squashfs_operations *s_ops;
     //struct inode* rootinode = 
     //qDebug() << "root inode offset:" << superblock.root_inode;
     //i = s_ops->read_inode(start_block, offset);
