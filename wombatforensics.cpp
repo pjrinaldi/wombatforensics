@@ -2109,8 +2109,6 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
         else if(verevidlist.at(i).endsWith(".zmg"))
         {
             QString zmgdd = wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".zmg").first() + ".dd";
-            //qDebug() << "zmg log:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".zmg").first() + ".dd.log";
-            //qDebug() << "verify zmg image here and update log somehow...";
             verlist.append(zmgdd.toStdString());
             //verlist.append(verevidlist.at(i).toStdString());
         }
