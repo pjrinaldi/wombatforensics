@@ -63,6 +63,8 @@ void PopulateTreeModel(QString evidstring)
     pathvector.clear();
     if(elist.at(3).endsWith(".sfs"))
         pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last().split(".sfs").first() + ".dd").toStdString());
+    else if(elist.at(3).endsWith(".zmg"))
+        pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last().split(".zmg").first() + ".dd").toStdString());
     else
         pathvector.push_back(elist.at(3).toStdString());
     //pathvector.push_back(elist.at(3).toStdString());

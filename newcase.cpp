@@ -18,6 +18,8 @@ void InitializeEvidenceStructure(QString evidname)
     fullpathvector.clear();
     if(evidname.endsWith(".sfs"))
         fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split(".sfs").first() + ".dd").toStdString());
+    else if(evidname.endsWith(".zmg"))
+        fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split("/").last().split(".zmg").first() + ".dd").toStdString());
     else
         fullpathvector.push_back(evidname.toStdString());
     images = (const char**)malloc(fullpathvector.size()*sizeof(char*));

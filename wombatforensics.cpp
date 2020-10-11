@@ -1031,6 +1031,12 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             if(existingevidence.at(i).endsWith(".zmg"))
                 ZmgFuser(wombatvariable.imgdatapath.toStdString(), existingevidence.at(i).toStdString());
         }
+        // I NEED TO IMPLEMENT REPLACING THE .ZMG FORENSIC IMAGE WITH PATH TO THE .DD FORENSIC IMAGE FILE TO PASS TO MAP FUNCTION
+        // PROBABLY NEED TO SET EXISTINGEVIDENCE[I] = NEW PATH TO .DD FILE.
+        // OR I NEED TO DO IT WITHIN THE POPULATETREEMODEL
+
+
+
 	//qDebug() << "existing evidence:" << existingevidence;
 	// If i run sqfuse stuff here, i avoid issues with multiple def    QDir eviddir = QDir(wombatvariable.tmpmntpath);
 	/*
@@ -1084,8 +1090,8 @@ initions.
     //}
         
         // COMMENT OUT FOR TESTING SQUASHFUSE IMPLEMENTATION
-	//QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
-        //openwatcher.setFuture(tmpfuture);
+	QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
+        openwatcher.setFuture(tmpfuture);
     }
     else
     {
@@ -1503,6 +1509,7 @@ void WombatForensics::AddEvidence()
         QDir dir;
         dir.mkpath(evidencepath);
         ecount++;
+        // maybe place the zmg stuff here as i did for open
     }
     if(newevidence.count() > 0)
     {
