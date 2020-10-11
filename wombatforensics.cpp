@@ -2109,13 +2109,14 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
         else if(verevidlist.at(i).endsWith(".zmg"))
         {
             QString zmgdd = wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".zmg").first() + ".dd";
-            qDebug() << "zmg log:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".zmg").first() + ".dd.log";
-            qDebug() << "verify zmg image here and update log somehow...";
+            //qDebug() << "zmg log:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".zmg").first() + ".dd.log";
+            //qDebug() << "verify zmg image here and update log somehow...";
             verlist.append(zmgdd.toStdString());
             //verlist.append(verevidlist.at(i).toStdString());
         }
         else if(verevidlist.at(i).endsWith(".e01"))
         {
+            QString ewfdd = wombatvariable.imgdatapath + verevidlist.at(i).split("/").last() + ".raw";
             /*
             if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
             {
@@ -2125,13 +2126,16 @@ void WombatForensics::VerifyEvidence(QStringList verevidlist)
                 mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
             }
             */
+            verlist.append(ewfdd.toStdString());
             qDebug() << "e01 image";
         }
         else if(verevidlist.at(i).endsWith("aff") || verevidlist.at(i).endsWith(".000") || verevidlist.at(i).endsWith(".001"))
         {
+            QString affdd = wombatvariable.imgdatapath + verevidlist.at(i).split("/").last() + ".raw";
             //if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
             //    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
             qDebug() << "affuse image";
+            verlist.append(affdd.toStdString());
         }
         else
         {
