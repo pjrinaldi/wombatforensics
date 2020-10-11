@@ -3,6 +3,7 @@
 #include "affuse.h"
 #include "ewffuse.h"
 #include "sqfuse.h"
+#include "zmgfuse.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -1027,6 +1028,8 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         {
             if(existingevidence.at(i).endsWith(".sfs"))
                 SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
+            if(existingevidence.at(i).endsWith(".zmg"))
+                ZmgFuser(wombatvariable.imgdatapath, existingevidence.at(i));
         }
 	//qDebug() << "existing evidence:" << existingevidence;
 	// If i run sqfuse stuff here, i avoid issues with multiple def    QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -1962,6 +1965,14 @@ void WombatForensics::CloseCurrentCase()
             //QString xunmntstr = "fusermount -uz " + wombatvariable.imgdatapath;
             //qDebug() << "xunmntstr:" << xunmntstr;
             //QProcess::execute(xunmntstr, QStringList());
+        }
+        else if(imgext.contains("zmg")) // zmgfuse
+        {
+            if(zmgfuser != NULL)
+            {
+                fuse_unmount(zmgfuser);
+                fuse_destroy(zmgfuser);
+            }
         }
         else if(imgext.contains("sfs")) // squashfuse
         {

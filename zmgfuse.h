@@ -2,9 +2,11 @@
 // Created by rainm on 17-6-9.
 //
 
-#define FUSE_USE_VERSION 26
+//#define FUSE_USE_VERSION 26
 
-#include <fuse.h>
+//#include <fuse.h>
+#include <fuse3/fuse.h>
+#include <fuse3/fuse_lowlevel.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -18,9 +20,11 @@
 #include <sys/stat.h>
 #include <pthread.h>
 
+extern "C" {
 #include "uthash.h"
 
 #include "zmgfs.h"
+}
 
 //#define DEBUG
 
@@ -64,7 +68,7 @@ int is_file_cached(const char *path) {
     pthread_mutex_unlock(&cache_mutex);
 
     return (cache != NULL);
-}
+};
 
 char *get_cached_buffer(const char *path) {
     struct file_buffer_cache *cache;
@@ -77,7 +81,7 @@ char *get_cached_buffer(const char *path) {
         return cache->buffer;
     }
     return NULL;
-}
+};
 
 char *remove_cache_if_cached(const char *path) {
     char *ret = NULL;
@@ -94,7 +98,7 @@ char *remove_cache_if_cached(const char *path) {
     pthread_mutex_unlock(&cache_mutex);
 
     return ret;
-}
+};
 
 int put_cache_if_not_cached(const char *path, char *buffer) {
 
@@ -115,13 +119,13 @@ int put_cache_if_not_cached(const char *path, char *buffer) {
     pthread_mutex_unlock(&cache_mutex);
 
     return ret;
-}
+};
 
 struct zmg_dir_entry *open_root(const char *zmgmap) {
     return (struct zmg_dir_entry *) (zmgmap + sizeof(struct zmg_header));
 }
 
-static int zmgfs_getattr(const char *path, struct stat *stbuf) {
+static int zmgfs_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
 
     struct zmg_dir_entry *root = open_root(zmgmap);
     struct zmg_dir_entry *dentry = find_dir_entry_at(path, root);
@@ -149,10 +153,9 @@ static int zmgfs_getattr(const char *path, struct stat *stbuf) {
         }
     }
     return -ENOENT;
-}
+};
 
-static int zmgfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-                         off_t offset, struct fuse_file_info *fi) {
+static int zmgfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags) {
     (void) offset;
     (void) fi;
 
@@ -163,22 +166,23 @@ static int zmgfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
         return -ENOENT;
     }
 
-    filler(buf, ".", NULL, 0);
-    filler(buf, "..", NULL, 0);
+    //filler(buf, ".", NULL, 0);
+    //filler(buf, "..", NULL, 0);
 
     struct zmg_dir_entry *dentries = (struct zmg_dir_entry *) (((char *) dentry) + dentry->off_data);
     struct zmg_file_entry *fentry = (struct zmg_file_entry *) (dentries + dentry->n_dirs);
 
+    //filler(buf, rawpath + 1, NULL, 0, (fuse_fill_dir_flags)0);
     for (int i = 0; i < dentry->n_dirs; i++) {
-        filler(buf, dentries[i].name, NULL, 0);
+        filler(buf, dentries[i].name, NULL, 0, (fuse_fill_dir_flags)0);
     }
 
     for (int i = 0; i < dentry->n_files; i++) {
-        filler(buf, fentry->name, NULL, 0);
+        filler(buf, fentry->name, NULL, 0, (fuse_fill_dir_flags)0);
         fentry = (struct zmg_file_entry *) (((char *) fentry) + fentry->off_data + fentry->data_size);
     }
     return 0;
-}
+};
 
 static int zmgfs_open(const char *path, struct fuse_file_info *fi) {
 
@@ -194,7 +198,7 @@ static int zmgfs_open(const char *path, struct fuse_file_info *fi) {
         return 0;
     }
     return -ENOENT;
-}
+};
 
 static int zmgfs_release(const char *path, struct fuse_file_info *fi) {
 
@@ -205,7 +209,7 @@ static int zmgfs_release(const char *path, struct fuse_file_info *fi) {
         free(buffer);
     }
     return 0;
-}
+};
 
 static int zmgfs_read(const char *path, char *buf, size_t size, off_t offset,
                       struct fuse_file_info *fi) {
@@ -228,7 +232,7 @@ static int zmgfs_read(const char *path, char *buf, size_t size, off_t offset,
                 memcpy(buf, buffer + offset, size);
             } else {
                 char *zipbuf = ((char *) fentry) + fentry->off_data;
-                buffer = malloc(fentry->file_size);
+                buffer = (char*)malloc(fentry->file_size);
                 size_t sz;
                 unzip_buffer_to_buffer(zipbuf, fentry->data_size, buffer, &sz);
 
@@ -247,7 +251,7 @@ static int zmgfs_read(const char *path, char *buf, size_t size, off_t offset,
     }
     log("zmgfs: end read %s", path);
     return (int) size;
-}
+};
 
 static int
 zmg_opt_proc(void *data, const char *arg, int key, struct fuse_args *outargs) {
@@ -269,16 +273,69 @@ zmg_opt_proc(void *data, const char *arg, int key, struct fuse_args *outargs) {
             fprintf(stderr, "internal error\n");
             abort();
     }
-}
-
-static struct fuse_operations zmgfs_oper = {
-        .getattr    = zmgfs_getattr,
-        .readdir    = zmgfs_readdir,
-        .open        = zmgfs_open,
-        .read        = zmgfs_read,
-        .release    = zmgfs_release,
 };
 
+static struct fuse_operations zmgfs_oper = {
+        .getattr     = zmgfs_getattr,
+        .open        = zmgfs_open,
+        .read        = zmgfs_read,
+        .readdir     = zmgfs_readdir,
+        //.release    = zmgfs_release,
+};
+
+void* zmgfuselooper(void *data)
+{
+    struct fuse* fuse = (struct fuse*) data;
+    fuse_loop(fuse);
+    //int ret = fuse_loop(fuse);
+    //printf("fuse loop return: %d\n", ret);
+    //pthread_exit(NULL);
+};
+
+struct fuse_args zmgargs;
+struct fuse* zmgfuser;
+//struct fuse_session* affusersession;
+pthread_t zmgfusethread;
+
+void ZmgFuser(QString imgpath, QString imgfile)
+{
+    char** fargv = NULL;
+    fargv = XCALLOC(char *, 3);
+    fargv[0] = "zmgfuse";
+    int fargc = 1;
+    int ret = 0;
+    char* ipath = new char[imgpath.toStdString().size() + 1];
+    strcpy(ipath, imgpath.toStdString().c_str());
+    char* iname = new char[imgfile.toStdString().size() + 1];
+    strcpy(iname, imgfile.toStdString().c_str());
+    //zmgfile = (char*)imgfile.toStdString().c_str();
+    //mtpt = (char*)imgpath.toStdString().c_str();
+    printf("zmgfile: %s mtpt: %s", iname, ipath);
+    zmgfd = open(iname, O_RDONLY);
+    //zmgfd = open(argv[1], O_RDONLY);
+    struct stat st;
+    fstat(zmgfd, &st);
+    size_t size = (size_t) st.st_size;
+    zmgmap = (const char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, zmgfd, 0);
+    zmgargs = FUSE_ARGS_INIT(fargc, fargv);
+    zmgfuser = fuse_new(&zmgargs, &zmgfs_oper, sizeof(fuse_operations), NULL);
+    ret = fuse_mount(zmgfuser, imgpath.toStdString().c_str());
+    int retd = fuse_daemonize(1);
+    int perr = pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *) zmgfuser);
+    /*
+    struct fuse_loop_config config;
+    config.clone_fd = 0;
+    config.max_idle_threads = 5;
+    args = FUSE_ARGS_INIT(fargc, fargv);
+    affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
+    if(affuser == NULL)
+        qDebug() << "affuser new error.";
+    ret = fuse_mount(affuser, imgpath.toStdString().c_str());
+    int retd = fuse_daemonize(1);
+    int perr = pthread_create(&fusethread, NULL, fuselooper, (void *) affuser);
+    */
+};
+/*
 int main(int argc, char *argv[]) {
 
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
@@ -309,3 +366,4 @@ int main(int argc, char *argv[]) {
 
     return ret;
 }
+*/
