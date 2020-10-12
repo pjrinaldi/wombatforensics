@@ -75,6 +75,7 @@ public:
         treeWidget->setSizePolicy(sizePolicy2);
         treeWidget->setSelectionBehavior(QAbstractItemView::SelectItems);
         splitter->addWidget(treeWidget);
+        treeWidget->header()->setVisible(false);
         splitter_3->addWidget(splitter);
         splitter_2 = new QSplitter(splitter_3);
         splitter_2->setObjectName(QString::fromUtf8("splitter_2"));

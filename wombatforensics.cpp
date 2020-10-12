@@ -1813,12 +1813,13 @@ void WombatForensics::CloseCurrentCase()
         //qDebug() << "imgext:" << imgext;
         if(imgext.contains("e01")) // ewfmount
         {
-            fuse_unmount(ewfuser);
-            fuse_destroy(ewfuser);
-            /*
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
-            QProcess::execute(xunmntstr, QStringList());
-            */
+            if(ewfuser != NULL)
+            {
+                fuse_unmount(ewfuser);
+                fuse_destroy(ewfuser);
+            }
+            else
+                qDebug() << "ewfuser was null";
         }
         else if(imgext.contains("aff") || imgext.contains("000")) // affuse
         {
@@ -1826,30 +1827,9 @@ void WombatForensics::CloseCurrentCase()
             {
                 fuse_unmount(affuser);
                 fuse_destroy(affuser);
-		//int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), MNT_FORCE);
-                //execle("/bin/umount", "/bin/umount", "-i", rel_mnt, NULL, NULL);
-		//int ures = umount2(mnt, lazy ? UMOUNT_DETACH : 0);
-                //qDebug() << "ures:" << ures;
-                qDebug() << "affuser exists and should be unmounting";
             }
             else
-            {
-		//pthread_cancel(fusethread);
-		//setfsuid(getuid());
-		//setfsgid(getgid());
-	        //umask(033);
-		//int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), MNT_FORCE);
-                //execle("/bin/umount", "/bin/umount", "-i", wombatvariable.imgdatapath.toStdString().c_str(), NULL, NULL);
-		//int ures = umount2(wombatvariable.imgdatapath.toStdString().c_str(), 0);
-                //qDebug() << "ures:" << ures;
-		//fprintf(stderr, "std:error: error releasing lock: %s\n", strerror(errno));
                 qDebug() << "affuser was null";
-            }
-	    //fuse_session_unmount(affusersession);
-	    //fuse_remove_signal_handlers(se);
-            //QString xunmntstr = "fusermount -uz " + wombatvariable.imgdatapath;
-            //qDebug() << "xunmntstr:" << xunmntstr;
-            //QProcess::execute(xunmntstr, QStringList());
         }
         else if(imgext.contains("zmg")) // zmgfuse
         {
@@ -1866,30 +1846,6 @@ void WombatForensics::CloseCurrentCase()
                 fuse_unmount(sqfuser);
                 fuse_destroy(sqfuser);
             }
-            /*
-            QProcess builder;
-            builder.setProcessChannelMode(QProcess::MergedChannels);
-            builder.start("fusermount", QStringList() << "-u" << wombatvariable.imgdatapath);
-            //builder.start("squashfuse", QStringList() << elist.at(3) << wombatvariable.imgdatapath);
-            if(!builder.waitForFinished())
-                qDebug() << "fuse failed:" << builder.errorString();
-            else
-                qDebug() << "fuse output:" << builder.readAll();
-            */
-            /*
-            QString umntstr = "fusermount";
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
-            QStringList strlist;
-            strlist.clear();
-            strlist.append("-u");
-            strlist.append(wombatvariable.imgdatapath);
-            int ecode = QProcess::execute(umntstr, strlist);
-            //int ecode = QProcess::execute(xunmntstr, QStringList());
-            qDebug() << "ecode:" << ecode;
-            //QProcess* unmnt = new QProcess();
-            //unmnt->start(xunmntstr);
-            //unmnt->waitForFinished(-1);
-            */
         }
         /*
         else // raw, so nothing to unmount
@@ -1904,6 +1860,11 @@ void WombatForensics::CloseCurrentCase()
     newevidence.clear();
     // BEGIN TAR METHOD
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
+    QString oldtmptar = tmptar + ".old";
+    if(FileExists(tmptar.toStdString()))
+    {
+        rename(tmptar.toStdString().c_str(), oldtmptar.toStdString().c_str());
+    }
     QByteArray tmparray = tmptar.toLocal8Bit();
     QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
     QByteArray tmparray3 = QString("./" + wombatvariable.casename).toLocal8Bit();
@@ -1911,6 +1872,7 @@ void WombatForensics::CloseCurrentCase()
     tar_open(&casehandle, tmparray.data(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
     tar_append_tree(casehandle, tmparray2.data(), tmparray3.data());
     tar_close(casehandle);
+    std::remove(oldtmptar.toStdString().c_str());
     // END TAR METHOD
     StatusUpdate("Saved...");
     qInfo() << "Wombat Case File Saved";
@@ -1938,174 +1900,19 @@ void WombatForensics::RemEvidence()
 
 void WombatForensics::FinishVerify()
 {
-    //qDebug() << "verfuture result count:" << verfuture.resultCount();
     QString resultstring = "";
     for(int i=0; i < verfuture.resultCount(); i++)
     {
         resultstring += QString::fromStdString(verfuture.resultAt(i)) + "\n";
-        // NEED TO UNMOUNT WHAT WAS MOUNTED HERE....
-        //qDebug() << "verfuture result:" << QString::fromStdString(verfuture.resultAt(i));
-        //resultstring += "Forensic Image
     }
-    //QMessageBox::information(this, "Finished", " Forensic Image (" + verevidlist.at(i).split("/").last() + ") Verification " + QString::fromStdString(retstr), QMessageBox::Ok);
     QMessageBox::information(this, "Finished", " " + resultstring, QMessageBox::Ok);
 }
 
 void WombatForensics::VerifyEvidence(QStringList verevidlist)
 {
-    // prior to verifying evidence list, I need to mount each of them in the for loop unless it is a raw image.
-    QList<std::string> verlist;
-    verlist.clear();
-    for(int i=0; i < verevidlist.count(); i++)
-    {
-        // PROBABLY SHOULD MOUNT EACH IMAGE IN ITS OWN DIR SO THEY DON'T CONFLICT WHILE VERIFYING.
-        QString mntstr = "";
-        QString unsqshfs = "";
-        QString sqshfs = "";
-        // call different fuse mounts here and adjust the outstring that get's added to the QList<std::string> so it points to the right forensic image
-        // might have to include the path to the log since it varies for affuse, e01, raw, and sfs...
-        if(verevidlist.at(i).endsWith(".sfs"))
-        {
-            mntstr = "squashfuse -s " + verevidlist.at(i) + " " + wombatvariable.imgdatapath;
-            qDebug() << "mntstr:" << mntstr;
-            qDebug() << "dd image:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".dd";
-            unsqshfs = "unsquashfs -d " + wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".dd.log " + verevidlist.at(i);
-            sqshfs = "mksquashfs " + wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".dd.log " + verevidlist.at(i);
-            //std::string sqshcmd = "mksquashfs " + outpath + "/" + outstr + ".dd " + outpath + "/" + outstr + ".dd.log " + outpath + "/" + outstr + ".sfs";
-
-            qDebug() << "log unsquash:" << unsqshfs;
-            qDebug() << "log mksquash:" << sqshfs;
-            //qDebug() << "log file:" << wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".sfs").first() + ".log";
-            //qDebug() << "sfs image";
-        }
-        else if(verevidlist.at(i).endsWith(".zmg"))
-        {
-            QString zmgdd = wombatvariable.imgdatapath + verevidlist.at(i).split("/").last().split(".zmg").first() + ".dd";
-            verlist.append(zmgdd.toStdString());
-            //verlist.append(verevidlist.at(i).toStdString());
-        }
-        else if(verevidlist.at(i).endsWith(".e01"))
-        {
-            QString ewfdd = wombatvariable.imgdatapath + verevidlist.at(i).split("/").last() + ".raw";
-            /*
-            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
-            {
-                QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
-                QDir dir;
-                dir.mkpath(tmpstring);
-                mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
-            }
-            */
-            verlist.append(ewfdd.toStdString());
-            qDebug() << "e01 image";
-        }
-        else if(verevidlist.at(i).endsWith("aff") || verevidlist.at(i).endsWith(".000") || verevidlist.at(i).endsWith(".001"))
-        {
-            QString affdd = wombatvariable.imgdatapath + verevidlist.at(i).split("/").last() + ".raw";
-            //if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-            //    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
-            qDebug() << "affuse image";
-            verlist.append(affdd.toStdString());
-        }
-        else
-        {
-            verlist.append(verevidlist.at(i).toStdString());
-            qDebug() << "raw image, don't think i have to anything.";
-        }
-    }
-
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
-    verfuture = QtConcurrent::mapped(verlist, Verify);
+    verfuture = QtConcurrent::mapped(verevidlist, Verify);
     verifywatcher.setFuture(verfuture);
-        /*
-         *
-         *  ui->evidencelist->addItem(evidfilename);
-            if(evidfilename.toLower().endsWith(".sfs"))
-            {
-                // need to mount and provide access to the raw dd file...
-                QString mntstr = "squashfuse " + evidfilename + " " + wombatvariable.imgdatapath;
-                //qDebug() << "mntstr:" << mntstr;
-		xmntprocess = new QProcess();
-		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
-		connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
-		//xmntprocess->setProgram(mntstr);
-		xmntprocess->start(mntstr);
-                //evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last();
-                //qDebug() << "evidfilename:" << evidfilename;
-                evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last().split(".sfs").first() + ".dd";
-                xmntprocess->waitForFinished(-1);
-            }
-
-        //if(evidfilename.toLower().endsWith(".sfs"))
-        int imgtype = tmpstr.split(",").at(0).toInt();
-        QString imagefile = tmpstr.split(",").at(3);
-        if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype)) // AFF
-        {
-            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
-        }
-        else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
-        {
-            if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
-            {
-                QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
-                QDir dir;
-                dir.mkpath(tmpstring);
-                mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
-            }
-        }
-        else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
-        {
-            QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
-            if(imgext.contains(".000"))
-            {
-                if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                    mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
-            }
-            else
-                mntstr = "";
-        }
-        else
-        {
-            qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
-        }
-        if(!mntstr.isEmpty())
-        {
-            xmntprocess = new QProcess();
-            connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
-            connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
-            xmntprocess->setProgram(mntstr);
-            xmntprocess->start();
-        }
-        */
-        // NEED TO DETERMINE IF IT IS AFF, EWF, SFS, OR RAW AND THEN DO FUSE MOUNTING SO I CAN MD5 THE RAW IMAGE...
-        // ALSO NEED TO GET MD5 FROM IMAGE TO COMPARE TO...
-        //std::string verifystr = Verify(verevidlist.at(i).toStdString());
-        
-        /*
-        QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
-        if(imgext.contains("e01")) // ewfmount
-        {
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
-            QProcess::execute(xunmntstr, QStringList());
-        }
-        else if(imgext.contains("aff") || imgext.contains("000")) // affuse
-        {
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
-            QProcess::execute(xunmntstr, QStringList());
-        }
-        else if(imgext.contains("sfs")) // squashfuse
-        {
-            QString xunmntstr = "fusermount -u " + wombatvariable.imgdatapath;
-            QProcess* unmnt = new QProcess();
-            unmnt->start(xunmntstr);
-            unmnt->waitForFinished(-1);
-        }
-        else // raw, so nothing to unmount
-        {
-        }
-        */
-    //}
 }
 
 void WombatForensics::RemoveEvidence(QStringList remevidlist)

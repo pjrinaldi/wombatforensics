@@ -72,6 +72,9 @@
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectItems</enum>
        </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
        <column>
         <property name="text">
          <string notr="true">1</string>

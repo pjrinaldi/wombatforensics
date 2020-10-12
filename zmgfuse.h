@@ -322,7 +322,7 @@ void ZmgFuser(std::string imgpath, std::string imgfile)
     */
     //zmgfile = (char*)imgfile.toStdString().c_str();
     //mtpt = (char*)imgpath.toStdString().c_str();
-    printf("zmgfile: %s mtpt: %s", iname, ipath);
+    //printf("zmgfile: %s mtpt: %s", iname, ipath);
     zmgfd = open(iname, O_RDONLY);
     //zmgfd = open(argv[1], O_RDONLY);
     struct stat st;

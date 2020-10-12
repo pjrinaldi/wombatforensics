@@ -86,6 +86,11 @@ void GenerateWombatCaseFile(void)
 {
     // BEGIN TAR METHOD
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
+    QString oldtmptar = tmptar + ".old";
+    if(FileExists(tmptar.toStdString()))
+    {
+        rename(tmptar.toStdString().c_str(), oldtmptar.toStdString().c_str());
+    }
     QByteArray tmparray = tmptar.toLocal8Bit();
     QByteArray tmparray2 = wombatvariable.tmpmntpath.toLocal8Bit();
     QByteArray tmparray3 = QString("./" + wombatvariable.casename).toLocal8Bit();
@@ -93,6 +98,7 @@ void GenerateWombatCaseFile(void)
     tar_open(&casehandle, tmparray.data(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
     tar_append_tree(casehandle, tmparray2.data(), tmparray3.data());
     tar_close(casehandle);
+    std::remove(oldtmptar.toStdString().c_str());
     // END TAR METHOD
 }
 
@@ -136,7 +142,17 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
-    pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
+    QString imgfile = tmpstr.split(",").at(3).split("|").at(0);
+    if(imgfile.endsWith(".zmg"))
+        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last().split(".zmg").first() + ".dd").toStdString());
+    else if(imgfile.toLower().endsWith(".e01"))
+        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last() + ".raw").toStdString());
+    else if(imgfile.toLower().endsWith(".aff"))
+        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last() + ".raw").toStdString());
+    else if(imgfile.toLower().endsWith(".sfs"))
+        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last().split(".sfs").first() + ".dd").toStdString());
+    else
+        pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
     const TSK_TCHAR** images;
     images = (const char**)malloc(pathvector.size()*sizeof(char*));
     images[0] = pathvector[0].c_str();

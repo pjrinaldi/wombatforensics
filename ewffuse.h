@@ -17,7 +17,7 @@
  * ## Source code ##
  * \include hello.c
  *
- * Modified by Pasquale J. Rinaldi, Jr. to be used for aff fuse mounting
+ * Modified by Pasquale J. Rinaldi, Jr. to be used for ewf fuse mounting
  * as a function.
  */
 
@@ -190,7 +190,7 @@ pthread_t ewfusethread;
 
 void EwfFuser(QString imgpath, QString imgfile)
 {
-    char** ewffilenames = NULL;
+    //char** ewffilenames = NULL;
     char* filenames[1] = {NULL};
     //char* filenames[];
     //system_character_t * const *imgfilenames = NULL;

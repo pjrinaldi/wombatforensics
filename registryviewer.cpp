@@ -7,6 +7,7 @@ RegistryDialog::RegistryDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
 {
     ui->setupUi(this);
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value Type", "Tag"});
     ui->label->setText("");
     connect(ui->treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(KeySelected()), Qt::DirectConnection);
     connect(ui->tableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(ValueSelected()), Qt::DirectConnection);
