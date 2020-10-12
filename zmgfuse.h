@@ -3,6 +3,7 @@
 //
 // Created by rainm on 17-6-9.
 //
+// Modified by Pasquale J. Rinaldi, Jr. 2020-10-09
 
 //#define FUSE_USE_VERSION 26
 #define FUSE_USE_VERSION 35
@@ -303,6 +304,7 @@ pthread_t zmgfusethread;
 
 void ZmgFuser(std::string imgpath, std::string imgfile)
 {
+    //printf("imgpath: %s\n", imgpath.c_str());
     char** fargv = NULL;
     fargv = (char**)calloc(3, sizeof(char*));
     //fargv = XCALLOC(char *, 3);

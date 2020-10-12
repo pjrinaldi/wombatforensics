@@ -21,20 +21,20 @@ void PopulateTreeModel(QString evidstring)
     std::vector<std::string> pathvector;
     pathvector.clear();
     if(elist.at(3).endsWith(".sfs"))
-        pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last().split(".sfs").first() + ".dd").toStdString());
+        pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + "/" + elist.at(3).split("/").last().split(".sfs").first() + ".dd").toStdString());
     else if(elist.at(3).endsWith(".zmg"))
-        pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last().split(".zmg").first() + ".dd").toStdString());
+        pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + "/" + elist.at(3).split("/").last().split(".zmg").first() + ".dd").toStdString());
     else if(elist.at(3).toLower().endsWith(".aff") || elist.at(3).endsWith(".000") || elist.at(3).endsWith(".001"))
     {
         if(elist.at(3).toLower().endsWith(".aff"))
-            pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + ".raw").toStdString());
+            pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + "/" + elist.at(3).split("/").last() + ".raw").toStdString());
         else if(elist.at(3).endsWith(".000"))
-            pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + ".raw").toStdString());
+            pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + "/" + elist.at(3).split("/").last() + ".raw").toStdString());
         else if(elist.at(3).endsWith(".001"))
-            pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + ".raw").toStdString());
+            pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + "/" + elist.at(3).split("/").last() + ".raw").toStdString());
     }
     else if(elist.at(3).toLower().endsWith(".e01"))
-        pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + ".raw").toStdString());
+        pathvector.push_back(QString(wombatvariable.imgdatapath + elist.at(3).split("/").last() + "/" + elist.at(3).split("/").last() + ".raw").toStdString());
     else
         pathvector.push_back(elist.at(3).toStdString());
     //pathvector.push_back(elist.at(3).toStdString());

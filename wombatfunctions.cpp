@@ -144,13 +144,13 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     evidfile.close();
     QString imgfile = tmpstr.split(",").at(3).split("|").at(0);
     if(imgfile.endsWith(".zmg"))
-        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last().split(".zmg").first() + ".dd").toStdString());
+        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last() + "/" + imgfile.split("/").last().split(".zmg").first() + ".dd").toStdString());
     else if(imgfile.toLower().endsWith(".e01"))
-        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last() + ".raw").toStdString());
-    else if(imgfile.toLower().endsWith(".aff"))
-        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last() + ".raw").toStdString());
+        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last() + "/" + imgfile.split("/").last() + ".raw").toStdString());
+    else if(imgfile.toLower().endsWith(".aff") || imgfile.toLower().endsWith(".000") || imgfile.toLower().endsWith(".001"))
+        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last() + "/" + imgfile.split("/").last() + ".raw").toStdString());
     else if(imgfile.toLower().endsWith(".sfs"))
-        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last().split(".sfs").first() + ".dd").toStdString());
+        pathvector.push_back(QString(wombatvariable.imgdatapath + imgfile.split("/").last() + "/" + imgfile.split("/").last().split(".sfs").first() + ".dd").toStdString());
     else
         pathvector.push_back(tmpstr.split(",").at(3).split("|").at(0).toStdString());
     const TSK_TCHAR** images;

@@ -16,20 +16,20 @@ void InitializeEvidenceStructure(QString evidname)
     std::vector<std::string> fullpathvector;
     fullpathvector.clear();
     if(evidname.endsWith(".sfs"))
-        fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split(".sfs").first() + ".dd").toStdString());
+        fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename + "/" + evidencename.split(".sfs").first() + ".dd").toStdString());
     else if(evidname.endsWith(".zmg"))
-        fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split("/").last().split(".zmg").first() + ".dd").toStdString());
+        fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename + "/" + evidencename.split(".zmg").first() + ".dd").toStdString());
     else if(evidname.toLower().endsWith(".aff") || evidname.endsWith(".000") || evidname.endsWith(".001"))
     {
         if(evidname.toLower().endsWith(".aff"))
-            fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split("/").last() + ".raw").toStdString());
+            fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename + "/" + evidencename + ".raw").toStdString());
         else if(evidname.endsWith(".000"))
-            fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split("/").last() + ".raw").toStdString());
+            fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename + "/" + evidencename + ".raw").toStdString());
         else if(evidname.endsWith(".001"))
-            fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split("/").last() + ".raw").toStdString());
+            fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename + "/" + evidencename + ".raw").toStdString());
     }
     else if(evidname.toLower().endsWith(".e01"))
-        fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename.split("/").last() + ".raw").toStdString());
+        fullpathvector.push_back(QString(wombatvariable.imgdatapath + evidencename + "/" + evidencename + ".raw").toStdString());
     else
         fullpathvector.push_back(evidname.toStdString());
     images = (const char**)malloc(fullpathvector.size()*sizeof(char*));

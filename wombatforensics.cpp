@@ -1026,14 +1026,17 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     {
         for(int i=0; i < existingevidence.count(); i++)
         {
+            QString emntpath = wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
+            QDir dir;
+            dir.mkpath(emntpath);
             if(existingevidence.at(i).endsWith(".sfs"))
-                SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
+                SquashFuser(emntpath,  existingevidence.at(i));
             else if(existingevidence.at(i).endsWith(".zmg"))
-                ZmgFuser(wombatvariable.imgdatapath.toStdString(), existingevidence.at(i).toStdString());
+                ZmgFuser(emntpath.toStdString(), existingevidence.at(i).toStdString());
             else if(existingevidence.at(i).toLower().endsWith(".aff") || existingevidence.at(i).endsWith(".000") || existingevidence.at(i).endsWith(".001"))
-            AffFuser(wombatvariable.imgdatapath, existingevidence.at(i));
+                AffFuser(emntpath, existingevidence.at(i));
             else if(existingevidence.at(i).toLower().endsWith(".e01"))
-            EwfFuser(wombatvariable.imgdatapath, existingevidence.at(i));
+                EwfFuser(emntpath, existingevidence.at(i));
         }
 	QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
         openwatcher.setFuture(tmpfuture);
@@ -1266,13 +1269,11 @@ void WombatForensics::PrepareEvidenceImage()
 	    {
 	        if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
                     SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
-		qDebug() << "mount sfs fuse here...";
 	    }
             else if(imagefile.endsWith(".zmg")) // ZMG
             {
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
-                    ZmgFuser(wombatvariable.imgdatapath.toStdString(), existingevidence.at(i).toStdString());
-                qDebug() << "mount zmg fuse here...";
+                    ZmgFuser(QString(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last()).toStdString(), existingevidence.at(i).toStdString());
             }
 	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
 	    {
@@ -1377,11 +1378,13 @@ void WombatForensics::AddEvidence()
     for(int i=0; i < newevidence.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
+        QString emntpath = wombatvariable.imgdatapath + newevidence.at(i).split("/").last() + "/";
         QDir dir;
         dir.mkpath(evidencepath);
+        dir.mkpath(emntpath);
         ecount++;
         if(newevidence.at(i).endsWith(".zmg"))
-            ZmgFuser(wombatvariable.imgdatapath.toStdString(), newevidence.at(i).toStdString());
+            ZmgFuser(QString(wombatvariable.imgdatapath + newevidence.at(i).split("/").last() + "/").toStdString(), newevidence.at(i).toStdString());
         else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
             AffFuser(wombatvariable.imgdatapath, newevidence.at(i));
         else if(newevidence.at(i).toLower().endsWith(".e01"))
@@ -1516,26 +1519,26 @@ void WombatForensics::LoadHexContents()
     evidfile.close();
     QString datastring = wombatvariable.imgdatapath;
     if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
-        datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+        datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
     else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
     {
         //datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
-        datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+        datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
     }
     else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
     {
         QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
-        if(imgext.contains(".000"))
-            datastring += tmpstr.split(",").at(3).split("/").last() + ".raw";
+        if(imgext.contains(".000") || imgext.contains(".001"))
+            datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
         else
             datastring = tmpstr.split(",").at(3);
     }
     else
         qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
     if(datastring.endsWith(".sfs"))
-        datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
+        datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
     else if(datastring.endsWith(".zmg"))
-        datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
+        datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
     //qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->BypassColor(false);
