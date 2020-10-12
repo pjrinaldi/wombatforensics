@@ -1028,68 +1028,13 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         {
             if(existingevidence.at(i).endsWith(".sfs"))
                 SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
-            if(existingevidence.at(i).endsWith(".zmg"))
+            else if(existingevidence.at(i).endsWith(".zmg"))
                 ZmgFuser(wombatvariable.imgdatapath.toStdString(), existingevidence.at(i).toStdString());
+            else if(existingevidence.at(i).toLower().endsWith(".aff") || existingevidence.at(i).endsWith(".000") || existingevidence.at(i).endsWith(".001"))
+            AffFuser(wombatvariable.imgdatapath, existingevidence.at(i));
+            else if(existingevidence.at(i).toLower().endsWith(".e01"))
+            EwfFuser(wombatvariable.imgdatapath, existingevidence.at(i));
         }
-        // I NEED TO IMPLEMENT REPLACING THE .ZMG FORENSIC IMAGE WITH PATH TO THE .DD FORENSIC IMAGE FILE TO PASS TO MAP FUNCTION
-        // PROBABLY NEED TO SET EXISTINGEVIDENCE[I] = NEW PATH TO .DD FILE.
-        // OR I NEED TO DO IT WITHIN THE POPULATETREEMODEL
-
-
-
-	//qDebug() << "existing evidence:" << existingevidence;
-	// If i run sqfuse stuff here, i avoid issues with multiple def    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-	/*
-    QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
-    QString evidid = "." + evidlist.first().split(".").last();
-    QStringList elist;
-    elist.clear();
-    QString evidencename = evidlist.first().split(evidid).first();
-    QString evidencepath = wombatvariable.tmpmntpath + evidencename + evidid + "/";
-    QFile evidfile(evidencepath + "stat");
-    if(!evidfile.isOpen())
-        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(evidfile.isOpen())
-        elist = QString(evidfile.readLine()).split(",");
-    evidfile.close();
-initions.
-    if(elist.at(3).endsWith(".sfs"))
-    {
-        //SquashFuser(wombatvariable.imgdatapath, elist.at(3));
-        qDebug() << "push squashfuse function calls here...";
-        QProcess builder;
-        builder.setProcessChannelMode(QProcess::MergedChannels);
-        builder.start("squashfuse", QStringList() << "-s" << elist.at(3) << wombatvariable.imgdatapath);
-        if(!builder.waitForFinished())
-            qDebug() << "fuse failed:" << builder.errorString();
-        else
-            qDebug() << "fuse output:" << builder.readAll();
-        QString mstr = "squashfuse";
-        QStringList mstrlist;
-        mstrlist.clear();
-        mstrlist.append(elist.at(3));
-        mstrlist.append(wombatvariable.imgdatapath);
-        QString mntstr = "squashfuse " + elist.at(3) + " " + wombatvariable.imgdatapath;
-        //QProcess::execute(mntstr, QStringList());
-        QProcess* xmntprocess = new QProcess();
-        //connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
-        //connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErrr()), Qt::QueuedConnection);
-        //xmntprocess->start(mntstr);
-        xmntprocess->start(mstr, mstrlist);
-        xmntprocess->waitForFinished(-1);
-        */
-        /*
-         * + "/"QProcess builder;
-        builder.setProcessChannelMode(QProcess::MergedChannels);
-        builder.start("make", QStringList() << "-j2");
-        if (!builder.waitForFinished())
-            qDebug() << "Make failed:" << builder.errorString();
-        else
-            qDebug() << "Make output:" << builder.readAll();
-         */ 
-    //}
-        
-        // COMMENT OUT FOR TESTING SQUASHFUSE IMPLEMENTATION
 	QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
         openwatcher.setFuture(tmpfuture);
     }
@@ -1148,7 +1093,7 @@ void WombatForensics::OpenUpdate()
         InitializeHashList();
         InitializeTaggedList();
     }
-    PrepareEvidenceImage();
+    //PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
@@ -1303,110 +1248,30 @@ void WombatForensics::PrepareEvidenceImage()
         {
 	    int imgtype = tmpstr.split(",").at(0).toInt();
 	    QString imagefile = tmpstr.split(",").at(3);
-            qDebug() << "imagefile:" << imagefile;
-            qDebug() << "imgtype:" << imgtype;
+            //qDebug() << "imagefile:" << imagefile;
+            //qDebug() << "imgtype:" << imgtype;
 	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype) || imagefile.endsWith(".aff")) // AFF
 	    {
                 //qDebug() << "is aff";
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                {
                     AffFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
-                    /*
-                    //qDebug() << "doesn't exist, mount";
-                    int ret;
-                    char* afpath = NULL;
-                    char* afbasename = NULL;
-                    size_t rawpathlen = 0;
-                    char** fargv = NULL;
-	            fargv = XCALLOC(char *, 3);
-                    int fargc = 0;
-                    char* ipath = new char[wombatvariable.imgdatapath.toStdString().size() + 1];
-                    strcpy(ipath, wombatvariable.imgdatapath.toStdString().c_str());
-                    char* iname = new char[imagefile.toStdString().size() + 1];
-                    strcpy(iname, imagefile.toStdString().c_str());
-                    fargv[0] = "./hello";
-                    //fargv[1] = ipath;
-                    //fargv[1] = "-s";
-                    fargc = 1;
-                    for(int i=0; i < fargc; i++)
-                        printf("fargv[%d]: %s\n", i, fargv[i]);
-                    afimage = af_open(iname, O_RDONLY|O_EXCL,0);
-                    afpath = xstrdup(ipath);
-	            printf("afpath: %s\n", afpath);
-                    afbasename = basename(iname);
-                    rawpathlen = 1 + strlen(afbasename) + strlen(rawext) + 1;
-                    //rawpathlen = 1 + strlen(ipath) + strlen(afbasename) + strlen(rawext) + 1;
-                    rawpath = XCALLOC(char, rawpathlen);
-                    rawpath[0] = '/';
-                    //strcat(rawpath, ipath);
-                    //rawpath[0] = '/';
-                    strcat(rawpath, afbasename);
-                    strcat(rawpath, rawext);
-                    rawpath[rawpathlen - 1] = 0;
-	            printf("rawpath: %s\n", rawpath);
-                    XFREE(afpath);
-                    rawsize = af_get_imagesize(afimage);
-		    
-		    struct fuse_loop_config config;
-		    config.clone_fd = 0;
-		    config.max_idle_threads = 5;
-	            struct fuse_args args = FUSE_ARGS_INIT(fargc, fargv);
-                    //struct fuse* affuser = fuse_new(&args, &hello_oper, sizeof(hello_oper), NULL);
-                    struct fuse* affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
-                    if(affuser == NULL)
-                        qDebug() << "affuser new error.";
-                    ret = fuse_mount(affuser, wombatvariable.imgdatapath.toStdString().c_str());
-                    qDebug() << "fuse mount return:" << ret;
-		    int retd = fuse_daemonize(1);
-                    qDebug() << "fuse daemonize return:" << retd;
-
-		    //pthread_t updater;     // Start thread to update file contents
-		    //int pret = pthread_create(&updater, NULL, update_fs_loop, (void *) affuser);
-		    //if (pret != 0)
-			//fprintf(stderr, "pthread_create failed with %s\n", strerror(ret));
-		     
-		    struct fuse_session* se = fuse_get_session(affuser);
-		    int retsh = fuse_set_signal_handlers(se);
-		    qDebug() << "fuse session signal handlers:" << retsh;
-		    pthread_t threadId;
-		    int perr = pthread_create(&threadId, NULL, fuselooper, (void *) affuser);
-		    //int err = pthread_create(&threadId, NULL, &threadFunc, NULL);
-		    //int ret2 = fuse_loop_mt(affuser, &config);
-		    //int ret2 = fuse_loop(affuser);
-                    //qDebug() << "fuse loop return:" << ret2;
-		    //fuse_session_unmount(se);
-		    //fuse_remove_signal_handlers(se);
-                    // getting close....
-                    mntstr = "";
-                    //mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
-                    // fuse_main SEEMS TO RETURN THE PROGRAM... PROBABLY NEED TO CALL A DIFFERENT SET OF FUNCTIONS FROM FUSE.H
-                    // HAVE TO RUN FUSE_NEW, FUSE_MOUNT, FUSE_UNMOUNT, FUSE_DESTROY
-                    //ret = fuse_main(fargc, fargv, &hello_oper, NULL);
-                    */
-                }
 	    }
-	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype)) // EWF
+	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype) || imagefile.endsWith(".e01")) // EWF
 	    {
 		//if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-		{
-                    /*
-		    QString tmpstring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/";
-		    QDir dir;
-		    dir.mkpath(tmpstring);
-		    //mntstr = "ewfmount " + tmpstr.split(",").at(3) + " " + tmpstring;
-                    qDebug() << "should do ewf fuse calls here.";
-                    */
-                    //EwfFuser();
                     EwfFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
-		}
 	    }
 	    else if(imagefile.endsWith(".sfs")) // SFS
 	    {
+	        if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
+                    SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
 		qDebug() << "mount sfs fuse here...";
 	    }
             else if(imagefile.endsWith(".zmg")) // ZMG
             {
+		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
+                    ZmgFuser(wombatvariable.imgdatapath.toStdString(), existingevidence.at(i).toStdString());
                 qDebug() << "mount zmg fuse here...";
             }
 	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
@@ -1415,7 +1280,8 @@ void WombatForensics::PrepareEvidenceImage()
 		if(imgext.contains(".000"))
 		{
 		    if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-			mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
+                        AffFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
+			//mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
 		}
 		else
 		    mntstr = "";
@@ -1426,6 +1292,7 @@ void WombatForensics::PrepareEvidenceImage()
 	    }
 	    if(!mntstr.isEmpty())
 	    {
+                /*
                 qDebug() << "call affuse:" << mntstr;
 		xmntprocess = new QProcess();
 		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
@@ -1434,6 +1301,7 @@ void WombatForensics::PrepareEvidenceImage()
 		xmntprocess->start();
 		//xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them.. NEED TO FIX
 		//xmntprocess->start(mntstr, QStringList());
+                */
 	    }
             //else
             //    qDebug() << "affuse command not called, function call instead..";
@@ -1464,7 +1332,7 @@ void WombatForensics::UpdateStatus()
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
     UpdateEvidenceList();
-    PrepareEvidenceImage();
+    //PrepareEvidenceImage();
     //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
     for(int i=0; i < evidrepdatalist.count(); i++)
     {
@@ -1514,6 +1382,10 @@ void WombatForensics::AddEvidence()
         ecount++;
         if(newevidence.at(i).endsWith(".zmg"))
             ZmgFuser(wombatvariable.imgdatapath.toStdString(), newevidence.at(i).toStdString());
+        else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
+            AffFuser(wombatvariable.imgdatapath, newevidence.at(i));
+        else if(newevidence.at(i).toLower().endsWith(".e01"))
+            EwfFuser(wombatvariable.imgdatapath, newevidence.at(i));
     }
     if(newevidence.count() > 0)
     {
