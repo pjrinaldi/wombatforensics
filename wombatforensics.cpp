@@ -1384,11 +1384,11 @@ void WombatForensics::AddEvidence()
         dir.mkpath(emntpath);
         ecount++;
         if(newevidence.at(i).endsWith(".zmg"))
-            ZmgFuser(QString(wombatvariable.imgdatapath + newevidence.at(i).split("/").last() + "/").toStdString(), newevidence.at(i).toStdString());
+            ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString());
         else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
-            AffFuser(wombatvariable.imgdatapath, newevidence.at(i));
+            AffFuser(emntpath, newevidence.at(i));
         else if(newevidence.at(i).toLower().endsWith(".e01"))
-            EwfFuser(wombatvariable.imgdatapath, newevidence.at(i));
+            EwfFuser(emntpath, newevidence.at(i));
     }
     if(newevidence.count() > 0)
     {
