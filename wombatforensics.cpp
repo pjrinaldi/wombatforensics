@@ -1520,7 +1520,7 @@ void WombatForensics::LoadHexContents()
     QString datastring = wombatvariable.imgdatapath;
     if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
         datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
-    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).toLower().endsWith(".e01"))
     {
         //datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
         datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
@@ -1539,7 +1539,7 @@ void WombatForensics::LoadHexContents()
         datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
     else if(datastring.endsWith(".zmg"))
         datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
-    //qDebug() << "datastring:" << datastring;
+    qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->BypassColor(false);
     ui->hexview->setData(casedatafile);

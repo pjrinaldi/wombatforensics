@@ -190,6 +190,12 @@ pthread_t ewfusethread;
 
 void EwfFuser(QString imgpath, QString imgfile)
 {
+    //qDebug() << "imgfile:" << imgfile;
+    //qDebug() << "imgdir:" << imgfile.split(imgfile.split("/").last()).first();
+    //QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
+    //QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
+    //QStringList efiles = edir.entryList(QStringList(imgfile.split("/").last().split(".e01").first()), QDir::NoSymLinks | QDir::Files);
+    //qDebug() << "efiles count:" << efiles.count();
     //char** ewffilenames = NULL;
     char* filenames[1] = {NULL};
     //char* filenames[];
