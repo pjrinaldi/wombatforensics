@@ -7,29 +7,24 @@ void PopulateTreeModel(QString evidstring)
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
-    qDebug() << "evidlist:" << evidlist;
+    //qDebug() << "evidlist:" << evidlist;
     QString evidid = "." + evidlist.first().split(".").last();
-    qDebug() << "evidid:" << evidid;
+    //qDebug() << "evidid:" << evidid;
     QStringList elist;
     elist.clear();
-    QString evidencename = evidlist.first().split(evidid).first();
-    qDebug() << "evidencename:" << evidencename;
+    QString evidencename = evidlist.first().mid(0, evidlist.first().count() - evidid.count());
+    //QString evidencename = evidlist.first().split(evidid).first();
+    //qDebug() << "evidencename:" << evidencename;
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + evidid + "/";
-    qDebug() << "evidencepath:" << evidencepath;
-    qDebug() << "evidencefile:" << QString(evidencepath + "stat");
+    //qDebug() << "evidencepath:" << evidencepath;
+    //qDebug() << "evidencefile:" << QString(evidencepath + "stat");
     QFile evidfile(evidencepath + "stat");
     if(!evidfile.isOpen())
-    {
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        qDebug() << "evidence file is opened";
-    }
     if(evidfile.isOpen())
-    {
-        qDebug() << "evidfile is open..";
         elist = QString(evidfile.readLine()).split(",");
-    }
     evidfile.close();
-    qDebug() << "elist:" << elist;
+    //qDebug() << "elist:" << elist;
     std::vector<std::string> pathvector;
     pathvector.clear();
     if(elist.at(3).endsWith(".sfs"))
