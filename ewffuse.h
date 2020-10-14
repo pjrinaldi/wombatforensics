@@ -194,6 +194,8 @@ void EwfFuser(QString imgpath, QString imgfile)
     QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
     QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e*") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E*"), QDir::NoSymLinks | QDir::Files);
     //char** ewffilenames = NULL;
+    char* filenames[1] = {NULL};
+    /*
     char* filenames[efiles.count()] = {NULL};
     for(int i=0; i < efiles.count(); i++)
     {
@@ -201,6 +203,7 @@ void EwfFuser(QString imgpath, QString imgfile)
         filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
         printf("filenames[%d] = %s\n", i, filenames[i]);
     }
+    */
     //char* filenames[];
     //system_character_t * const *imgfilenames = NULL;
     //system_character_t **libewf_filenames = NULL;
@@ -217,10 +220,12 @@ void EwfFuser(QString imgpath, QString imgfile)
     strcpy(ipath, imgpath.toStdString().c_str());
     char* iname = new char[imgfile.toStdString().size() + 1];
     strcpy(iname, imgfile.toStdString().c_str());
-    //filenames[0] = (char*)iname;
-    qDebug() << "filenames count:" << efiles.count();
+    filenames[0] = (char*)iname;
+    //qDebug() << "filenames count:" << efiles.count();
     libewf_handle_initialize(&ewfhandle, &ewferror);
-    int retopen = libewf_handle_open(ewfhandle, filenames, efiles.count(), LIBEWF_OPEN_READ, &ewferror);
+    //libewf_handle_open_file_io_pool(ewfhandle, pool, LIBEWF_OPEN_READ, &ewferror);
+    //int retopen = libewf_handle_open(ewfhandle, filenames, efiles.count(), LIBEWF_OPEN_READ, &ewferror);
+    int retopen = libewf_handle_open(ewfhandle, filenames, 1, LIBEWF_OPEN_READ, &ewferror);
     if(retopen == -1)
         libewf_error_fprint(ewferror, stdout);
     //libewf_handle_open(ewfhandle, (char* const)iname, 1, LIBEWF_OPEN_READ, &ewferror)

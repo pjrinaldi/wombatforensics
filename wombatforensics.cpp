@@ -1539,7 +1539,7 @@ void WombatForensics::LoadHexContents()
         datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
     else if(datastring.endsWith(".zmg"))
         datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
-    //qDebug() << "datastring:" << datastring;
+    qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->BypassColor(false);
     ui->hexview->setData(casedatafile);
