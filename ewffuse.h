@@ -33,7 +33,7 @@
 #define FUSE_USE_VERSION 35
 //#define HAVE_LIBBFIO 1
 //#define LIBEWF_HAVE_BFIO 1
-//#include <libbfio.h>
+#include <libbfio.h>
 #include <libewf.h>
 #include <fuse3/fuse.h>
 #include <fuse3/fuse_lowlevel.h>
@@ -47,13 +47,16 @@
 #include <sys/fsuid.h>
 #include <paths.h>
 
-//libbfio_pool_t* bfiohandle = NULL;
-//libbfio_error_t* bfioerror = NULL;
+libbfio_pool_t* bfiopool = NULL;
+libbfio_handle_t* bfiohandle = NULL;
+libbfio_error_t* bfioerror = NULL;
 libewf_handle_t* ewfhandle = NULL;
 libewf_error_t* ewferror = NULL;
 static char* erawpath = NULL;
 static off_t erawsize = 0;
 static const char* erawext = ".raw";
+char** globfiles = NULL;
+int globfilecnt = 0;
 /*
 #define XCALLOC(type, num) ((type *) xcalloc ((num), sizeof(type)))
 #define XMALLOC(type, num) ((type *) xmalloc ((num) * sizeof(type)))
@@ -165,7 +168,8 @@ static void ewfuse_destroy(void* param)
     //int libewf_glob_free(char *filenames[], int number_of_filenames, libewf_error_t **error );
     libewf_handle_close(ewfhandle, &ewferror);
     libewf_handle_free(&ewfhandle, &ewferror);
-    //libbfio_pool_free(&bfiohandle, &bfioerror);
+    libbfio_pool_free(&bfiopool, &bfioerror);
+    libewf_glob_free(globfiles, globfilecnt, &ewferror);
     //af_close(afimage);
     XFREE(erawpath);
     return;
@@ -200,8 +204,7 @@ void EwfFuser(QString imgpath, QString imgfile)
     QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
     QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e*") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E*"), QDir::NoSymLinks | QDir::Files);
     //char** ewffilenames = NULL;
-    char* filenames[1] = {NULL};
-    /*
+    //char* filenames[1] = {NULL};
     char* filenames[efiles.count()] = {NULL};
     for(int i=0; i < efiles.count(); i++)
     {
@@ -209,7 +212,6 @@ void EwfFuser(QString imgpath, QString imgfile)
         filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
         printf("filenames[%d] = %s\n", i, filenames[i]);
     }
-    */
     //char* filenames[];
     //system_character_t * const *imgfilenames = NULL;
     //system_character_t **libewf_filenames = NULL;
@@ -226,30 +228,76 @@ void EwfFuser(QString imgpath, QString imgfile)
     strcpy(ipath, imgpath.toStdString().c_str());
     char* iname = new char[imgfile.toStdString().size() + 1];
     strcpy(iname, imgfile.toStdString().c_str());
-    filenames[0] = (char*)iname;
+    //filenames[0] = (char*)iname;
     int retopen = 0;
-    //libbfio_pool_initialize(&bfiohandle, 1, 1, &bfioerror);
-    libewf_handle_initialize(&ewfhandle, &ewferror);
-    //int retopen = libbfio_file_pool_append_handles_for_names(bfiohandle, filenames, 1, LIBBFIO_ACCESS_FLAG_READ, &bfioerror);
+    //libewf_handle_initialize(&ewfhandle, &ewferror);
     //if(retopen == -1)
     //    libbfio_error_fprint(bfioerror, stdout);
-    //libbfio_pool_open(bfiohandle, 0, LIBBFIO_OPEN_READ, &bfioerror);
     //int libbfio_pool_initialize(libbfio_pool_t **pool, int number_of_handles, int maximum_number_of_open_handles, libbfio_error_t **error );
     //int libbfio_pool_open(libbfio_pool_t *pool, int entry, int access_flags, libbfio_error_t **error );
     //int libbfio_file_pool_append_handles_for_names(libbfio_pool_t *pool, char * const names[], int number_of_names, int access_flags, libbfio_error_t **error );
 
+    /*
+    QString basefilename = imgfile.split("/").last();
+    if(basefilename.endsWith(".e01"))
+        basefilename = basefilename.split(".e01").first();
+    else if(basefilename.endsWith(".E01"))
+        basefilename = basefilename.split(".E01").first();
+    printf("basefilename: %s\n", basefilename.toStdString().c_str());
+    int basestrlen = basefilename.count();
+    */
 
+
+    libbfio_pool_initialize(&bfiopool, globfilecnt, LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES, &bfioerror);
+    retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
+    if(retopen == -1)
+        libewf_error_fprint(ewferror, stdout);
+    else
+        printf("libewf glob was successful: %d\n", retopen);
+
+    for(int filename_index = 0; filename_index < globfilecnt; filename_index++)
+    {
+        retopen = libbfio_file_initialize(&bfiohandle, &bfioerror);
+        if(retopen == -1)
+            libewf_error_fprint(bfioerror, stdout);
+        else
+            printf("libbfio_file initialize worked\n");
+        retopen = libbfio_file_set_name(bfiohandle, globfiles[filename_index], strlen(globfiles[filename_index]), &bfioerror);
+        if(retopen == -1)
+            libewf_error_fprint(bfioerror, stdout);
+        else
+            printf("bfio file set name worked\n");
+        retopen = libbfio_pool_set_handle(bfiopool, filename_index, bfiohandle, LIBBFIO_OPEN_READ, &bfioerror);
+        if(retopen == -1)
+            libewf_error_fprint(bfioerror, stdout);
+        else
+            printf("bfio pool set handle worked\n");
+        //libbfio_pool_set_handle( file_io_pool, filename_index, file_io_handle, LIBBFIO_OPEN_READ, &error );
+        //libbfio_file_set_name( file_io_handle, filenames[ filename_index ], string_length, &error );
+    }
+    libewf_handle_initialize(&ewfhandle, &ewferror);
+    //libbfio_pool_open(bfiohandle, 0, LIBBFIO_OPEN_READ, &bfioerror);
+
+
+
+
+    //retopen = libbfio_file_pool_append_handles_for_names(bfiohandle, globfiles, globfilecnt, LIBBFIO_ACCESS_FLAG_READ, &bfioerror);
+    //if(retopen == -1)
+    //    libewf_error_fprint(bfioerror, stdout);
+    //else
+    //    printf("libbfio file pool append worked.\n");
     //int libewf_glob(const char *filename, size_t filename_length, uint8_t format, char **filenames[], int *number_of_filenames, libewf_error_t **error );
     
-    char** globfiles = NULL;
     //int retopen = libewf_glob(iname, sizeof(iname), LIBEWF_FORMAT_UNKNOWN, filenames, 1, &ewferror);
 
     //qDebug() << "filenames count:" << efiles.count();
-    //retopen = libewf_handle_open_file_io_pool(ewfhandle, bfiohandle, LIBEWF_OPEN_READ, &ewferror);
+    retopen = libewf_handle_open_file_io_pool(ewfhandle, bfiopool, LIBEWF_OPEN_READ, &ewferror);
     //int retopen = libewf_handle_open(ewfhandle, filenames, efiles.count(), LIBEWF_OPEN_READ, &ewferror);
-    retopen = libewf_handle_open(ewfhandle, filenames, 1, LIBEWF_OPEN_READ, &ewferror);
+    //retopen = libewf_handle_open(ewfhandle, globfiles, 1, LIBEWF_OPEN_READ, &ewferror);
     if(retopen == -1)
         libewf_error_fprint(ewferror, stdout);
+    else
+        printf("libewf_handle_open was successful %d\n", retopen);
     //libewf_handle_open(ewfhandle, (char* const)iname, 1, LIBEWF_OPEN_READ, &ewferror)
     fargv[0] = "./effuse";
     //fargv[1] = "-o";
