@@ -33,7 +33,7 @@
 #define FUSE_USE_VERSION 35
 //#define HAVE_LIBBFIO 1
 //#define LIBEWF_HAVE_BFIO 1
-#include <libbfio.h>
+//#include <libbfio.h>
 #include <libewf.h>
 #include <fuse3/fuse.h>
 #include <fuse3/fuse_lowlevel.h>
@@ -47,9 +47,9 @@
 #include <sys/fsuid.h>
 #include <paths.h>
 
-libbfio_pool_t* bfiopool = NULL;
-libbfio_handle_t* bfiohandle = NULL;
-libbfio_error_t* bfioerror = NULL;
+//libbfio_pool_t* bfiopool = NULL;
+//libbfio_handle_t* bfiohandle = NULL;
+//libbfio_error_t* bfioerror = NULL;
 libewf_handle_t* ewfhandle = NULL;
 libewf_error_t* ewferror = NULL;
 static char* erawpath = NULL;
@@ -168,7 +168,7 @@ static void ewfuse_destroy(void* param)
     //int libewf_glob_free(char *filenames[], int number_of_filenames, libewf_error_t **error );
     libewf_handle_close(ewfhandle, &ewferror);
     libewf_handle_free(&ewfhandle, &ewferror);
-    libbfio_pool_free(&bfiopool, &bfioerror);
+    //libbfio_pool_free(&bfiopool, &bfioerror);
     libewf_glob_free(globfiles, globfilecnt, &ewferror);
     //af_close(afimage);
     XFREE(erawpath);
@@ -250,11 +250,13 @@ void EwfFuser(QString imgpath, QString imgfile)
 
     printf("globfilecnt: %d\n", globfilecnt);
 
+    /*
     retopen = libbfio_pool_initialize(&bfiopool, globfilecnt, LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES, &bfioerror);
     if(retopen == -1)
 	libewf_error_fprint(bfioerror, stdout);
     else
 	printf("bfio pool initialize worked\n");
+    */
     retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
     if(retopen == -1)
         libewf_error_fprint(ewferror, stdout);
