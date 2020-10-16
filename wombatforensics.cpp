@@ -1038,6 +1038,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             else if(existingevidence.at(i).toLower().endsWith(".e01"))
                 EwfFuser(emntpath, existingevidence.at(i));
         }
+        //QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTskTree);
 	QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
         openwatcher.setFuture(tmpfuture);
     }
