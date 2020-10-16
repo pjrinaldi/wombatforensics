@@ -158,8 +158,6 @@ void EwfFuser(QString imgpath, QString imgfile)
     QString efilepath = imgfile.split(imgfile.split("/").last()).first();
     QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
     QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
-    //char** ewffilenames = NULL;
-    //char* filenames[1] = {NULL};
     char* filenames[efiles.count()] = {NULL};
     for(int i=0; i < efiles.count(); i++)
     {

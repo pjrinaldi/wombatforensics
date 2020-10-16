@@ -40,6 +40,18 @@ void InitializeEvidenceStructure(QString evidname)
     TSK_IMG_INFO* imginfo = NULL;
     imginfo = tsk_img_open(1, images, TSK_IMG_TYPE_DETECT, 0);
     free(images);
+    /*
+    QString efilepath = imgfile.split(imgfile.split("/").last()).first();
+    QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
+    QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
+    char* filenames[efiles.count()] = {NULL};
+    for(int i=0; i < efiles.count(); i++)
+    {
+        filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
+        printf("filenames[%d] = %s\n", i, filenames[i]);
+    }
+    globfilecnt = efiles.count();
+     */ 
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
     QTextStream out;
     QFile evidfile(evidencepath + "stat");
