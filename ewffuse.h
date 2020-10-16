@@ -212,6 +212,7 @@ void EwfFuser(QString imgpath, QString imgfile)
         filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
         printf("filenames[%d] = %s\n", i, filenames[i]);
     }
+    globfilecnt = efiles.count();
     //char* filenames[];
     //system_character_t * const *imgfilenames = NULL;
     //system_character_t **libewf_filenames = NULL;
@@ -247,16 +248,23 @@ void EwfFuser(QString imgpath, QString imgfile)
     int basestrlen = basefilename.count();
     */
 
+    printf("globfilecnt: %d\n", globfilecnt);
 
-    libbfio_pool_initialize(&bfiopool, globfilecnt, LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES, &bfioerror);
+    retopen = libbfio_pool_initialize(&bfiopool, globfilecnt, LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES, &bfioerror);
+    if(retopen == -1)
+	libewf_error_fprint(bfioerror, stdout);
+    else
+	printf("bfio pool initialize worked\n");
     retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
     if(retopen == -1)
         libewf_error_fprint(ewferror, stdout);
     else
         printf("libewf glob was successful: %d\n", retopen);
 
+    /*
     for(int filename_index = 0; filename_index < globfilecnt; filename_index++)
     {
+	bfiohandle = NULL;
         retopen = libbfio_file_initialize(&bfiohandle, &bfioerror);
         if(retopen == -1)
             libewf_error_fprint(bfioerror, stdout);
@@ -275,7 +283,12 @@ void EwfFuser(QString imgpath, QString imgfile)
         //libbfio_pool_set_handle( file_io_pool, filename_index, file_io_handle, LIBBFIO_OPEN_READ, &error );
         //libbfio_file_set_name( file_io_handle, filenames[ filename_index ], string_length, &error );
     }
-    libewf_handle_initialize(&ewfhandle, &ewferror);
+    */
+    retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
+    if(retopen == -1)
+	libewf_error_fprint(ewferror, stdout);
+    else
+	printf("libewf handle initialize worked\n");
     //libbfio_pool_open(bfiohandle, 0, LIBBFIO_OPEN_READ, &bfioerror);
 
 
@@ -291,9 +304,9 @@ void EwfFuser(QString imgpath, QString imgfile)
     //int retopen = libewf_glob(iname, sizeof(iname), LIBEWF_FORMAT_UNKNOWN, filenames, 1, &ewferror);
 
     //qDebug() << "filenames count:" << efiles.count();
-    retopen = libewf_handle_open_file_io_pool(ewfhandle, bfiopool, LIBEWF_OPEN_READ, &ewferror);
+    //retopen = libewf_handle_open_file_io_pool(ewfhandle, bfiopool, LIBEWF_OPEN_READ, &ewferror);
     //int retopen = libewf_handle_open(ewfhandle, filenames, efiles.count(), LIBEWF_OPEN_READ, &ewferror);
-    //retopen = libewf_handle_open(ewfhandle, globfiles, 1, LIBEWF_OPEN_READ, &ewferror);
+    retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
     if(retopen == -1)
         libewf_error_fprint(ewferror, stdout);
     else
