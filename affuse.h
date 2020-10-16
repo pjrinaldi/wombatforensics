@@ -144,7 +144,6 @@ void* fuselooper(void *data)
 
 struct fuse_args args;
 struct fuse* affuser;
-//struct fuse_session* affusersession;
 pthread_t fusethread;
 
 void AffFuser(QString imgpath, QString imgfile)
@@ -189,11 +188,6 @@ void AffFuser(QString imgpath, QString imgfile)
     ret = fuse_mount(affuser, imgpath.toStdString().c_str());
     int retd = fuse_daemonize(1);
 
-    //affusersession = fuse_get_session(affuser); 
-    //struct fuse_session* se = fuse_get_session(affuser);
-    //int retsh = fuse_set_signal_handlers(se);
-    //qDebug() << "fuse session signal handlers:" << retsh;
-    //pthread_t threadId;
     int perr = pthread_create(&fusethread, NULL, fuselooper, (void *) affuser);
 };
 

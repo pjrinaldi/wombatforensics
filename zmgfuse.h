@@ -5,10 +5,8 @@
 //
 // Modified by Pasquale J. Rinaldi, Jr. 2020-10-09
 
-//#define FUSE_USE_VERSION 26
 #define FUSE_USE_VERSION 35
 
-//#include <fuse.h>
 #include <fuse3/fuse.h>
 #include <fuse3/fuse_lowlevel.h>
 #include <stdio.h>
@@ -292,14 +290,10 @@ void* zmgfuselooper(void *data)
 {
     struct fuse* fuse = (struct fuse*) data;
     fuse_loop(fuse);
-    //int ret = fuse_loop(fuse);
-    //printf("fuse loop return: %d\n", ret);
-    //pthread_exit(NULL);
 };
 
 struct fuse_args zmgargs;
 struct fuse* zmgfuser;
-//struct fuse_session* affusersession;
 pthread_t zmgfusethread;
 
 void ZmgFuser(std::string imgpath, std::string imgfile)
@@ -307,26 +301,13 @@ void ZmgFuser(std::string imgpath, std::string imgfile)
     //printf("imgpath: %s\n", imgpath.c_str());
     char** fargv = NULL;
     fargv = (char**)calloc(3, sizeof(char*));
-    //fargv = XCALLOC(char *, 3);
-    //#define XCALLOC(type, num) ((type *) xcalloc ((num), sizeof(type)))
-    fargv[0] = "zmgfuse";
     int fargc = 1;
     int ret = 0;
     char* ipath = new char[imgpath.size() + 1];
     strcpy(ipath, imgpath.c_str());
     char* iname = new char[imgfile.size() + 1];
     strcpy(iname, imgfile.c_str());
-    /*
-    char* ipath = new char[imgpath.toStdString().size() + 1];
-    strcpy(ipath, imgpath.toStdString().c_str());
-    char* iname = new char[imgfile.toStdString().size() + 1];
-    strcpy(iname, imgfile.toStdString().c_str());
-    */
-    //zmgfile = (char*)imgfile.toStdString().c_str();
-    //mtpt = (char*)imgpath.toStdString().c_str();
-    //printf("zmgfile: %s mtpt: %s", iname, ipath);
     zmgfd = open(iname, O_RDONLY);
-    //zmgfd = open(argv[1], O_RDONLY);
     struct stat st;
     fstat(zmgfd, &st);
     size_t size = (size_t) st.st_size;
@@ -334,52 +315,7 @@ void ZmgFuser(std::string imgpath, std::string imgfile)
     zmgargs = FUSE_ARGS_INIT(fargc, fargv);
     zmgfuser = fuse_new(&zmgargs, &zmgfs_oper, sizeof(fuse_operations), NULL);
     ret = fuse_mount(zmgfuser, imgpath.c_str());
-    //ret = fuse_mount(zmgfuser, imgpath.toStdString().c_str());
     int retd = fuse_daemonize(1);
     int perr = pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *) zmgfuser);
-    /*
-    struct fuse_loop_config config;
-    config.clone_fd = 0;
-    config.max_idle_threads = 5;
-    args = FUSE_ARGS_INIT(fargc, fargv);
-    affuser = fuse_new(&args, &affuse_oper, sizeof(fuse_operations), NULL);
-    if(affuser == NULL)
-        qDebug() << "affuser new error.";
-    ret = fuse_mount(affuser, imgpath.toStdString().c_str());
-    int retd = fuse_daemonize(1);
-    int perr = pthread_create(&fusethread, NULL, fuselooper, (void *) affuser);
-    */
 };
-/*
-int main(int argc, char *argv[]) {
-
-    struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
-    if (fuse_opt_parse(&args, NULL, zmg_opts, zmg_opt_proc) == -1) {
-        return -1;
-    }
-
-    if (zmgfile == NULL || mtpt == NULL) {
-        printf("Invalid arguments.\n");
-        exit(-1);
-    }
-
-    printf("zmg file: %s\n", zmgfile);
-    printf("mount point: %s\n", mtpt);
-
-    pthread_mutex_init(&cache_mutex, NULL);
-
-    zmgfd = open(argv[1], O_RDONLY);
-    struct stat st;
-    fstat(zmgfd, &st);
-    size_t size = (size_t) st.st_size;
-    zmgmap = mmap(NULL, size, PROT_READ, MAP_PRIVATE, zmgfd, 0);
-
-    int ret = fuse_main(args.argc, args.argv, &zmgfs_oper, NULL);
-
-    munmap((void *) zmgmap, size);
-    close(zmgfd);
-
-    return ret;
-}
-*/
 #endif // ZMGFUSE_H
