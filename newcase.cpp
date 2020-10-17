@@ -3,11 +3,44 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
+int GetFileSystemType(QString estring)
+{
+    int fstype = 0;
+    qDebug() << "FSTYPE estring:" << estring;
+    libfsapfs_error_t* apfserror = NULL;
+    libfsext_error_t* exterror = NULL;
+    libfshfs_error_t* hfserror = NULL;
+    libfsntfs_error_t* ntfserror = NULL;
+    libfsrefs_error_t* refserror = NULL;
+    libfsxfs_error_t* xfserror = NULL;
+    if(libfsapfs_check_container_signature(estring.toStdString().c_str(), &apfserror) == 1)
+        fstype = 1; // APFS
+    if(libfsext_check_volume_signature(estring.toStdString().c_str(), &exterror) == 1)
+        fstype = 2; // EXT(2,3,4)
+    if(libfshfs_check_volume_signature(estring.toStdString().c_str(), &hfserror) == 1)
+        fstype = 3; // HFS(+)
+    if(libfsntfs_check_volume_signature(estring.toStdString().c_str(), &ntfserror) == 1)
+        fstype = 4; // NTFS
+    if(libfsrefs_check_volume_signature(estring.toStdString().c_str(), &refserror) == 1)
+        fstype = 5; // REFS
+    if(libfsxfs_check_volume_signature(estring.toStdString().c_str(), &xfserror) == 1)
+        fstype = 6; // XFS
+    libfsapfs_error_free(&apfserror);
+    libfsapfs_error_free(&exterror);
+    libfshfs_error_free(&hfserror);
+    libfsntfs_error_free(&ntfserror);
+    libfsrefs_error_free(&refserror);
+    libfsxfs_error_free(&xfserror);
+    
+    return fstype;
+}
 void ProcessVolume(QString evidstring)
 {
     qDebug() << "evidstring:" << evidstring;
     int evidcnt = 0;
-    QString emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
+    QString emntstring = evidstring;
+    if(evidstring.toLower().endsWith(".e01") || evidstring.toLower().endsWith(".aff") || evidstring.toLower().endsWith(".000") || evidstring.toLower().endsWith("001") || evidstring.toLower().endsWith(".zmg"))
+        emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
     QFileInfo efileinfo(emntstring);
     qint64 imgsize = efileinfo.size();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -41,7 +74,10 @@ void ProcessVolume(QString evidstring)
     if(isgpt == 1)
         voltype = 1;
     if(ismbr == 1 && isgpt == 0)
+    {
         voltype = 2;
+    }
+    qDebug() << "volume type:" << voltype;
     if(voltype == 1) // GPT
     {
         uint8_t guiddata = 0;
@@ -89,7 +125,7 @@ void ProcessVolume(QString evidstring)
             libvsmbr_partition_get_size(mbrpart, &partsize, &mbrerror);
             libvsmbr_partition_get_type(mbrpart, &parttype, &mbrerror);
             libvsmbr_partition_free(&mbrpart, &mbrerror);
-            qDebug() << "partition:" << i << "offset:" << partoffset << "size:" << partsize << "parttype:" << parttype;
+            qDebug() << "partition:" << i << "offset:" << partoffset << "size:" << partsize << "parttype:" << QString::number(parttype, 16);
             pofflist.append(partoffset);
             psizelist.append(partsize);
         }
@@ -100,20 +136,26 @@ void ProcessVolume(QString evidstring)
     {
         qDebug() << "it's virtual...";
     }
+    int fstype = 0;
     int ptreecnt = 0;
     for(int i=0; i < partcount; i++)
     {
         qDebug() << "starting aprtition check...";
         qDebug() << "pofflist:" << pofflist << "psizelist:" << psizelist;
-        if(pofflist.at(i) > 0 && i == 0)
+        if(i == 0)
         {
-            // add unalloc partition to tree here...
-            nodedata.clear();
-            nodedata << "UNALLOCATED" << "0" << QString::number(pofflist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-            mutex.lock();
-            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
-            mutex.unlock();
-            ptreecnt++;
+            if(pofflist.at(i) > 0)
+            {
+                // add unalloc partition to tree here...
+                nodedata.clear();
+                nodedata << "UNALLOCATED" << "0" << QString::number(pofflist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+                mutex.unlock();
+                ptreecnt++;
+            }
+            fstype = GetFileSystemType(emntstring);
+            qDebug() << "fstype:" << fstype;
             nodedata.clear();
             nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             mutex.lock();
@@ -135,6 +177,8 @@ void ProcessVolume(QString evidstring)
                 mutex.unlock();
                 ptreecnt++;
             }
+            fstype = GetFileSystemType(emntstring);
+            qDebug() << "fstype:" << fstype;
             nodedata.clear();
             nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             mutex.lock();

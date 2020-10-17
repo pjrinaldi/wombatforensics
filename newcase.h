@@ -11,8 +11,15 @@
 #include "wombatfunctions.h"
 #include "libvsmbr.h"
 #include "libvsgpt.h"
+#include "libfsapfs.h"
+#include "libfsext.h"
+#include "libfshfs.h"
+#include "libfsntfs.h"
+#include "libfsrefs.h"
+#include "libfsxfs.h"
 
 void ProcessVolume(QString evidstring);
+int GetFileSystemType(QString estring);
 void InitializeEvidenceStructure(QString evidstring);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 
