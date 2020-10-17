@@ -1398,6 +1398,7 @@ void WombatForensics::AddEvidence()
         evidrepdatalist.clear();
         for(int i=0; i < newevidence.count(); i++)
         {
+            //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
             ProcessVolume(newevidence.at(i));
         }
         UpdateStatus();

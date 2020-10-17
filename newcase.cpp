@@ -8,6 +8,8 @@ void ProcessVolume(QString evidstring)
     qDebug() << "evidstring:" << evidstring;
     int evidcnt = 0;
     QString emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
+    QFileInfo efileinfo(emntstring);
+    qint64 imgsize = efileinfo.size();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("-e*"), QDir::NoSymLinks | QDir::Dirs);
     evidcnt = evidfiles.count();
@@ -24,23 +26,75 @@ void ProcessVolume(QString evidstring)
     qDebug() << "emntstring:" << emntstring;
     int isgpt = 0;
     int ismbr = 0;
-    int parttype = 0;
+    int voltype = 0;
     libvsgpt_error_t* gpterror = NULL;
     libvsmbr_error_t* mbrerror = NULL;
     isgpt = libvsgpt_check_volume_signature(emntstring.toStdString().c_str(), &gpterror);
     ismbr = libvsmbr_check_file_signature(emntstring.toStdString().c_str(), &mbrerror);
     if(isgpt == 1)
-        parttype = 1;
+        voltype = 1;
     if(ismbr == 1 && isgpt == 0)
-        parttype = 2;
-    if(parttype == 1) // GPT
+        voltype = 2;
+    if(voltype == 1) // GPT
     {
         uint32_t sectorbytes = 0;
         int partcount = 0;
+        uint8_t guiddata = 0;
         qDebug() << "it's gpt...";
         libvsgpt_volume_t* gptvolume = NULL;
+        libvsgpt_volume_initialize(&gptvolume, &gpterror);
+        libvsgpt_volume_open(gptvolume, emntstring.toStdString().c_str(), LIBVSGPT_ACCESS_FLAG_READ, &gpterror);
+        libvsgpt_volume_get_bytes_per_sector(gptvolume, &sectorbytes, &gpterror);
+        libvsgpt_volume_get_disk_identifier(gptvolume, &guiddata, 16, &gpterror);
+        libvsgpt_volume_get_number_of_partitions(gptvolume, &partcount, &gpterror);
+        qDebug() << "volume:" << guiddata << "bytes per sector:" << sectorbytes << "part count:" << partcount;
+        QList<qint64> pofflist;
+        pofflist.clear();
+        QList<qint64> psizelist;
+        psizelist.clear();
+        for(int i=0; i < partcount; i++)
+        {
+            uint8_t parttype = 0;
+            off64_t partoffset = 0;
+            size64_t partsize = 0;
+            libvsgpt_partition_t* gptpart = NULL;
+            libvsgpt_volume_get_partition_by_index(gptvolume, i, &gptpart, &gpterror);
+            libvsgpt_partition_get_type(gptpart, &parttype, &gpterror);
+            libvsgpt_partition_get_volume_offset(gptpart, &partoffset, &gpterror);
+            libvsgpt_partition_get_size(gptpart, &partsize, &gpterror);
+            qDebug() << "partiton:" << i << "part type:" << parttype << "part offset:" << partoffset << "part size:" << partsize;
+            libvsgpt_partition_free(&gptpart, &gpterror);
+            pofflist.append(partoffset);
+            psizelist.append(partsize);
+        }
+        int ptreecnt = 0;
+        for(int i=0; i < partcount; i++)
+        {
+            if(pofflist.at(i) > 0 && i == 0)
+            {
+                // add unalloc partition to tree here...
+                ptreecnt++;
+                qDebug() << "1st partition which has unalloc before...";
+            }
+            if(i > 0 && i < partcount && pofflist.at(i) > (pofflist.at(i-1) + psizelist.at(i-1) + sectorbytes))
+            {
+                // add between unalloc partition here...
+                ptreecnt++;
+                // add existing partition here...
+                ptreecnt++;
+                qDebug() << "unalloc between 2 partitions exists...";
+            }
+            if(i == partcount-1 && (pofflist.at(i) + psizelist.at(i)) < imgsize)
+            {
+                //add final unalloc partition to tree here...
+                ptreecnt++;
+                qDebug() << "unalloc exists after last partition...";
+            }
+        }
+        libvsgpt_volume_close(gptvolume, &gpterror);
+        libvsgpt_volume_free(&gptvolume, &gpterror);
     }
-    else if(parttype == 2)
+    else if(voltype == 2)
     {
         uint32_t sectorbytes = 0;
         int partcount = 0;
@@ -50,6 +104,7 @@ void ProcessVolume(QString evidstring)
         libvsmbr_handle_get_bytes_per_sector(mbrhandle, &sectorbytes, &mbrerror);
         libvsmbr_handle_get_number_of_partitions(mbrhandle, &partcount, &mbrerror);
         qDebug() << "bytes per sector:" << sectorbytes << "partition count:" << partcount;
+        // to get unallocated partitions, i need to compare the partoffset to 0, then end offset (partoffset + partsize) and compare to volume size... etc...
         for(int i=0; i < partcount; i++)
         {
             size64_t partsize = 0;
@@ -62,15 +117,9 @@ void ProcessVolume(QString evidstring)
             libvsmbr_partition_get_type(mbrpart, &parttype, &mbrerror);
             libvsmbr_partition_free(&mbrpart, &mbrerror);
             qDebug() << "partition:" << i << "offset:" << partoffset << "size:" << partsize << "parttype:" << parttype;
-            //int libvsmbr_handle_get_partition_by_index(libvsmbr_handle_t *handle,int partition_index,libvsmbr_partition_t **partition,libvsmbr_error_t **error );
-            //int libvsmbr_partition_get_offset(libvsmbr_partition_t *partition,off64_t *offset,libvsmbr_error_t **error );
-            //int libvsmbr_partition_get_size(libvsmbr_partition_t *partition,size64_t *size,libvsmbr_error_t **error );
-            //int libvsmbr_partition_get_type(libvsmbr_partition_t *partition,uint8_t *type,libvsmbr_error_t **error );
-            //int libvsmbr_partition_free(libvsmbr_partition_t **partition,libvsmbr_error_t **error );
         }
+        libvsmbr_handle_close(mbrhandle, &mbrerror);
         libvsmbr_handle_free(&mbrhandle, &mbrerror);
-        //int libvsmbr_handle_close(libvsmbr_handle_t *handle,libvsmbr_error_t **error );
-        qDebug() << "it's mbr...";
     }
     else
     {
