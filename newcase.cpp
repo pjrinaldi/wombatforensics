@@ -179,7 +179,6 @@ void ProcessVolume(QString evidstring)
     pofflist.clear();
     QList<qint64> psizelist;
     psizelist.clear();
-    //QList
     libvsgpt_error_t* gpterror = NULL;
     libvsmbr_error_t* mbrerror = NULL;
     isgpt = libvsgpt_check_volume_signature(emntstring.toStdString().c_str(), &gpterror);
