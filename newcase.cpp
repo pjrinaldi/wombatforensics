@@ -43,6 +43,18 @@ void ProcessVolume(QString evidstring)
         emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
     QFileInfo efileinfo(emntstring);
     qint64 imgsize = efileinfo.size();
+    QFile efile(emntstring);
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    int hasntfs = 0;
+    if(efile.isOpen())
+    {
+        efile.seek(0);
+        QByteArray sigbuf = efile.read(8);
+        efile.close();
+        if(sigbuf.at(0) == (char)0xeb && sigbuf.at(1) == (char)0x52 && sigbuf.at(2) == (char)0x90 && sigbuf.at(3) == (char)0x4e && sigbuf.at(4) == (char)0x54 && sigbuf.at(5) == (char)0x46)
+            hasntfs = 1;
+    }
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("-e*"), QDir::NoSymLinks | QDir::Dirs);
     evidcnt = evidfiles.count();
@@ -61,6 +73,7 @@ void ProcessVolume(QString evidstring)
     int ismbr = 0;
     int voltype = 0;
     int partcount = 0;
+    int fstype = 0;
     uint32_t sectorbytes = 0;
     QList<qint64> pofflist;
     pofflist.clear();
@@ -76,6 +89,8 @@ void ProcessVolume(QString evidstring)
     if(ismbr == 1 && isgpt == 0)
     {
         voltype = 2;
+        if(hasntfs)
+            voltype = 0;
     }
     qDebug() << "volume type:" << voltype;
     if(voltype == 1) // GPT
@@ -135,8 +150,14 @@ void ProcessVolume(QString evidstring)
     else
     {
         qDebug() << "it's virtual...";
+        fstype = GetFileSystemType(emntstring);
+        qDebug() << "fstype:" << fstype;
+        nodedata.clear();
+        nodedata << "ALLOCATED" << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p0");
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+        mutex.unlock();
     }
-    int fstype = 0;
     int ptreecnt = 0;
     for(int i=0; i < partcount; i++)
     {
