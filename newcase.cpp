@@ -174,8 +174,15 @@ QString GetFileSystemVolumeName(QString estring, int fstype)
         {
             efile.seek(0x36);
             QByteArray vollabel = efile.read(8);
+            fsvolname = QString::fromStdString(vollabel.toStdString());
             efile.close();
         }
+        if(fstype == 7)
+            fsvolname += " [FAT12]";
+        else if(fstype == 8)
+            fsvolname += " [FAT16]";
+        else if(fstype == 9)
+            fsvolname += " [FAT32]";
     }
     else if(fstype == 10) // EXFAT
     {
@@ -188,6 +195,7 @@ QString GetFileSystemVolumeName(QString estring, int fstype)
             QByteArray vollabel = efile.read(8);
             efile.close();
         }
+        fsvolname += " [EXFAT]";
     }
 
     return fsvolname;
