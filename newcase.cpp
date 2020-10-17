@@ -25,6 +25,41 @@ int GetFileSystemType(QString estring)
         fstype = 5; // REFS
     if(libfsxfs_check_volume_signature(estring.toStdString().c_str(), &xfserror) == 1)
         fstype = 6; // XFS
+    // CHECKING FAT... FATFS*->fs_type FAT12 - 1, FAT16 - 2, FAT32 - 3, EXFAT - 4
+    if(fstype == 0) // none of others, check for FATFS
+    {
+        QFile efile(estring);
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly);
+        if(efile.isOpen())
+        {
+            efile.seek(0x39);
+            QByteArray fatbuf = efile.read(2);
+            efile.seek(0x03);
+            QByteArray exfatbuf = efile.read(5);
+            efile.close();
+            if(fatbuf.at(0) == (char)0x31 && fatbuf.at(1) == (char)0x32)
+            {
+                fstype = 7; // FAT12
+                qDebug() << "FAT12";
+            }
+            else if(fatbuf.at(0) == (char)0x31 && fatbuf.at(1) == (char)0x36)
+            {
+                fstype = 8; // FAT16
+                qDebug() << "FAT16";
+            }
+            else if(fatbuf.at(0) == (char)0x33 && fatbuf.at(1) == (char)0x32)
+            {
+                fstype = 9; // FAT32
+                qDebug() << "FAT32";
+            }
+            else if(exfatbuf.at(0) == (char)0x45 && exfatbuf.at(1) == (char)0x58 && exfatbuf.at(2) == (char)0x46 && exfatbuf.at(3) == (char)0x41 && exfatbuf.at(4) == (char)0x54)
+            {
+                fstype = 10; // EXFAT
+                qDebug() << "EXFAT";
+            }
+        }
+    }
     libfsapfs_error_free(&apfserror);
     libfsext_error_free(&exterror);
     libfshfs_error_free(&hfserror);
@@ -130,6 +165,18 @@ QString GetFileSystemVolumeName(QString estring, int fstype)
         libfsxfs_volume_free(&xfsvol, &xfserr);
         libfsxfs_error_free(&xfserr);
     }
+    else if(fstype == 7) // FAT12
+    {
+    }
+    else if(fstype == 8) // FAT16
+    {
+    }
+    else if(fstype == 9) // FAT32
+    {
+    }
+    else if(fstype == 10) // EXFAT
+    {
+    }
 
     return fsvolname;
 }
@@ -147,13 +194,18 @@ void ProcessVolume(QString evidstring)
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly);
     int hasntfs = 0;
+    int hasfat = 0;
     if(efile.isOpen())
     {
         efile.seek(0);
         QByteArray sigbuf = efile.read(8);
+        efile.seek(0x36);
+        QByteArray fatbuf = efile.read(3);
         efile.close();
         if(sigbuf.at(0) == (char)0xeb && sigbuf.at(1) == (char)0x52 && sigbuf.at(2) == (char)0x90 && sigbuf.at(3) == (char)0x4e && sigbuf.at(4) == (char)0x54 && sigbuf.at(5) == (char)0x46)
             hasntfs = 1;
+        if(fatbuf.at(0) == (char)0x46 && fatbuf.at(1) == (char)0x41 && fatbuf.at(2) == (char)0x54)
+            hasfat = 1;
     }
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("-e*"), QDir::NoSymLinks | QDir::Dirs);
@@ -188,7 +240,7 @@ void ProcessVolume(QString evidstring)
     if(ismbr == 1 && isgpt == 0)
     {
         voltype = 2;
-        if(hasntfs)
+        if(hasntfs || hasfat)
             voltype = 0;
     }
     qDebug() << "volume type:" << voltype;

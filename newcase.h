@@ -17,7 +17,6 @@
 #include "libfsntfs.h"
 #include "libfsrefs.h"
 #include "libfsxfs.h"
-#include "ff.h"
 
 void ProcessVolume(QString evidstring);
 int GetFileSystemType(QString estring);
