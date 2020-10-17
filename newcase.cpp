@@ -3,10 +3,15 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-int GetFileSystemType(QString estring)
+//int GetFileSystemType(QString estring)
+int GetFileSystemType(QString estring, off64_t partoffset)
 {
     int fstype = 0;
-    qDebug() << "FSTYPE estring:" << estring;
+    qDebug() << "FSTYPE estring:" << estring << "partoffset:" << partoffset;
+    if(partoffset > 0)
+    {
+        // write out file name for volumes based on offset..
+    }
     libfsapfs_error_t* apfserror = NULL;
     libfsext_error_t* exterror = NULL;
     libfshfs_error_t* hfserror = NULL;
@@ -70,8 +75,10 @@ int GetFileSystemType(QString estring)
     return fstype;
 }
 
-QString GetFileSystemVolumeName(QString estring, int fstype)
+//QString GetFileSystemVolumeName(QString estring, int fstype)
+QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset)
 {
+    qDebug() << "partoffset:" << partoffset;
     QString fsvolname = "";
     if(fstype == 0)
     {
@@ -321,9 +328,9 @@ void ProcessVolume(QString evidstring)
     else
     {
         qDebug() << "it's virtual...";
-        fstype = GetFileSystemType(emntstring);
+        fstype = GetFileSystemType(emntstring, 0);
         qDebug() << "fstype:" << fstype;
-        QString fsvolname = GetFileSystemVolumeName(emntstring, fstype);
+        QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, 0);
         qDebug() << "fsvolname:" << fsvolname;
         nodedata.clear();
         nodedata << fsvolname << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p0");
@@ -348,9 +355,9 @@ void ProcessVolume(QString evidstring)
                 mutex.unlock();
                 ptreecnt++;
             }
-            fstype = GetFileSystemType(emntstring);
+            fstype = GetFileSystemType(emntstring, pofflist.at(i));
             qDebug() << "fstype:" << fstype;
-            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype);
+            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i));
             nodedata.clear();
             nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             mutex.lock();
@@ -372,9 +379,9 @@ void ProcessVolume(QString evidstring)
                 mutex.unlock();
                 ptreecnt++;
             }
-            fstype = GetFileSystemType(emntstring);
+            fstype = GetFileSystemType(emntstring, pofflist.at(i));
             qDebug() << "fstype:" << fstype;
-            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype);
+            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i));
             nodedata.clear();
             nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             mutex.lock();
