@@ -165,17 +165,29 @@ QString GetFileSystemVolumeName(QString estring, int fstype)
         libfsxfs_volume_free(&xfsvol, &xfserr);
         libfsxfs_error_free(&xfserr);
     }
-    else if(fstype == 7) // FAT12
+    else if(fstype == 7 || fstype == 8 || fstype == 9) // FAT12 | FAT16 | FAT32
     {
-    }
-    else if(fstype == 8) // FAT16
-    {
-    }
-    else if(fstype == 9) // FAT32
-    {
+        QFile efile(estring);
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly);
+        if(efile.isOpen())
+        {
+            efile.seek(0x36);
+            QByteArray vollabel = efile.read(8);
+            efile.close();
+        }
     }
     else if(fstype == 10) // EXFAT
     {
+        QFile efile(estring);
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly);
+        if(efile.isOpen())
+        {
+            efile.seek(0x03);
+            QByteArray vollabel = efile.read(8);
+            efile.close();
+        }
     }
 
     return fsvolname;
