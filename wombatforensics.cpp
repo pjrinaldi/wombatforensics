@@ -1115,7 +1115,7 @@ void WombatForensics::OpenUpdate()
         //QThread::sleep(60);
         ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
         //selectedindex = indexlist.first();
-        LoadHexContents();
+        //LoadHexContents();
         //bool test = false;
         //qDebug() << ui->hexview->addressOffset() << selectedoffset->text().split("0x").last().toLongLong(&test, 16);
         //test = false;
@@ -1193,7 +1193,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        LoadHexContents();
+        //LoadHexContents();
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
     }
@@ -1323,6 +1323,7 @@ void WombatForensics::ReadXMountErr()
 
 void WombatForensics::UpdateStatus()
 {
+/*
     StatusUpdate("Preparing Evidence Image...");
     qInfo() << "Preparing Evidence Image...";
     //LogMessage("Preparing Evidence Image...");
@@ -1342,6 +1343,7 @@ void WombatForensics::UpdateStatus()
         AddEvidItem(evidrepdatalist.at(i).evidcontent);
     }
     //LogMessage("Building Initial Evidence Tree...");
+*/
     ui->dirTreeView->setModel(treenodemodel);
     ReadBookmarks();
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
@@ -1374,11 +1376,11 @@ void WombatForensics::AddEvidence()
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::NoSymLinks | QDir::Dirs);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
     for(int i=0; i < newevidence.count(); i++)
     {
-        QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + ".e" + QString::number(ecount) + "/";
+        QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + "-e" + QString::number(ecount) + "/";
         QString emntpath = wombatvariable.imgdatapath + newevidence.at(i).split("/").last() + "/";
         QDir dir;
         dir.mkpath(evidencepath);
@@ -1394,8 +1396,13 @@ void WombatForensics::AddEvidence()
     if(newevidence.count() > 0)
     {
         evidrepdatalist.clear();
-        QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
-        sqlwatcher.setFuture(tmpfuture);
+        for(int i=0; i < newevidence.count(); i++)
+        {
+            ProcessVolume(newevidence.at(i));
+        }
+        UpdateStatus();
+        //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
+        //sqlwatcher.setFuture(tmpfuture);
     }
 }
 
@@ -1511,28 +1518,42 @@ void WombatForensics::LoadHexContents()
     }
     QString evidid = nodeid.split("-").first();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + evidid)), QDir::NoSymLinks | QDir::Dirs);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-" + evidid)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
     QString tmpstr = "";
+    /*
     QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
     evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine();
     evidfile.close();
+    */
     QString datastring = wombatvariable.imgdatapath;
     if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
-        datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+    {
+        datastring += evidname + "/" + evidname + ".raw";
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+    }
     else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).toLower().endsWith(".e01"))
     {
+        datastring += evidname + "/" + evidname + ".raw";
         //datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
-        datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
     }
     else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
     {
-        QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+        QString imgext = evidname.split(".").last();
+        //QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
         if(imgext.contains(".000") || imgext.contains(".001"))
-            datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+        {
+            datastring += evidname + "/" + evidname + ".raw";
+            //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+        }
         else
-            datastring = tmpstr.split(",").at(3);
+        {
+            datastring = "get raw path...";
+            //datastring = tmpstr.split(",").at(3);
+        }
     }
     else
         qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");

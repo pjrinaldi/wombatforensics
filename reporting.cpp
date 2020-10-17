@@ -29,18 +29,21 @@ int UpdateBookmarkItems(QString tagname)
 void UpdateEvidenceList()
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*.e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
     existingevidence.clear();
-    QStringList tmplist;
+    //QStringList tmplist;
     for(int i=0; i < evidfiles.count(); i++)
     {
-        tmplist.clear();
+        existingevidence.append(evidfiles.at(i).split("-e" + QString::number(i)).first());
+        //tmplist.clear();
+        /*
         QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");
         evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(evidfile.isOpen())
             tmplist = QString(evidfile.readLine()).split(",");
         existingevidence.append(tmplist.at(3));
         evidfile.close();
+        */
     }
 }
 
