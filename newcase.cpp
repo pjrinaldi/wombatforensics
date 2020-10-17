@@ -13,7 +13,7 @@ int GetFileSystemType(QString estring)
     libfsntfs_error_t* ntfserror = NULL;
     libfsrefs_error_t* refserror = NULL;
     libfsxfs_error_t* xfserror = NULL;
-    if(libfsapfs_check_container_signature(estring.toStdString().c_str(), &apfserror) == 1)
+    if(libfsapfs_check_container_signature(estring.toStdString().c_str(), &apfserror) == 1 || libfsapfs_check_volume_signature(estring.toStdString().c_str(), &apfserror) == 1)
         fstype = 1; // APFS
     if(libfsext_check_volume_signature(estring.toStdString().c_str(), &exterror) == 1)
         fstype = 2; // EXT(2,3,4)
@@ -26,7 +26,7 @@ int GetFileSystemType(QString estring)
     if(libfsxfs_check_volume_signature(estring.toStdString().c_str(), &xfserror) == 1)
         fstype = 6; // XFS
     libfsapfs_error_free(&apfserror);
-    libfsapfs_error_free(&exterror);
+    libfsext_error_free(&exterror);
     libfshfs_error_free(&hfserror);
     libfsntfs_error_free(&ntfserror);
     libfsrefs_error_free(&refserror);
@@ -34,6 +34,106 @@ int GetFileSystemType(QString estring)
     
     return fstype;
 }
+
+QString GetFileSystemVolumeName(QString estring, int fstype)
+{
+    QString fsvolname = "";
+    if(fstype == 0)
+    {
+        fsvolname = "NON-RECOGNIZED FS";
+    }
+    else if(fstype == 1) // APFS
+    {
+        // NEED TO DO CONTAINER'S AND VOLUMES OR JUST VOLUME
+        libfsapfs_error_t* apfserror = NULL;
+        libfsapfs_error_free(&apfserror);
+    }
+    else if(fstype == 2) // EXT(2,3,4)
+    {
+        libfsext_error_t* exterror = NULL;
+        libfsext_volume_t* extvol = NULL;
+        libfsext_volume_initialize(&extvol, &exterror);
+        libfsext_volume_open(extvol, estring.toStdString().c_str(), LIBFSEXT_ACCESS_FLAG_READ, &exterror);
+        size_t vollabelsize = 0;
+        libfsext_volume_get_utf8_label_size(extvol, &vollabelsize, &exterror);
+        uint8_t vollabel[vollabelsize];
+        libfsext_volume_get_utf8_label(extvol, vollabel, vollabelsize, &exterror);
+        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(vollabel));
+        uint8_t formatversion;
+        libfsext_volume_get_format_version(extvol, &formatversion, &exterror);
+        fsvolname = fsvolname + " [EXT" + QString::number(formatversion) + "]";
+        libfsext_volume_close(extvol, &exterror);
+        libfsext_volume_free(&extvol, &exterror);
+        libfsext_error_free(&exterror);
+    }
+    else if(fstype == 3) // HFS(+)
+    {
+        libfshfs_volume_t* hfsvol = NULL;
+        libfshfs_error_t* hfserr = NULL;
+        libfshfs_volume_initialize(&hfsvol, &hfserr);
+        libfshfs_volume_open(hfsvol, estring.toStdString().c_str(), LIBFSHFS_ACCESS_FLAG_READ, &hfserr);
+        size_t volnamesize = 0;
+        libfshfs_volume_get_utf8_name_size(hfsvol, &volnamesize, &hfserr);
+        uint8_t volname[volnamesize];
+        libfshfs_volume_get_utf8_name(hfsvol, volname, volnamesize, &hfserr);
+        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(volname));
+        fsvolname = fsvolname + " [HFS]";
+        libfshfs_volume_close(hfsvol, &hfserr);
+        libfshfs_volume_free(&hfsvol, &hfserr);
+        libfshfs_error_free(&hfserr);
+    }
+    else if(fstype == 4) // NTFS
+    {
+        libfsntfs_volume_t* ntfsvol = NULL;
+        libfsntfs_error_t* ntfserror = NULL;
+        libfsntfs_volume_initialize(&ntfsvol, &ntfserror);
+        libfsntfs_volume_open(ntfsvol, estring.toStdString().c_str(), LIBFSNTFS_ACCESS_FLAG_READ, &ntfserror);
+        size_t volnamesize = 0;
+        libfsntfs_volume_get_utf8_name_size(ntfsvol, &volnamesize, &ntfserror);
+        uint8_t volname[volnamesize];
+        libfsntfs_volume_get_utf8_name(ntfsvol, volname, volnamesize, &ntfserror);
+        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(volname));
+        fsvolname = fsvolname + " [NTFS]";
+        libfsntfs_volume_close(ntfsvol, &ntfserror);
+        libfsntfs_volume_free(&ntfsvol, &ntfserror);
+        libfsntfs_error_free(&ntfserror);
+    }
+    else if(fstype == 5) // REFS
+    {
+        libfsrefs_volume_t* refsvol = NULL;
+        libfsrefs_error_t* refserr = NULL;
+        libfsrefs_volume_initialize(&refsvol, &refserr);
+        libfsrefs_volume_open(refsvol, estring.toStdString().c_str(), LIBFSREFS_ACCESS_FLAG_READ, &refserr);
+        size_t volnamesize = 0;
+        libfsrefs_volume_get_utf8_name_size(refsvol, &volnamesize, &refserr);
+        uint8_t volname[volnamesize];
+        libfsrefs_volume_get_utf8_name(refsvol, volname, volnamesize, &refserr);
+        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(volname));
+        fsvolname = fsvolname + " [REFS]";
+        libfsrefs_volume_close(refsvol, &refserr);
+        libfsrefs_volume_free(&refsvol, &refserr);
+        libfsrefs_error_free(&refserr);
+    }
+    else if(fstype == 6) // XFS
+    {
+        libfsxfs_volume_t* xfsvol = NULL;
+        libfsxfs_error_t* xfserr = NULL;
+        libfsxfs_volume_initialize(&xfsvol, &xfserr);
+        libfsxfs_volume_open(xfsvol, estring.toStdString().c_str(), LIBFSXFS_ACCESS_FLAG_READ, &xfserr);
+        size_t vollabelsize = 0;
+        libfsxfs_volume_get_utf8_label_size(xfsvol, &vollabelsize, &xfserr);
+        uint8_t vollabel[vollabelsize];
+        libfsxfs_volume_get_utf8_label(xfsvol, vollabel, vollabelsize, &xfserr);
+        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(vollabel));
+        fsvolname = fsvolname + " [XFS]";
+        libfsxfs_volume_close(xfsvol, &xfserr);
+        libfsxfs_volume_free(&xfsvol, &xfserr);
+        libfsxfs_error_free(&xfserr);
+    }
+
+    return fsvolname;
+}
+
 void ProcessVolume(QString evidstring)
 {
     qDebug() << "evidstring:" << evidstring;
@@ -152,8 +252,10 @@ void ProcessVolume(QString evidstring)
         qDebug() << "it's virtual...";
         fstype = GetFileSystemType(emntstring);
         qDebug() << "fstype:" << fstype;
+        QString fsvolname = GetFileSystemVolumeName(emntstring, fstype);
+        qDebug() << "fsvolname:" << fsvolname;
         nodedata.clear();
-        nodedata << "ALLOCATED" << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p0");
+        nodedata << fsvolname << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p0");
         mutex.lock();
         treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
         mutex.unlock();
@@ -177,8 +279,9 @@ void ProcessVolume(QString evidstring)
             }
             fstype = GetFileSystemType(emntstring);
             qDebug() << "fstype:" << fstype;
+            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype);
             nodedata.clear();
-            nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+            nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
             mutex.unlock();
@@ -200,8 +303,9 @@ void ProcessVolume(QString evidstring)
             }
             fstype = GetFileSystemType(emntstring);
             qDebug() << "fstype:" << fstype;
+            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype);
             nodedata.clear();
-            nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+            nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             mutex.lock();
             treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
             mutex.unlock();

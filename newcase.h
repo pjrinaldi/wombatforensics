@@ -20,6 +20,7 @@
 
 void ProcessVolume(QString evidstring);
 int GetFileSystemType(QString estring);
+QString GetFileSystemVolumeName(QString estring, int fstype);
 void InitializeEvidenceStructure(QString evidstring);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 
