@@ -10,6 +10,27 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     qDebug() << "FSTYPE estring:" << estring << "partoffset:" << partoffset;
     if(partoffset > 0)
     {
+        QByteArray partbuf;
+        partbuf.clear();
+        QFile efile(estring);
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly);
+        if(efile.isOpen())
+        {
+            efile.seek(partoffset);
+            partbuf = efile.read(4096);
+            efile.close();
+        }
+        QString partsigfile = wombatvariable.tmpfilepath + "partsigfile";
+        QFile pfile(wombatvariable.tmpfilepath + "partsigfile");
+        if(!pfile.isOpen())
+            pfile.open(QIODevice::WriteOnly);
+        if(pfile.isOpen())
+        {
+            pfile.write(partbuf);
+            pfile.close();
+        }
+        estring = partsigfile;
         // write out file name for volumes based on offset..
     }
     libfsapfs_error_t* apfserror = NULL;
@@ -76,9 +97,36 @@ int GetFileSystemType(QString estring, off64_t partoffset)
 }
 
 //QString GetFileSystemVolumeName(QString estring, int fstype)
-QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset)
+QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset, size64_t partsize)
 {
     qDebug() << "partoffset:" << partoffset;
+    if(partoffset > 0)
+    {
+        QByteArray partbuf;
+        partbuf.clear();
+        QFile efile(estring);
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly);
+        if(efile.isOpen())
+        {
+            efile.seek(partoffset);
+            partbuf = efile.read(partsize);
+            efile.close();
+        }
+        QString partsigfile = wombatvariable.tmpfilepath + "partsigfile";
+        QFile pfile(wombatvariable.tmpfilepath + "partsigfile");
+        if(!pfile.isOpen())
+            pfile.open(QIODevice::WriteOnly);
+        if(pfile.isOpen())
+        {
+            pfile.write(partbuf);
+            pfile.close();
+        }
+        estring = partsigfile;
+        // works, but it requires writing out full fs which could be big for a large image...
+        // need a different way to load what i need...
+        // write out file name for volumes based on offset..
+    }
     QString fsvolname = "";
     if(fstype == 0)
     {
@@ -330,7 +378,7 @@ void ProcessVolume(QString evidstring)
         qDebug() << "it's virtual...";
         fstype = GetFileSystemType(emntstring, 0);
         qDebug() << "fstype:" << fstype;
-        QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, 0);
+        QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, 0, 0);
         qDebug() << "fsvolname:" << fsvolname;
         nodedata.clear();
         nodedata << fsvolname << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p0");
@@ -341,7 +389,7 @@ void ProcessVolume(QString evidstring)
     int ptreecnt = 0;
     for(int i=0; i < partcount; i++)
     {
-        qDebug() << "starting aprtition check...";
+        qDebug() << "starting partition check...";
         qDebug() << "pofflist:" << pofflist << "psizelist:" << psizelist;
         if(i == 0)
         {
@@ -357,7 +405,7 @@ void ProcessVolume(QString evidstring)
             }
             fstype = GetFileSystemType(emntstring, pofflist.at(i));
             qDebug() << "fstype:" << fstype;
-            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i));
+            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
             nodedata.clear();
             nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             mutex.lock();
@@ -381,7 +429,7 @@ void ProcessVolume(QString evidstring)
             }
             fstype = GetFileSystemType(emntstring, pofflist.at(i));
             qDebug() << "fstype:" << fstype;
-            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i));
+            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
             nodedata.clear();
             nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             mutex.lock();
