@@ -2,7 +2,7 @@
 #include "fusefunctions.h"
 #include "affuse.h"
 #include "ewffuse.h"
-#include "sqfuse.h"
+//#include "sqfuse.h"
 #include "zmgfuse.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
@@ -1030,7 +1030,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             QDir dir;
             dir.mkpath(emntpath);
             if(existingevidence.at(i).endsWith(".sfs"))
-                SquashFuser(emntpath,  existingevidence.at(i));
+            {
+                //SquashFuser(emntpath,  existingevidence.at(i));
+            }
             else if(existingevidence.at(i).endsWith(".zmg"))
                 ZmgFuser(emntpath.toStdString(), existingevidence.at(i).toStdString());
             else if(existingevidence.at(i).toLower().endsWith(".aff") || existingevidence.at(i).endsWith(".000") || existingevidence.at(i).endsWith(".001"))
@@ -1273,8 +1275,10 @@ void WombatForensics::PrepareEvidenceImage()
 	    }
 	    else if(imagefile.endsWith(".sfs")) // SFS
 	    {
+                /*
 	        if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
                     SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
+                */
 	    }
             else if(imagefile.endsWith(".zmg")) // ZMG
             {
@@ -1390,6 +1394,7 @@ void WombatForensics::AddEvidence()
         QDir dir;
         dir.mkpath(evidencepath);
         dir.mkpath(emntpath);
+        // need to delete emntpath directories on close for cleanup purposes after unmount...
         ecount++;
         if(newevidence.at(i).endsWith(".zmg"))
             ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString());
@@ -1872,11 +1877,13 @@ void WombatForensics::CloseCurrentCase()
         }
         else if(imgext.contains("sfs")) // squashfuse
         {
+            /*
             if(sqfuser != NULL)
             {
                 fuse_unmount(sqfuser);
                 fuse_destroy(sqfuser);
             }
+            */
         }
         /*
         else // raw, so nothing to unmount
