@@ -9,7 +9,7 @@
 #include "tskcpp.h"
 #include "properties.h"
 #include "wombatfunctions.h"
-#include "libvsmbr.h"
+/*#include "libvsmbr.h"
 #include "libvsgpt.h"
 #include "libfsapfs.h"
 #include "libfsext.h"
@@ -17,6 +17,7 @@
 #include "libfsntfs.h"
 #include "libfsrefs.h"
 #include "libfsxfs.h"
+*/
 
 void ProcessVolume(QString evidstring);
 int ParseVolume(QString estring);

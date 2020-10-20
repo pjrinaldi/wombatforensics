@@ -5,6 +5,32 @@
 
 int ParseVolume(QString estring)
 {
+    qDebug() << "estring:" << estring;
+    QFile rawforimg(estring);
+    if(!rawforimg.isOpen())
+	rawforimg.open(QIODevice::ReadOnly);
+    QByteArray sector1 = rawforimg.peek(512);
+    //rawforimg.seek(446);
+    //QByteArray part1 = rawforimg.read(16);
+    //rawforimg.seek(462);
+    //QByteArray part2 = rawforimg.read(16);
+    //QByteArray part3 = rawforimg.read(16);
+    //QByteArray part4 = rawforimg.read(16);
+    QByteArray part1 = sector1.mid(445, 16).toHex(0);
+    QByteArray part2 = sector1.mid(461, 16).toHex(0);
+    //qDebug() << "part1:" << part1.toHex(0);
+    //qDebug() << "part2:" << part2.toHex(0);
+    //rawforimg.seek(512);
+    //QByteArray sector2 = rawforimg.read(512);
+    rawforimg.close();
+    bool ok;
+    QString signature = sector1.mid(510,2).toHex(0);
+    if(signature == "55aa")
+	qDebug() << "might be mbr";
+    else
+	qDebug() << "not mbr";
+    //qDebug() << "signature:" << signature;
+    //qDebug() << "byte 510-511:" << sector1.mid(510, 2).toHex(0);
 
 }
 
@@ -12,6 +38,7 @@ int ParseVolume(QString estring)
 int GetFileSystemType(QString estring, off64_t partoffset)
 {
     int fstype = 0;
+    /*
     qDebug() << "FSTYPE estring:" << estring << "partoffset:" << partoffset;
     if(partoffset > 0)
     {
@@ -97,13 +124,13 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     libfsntfs_error_free(&ntfserror);
     libfsrefs_error_free(&refserror);
     libfsxfs_error_free(&xfserror);
-    
+    */
     return fstype;
 }
 
 //QString GetFileSystemVolumeName(QString estring, int fstype)
 QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset, size64_t partsize)
-{
+{/*
     qDebug() << "partoffset:" << partoffset;
     if(partoffset > 0)
     {
@@ -132,7 +159,9 @@ QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset,
         // need a different way to load what i need...
         // write out file name for volumes based on offset..
     }
+    */
     QString fsvolname = "";
+    /*
     if(fstype == 0)
     {
         fsvolname = "NON-RECOGNIZED FS";
@@ -257,6 +286,7 @@ QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset,
         }
         fsvolname += " [EXFAT]";
     }
+    */
 
     return fsvolname;
 }
@@ -275,6 +305,8 @@ void ProcessVolume(QString evidstring)
     QString emntstring = evidstring;
     if(evidstring.toLower().endsWith(".e01") || evidstring.toLower().endsWith(".aff") || evidstring.toLower().endsWith(".000") || evidstring.toLower().endsWith("001") || evidstring.toLower().endsWith(".zmg"))
         emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
+    ParseVolume(emntstring);
+    /*
     QFileInfo efileinfo(emntstring);
     qint64 imgsize = efileinfo.size();
     QFile efile(emntstring);
@@ -476,8 +508,8 @@ void ProcessVolume(QString evidstring)
 		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
 		mutex.unlock();
                 */
-    libvsgpt_error_free(&gpterror);
-    libvsmbr_error_free(&mbrerror);
+    //libvsgpt_error_free(&gpterror);
+    //libvsmbr_error_free(&mbrerror);
 }
 
 void InitializeEvidenceStructure(QString evidname)
