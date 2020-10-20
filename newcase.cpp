@@ -3,6 +3,11 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
+int ParseVolume(QString estring)
+{
+
+}
+
 //int GetFileSystemType(QString estring)
 int GetFileSystemType(QString estring, off64_t partoffset)
 {
@@ -277,8 +282,12 @@ void ProcessVolume(QString evidstring)
         efile.open(QIODevice::ReadOnly);
     int hasntfs = 0;
     int hasfat = 0;
+    QByteArray bootsector;
+    bootsector.clear();
     if(efile.isOpen())
     {
+        efile.seek(0);
+        bootsector = efile.read(512);
         efile.seek(0);
         QByteArray sigbuf = efile.read(8);
         efile.seek(0x36);
@@ -291,7 +300,7 @@ void ProcessVolume(QString evidstring)
     }
     QList<QVariant> nodedata;
     nodedata.clear();
-    nodedata << evidencename << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt));
+    nodedata << evidencename << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt));
     mutex.lock();
     treenodemodel->AddNode(nodedata, "-1", -1, -1);
     mutex.unlock();

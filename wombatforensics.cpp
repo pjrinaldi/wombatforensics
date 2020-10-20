@@ -1411,6 +1411,8 @@ void WombatForensics::AddEvidence()
             //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
             ProcessVolume(newevidence.at(i));
         }
+        //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
+        //volwatcher.setFuture(tmpfuture);
         UpdateStatus();
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
         //sqlwatcher.setFuture(tmpfuture);

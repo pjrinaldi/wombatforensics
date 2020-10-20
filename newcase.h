@@ -19,6 +19,7 @@
 #include "libfsxfs.h"
 
 void ProcessVolume(QString evidstring);
+int ParseVolume(QString estring);
 //int GetFileSystemType(QString estring);
 int GetFileSystemType(QString estring, off64_t offset);
 //QString GetFileSystemVolumeName(QString estring, int fstype);
