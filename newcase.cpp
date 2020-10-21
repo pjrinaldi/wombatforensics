@@ -10,46 +10,42 @@ int ParseVolume(QString estring, qint64 imgsize)
     if(!rawforimg.isOpen())
 	rawforimg.open(QIODevice::ReadOnly);
     QByteArray sector1 = rawforimg.peek(512);
-    //rawforimg.seek(446);
-    //QByteArray part1 = rawforimg.read(16);
-    //rawforimg.seek(462);
-    //QByteArray part2 = rawforimg.read(16);
-    //QByteArray part3 = rawforimg.read(16);
-    //QByteArray part4 = rawforimg.read(16);
-    //QByteArray part1 = sector1.mid(445, 16).toHex(0);
-    //QByteArray part2 = sector1.mid(461, 16).toHex(0);
-    //qDebug() << "part1:" << part1.toHex(0);
-    //qDebug() << "part2:" << part2.toHex(0);
-    //rawforimg.seek(512);
-    //QByteArray sector2 = rawforimg.read(512);
     rawforimg.close();
-    bool ok;
-    QString signature = sector1.mid(510,2).toHex(0);
-    if(signature == "55aa") // POSSIBLY MBR OR GPT
+    uint16_t signature = qFromLittleEndian<uint16_t>(sector1.mid(510,2));
+    if(signature == 0xaa55) // POSSIBLY MBR OR GPT
     {
-        qDebug() << "imgsize:" << imgsize;
-        for(int i=0; i < 4; i++)
-        {
-            int cnt = i*16;
-            QByteArray curpart = sector1.mid(446 + i, 16);
-            //uint32_t leroothdr = qFromLittleEndian<uint32_t>(indxrootba.left(4)); // uint 4 bytes (0-3)
-            uint8_t curparttype = curpart.at(4);
-            uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
-            uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
-            //if((cursize <= imgsize && curoffset <= imgsize) || curparttype > 0x00)
-                qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
-                // extended partitions... and gpt type checks... then operate on them...
-        }
 	qDebug() << "might be mbr";
+        qDebug() << "imgsize:" << imgsize;
+	qDebug() << "parttype string:" << QString::number((uint8_t)sector1.at(450), 16);
+	if((uint8_t)sector1.at(450) == 0xee)
+	    qDebug() << "protected mbr for a gpt disk";
+	else
+	{
+	    qDebug() << "yup, mbr disk";
+	    for(int i=0; i < 4; i++)
+	    {
+		int cnt = i*16;
+		QByteArray curpart = sector1.mid(446 + cnt, 16);
+		uint8_t curparttype = curpart.at(4);
+		uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
+		uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
+		if(curparttype == 0x05) // extended partition
+		{
+		    qDebug() << "parse extended partition recurse loop here...";
+		}
+		else
+		    qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+		// extended partitions...
+	    }
+	}
     }
     else
     {
         // do gpt check, apple check, sun check, bsd check, etc...
 	qDebug() << "not mbr";
     }
-    //qDebug() << "signature:" << signature;
-    //qDebug() << "byte 510-511:" << sector1.mid(510, 2).toHex(0);
 
+    return 0;
 }
 
 //int GetFileSystemType(QString estring)
@@ -326,7 +322,7 @@ void ProcessVolume(QString evidstring)
         emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
     QFileInfo efileinfo(emntstring);
     imgsize = efileinfo.size();
-    ParseVolume(emntstring, imgsize);
+    int pvret = ParseVolume(emntstring, imgsize);
     /*
     QFileInfo efileinfo(emntstring);
     qint64 imgsize = efileinfo.size();
