@@ -3,7 +3,7 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-int ParseVolume(QString estring)
+int ParseVolume(QString estring, qint64 imgsize)
 {
     qDebug() << "estring:" << estring;
     QFile rawforimg(estring);
@@ -16,8 +16,8 @@ int ParseVolume(QString estring)
     //QByteArray part2 = rawforimg.read(16);
     //QByteArray part3 = rawforimg.read(16);
     //QByteArray part4 = rawforimg.read(16);
-    QByteArray part1 = sector1.mid(445, 16).toHex(0);
-    QByteArray part2 = sector1.mid(461, 16).toHex(0);
+    //QByteArray part1 = sector1.mid(445, 16).toHex(0);
+    //QByteArray part2 = sector1.mid(461, 16).toHex(0);
     //qDebug() << "part1:" << part1.toHex(0);
     //qDebug() << "part2:" << part2.toHex(0);
     //rawforimg.seek(512);
@@ -25,10 +25,28 @@ int ParseVolume(QString estring)
     rawforimg.close();
     bool ok;
     QString signature = sector1.mid(510,2).toHex(0);
-    if(signature == "55aa")
+    if(signature == "55aa") // POSSIBLY MBR OR GPT
+    {
+        qDebug() << "imgsize:" << imgsize;
+        for(int i=0; i < 4; i++)
+        {
+            int cnt = i*16;
+            QByteArray curpart = sector1.mid(446 + i, 16);
+            //uint32_t leroothdr = qFromLittleEndian<uint32_t>(indxrootba.left(4)); // uint 4 bytes (0-3)
+            uint8_t curparttype = curpart.at(4);
+            uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
+            uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
+            //if((cursize <= imgsize && curoffset <= imgsize) || curparttype > 0x00)
+                qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+                // extended partitions... and gpt type checks... then operate on them...
+        }
 	qDebug() << "might be mbr";
+    }
     else
+    {
+        // do gpt check, apple check, sun check, bsd check, etc...
 	qDebug() << "not mbr";
+    }
     //qDebug() << "signature:" << signature;
     //qDebug() << "byte 510-511:" << sector1.mid(510, 2).toHex(0);
 
@@ -293,6 +311,7 @@ QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset,
 
 void ProcessVolume(QString evidstring)
 {
+    qint64 imgsize = 0;
     // if evidstring .exists, then we find dir with evidstring in it and split at evidstring -e
     //qDebug() << "evidstring:" << evidstring;
     int evidcnt = 0;
@@ -305,7 +324,9 @@ void ProcessVolume(QString evidstring)
     QString emntstring = evidstring;
     if(evidstring.toLower().endsWith(".e01") || evidstring.toLower().endsWith(".aff") || evidstring.toLower().endsWith(".000") || evidstring.toLower().endsWith("001") || evidstring.toLower().endsWith(".zmg"))
         emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
-    ParseVolume(emntstring);
+    QFileInfo efileinfo(emntstring);
+    imgsize = efileinfo.size();
+    ParseVolume(emntstring, imgsize);
     /*
     QFileInfo efileinfo(emntstring);
     qint64 imgsize = efileinfo.size();
