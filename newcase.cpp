@@ -3,56 +3,106 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
+void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offset, uint32_t size)
+{
+    qDebug() << "primary extended size in bytes:" << size*512;
+    QFile rawforimg(estring);
+    if(!rawforimg.isOpen())
+        rawforimg.open(QIODevice::ReadOnly);
+    if(primextoff == offset)
+        rawforimg.seek(offset * 512);
+    else
+        rawforimg.seek((primextoff + offset)*512);
+    QByteArray sector = rawforimg.peek(512);
+    rawforimg.close();
+    uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector.mid(510,2));
+    if(mbrsig == 0xaa55)
+    {
+        qDebug() << "i am reading extended part correctly...";
+    }
+    else
+        qDebug() << "i screwed up the math somewhere...";
+}
+
 int ParseVolume(QString estring, qint64 imgsize)
 {
     qDebug() << "estring:" << estring;
     QFile rawforimg(estring);
     if(!rawforimg.isOpen())
 	rawforimg.open(QIODevice::ReadOnly);
-    QByteArray sector1 = rawforimg.peek(512);
+    QByteArray sector0 = rawforimg.peek(512);
     rawforimg.close();
-    uint16_t signature = qFromLittleEndian<uint16_t>(sector1.mid(510,2));
-    if(signature == 0xaa55) // POSSIBLY MBR OR GPT
+    uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector0.mid(510, 2));
+    uint16_t applesig = qFromLittleEndian<uint16_t>(sector0.left(2));
+    uint32_t bsdsig = qFromLittleEndian<uint32_t>(sector0.left(4));
+    uint16_t sunsig = qFromLittleEndian<uint16_t>(sector0.mid(508, 2));
+    uint64_t gptsig = qFromBigEndian<uint16_t>(sector0.left(8));
+    if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
     {
 	qDebug() << "might be mbr";
         qDebug() << "imgsize:" << imgsize;
-	qDebug() << "parttype string:" << QString::number((uint8_t)sector1.at(450), 16);
-	if((uint8_t)sector1.at(450) == 0xee)
+	qDebug() << "parttype string:" << QString::number((uint8_t)sector0.at(450), 16);
+	if((uint8_t)sector0.at(450) == 0xee)
+        {
 	    qDebug() << "protected mbr for a gpt disk";
+            if(!rawforimg.isOpen())
+                rawforimg.open(QIODevice::ReadOnly);
+            rawforimg.seek(512);
+            QByteArray sector1 = rawforimg.read(512);
+            QByteArray gptsectors = rawforimg.read(16384);
+            rawforimg.close();
+        }
 	else
 	{
 	    qDebug() << "yup, mbr disk";
 	    for(int i=0; i < 4; i++)
 	    {
 		int cnt = i*16;
-		QByteArray curpart = sector1.mid(446 + cnt, 16);
+		QByteArray curpart = sector0.mid(446 + cnt, 16);
 		uint8_t curparttype = curpart.at(4);
 		uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
 		uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
 		if(curparttype == 0x05) // extended partition
 		{
+                    qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
 		    qDebug() << "parse extended partition recurse loop here...";
+                    ParseExtendedPartition(estring, curoffset, curoffset, cursize);
 		}
+                else if(curparttype == 0x00)
+                    qDebug() << "do nothing here cause it is an empty partition...";
 		else
+                {
+                    qDebug() << "parse primary partition here...";
 		    qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
-		// extended partitions...
+                }
 	    }
 	}
     }
-    else
+    else if(applesig == 0x504d)
     {
-        // do gpt check, apple check, sun check, bsd check, etc...
-	qDebug() << "not mbr";
+        qDebug() << "apple sig here...";
+    }
+    else if(bsdsig == 0x82564557)
+    {
+        qDebug() << "bsd part here...";
+    }
+    else if(sunsig == 0xDABE)
+    {
+        qDebug() << "determine if sparc or i386 and then process partitions.";
+    }
+    else if(gptsig == 0x45464920504152)
+    {
+        qDebug() << "gpt and parse accordingly.";
     }
 
     return 0;
 }
 
+    /*
 //int GetFileSystemType(QString estring)
 int GetFileSystemType(QString estring, off64_t partoffset)
 {
     int fstype = 0;
-    /*
     qDebug() << "FSTYPE estring:" << estring << "partoffset:" << partoffset;
     if(partoffset > 0)
     {
@@ -138,13 +188,13 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     libfsntfs_error_free(&ntfserror);
     libfsrefs_error_free(&refserror);
     libfsxfs_error_free(&xfserror);
-    */
     return fstype;
 }
-
+    */
+/*
 //QString GetFileSystemVolumeName(QString estring, int fstype)
-QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset, size64_t partsize)
-{/*
+//QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset, size64_t partsize)
+{
     qDebug() << "partoffset:" << partoffset;
     if(partoffset > 0)
     {
@@ -174,7 +224,7 @@ QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset,
         // write out file name for volumes based on offset..
     }
     */
-    QString fsvolname = "";
+    //QString fsvolname = "";
     /*
     if(fstype == 0)
     {
@@ -300,10 +350,8 @@ QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset,
         }
         fsvolname += " [EXFAT]";
     }
-    */
-
     return fsvolname;
-}
+}*/
 
 void ProcessVolume(QString evidstring)
 {
@@ -323,6 +371,9 @@ void ProcessVolume(QString evidstring)
     QFileInfo efileinfo(emntstring);
     imgsize = efileinfo.size();
     int pvret = ParseVolume(emntstring, imgsize);
+    if(pvret)
+    {
+    }
     /*
     QFileInfo efileinfo(emntstring);
     qint64 imgsize = efileinfo.size();
@@ -509,7 +560,6 @@ void ProcessVolume(QString evidstring)
             //qDebug() << "unalloc exists after last partition...";
         }
     }
-    /*
                 // ADD ManualCarved Folder HERE
                 treeout.clear();
                 treeout << QByteArray("$Carved-Verified").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-pc"); // should make -vc for VerifiedCarved
