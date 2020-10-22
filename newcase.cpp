@@ -39,12 +39,12 @@ int ParseVolume(QString estring, qint64 imgsize)
     uint64_t gptsig = qFromBigEndian<uint16_t>(sector0.left(8));
     if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
     {
-	qDebug() << "might be mbr";
-        qDebug() << "imgsize:" << imgsize;
-	qDebug() << "parttype string:" << QString::number((uint8_t)sector0.at(450), 16);
+	//qDebug() << "might be mbr";
+        //qDebug() << "imgsize:" << imgsize;
+	//qDebug() << "parttype string:" << QString::number((uint8_t)sector0.at(450), 16);
 	if((uint8_t)sector0.at(450) == 0xee)
         {
-	    qDebug() << "protected mbr for a gpt disk";
+	    //qDebug() << "protected mbr for a gpt disk";
             if(!rawforimg.isOpen())
                 rawforimg.open(QIODevice::ReadOnly);
             rawforimg.seek(512);
