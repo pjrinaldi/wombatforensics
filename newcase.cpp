@@ -3,9 +3,9 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offset, uint32_t size)
+void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offset, uint32_t size, QList<int>* pofflist, QList<int>* psizelist)
 {
-    qDebug() << "primary extended size in bytes:" << size*512;
+    //qDebug() << "primary extended size in bytes:" << size*512;
     QFile rawforimg(estring);
     if(!rawforimg.isOpen())
         rawforimg.open(QIODevice::ReadOnly);
@@ -18,43 +18,76 @@ void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offse
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector.mid(510,2));
     if(mbrsig == 0xaa55)
     {
-        qDebug() << "i am reading extended part correctly...";
+        //qDebug() << "i am reading extended part correctly...";
+	for(int i=0; i < 4; i++)
+	{
+	    int cnt = i*16;
+	    QByteArray curpart = sector.mid(446 + cnt, 16);
+	    uint8_t curparttype = curpart.at(4);
+	    uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
+	    uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
+	    if(curparttype == 0x05) // extended partition
+	    {
+		ParseExtendedPartition(estring, primextoff, curoffset, cursize, pofflist, psizelist);
+	    }
+	    else if(curparttype == 0x00)
+	    {
+	    }
+	    else // primary partition to process
+	    {
+		if(primextoff == offset)
+		{
+		    pofflist->append(offset+curoffset);
+		    //qDebug() << "part[i]:" << i << "offset:" << offset + curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+		}
+		else
+		{
+		    pofflist->append(primextoff + offset + curoffset);
+		    //qDebug() << "part[i]:" << i << "offset:" << primextoff + offset + curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+		}
+		psizelist->append(cursize);
+	    }
+	}
     }
-    else
-        qDebug() << "i screwed up the math somewhere...";
+    //else
+        //qDebug() << "i screwed up the math somewhere...";
 }
 
-int ParseVolume(QString estring, qint64 imgsize)
+int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int>* psizelist)
 {
-    qDebug() << "estring:" << estring;
+    // NEED TO DETERMINE AND INDICATE VIRTUAL PARTITIONS SOMEWHERE... IT COULD SIMPLY BE THAT POFFLIST.COUNT() IS 0...
+    //qDebug() << "estring:" << estring;
     QFile rawforimg(estring);
     if(!rawforimg.isOpen())
 	rawforimg.open(QIODevice::ReadOnly);
     QByteArray sector0 = rawforimg.peek(512);
     rawforimg.close();
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector0.mid(510, 2));
-    uint16_t applesig = qFromLittleEndian<uint16_t>(sector0.left(2));
-    uint32_t bsdsig = qFromLittleEndian<uint32_t>(sector0.left(4));
-    uint16_t sunsig = qFromLittleEndian<uint16_t>(sector0.mid(508, 2));
-    uint64_t gptsig = qFromBigEndian<uint16_t>(sector0.left(8));
+    uint16_t applesig = qFromLittleEndian<uint16_t>(sector0.left(2)); // should be in 2nd sector, powerpc mac's not intel mac's
+    uint32_t bsdsig = qFromLittleEndian<uint32_t>(sector0.left(4)); // can be at start of partition entry of a dos mbr
+    uint16_t sunsig = qFromLittleEndian<uint16_t>(sector0.mid(508, 2)); // worry about it later, i386 sun can be at 2nd sector of partition entry of a dos mbr
+    uint64_t gptsig = qFromLittleEndian<uint64_t>(sector0.left(8));
     if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
     {
-	//qDebug() << "might be mbr";
         //qDebug() << "imgsize:" << imgsize;
-	//qDebug() << "parttype string:" << QString::number((uint8_t)sector0.at(450), 16);
-	if((uint8_t)sector0.at(450) == 0xee)
+	if((uint8_t)sector0.at(450) == 0xee) // GPT DISK
         {
-	    //qDebug() << "protected mbr for a gpt disk";
             if(!rawforimg.isOpen())
                 rawforimg.open(QIODevice::ReadOnly);
             rawforimg.seek(512);
             QByteArray sector1 = rawforimg.read(512);
             QByteArray gptsectors = rawforimg.read(16384);
             rawforimg.close();
+	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
+	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
+	    {
+		qDebug() << "gpt found, parse table now...";
+	    }
+	    else
+		qDebug() << "gpt should have been there, math is off...";
         }
-	else
+	else // MBR DISK
 	{
-	    qDebug() << "yup, mbr disk";
 	    for(int i=0; i < 4; i++)
 	    {
 		int cnt = i*16;
@@ -64,33 +97,45 @@ int ParseVolume(QString estring, qint64 imgsize)
 		uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
 		if(curparttype == 0x05) // extended partition
 		{
-                    qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
-		    qDebug() << "parse extended partition recurse loop here...";
-                    ParseExtendedPartition(estring, curoffset, curoffset, cursize);
+                    //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
+		    //qDebug() << "parse extended partition recurse loop here...";
+                    ParseExtendedPartition(estring, curoffset, curoffset, cursize, pofflist, psizelist);
 		}
                 else if(curparttype == 0x00)
-                    qDebug() << "do nothing here cause it is an empty partition...";
+		{
+                    //qDebug() << "do nothing here cause it is an empty partition...";
+		}
+		else if(curparttype == 0x82) // Sun i386
+		{
+		    // parse sun table here passing pofflist and psizelist
+		}
+		else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
+		{
+		    // parse bsd table here passing pofflist nad psizelist
+		}
 		else
                 {
-                    qDebug() << "parse primary partition here...";
-		    qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+                    //qDebug() << "parse primary partition here...";
+		    pofflist->append(curoffset);
+		    psizelist->append(cursize);
+		    //qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
                 }
 	    }
 	}
     }
-    else if(applesig == 0x504d)
+    else if(applesig == 0x504d) // APPLE PARTITION
     {
         qDebug() << "apple sig here...";
     }
-    else if(bsdsig == 0x82564557)
+    else if(bsdsig == 0x82564557) // BSD PARTITION
     {
         qDebug() << "bsd part here...";
     }
-    else if(sunsig == 0xDABE)
+    else if(sunsig == 0xDABE) // SUN PARTITION
     {
         qDebug() << "determine if sparc or i386 and then process partitions.";
     }
-    else if(gptsig == 0x45464920504152)
+    else if(gptsig == 0x5452415020494645) // GPT PARTITION
     {
         qDebug() << "gpt and parse accordingly.";
     }
@@ -355,6 +400,10 @@ int GetFileSystemType(QString estring, off64_t partoffset)
 
 void ProcessVolume(QString evidstring)
 {
+    QList<int> pofflist;
+    pofflist.clear();
+    QList<int> psizelist;
+    psizelist.clear();
     qint64 imgsize = 0;
     // if evidstring .exists, then we find dir with evidstring in it and split at evidstring -e
     //qDebug() << "evidstring:" << evidstring;
@@ -370,8 +419,17 @@ void ProcessVolume(QString evidstring)
         emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
     QFileInfo efileinfo(emntstring);
     imgsize = efileinfo.size();
-    int pvret = ParseVolume(emntstring, imgsize);
+    int pvret = ParseVolume(emntstring, imgsize, &pofflist, &psizelist);
     if(pvret)
+    {
+    }
+    qDebug() << "pofflist:" << pofflist;
+    qDebug() << "psizelist:" << psizelist;
+    if(pofflist.count() == 0)
+    {
+	// virtual attempt to process entire image as a filesystem...
+    }
+    else // add partitions to tree and decide about stat/prop files and where to put them...
     {
     }
     /*

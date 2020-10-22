@@ -20,8 +20,8 @@
 */
 
 void ProcessVolume(QString evidstring);
-int ParseVolume(QString estring, qint64 imgsize);
-void ParseExtendedPartition(QString estring, uint32_t primaryextendedoffset, uint32_t offset, uint32_t size);
+int ParseVolume(QString estring, qint64 imgsize, QList<int> *offlist, QList<int> *sizlist);
+void ParseExtendedPartition(QString estring, uint32_t primaryextendedoffset, uint32_t offset, uint32_t size, QList<int>* offlist, QList<int>* sizelist);
 /*
 //int GetFileSystemType(QString estring);
 int GetFileSystemType(QString estring, off64_t offset);
