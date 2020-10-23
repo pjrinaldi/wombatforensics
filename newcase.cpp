@@ -473,25 +473,10 @@ void ProcessVolume(QString evidstring)
     if(estatfile.isOpen())
     {
         out.setDevice(&estatfile);
-        out << evidstring << "," << emntstring << "," << QString::number(imgsize) << "," << QString("e" + QString::number(evidcnt));
+        out << evidstring << "," << emntstring << "," << QString::number(imgsize) << "," << QString("e" + QString::number(evidcnt)) << ",0";
         out.flush();
         estatfile.close();
     }
-    /*
-    QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
-    QTextStream out;
-    QFile evidfile(evidencepath + "stat");
-    if(!evidfile.isOpen())
-        evidfile.open(QIODevice::Append | QIODevice::Text);
-    if(evidfile.isOpen())
-    {
-        out.setDevice(&evidfile);
-        out << QString::number(imginfo->itype) << "," << QString::number(imginfo->size) << "," << QString::number(imginfo->sector_size) << ",";
-        out << evidname << "," << QString::number(1) << ",e" + QString::number(evidcnt) << ",0";
-        out.flush();
-        evidfile.close();
-    }
-    */
     int pvret = ParseVolume(emntstring, imgsize, &pofflist, &psizelist);
     if(pofflist.count() == 0)
     {	
@@ -505,6 +490,21 @@ void ProcessVolume(QString evidstring)
     int ptreecnt = 0;
     for(int i=0; i < pofflist.count(); i++)
     {
+        /*
+        QString curpartpath = evidencepath + "p" + i + "/";
+        QDir dir;
+        dir.mkpath(curpartpath);
+        //QFile pstatfile(curpartpath + "stat");
+        //QTextStream pout;
+        //if(!pstatfile.isOpen())
+        //    pstatfile.open(QIODevice::Append | QIODevice::Text);
+        //if(pstatfile.isOpen())
+        //{
+        //    pout.setDevice(&pstatfile);
+        //    pout << 
+        //    pstatfile.close();
+        }
+         */ 
 	if(i == 0) // INITIAL PARTITION
 	{
 	    if(pofflist.at(i)*512 > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
