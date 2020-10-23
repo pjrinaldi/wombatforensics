@@ -1391,13 +1391,17 @@ void WombatForensics::AddEvidence()
     for(int i=0; i < newevidence.count(); i++)
     {
         QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + "-e" + QString::number(ecount) + "/";
-        QString emntpath = wombatvariable.imgdatapath + newevidence.at(i).split("/").last() + "/";
+	QString emntpath = "";
         QDir dir;
         dir.mkpath(evidencepath);
-        dir.mkpath(emntpath);
+	if(newevidence.at(i).toLower().endsWith(".zmg") || newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001") || newevidence.at(i).toLower().endsWith(".e01"))
+	{
+            emntpath = wombatvariable.imgdatapath + newevidence.at(i).split("/").last() + "/";
+	    dir.mkpath(emntpath);
+	}
         // need to delete emntpath directories on close for cleanup purposes after unmount...
         ecount++;
-        if(newevidence.at(i).endsWith(".zmg"))
+        if(newevidence.at(i).toLower().endsWith(".zmg"))
             ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString());
         else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
             AffFuser(emntpath, newevidence.at(i));
