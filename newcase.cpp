@@ -466,6 +466,32 @@ void ProcessVolume(QString evidstring)
     mutex.lock();
     treenodemodel->AddNode(nodedata, "-1", -1, -1);
     mutex.unlock();
+    QFile estatfile(evidencepath + "stat");
+    QTextStream out;
+    if(!estatfile.isOpen())
+        estatfile.open(QIODevice::Append | QIODevice::Text);
+    if(estatfile.isOpen())
+    {
+        out.setDevice(&estatfile);
+        out << evidstring << "," << emntstring << "," << QString::number(imgsize) << "," << QString("e" + QString::number(evidcnt));
+        out.flush();
+        estatfile.close();
+    }
+    /*
+    QString evidencepath = wombatvariable.tmpmntpath + evidencename + ".e" + QString::number(evidcnt) + "/";
+    QTextStream out;
+    QFile evidfile(evidencepath + "stat");
+    if(!evidfile.isOpen())
+        evidfile.open(QIODevice::Append | QIODevice::Text);
+    if(evidfile.isOpen())
+    {
+        out.setDevice(&evidfile);
+        out << QString::number(imginfo->itype) << "," << QString::number(imginfo->size) << "," << QString::number(imginfo->sector_size) << ",";
+        out << evidname << "," << QString::number(1) << ",e" + QString::number(evidcnt) << ",0";
+        out.flush();
+        evidfile.close();
+    }
+    */
     int pvret = ParseVolume(emntstring, imgsize, &pofflist, &psizelist);
     if(pofflist.count() == 0)
     {	

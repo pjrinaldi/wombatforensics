@@ -40,9 +40,9 @@ void AddEvidenceDialog::SelectEvidence()
         {
             // it's an evidence image so process...
             ui->evidencelist->addItem(evidfilename);
-            if(evidfilename.toLower().endsWith(".sfs"))
-            {
-                qDebug() << "place squashfuse test stuff here...";
+            //if(evidfilename.toLower().endsWith(".sfs"))
+            //{
+                //qDebug() << "place squashfuse test stuff here...";
                 /*
                 // need to mount and provide access to the raw dd file...
                 QString mntstr = "squashfuse -s " + evidfilename + " " + wombatvariable.imgdatapath;
@@ -57,7 +57,7 @@ void AddEvidenceDialog::SelectEvidence()
                 evidfilename = wombatvariable.imgdatapath + evidfilename.split("/").last().split(".sfs").first() + ".dd";
                 xmntprocess->waitForFinished(-1);
                 */
-            }
+            //}
             ui->startbutton->setEnabled(true);
             //qDebug() << "evidfilename:" << evidfilename;
             // POPUP HERE FOR EVID ITEM WOULD BE GOOD....
@@ -65,6 +65,7 @@ void AddEvidenceDialog::SelectEvidence()
             // IF I DON'T WRITE THE STAT/PROP FILE'S HERE, WHERE I WILL STORE PASSWORDS FOR MULTIPLE EVIDENCE ITEMS WITH MULTIPLE ENCRYPTED POOL'S/FS'S
             // IF I DO WRITE THE STAT/PROP FILE'S HERE, HOW I WILL NO TO DELETE THE FILES IF THE USER CANCEL'S THE OPERATION...
             //qDebug() << "encryption test begins...";
+            /*
             const TSK_TCHAR** images;
             std::vector<std::string> fullpathvector;
             fullpathvector.clear();
@@ -109,7 +110,7 @@ void AddEvidenceDialog::SelectEvidence()
                         //else
                         //    qDebug() << "not encrypted FS...";
                     }*/
-                }
+                /*}
                 else // has a pool
                 {
                     if(poolinfo->num_vols > 0)
@@ -147,7 +148,7 @@ void AddEvidenceDialog::SelectEvidence()
                                         qDebug() << "encrypted FS: prompt for password...";
 				    }
                                 }*/
-			    }
+		/*	    }
                         }
 			tsk_img_close(curimginfo);
                     }
@@ -183,7 +184,7 @@ void AddEvidenceDialog::SelectEvidence()
 					}
 				    }
                                     */
-                                }
+                  /*              }
                                 else
                                 {
                                     if(poolinfo->num_vols > 0)
@@ -225,7 +226,7 @@ void AddEvidenceDialog::SelectEvidence()
                                                     qDebug() << "encrypted FS: prompt for password...";
 						}
                                             }*/
-                                        }
+                    /*                    }
 					tsk_img_close(curimginfo);
                                     }
                                 }
@@ -238,6 +239,7 @@ void AddEvidenceDialog::SelectEvidence()
 	    tsk_pool_close(poolinfo);
 	    tsk_vs_close(vsinfo);
 	    tsk_img_close(imginfo);
+            */
         }
         else if(evidfilename.isNull())
         {
