@@ -60,8 +60,7 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
     QFile rawforimg(estring);
     if(!rawforimg.isOpen())
 	rawforimg.open(QIODevice::ReadOnly);
-    QByteArray sector0 = rawforimg.read(512);
-    QByteArray sector1 = rawforimg.read(512);
+    QByteArray sector0 = rawforimg.peek(512);
     rawforimg.close();
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector0.mid(510, 2));
     uint16_t applesig = qFromLittleEndian<uint16_t>(sector0.left(2)); // should be in 2nd sector, powerpc mac's not intel mac's
@@ -73,18 +72,16 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
         //qDebug() << "imgsize:" << imgsize;
 	if((uint8_t)sector0.at(450) == 0xee) // GPT DISK
         {
-	    /*
             if(!rawforimg.isOpen())
                 rawforimg.open(QIODevice::ReadOnly);
             rawforimg.seek(512);
             QByteArray sector1 = rawforimg.read(512);
             //QByteArray gptsectors = rawforimg.read(16384); // this should be determined from (partentrycount * partentrysize) for number of bytes to read...
             rawforimg.close();
-	    */
 	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
 	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
 	    {
-		qDebug() << "gpt found, parse table now...";
+		//qDebug() << "gpt found, parse table now...";
 		uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector1.mid(72, 8));
 		uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector1.mid(80, 4));
 		uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector1.mid(84, 4));
@@ -96,8 +93,6 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
 		for(int i=0; i < partentrycount; i++)
 		{
 		    int cnt = i*partentrysize;
-		    QByteArray curpart = partentries.mid(cnt, partentrysize);
-		    //uint32_t curstartsector = qFromLittleEndian<uint32_t>(curpart.mid(32, 8));
 		    uint32_t curstartsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 32, 8));
 		    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
 		    if((curendsector - curstartsector) > 0)
@@ -165,30 +160,27 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
     else if(gptsig == 0x5452415020494645) // GPT PARTITION
     {
         qDebug() << "gpt and parse accordingly.";
-		uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector1.mid(72, 8));
-		uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector1.mid(80, 4));
-		uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector1.mid(84, 4));
-		if(!rawforimg.isOpen())
-		    rawforimg.open(QIODevice::ReadOnly);
-		rawforimg.seek((parttablestart*512));
-		QByteArray partentries = rawforimg.read((partentrycount*partentrysize));
-		rawforimg.close();
-		for(int i=0; i < partentrycount; i++)
-		{
-		    int cnt = i*partentrysize;
-		    QByteArray curpart = partentries.mid(cnt, partentrysize);
-		    //uint32_t curstartsector = qFromLittleEndian<uint32_t>(curpart.mid(32, 8));
-		    uint32_t curstartsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 32, 8));
-		    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
-		    if((curendsector - curstartsector) > 0)
-		    {
-			pofflist->append(curstartsector);
-			psizelist->append((curendsector - curstartsector + 1));
-			//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
-		    }
-
+	uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector0.mid(72, 8));
+	uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector0.mid(80, 4));
+	uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector0.mid(84, 4));
+	if(!rawforimg.isOpen())
+	    rawforimg.open(QIODevice::ReadOnly);
+	rawforimg.seek((parttablestart*512));
+	QByteArray partentries = rawforimg.read((partentrycount*partentrysize));
+	rawforimg.close();
+	for(int i=0; i < partentrycount; i++)
+	{
+	    int cnt = i*partentrysize;
+	    uint32_t curstartsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 32, 8));
+	    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
+	    if((curendsector - curstartsector) > 0)
+	    {
+		pofflist->append(curstartsector);
+		psizelist->append((curendsector - curstartsector + 1));
+		//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
+	    }
+	}
     }
-
     return 0;
 }
 
@@ -468,18 +460,82 @@ void ProcessVolume(QString evidstring)
         emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
     QFileInfo efileinfo(emntstring);
     imgsize = efileinfo.size();
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << evidencename << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt));
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, "-1", -1, -1);
+    mutex.unlock();
     int pvret = ParseVolume(emntstring, imgsize, &pofflist, &psizelist);
-    if(pvret)
-    {
+    if(pofflist.count() == 0)
+    {	
+	// virtual attempt to process entire image as a filesystem...
+	pofflist.append(0);
+	psizelist.append(imgsize);
     }
     qDebug() << "pofflist:" << pofflist;
     qDebug() << "psizelist:" << psizelist;
-    if(pofflist.count() == 0)
+    // add partitions to tree and decide about stat/prop files and where to put them...
+    int ptreecnt = 0;
+    for(int i=0; i < pofflist.count(); i++)
     {
-	// virtual attempt to process entire image as a filesystem...
-    }
-    else // add partitions to tree and decide about stat/prop files and where to put them...
-    {
+	if(i == 0) // INITIAL PARTITION
+	{
+	    if(pofflist.at(i)*512 > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+	    {
+		nodedata.clear();
+		nodedata << "UNALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+		mutex.lock();
+		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+		mutex.unlock();
+		ptreecnt++;
+	    }
+	    //fstype = GetFileSystemType(emntstring, pofflist.at(i));
+	    //qDebug() << "fstype:" << fstype;
+	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
+	    nodedata.clear();
+	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    mutex.lock();
+	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+	    mutex.unlock();
+	    ptreecnt++;
+	    //qDebug() << "1st partition which has unalloc before...";
+	}
+	if(i > 0 && i < pofflist.count()) // MIDDLE PARTITIONS
+	{
+	    if(pofflist.at(i) > (pofflist.at(i-1) + psizelist.at(i-1)))
+	    {
+		nodedata.clear();
+		nodedata << "UNALLOCATED" << "0" << QString::number((512*pofflist.at(i) - (pofflist.at(i-1) + psizelist.at(i-1)))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+		mutex.lock();
+		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+		mutex.unlock();
+		ptreecnt++;
+	    }
+	    // add existing partition here...
+	    //fstype = GetFileSystemType(emntstring, pofflist.at(i));
+	    //qDebug() << "fstype:" << fstype;
+	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
+	    nodedata.clear();
+	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    mutex.lock();
+	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+	    mutex.unlock();
+	    ptreecnt++;
+	}
+	if(i == pofflist.count() - 1 && ((pofflist.at(i) + psizelist.at(i))*512) < imgsize)
+	{
+	    nodedata.clear();
+	    nodedata << "UNALLOCATED" << "0" << QString::number(imgsize - 512*(pofflist.at(i) + psizelist.at(i))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    mutex.lock();
+	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+	    mutex.unlock();
+	    //add final unalloc partition to tree here...
+	    ptreecnt++;
+	    //qDebug() << "unalloc exists after last partition...";
+	}
     }
     /*
     QFileInfo efileinfo(emntstring);
