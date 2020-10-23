@@ -159,7 +159,7 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
     }
     else if(gptsig == 0x5452415020494645) // GPT PARTITION
     {
-        qDebug() << "gpt and parse accordingly.";
+        //qDebug() << "gpt and parse accordingly.";
 	uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector0.mid(72, 8));
 	uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector0.mid(80, 4));
 	uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector0.mid(84, 4));
@@ -473,8 +473,8 @@ void ProcessVolume(QString evidstring)
 	pofflist.append(0);
 	psizelist.append(imgsize);
     }
-    qDebug() << "pofflist:" << pofflist;
-    qDebug() << "psizelist:" << psizelist;
+    //qDebug() << "pofflist:" << pofflist;
+    //qDebug() << "psizelist:" << psizelist;
     // add partitions to tree and decide about stat/prop files and where to put them...
     int ptreecnt = 0;
     for(int i=0; i < pofflist.count(); i++)

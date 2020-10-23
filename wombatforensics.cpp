@@ -1027,8 +1027,11 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         for(int i=0; i < existingevidence.count(); i++)
         {
             QString emntpath = wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
-            QDir dir;
-            dir.mkpath(emntpath);
+	    if(existingevidence.at(i).toLower().endsWith("sfs") || existingevidence.at(i).toLower().endsWith(".zmg") || existingevidence.at(i).toLower().endsWith(".aff") || existingevidence.at(i).endsWith(".000") || existingevidence.at(i).endsWith(".001") || existingevidence.at(i).toLower().endsWith(".e01"))
+	    {
+                QDir dir;
+	        dir.mkpath(emntpath);
+	    }
             if(existingevidence.at(i).endsWith(".sfs"))
             {
                 //SquashFuser(emntpath,  existingevidence.at(i));
@@ -1332,7 +1335,6 @@ void WombatForensics::ReadXMountErr()
 
 void WombatForensics::UpdateStatus()
 {
-/*
     StatusUpdate("Preparing Evidence Image...");
     qInfo() << "Preparing Evidence Image...";
     //LogMessage("Preparing Evidence Image...");
@@ -1352,7 +1354,6 @@ void WombatForensics::UpdateStatus()
         AddEvidItem(evidrepdatalist.at(i).evidcontent);
     }
     //LogMessage("Building Initial Evidence Tree...");
-*/
     ui->dirTreeView->setModel(treenodemodel);
     ReadBookmarks();
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
@@ -1524,14 +1525,17 @@ void WombatForensics::LoadHexContents()
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     QString nodeid = selectednode->Data(11).toString();
+    qDebug() << "nodeid:" << nodeid;
     if(nodeid.split("-f").last().startsWith("z"))
     {
         selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
         nodeid = selectednode->Data(11).toString();
     }
     QString evidid = nodeid.split("-").first();
+    qDebug() << "evidid:" << evidid;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-" + evidid)), QDir::NoSymLinks | QDir::Dirs);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
+    qDebug() << "evidfiles:" << evidfiles;
     QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
     QString tmpstr = "";
     /*
@@ -1542,18 +1546,20 @@ void WombatForensics::LoadHexContents()
     evidfile.close();
     */
     QString datastring = wombatvariable.imgdatapath;
-    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
+    //if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
+    if(evidname.toLower().endsWith(".aff"))
     {
         datastring += evidname + "/" + evidname + ".raw";
         //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
     }
-    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).toLower().endsWith(".e01"))
+    else if(evidname.toLower().endsWith(".e01"))
+    //else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).toLower().endsWith(".e01"))
     {
         datastring += evidname + "/" + evidname + ".raw";
         //datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
         //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
     }
-    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+    /*else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
     {
         QString imgext = evidname.split(".").last();
         //QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
@@ -1567,13 +1573,21 @@ void WombatForensics::LoadHexContents()
             datastring = "get raw path...";
             //datastring = tmpstr.split(",").at(3);
         }
-    }
-    else
-        qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
-    if(datastring.endsWith(".sfs"))
-        datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
+    }*/
+    //else
+    //{
+    //    qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
+    //}
+    //if(datastring.endsWith(".sfs"))
+    //{
+	//datastring = 
+        //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
+    //}
     else if(datastring.endsWith(".zmg"))
-        datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
+    {
+	datastring += evidname + "/" + evidname.split(".zmg").first() + ".dd";
+        //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
+    }
     //qDebug() << "datastring:" << datastring;
     casedatafile.setFileName(datastring);
     ui->hexview->BypassColor(false);
