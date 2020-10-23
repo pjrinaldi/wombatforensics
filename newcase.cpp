@@ -76,12 +76,32 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
                 rawforimg.open(QIODevice::ReadOnly);
             rawforimg.seek(512);
             QByteArray sector1 = rawforimg.read(512);
-            QByteArray gptsectors = rawforimg.read(16384);
+            //QByteArray gptsectors = rawforimg.read(16384); // this should be determined from (partentrycount * partentrysize) for number of bytes to read...
             rawforimg.close();
 	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
 	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
 	    {
 		qDebug() << "gpt found, parse table now...";
+		uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector1.mid(72, 8));
+		uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector1.mid(80, 4));
+		uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector1.mid(84, 4));
+		if(!rawforimg.isOpen())
+		    rawforimg.open(QIODevice::ReadOnly);
+		rawforimg.seek((parttablestart*512));
+		QByteArray partentries = rawforimg.read((partentrycount*partentrysize));
+		rawforimg.close();
+		for(int i=0; i < partentrycount; i++)
+		{
+		    int cnt = i*partentrysize;
+		    QByteArray curpart = partentries.mid(cnt, partentrysize);
+		    //uint32_t curstartsector = qFromLittleEndian<uint32_t>(curpart.mid(32, 8));
+		    uint32_t curstartsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 32, 8));
+		    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
+		    if((curendsector - curstartsector) > 0)
+			qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
+
+		}
+		//qDebug() << "gpt table start sector:" << parttablestart << "partentry count:" << partentrycount << "partentrysize:" << partentrysize;
 	    }
 	    else
 		qDebug() << "gpt should have been there, math is off...";
