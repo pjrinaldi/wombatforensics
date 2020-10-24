@@ -473,6 +473,7 @@ void ProcessVolume(QString evidstring)
     if(estatfile.isOpen())
     {
         out.setDevice(&estatfile);
+        // original evidence filename, evidence mount string, imgsize, id
         out << evidstring << "," << emntstring << "," << QString::number(imgsize) << "," << QString("e" + QString::number(evidcnt)) << ",0";
         out.flush();
         estatfile.close();
@@ -488,29 +489,30 @@ void ProcessVolume(QString evidstring)
     //qDebug() << "psizelist:" << psizelist;
     // add partitions to tree and decide about stat/prop files and where to put them...
     int ptreecnt = 0;
+    QString curpartpath;
+    QDir dir;
+    QFile pstatfile;
     for(int i=0; i < pofflist.count(); i++)
     {
-        /*
-        QString curpartpath = evidencepath + "p" + i + "/";
-        QDir dir;
-        dir.mkpath(curpartpath);
-        //QFile pstatfile(curpartpath + "stat");
-        //QTextStream pout;
-        //if(!pstatfile.isOpen())
-        //    pstatfile.open(QIODevice::Append | QIODevice::Text);
-        //if(pstatfile.isOpen())
-        //{
-        //    pout.setDevice(&pstatfile);
-        //    pout << 
-        //    pstatfile.close();
-        }
-         */ 
 	if(i == 0) // INITIAL PARTITION
 	{
 	    if(pofflist.at(i)*512 > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
 	    {
+                curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+                dir.mkpath(curpartpath);
+                pstatfile.setFileName(curpartpath + "stat");
+                if(!pstatfile.isOpen())
+                    pstatfile.open(QIODevice::Append | QIODevice::Text);
+                if(pstatfile.isOpen())
+                {
+                    out.setDevice(&pstatfile);
+                    // partition name, offset, size, partition type, id
+                    out << "UNALLOCATED,0," << QString::number(pofflist.at(i)*512) << ",0," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                    out.flush();
+                    pstatfile.close();
+                }
 		nodedata.clear();
-		nodedata << "UNALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+		nodedata << "UNALLOCATED" << "0" << QString::number(pofflist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 		mutex.lock();
 		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 		mutex.unlock();
@@ -519,6 +521,18 @@ void ProcessVolume(QString evidstring)
 	    //fstype = GetFileSystemType(emntstring, pofflist.at(i));
 	    //qDebug() << "fstype:" << fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
+            curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+            dir.mkpath(curpartpath);
+            pstatfile.setFileName(curpartpath + "stat");
+            if(!pstatfile.isOpen())
+                pstatfile.open(QIODevice::Append | QIODevice::Text);
+            if(pstatfile.isOpen())
+            {
+                out.setDevice(&pstatfile);
+                out << "ALLOCATED," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                out.flush();
+                pstatfile.close();
+            }
 	    nodedata.clear();
 	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
@@ -532,8 +546,21 @@ void ProcessVolume(QString evidstring)
 	{
 	    if(pofflist.at(i) > (pofflist.at(i-1) + psizelist.at(i-1)))
 	    {
+                curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+                dir.mkpath(curpartpath);
+                pstatfile.setFileName(curpartpath + "stat");
+                if(!pstatfile.isOpen())
+                    pstatfile.open(QIODevice::Append | QIODevice::Text);
+                if(pstatfile.isOpen())
+                {
+                    out.setDevice(&pstatfile);
+                    // partition name, offset, size, partition type, id
+                    out << "UNALLOCATED," << QString::number((pofflist.at(i-1) + psizelist.at(i-1))*512) << "," << QString::number(512*(pofflist.at(i) - (pofflist.at(i-1) + psizelist.at(i-1)))) << ",0," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                    out.flush();
+                    pstatfile.close();
+                }
 		nodedata.clear();
-		nodedata << "UNALLOCATED" << "0" << QString::number((512*pofflist.at(i) - (pofflist.at(i-1) + psizelist.at(i-1)))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+		nodedata << "UNALLOCATED" << "0" << QString::number(512*(pofflist.at(i) - (pofflist.at(i-1) + psizelist.at(i-1)))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 		mutex.lock();
 		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 		mutex.unlock();
@@ -545,6 +572,19 @@ void ProcessVolume(QString evidstring)
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
 	    nodedata.clear();
 	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+            curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+            dir.mkpath(curpartpath);
+            pstatfile.setFileName(curpartpath + "stat");
+            if(!pstatfile.isOpen())
+                pstatfile.open(QIODevice::Append | QIODevice::Text);
+            if(pstatfile.isOpen())
+            {
+                out.setDevice(&pstatfile);
+                // partition name, offset, size, partition type, id
+                out << "ALLOCATED," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                out.flush();
+                pstatfile.close();
+            }
 	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
@@ -553,6 +593,19 @@ void ProcessVolume(QString evidstring)
 	}
 	if(i == pofflist.count() - 1 && ((pofflist.at(i) + psizelist.at(i))*512) < imgsize)
 	{
+            curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+            dir.mkpath(curpartpath);
+            pstatfile.setFileName(curpartpath + "stat");
+            if(!pstatfile.isOpen())
+                pstatfile.open(QIODevice::Append | QIODevice::Text);
+            if(pstatfile.isOpen())
+            {
+                out.setDevice(&pstatfile);
+                // partition name, offset, size, partition type, id
+                out << "UNALLOCATED," << QString::number((psizelist.at(i) + pofflist.at(i))*512) << "," << QString::number(imgsize - 512*(pofflist.at(i) + psizelist.at(i))) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                out.flush();
+                pstatfile.close();
+            }
 	    nodedata.clear();
 	    nodedata << "UNALLOCATED" << "0" << QString::number(imgsize - 512*(pofflist.at(i) + psizelist.at(i))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
