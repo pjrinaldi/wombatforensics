@@ -184,6 +184,21 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
     return 0;
 }
 
+int GetFileSystemType(QString estring, off64_t partoffset)
+{
+    int fstype = 0;
+    QByteArray partbuf;
+    partbuf.clear();
+    QFile efile(estring);
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        efile.seek(partoffset);
+        partbuf = efile.read(2048);
+        efile.close();
+    }
+}
     /*
 //int GetFileSystemType(QString estring)
 int GetFileSystemType(QString estring, off64_t partoffset)
@@ -492,6 +507,7 @@ void ProcessVolume(QString evidstring)
     QString curpartpath;
     QDir dir;
     QFile pstatfile;
+    int fstype = 0;
     for(int i=0; i < pofflist.count(); i++)
     {
 	if(i == 0) // INITIAL PARTITION
@@ -518,6 +534,7 @@ void ProcessVolume(QString evidstring)
 		mutex.unlock();
 		ptreecnt++;
 	    }
+            fstype = GetFileSystemType(emntstring, pofflist.at(i));
 	    //fstype = GetFileSystemType(emntstring, pofflist.at(i));
 	    //qDebug() << "fstype:" << fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
