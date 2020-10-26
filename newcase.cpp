@@ -239,6 +239,7 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     }
     else if(hfssig == "H+" || hfssig == "HX") // HFS+/HFSX
     {
+        // test of hfs+/X failed.
 	fstype = 8; // HFS+/HFSX
     }
     else if(xfssig == "XFSB") // XFS
@@ -247,8 +248,10 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     }
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
+        //  test of btrfs failed.
 	fstype = 10; // BTRFS
     }
+    // need to implement udf
     
     return fstype;
 }
