@@ -193,6 +193,7 @@ int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<
 
 int GetFileSystemType(QString estring, off64_t partoffset)
 {
+    // btrfs magic number is at 65536 + 40, length of 8 == "_BHRfS_M" superblock size is 4096, but only 3531 is in use... (69120) should be enough for btrfs...
     qDebug() << "estring:" << estring << "partoffset:" << partoffset;
     int fstype = 0;
     QByteArray partbuf;
@@ -203,12 +204,16 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     if(efile.isOpen())
     {
         efile.seek(partoffset*512);
-        partbuf = efile.read(2048);
+        partbuf = efile.read(69120);
         efile.close();
     }
     // check for various FAT FS's
     uint16_t winsig = qFromLittleEndian<uint16_t>(partbuf.mid(510, 2));
     uint16_t extsig = qFromLittleEndian<uint16_t>(partbuf.mid(1080, 2));
+    QString apfssig = QString::fromStdString(partbuf.mid(32, 4).toStdString());
+    QString hfssig = QString::fromStdString(partbuf.mid(0, 2).toStdString());
+    QString xfssig = QString::fromStdString(partbuf.mid(0, 4).toStdString());
+    QString btrsig = QString::fromStdString(partbuf.mid(65576, 8).toStdString());
     if(winsig == 0xaa55) // FAT OR NTFS
     {
 	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
@@ -227,6 +232,22 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     else if(extsig == 0xef53) // EXT2/3/4
     {
 	fstype = 6; // EXT2/3/4
+    }
+    else if(apfssig == "NXSB") // APFS Container
+    {
+	fstype = 7; // APFS Container
+    }
+    else if(hfssig == "H+" || hfssig == "HX") // HFS+/HFSX
+    {
+	fstype = 8; // HFS+/HFSX
+    }
+    else if(xfssig == "XFSB") // XFS
+    {
+	fstype = 9; // XFS
+    }
+    else if(btrsig == "_BHRfS_M") // BTRFS
+    {
+	fstype = 10; // BTRFS
     }
     
     return fstype;
