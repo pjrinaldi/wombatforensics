@@ -198,6 +198,45 @@ int GetFileSystemType(QString estring, off64_t partoffset)
         partbuf = efile.read(2048);
         efile.close();
     }
+    // check for various FAT FS's
+    uint16_t winsig = qFromLittleEndian<uint16_t>(partbuf.mid(510, 2));
+    if(winsig == 0xaa55) // FAT OR NTFS
+    {
+	if(QString::fromStdString(partbuf.mid(54, 3).toStdString()) == "FAT") // FAT12/16/32/EXFAT
+	{
+	}
+	else // probably ntfs, but need to figure out how to verify inside if...
+	{
+	}
+    }
+    /*
+    efile.seek(0x39);
+    QByteArray fatbuf = efile.read(2);
+    efile.seek(0x03);
+    QByteArray exfatbuf = efile.read(5);
+    efile.close();
+    if(fatbuf.at(0) == (char)0x31 && fatbuf.at(1) == (char)0x32)
+    {
+	fstype = 7; // FAT12
+	qDebug() << "FAT12";
+    }
+    else if(fatbuf.at(0) == (char)0x31 && fatbuf.at(1) == (char)0x36)
+    {
+	fstype = 8; // FAT16
+	qDebug() << "FAT16";
+    }
+    else if(fatbuf.at(0) == (char)0x33 && fatbuf.at(1) == (char)0x32)
+    {
+	fstype = 9; // FAT32
+	qDebug() << "FAT32";
+    }
+    else if(exfatbuf.at(0) == (char)0x45 && exfatbuf.at(1) == (char)0x58 && exfatbuf.at(2) == (char)0x46 && exfatbuf.at(3) == (char)0x41 && exfatbuf.at(4) == (char)0x54)
+    {
+	fstype = 10; // EXFAT
+	qDebug() << "EXFAT";
+    }
+    */
+
 }
     /*
 //int GetFileSystemType(QString estring)
