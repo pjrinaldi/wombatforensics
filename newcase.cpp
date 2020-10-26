@@ -3,7 +3,7 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offset, uint32_t size, QList<int>* pofflist, QList<int>* psizelist)
+void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offset, uint32_t size, QList<qint64>* pofflist, QList<qint64>* psizelist)
 {
     //qDebug() << "primary extended size in bytes:" << size*512;
     QFile rawforimg(estring);
@@ -53,7 +53,7 @@ void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offse
         //qDebug() << "i screwed up the math somewhere...";
 }
 
-int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int>* psizelist)
+int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist)
 {
     // NEED TO DETERMINE AND INDICATE VIRTUAL PARTITIONS SOMEWHERE... IT COULD SIMPLY BE THAT POFFLIST.COUNT() IS 0...
     //qDebug() << "estring:" << estring;
@@ -137,10 +137,17 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
 		}
 		else
                 {
-                    //qDebug() << "parse primary partition here...";
-		    pofflist->append(curoffset);
-		    psizelist->append(cursize);
-		    //qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+		    if(cursize <= imgsize && cursize > 0)
+		    {
+                        //qDebug() << "parse primary partition here...";
+			pofflist->append(curoffset);
+        		psizelist->append(cursize);
+			qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+		    }
+		    else
+		    {
+			//qDebug() << "bogus partition entry";
+		    }
                 }
 	    }
 	}
@@ -186,6 +193,7 @@ int ParseVolume(QString estring, qint64 imgsize, QList<int>* pofflist, QList<int
 
 int GetFileSystemType(QString estring, off64_t partoffset)
 {
+    qDebug() << "estring:" << estring << "partoffset:" << partoffset;
     int fstype = 0;
     QByteArray partbuf;
     partbuf.clear();
@@ -194,49 +202,34 @@ int GetFileSystemType(QString estring, off64_t partoffset)
         efile.open(QIODevice::ReadOnly);
     if(efile.isOpen())
     {
-        efile.seek(partoffset);
+        efile.seek(partoffset*512);
         partbuf = efile.read(2048);
         efile.close();
     }
     // check for various FAT FS's
     uint16_t winsig = qFromLittleEndian<uint16_t>(partbuf.mid(510, 2));
+    uint16_t extsig = qFromLittleEndian<uint16_t>(partbuf.mid(1080, 2));
     if(winsig == 0xaa55) // FAT OR NTFS
     {
-	if(QString::fromStdString(partbuf.mid(54, 3).toStdString()) == "FAT") // FAT12/16/32/EXFAT
-	{
-	}
-	else // probably ntfs, but need to figure out how to verify inside if...
-	{
-	}
+	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
+	QString fatstr = QString::fromStdString(partbuf.mid(54, 5).toStdString());
+	if(fatstr == "FAT12") // FAT12
+	    fstype = 1; // FAT12
+	else if(fatstr == "FAT16") // FAT16
+	    fstype = 2; // FAT16
+	else if(fatstr == "FAT32") // FAT32
+	    fstype = 3; // FAT32
+	else if(exfatstr == "EXFAT") // EXFAT
+	    fstype = 4; // EXFAT
+	else if(exfatstr.startsWith("NTFS")) // NTFS
+	    fstype = 5; // NTFS
     }
-    /*
-    efile.seek(0x39);
-    QByteArray fatbuf = efile.read(2);
-    efile.seek(0x03);
-    QByteArray exfatbuf = efile.read(5);
-    efile.close();
-    if(fatbuf.at(0) == (char)0x31 && fatbuf.at(1) == (char)0x32)
+    else if(extsig == 0xef53) // EXT2/3/4
     {
-	fstype = 7; // FAT12
-	qDebug() << "FAT12";
+	fstype = 6; // EXT2/3/4
     }
-    else if(fatbuf.at(0) == (char)0x31 && fatbuf.at(1) == (char)0x36)
-    {
-	fstype = 8; // FAT16
-	qDebug() << "FAT16";
-    }
-    else if(fatbuf.at(0) == (char)0x33 && fatbuf.at(1) == (char)0x32)
-    {
-	fstype = 9; // FAT32
-	qDebug() << "FAT32";
-    }
-    else if(exfatbuf.at(0) == (char)0x45 && exfatbuf.at(1) == (char)0x58 && exfatbuf.at(2) == (char)0x46 && exfatbuf.at(3) == (char)0x41 && exfatbuf.at(4) == (char)0x54)
-    {
-	fstype = 10; // EXFAT
-	qDebug() << "EXFAT";
-    }
-    */
-
+    
+    return fstype;
 }
     /*
 //int GetFileSystemType(QString estring)
@@ -495,9 +488,9 @@ int GetFileSystemType(QString estring, off64_t partoffset)
 
 void ProcessVolume(QString evidstring)
 {
-    QList<int> pofflist;
+    QList<qint64> pofflist;
     pofflist.clear();
-    QList<int> psizelist;
+    QList<qint64> psizelist;
     psizelist.clear();
     qint64 imgsize = 0;
     // if evidstring .exists, then we find dir with evidstring in it and split at evidstring -e
@@ -537,7 +530,7 @@ void ProcessVolume(QString evidstring)
     {	
 	// virtual attempt to process entire image as a filesystem...
 	pofflist.append(0);
-	psizelist.append(imgsize);
+	psizelist.append(imgsize/512);
     }
     //qDebug() << "pofflist:" << pofflist;
     //qDebug() << "psizelist:" << psizelist;
@@ -575,7 +568,7 @@ void ProcessVolume(QString evidstring)
 	    }
             fstype = GetFileSystemType(emntstring, pofflist.at(i));
 	    //fstype = GetFileSystemType(emntstring, pofflist.at(i));
-	    //qDebug() << "fstype:" << fstype;
+	    qDebug() << "fstype:" << fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
             curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
             dir.mkpath(curpartpath);
@@ -623,8 +616,8 @@ void ProcessVolume(QString evidstring)
 		ptreecnt++;
 	    }
 	    // add existing partition here...
-	    //fstype = GetFileSystemType(emntstring, pofflist.at(i));
-	    //qDebug() << "fstype:" << fstype;
+	    fstype = GetFileSystemType(emntstring, pofflist.at(i));
+	    qDebug() << "fstype:" << fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
 	    nodedata.clear();
 	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
