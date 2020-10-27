@@ -213,20 +213,31 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     QString hfssig = QString::fromStdString(partbuf.mid(1024, 2).toStdString());
     QString xfssig = QString::fromStdString(partbuf.mid(0, 4).toStdString());
     QString btrsig = QString::fromStdString(partbuf.mid(65600, 8).toStdString());
+    QString bitlcksig = QString::fromStdString(partbuf.mid(0, 8).toString());
     if(winsig == 0xaa55) // FAT OR NTFS
     {
 	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
 	QString fatstr = QString::fromStdString(partbuf.mid(54, 5).toStdString());
 	if(fatstr == "FAT12") // FAT12
+        {
 	    fstype = 1; // FAT12
+        }
 	else if(fatstr == "FAT16") // FAT16
+        {
 	    fstype = 2; // FAT16
+        }
 	else if(fatstr == "FAT32") // FAT32
+        {
 	    fstype = 3; // FAT32
+        }
 	else if(exfatstr == "EXFAT") // EXFAT
+        {
 	    fstype = 4; // EXFAT
+        }
 	else if(exfatstr.startsWith("NTFS")) // NTFS
+        {
 	    fstype = 5; // NTFS
+        }
     }
     else if(extsig == 0xef53) // EXT2/3/4
     {
@@ -247,6 +258,10 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
 	fstype = 10; // BTRFS
+    }
+    else if(bitlcksig == "-FVE-FS-") // BITLOCKER
+    {
+        fstype = 11; // BITLOCKER
     }
     // need to implement iso, udf, hfs, zfs
     

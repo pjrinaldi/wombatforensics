@@ -39,6 +39,23 @@ typedef struct
     tsk_lock_t readlock;
 } IMG_EWF_INFO;
 
+struct FileSystemInfo
+{
+    uint16_t bytespersector;
+    uint8_t sectorspercluster;
+    uint16_t reservedareasize; // in sectors
+    uint8_t fatcount;
+    uint16_t rootdirmaxfiles; // 0 for FAT32
+    uint16_t fssectorcnt; // 0 if need 4-byte value
+    uint8_t mediatype;
+    uint16_t fatsize; // FAT size in sectors for FAT/12/16, 0 for FAT32
+    uint32_t fs32sectorcnt; // 0 if can use 2-byte value
+    uint8_t extbootsig; // 0x29 for FAT12/16
+    uint32_t volserialnum; // volume serial number
+    QString vollabel; // ASCII volume label
+    QString fatlabel; // ASCI FAT/FAT12/FAT16
+};
+
 /*
 typedef struct
 {
@@ -68,6 +85,7 @@ typedef struct
 
 Q_DECLARE_METATYPE(WombatVariable);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);
+Q_DECLARE_METATYPE(FileSystemInfo);
 //Q_DECLARE_METATYPE(ntfsattrfname);
 //Q_DECLARE_METATYPE(ntfsindxrecord);
 
