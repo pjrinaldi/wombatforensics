@@ -211,9 +211,9 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     uint16_t winsig = qFromLittleEndian<uint16_t>(partbuf.mid(510, 2));
     uint16_t extsig = qFromLittleEndian<uint16_t>(partbuf.mid(1080, 2));
     QString apfssig = QString::fromStdString(partbuf.mid(32, 4).toStdString());
-    QString hfssig = QString::fromStdString(partbuf.mid(0, 2).toStdString());
+    QString hfssig = QString::fromStdString(partbuf.mid(1024, 2).toStdString());
     QString xfssig = QString::fromStdString(partbuf.mid(0, 4).toStdString());
-    QString btrsig = QString::fromStdString(partbuf.mid(65576, 8).toStdString());
+    QString btrsig = QString::fromStdString(partbuf.mid(65600, 8).toStdString());
     if(winsig == 0xaa55) // FAT OR NTFS
     {
 	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
