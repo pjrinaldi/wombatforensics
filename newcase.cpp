@@ -193,7 +193,6 @@ int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<
 
 int GetFileSystemType(QString estring, off64_t partoffset)
 {
-    // btrfs magic number is at 65536 + 40, length of 8 == "_BHRfS_M" superblock size is 4096, but only 3531 is in use... (69120) should be enough for btrfs...
     qDebug() << "estring:" << estring << "partoffset:" << partoffset;
     int fstype = 0;
     QByteArray partbuf;
@@ -239,7 +238,6 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     }
     else if(hfssig == "H+" || hfssig == "HX") // HFS+/HFSX
     {
-        // test of hfs+/X failed.
 	fstype = 8; // HFS+/HFSX
     }
     else if(xfssig == "XFSB") // XFS
@@ -248,106 +246,12 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     }
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
-        //  test of btrfs failed.
 	fstype = 10; // BTRFS
     }
     // need to implement iso, udf, hfs, zfs
     
     return fstype;
 }
-    /*
-//int GetFileSystemType(QString estring)
-int GetFileSystemType(QString estring, off64_t partoffset)
-{
-    int fstype = 0;
-    qDebug() << "FSTYPE estring:" << estring << "partoffset:" << partoffset;
-    if(partoffset > 0)
-    {
-        QByteArray partbuf;
-        partbuf.clear();
-        QFile efile(estring);
-        if(!efile.isOpen())
-            efile.open(QIODevice::ReadOnly);
-        if(efile.isOpen())
-        {
-            efile.seek(partoffset);
-            partbuf = efile.read(4096);
-            efile.close();
-        }
-        QString partsigfile = wombatvariable.tmpfilepath + "partsigfile";
-        QFile pfile(wombatvariable.tmpfilepath + "partsigfile");
-        if(!pfile.isOpen())
-            pfile.open(QIODevice::WriteOnly);
-        if(pfile.isOpen())
-        {
-            pfile.write(partbuf);
-            pfile.close();
-        }
-        estring = partsigfile;
-        // write out file name for volumes based on offset..
-    }
-    libfsapfs_error_t* apfserror = NULL;
-    libfsext_error_t* exterror = NULL;
-    libfshfs_error_t* hfserror = NULL;
-    libfsntfs_error_t* ntfserror = NULL;
-    libfsrefs_error_t* refserror = NULL;
-    libfsxfs_error_t* xfserror = NULL;
-    if(libfsapfs_check_container_signature(estring.toStdString().c_str(), &apfserror) == 1 || libfsapfs_check_volume_signature(estring.toStdString().c_str(), &apfserror) == 1)
-        fstype = 1; // APFS
-    if(libfsext_check_volume_signature(estring.toStdString().c_str(), &exterror) == 1)
-        fstype = 2; // EXT(2,3,4)
-    if(libfshfs_check_volume_signature(estring.toStdString().c_str(), &hfserror) == 1)
-        fstype = 3; // HFS(+)
-    if(libfsntfs_check_volume_signature(estring.toStdString().c_str(), &ntfserror) == 1)
-        fstype = 4; // NTFS
-    if(libfsrefs_check_volume_signature(estring.toStdString().c_str(), &refserror) == 1)
-        fstype = 5; // REFS
-    if(libfsxfs_check_volume_signature(estring.toStdString().c_str(), &xfserror) == 1)
-        fstype = 6; // XFS
-    // CHECKING FAT... FATFS*->fs_type FAT12 - 1, FAT16 - 2, FAT32 - 3, EXFAT - 4
-    if(fstype == 0) // none of others, check for FATFS
-    {
-        QFile efile(estring);
-        if(!efile.isOpen())
-            efile.open(QIODevice::ReadOnly);
-        if(efile.isOpen())
-        {
-            efile.seek(0x39);
-            QByteArray fatbuf = efile.read(2);
-            efile.seek(0x03);
-            QByteArray exfatbuf = efile.read(5);
-            efile.close();
-            if(fatbuf.at(0) == (char)0x31 && fatbuf.at(1) == (char)0x32)
-            {
-                fstype = 7; // FAT12
-                qDebug() << "FAT12";
-            }
-            else if(fatbuf.at(0) == (char)0x31 && fatbuf.at(1) == (char)0x36)
-            {
-                fstype = 8; // FAT16
-                qDebug() << "FAT16";
-            }
-            else if(fatbuf.at(0) == (char)0x33 && fatbuf.at(1) == (char)0x32)
-            {
-                fstype = 9; // FAT32
-                qDebug() << "FAT32";
-            }
-            else if(exfatbuf.at(0) == (char)0x45 && exfatbuf.at(1) == (char)0x58 && exfatbuf.at(2) == (char)0x46 && exfatbuf.at(3) == (char)0x41 && exfatbuf.at(4) == (char)0x54)
-            {
-                fstype = 10; // EXFAT
-                qDebug() << "EXFAT";
-            }
-        }
-    }
-    libfsapfs_error_free(&apfserror);
-    libfsext_error_free(&exterror);
-    libfshfs_error_free(&hfserror);
-    libfsntfs_error_free(&ntfserror);
-    libfsrefs_error_free(&refserror);
-    libfsxfs_error_free(&xfserror);
-    return fstype;
-}
-    */
 /*
 //QString GetFileSystemVolumeName(QString estring, int fstype)
 //QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset, size64_t partsize)
