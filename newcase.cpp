@@ -251,7 +251,7 @@ int GetFileSystemType(QString estring, off64_t partoffset)
         //  test of btrfs failed.
 	fstype = 10; // BTRFS
     }
-    // need to implement udf
+    // need to implement iso, udf, hfs, zfs
     
     return fstype;
 }
