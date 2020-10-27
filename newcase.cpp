@@ -191,8 +191,9 @@ int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<
     return 0;
 }
 
-int GetFileSystemType(QString estring, off64_t partoffset)
+int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>* fsinfolist)
 {
+    FileSystemInfo fsinfo;
     qDebug() << "estring:" << estring << "partoffset:" << partoffset;
     int fstype = 0;
     QByteArray partbuf;
@@ -213,7 +214,7 @@ int GetFileSystemType(QString estring, off64_t partoffset)
     QString hfssig = QString::fromStdString(partbuf.mid(1024, 2).toStdString());
     QString xfssig = QString::fromStdString(partbuf.mid(0, 4).toStdString());
     QString btrsig = QString::fromStdString(partbuf.mid(65600, 8).toStdString());
-    QString bitlcksig = QString::fromStdString(partbuf.mid(0, 8).toString());
+    QString bitlcksig = QString::fromStdString(partbuf.mid(0, 8).toStdString());
     if(winsig == 0xaa55) // FAT OR NTFS
     {
 	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
@@ -237,6 +238,37 @@ int GetFileSystemType(QString estring, off64_t partoffset)
 	else if(exfatstr.startsWith("NTFS")) // NTFS
         {
 	    fstype = 5; // NTFS
+        }
+        if(fatstr == "FAT12" || fatstr == "FAT16" || fatstr == "FAT32" || exfatstr == "EXFAT")
+        {
+            fsinfo.bytespersector = qFromLittleEndian<uint16_t>(partbuf.mid(11, 2));
+            fsinfo.sectorspercluster = partbuf.at(13);
+            fsinfo.reservedareasize = qFromLittleEndian<uint16_t>(partbuf.mid(14, 2));
+            fsinfo.fatcount = partbuf.at(16);
+            fsinfo.rootdirmaxfiles = qFromLittleEndian<uint16_t>(partbuf.mid(17, 2));
+            fsinfo.fssectorcnt = qFromLittleEndian<uint16_t>(partbuf.mid(19, 2));
+            fsinfo.mediatype = partbuf.at(21);
+            fsinfo.fatsize = qFromLittleEndian<uint16_t>(partbuf.mid(22, 2));
+            fsinfo.fs32sectorcnt = qFromLittleEndian<uint32_t>(partbuf.mid(32, 4));
+            if(fatstr == "FAT12" || fatstr == "FAT16")
+            {
+                fsinfo.extbootsig = partbuf.at(38);
+                fsinfo.volserialnum = qFromLittleEndian<uint32_t>(partbuf.mid(39, 4));
+                fsinfo.vollabel = QString::fromStdString(partbuf.mid(43, 11).toStdString());
+                fsinfo.fatlabel = QString::fromStdString(partbuf.mid(54, 8).toStdString());
+            }
+            else if(fatstr == "FAT32")
+            {
+                fsinfo.extbootsig = partbuf.at(66);
+                fsinfo.volserialnum = qFromLittleEndian<uint32_t>(partbuf.mid(67, 4));
+                fsinfo.vollabel = QString::fromStdString(partbuf.mid(71, 11).toStdString());
+                fsinfo.fatlabel = QString::fromStdString(partbuf.mid(82, 8).toStdString());
+                fsinfo.fat32count = qFromLittleEndian<uint32_t>(partbuf.mid(36, 4));
+                fsinfo.rootdircluster = qFromLittleEndian<uint32_t>(partbuf.mid(44, 4));
+                /*
+                uint16_t fsinfosector; // FSINFO sector location
+                */ 
+            }
         }
     }
     else if(extsig == 0xef53) // EXT2/3/4
@@ -264,7 +296,7 @@ int GetFileSystemType(QString estring, off64_t partoffset)
         fstype = 11; // BITLOCKER
     }
     // need to implement iso, udf, hfs, zfs
-    
+    fsinfolist->append(fsinfo);
     return fstype;
 }
 /*
@@ -435,6 +467,8 @@ void ProcessVolume(QString evidstring)
     pofflist.clear();
     QList<qint64> psizelist;
     psizelist.clear();
+    QList<FileSystemInfo> fsinfolist;
+    fsinfolist.clear();
     qint64 imgsize = 0;
     // if evidstring .exists, then we find dir with evidstring in it and split at evidstring -e
     //qDebug() << "evidstring:" << evidstring;
@@ -509,7 +543,7 @@ void ProcessVolume(QString evidstring)
 		mutex.unlock();
 		ptreecnt++;
 	    }
-            fstype = GetFileSystemType(emntstring, pofflist.at(i));
+            fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist);
 	    //fstype = GetFileSystemType(emntstring, pofflist.at(i));
 	    qDebug() << "fstype:" << fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
@@ -559,7 +593,7 @@ void ProcessVolume(QString evidstring)
 		ptreecnt++;
 	    }
 	    // add existing partition here...
-	    fstype = GetFileSystemType(emntstring, pofflist.at(i));
+	    fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist);
 	    qDebug() << "fstype:" << fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
 	    nodedata.clear();

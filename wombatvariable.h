@@ -54,6 +54,9 @@ struct FileSystemInfo
     uint32_t volserialnum; // volume serial number
     QString vollabel; // ASCII volume label
     QString fatlabel; // ASCI FAT/FAT12/FAT16
+    uint32_t fat32count; // FAT size in sectors
+    uint32_t rootdircluster; // cluster where root directory is located
+    uint16_t fsinfosector; // FSINFO sector location
 };
 
 /*
