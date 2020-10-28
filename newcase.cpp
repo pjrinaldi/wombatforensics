@@ -55,7 +55,6 @@ void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offse
 
 int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist)
 {
-    // NEED TO DETERMINE AND INDICATE VIRTUAL PARTITIONS SOMEWHERE... IT COULD SIMPLY BE THAT POFFLIST.COUNT() IS 0...
     //qDebug() << "estring:" << estring;
     QFile rawforimg(estring);
     if(!rawforimg.isOpen())
@@ -312,6 +311,7 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
     fsinfolist->append(fsinfo);
     return fstype;
 }
+// QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
 /*
 //QString GetFileSystemVolumeName(QString estring, int fstype)
@@ -558,7 +558,6 @@ void ProcessVolume(QString evidstring)
 		ptreecnt++;
 	    }
             fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist);
-	    //fstype = GetFileSystemType(emntstring, pofflist.at(i));
 	    qDebug() << "fstype:" << fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
             curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
@@ -660,208 +659,21 @@ void ProcessVolume(QString evidstring)
 	}
     }
     /*
-    QFileInfo efileinfo(emntstring);
-    qint64 imgsize = efileinfo.size();
-    QFile efile(emntstring);
-    if(!efile.isOpen())
-        efile.open(QIODevice::ReadOnly);
-    int hasntfs = 0;
-    int hasfat = 0;
-    QByteArray bootsector;
-    bootsector.clear();
-    if(efile.isOpen())
-    {
-        efile.seek(0);
-        bootsector = efile.read(512);
-        efile.seek(0);
-        QByteArray sigbuf = efile.read(8);
-        efile.seek(0x36);
-        QByteArray fatbuf = efile.read(3);
-        efile.close();
-        if(sigbuf.at(0) == (char)0xeb && sigbuf.at(1) == (char)0x52 && sigbuf.at(2) == (char)0x90 && sigbuf.at(3) == (char)0x4e && sigbuf.at(4) == (char)0x54 && sigbuf.at(5) == (char)0x46)
-            hasntfs = 1;
-        if(fatbuf.at(0) == (char)0x46 && fatbuf.at(1) == (char)0x41 && fatbuf.at(2) == (char)0x54)
-            hasfat = 1;
-    }
-    QList<QVariant> nodedata;
-    nodedata.clear();
-    nodedata << evidencename << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt));
-    mutex.lock();
-    treenodemodel->AddNode(nodedata, "-1", -1, -1);
-    mutex.unlock();
-    qDebug() << "emntstring:" << emntstring;
-    int isgpt = 0;
-    int ismbr = 0;
-    int voltype = 0;
-    int partcount = 0;
-    int fstype = 0;
-    uint32_t sectorbytes = 0;
-    QList<qint64> pofflist;
-    pofflist.clear();
-    QList<qint64> psizelist;
-    psizelist.clear();
-    libvsgpt_error_t* gpterror = NULL;
-    libvsmbr_error_t* mbrerror = NULL;
-    isgpt = libvsgpt_check_volume_signature(emntstring.toStdString().c_str(), &gpterror);
-    ismbr = libvsmbr_check_volume_signature(emntstring.toStdString().c_str(), &mbrerror);
-    if(isgpt == 1)
-        voltype = 1;
-    if(ismbr == 1 && isgpt == 0)
-    {
-        voltype = 2;
-        if(hasntfs || hasfat)
-            voltype = 0;
-    }
-    // implement other volume types such as apple, sun, and bsd...
-    //qDebug() << "volume type:" << voltype;
-    if(voltype == 1) // GPT
-    {
-        uint8_t guiddata = 0;
-        libvsgpt_volume_t* gptvolume = NULL;
-        libvsgpt_volume_initialize(&gptvolume, &gpterror);
-        libvsgpt_volume_open(gptvolume, emntstring.toStdString().c_str(), LIBVSGPT_ACCESS_FLAG_READ, &gpterror);
-        libvsgpt_volume_get_bytes_per_sector(gptvolume, &sectorbytes, &gpterror);
-        libvsgpt_volume_get_disk_identifier(gptvolume, &guiddata, 16, &gpterror);
-        libvsgpt_volume_get_number_of_partitions(gptvolume, &partcount, &gpterror);
-        //qDebug() << "volume:" << guiddata << "bytes per sector:" << sectorbytes << "part count:" << partcount;
-        for(int i=0; i < partcount; i++)
-        {
-            uint8_t parttype = 0;
-            off64_t partoffset = 0;
-            size64_t partsize = 0;
-            libvsgpt_partition_t* gptpart = NULL;
-            libvsgpt_volume_get_partition_by_index(gptvolume, i, &gptpart, &gpterror);
-            libvsgpt_partition_get_type(gptpart, &parttype, &gpterror);
-            libvsgpt_partition_get_volume_offset(gptpart, &partoffset, &gpterror);
-            libvsgpt_partition_get_size(gptpart, &partsize, &gpterror);
-            //qDebug() << "partiton:" << i << "part type:" << parttype << "part offset:" << partoffset << "part size:" << partsize;
-            libvsgpt_partition_free(&gptpart, &gpterror);
-            pofflist.append(partoffset);
-            psizelist.append(partsize);
-        }
-        libvsgpt_volume_close(gptvolume, &gpterror);
-        libvsgpt_volume_free(&gptvolume, &gpterror);
-    }
-    else if(voltype == 2)
-    {
-        libvsmbr_volume_t* mbrhandle = NULL;
-        libvsmbr_volume_initialize(&mbrhandle, &mbrerror);
-        libvsmbr_volume_open(mbrhandle, emntstring.toStdString().c_str(), LIBVSMBR_ACCESS_FLAG_READ, &mbrerror);
-        libvsmbr_volume_get_bytes_per_sector(mbrhandle, &sectorbytes, &mbrerror);
-        libvsmbr_volume_get_number_of_partitions(mbrhandle, &partcount, &mbrerror);
-        //qDebug() << "bytes per sector:" << sectorbytes << "partition count:" << partcount;
-        for(int i=0; i < partcount; i++)
-        {
-            size64_t partsize = 0;
-            off64_t partoffset = 0;
-            uint8_t parttype = 0;
-            libvsmbr_partition_t* mbrpart = NULL;
-            libvsmbr_volume_get_partition_by_index(mbrhandle, i, &mbrpart, &mbrerror);
-            libvsmbr_partition_get_volume_offset(mbrpart, &partoffset, &mbrerror);
-            libvsmbr_partition_get_size(mbrpart, &partsize, &mbrerror);
-            libvsmbr_partition_get_type(mbrpart, &parttype, &mbrerror);
-            libvsmbr_partition_free(&mbrpart, &mbrerror);
-            //qDebug() << "partition:" << i << "offset:" << partoffset << "size:" << partsize << "parttype:" << QString::number(parttype, 16);
-            pofflist.append(partoffset);
-            psizelist.append(partsize);
-        }
-        libvsmbr_volume_close(mbrhandle, &mbrerror);
-        libvsmbr_volume_free(&mbrhandle, &mbrerror);
-    }
-    else
-    {
-        qDebug() << "it's virtual...";
-        fstype = GetFileSystemType(emntstring, 0);
-        //qDebug() << "fstype:" << fstype;
-        QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, 0, 0);
-        //qDebug() << "fsvolname:" << fsvolname;
+        // ADD ManualCarved Folder HERE
+        treeout.clear();
+        treeout << QByteArray("$Carved-Verified").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-pc"); // should make -vc for VerifiedCarved
         nodedata.clear();
-        nodedata << fsvolname << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p0");
+        for(int i=0; i < treeout.count(); i++)
+            nodedata << treeout.at(i);
         mutex.lock();
-        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
         mutex.unlock();
-    }
-    int ptreecnt = 0;
-    for(int i=0; i < partcount; i++)
-    {
-        //qDebug() << "starting partition check...";
-        //qDebug() << "pofflist:" << pofflist << "psizelist:" << psizelist;
-        if(i == 0)
-        {
-            if(pofflist.at(i) > 0)
-            {
-                // add unalloc partition to tree here...
-                nodedata.clear();
-                nodedata << "UNALLOCATED" << "0" << QString::number(pofflist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-                mutex.lock();
-                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
-                mutex.unlock();
-                ptreecnt++;
-            }
-            fstype = GetFileSystemType(emntstring, pofflist.at(i));
-            //qDebug() << "fstype:" << fstype;
-            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
-            nodedata.clear();
-            nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-            mutex.lock();
-            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
-            mutex.unlock();
-            ptreecnt++;
-            //qDebug() << "1st partition which has unalloc before...";
-        }
-        if(i > 0 && i < partcount)
-        {
-            if(pofflist.at(i) > (pofflist.at(i-1) + psizelist.at(i-1) + sectorbytes))
-            {
-                // add between unalloc partition here...   
-                //qDebug() << "unalloc between 2 partitions exists...";
-                nodedata.clear();
-                nodedata << "UNALLOCATED" << "0" << QString::number(pofflist.at(i) - (pofflist.at(i-1) + psizelist.at(i-1))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-                mutex.lock();
-                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
-                mutex.unlock();
-                ptreecnt++;
-            }
-            fstype = GetFileSystemType(emntstring, pofflist.at(i));
-            //qDebug() << "fstype:" << fstype;
-            QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
-            nodedata.clear();
-            nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-            mutex.lock();
-            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
-            mutex.unlock();
-            // add existing partition here...
-            ptreecnt++;
-        }
-        if(i == partcount-1 && (pofflist.at(i) + psizelist.at(i)) < imgsize)
-        {
-            nodedata.clear();
-            nodedata << "UNALLOCATED" << "0" << QString::number(imgsize - (pofflist.at(i) + psizelist.at(i))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-            mutex.lock();
-            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
-            mutex.unlock();
-            //add final unalloc partition to tree here...
-            ptreecnt++;
-            //qDebug() << "unalloc exists after last partition...";
-        }
-    }
-                // ADD ManualCarved Folder HERE
-                treeout.clear();
-                treeout << QByteArray("$Carved-Verified").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-pc"); // should make -vc for VerifiedCarved
-                nodedata.clear();
-                for(int i=0; i < treeout.count(); i++)
-                    nodedata << treeout.at(i);
-                mutex.lock();
-                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
-                mutex.unlock();
-		nodedata.clear();
-		nodedata << QByteArray("$Carved-UnVerified").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-uc");
-		mutex.lock();
-		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
-		mutex.unlock();
-                */
-    //libvsgpt_error_free(&gpterror);
-    //libvsmbr_error_free(&mbrerror);
+	nodedata.clear();
+	nodedata << QByteArray("$Carved-UnVerified").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-uc");
+	mutex.lock();
+	treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
+	mutex.unlock();
+        */
 }
 
 void InitializeEvidenceStructure(QString evidname)
