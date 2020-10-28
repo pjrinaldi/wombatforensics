@@ -54,9 +54,25 @@ struct FileSystemInfo
     uint32_t volserialnum; // volume serial number
     QString vollabel; // ASCII volume label
     QString fatlabel; // ASCI FAT/FAT12/FAT16
-    uint32_t fat32count; // FAT size in sectors
+    uint32_t fat32size; // FAT size in sectors
     uint32_t rootdircluster; // cluster where root directory is located
     uint16_t fsinfosector; // FSINFO sector location
+};
+
+struct DirEntryInfo // 32 bytes
+{
+    uint8_t allocstatus; // first character of filename and/or allocation status
+    QString name; // 2-11 characters of filename
+    uint8_t attr; // bits
+    uint8_t createdtenths; // (tenths of seconds)
+    uint16_t createdtime; // housrs, minutes, seconds
+    uint16_t createday;
+    uint16_t accessday;
+    uint16_t highfirstclusteraddr; // high 2 bytes of first cluster address (0 for FAT12/16)
+    uint16_t writtentime;
+    uint16_t writeday;
+    uint16_t lowfirstclusteraddr; // low 2 bytes of first cluster address
+    uint32_t size; // 0 for directories
 };
 
 /*
@@ -89,6 +105,7 @@ typedef struct
 Q_DECLARE_METATYPE(WombatVariable);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);
 Q_DECLARE_METATYPE(FileSystemInfo);
+Q_DECLARE_METATYPE(DirEntryInfo);
 //Q_DECLARE_METATYPE(ntfsattrfname);
 //Q_DECLARE_METATYPE(ntfsindxrecord);
 

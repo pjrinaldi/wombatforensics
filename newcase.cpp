@@ -219,6 +219,7 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
     {
 	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
 	QString fatstr = QString::fromStdString(partbuf.mid(54, 5).toStdString());
+        QString fat32str = QString::fromStdString(partbuf.mid(82, 5).toStdString());
 	if(fatstr == "FAT12") // FAT12
         {
 	    fstype = 1; // FAT12
@@ -227,7 +228,7 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
         {
 	    fstype = 2; // FAT16
         }
-	else if(fatstr == "FAT32") // FAT32
+	else if(fat32str == "FAT32") // FAT32
         {
 	    fstype = 3; // FAT32
         }
@@ -239,7 +240,9 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
         {
 	    fstype = 5; // NTFS
         }
-        if(fatstr == "FAT12" || fatstr == "FAT16" || fatstr == "FAT32" || exfatstr == "EXFAT")
+        // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
+        // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
+        if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || exfatstr == "EXFAT")
         {
             fsinfo.bytespersector = qFromLittleEndian<uint16_t>(partbuf.mid(11, 2));
             fsinfo.sectorspercluster = partbuf.at(13);
@@ -250,24 +253,33 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
             fsinfo.mediatype = partbuf.at(21);
             fsinfo.fatsize = qFromLittleEndian<uint16_t>(partbuf.mid(22, 2));
             fsinfo.fs32sectorcnt = qFromLittleEndian<uint32_t>(partbuf.mid(32, 4));
+            int rootdirsectors = 0;
             if(fatstr == "FAT12" || fatstr == "FAT16")
             {
+                rootdirsectors = ((fsinfo.rootdirmaxfiles * 32) + (fsinfo.bytespersector - 1)) / fsinfo.bytespersector;
+                qDebug() << "rootdirsectors:" << rootdirsectors;
                 fsinfo.extbootsig = partbuf.at(38);
                 fsinfo.volserialnum = qFromLittleEndian<uint32_t>(partbuf.mid(39, 4));
                 fsinfo.vollabel = QString::fromStdString(partbuf.mid(43, 11).toStdString());
                 fsinfo.fatlabel = QString::fromStdString(partbuf.mid(54, 8).toStdString());
+                qDebug() << "reserved area size:" << fsinfo.reservedareasize << "fatcount:" << fsinfo.fatcount << "fatsize:" << fsinfo.fatsize;
+                qDebug() << "root dir start:" << fsinfo.reservedareasize + (fsinfo.fatcount * fsinfo.fatsize);
+                qDebug() << "cluster area/data start:" << fsinfo.reservedareasize + (fsinfo.fatcount * fsinfo.fatsize) + rootdirsectors;
             }
-            else if(fatstr == "FAT32")
+            else if(fat32str == "FAT32")
             {
                 fsinfo.extbootsig = partbuf.at(66);
                 fsinfo.volserialnum = qFromLittleEndian<uint32_t>(partbuf.mid(67, 4));
                 fsinfo.vollabel = QString::fromStdString(partbuf.mid(71, 11).toStdString());
                 fsinfo.fatlabel = QString::fromStdString(partbuf.mid(82, 8).toStdString());
-                fsinfo.fat32count = qFromLittleEndian<uint32_t>(partbuf.mid(36, 4));
+                fsinfo.fat32size = qFromLittleEndian<uint32_t>(partbuf.mid(36, 4));
                 fsinfo.rootdircluster = qFromLittleEndian<uint32_t>(partbuf.mid(44, 4));
-                /*
-                uint16_t fsinfosector; // FSINFO sector location
-                */ 
+                fsinfo.fsinfosector;
+                qDebug() << "reserved area size:" << fsinfo.reservedareasize << "fatcount:" << fsinfo.fatcount << "fatsize:" << fsinfo.fat32size;
+                qDebug() << "rootdirsectors:" << rootdirsectors;
+                qDebug() << "cluster area/data start (also root dir):" << fsinfo.reservedareasize + (fsinfo.fatcount * fsinfo.fat32size) + rootdirsectors;
+                // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
+                //qDebug() << "reserved areasize
             }
         }
     }
