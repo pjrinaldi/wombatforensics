@@ -567,10 +567,12 @@ void ProcessVolume(QString evidstring)
             if(pstatfile.isOpen())
             {
                 out.setDevice(&pstatfile);
+                //out << QString(fsinfolist.at(i).vollabel + " [" + fsinfolist.at(i).fatlabel.left(5) + "]") << "," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
                 out << "ALLOCATED," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
                 out.flush();
                 pstatfile.close();
             }
+            qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).vollabel << "[" << fsinfolist.at(i).fatlabel.left(5) << "]";
 	    nodedata.clear();
 	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
@@ -623,6 +625,7 @@ void ProcessVolume(QString evidstring)
                 out.flush();
                 pstatfile.close();
             }
+            qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).vollabel << "[" << fsinfolist.at(i).fatlabel.left(5) << "]";
 	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
