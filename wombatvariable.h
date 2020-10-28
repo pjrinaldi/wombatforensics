@@ -45,7 +45,7 @@ struct FileSystemInfo
     uint8_t sectorspercluster;
     uint16_t reservedareasize; // in sectors
     uint8_t fatcount;
-    uint16_t rootdirmaxfiles; // 0 for FAT32
+    uint16_t rootdirmaxfiles; // # of 32-byte directory entries in the root dir, 0 for FAT32, FAT16 should use 512
     uint16_t fssectorcnt; // 0 if need 4-byte value
     uint8_t mediatype;
     uint16_t fatsize; // FAT size in sectors for FAT/12/16, 0 for FAT32
@@ -55,8 +55,12 @@ struct FileSystemInfo
     QString vollabel; // ASCII volume label
     QString fatlabel; // ASCI FAT/FAT12/FAT16
     uint32_t fat32size; // FAT size in sectors
-    uint32_t rootdircluster; // cluster where root directory is located
+    uint32_t rootdircluster; // cluster where root directory is located (FAT32 only)
     uint16_t fsinfosector; // FSINFO sector location
+    int fstype; // fstype for filesystem
+    QString fstypestr; // fstype string
+    qint64 rootdiroffset; // offset to root directory
+    qint64 fatoffset; // offset to 1st FAT
 };
 
 struct DirEntryInfo // 32 bytes

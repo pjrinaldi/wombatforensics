@@ -190,12 +190,13 @@ int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<
     return 0;
 }
 
-// Possibly Rename to ParseFileSystemInformation(
+// Possibly Rename to void ParseFileSystemInformation(
 int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>* fsinfolist)
 {
     FileSystemInfo fsinfo;
+    // possibly add fsinfo.fstype to variable.
     qDebug() << "estring:" << estring << "partoffset:" << partoffset;
-    int fstype = 0;
+    //int fstype = 0;
     QByteArray partbuf;
     partbuf.clear();
     QFile efile(estring);
@@ -222,23 +223,28 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
         QString fat32str = QString::fromStdString(partbuf.mid(82, 5).toStdString());
 	if(fatstr == "FAT12") // FAT12
         {
-	    fstype = 1; // FAT12
+	    fsinfo.fstype = 1; // FAT12
+	    fsinfo.fstypestr = "FAT12";
         }
 	else if(fatstr == "FAT16") // FAT16
         {
-	    fstype = 2; // FAT16
+	    fsinfo.fstype = 2; // FAT16
+	    fsinfo.fstypestr = "FAT16";
         }
 	else if(fat32str == "FAT32") // FAT32
         {
-	    fstype = 3; // FAT32
+	    fsinfo.fstype = 3; // FAT32
+	    fsinfo.fstypestr = "FAT32";
         }
 	else if(exfatstr == "EXFAT") // EXFAT
         {
-	    fstype = 4; // EXFAT
+	    fsinfo.fstype = 4; // EXFAT
+	    fsinfo.fstypestr = "EXFAT";
         }
 	else if(exfatstr.startsWith("NTFS")) // NTFS
         {
-	    fstype = 5; // NTFS
+	    fsinfo.fstype = 5; // NTFS
+	    fsinfo.fstypestr = "NTFS";
         }
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
         // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
@@ -285,31 +291,32 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
     }
     else if(extsig == 0xef53) // EXT2/3/4
     {
-	fstype = 6; // EXT2/3/4
+	fsinfo.fstype = 6; // EXT2/3/4
     }
     else if(apfssig == "NXSB") // APFS Container
     {
-	fstype = 7; // APFS Container
+	fsinfo.fstype = 7; // APFS Container
     }
     else if(hfssig == "H+" || hfssig == "HX") // HFS+/HFSX
     {
-	fstype = 8; // HFS+/HFSX
+	fsinfo.fstype = 8; // HFS+/HFSX
     }
     else if(xfssig == "XFSB") // XFS
     {
-	fstype = 9; // XFS
+	fsinfo.fstype = 9; // XFS
     }
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
-	fstype = 10; // BTRFS
+	fsinfo.fstype = 10; // BTRFS
     }
     else if(bitlcksig == "-FVE-FS-") // BITLOCKER
     {
-        fstype = 11; // BITLOCKER
+        fsinfo.fstype = 11; // BITLOCKER
     }
     // need to implement iso, udf, hfs, zfs
     fsinfolist->append(fsinfo);
-    return fstype;
+    return 0;
+    //return fstype;
 }
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
@@ -557,8 +564,8 @@ void ProcessVolume(QString evidstring)
 		mutex.unlock();
 		ptreecnt++;
 	    }
-            fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist);
-	    qDebug() << "fstype:" << fstype;
+            fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist); // MIGHT NEED TO MOVE THIS OPERATION OUTSIDE THIS FOR LOOP AND GENERATE FSINFO, BUT MIGHT NOT
+	    qDebug() << "fstype:" << fsinfolist.at(i).fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
             curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
             dir.mkpath(curpartpath);
@@ -609,7 +616,7 @@ void ProcessVolume(QString evidstring)
 	    }
 	    // add existing partition here...
 	    fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist);
-	    qDebug() << "fstype:" << fstype;
+	    qDebug() << "fstype:" << fsinfolist.at(i).fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
 	    nodedata.clear();
 	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
