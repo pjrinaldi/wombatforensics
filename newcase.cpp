@@ -191,6 +191,7 @@ int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<
     return 0;
 }
 
+// Possibly Rename to ParseFileSystemInformation(
 int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>* fsinfolist)
 {
     FileSystemInfo fsinfo;
@@ -311,6 +312,7 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
     fsinfolist->append(fsinfo);
     return fstype;
 }
+//ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
 /*
 //QString GetFileSystemVolumeName(QString estring, int fstype)
 //QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset, size64_t partsize)
