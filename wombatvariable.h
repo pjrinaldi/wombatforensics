@@ -39,6 +39,7 @@ typedef struct
     tsk_lock_t readlock;
 } IMG_EWF_INFO;
 
+/*
 struct FileSystemInfo
 {
     uint16_t bytespersector;
@@ -78,7 +79,7 @@ struct DirEntryInfo // 32 bytes
     uint16_t lowfirstclusteraddr; // low 2 bytes of first cluster address
     uint32_t size; // 0 for directories
 };
-
+*/
 /*
 typedef struct
 {
@@ -108,8 +109,8 @@ typedef struct
 
 Q_DECLARE_METATYPE(WombatVariable);
 Q_DECLARE_METATYPE(IMG_EWF_INFO);
-Q_DECLARE_METATYPE(FileSystemInfo);
-Q_DECLARE_METATYPE(DirEntryInfo);
+//Q_DECLARE_METATYPE(FileSystemInfo);
+//Q_DECLARE_METATYPE(DirEntryInfo);
 //Q_DECLARE_METATYPE(ntfsattrfname);
 //Q_DECLARE_METATYPE(ntfsindxrecord);
 
