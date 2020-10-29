@@ -317,6 +317,21 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             }
             else if(fat32str == "FAT32")
             {
+                fsinfo.insert("extbootsig", QVariant(partbuf.at(66)));
+                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(67, 4))));
+                fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(71, 11).toStdString())));
+                fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(82, 8).toStdString())));
+                fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
+                fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(44, 4))));
+                //fsinfo.fsinfosector;
+                fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt()) + rootdirsectors) * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
+                qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
+                qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
+                qDebug() << "reserved area size:" << fsinfo.value("reservedareasize").toUInt() << "fatcount:" << fsinfo.value("fatcount").toUInt() << "fatsize:" << fsinfo.value("fat32size").toUInt();
+                qDebug() << "rootdirsectors:" << rootdirsectors;
+                qDebug() << "cluster area/data start (also root dir):" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt()) + rootdirsectors;
+                // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
                 /*
                 fsinfo.extbootsig = partbuf.at(66);
                 fsinfo.volserialnum = qFromLittleEndian<uint32_t>(partbuf.mid(67, 4));
