@@ -41,14 +41,12 @@ void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offse
 		{
 		    pofflist->append(offset+curoffset);
                     curoff = offset + curoffset;
-                    // ADD PARSEFILESYSTEMINFORMATION HERE AS WELL
 		    //qDebug() << "part[i]:" << i << "offset:" << offset + curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
 		}
 		else
 		{
 		    pofflist->append(primextoff + offset + curoffset);
                     curoff = primextoff + offset + curoffset;
-                    // ADD PARSEFILESYSTEMINFORMATION() HERE AS WELL
 		    //qDebug() << "part[i]:" << i << "offset:" << primextoff + offset + curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
 		}
 		psizelist->append(cursize);
@@ -60,7 +58,6 @@ void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offse
         //qDebug() << "i screwed up the math somewhere...";
 }
 
-//int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist) // would have to add &fsinfolist here...
 void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
 {
     //qDebug() << "estring:" << estring;
@@ -83,7 +80,6 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
                 rawforimg.open(QIODevice::ReadOnly);
             rawforimg.seek(512);
             QByteArray sector1 = rawforimg.read(512);
-            //QByteArray gptsectors = rawforimg.read(16384); // this should be determined from (partentrycount * partentrysize) for number of bytes to read...
             rawforimg.close();
 	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
 	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
@@ -107,7 +103,6 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 			pofflist->append(curstartsector);
 			psizelist->append((curendsector - curstartsector + 1));
                         ParseFileSystemInformation(estring, curstartsector, fsinfolist);
-                        // PLACE TO ADD PARSEFILESYSTEMINFORMATION()
 			//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
 		    }
 
@@ -152,7 +147,6 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 			pofflist->append(curoffset);
         		psizelist->append(cursize);
                         ParseFileSystemInformation(estring, curoffset, fsinfolist);
-                        // ADD PARSEFILESYSTEMINFORMATION HERE AS WELL
 			qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
 		    }
 		    else
@@ -196,15 +190,12 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 		pofflist->append(curstartsector);
 		psizelist->append((curendsector - curstartsector + 1));
                 ParseFileSystemInformation(estring, curstartsector,fsinfolist);
-                // add PARSEFILESYSTEMINFORMATION() HERE AS WELL
 		//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
 	    }
 	}
     }
-    //return 0;
 }
 
-//int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>* fsinfolist)
 void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash<QString, QVariant>> *fsinfolist)
 {
     QHash<QString, QVariant> fsinfo;
@@ -333,172 +324,10 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     }
     // need to implement iso, udf, hfs, zfs
     fsinfolist->append(fsinfo);
-    //return 0;
-    //return fstype;
 }
+
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
-/*
-//QString GetFileSystemVolumeName(QString estring, int fstype)
-//QString GetFileSystemVolumeName(QString estring, int fstype, off64_t partoffset, size64_t partsize)
-{
-    qDebug() << "partoffset:" << partoffset;
-    if(partoffset > 0)
-    {
-        QByteArray partbuf;
-        partbuf.clear();
-        QFile efile(estring);
-        if(!efile.isOpen())
-            efile.open(QIODevice::ReadOnly);
-        if(efile.isOpen())
-        {
-            efile.seek(partoffset);
-            partbuf = efile.read(partsize);
-            efile.close();
-        }
-        QString partsigfile = wombatvariable.tmpfilepath + "partsigfile";
-        QFile pfile(wombatvariable.tmpfilepath + "partsigfile");
-        if(!pfile.isOpen())
-            pfile.open(QIODevice::WriteOnly);
-        if(pfile.isOpen())
-        {
-            pfile.write(partbuf);
-            pfile.close();
-        }
-        estring = partsigfile;
-        // works, but it requires writing out full fs which could be big for a large image...
-        // need a different way to load what i need...
-        // write out file name for volumes based on offset..
-    }
-    */
-    //QString fsvolname = "";
-    /*
-    if(fstype == 0)
-    {
-        fsvolname = "NON-RECOGNIZED FS";
-    }
-    else if(fstype == 1) // APFS
-    {
-        // NEED TO DO CONTAINER'S AND VOLUMES OR JUST VOLUME
-        libfsapfs_error_t* apfserror = NULL;
-        libfsapfs_error_free(&apfserror);
-    }
-    else if(fstype == 2) // EXT(2,3,4)
-    {
-        libfsext_error_t* exterror = NULL;
-        libfsext_volume_t* extvol = NULL;
-        libfsext_volume_initialize(&extvol, &exterror);
-        libfsext_volume_open(extvol, estring.toStdString().c_str(), LIBFSEXT_ACCESS_FLAG_READ, &exterror);
-        size_t vollabelsize = 0;
-        libfsext_volume_get_utf8_label_size(extvol, &vollabelsize, &exterror);
-        uint8_t vollabel[vollabelsize];
-        libfsext_volume_get_utf8_label(extvol, vollabel, vollabelsize, &exterror);
-        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(vollabel));
-        uint8_t formatversion;
-        libfsext_volume_get_format_version(extvol, &formatversion, &exterror);
-        fsvolname = fsvolname + " [EXT" + QString::number(formatversion) + "]";
-        libfsext_volume_close(extvol, &exterror);
-        libfsext_volume_free(&extvol, &exterror);
-        libfsext_error_free(&exterror);
-    }
-    else if(fstype == 3) // HFS(+)
-    {
-        libfshfs_volume_t* hfsvol = NULL;
-        libfshfs_error_t* hfserr = NULL;
-        libfshfs_volume_initialize(&hfsvol, &hfserr);
-        libfshfs_volume_open(hfsvol, estring.toStdString().c_str(), LIBFSHFS_ACCESS_FLAG_READ, &hfserr);
-        size_t volnamesize = 0;
-        libfshfs_volume_get_utf8_name_size(hfsvol, &volnamesize, &hfserr);
-        uint8_t volname[volnamesize];
-        libfshfs_volume_get_utf8_name(hfsvol, volname, volnamesize, &hfserr);
-        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(volname));
-        fsvolname = fsvolname + " [HFS]";
-        libfshfs_volume_close(hfsvol, &hfserr);
-        libfshfs_volume_free(&hfsvol, &hfserr);
-        libfshfs_error_free(&hfserr);
-    }
-    else if(fstype == 4) // NTFS
-    {
-        libfsntfs_volume_t* ntfsvol = NULL;
-        libfsntfs_error_t* ntfserror = NULL;
-        libfsntfs_volume_initialize(&ntfsvol, &ntfserror);
-        libfsntfs_volume_open(ntfsvol, estring.toStdString().c_str(), LIBFSNTFS_ACCESS_FLAG_READ, &ntfserror);
-        size_t volnamesize = 0;
-        libfsntfs_volume_get_utf8_name_size(ntfsvol, &volnamesize, &ntfserror);
-        uint8_t volname[volnamesize];
-        libfsntfs_volume_get_utf8_name(ntfsvol, volname, volnamesize, &ntfserror);
-        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(volname));
-        fsvolname = fsvolname + " [NTFS]";
-        libfsntfs_volume_close(ntfsvol, &ntfserror);
-        libfsntfs_volume_free(&ntfsvol, &ntfserror);
-        libfsntfs_error_free(&ntfserror);
-    }
-    else if(fstype == 5) // REFS
-    {
-        libfsrefs_volume_t* refsvol = NULL;
-        libfsrefs_error_t* refserr = NULL;
-        libfsrefs_volume_initialize(&refsvol, &refserr);
-        libfsrefs_volume_open(refsvol, estring.toStdString().c_str(), LIBFSREFS_ACCESS_FLAG_READ, &refserr);
-        size_t volnamesize = 0;
-        libfsrefs_volume_get_utf8_name_size(refsvol, &volnamesize, &refserr);
-        uint8_t volname[volnamesize];
-        libfsrefs_volume_get_utf8_name(refsvol, volname, volnamesize, &refserr);
-        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(volname));
-        fsvolname = fsvolname + " [REFS]";
-        libfsrefs_volume_close(refsvol, &refserr);
-        libfsrefs_volume_free(&refsvol, &refserr);
-        libfsrefs_error_free(&refserr);
-    }
-    else if(fstype == 6) // XFS
-    {
-        libfsxfs_volume_t* xfsvol = NULL;
-        libfsxfs_error_t* xfserr = NULL;
-        libfsxfs_volume_initialize(&xfsvol, &xfserr);
-        libfsxfs_volume_open(xfsvol, estring.toStdString().c_str(), LIBFSXFS_ACCESS_FLAG_READ, &xfserr);
-        size_t vollabelsize = 0;
-        libfsxfs_volume_get_utf8_label_size(xfsvol, &vollabelsize, &xfserr);
-        uint8_t vollabel[vollabelsize];
-        libfsxfs_volume_get_utf8_label(xfsvol, vollabel, vollabelsize, &xfserr);
-        fsvolname = QString::fromUtf8(reinterpret_cast<char*>(vollabel));
-        fsvolname = fsvolname + " [XFS]";
-        libfsxfs_volume_close(xfsvol, &xfserr);
-        libfsxfs_volume_free(&xfsvol, &xfserr);
-        libfsxfs_error_free(&xfserr);
-    }
-    else if(fstype == 7 || fstype == 8 || fstype == 9) // FAT12 | FAT16 | FAT32
-    {
-        QFile efile(estring);
-        if(!efile.isOpen())
-            efile.open(QIODevice::ReadOnly);
-        if(efile.isOpen())
-        {
-            efile.seek(0x36);
-            QByteArray vollabel = efile.read(8);
-            fsvolname = QString::fromStdString(vollabel.toStdString());
-            efile.close();
-        }
-        if(fstype == 7)
-            fsvolname += " [FAT12]";
-        else if(fstype == 8)
-            fsvolname += " [FAT16]";
-        else if(fstype == 9)
-            fsvolname += " [FAT32]";
-    }
-    else if(fstype == 10) // EXFAT
-    {
-        QFile efile(estring);
-        if(!efile.isOpen())
-            efile.open(QIODevice::ReadOnly);
-        if(efile.isOpen())
-        {
-            efile.seek(0x03);
-            QByteArray vollabel = efile.read(8);
-            efile.close();
-        }
-        fsvolname += " [EXFAT]";
-    }
-    return fsvolname;
-}*/
 
 void ProcessVolume(QString evidstring)
 {
@@ -561,10 +390,8 @@ void ProcessVolume(QString evidstring)
     //int fstype = 0;
     for(int i=0; i < pofflist.count(); i++)
     {
-        // might want to move this up into ParseVolume, then i gather all info above and can just pull the info i need to output what i need...
         // might want to also look at having a single stat for all parts/fs and one for all files for each part/fs..
         // probably should write tree out to a file for easy loading on case open...
-        //ParseFileSystemInformation(emntstring, pofflist.at(i), &fsinfolist);
 	if(i == 0) // INITIAL PARTITION
 	{
 	    if(pofflist.at(i)*512 > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
@@ -589,9 +416,6 @@ void ProcessVolume(QString evidstring)
 		mutex.unlock();
 		ptreecnt++;
 	    }
-            //fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist); // MIGHT NEED TO MOVE THIS OPERATION OUTSIDE THIS FOR LOOP AND GENERATE FSINFO, BUT MIGHT NOT
-	    //qDebug() << "fstype:" << fsinfolist.at(i).fstype;
-	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
             curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
             dir.mkpath(curpartpath);
             pstatfile.setFileName(curpartpath + "stat");
@@ -600,16 +424,17 @@ void ProcessVolume(QString evidstring)
             if(pstatfile.isOpen())
             {
                 out.setDevice(&pstatfile);
+                // FOR OUT STAT FILE, MAYBE I SHOULD JUST LOOP OVER THE HASH PROPERTIES AND STORE THEM ALL IN A COMMA LIST... OR A NAME|VALUE, LIST
+                // OR I CAN FIGURE OUT WHAT I NEED FOR EACH FILE TYPE AND GENERATE STRING ACCORDINGLY THROUGH A FUNCTION... QString GetFileSystemOutString(fsinfolist.at(i));
                 //out << QString(fsinfolist.at(i).vollabel + " [" + fsinfolist.at(i).fatlabel.left(5) + "]") << "," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
                 out << "ALLOCATED," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
                 out.flush();
                 pstatfile.close();
             }
-            qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).value("vollabel").toString() << "[" << fsinfolist.at(i).value("typestr").toString() << "]";
-            //qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).vollabel << "[" << fsinfolist.at(i).fatlabel.left(5) << "]";
+            //qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).value("vollabel").toString() << "[" << fsinfolist.at(i).value("typestr").toString() << "]";
 	    nodedata.clear();
-	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    nodedata << QString(fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]") << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    //nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 	    mutex.unlock();
@@ -641,9 +466,6 @@ void ProcessVolume(QString evidstring)
 		ptreecnt++;
 	    }
 	    // add existing partition here...
-	    //fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist);
-	    //qDebug() << "fstype:" << fsinfolist.at(i).fstype;
-	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
 	    nodedata.clear();
 	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
             curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
@@ -659,9 +481,9 @@ void ProcessVolume(QString evidstring)
                 out.flush();
                 pstatfile.close();
             }
-            qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).value("vollabel").toString() << "[" << fsinfolist.at(i).value("typestr").toString() << "]";
-            //qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).vollabel << "[" << fsinfolist.at(i).fatlabel.left(5) << "]";
-	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+            //qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).value("vollabel").toString() << "[" << fsinfolist.at(i).value("typestr").toString() << "]";
+	    nodedata << QString(fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]") << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    //nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 	    mutex.unlock();

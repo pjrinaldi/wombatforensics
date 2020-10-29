@@ -9,28 +9,11 @@
 #include "tskcpp.h"
 #include "properties.h"
 #include "wombatfunctions.h"
-/*#include "libvsmbr.h"
-#include "libvsgpt.h"
-#include "libfsapfs.h"
-#include "libfsext.h"
-#include "libfshfs.h"
-#include "libfsntfs.h"
-#include "libfsrefs.h"
-#include "libfsxfs.h"
-*/
 
 void ProcessVolume(QString evidstring);
-//int ParseVolume(QString estring, qint64 imgsize, QList<qint64> *offlist, QList<qint64> *sizlist);
 void ParseVolume(QString estring, qint64 imgsize, QList<qint64> *offlist, QList<qint64> *sizlist, QList<QHash<QString, QVariant>> *fsinfolist);
 void ParseExtendedPartition(QString estring, uint32_t primaryextendedoffset, uint32_t offset, uint32_t size, QList<qint64>* offlist, QList<qint64>* sizelist, QList<QHash<QString, QVariant>>* fsinfolist);
 void ParseFileSystemInformation(QString estring, off64_t offset, QList<QHash<QString, QVariant>> *fsinfolist);
-//int GetFileSystemType(QString estring, off64_t offset, QList<FileSystemInfo> *fsinfolist);
-/*
-//int GetFileSystemType(QString estring);
-int GetFileSystemType(QString estring, off64_t offset);
-//QString GetFileSystemVolumeName(QString estring, int fstype);
-QString GetFileSystemVolumeName(QString estring, int fstype, off64_t offset, size64_t psize);
-*/
 void InitializeEvidenceStructure(QString evidstring);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 
