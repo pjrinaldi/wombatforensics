@@ -190,10 +190,12 @@ int ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<
     return 0;
 }
 
-// Possibly Rename to void ParseFileSystemInformation(
-int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>* fsinfolist)
+//int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>* fsinfolist)
+void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash<QString, QVariant>> *fsinfolist)
 {
-    FileSystemInfo fsinfo;
+    // May want to switch it to a QList<QMap<QString, QVariant>>, then i can store what i want and not take up space with a ton of required variabiles that are empty...
+    QHash<QString, QVariant> fsinfo;
+    //FileSystemInfo fsinfo;
     // possibly add fsinfo.fstype to variable.
     qDebug() << "estring:" << estring << "partoffset:" << partoffset;
     //int fstype = 0;
@@ -223,33 +225,53 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
         QString fat32str = QString::fromStdString(partbuf.mid(82, 5).toStdString());
 	if(fatstr == "FAT12") // FAT12
         {
-	    fsinfo.fstype = 1; // FAT12
-	    fsinfo.fstypestr = "FAT12";
+            fsinfo.insert("type", QVariant(1));
+            fsinfo.insert("typestr", QVariant("FAT12"));
+	    //fsinfo.fstype = 1; // FAT12
+	    //fsinfo.fstypestr = "FAT12";
         }
 	else if(fatstr == "FAT16") // FAT16
         {
-	    fsinfo.fstype = 2; // FAT16
-	    fsinfo.fstypestr = "FAT16";
+            fsinfo.insert("type", QVariant(2));
+            fsinfo.insert("typestr", QVariant("FAT16"));
+	    //fsinfo.fstype = 2; // FAT16
+	    //fsinfo.fstypestr = "FAT16";
         }
 	else if(fat32str == "FAT32") // FAT32
         {
-	    fsinfo.fstype = 3; // FAT32
-	    fsinfo.fstypestr = "FAT32";
+            fsinfo.insert("type", QVariant(3));
+            fsinfo.insert("typestr", QVariant("FAT32"));
+	    //fsinfo.fstype = 3; // FAT32
+	    //fsinfo.fstypestr = "FAT32";
         }
 	else if(exfatstr == "EXFAT") // EXFAT
         {
-	    fsinfo.fstype = 4; // EXFAT
-	    fsinfo.fstypestr = "EXFAT";
+            fsinfo.insert("type", QVariant(4));
+            fsinfo.insert("typestr", QVariant("EXFAT"));
+	    //fsinfo.fstype = 4; // EXFAT
+	    //fsinfo.fstypestr = "EXFAT";
         }
 	else if(exfatstr.startsWith("NTFS")) // NTFS
         {
-	    fsinfo.fstype = 5; // NTFS
-	    fsinfo.fstypestr = "NTFS";
+            fsinfo.insert("type", QVariant(5));
+            fsinfo.insert("typestr", QVariant("NTFS"));
+	    //fsinfo.fstype = 5; // NTFS
+	    //fsinfo.fstypestr = "NTFS";
         }
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
         // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
         if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || exfatstr == "EXFAT")
         {
+            fsinfo.insert("bytespersector", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(11, 2))));
+            fsinfo.insert("sectorspercluster", QVariant(partbuf.at(13)));
+            fsinfo.insert("reservedareasize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(14, 2))));
+            fsinfo.insert("fatcount", QVariant(partbuf.at(16)));
+            fsinfo.insert("rootdirmaxfiles", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(17, 2))));
+            fsinfo.insert("fssectorcnt", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(19, 2))));
+            fsinfo.insert("mediatype", QVariant(partbuf.at(21)));
+            fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(22, 2))));
+            fsinfo.insert("fs32sectorcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(32, 4))));
+            /*
             fsinfo.bytespersector = qFromLittleEndian<uint16_t>(partbuf.mid(11, 2));
             fsinfo.sectorspercluster = partbuf.at(13);
             fsinfo.reservedareasize = qFromLittleEndian<uint16_t>(partbuf.mid(14, 2));
@@ -259,63 +281,89 @@ int GetFileSystemType(QString estring, off64_t partoffset, QList<FileSystemInfo>
             fsinfo.mediatype = partbuf.at(21);
             fsinfo.fatsize = qFromLittleEndian<uint16_t>(partbuf.mid(22, 2));
             fsinfo.fs32sectorcnt = qFromLittleEndian<uint32_t>(partbuf.mid(32, 4));
+            */
             int rootdirsectors = 0;
             if(fatstr == "FAT12" || fatstr == "FAT16")
             {
+                rootdirsectors = ((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt();
+                //qDebug() << "rootdirsectors:" << rootdirsectors;
+                fsinfo.insert("extbootsig", QVariant(partbuf.at(38)));
+                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(39, 4))));
+                qDebug() << "volserialnum:" << QString("0x" + QString::number(fsinfo.value("volserialnum").toUInt(), 16));
+                fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(43, 11).toStdString())));
+                fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
+                fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
+                qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
+                qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
+                qDebug() << "reserved area size:" << fsinfo.value("reservedareasize").toUInt() << "fatcount:" << fsinfo.value("fatcount").toUInt() << "fatsize:" << fsinfo.value("fatsize").toUInt();
+                qDebug() << "root dir start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt());
+                qDebug() << "cluster area/data start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + rootdirsectors;
+                /*
                 rootdirsectors = ((fsinfo.rootdirmaxfiles * 32) + (fsinfo.bytespersector - 1)) / fsinfo.bytespersector;
-                qDebug() << "rootdirsectors:" << rootdirsectors;
                 fsinfo.extbootsig = partbuf.at(38);
                 fsinfo.volserialnum = qFromLittleEndian<uint32_t>(partbuf.mid(39, 4));
                 fsinfo.vollabel = QString::fromStdString(partbuf.mid(43, 11).toStdString());
                 fsinfo.fatlabel = QString::fromStdString(partbuf.mid(54, 8).toStdString());
+                fsinfo.rootdiroffset = (fsinfo.reservedareasize + (fsinfo.fatcount * fsinfo.fatsize)) * fsinfo.bytespersector;
+                fsinfo.fatoffset = fsinfo.reservedareasize * fsinfo.bytespersector;
+                qDebug() << "rootdiroffset:" << fsinfo.rootdiroffset << fsinfo.rootdiroffset/fsinfo.bytespersector;
+                qDebug() << "fatoffset:" << fsinfo.fatoffset << fsinfo.fatoffset/fsinfo.bytespersector;
                 qDebug() << "reserved area size:" << fsinfo.reservedareasize << "fatcount:" << fsinfo.fatcount << "fatsize:" << fsinfo.fatsize;
                 qDebug() << "root dir start:" << fsinfo.reservedareasize + (fsinfo.fatcount * fsinfo.fatsize);
                 qDebug() << "cluster area/data start:" << fsinfo.reservedareasize + (fsinfo.fatcount * fsinfo.fatsize) + rootdirsectors;
+                */
             }
             else if(fat32str == "FAT32")
             {
+                /*
                 fsinfo.extbootsig = partbuf.at(66);
                 fsinfo.volserialnum = qFromLittleEndian<uint32_t>(partbuf.mid(67, 4));
                 fsinfo.vollabel = QString::fromStdString(partbuf.mid(71, 11).toStdString());
                 fsinfo.fatlabel = QString::fromStdString(partbuf.mid(82, 8).toStdString());
                 fsinfo.fat32size = qFromLittleEndian<uint32_t>(partbuf.mid(36, 4));
                 fsinfo.rootdircluster = qFromLittleEndian<uint32_t>(partbuf.mid(44, 4));
-                fsinfo.fsinfosector;
+                //fsinfo.fsinfosector;
+                fsinfo.rootdiroffset = (fsinfo.reservedareasize + (fsinfo.fatcount * fsinfo.fat32size) + rootdirsectors) * fsinfo.bytespersector;
+                fsinfo.fatoffset = fsinfo.reservedareasize * fsinfo.bytespersector;
+                qDebug() << "rootdiroffset:" << fsinfo.rootdiroffset << fsinfo.rootdiroffset/fsinfo.bytespersector;
+                qDebug() << "fatoffset:" << fsinfo.fatoffset << fsinfo.fatoffset/fsinfo.bytespersector;
                 qDebug() << "reserved area size:" << fsinfo.reservedareasize << "fatcount:" << fsinfo.fatcount << "fatsize:" << fsinfo.fat32size;
                 qDebug() << "rootdirsectors:" << rootdirsectors;
                 qDebug() << "cluster area/data start (also root dir):" << fsinfo.reservedareasize + (fsinfo.fatcount * fsinfo.fat32size) + rootdirsectors;
                 // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
                 //qDebug() << "reserved areasize
+                */
             }
         }
     }
     else if(extsig == 0xef53) // EXT2/3/4
     {
-	fsinfo.fstype = 6; // EXT2/3/4
+	//fsinfo.fstype = 6; // EXT2/3/4
     }
     else if(apfssig == "NXSB") // APFS Container
     {
-	fsinfo.fstype = 7; // APFS Container
+	//fsinfo.fstype = 7; // APFS Container
     }
     else if(hfssig == "H+" || hfssig == "HX") // HFS+/HFSX
     {
-	fsinfo.fstype = 8; // HFS+/HFSX
+	//fsinfo.fstype = 8; // HFS+/HFSX
     }
     else if(xfssig == "XFSB") // XFS
     {
-	fsinfo.fstype = 9; // XFS
+	//fsinfo.fstype = 9; // XFS
     }
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
-	fsinfo.fstype = 10; // BTRFS
+	//fsinfo.fstype = 10; // BTRFS
     }
     else if(bitlcksig == "-FVE-FS-") // BITLOCKER
     {
-        fsinfo.fstype = 11; // BITLOCKER
+        //fsinfo.fstype = 11; // BITLOCKER
     }
     // need to implement iso, udf, hfs, zfs
     fsinfolist->append(fsinfo);
-    return 0;
+    //return 0;
     //return fstype;
 }
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
@@ -488,7 +536,8 @@ void ProcessVolume(QString evidstring)
     pofflist.clear();
     QList<qint64> psizelist;
     psizelist.clear();
-    QList<FileSystemInfo> fsinfolist;
+    //QList<FileSystemInfo> fsinfolist;
+    QList<QHash<QString, QVariant>> fsinfolist;
     fsinfolist.clear();
     qint64 imgsize = 0;
     // if evidstring .exists, then we find dir with evidstring in it and split at evidstring -e
@@ -537,9 +586,10 @@ void ProcessVolume(QString evidstring)
     QString curpartpath;
     QDir dir;
     QFile pstatfile;
-    int fstype = 0;
+    //int fstype = 0;
     for(int i=0; i < pofflist.count(); i++)
     {
+        ParseFileSystemInformation(emntstring, pofflist.at(i), &fsinfolist);
 	if(i == 0) // INITIAL PARTITION
 	{
 	    if(pofflist.at(i)*512 > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
@@ -564,8 +614,8 @@ void ProcessVolume(QString evidstring)
 		mutex.unlock();
 		ptreecnt++;
 	    }
-            fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist); // MIGHT NEED TO MOVE THIS OPERATION OUTSIDE THIS FOR LOOP AND GENERATE FSINFO, BUT MIGHT NOT
-	    qDebug() << "fstype:" << fsinfolist.at(i).fstype;
+            //fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist); // MIGHT NEED TO MOVE THIS OPERATION OUTSIDE THIS FOR LOOP AND GENERATE FSINFO, BUT MIGHT NOT
+	    //qDebug() << "fstype:" << fsinfolist.at(i).fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
             curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
             dir.mkpath(curpartpath);
@@ -580,7 +630,7 @@ void ProcessVolume(QString evidstring)
                 out.flush();
                 pstatfile.close();
             }
-            qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).vollabel << "[" << fsinfolist.at(i).fatlabel.left(5) << "]";
+            //qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).vollabel << "[" << fsinfolist.at(i).fatlabel.left(5) << "]";
 	    nodedata.clear();
 	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
@@ -615,8 +665,8 @@ void ProcessVolume(QString evidstring)
 		ptreecnt++;
 	    }
 	    // add existing partition here...
-	    fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist);
-	    qDebug() << "fstype:" << fsinfolist.at(i).fstype;
+	    //fstype = GetFileSystemType(emntstring, pofflist.at(i), &fsinfolist);
+	    //qDebug() << "fstype:" << fsinfolist.at(i).fstype;
 	    //QString fsvolname = GetFileSystemVolumeName(emntstring, fstype, pofflist.at(i), psizelist.at(i));
 	    nodedata.clear();
 	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
@@ -633,7 +683,7 @@ void ProcessVolume(QString evidstring)
                 out.flush();
                 pstatfile.close();
             }
-            qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).vollabel << "[" << fsinfolist.at(i).fatlabel.left(5) << "]";
+            //qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).vollabel << "[" << fsinfolist.at(i).fatlabel.left(5) << "]";
 	    nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);

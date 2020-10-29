@@ -22,7 +22,8 @@
 void ProcessVolume(QString evidstring);
 int ParseVolume(QString estring, qint64 imgsize, QList<qint64> *offlist, QList<qint64> *sizlist);
 void ParseExtendedPartition(QString estring, uint32_t primaryextendedoffset, uint32_t offset, uint32_t size, QList<qint64>* offlist, QList<qint64>* sizelist);
-int GetFileSystemType(QString estring, off64_t offset, QList<FileSystemInfo> *fsinfolist);
+void ParseFileSystemInformation(QString estring, off64_t offset, QList<QHash<QString, QVariant>> *fsinfolist);
+//int GetFileSystemType(QString estring, off64_t offset, QList<FileSystemInfo> *fsinfolist);
 /*
 //int GetFileSystemType(QString estring);
 int GetFileSystemType(QString estring, off64_t offset);
