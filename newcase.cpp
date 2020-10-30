@@ -274,7 +274,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             {
                 efile.seek(fsinfo.value("mftoffset").toUInt());
                 mftentry0 = efile.read(mftentrybytes);
-		efile.seek(fsinfo.value("mftoffset").toUInt() + 3 * 1024);
+		efile.seek(fsinfo.value("mftoffset").toUInt() + 3 * mftentrybytes);
 		mftentry3 = efile.read(mftentrybytes);
                 efile.close();
             }
@@ -335,10 +335,36 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			break;
 		    //break;
 		}
-		qDebug() << "MFT ENTRY FOR $VOLUME SIGNATURE:" << QString::fromStdString(mftentry3.left(4).toStdString());
             }
             else
                 qDebug() << "error this is not a valid MFT ENTRY...";
+	    qDebug() << "MFT ENTRY FOR $VOLUME SIGNATURE:" << QString::fromStdString(mftentry3.left(4).toStdString());
+	    if(QString::fromStdString(mftentry3.left(4).toStdString()) == "FILE") // a proper mft entry
+	    {
+		int curoffset = 0;
+                uint16_t firstattroffset = qFromLittleEndian<uint16_t>(mftentry3.mid(20, 2)); // offset to first attribute
+                //uint32_t mftentryusedsize = qFromLittleEndian<uint32_t>(mftentry0.mid(24, 4)); // mft entry used size
+                uint16_t attrcount = qFromLittleEndian<uint16_t>(mftentry3.mid(40, 2)); // next attribute id
+		uint32_t attrlength = 0;
+                qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
+                curoffset = firstattroffset;
+                for(int i=0; i < attrcount; i++)
+                {
+                    uint32_t atrtype = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset, 4)); // attribute type
+                    //uint8_t namelength = qFromLittleEndian<uint8_t>(mftentry3.mid(curoffset + 9, 1)); // length of name
+                    attrlength = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset + 4, 4)); // attribute length
+                    qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
+		    if(atrtype == 96) // $DATA attribute to parse
+		    {
+			break;
+		    }
+                    curoffset += attrlength;
+                }
+		qDebug() << "curoffset of $Volume attribute:" << curoffset;
+		qDebug() << "volume name attr length:" << attrlength;
+		QString volnamestr = QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset, attrlength).data()));
+		qDebug() << "volnamestr:" << volnamestr;
+	    }
         }
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
         // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
