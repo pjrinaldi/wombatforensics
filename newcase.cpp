@@ -256,6 +256,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             fsinfo.insert("mftstartingcluster", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(48, 8))));
             qDebug() << "MFT starting cluster:" << fsinfo.value("mftstartingcluster").toUInt();
             fsinfo.insert("mftentrysize", QVariant(partbuf.at(64)));
+	    unsigned int mftentrybytes = fsinfo.value("mftentrysize").toUInt() * fsinfo.value("bytespersector").toUInt() * fsinfo.value("sectorspercluster").toUInt();
+	    qDebug() << "mft entry size in bytes:" << mftentrybytes;
             fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
             fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
             qDebug() << "serial num:" << QString("0x" + QString::number(fsinfo.value("serialnum").toULongLong(), 16));
@@ -263,14 +265,17 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toUInt();
             // get MFT entry for $MFT to determine cluster's that contain the MFT...
             QByteArray mftentry0;
+	    QByteArray mftentry3;
             mftentry0.clear();
+	    mftentry3.clear();
             if(!efile.isOpen())
                 efile.open(QIODevice::ReadOnly);
             if(efile.isOpen())
             {
                 efile.seek(fsinfo.value("mftoffset").toUInt());
-                mftentry0 = efile.read(1024);
-                //partbuf = efile.read(69120);
+                mftentry0 = efile.read(mftentrybytes);
+		efile.seek(fsinfo.value("mftoffset").toUInt() + 3 * 1024);
+		mftentry3 = efile.read(mftentrybytes);
                 efile.close();
             }
             qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
@@ -278,61 +283,62 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             {
                 int curoffset = 0;
                 uint16_t firstattroffset = qFromLittleEndian<uint16_t>(mftentry0.mid(20, 2)); // offset to first attribute
-                uint32_t mftentryusedsize = qFromLittleEndian<uint32_t>(mftentry0.mid(24, 4)); // mft entry used size
+                //uint32_t mftentryusedsize = qFromLittleEndian<uint32_t>(mftentry0.mid(24, 4)); // mft entry used size
                 uint16_t attrcount = qFromLittleEndian<uint16_t>(mftentry0.mid(40, 2)); // next attribute id
+		uint32_t attrlength = 0;
                 qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
                 curoffset = firstattroffset;
                 for(int i=0; i < attrcount; i++)
                 {
                     uint32_t atrtype = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset, 4)); // attribute type
                     uint8_t namelength = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset + 9, 1)); // length of name
-                    uint32_t attrlength = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset + 4, 4)); // attribute length
-                    qDebug() << "attr type:" << atrtype;
+                    attrlength = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset + 4, 4)); // attribute length
+                    qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
+		    if(atrtype == 128 && namelength == 0) // $DATA attribute to parse
+		    {
+			break;
+		    }
                     curoffset += attrlength;
                 }
+		qDebug() << "curoffset of $Data attribute:" << curoffset;
+		uint64_t vcnstart = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 16, 8));
+		uint64_t vcnend = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 24, 8));
+		uint16_t runlistoff = qFromLittleEndian<uint16_t>(mftentry0.mid(curoffset + 32, 2));
+		//uint16_t compressszunit = qFromLittleEndian<uint16_t>(mftentry0.mid(curoffset + 34, 2));
+		uint64_t actualattrcontentsize = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 48, 8));
+		qDebug() << "Starting VCN:" << vcnstart << "Ending VCN:" << vcnend;
+		qDebug() << "attrlength:" << attrlength << "runlistoff:" << runlistoff << "actual attr content size:" << actualattrcontentsize;
+		curoffset = curoffset + runlistoff;
+		qDebug() << "run list start curoffset:" << curoffset;
+		int i=0;
+		while(curoffset < mftentrybytes) // might have to do a while < mftentrybytes and then go from there.... to build the curoffset = curoffset + 3, 4, etc...
+		{
+		    if(mftentry0.at(curoffset) > 0)
+		    {
+			qDebug() << "1st byte:" << QString::number(mftentry0.at(curoffset), 16);
+			int runlengthbytes = QString(QString::number(mftentry0.at(curoffset), 16).at(1)).toInt();
+			int runlengthoffset = QString(QString::number(mftentry0.at(curoffset), 16).at(0)).toInt();
+			if(runlengthbytes == 0 && runlengthoffset == 0)
+			    break;
+			curoffset++;
+			qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
+			int runlength = qFromLittleEndian<int>(mftentry0.mid(curoffset, runlengthbytes));
+			int runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+			qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
+			i++;
+			curoffset += runlengthbytes + runlengthoffset;
+			qDebug() << "current offset after run [" << i-1 << "]" << curoffset;
+			qDebug() << "mft byte start:" << runoffset * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
+			qDebug() << "mft byte count:" << runlength * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
+		    }
+		    else
+			break;
+		    //break;
+		}
+		qDebug() << "MFT ENTRY FOR $VOLUME SIGNATURE:" << QString::fromStdString(mftentry3.left(4).toStdString());
             }
             else
                 qDebug() << "error this is not a valid MFT ENTRY...";
-            /*
-             *
-             *      curoffset = 0;
-		    mftoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(20, 2)); // offset to first attribute
-		    uint16_t attrcnt = qFromLittleEndian<uint16_t>(resbuffer.mid(40, 2)); // next attribute id
-		    curoffset += mftoffset;
-		    // Loop over attributes...
-                    for(uint i = 0; i < attrcnt; i++)
-                    {
-			atrtype = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset, 4)); // attribute type
-			namelength = qFromLittleEndian<uint8_t>(resbuffer.mid(curoffset + 9, 1)); // length of name
-			attrlength = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset + 4, 4)); // attribute length
-		        if(isdir && atrtype == 144)
-                        {
-			    break;
-                        }
-		        if(!isdir && isads && namelength > 0 && atrtype == 128)
-                        {
-			    break;
-                        }
-		        else if(!isdir && !isads && namelength == 0 && atrtype == 128)
-                        {
-			    break;
-                        }
-                        if(atrtype == 4294967295)
-                        {
-                            //qDebug() << "next attribute is 0xFFFFFFFF";
-                            break;
-                        }
-                        curoffset += attrlength;
-                    }
-		    resoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(curoffset + 20, 2)); // resident attribute content offset
-attr type: 16
-attr type: 48
-attr type: 128
-attr type: 176
-attr type: 4294967295
-attr type: 4294967295
-
-             */ 
         }
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
         // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
