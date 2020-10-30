@@ -258,6 +258,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             fsinfo.insert("mftentrysize", QVariant(partbuf.at(64)));
             fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
             fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
+            qDebug() << "serial num:" << QString("0x" + QString::number(fsinfo.value("serialnum").toULongLong(), 16));
             fsinfo.insert("mftoffset", QVariant((fsinfo.value("mftstartingcluster").toUInt() * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt())));
             qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toUInt();
             // get MFT entry for $MFT to determine cluster's that contain the MFT...
@@ -272,7 +273,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 //partbuf = efile.read(69120);
                 efile.close();
             }
-            qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
+            //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
         }
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
         // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
