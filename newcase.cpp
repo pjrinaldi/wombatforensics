@@ -248,6 +248,31 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         {
             fsinfo.insert("type", QVariant(5));
             fsinfo.insert("typestr", QVariant("NTFS"));
+            fsinfo.insert("bytespersector", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(11, 2))));
+            qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
+            fsinfo.insert("sectorspercluster", QVariant(partbuf.at(13)));
+            qDebug() << "sectors per cluster:" << fsinfo.value("sectorspercluster").toUInt();
+            fsinfo.insert("totalsectors", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(40, 8))));
+            fsinfo.insert("mftstartingcluster", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(48, 8))));
+            qDebug() << "MFT starting cluster:" << fsinfo.value("mftstartingcluster").toUInt();
+            fsinfo.insert("mftentrysize", QVariant(partbuf.at(64)));
+            fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
+            fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
+            fsinfo.insert("mftoffset", QVariant((fsinfo.value("mftstartingcluster").toUInt() * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt())));
+            qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toUInt();
+            // get MFT entry for $MFT to determine cluster's that contain the MFT...
+            QByteArray mftentry0;
+            mftentry0.clear();
+            if(!efile.isOpen())
+                efile.open(QIODevice::ReadOnly);
+            if(efile.isOpen())
+            {
+                efile.seek(fsinfo.value("mftoffset").toUInt());
+                mftentry0 = efile.read(1024);
+                //partbuf = efile.read(69120);
+                efile.close();
+            }
+            qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
         }
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
         // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
