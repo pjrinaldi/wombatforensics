@@ -273,7 +273,66 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 //partbuf = efile.read(69120);
                 efile.close();
             }
-            //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
+            qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
+            if(QString::fromStdString(mftentry0.left(4).toStdString()) == "FILE") // a proper mft entry
+            {
+                int curoffset = 0;
+                uint16_t firstattroffset = qFromLittleEndian<uint16_t>(mftentry0.mid(20, 2)); // offset to first attribute
+                uint32_t mftentryusedsize = qFromLittleEndian<uint32_t>(mftentry0.mid(24, 4)); // mft entry used size
+                uint16_t attrcount = qFromLittleEndian<uint16_t>(mftentry0.mid(40, 2)); // next attribute id
+                qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
+                curoffset = firstattroffset;
+                for(int i=0; i < attrcount; i++)
+                {
+                    uint32_t atrtype = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset, 4)); // attribute type
+                    uint8_t namelength = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset + 9, 1)); // length of name
+                    uint32_t attrlength = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset + 4, 4)); // attribute length
+                    qDebug() << "attr type:" << atrtype;
+                    curoffset += attrlength;
+                }
+            }
+            else
+                qDebug() << "error this is not a valid MFT ENTRY...";
+            /*
+             *
+             *      curoffset = 0;
+		    mftoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(20, 2)); // offset to first attribute
+		    uint16_t attrcnt = qFromLittleEndian<uint16_t>(resbuffer.mid(40, 2)); // next attribute id
+		    curoffset += mftoffset;
+		    // Loop over attributes...
+                    for(uint i = 0; i < attrcnt; i++)
+                    {
+			atrtype = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset, 4)); // attribute type
+			namelength = qFromLittleEndian<uint8_t>(resbuffer.mid(curoffset + 9, 1)); // length of name
+			attrlength = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset + 4, 4)); // attribute length
+		        if(isdir && atrtype == 144)
+                        {
+			    break;
+                        }
+		        if(!isdir && isads && namelength > 0 && atrtype == 128)
+                        {
+			    break;
+                        }
+		        else if(!isdir && !isads && namelength == 0 && atrtype == 128)
+                        {
+			    break;
+                        }
+                        if(atrtype == 4294967295)
+                        {
+                            //qDebug() << "next attribute is 0xFFFFFFFF";
+                            break;
+                        }
+                        curoffset += attrlength;
+                    }
+		    resoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(curoffset + 20, 2)); // resident attribute content offset
+attr type: 16
+attr type: 48
+attr type: 128
+attr type: 176
+attr type: 4294967295
+attr type: 4294967295
+
+             */ 
         }
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
         // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
