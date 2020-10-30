@@ -366,6 +366,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		qDebug() << "vol content offset:" << contentoffset << "vol  content size:" << contentsize;
 		//qDebug() << "volname name:" << QString::fromStdString(mftentry3.mid(curoffset + contentoffset, contentsize).toStdString());
 		// EASY WAY TO READ UTF16 STRING !!!!!!!!!!
+		fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()))));
 		QString volnamestr = QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()));
 		qDebug() << "volnamestr:" << volnamestr;
 	    }
