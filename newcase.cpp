@@ -354,15 +354,19 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                     //uint8_t namelength = qFromLittleEndian<uint8_t>(mftentry3.mid(curoffset + 9, 1)); // length of name
                     attrlength = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset + 4, 4)); // attribute length
                     qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
-		    if(atrtype == 96) // $DATA attribute to parse
+		    if(atrtype == 96) // $VOLUME_NAME attribute to parse (always resident)
 		    {
 			break;
 		    }
                     curoffset += attrlength;
                 }
+		uint32_t contentsize = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset + 16, 4));
+		uint16_t contentoffset = qFromLittleEndian<uint16_t>(mftentry3.mid(curoffset + 20, 2));
 		qDebug() << "curoffset of $Volume attribute:" << curoffset;
-		qDebug() << "volume name attr length:" << attrlength;
-		QString volnamestr = QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset, attrlength).data()));
+		qDebug() << "vol content offset:" << contentoffset << "vol  content size:" << contentsize;
+		//qDebug() << "volname name:" << QString::fromStdString(mftentry3.mid(curoffset + contentoffset, contentsize).toStdString());
+		// EASY WAY TO READ UTF16 STRING !!!!!!!!!!
+		QString volnamestr = QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()));
 		qDebug() << "volnamestr:" << volnamestr;
 	    }
         }
