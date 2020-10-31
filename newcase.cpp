@@ -422,6 +422,45 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     }
     else if(extsig == 0xef53) // EXT2/3/4
     {
+        fsinfo.insert("type", QVariant(6));
+        //fsinfo.insert("typestr", QVariant("EXT2/3/4"));
+        fsinfo.insert("fsinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1024, 4))));
+        fsinfo.insert("fsblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1028, 4))));
+        fsinfo.insert("blockgroup0startblk", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1044, 4))));
+        fsinfo.insert("blocksize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1048, 4))));
+        fsinfo.insert("fragsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1052, 4))));
+        fsinfo.insert("blockgroupblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1056, 4))));
+        fsinfo.insert("blockgroupfragcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1060, 4))));
+        fsinfo.insert("blockgroupinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1064, 4))));
+        fsinfo.insert("inodesize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(1112, 2))));
+        fsinfo.insert("compatflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1116, 4))));
+        fsinfo.insert("incompatflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1120, 4))));
+        fsinfo.insert("readonlyflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1124, 4))));
+        fsinfo.insert("vollabel", QString::fromStdString(partbuf.mid(1144, 16).toStdString()));
+        qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
+        if(((fsinfo.value("compatflags").toUInt() & 0x00000200UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0001f7c0UL) != 0) || ((fsinfo.value("readonlyflags").toUInt() & 0x00000378UL) != 0))
+            fsinfo.insert("typestr", QVariant("EXT4"));
+        else if(((fsinfo.value("compatflags").toUInt() & 0x00000004UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0000000cUL) != 0))
+            fsinfo.insert("typestr", QVariant("EXT3"));
+        else
+            fsinfo.insert("typestr", QVariant("EXT2"));
+        /*
+         *if( ( ( superblock->compatible_features_flags & 0x00000200UL ) != 0 )
+	 || ( ( superblock->incompatible_features_flags & 0x0001f7c0UL ) != 0 )
+	 || ( ( superblock->read_only_compatible_features_flags & 0x00000378UL ) != 0 ) )
+	{
+		superblock->format_version = 4;
+	}
+	else if( ( ( superblock->compatible_features_flags & 0x00000004UL ) != 0 )
+	      || ( ( superblock->incompatible_features_flags & 0x0000000cUL ) != 0 ) )
+	{
+		superblock->format_version = 3;
+	}
+	else
+	{
+		superblock->format_version = 2;
+	}
+         */ 
 	//fsinfo.fstype = 6; // EXT2/3/4
     }
     else if(apfssig == "NXSB") // APFS Container
