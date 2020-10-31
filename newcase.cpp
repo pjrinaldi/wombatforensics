@@ -513,7 +513,17 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     }
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
-	//fsinfo.fstype = 10; // BTRFS
+        int curoffset = 65536;
+        fsinfo.insert("type", QVariant(10));
+        fsinfo.insert("typestr", QVariant("BTRFS"));
+        fsinfo.insert("rootaddr", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(curoffset + 0x50, 8))));
+        fsinfo.insert("chunkrootaddr", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(curoffset + 0x58, 8))));
+        fsinfo.insert("rootdirobjid", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(curoffset + 0x80, 8))));
+        fsinfo.insert("sectorsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(curoffset + 0x90, 4))));
+        fsinfo.insert("nodesize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(curoffset + 0x94, 4))));
+        fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(curoffset + 0x12b, 100).toStdString())));
+        qDebug() << "sectorsize:" << fsinfo.value("sectorsize").toUInt();
+        qDebug() << "rootdirobjid:" << fsinfo.value("rootdirobjid").toUInt();
     }
     else if(bitlcksig == "-FVE-FS-") // BITLOCKER
     {
@@ -531,6 +541,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         fsinfo.insert("timeenabled", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(104, 8))));
         fsinfo.insert("volnamelength", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(112, 2))));
         fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(118, fsinfo.value("volnamelength").toUInt() - 8).toStdString())));
+        qDebug() << "When Bitlocker was Enabled:" << ConvertWindowsTimeToUnixTimeUTC(fsinfo.value("timeenabled").toULongLong());
         uint encryptalgo = fsinfo.value("algorithm").toUInt();
         if(encryptalgo == 0x1000)
             qDebug() << "stretch";
