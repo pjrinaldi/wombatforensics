@@ -423,7 +423,6 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     else if(extsig == 0xef53) // EXT2/3/4
     {
         fsinfo.insert("type", QVariant(6));
-        //fsinfo.insert("typestr", QVariant("EXT2/3/4"));
         fsinfo.insert("fsinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1024, 4))));
         fsinfo.insert("fsblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1028, 4))));
         fsinfo.insert("blockgroup0startblk", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1044, 4))));
@@ -444,24 +443,6 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             fsinfo.insert("typestr", QVariant("EXT3"));
         else
             fsinfo.insert("typestr", QVariant("EXT2"));
-        /*
-         *if( ( ( superblock->compatible_features_flags & 0x00000200UL ) != 0 )
-	 || ( ( superblock->incompatible_features_flags & 0x0001f7c0UL ) != 0 )
-	 || ( ( superblock->read_only_compatible_features_flags & 0x00000378UL ) != 0 ) )
-	{
-		superblock->format_version = 4;
-	}
-	else if( ( ( superblock->compatible_features_flags & 0x00000004UL ) != 0 )
-	      || ( ( superblock->incompatible_features_flags & 0x0000000cUL ) != 0 ) )
-	{
-		superblock->format_version = 3;
-	}
-	else
-	{
-		superblock->format_version = 2;
-	}
-         */ 
-	//fsinfo.fstype = 6; // EXT2/3/4
     }
     else if(apfssig == "NXSB") // APFS Container
     {
