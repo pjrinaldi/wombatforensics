@@ -517,7 +517,35 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     }
     else if(bitlcksig == "-FVE-FS-") // BITLOCKER
     {
-        //fsinfo.fstype = 11; // BITLOCKER
+        // NEED AN IMAGE TO TEST BITLOCKER
+        fsinfo.insert("type", QVariant(11));
+        fsinfo.insert("typestr", QVariant("BITLOCKER"));
+        fsinfo.insert("metadatasize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(8, 2))));
+        fsinfo.insert("meta1offset", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(32, 8))));
+        fsinfo.insert("meta2offset", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(40, 8))));
+        fsinfo.insert("meta3offset", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(48, 8))));
+        fsinfo.insert("mftmirrorcluster", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(56, 8))));
+        fsinfo.insert("sizeminusheader", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(64, 4))));
+        fsinfo.insert("nextcounter", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(96, 4))));
+        fsinfo.insert("algorithm", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(100, 4))));
+        fsinfo.insert("timeenabled", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(104, 8))));
+        fsinfo.insert("volnamelength", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(112, 2))));
+        fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(118, fsinfo.value("volnamelength").toUInt() - 8).toStdString())));
+        uint encryptalgo = fsinfo.value("algorithm").toUInt();
+        if(encryptalgo == 0x1000)
+            qDebug() << "stretch";
+        else if(encryptalgo >= 0x2000 || encryptalgo <= 0x2005)
+            qDebug() << "256-bit AES-CCM";
+        else if(encryptalgo == 0x8000)
+            qDebug() << "128-bit AES + Elephant";
+        else if(encryptalgo == 0x8001)
+            qDebug() << "256-bit AES + Elephant";
+        else if(encryptalgo == 0x8002)
+            qDebug() << "128-bit AES";
+        else if(encryptalgo == 0x8003)
+            qDebug() << "256-bit AES";
+        else
+            qDebug() << "not defined in paperwork i have.";
     }
     // need to implement iso, udf, hfs, zfs
     fsinfolist->append(fsinfo);
