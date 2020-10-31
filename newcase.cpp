@@ -439,7 +439,27 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt()));
                 qDebug() << "rootdir offset (bytes):" << fsinfo.value("rootdiroffset").toUInt();
                 qDebug() << "rootdir offset (sectors):" << (fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt()));
-                
+                QByteArray rootdirentry;
+                rootdirentry.clear();
+                if(!efile.isOpen())
+                    efile.open(QIODevice::ReadOnly);
+                if(efile.isOpen())
+                {
+                    efile.seek(fsinfo.value("rootdiroffset").toUInt());
+                    rootdirentry = efile.read(1024);
+                    efile.close();
+                }
+                int curoffset = 0;
+                while(curoffset < 1024)
+                {
+                    if(((uint8_t)rootdirentry.at(curoffset)) == 0x83)
+                        break;
+                    curoffset += 32;
+                    qDebug() << "while offset:" << curoffset;
+                }
+                qDebug() << "at volume curoffset:" << curoffset;
+                fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirentry.mid(curoffset + 2, 2*((uint8_t(rootdirentry.at(curoffset + 1))))).data()))));
+                qDebug() << "vollabel:" << fsinfo.value("vollabel").toString();
             }
         }
     }
