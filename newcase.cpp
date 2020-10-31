@@ -418,6 +418,29 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 qDebug() << "cluster area/data start (also root dir):" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt()) + rootdirsectors;
                 // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
             }
+            else if(exfatstr == "EXFAT")
+            {
+                fsinfo.insert("partoffset", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(64, 8)))); // sector address
+                fsinfo.insert("vollength", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8)))); // volume size in sectors
+                fsinfo.insert("fatoffset", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(80, 4)))); // sector address of 1st FAT
+                fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(84, 4)))); // size in sectors
+                fsinfo.insert("clusteroffset", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(88, 4)))); // sector address of cluster heap/data region
+                fsinfo.insert("clustercount", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(92, 4)))); // number of clusters in heap
+                fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(96, 4)))); // cluster address
+                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(100, 4))));
+                fsinfo.insert("bytespersector", QVariant(pow(2, partbuf.at(108)))); // power of 2, so 2^(bytespersector)
+                fsinfo.insert("sectorspercluster", QVariant(pow(2, partbuf.at(109)))); // power of 2, so 2^(sectorspercluster)
+                fsinfo.insert("fatcount", QVariant(partbuf.at(110))); // 1 or 2, 2 if TexFAT is in use
+                qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt();
+                qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
+                qDebug() << "cluster offset:" << fsinfo.value("clusteroffset").toUInt();
+                qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
+                qDebug() << "sectorspercluster:" << fsinfo.value("sectorspercluster").toUInt();
+                fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+                qDebug() << "rootdir offset (bytes):" << fsinfo.value("rootdiroffset").toUInt();
+                qDebug() << "rootdir offset (sectors):" << (fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt()));
+                
+            }
         }
     }
     else if(extsig == 0xef53) // EXT2/3/4
