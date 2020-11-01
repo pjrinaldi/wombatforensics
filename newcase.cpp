@@ -458,7 +458,15 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                     qDebug() << "while offset:" << curoffset;
                 }
                 qDebug() << "at volume curoffset:" << curoffset;
-                fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirentry.mid(curoffset + 2, 2*((uint8_t(rootdirentry.at(curoffset + 1))))).data()))));
+                if(curoffset < 1024)
+                {
+                    if(uint8_t(rootdirentry.at(curoffset + 1)) > 0)
+                        fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirentry.mid(curoffset + 2, 2*((uint8_t(rootdirentry.at(curoffset + 1))))).data()))));
+                    else
+                        fsinfo.insert("vollabel", QVariant(""));
+                }
+                else
+                    fsinfo.insert("vollabel", QVariant(""));
                 qDebug() << "vollabel:" << fsinfo.value("vollabel").toString();
             }
         }
@@ -489,7 +497,24 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     }
     else if(apfssig == "NXSB") // APFS Container
     {
-	//fsinfo.fstype = 7; // APFS Container
+        fsinfo.insert("type", QVariant(7));
+        fsinfo.insert("typestr", QVariant("APFS"));
+        fsinfo.insert("blocksize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
+        qDebug() << "blocksize:" << fsinfo.value("blocksize").toUInt();
+        fsinfo.insert("blockcount", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(40, 8))));
+        fsinfo.insert("descblocks", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(104, 4))));
+        fsinfo.insert("datablocks", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(108, 4))));
+        fsinfo.insert("descbase", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(112, 8))));
+        fsinfo.insert("database", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(120, 8))));
+        fsinfo.insert("descnext", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(128, 4))));
+        fsinfo.insert("datanext", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(132, 4))));
+        fsinfo.insert("descindex", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(136, 4))));
+        fsinfo.insert("desclen", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(140, 4))));
+        fsinfo.insert("dataindex", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(144, 4))));
+        fsinfo.insert("datalen", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(148, 4))));
+        fsinfo.insert("maxfilesystems", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(180, 4))));
+        qDebug() << "desc blocks:" << fsinfo.value("descblocks").toUInt() << "descbase:" << fsinfo.value("descbase").toUInt();
+        qDebug() << "desc index:" << fsinfo.value("descindex").toUInt() << "desc length:" << fsinfo.value("descindex").toUInt();
     }
     else if(hfssig == "H+" || hfssig == "HX") // HFS+/HFSX
     {
