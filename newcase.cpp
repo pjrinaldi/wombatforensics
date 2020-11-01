@@ -493,7 +493,27 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     }
     else if(hfssig == "H+" || hfssig == "HX") // HFS+/HFSX
     {
-	//fsinfo.fstype = 8; // HFS+/HFSX
+        int curoffset = 1024;
+        fsinfo.insert("type", QVariant(8));
+        if(hfssig == "H+")
+            fsinfo.insert("typestr", QVariant("HFS+"));
+        else if(hfssig == "HX")
+            fsinfo.insert("typestr", QVariant("HFSX"));
+        fsinfo.insert("createdate", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 16, 4))));
+        fsinfo.insert("modifydate", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 20, 4))));
+        fsinfo.insert("backupdate", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 24, 4))));
+        fsinfo.insert("filecount", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 32, 4))));
+        fsinfo.insert("foldercount", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 36, 4))));
+        fsinfo.insert("blocksize", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 40, 4))));
+        fsinfo.insert("totalblocks", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 44, 4))));
+        qDebug() << "block size:" << fsinfo.value("blocksize").toUInt();
+        fsinfo.insert("cataloglogsize", QVariant(qFromBigEndian<qulonglong>(partbuf.mid(curoffset + 272, 8))));
+        fsinfo.insert("catalogtotalblocks", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 284, 4))));
+        fsinfo.insert("catalogextent0startblk", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 288, 4))));
+        fsinfo.insert("catalogextent0blkcnt", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 292, 4))));
+        qDebug() << "catalog startblk:" << fsinfo.value("catalogextent0startblk").toUInt();
+        qDebug() << "catalog blkcnt:" << fsinfo.value("catalogextent0blkcnt").toUInt();
+        // 995344 is where the volume name is stored.... in sector 1944
     }
     else if(xfssig == "XFSB") // XFS
     {
