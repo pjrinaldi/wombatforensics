@@ -219,6 +219,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     QString xfssig = QString::fromStdString(partbuf.mid(0, 4).toStdString());
     QString btrsig = QString::fromStdString(partbuf.mid(65600, 8).toStdString());
     QString bitlcksig = QString::fromStdString(partbuf.mid(0, 8).toStdString());
+    QString bfssig = QString::fromStdString(partbuf.mid(544, 4).toStdString());
     if(winsig == 0xaa55) // FAT OR NTFS
     {
 	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
@@ -617,6 +618,14 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             qDebug() << "256-bit AES";
         else
             qDebug() << "not defined in paperwork i have.";
+    }
+    else if(bfssig == "1SFB")
+    {
+        fsinfo.insert("type", QVariant(12));
+        fsinfo.insert("typestr", QVariant("BFS"));
+        fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(512, 32).toStdString())));
+        fsinfo.insert("fsbyteorder", QVariant(qFromLittleEndian<int32_t>(partbuf.mid(548, 4))));
+        //qDebug() << "fsbyteorder:" << QString::number(fsinfo.value("fsbyteorder").toInt(), 16);
     }
     // need to implement iso, udf, hfs, zfs
     fsinfolist->append(fsinfo);
