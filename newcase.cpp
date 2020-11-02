@@ -198,6 +198,7 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 
 void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash<QString, QVariant>> *fsinfolist)
 {
+    QList<QHash<QString, QVariant>> *fileinfolist;
     QHash<QString, QVariant> fsinfo;
     qDebug() << "estring:" << estring << "partoffset:" << partoffset;
     QByteArray partbuf;
