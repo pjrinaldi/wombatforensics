@@ -446,6 +446,35 @@ QString ConvertGmtHours(int gmtvar)
 
 }
 
+qint64 ConvertDosTimeToUnixTime(uint8_t t1, uint8_t t2, uint8_t d1, uint8_t d2)
+{
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int hour = 0;
+    int min = 0;
+    int sec = 0;
+    QString tmpdate = QString("%1%2").arg(d1, 8, 2, QChar('0')).arg(d2, 8, 2, QChar('0'));
+    QString tmptime = QString("%1%2").arg(t1, 8, 2, QChar('0')).arg(t2, 8, 2, QChar('0'));
+    year = tmpdate.left(7).toInt(nullptr, 2) + 1980;
+    month = tmpdate.mid(7, 4).toInt(nullptr, 2);
+    day = tmpdate.right(5).toInt(nullptr, 2);
+    hour = tmptime.left(5).toInt(nullptr, 2);
+    min = tmptime.mid(5, 6).toInt(nullptr, 2);
+    sec = tmptime.right(5).toInt(nullptr, 2) * 2;
+    qDebug()  << QString::number(year) + "-" + QString::number(month) + "-" + QString::number(day) + " " + QString::number(hour) + ":" + QString::number(min) + ":" + QString::number(sec);
+    QString datetimestring = QString("%1-%2-%3 %4:%5:%6").arg(year, 4, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(day, 2, 10, QChar('0')).arg(hour, 2, 10, QChar('0')).arg(min, 2, 10, QChar('0')).arg(sec, 2, 10, QChar('0'));
+    return QDateTime::fromString(datetimestring, "yyyy-MM-dd hh:mm:ss").toSecsSinceEpoch();
+    // return QDateTime::fromString("datetimestring", "string format").toSecsSinceEpoch(); // use QString.arg() since DateTime is greedy when reading...
+    //QString timestr = "";
+    // if t1 and t2 == 0, then it's a date only... so set time var's as 00:00:00 to put into string and get the unixepoch integer
+    //QString datetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 17), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 16), 8, 2, QChar('0'));
+    //qDebug() << datetest;
+    //qDebug() << "year:" << 1980 + datetest.left(7).toInt(nullptr, 2) << "month:" << datetest.mid(7, 4).toInt(nullptr, 2) << "day:" << datetest.right(5).toInt(nullptr, 2);
+    //QString timetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 15), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 14), 8, 2, QChar('0'));
+    //qDebug() << "hour:" << timetest.left(5).toInt(nullptr, 2) << "min:" << timetest.mid(5, 6).toInt(nullptr, 2) << "sec:" << timetest.right(5).toInt(nullptr, 2) * 2;
+    //return 0;
+}
 QString ConvertWindowsTimeToUnixTime(uint64_t input)
 {
     QTimeZone tmpzone = QTimeZone(reporttimezone);

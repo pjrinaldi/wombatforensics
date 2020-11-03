@@ -455,8 +455,9 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		    */
 			
                     uint8_t createtenth = rootdirbuf.at(i*32 + 13);
-                    uint16_t createdtime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2));
-                    uint16_t createdday = qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2));
+		    //fileinfo.insert("createdate", QVariant(ConvertDosTimeToUnixTime(rootdirbuf.mid(i*32 + 15), rootdir.mid(i*32 + 14), rootdir.mid(i*32 + 17), rootdir.mid(i*32 + 16))));
+                    //uint16_t createdtime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2));
+                    //uint16_t createdday = qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2));
                     uint16_t accessday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2));
                     uint16_t writetime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2));
                     uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2));
@@ -466,11 +467,15 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		    if(fileattr != 0x0f && fileattr != 0x00) // need to process differently
 		    {
 			qDebug() << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
-			qDebug() << "created day:" << QString::number(rootdirbuf.at(i*32 + 17), 2) << QString::number(rootdirbuf.at(i*32 + 16), 2) << QString::number(createdday, 2);
-			QString datetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 17), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 16), 8, 2, QChar('0'));
-			qDebug() << datetest;
-			qDebug() << "year:" << datetest.left(7).toInt(nullptr, 2) << "month:" << datetest.mid(7, 4).toInt(nullptr, 2) << "day:" << datetest.right(5).toInt(nullptr, 2);
-			// QString("%1 %2").arg(myNumber, 2, 10, QChar('0'))
+			qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
+			qDebug() << "date time:" << QDateTime::fromSecsSinceEpoch(tmpdatetime, Qt::UTC).toString("yyyy-MM-dd hh:mm:ss");
+			
+			//qDebug() << "created day:" << QString::number(rootdirbuf.at(i*32 + 17), 2) << QString::number(rootdirbuf.at(i*32 + 16), 2) << QString::number(createdday, 2);
+			//QString datetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 17), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 16), 8, 2, QChar('0'));
+			//qDebug() << datetest;
+			//qDebug() << "year:" << 1980 + datetest.left(7).toInt(nullptr, 2) << "month:" << datetest.mid(7, 4).toInt(nullptr, 2) << "day:" << datetest.right(5).toInt(nullptr, 2);
+			//QString timetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 15), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 14), 8, 2, QChar('0'));
+			//qDebug() << "hour:" << timetest.left(5).toInt(nullptr, 2) << "min:" << timetest.mid(5, 6).toInt(nullptr, 2) << "sec:" << timetest.right(5).toInt(nullptr, 2) * 2;
 		    }
                 }
             }
