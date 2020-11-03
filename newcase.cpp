@@ -396,12 +396,47 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(43, 11).toStdString())));
                 fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
                 fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("rootdirsectors", QVariant(((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("rootdirsize", QVariant(fsinfo.value("rootdirsectors").toUInt() * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("clusterareastart", QVariant(fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + fsinfo.value("rootdirsectors").toUInt()));
                 fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
                 qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
                 qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
                 qDebug() << "reserved area size:" << fsinfo.value("reservedareasize").toUInt() << "fatcount:" << fsinfo.value("fatcount").toUInt() << "fatsize:" << fsinfo.value("fatsize").toUInt();
                 qDebug() << "root dir start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt());
+                qDebug() << "root dir sectors:" << fsinfo.value("rootdirsectors").toUInt();
                 qDebug() << "cluster area/data start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + rootdirsectors;
+                // PARSE ROOT DIR HERE...
+                QByteArray rootdirbuf;
+                rootdirbuf.clear();
+                if(!efile.isOpen())
+                    efile.open(QIODevice::ReadOnly);
+                if(efile.isOpen())
+                {
+                    efile.seek(fsinfo.value("rootdiroffset").toUInt());
+                    rootdirbuf = efile.read(fsinfo.value("rootdirsize").toUInt());
+                    efile.close();
+                }
+                qDebug() << "rootdirbuf size:" << rootdirbuf.count();
+                qDebug() << "rootdirmaxfiles:" << fsinfo.value("rootdirmaxfiles").toUInt();
+                for(uint i=0; i < fsinfo.value("rootdirmaxfiles").toUInt(); i++)
+                {
+                    uint8_t firstchar = rootdirbuf.at(i*32);
+                    QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 10).toStdString());
+                    uint8_t fileattr = rootdirbuf.at(i*32 + 11);
+                    uint8_t createtenth = rootdirbuf.at(i*32 + 13);
+                    uint16_t createdtime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2));
+                    uint16_t createdday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2));
+                    uint16_t accessday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2));
+                    uint16_t writetime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2));
+                    uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
+                    uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
+                    // probably cehck file attr first... (byte 11), then firstchar (byte 0)
+                    qDebug() << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << char(firstchar) << restname << filesize;
+                }
+                // efile.open()
+                // seek(rootdiroffset);
+                // read(rootdirsize);
             }
             else if(fat32str == "FAT32")
             {
