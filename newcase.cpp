@@ -422,21 +422,57 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 for(uint i=0; i < fsinfo.value("rootdirmaxfiles").toUInt(); i++)
                 {
                     uint8_t firstchar = rootdirbuf.at(i*32);
-                    QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 10).toStdString());
+                    QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString());
+		    QString extname = QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString());
+		    if(firstchar == 0x00) // entry is free and all remaining are free
+			break;
+		    else if(firstchar == 0xe5 || firstchar == 0x05) // was allocated but now free
+			qDebug() << "is deleted";
+		    else if(firstchar == 0x2e) // directory
+		    {
+			qDebug() << "is directory";
+			if(restname.at(0) == 0x2e)
+			    qDebug() << "cluster number contains the parent directory cluster number...may not need this info";
+		    }
                     uint8_t fileattr = rootdirbuf.at(i*32 + 11);
+		    /*
+		    if(fileattr & 0x01)
+			qDebug() << "read only";
+		    else if(fileattr & 0x02)
+			qDebug() << "hidden file";
+		    else if(fileattr & 0x04)
+			qDebug() << "system file";
+		    else if(fileattr & 0x08)
+			qDebug() << "volume id";
+		    else if(fileattr & 0x10)
+			qDebug() << "subdirectory";
+		    else if(fileattr & 0x20)
+			qDebug() << "archive file";
+		    if(fileattr == 0x0f) // need to process differently
+			qDebug() << "long name";
+		    else if(fileattr == 0x00) // need to process differently
+			qDebug() << "deleted long file name????";
+		    */
+			
                     uint8_t createtenth = rootdirbuf.at(i*32 + 13);
                     uint16_t createdtime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2));
-                    uint16_t createdday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2));
+                    uint16_t createdday = qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2));
                     uint16_t accessday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2));
                     uint16_t writetime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2));
-                    uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
+                    uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2));
+		    uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
                     uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
                     // probably cehck file attr first... (byte 11), then firstchar (byte 0)
-                    qDebug() << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << char(firstchar) << restname << filesize;
+		    if(fileattr != 0x0f && fileattr != 0x00) // need to process differently
+		    {
+			qDebug() << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
+			qDebug() << "created day:" << QString::number(rootdirbuf.at(i*32 + 17), 2) << QString::number(rootdirbuf.at(i*32 + 16), 2) << QString::number(createdday, 2);
+			QString datetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 17), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 16), 8, 2, QChar('0'));
+			qDebug() << datetest;
+			qDebug() << "year:" << datetest.left(7).toInt(nullptr, 2) << "month:" << datetest.mid(7, 4).toInt(nullptr, 2) << "day:" << datetest.right(5).toInt(nullptr, 2);
+			// QString("%1 %2").arg(myNumber, 2, 10, QChar('0'))
+		    }
                 }
-                // efile.open()
-                // seek(rootdiroffset);
-                // read(rootdirsize);
             }
             else if(fat32str == "FAT32")
             {
@@ -643,19 +679,19 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         if(encryptalgo == 0x1000)
             qDebug() << "stretch";
         else if(encryptalgo >= 0x2000 || encryptalgo <= 0x2005)
-            qDebug() << "256-bit AES-CCM";
+            fsinfo.insert("algoname", QVariant("256-bit AES-CCM"));
         else if(encryptalgo == 0x8000)
-            qDebug() << "128-bit AES + Elephant";
+            fsinfo.insert("algoname", QVariant("128-bit AES + Elephant"));
         else if(encryptalgo == 0x8001)
-            qDebug() << "256-bit AES + Elephant";
+            fsinfo.insert("algoname", QVariant("256-bit AES + Elephant"));
         else if(encryptalgo == 0x8002)
-            qDebug() << "128-bit AES";
+            fsinfo.insert("algoname", QVariant("128-bit AES"));
         else if(encryptalgo == 0x8003)
-            qDebug() << "256-bit AES";
+            fsinfo.insert("algoname", QVariant("256-bit AES"));
         else
-            qDebug() << "not defined in paperwork i have.";
+            fsinfo.insert("algoname", QVariant("NOT DEFINED"));
     }
-    else if(bfssig == "1SFB")
+    else if(bfssig == "1SFB") // BFS
     {
         fsinfo.insert("type", QVariant(12));
         fsinfo.insert("typestr", QVariant("BFS"));
