@@ -448,7 +448,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			qDebug() << "subdirectory";
 		    else if(fileattr & 0x20)
 			qDebug() << "archive file";
-		    if(fileattr == 0x0f) // need to process differently
+		    if(fileattr == 0x0f) // need to process differently // ATTR_LONG_NAME
 			qDebug() << "long name";
 		    else if(fileattr == 0x00) // need to process differently
 			qDebug() << "deleted long file name????";
@@ -464,7 +464,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		    uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
                     uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
                     // probably cehck file attr first... (byte 11), then firstchar (byte 0)
-		    if(fileattr != 0x0f && fileattr != 0x00) // need to process differently
+		    if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
 		    {
 			qDebug() << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
 			qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
