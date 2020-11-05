@@ -419,11 +419,10 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 }
                 qDebug() << "rootdirbuf size:" << rootdirbuf.count();
                 qDebug() << "rootdirmaxfiles:" << fsinfo.value("rootdirmaxfiles").toUInt();
+		uint inodecnt = 0;
                 for(uint i=0; i < fsinfo.value("rootdirmaxfiles").toUInt(); i++)
                 {
                     uint8_t firstchar = rootdirbuf.at(i*32);
-                    QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString());
-		    QString extname = QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString());
 		    if(firstchar == 0x00) // entry is free and all remaining are free
 			break;
 		    else if(firstchar == 0xe5 || firstchar == 0x05) // was allocated but now free
@@ -431,8 +430,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		    else if(firstchar == 0x2e) // directory
 		    {
 			qDebug() << "is directory";
-			if(restname.at(0) == 0x2e)
-			    qDebug() << "cluster number contains the parent directory cluster number...may not need this info";
+			//if(restname.at(0) == 0x2e)
+			    //qDebug() << "cluster number contains the parent directory cluster number...may not need this info";
 		    }
                     uint8_t fileattr = rootdirbuf.at(i*32 + 11);
 		    /*
@@ -454,21 +453,24 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			qDebug() << "deleted long file name????";
 		    */
 			
-                    uint8_t createtenth = rootdirbuf.at(i*32 + 13);
-		    //fileinfo.insert("createdate", QVariant(ConvertDosTimeToUnixTime(rootdirbuf.mid(i*32 + 15), rootdir.mid(i*32 + 14), rootdir.mid(i*32 + 17), rootdir.mid(i*32 + 16))));
-                    //uint16_t createdtime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2));
-                    //uint16_t createdday = qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2));
-                    uint16_t accessday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2));
-                    uint16_t writetime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2));
-                    uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2));
-		    uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
-                    uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
                     // probably cehck file attr first... (byte 11), then firstchar (byte 0)
 		    if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
 		    {
-			qDebug() << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
+			QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString());
+			QString extname = QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString());
+			uint8_t createtenth = rootdirbuf.at(i*32 + 13);
+			//fileinfo.insert("createdate", QVariant(ConvertDosTimeToUnixTime(rootdirbuf.mid(i*32 + 15), rootdir.mid(i*32 + 14), rootdir.mid(i*32 + 17), rootdir.mid(i*32 + 16))));
+			//uint16_t createdtime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2));
+			//uint16_t createdday = qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2));
+			uint16_t accessday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2));
+			uint16_t writetime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2));
+			uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2));
+			uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
+			uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
+			qDebug() << "inodecnt:" << inodecnt << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
 			qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
 			qDebug() << "date time:" << QDateTime::fromSecsSinceEpoch(tmpdatetime, Qt::UTC).toString("yyyy-MM-dd hh:mm:ss");
+			inodecnt++;
 			
 			//qDebug() << "created day:" << QString::number(rootdirbuf.at(i*32 + 17), 2) << QString::number(rootdirbuf.at(i*32 + 16), 2) << QString::number(createdday, 2);
 			//QString datetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 17), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 16), 8, 2, QChar('0'));
@@ -476,6 +478,15 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			//qDebug() << "year:" << 1980 + datetest.left(7).toInt(nullptr, 2) << "month:" << datetest.mid(7, 4).toInt(nullptr, 2) << "day:" << datetest.right(5).toInt(nullptr, 2);
 			//QString timetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 15), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 14), 8, 2, QChar('0'));
 			//qDebug() << "hour:" << timetest.left(5).toInt(nullptr, 2) << "min:" << timetest.mid(5, 6).toInt(nullptr, 2) << "sec:" << timetest.right(5).toInt(nullptr, 2) * 2;
+		    }
+		    else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
+		    {
+			// NEED TO DETERMINE HOW TO CONCAT THE LONG ENTRIES THAT OCCUR PRIOR TO THE SHORT ENTRY?????
+			// MAYBE HAVE LONGHASHLIST<QHASH<STRING, QVARIANT>> WHICH STORES THE LIST WHICH ENDS ON AT(11) == 0X40
+			// THEN ONCE THE LONG IS PARSED WITH IT'S SHORT ENTRY, THE LIST CAN BE CLEARED FOR THE NEXT LONG LIST...
+			// IF 0X40 IS HIT AND THERE IS NO SHORT ENTRY, THE LONG ENTRY IS AN ORPHAN FILE I NEED TO PROCESS....
+			// CURRENT DESIGN DESCIBED ABOVE WOULD CLEAR IT OUT AND NOT LIST IT UNDER ORPHANS...
+			qDebug() << "inodecnt:" << inodecnt << "count i:" << i << "which should apply to the short dir name...";
 		    }
                 }
             }
