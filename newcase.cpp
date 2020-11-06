@@ -420,6 +420,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 qDebug() << "rootdirbuf size:" << rootdirbuf.count();
                 qDebug() << "rootdirmaxfiles:" << fsinfo.value("rootdirmaxfiles").toUInt();
 		uint inodecnt = 0;
+		QList<QHash<QString, QVariant>> longnamelist;
                 for(uint i=0; i < fsinfo.value("rootdirmaxfiles").toUInt(); i++)
                 {
                     uint8_t firstchar = rootdirbuf.at(i*32);
@@ -456,6 +457,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                     // probably cehck file attr first... (byte 11), then firstchar (byte 0)
 		    if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
 		    {
+			// if longnamelist.count() > 0 then parse long name list loop here using int j...
+			// and clear it when done.
 			QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString());
 			QString extname = QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString());
 			uint8_t createtenth = rootdirbuf.at(i*32 + 13);
@@ -481,11 +484,25 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		    }
 		    else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
 		    {
+			qDebug() << "0 value:" << QString::number(rootdirbuf.at(i*32), 16);
+			if(rootdirbuf.at(i*32) & 0x40)
+			{
+			    // if longnamelist.count() > 0, then parse the orphan entry set, then clear it, then start with new one...
+			    //qDebug() << "minus0x40:" << rootdirbuf.at(i*32) - 0x40;
+			    qDebug() << "true - it is start of long entry";
+			    if(rootdirbuf.at(i*32) - 0x40 == 0x01)
+				qDebug() << "it is also the end of the long entry..";
+			}
+			else
+			{
+			    qDebug() << "false - it isn't start of a long entry";
+			}
 			// NEED TO DETERMINE HOW TO CONCAT THE LONG ENTRIES THAT OCCUR PRIOR TO THE SHORT ENTRY?????
 			// MAYBE HAVE LONGHASHLIST<QHASH<STRING, QVARIANT>> WHICH STORES THE LIST WHICH ENDS ON AT(11) == 0X40
 			// THEN ONCE THE LONG IS PARSED WITH IT'S SHORT ENTRY, THE LIST CAN BE CLEARED FOR THE NEXT LONG LIST...
 			// IF 0X40 IS HIT AND THERE IS NO SHORT ENTRY, THE LONG ENTRY IS AN ORPHAN FILE I NEED TO PROCESS....
 			// CURRENT DESIGN DESCIBED ABOVE WOULD CLEAR IT OUT AND NOT LIST IT UNDER ORPHANS...
+			// SINCE IT GOES LAST TO FIRST IN TERMS OF LONG NAME, I CAN LIST.PREPEND() RATHER THAN LIST.APPEND()
 			// 
 			// IF THE SHORT CLEARS TEH LONG LIST, THEN I CAN CHECK WHEN A LONG IS DETECTED AFTER A 0X40 IS FOUND AND THEN PRIOR TO ADDING THE NEW LONG TO THE LONGLIST,
 			// I CAN PROCESS THE ORPHAN, CLEAR THE LONG LIST AND THEN ADD THE NEW STARTING ORPHAN... (OR SOMETHING LIKE THAT)
