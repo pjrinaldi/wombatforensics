@@ -462,7 +462,7 @@ qint64 ConvertDosTimeToUnixTime(uint8_t t1, uint8_t t2, uint8_t d1, uint8_t d2)
     hour = tmptime.left(5).toInt(nullptr, 2);
     min = tmptime.mid(5, 6).toInt(nullptr, 2);
     sec = tmptime.right(5).toInt(nullptr, 2) * 2;
-    qDebug()  << QString::number(year) + "-" + QString::number(month) + "-" + QString::number(day) + " " + QString::number(hour) + ":" + QString::number(min) + ":" + QString::number(sec);
+    //qDebug()  << QString::number(year) + "-" + QString::number(month) + "-" + QString::number(day) + " " + QString::number(hour) + ":" + QString::number(min) + ":" + QString::number(sec);
     QString datetimestring = QString("%1-%2-%3 %4:%5:%6").arg(year, 4, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(day, 2, 10, QChar('0')).arg(hour, 2, 10, QChar('0')).arg(min, 2, 10, QChar('0')).arg(sec, 2, 10, QChar('0'));
     return QDateTime::fromString(datetimestring, "yyyy-MM-dd hh:mm:ss").toSecsSinceEpoch();
     // return QDateTime::fromString("datetimestring", "string format").toSecsSinceEpoch(); // use QString.arg() since DateTime is greedy when reading...

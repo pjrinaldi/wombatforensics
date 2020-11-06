@@ -420,7 +420,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 qDebug() << "rootdirbuf size:" << rootdirbuf.count();
                 qDebug() << "rootdirmaxfiles:" << fsinfo.value("rootdirmaxfiles").toUInt();
 		uint inodecnt = 0;
-		QList<QHash<QString, QVariant>> longnamelist;
+		//QList<QHash<QString, QVariant>> longnamelist;
+		QString longnamestring = "";
                 for(uint i=0; i < fsinfo.value("rootdirmaxfiles").toUInt(); i++)
                 {
                     uint8_t firstchar = rootdirbuf.at(i*32);
@@ -457,7 +458,18 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                     // probably cehck file attr first... (byte 11), then firstchar (byte 0)
 		    if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
 		    {
+			QString longstr = "";
+			if(!longnamestring.isEmpty())
+			{
+			    //qDebug() << "do something here...";
+			    longstr = longnamestring;
+			    //qDebug() << "long string name:" << longnamestring;
+			    longnamestring = "";
+			}
+			else
+			    qDebug() << "string is empty, nothing to do here...";
 			// if longnamelist.count() > 0 then parse long name list loop here using int j...
+			// compute checksum for short entry and compare to checksum calculated for each previous long entry..
 			// and clear it when done.
 			QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString());
 			QString extname = QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString());
@@ -470,9 +482,10 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2));
 			uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
 			uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
-			qDebug() << "inodecnt:" << inodecnt << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
+			qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr;
+			//qDebug() << "inodecnt:" << inodecnt << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
 			qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
-			qDebug() << "date time:" << QDateTime::fromSecsSinceEpoch(tmpdatetime, Qt::UTC).toString("yyyy-MM-dd hh:mm:ss");
+			//qDebug() << "date time:" << QDateTime::fromSecsSinceEpoch(tmpdatetime, Qt::UTC).toString("yyyy-MM-dd hh:mm:ss");
 			inodecnt++;
 			
 			//qDebug() << "created day:" << QString::number(rootdirbuf.at(i*32 + 17), 2) << QString::number(rootdirbuf.at(i*32 + 16), 2) << QString::number(createdday, 2);
@@ -484,18 +497,33 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		    }
 		    else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
 		    {
-			qDebug() << "0 value:" << QString::number(rootdirbuf.at(i*32), 16);
+			//qDebug() << "0 value:" << QString::number(rootdirbuf.at(i*32), 16);
 			if(rootdirbuf.at(i*32) & 0x40)
 			{
+			    if(!longnamestring.isEmpty()) // orphan long entry
+			    {
+				qDebug() << "parse orphan long entry here.";
+				qDebug() << "long string:" << longnamestring;
+				longnamestring = "";
+			    }
 			    // if longnamelist.count() > 0, then parse the orphan entry set, then clear it, then start with new one...
+			    // might just be able to use a string = "" and if string is not empty... and just prepend everything to it...
 			    //qDebug() << "minus0x40:" << rootdirbuf.at(i*32) - 0x40;
-			    qDebug() << "true - it is start of long entry";
-			    if(rootdirbuf.at(i*32) - 0x40 == 0x01)
-				qDebug() << "it is also the end of the long entry..";
+			    longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 4).data())));
+			    longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 12).data())));
+			    longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 10).data())));
+			    qDebug() << "checksum:" << QString::number(rootdirbuf.at(13), 16);
+			    //fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()))));
+			    //qDebug() << "true - it is start of long entry";
+			    //if(rootdirbuf.at(i*32) - 0x40 == 0x01)
+				//qDebug() << "it is also the end of the long entry..";
 			}
 			else
 			{
-			    qDebug() << "false - it isn't start of a long entry";
+			    //qDebug() << "false - it isn't start of a long entry";
+			    longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 4).data())));
+			    longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 12).data())));
+			    longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 10).data())));
 			}
 			// NEED TO DETERMINE HOW TO CONCAT THE LONG ENTRIES THAT OCCUR PRIOR TO THE SHORT ENTRY?????
 			// MAYBE HAVE LONGHASHLIST<QHASH<STRING, QVARIANT>> WHICH STORES THE LIST WHICH ENDS ON AT(11) == 0X40
@@ -506,7 +534,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			// 
 			// IF THE SHORT CLEARS TEH LONG LIST, THEN I CAN CHECK WHEN A LONG IS DETECTED AFTER A 0X40 IS FOUND AND THEN PRIOR TO ADDING THE NEW LONG TO THE LONGLIST,
 			// I CAN PROCESS THE ORPHAN, CLEAR THE LONG LIST AND THEN ADD THE NEW STARTING ORPHAN... (OR SOMETHING LIKE THAT)
-			qDebug() << "inodecnt:" << inodecnt << "count i:" << i << "which should apply to the short dir name...";
+			//qDebug() << "inodecnt:" << inodecnt << "count i:" << i << "which should apply to the short dir name...";
 		    }
                 }
             }
