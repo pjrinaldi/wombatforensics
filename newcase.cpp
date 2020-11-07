@@ -407,6 +407,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 qDebug() << "root dir sectors:" << fsinfo.value("rootdirsectors").toUInt();
                 qDebug() << "cluster area/data start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + rootdirsectors;
                 // PARSE ROOT DIR HERE...
+                QByteArray fatbuf;
+                fatbuf.clear();
                 QByteArray rootdirbuf;
                 rootdirbuf.clear();
                 if(!efile.isOpen())
@@ -415,8 +417,11 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 {
                     efile.seek(fsinfo.value("rootdiroffset").toUInt());
                     rootdirbuf = efile.read(fsinfo.value("rootdirsize").toUInt());
+                    efile.seek(fsinfo.value("fatoffset").toUInt());
+                    fatbuf = efile.read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
                     efile.close();
                 }
+                qDebug() << "fat size:" << fatbuf.count();
                 qDebug() << "rootdirbuf size:" << rootdirbuf.count();
                 qDebug() << "rootdirmaxfiles:" << fsinfo.value("rootdirmaxfiles").toUInt();
 		uint inodecnt = 0;
@@ -468,6 +473,9 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			}
 			else
 			    qDebug() << "string is empty, nothing to do here...";
+                        longstr = longstr.replace("\uFF00", "");
+                        longstr = longstr.replace("\uFFFF", "");
+                        longstr = longstr.replace("\u5500", "");
 			// if longnamelist.count() > 0 then parse long name list loop here using int j...
 			// compute checksum for short entry and compare to checksum calculated for each previous long entry..
 			// and clear it when done.
@@ -482,6 +490,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2));
 			uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
 			uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
+                        // GET CLUSTERS FOR FILE AND THEN CONVERT FROM CLUSTER TO BYTEOFFSET AND BYTE LENGTH, WILL HAVE TO FIGURE IT OUT
 			qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr;
 			//qDebug() << "inodecnt:" << inodecnt << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
 			qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
