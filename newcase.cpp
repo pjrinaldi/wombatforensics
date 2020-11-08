@@ -386,6 +386,14 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             fsinfo.insert("mediatype", QVariant(partbuf.at(21)));
             fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(22, 2))));
             fsinfo.insert("fs32sectorcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(32, 4))));
+            float fatmultiplier = 0.0;
+            if(fatstr == "FAT12")
+                fatmultiplier  = 1.5;
+            else if(fatstr == "FAT16")
+                fatmultiplier = 2;
+            else if(fat32str == "FAT32")
+                fatmultiplier = 4;
+            qDebug() << "fat multiplier:" << fatmultiplier;
             int rootdirsectors = 0;
             if(fatstr == "FAT12" || fatstr == "FAT16")
             {
