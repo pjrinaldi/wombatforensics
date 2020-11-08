@@ -491,7 +491,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
 			uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
                         // GET CLUSTERS FOR FILE AND THEN CONVERT FROM CLUSTER TO BYTEOFFSET AND BYTE LENGTH, WILL HAVE TO FIGURE IT OUT
-			qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr;
+			qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr << "cluster num:" << clusternum;
 			//qDebug() << "inodecnt:" << inodecnt << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
 			qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
 			//qDebug() << "date time:" << QDateTime::fromSecsSinceEpoch(tmpdatetime, Qt::UTC).toString("yyyy-MM-dd hh:mm:ss");
