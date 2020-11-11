@@ -386,9 +386,9 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             fsinfo.insert("mediatype", QVariant(partbuf.at(21)));
             fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(22, 2))));
             fsinfo.insert("fs32sectorcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(32, 4))));
-            float fatmultiplier = 0.0;
+            int fatmultiplier = 0;
             if(fatstr == "FAT12")
-                fatmultiplier  = 1.5;
+                fatmultiplier  = 1;
             else if(fatstr == "FAT16")
                 fatmultiplier = 2;
             else if(fat32str == "FAT32")
@@ -499,6 +499,23 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
 			uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
                         // GET CLUSTERS FOR FILE AND THEN CONVERT FROM CLUSTER TO BYTEOFFSET AND BYTE LENGTH, WILL HAVE TO FIGURE IT OUT
+                        // POSSIBLY DUE A WHILE LOOP WHERE CNUM < 0XFFF8
+                        // Below Code is GetNextCluster(clusternum) // NEED TO ACCOUNT FOR HOW TO STORE CLUSTER VALUES DURING RECURSION...
+                        int fatbyte1 = 0;
+                        if(fatmultiplier == 1) // FAT12
+                        {
+                            fatbyte1 = clusternum + (clusternum / 2);
+                            qDebug() << "clusternum:" << clusternum << "fatbyte1:" << fatbyte1;
+                            if(clusternum & 0x0001) // ODD
+                                qDebug() << "fatcontent:" << QString::number((qFromLittleEndian<uint16_t>(fatbuf.mid(fatbyte1, 2)) >> 4), 16);
+                            else // EVEN
+                                qDebug() << "fatcontent:" << QString::number((qFromLittleEndian<uint16_t>(fatbuf.mid(fatbyte1, 2)) & 0x0FFF), 16);
+                            if(fatcontent < 0xFFF8)
+                                // GetNextCluster(fatcontent);
+                        }
+                        else if(fatmultiplier == 2) // FAT16
+                        {
+                        }
 			qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr << "cluster num:" << clusternum;
 			//qDebug() << "inodecnt:" << inodecnt << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
 			qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
