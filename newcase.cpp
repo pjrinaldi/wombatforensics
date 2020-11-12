@@ -510,7 +510,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                                 qDebug() << "fatcontent:" << QString::number((qFromLittleEndian<uint16_t>(fatbuf.mid(fatbyte1, 2)) >> 4), 16);
                             else // EVEN
                                 qDebug() << "fatcontent:" << QString::number((qFromLittleEndian<uint16_t>(fatbuf.mid(fatbyte1, 2)) & 0x0FFF), 16);
-                            if(fatcontent < 0xFFF8)
+                            //if(fatcontent < 0xFFF8)
                                 // GetNextCluster(fatcontent);
                         }
                         else if(fatmultiplier == 2) // FAT16
