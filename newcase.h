@@ -15,6 +15,7 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64> *offlist, QList<
 void ParseExtendedPartition(QString estring, uint32_t primaryextendedoffset, uint32_t offset, uint32_t size, QList<qint64>* offlist, QList<qint64>* sizelist, QList<QHash<QString, QVariant>>* fsinfolist);
 void ParseFileSystemInformation(QString estring, off64_t offset, QList<QHash<QString, QVariant>> *fsinfolist);
 //void PraseDirectory();
+void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist);
 void InitializeEvidenceStructure(QString evidstring);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);
 
