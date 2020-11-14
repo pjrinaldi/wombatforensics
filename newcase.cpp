@@ -417,6 +417,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 qDebug() << "root dir sectors:" << fsinfo.value("rootdirsectors").toUInt();
                 qDebug() << "cluster area/data start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + rootdirsectors;
                 ParseDirectory(estring, fsinfo.value("rootdiroffset").toUInt(), fsinfo.value("rootdirsize").toUInt(), &fsinfo, &fileinfolist);
+                qDebug() << "fileinfolist count:" << fileinfolist.count();
                 // PARSE ROOT DIR HERE...
                 // ParseDirectory(quint64 diroffset, uint64_t dirsize, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist);
                 /*
@@ -823,23 +824,24 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
         efile.open(QIODevice::ReadOnly);
     if(efile.isOpen())
     {
-        efile.seek(fsinfo.value("rootdiroffset").toUInt());
-        rootdirbuf = efile.read(fsinfo.value("rootdirsize").toUInt());
-        efile.seek(fsinfo.value("fatoffset").toUInt());
-        fatbuf = efile.read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
+        efile.seek(fsinfo->value("rootdiroffset").toUInt());
+        rootdirbuf = efile.read(fsinfo->value("rootdirsize").toUInt());
+        efile.seek(fsinfo->value("fatoffset").toUInt());
+        fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
         efile.close();
     }
     qDebug() << "fat size:" << fatbuf.count();
     qDebug() << "rootdirbuf size:" << rootdirbuf.count();
-    qDebug() << "rootdirmaxfiles:" << fsinfo.value("rootdirmaxfiles").toUInt();
+    qDebug() << "rootdirmaxfiles:" << fsinfo->value("rootdirmaxfiles").toUInt();
     uint inodecnt = 0;
-    //QList<QHash<QString, QVariant>> longnamelist;
     QString longnamestring = "";
-    for(uint i=0; i < fsinfo.value("rootdirmaxfiles").toUInt(); i++)
+    for(uint i=0; i < fsinfo->value("rootdirmaxfiles").toUInt(); i++)
     {
+        fileinfo.insert("fileattr", QVariant(rootdirbuf.at(i*32 + 11)));
         uint8_t firstchar = rootdirbuf.at(i*32);
         if(firstchar == 0x00) // entry is free and all remaining are free
             break;
+        /*
         else if(firstchar == 0xe5 || firstchar == 0x05) // was allocated but now free
             qDebug() << "is deleted";
         else if(firstchar == 0x2e) // directory
@@ -848,7 +850,23 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             //if(restname.at(0) == 0x2e)
                 //qDebug() << "cluster number contains the parent directory cluster number...may not need this info";
         }
+        */
         uint8_t fileattr = rootdirbuf.at(i*32 + 11);
+        QString attrstr = "";
+        if(fileattr & 0x01)
+            attrstr += "Read Only|";
+        else if(fileattr & 0x02)
+            attrstr += "Hidden File|";
+        else if(fileattr & 0x04)
+            attrstr += "System File|";
+        else if(fileattr & 0x08)
+            attrstr += "Volume ID|";
+        else if(fileattr & 0x10)
+            attrstr += "SubDirectory|";
+        else if(fileattr & 0x20)
+            attrstr += "Archive File|";
+        fileinfo.insert("attribute", QVariant(attrstr));
+
         /*
         if(fileattr & 0x01)
             qDebug() << "read only";
@@ -866,47 +884,128 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             qDebug() << "long name";
         else if(fileattr == 0x00) // need to process differently
             qDebug() << "deleted long file name????";
-        */
-            
+        */  
         // probably cehck file attr first... (byte 11), then firstchar (byte 0)
         if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
         {
-            QString longstr = "";
+            //QString longstr = "";
             if(!longnamestring.isEmpty())
             {
                 //qDebug() << "do something here...";
-                longstr = longnamestring;
+                longnamestring = longnamestring.replace("\uFF00", "");
+                longnamestring = longnamestring.replace("\uFFFF", "");
+                longnamestring = longnamestring.replace("\u5500", "");
+                fileinfo.insert("longname", QVariant(longnamestring));
+                //longstr = longnamestring;
                 //qDebug() << "long string name:" << longnamestring;
                 longnamestring = "";
             }
             else
-                qDebug() << "string is empty, nothing to do here...";
-            longstr = longstr.replace("\uFF00", "");
-            longstr = longstr.replace("\uFFFF", "");
-            longstr = longstr.replace("\u5500", "");
+                fileinfo.insert("longname", QVariant(""));
+            //else
+            //    qDebug() << "string is empty, nothing to do here...";
+            //longstr = longstr.replace("\uFF00", "");
+            //longstr = longstr.replace("\uFFFF", "");
+            //longstr = longstr.replace("\u5500", "");
+            //fileinfo.insert("longname", QVariant(longstr));
+            fileinfo.insert("firstchar", QVariant(rootdirbuf.at(i*32)));
+            if(fileinfo.value("firstchar").toUInt() == 0x00) // entry is free and all remanining are free
+                break;
+            else if(fileinfo.value("firstchar").toUInt() == 0xe5 || fileinfo.value("firstchar").toUInt() == 0x05) // was allocated but now free
+                fileinfo.insert("isdeleted", QVariant(1));
+            /*
+            else if(fileinfo.value("firstchar").toUInt() == 0x2e) // directory
+            {
+                // dot directory...
+            }
+            */
+            /*
+            uint8_t firstchar = rootdirbuf.at(i*32);
+            if(firstchar == 0x00) // entry is free and all remaining are free
+                break;
+            else if(firstchar == 0xe5 || firstchar == 0x05) // was allocated but now free
+                qDebug() << "is deleted";
+            else if(firstchar == 0x2e) // directory
+            {
+                qDebug() << "is directory";
+                //if(restname.at(0) == 0x2e)
+                    //qDebug() << "cluster number contains the parent directory cluster number...may not need this info";
+            }
+            */
+
             // if longnamelist.count() > 0 then parse long name list loop here using int j...
             // compute checksum for short entry and compare to checksum calculated for each previous long entry..
             // and clear it when done.
-            QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString());
-            QString extname = QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString());
-            uint8_t createtenth = rootdirbuf.at(i*32 + 13);
-            //fileinfo.insert("createdate", QVariant(ConvertDosTimeToUnixTime(rootdirbuf.mid(i*32 + 15), rootdir.mid(i*32 + 14), rootdir.mid(i*32 + 17), rootdir.mid(i*32 + 16))));
+            //QString restname = QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString()).replace(" ", "");
+            //QString extname = QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString()).replace(" ", "");
+            fileinfo.insert("restname", QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString()).replace(" ", ""));
+            fileinfo.insert("extname", QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString()).replace(" ", ""));
+            //qDebug() << "restname length:" << restname.count() << "extname length:" << extname.count();
+            //qDebug() << "restname:" << QString("|" + restname + "|") << "extname:" << QString("|" + extname + "|");
+            //uint8_t createtenth = rootdirbuf.at(i*32 + 13); // NOT GOING TO USE RIGHT NOW...
+            //qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
+            fileinfo.insert("createdate", QVariant(ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16))));
+            fileinfo.insert("accessdate", QVariant(ConvertDosTimeToUnixTime(0x00, 0x00, rootdirbuf.at(i*32 + 19), rootdirbuf.at(i*32 + 18))));
+            fileinfo.insert("modifydate", QVariant(ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 23), rootdirbuf.at(i*32 + 22), rootdirbuf.at(i*32 + 25), rootdirbuf.at(i*32 + 24))));
+            //fileinfo.insert("clusternum", QVariant(qFromLittleEndian<uint16_t>
             //uint16_t createdtime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2));
             //uint16_t createdday = qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2));
-            uint16_t accessday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2));
-            uint16_t writetime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2));
-            uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2));
-            uint16_t clusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
-            uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
+            //uint16_t accessday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2));
+            //uint16_t writetime = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2));
+            //uint16_t writeday = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2));
+            uint16_t hiclusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)); // always zero for fat12/16
+            uint16_t loclusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
+            fileinfo.insert("clusternum", QVariant(((uint32_t)hiclusternum >> 16) + loclusternum));
+            if(fileinfo.value("extname").toString().count() > 0)
+                fileinfo.insert("aliasname", QVariant(QString(char(firstchar) + fileinfo.value("restname").toString() + "." + fileinfo.value("extname").toString())));
+            else
+                fileinfo.insert("aliasname", QVariant(QString(char(firstchar) + fileinfo.value("restname").toString())));
+            fileinfo.insert("inode", QVariant(inodecnt));
+            //qDebug() << "clusternum:" << QString::number(fileinfo.value("clusternum").toUInt(), 16);
+            /*
+            uint16_t var1 = 0xFFFF;
+            uint16_t var2 = 0xFFFF;
+            qDebug() << "var1:" << QString::number(var1, 16) << "var2:" << QString::number(var2, 16);
+            uint32_t var3 = var1 + var2;
+            qDebug() << "var3:" << QString::number(var3, 16);
+            uint32_t var4 = ((uint32_t)var1 << 16) + var2;
+            qDebug() << "var4;" << QString::number(var4, 16);
+            */
+            //uint32_t filesize = qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4));
+            fileinfo.insert("size", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4))));
+            QList<uint> clusterlist;
+            clusterlist.clear();
+            GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), &fatbuf, &clusterlist);
+            /*
+            if(fileinfo.value("extname").toString().count() > 0)
+                qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + fileinfo.value("restname").toString() + "." + fileinfo.value("extname").toString()) << "name:" << fileinfo.value("longname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
+            else
+                qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + fileinfo.value("restname").toString()) << "name:" << fileinfo.value("longname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
+            */
+            //qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr << "cluster num:" << clusternum;
+            //qDebug() << "clusterlist:" << clusterlist;
+            QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + "|";
+            for(int j=0; j < clusterlist.count()-1; j++)
+            {
+                clusterstr += QString::number(clusterlist.at(j)) + "|";
+            }
+            fileinfo.insert("clusterlist", QVariant(clusterstr));
+            //qDebug() << "clusterstr:" << fileinfo.value("clusterlist").toString();
+            fileinfolist->append(fileinfo);
+            //clusterlist.append(GetNextCluster(fileinfo.value("clusternum").toUInt()));
+            //void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<uint>* clusterlist)
+
             // GET CLUSTERS FOR FILE AND THEN CONVERT FROM CLUSTER TO BYTEOFFSET AND BYTE LENGTH, WILL HAVE TO FIGURE IT OUT
             // POSSIBLY DUE A WHILE LOOP WHERE CNUM < 0XFFF8
             // Below Code is GetNextCluster(clusternum) // NEED TO ACCOUNT FOR HOW TO STORE CLUSTER VALUES DURING RECURSION...
+
+            /*
             int fatbyte1 = 0;
             if(fsinfo->value("typestr").toString() == "FAT12") // FAT12
             {
                 fatbyte1 = clusternum + (clusternum / 2);
                 qDebug() << "clusternum:" << clusternum << "fatbyte1:" << fatbyte1;
-                qDebug() << "first sector of cluster;" << ((clusternum - 2) * fsinfo.value("sectorspercluster").toUInt()) + fsinfo.value("clusterareastart").toUInt();
+                qDebug() << "first sector of cluster;" << ((clusternum - 2) * fsinfo->value("sectorspercluster").toUInt()) + fsinfo->value("clusterareastart").toUInt();
                 if(clusternum & 0x0001) // ODD
                     qDebug() << "fatcontent:" << QString::number((qFromLittleEndian<uint16_t>(fatbuf.mid(fatbyte1, 2)) >> 4), 16);
                 else // EVEN
@@ -920,11 +1019,21 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             else if(fsinfo->value("typestr").toString() == "FAT32")
             {
             }
-            qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr << "cluster num:" << clusternum;
+            */
+
+            //qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr << "cluster num:" << clusternum;
             //qDebug() << "inodecnt:" << inodecnt << QString("Dir Entry " + QString::number(i) + ":") << QString::number(fileattr, 16) << QString::number(firstchar, 16) << QString(char(firstchar) + restname + "." + extname) << filesize;
-            qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
+            //qint64 tmpdatetime = ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16));
             //qDebug() << "date time:" << QDateTime::fromSecsSinceEpoch(tmpdatetime, Qt::UTC).toString("yyyy-MM-dd hh:mm:ss");
             inodecnt++;
+            if(fileattr & 0x10 && firstchar != 0x2e) // sub-directory
+            {
+                qDebug() << "first char:" << QString::number(firstchar, 16);
+                qDebug() << "directory to recurse into offset:" << fileinfo.value("aliasname").toString() << ((fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) << "file size:" << fileinfo.value("filesize").toUInt();
+                ParseDirectory(estring, ((fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + 64, fsinfo->value("rootdirsize").toUInt(), fsinfo, fileinfolist);
+            }
+            else
+                qDebug() << "dot or dotdot directory";
             
             //qDebug() << "created day:" << QString::number(rootdirbuf.at(i*32 + 17), 2) << QString::number(rootdirbuf.at(i*32 + 16), 2) << QString::number(createdday, 2);
             //QString datetest = QString("%1%2").arg(rootdirbuf.at(i*32 + 17), 8, 2, QChar('0')).arg(rootdirbuf.at(i*32 + 16), 8, 2, QChar('0'));
@@ -950,7 +1059,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
                 longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 4).data())));
                 longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 12).data())));
                 longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 10).data())));
-                qDebug() << "checksum:" << QString::number(rootdirbuf.at(13), 16);
+                //qDebug() << "checksum:" << QString::number(rootdirbuf.at(13), 16);
                 //fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()))));
                 //qDebug() << "true - it is start of long entry";
                 //if(rootdirbuf.at(i*32) - 0x40 == 0x01)
@@ -975,6 +1084,35 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             //qDebug() << "inodecnt:" << inodecnt << "count i:" << i << "which should apply to the short dir name...";
         }
     }
+}
+
+void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<uint>* clusterlist)
+{
+    //qDebug() << "fatbuf count:" << fatbuf->count();
+    uint curcluster = 0;
+    int fatbyte1 = 0;
+    if(typestr == "FAT12") // FAT12
+    {
+        fatbyte1 = clusternum + (clusternum / 2);
+        //qDebug() << "clusternum:" << clusternum << "fatbyte1:" << fatbyte1;
+        //qDebug() << "first sector of cluster;" << ((clusternum - 2) * fsinfo->value("sectorspercluster").toUInt()) + fsinfo->value("clusterareastart").toUInt();
+        if(clusternum & 0x0001) // ODD
+            curcluster = (qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2)) >> 4);
+        else // EVEN
+            curcluster = (qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2)) & 0x0FFF);
+        //qDebug() << "curcluster;" << QString::number(curcluster, 16);
+        clusterlist->append(curcluster);
+        if(curcluster < 0xFF8)
+            GetNextCluster(curcluster, typestr, fatbuf, clusterlist);
+    }
+    else if(typestr == "FAT12") // FAT16
+    {
+    }
+    else if(typestr == "FAT32")
+    {
+    }
+    //if(fatcontent < 0xFFF8)
+        // GetNextCluster(fatcontent);
 }
 
 void ProcessVolume(QString evidstring)
