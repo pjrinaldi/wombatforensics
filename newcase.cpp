@@ -991,6 +991,52 @@ void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<
         // GetNextCluster(fatcontent);
 }
 
+/*
+void DetermineCategorySignature()
+{
+}
+ *
+ *
+    if(fsfile->name->type == TSK_FS_NAME_TYPE_DIR) // DIRECTORY
+        treeout << "Directory" << "Directory"; // CAT/SIG - 8/9
+    else if(fsfile->name->type == TSK_FS_NAME_TYPE_VIRT_DIR || QString(fsfile->name->name).contains("$OrphanFiles")) // VIRTUAL DIRECTORY
+        treeout << "Directory" << "Virtual Directory"; // CAT/SIG - 8,9
+    else
+    {
+        char* magicbuffer = new char[0];
+        magicbuffer = new char[charsize];
+        QByteArray tmparray("intro");
+        tmparray.clear();
+        mutex.lock();
+        tsk_fs_file_read(fsfile, 0, magicbuffer, charsize, TSK_FS_FILE_READ_FLAG_NONE);
+        mutex.unlock();
+        tmparray = QByteArray::fromRawData(magicbuffer, charsize);
+        QMimeDatabase mimedb;
+        //const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+        const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(QString::fromStdString(fsfile->name->name), tmparray);
+        QString mimestr = GenerateCategorySignature(mimetype);
+        if(mimestr.contains("Unknown")) // generate further analysis
+        {
+            if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
+                mimestr = "Windows System/Shortcut";
+            else if(strcmp(fsfile->name->name, "INFO2") == 0 && (tmparray.at(0) == 0x04 || tmparray.at(0) == 0x05))
+                mimestr = "Windows System/Recycler";
+            else if(QString::fromStdString(fsfile->name->name).startsWith("$I") && (tmparray.at(0) == 0x01 || tmparray.at(0) == 0x02))
+                mimestr = "Windows System/Recycle.Bin";
+            else if(QString::fromStdString(fsfile->name->name).endsWith(".pf") && tmparray.at(4) == 0x53 && tmparray.at(5) == 0x43 && tmparray.at(6) == 0x43 && tmparray.at(7) == 0x41)
+                mimestr = "Windows System/Prefetch";
+            else if(QString::fromStdString(fsfile->name->name).endsWith(".pf") && tmparray.at(0) == 0x4d && tmparray.at(1) == 0x41 && tmparray.at(2) == 0x4d)
+                mimestr = "Windows System/Prefetch";
+            else if(tmparray.at(0) == '\x72' && tmparray.at(1) == '\x65' && tmparray.at(2) == '\x67' && tmparray.at(3) == '\x66') // 72 65 67 66 | regf
+                mimestr = "Windows System/Registry";
+        }
+        //qDebug() << "mimestr:" << mimestr;
+        delete[] magicbuffer;
+        treeout << mimestr.split("/").at(0) << mimestr.split("/").at(1); // CAT/SIG - 8, 9
+    }
+
+ */ 
+
 void ProcessVolume(QString evidstring)
 {
     QList<qint64> pofflist;
@@ -1116,7 +1162,7 @@ void ProcessVolume(QString evidstring)
                     nodedata << fileinfolist.at(j).value("aliasname");
                 else
                     nodedata << fileinfolist.at(j).value("longname");
-                nodedata << fileinfolist.at(j).value("path") << fileinfolist.at(j).value("logicalsize") << fileinfolist.at(j).value("createdate") << fileinfolist.at(j).value("accessdata") << fileinfolist.at(j).value("modifydate") << "0" << "0" << "0" << "0" << "0" << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
+                nodedata << fileinfolist.at(j).value("path") << fileinfolist.at(j).value("logicalsize") << fileinfolist.at(j).value("createdate") << fileinfolist.at(j).value("accessdata") << fileinfolist.at(j).value("modifydate") << QVariant("0") << "0" << "0" << "0" << "0" << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(j).value("itemtype").toInt(), fileinfolist.at(j).value("isdeleted").toInt());
                 mutex.unlock();
