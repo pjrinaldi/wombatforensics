@@ -1162,7 +1162,45 @@ void ProcessVolume(QString evidstring)
                     nodedata << fileinfolist.at(j).value("aliasname");
                 else
                     nodedata << fileinfolist.at(j).value("longname");
-                nodedata << fileinfolist.at(j).value("path") << fileinfolist.at(j).value("logicalsize") << fileinfolist.at(j).value("createdate") << fileinfolist.at(j).value("accessdata") << fileinfolist.at(j).value("modifydate") << QVariant("0") << "0" << "0" << "0" << "0" << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
+                nodedata << fileinfolist.at(j).value("path") << fileinfolist.at(j).value("logicalsize") << fileinfolist.at(j).value("createdate") << fileinfolist.at(j).value("accessdata") << fileinfolist.at(j).value("modifydate") << QVariant("0") << "0";
+                if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
+                {
+                    nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
+                }
+                else
+                {
+                    QByteArray sigbuf;
+                    sigbuf.clear();
+                    QFile efile(emntstring);
+                    if(!efile.isOpen())
+                        efile.open(QIODevice::ReadOnly);
+                    if(efile.isOpen())
+                    {
+                        efile.seek(((fileinfolist.at(j).value("clusternum").toUInt() - 2) * fsinfolist.at(i).value("sectorspercluster").toUInt() * fsinfolist.at(i).value("bytespersector").toUInt()) + (fsinfolist.at(i).value("clusterareastart").toUInt() * fsinfolist.at(i).value("bytespersector").toUInt()));
+                        sigbuf = efile.read(fsinfolist.at(i).value("sectorspercluster").toUInt() * fsinfolist.at(i).value("bytespersector").toUInt());
+                        efile.close();
+                    }
+                    QMimeDatabase mimedb;
+                    const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist.at(j).value("aliasname").toString(), sigbuf);
+                    QString mimestr = GenerateCategorySignature(mimetype);
+                    if(mimestr.contains("Unknown")) // generate further analysis
+                    {
+                        if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
+                            mimestr = "Windows System/Shortcut";
+                        else if(strcmp(fileinfolist.at(j).value("aliasname").toString().toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
+                            mimestr = "Windows System/Recycler";
+                        else if(fileinfolist.at(j).value("aliasname").toString().startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
+                            mimestr = "Windows System/Recycle.Bin";
+                        else if(fileinfolist.at(j).value("aliasname").toString().endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
+                            mimestr = "Windows System/Prefetch";
+                        else if(fileinfolist.at(j).value("aliasname").toString().endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
+                            mimestr = "Windows System/Prefetch";
+                        else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
+                            mimestr = "Windows System/Registry";
+                    }
+                    nodedata << mimestr.split("/").at(0) << mimestr.split("/").at(1); // category << signature
+                }
+                nodedata << "0" << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(j).value("itemtype").toInt(), fileinfolist.at(j).value("isdeleted").toInt());
                 mutex.unlock();
@@ -1232,7 +1270,46 @@ void ProcessVolume(QString evidstring)
                     nodedata << fileinfolist.at(j).value("aliasname");
                 else
                     nodedata << fileinfolist.at(j).value("longname");
-                nodedata << fileinfolist.at(j).value("path") << fileinfolist.at(j).value("logicalsize") << fileinfolist.at(j).value("createdate") << fileinfolist.at(j).value("accessdata") << fileinfolist.at(j).value("modifydate") << "0" << "0" << "0" << "0" << "0" << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
+                nodedata << fileinfolist.at(j).value("path") << fileinfolist.at(j).value("logicalsize") << fileinfolist.at(j).value("createdate") << fileinfolist.at(j).value("accessdata") << fileinfolist.at(j).value("modifydate") << QVariant("0") << "0";
+                if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
+                {
+                    nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
+                }
+                else
+                {
+                    QByteArray sigbuf;
+                    sigbuf.clear();
+                    QFile efile(emntstring);
+                    if(!efile.isOpen())
+                        efile.open(QIODevice::ReadOnly);
+                    if(efile.isOpen())
+                    {
+                        efile.seek(((fileinfolist.at(j).value("clusternum").toUInt() - 2) * fsinfolist.at(i).value("sectorspercluster").toUInt() * fsinfolist.at(i).value("bytespersector").toUInt()) + (fsinfolist.at(i).value("clusterareastart").toUInt() * fsinfolist.at(i).value("bytespersector").toUInt()));
+                        sigbuf = efile.read(fsinfolist.at(i).value("sectorspercluster").toUInt() * fsinfolist.at(i).value("bytespersector").toUInt());
+                        efile.close();
+                    }
+                    QMimeDatabase mimedb;
+                    const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist.at(j).value("aliasname").toString(), sigbuf);
+                    QString mimestr = GenerateCategorySignature(mimetype);
+                    if(mimestr.contains("Unknown")) // generate further analysis
+                    {
+                        if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
+                            mimestr = "Windows System/Shortcut";
+                        else if(strcmp(fileinfolist.at(j).value("aliasname").toString().toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
+                            mimestr = "Windows System/Recycler";
+                        else if(fileinfolist.at(j).value("aliasname").toString().startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
+                            mimestr = "Windows System/Recycle.Bin";
+                        else if(fileinfolist.at(j).value("aliasname").toString().endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
+                            mimestr = "Windows System/Prefetch";
+                        else if(fileinfolist.at(j).value("aliasname").toString().endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
+                            mimestr = "Windows System/Prefetch";
+                        else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
+                            mimestr = "Windows System/Registry";
+                    }
+                    nodedata << mimestr.split("/").at(0) << mimestr.split("/").at(1); // category << signature
+                }
+                //nodedata << "0" << "0"; // category << signature
+                nodedata << "0" << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(j).value("itemtype").toInt(), fileinfolist.at(j).value("isdeleted").toInt());
                 mutex.unlock();
