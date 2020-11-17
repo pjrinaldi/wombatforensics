@@ -297,7 +297,7 @@ public:
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
         else if(role == Qt::ForegroundRole)
         {
-            if(nodetype == 5 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")) || (nodetype == 2 && itemnode->Data(11).toString().contains("-mc")))
+            if(nodetype == 3 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")) || (nodetype == 2 && itemnode->Data(11).toString().contains("-mc"))) // used to be 5
             {
                 if(itemnode->Data(11).toString().contains(filtervalues.idfilter) == false)
                     return QColor(Qt::lightGray);
@@ -419,14 +419,14 @@ public:
                         return QColor(Qt::lightGray);
                 }
             }
-            else if(nodetype < 4)
+            else if(nodetype < 3) // used to be 4
                 return QColor(Qt::darkBlue);
         }
         else if(role == Qt::DisplayRole)
         {
             if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
             {
-                if(nodetype == 5 || nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")))
+                if(nodetype == 3 || nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c"))) // used to be 3
                 {
                     ba.clear();
                     ba.append(itemnode->Data(index.column()).toString().toUtf8());
@@ -485,6 +485,7 @@ public:
                     else
                         return QIcon(":/basic/treevol");
                 }
+                /*
                 else if(nodetype == 3)
                     return QIcon(":/basic/treefs");
                 else if(nodetype == 4)
@@ -493,7 +494,8 @@ public:
                         return QIcon(":/basic/virtualfolder");
                     return QIcon(":/basic/carveicon");
                 }
-                else if(nodetype == 5)
+                */
+                else if(nodetype == 3) // used to be 5
                 {
                     if(nodename.startsWith("$"))
                     {

@@ -1113,10 +1113,10 @@ void ProcessVolume(QString evidstring)
                 QList<QVariant> nodedata;
                 nodedata.clear();
                 if(fileinfolist.at(j).value("longname").toString().isEmpty())
-                    nodedata << fileinfolist.at(j).value("aliasname");
+                    nodedata << QVariant(fileinfolist.at(j).value("aliasname").toString());
                 else
-                    nodedata << fileinfolist.at(j).value("longname");
-                nodedata << fileinfolist.at(j).value("path") << fileinfolist.at(j).value("logicalsize") << fileinfolist.at(j).value("createdate") << fileinfolist.at(j).value("accessdata") << fileinfolist.at(j).value("modifydate") << QVariant("0") << "0";
+                    nodedata << QVariant(fileinfolist.at(j).value("longname").toString());
+                nodedata << QVariant(fileinfolist.at(j).value("path").toString()) << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdata").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
                 if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
                 {
                     nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
@@ -1152,9 +1152,9 @@ void ProcessVolume(QString evidstring)
                         else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
                             mimestr = "Windows System/Registry";
                     }
-                    nodedata << mimestr.split("/").at(0) << mimestr.split("/").at(1); // category << signature
+                    nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
                 }
-                nodedata << "0" << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
+                nodedata << QVariant("0") << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(j).value("itemtype").toInt(), fileinfolist.at(j).value("isdeleted").toInt());
                 mutex.unlock();
@@ -1221,10 +1221,10 @@ void ProcessVolume(QString evidstring)
                 QList<QVariant> nodedata;
                 nodedata.clear();
                 if(fileinfolist.at(j).value("longname").toString().isEmpty())
-                    nodedata << fileinfolist.at(j).value("aliasname");
+                    nodedata << QVariant(fileinfolist.at(j).value("aliasname").toString());
                 else
-                    nodedata << fileinfolist.at(j).value("longname");
-                nodedata << fileinfolist.at(j).value("path") << fileinfolist.at(j).value("logicalsize") << fileinfolist.at(j).value("createdate") << fileinfolist.at(j).value("accessdata") << fileinfolist.at(j).value("modifydate") << QVariant("0") << "0";
+                    nodedata << QVariant(fileinfolist.at(j).value("longname").toString());
+                nodedata << QVariant(fileinfolist.at(j).value("path").toString()) << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdata").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
                 if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
                 {
                     nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
@@ -1260,7 +1260,7 @@ void ProcessVolume(QString evidstring)
                         else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
                             mimestr = "Windows System/Registry";
                     }
-                    nodedata << mimestr.split("/").at(0) << mimestr.split("/").at(1); // category << signature
+                    nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
                 }
                 nodedata << "0" << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("inode").toUInt())));
                 mutex.lock();
