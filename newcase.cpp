@@ -738,9 +738,11 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
         {
             if(!longnamestring.isEmpty())
             {
+                // this is not valid solution to do for every character, need to figure out what FAT is doing and pull them out prior...
                 longnamestring = longnamestring.replace("\uFF00", "");
                 longnamestring = longnamestring.replace("\uFFFF", "");
                 longnamestring = longnamestring.replace("\u5500", "");
+                longnamestring = longnamestring.replace("\u7F00", "");
                 fileinfo.insert("longname", QVariant(longnamestring));
                 longnamestring = "";
             }
@@ -1120,6 +1122,7 @@ void ProcessVolume(QString evidstring)
                     ba.append(fileinfolist.at(j).value("longname").toString().toUtf8());
                 nodedata << ba.toBase64();
                 ba.clear();
+                qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
                 ba.append(fileinfolist.at(j).value("path").toString().toUtf8());
                 nodedata << ba.toBase64() << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdate").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
                 if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
@@ -1233,6 +1236,7 @@ void ProcessVolume(QString evidstring)
                     ba.append(fileinfolist.at(j).value("longname").toString().toUtf8());
                 nodedata << ba.toBase64();
                 ba.clear();
+                qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
                 ba.append(fileinfolist.at(j).value("path").toString().toUtf8());
                 nodedata << ba.toBase64() << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdate").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
                 if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
