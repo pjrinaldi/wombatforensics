@@ -3067,6 +3067,7 @@ void WombatForensics::SaveState()
     SaveHashList();
     SavePasswordList();
     SaveImagesHash();
+    // SaveTreeModel();
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);
 }
@@ -3337,3 +3338,63 @@ void WombatForensics::FinishWombatCaseFile(void)
     else
 	StatusUpdate("Ready");
 }
+
+/*
+void WombatForensics::SaveTreeModel(void)
+{
+}
+void someFunction()
+{
+        QFile file(filePath);
+            if (file.open(QFile::WriteOnly))
+            {
+                QTextStream stream(&file);
+                this->printTree( 0, QModelIndex(), stream );
+                file.close();
+            }
+}
+
+void printTree( int level, const QModelIndex & index, QTextStream  & stream )
+{
+         QString indent;
+         for( int j = 0; j < level; ++j )
+             indent.append( "   " );
+
+        // print index itself
+        if( index.isValid() )
+        {
+             stream << indent;
+             for( int c = 0; c < index.model()->columnCount(index.parent()); ++c )
+             {
+                     QModelIndex columnIndex = index.sibling(index.row(), c);
+                     stream << index.data().toString();
+             }
+             stream << "\\n";
+       }
+       //print children
+       for (int r = 0; r < index.model()->rowCount(index); r++)
+        {
+               const QModelIndex childIndex = index.child( r, 0 );
+                this->printTree( level+1, childIndex, stream );
+        }
+}
+
+ for( int c = 0; c < index.model()->columnCount(index.parent()); c++)
+             {
+                     QModelIndex columnIndex = index.sibling(index.row(), c);
+                     stream << columnIndex .data().toString();
+             }
+
+void someFunction()
+{
+        QFile file(filePath);
+            if (file.open(QFile::WriteOnly))
+            {
+                QTextStream stream(&file);
+                for (int r = 0; r < model->rowCount(); r++)
+                        this->printTree( 0, model->index(r,0), stream );
+                file.close();
+            }
+}
+
+*/

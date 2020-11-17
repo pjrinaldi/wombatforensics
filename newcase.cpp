@@ -1112,11 +1112,16 @@ void ProcessVolume(QString evidstring)
                     parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("parentinode").toInt()));
                 QList<QVariant> nodedata;
                 nodedata.clear();
+                QByteArray ba;
+                ba.clear();
                 if(fileinfolist.at(j).value("longname").toString().isEmpty())
-                    nodedata << QVariant(fileinfolist.at(j).value("aliasname").toString());
+                    ba.append(fileinfolist.at(j).value("aliasname").toString().toUtf8());
                 else
-                    nodedata << QVariant(fileinfolist.at(j).value("longname").toString());
-                nodedata << QVariant(fileinfolist.at(j).value("path").toString()) << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdata").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
+                    ba.append(fileinfolist.at(j).value("longname").toString().toUtf8());
+                nodedata << ba.toBase64();
+                ba.clear();
+                ba.append(fileinfolist.at(j).value("path").toString().toUtf8());
+                nodedata << ba.toBase64() << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdate").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
                 if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
                 {
                     nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
@@ -1220,11 +1225,16 @@ void ProcessVolume(QString evidstring)
                     parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist.at(j).value("parentinode").toInt()));
                 QList<QVariant> nodedata;
                 nodedata.clear();
+                QByteArray ba;
+                ba.clear();
                 if(fileinfolist.at(j).value("longname").toString().isEmpty())
-                    nodedata << QVariant(fileinfolist.at(j).value("aliasname").toString());
+                    ba.append(fileinfolist.at(j).value("aliasname").toString().toUtf8());
                 else
-                    nodedata << QVariant(fileinfolist.at(j).value("longname").toString());
-                nodedata << QVariant(fileinfolist.at(j).value("path").toString()) << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdata").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
+                    ba.append(fileinfolist.at(j).value("longname").toString().toUtf8());
+                nodedata << ba.toBase64();
+                ba.clear();
+                ba.append(fileinfolist.at(j).value("path").toString().toUtf8());
+                nodedata << ba.toBase64() << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdate").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
                 if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
                 {
                     nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
