@@ -251,6 +251,7 @@ private:
     void CloseCurrentCase(void);
     void UpdateProperties(void);
     void LoadHexContents(void);
+    void PopulateHexContents(void);
     void GenerateHexFile(const QModelIndex index);
     QStringList GetFileLists(int filelisttype);
     void ProcessDig(QString curid);

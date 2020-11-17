@@ -1203,6 +1203,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        PopulateHexContents();
         //LoadHexContents();
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
@@ -1524,6 +1525,351 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
     //    qDebug() << "generatehex isn't setup for:" << curindex.sibling(curindex.row(), 11).data().toString() << "types yet.";
 }
 
+// MAYBE I SHOULD HAVE A POPULATEHEXCONTENTS WHICH GET'S IT FROM THE EVIDENCE IMAGE...
+// THEN I CAN HAVE AN LOCATEOFFSET WHICH THEN NAVIAGTES TO THE OFFSET...
+// OR I CAN DO IT ALL IN POPULATEHEXCONTENTS, BUT NEED TO SEE IF CURRENT HEXCONTENTS == NEW HEXCONTENTS AND THEN SKIP LOADING HEX, AND JUST GO TO LOCATING NEW OFFSET...
+void WombatForensics::PopulateHexContents()
+{
+    qDebug() << "new evidence:" << newevidence.at(0);
+    //ProcessVolume(existingevidence.at(i));
+    /*
+    selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
+    QString nodeid = selectednode->Data(11).toString();
+    if(nodeid.split("-f").last().startsWith("z"))
+    {
+        selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
+        nodeid = selectednode->Data(11).toString();
+    }
+    QString evidid = nodeid.split("-").first();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
+    //QString tmpstr = "";
+    /*
+    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
+    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        tmpstr = evidfile.readLine();
+    evidfile.close();
+    */
+    /*
+    QString datastring = wombatvariable.imgdatapath;
+    if(evidname.toLower().endsWith(".aff"))
+    {
+        datastring += evidname + "/" + evidname + ".raw";
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+    }
+    else if(evidname.toLower().endsWith(".e01"))
+    {
+        datastring += evidname + "/" + evidname + ".raw";
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+    }
+    else if(datastring.endsWith(".zmg"))
+    {
+	datastring += evidname + "/" + evidname.split(".zmg").first() + ".dd";
+        //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
+    }
+    else
+    {
+        if(imgext.contains(".000") || imgext.contains(".001"))
+        {
+            datastring += evidname + "/" + evidname + ".raw";
+            //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+        }
+        else
+        {
+            datastring = "get raw path...";
+            //datastring = tmpstr.split(",").at(3);
+        }
+    }
+
+    //qDebug() << "datastring:" << datastring;
+    casedatafile.setFileName(datastring);
+    ui->hexview->BypassColor(false);
+    ui->hexview->setData(casedatafile);
+    */
+    /*
+     *
+    // NEED TO GET EVIDENCE NAME FROM STAT FILE
+    selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
+    QString nodeid = selectednode->Data(11).toString();
+    qDebug() << "nodeid:" << nodeid;
+    if(nodeid.split("-f").last().startsWith("z"))
+    {
+        selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
+        nodeid = selectednode->Data(11).toString();
+    }
+    QString evidid = nodeid.split("-").first();
+    qDebug() << "evidid:" << evidid;
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
+    qDebug() << "evidfiles:" << evidfiles;
+    QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
+    QString tmpstr = "";
+    */
+    /*
+    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
+    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(evidfile.isOpen())
+        tmpstr = evidfile.readLine();
+    evidfile.close();
+    */ /*
+    QString datastring = wombatvariable.imgdatapath;
+    //if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
+    if(evidname.toLower().endsWith(".aff"))
+    {
+        datastring += evidname + "/" + evidname + ".raw";
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+    }
+    else if(evidname.toLower().endsWith(".e01"))
+    //else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).toLower().endsWith(".e01"))
+    {
+        datastring += evidname + "/" + evidname + ".raw";
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
+        //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+    }
+    */
+    /*else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
+    {
+        QString imgext = evidname.split(".").last();
+        //QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
+        if(imgext.contains(".000") || imgext.contains(".001"))
+        {
+            datastring += evidname + "/" + evidname + ".raw";
+            //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
+        }
+        else
+        {
+            datastring = "get raw path...";
+            //datastring = tmpstr.split(",").at(3);
+        }
+    }*/ /*
+    //else
+    //{
+    //    qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
+    //}
+    //if(datastring.endsWith(".sfs"))
+    //{
+	//datastring = 
+        //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
+    //}
+    else if(datastring.endsWith(".zmg"))
+    {
+	datastring += evidname + "/" + evidname.split(".zmg").first() + ".dd";
+        //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
+    }
+    //qDebug() << "datastring:" << datastring;
+    casedatafile.setFileName(datastring);
+    ui->hexview->BypassColor(false);
+    ui->hexview->setData(casedatafile);
+
+    // determine offset location in the editor
+    if(nodeid.split("-").count() == 1) // image file
+        ui->hexview->setCursorPosition(0);
+    else if(nodeid.split("-").count() == 2 && !nodeid.contains("-c")) // volume file
+    {
+        QFile volfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
+        volfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(volfile.isOpen())
+            tmpstr = volfile.readLine();
+        volfile.close();
+        ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toInt()*2);
+    }
+    else if(nodeid.contains("-c"))//else if(nodeid.split("-").count() == 2 && nodeid.contains("-c")) // carved file
+    {
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".stat");
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+            tmpstr = cfile.readLine();
+        cfile.close();
+        ui->hexview->BypassColor(true);
+        ui->hexview->SetColorInformation(0, 0, 0, 0, tmpstr.split(",").at(16), tmpstr.split(",").at(8).toULongLong(), 0);
+        if(tmpstr.split(",").count() > 15)
+            ui->hexview->setCursorPosition(tmpstr.split(",").at(16).toULongLong()*2);
+    }
+    else if(nodeid.split("-").count() == 3) // partition/file system
+    {
+        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            tmpstr = partfile.readLine();
+        partfile.close();
+        ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toLongLong()*2);
+    }
+    else if(nodeid.split("-").count() == 4) // $Carved directory
+    {
+        casedatafile.setFileName(QDir::tempPath() + "/zfile");
+        casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
+        casedatafile.write("dummy zerofile");
+        casedatafile.close();
+        ui->hexview->BypassColor(true);
+        ui->hexview->setData(casedatafile);
+        ui->hexview->setEnabled(false);
+        ui->actionsearchhex->setEnabled(false);
+    }
+    else if(nodeid.split("-").count() == 5) // dir/file
+    {
+        QString estring = nodeid.split("-", Qt::SkipEmptyParts).at(0);
+        QString vstring = nodeid.split("-", Qt::SkipEmptyParts).at(1);
+        QString pstring = nodeid.split("-", Qt::SkipEmptyParts).at(2);
+        QString fstring = nodeid.split("-", Qt::SkipEmptyParts).at(3);
+        QString astring = nodeid.split("-", Qt::SkipEmptyParts).at(4);
+        QString paridstr = astring.mid(1);
+        QStringList partlist;
+        partlist.clear();
+        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            partlist = QString(partfile.readLine()).split(",");
+        partfile.close();
+        qint64 fsoffset = partlist.at(4).toLongLong();
+        qint64 rootinum = partlist.at(3).toLongLong();
+        int blocksize = partlist.at(6).toInt();
+        int fstype = partlist.at(0).toInt();
+        if(paridstr.contains("-"))
+            paridstr = QString::number(rootinum);
+        int mftaddress = 0;
+        if(fstring.contains("a"))
+            mftaddress = astring.mid(2).toInt();
+        else
+            mftaddress = fstring.mid(1).toInt();
+        ui->hexview->setEnabled(true);
+        ui->actionsearchhex->setEnabled(true);
+        if(selectednode->Data(2).toInt() == 0) // zero file
+        {
+            casedatafile.setFileName(QDir::tempPath() + "/zfile");
+            casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
+            casedatafile.write("dummy zerofile");
+            casedatafile.close();
+            ui->hexview->BypassColor(true);
+            ui->hexview->setData(casedatafile);
+            ui->hexview->setEnabled(false);
+            ui->actionsearchhex->setEnabled(false);
+        }
+        else
+        {
+            QString blockstring = "";
+            QString residentstring = "";
+            QString bytestring = "";
+            QFile filefileprop;
+            filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + vstring + "/" + pstring + "/" + fstring + ".a" + paridstr + ".prop");
+            filefileprop.open(QIODevice::ReadOnly | QIODevice::Text);
+            while(!filefileprop.atEnd())
+            {
+                QString tmpstring = filefileprop.readLine();
+                if(tmpstring.contains("Block Address"))
+                    blockstring = tmpstring.split("||").at(1);
+                else if(tmpstring.contains("Byte Offset"))
+                    bytestring = tmpstring.split("||").at(1);
+                else if(tmpstring.contains("Data Attribute"))
+                    residentstring = tmpstring.split("||").at(1);
+            }
+            filefileprop.close();
+            bool isresident = true;
+            if(residentstring.contains("Non"))
+                isresident = false;
+            // ALTERNATIVE IF/ELSE METHOD TO SHORTEN CODE
+            bool isres = isresident;
+            bool isntfs = false;
+            bool isads = false;
+            bool isdir = false;
+	    bool isapfs = false;
+	    bool ishfs = false;
+	    if(fstype == TSK_FS_TYPE_APFS_DETECT)
+		isapfs = true;
+	    if(fstype == TSK_FS_TYPE_HFS_DETECT)
+		ishfs = true;
+            if(fstype == TSK_FS_TYPE_NTFS_DETECT)
+                isntfs = true;
+            if(fstring.contains("a"))
+	        isads = true;
+            if(selectednode->itemtype == 3 || selectednode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
+	        isdir = true;
+
+	    // ADD APFS FEATURES HERE...
+            if(isntfs && isres) // NTFS & RESIDENT
+            {
+    	        unsigned int curoffset = 0;
+		uint16_t mftoffset = 0;
+	        uint32_t atrtype = 0;
+	        uint8_t namelength = 0;
+	        uint32_t attrlength = 0;
+	        uint16_t resoffset = 0;
+		QStringList mftblocklist;
+		mftblocklist.clear();
+		QString mftid = nodeid.split("-").first() + "-" + nodeid.split("-").at(1) + "-" + nodeid.split("-").at(2) + "-f0-a5";
+		mftblocklist = mftblockhash.value(mftid).split("^^", Qt::SkipEmptyParts);
+                // NEW RESIDENT OFFSET CALCULATION
+                qint64 residentoffset = 0;
+                if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.
+                {
+                    residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
+                }
+                else // odd number, get starting block and jump the fractional amount to get to the correct entry.
+                {
+                    float mftblock = mftaddress * 1024.0/blocksize;
+                    int mftblockint = floor(mftblock);
+                    residentoffset = (mftblocklist.at(mftblockint).toLongLong() * blocksize) + fsoffset + (blocksize * (mftblock - mftblockint));
+                }
+                QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
+	        if(resbuffer.count() > 0)
+	        {
+                    curoffset = 0;
+		    mftoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(20, 2)); // offset to first attribute
+		    uint16_t attrcnt = qFromLittleEndian<uint16_t>(resbuffer.mid(40, 2)); // next attribute id
+		    curoffset += mftoffset;
+		    // Loop over attributes...
+                    for(uint i = 0; i < attrcnt; i++)
+                    {
+			atrtype = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset, 4)); // attribute type
+			namelength = qFromLittleEndian<uint8_t>(resbuffer.mid(curoffset + 9, 1)); // length of name
+			attrlength = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset + 4, 4)); // attribute length
+		        if(isdir && atrtype == 144)
+                        {
+			    break;
+                        }
+		        if(!isdir && isads && namelength > 0 && atrtype == 128)
+                        {
+			    break;
+                        }
+		        else if(!isdir && !isads && namelength == 0 && atrtype == 128)
+                        {
+			    break;
+                        }
+                        if(atrtype == 4294967295)
+                        {
+                            //qDebug() << "next attribute is 0xFFFFFFFF";
+                            break;
+                        }
+                        curoffset += attrlength;
+                    }
+		    resoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(curoffset + 20, 2)); // resident attribute content offset
+                    ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
+                    ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
+                }
+            }
+            else if(isapfs || ishfs)
+            {
+                // NO BYTESTRING AND BLOCKLIST FOR APFS... NEED TO FIGURE OUT HOW APFS DOES IT...
+                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+                ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
+                //qDebug() << "apfs works...";
+            }
+            else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
+	    {
+                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+                ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
+	    }
+        }
+    }
+    //else
+    //    qDebug() << "count for nodeid:" << nodeid.split("-").count();
+    ui->hexview->ensureVisible();
+
+     */ 
+}
 void WombatForensics::LoadHexContents()
 {
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
