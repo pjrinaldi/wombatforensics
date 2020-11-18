@@ -426,7 +426,7 @@ public:
         {
             if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
             {
-                if(nodetype == 3 || nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c"))) // used to be 3
+                if(nodetype == 3 || nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c"))) // used to be 5
                 {
                     ba.clear();
                     ba.append(itemnode->Data(index.column()).toString().toUtf8());
@@ -518,6 +518,8 @@ public:
                         return QIcon(":/basic/virtualdir");
                     else if(itemtype == 15)
                         return QIcon(":/basic/carveicon");
+		    else if(itemtype == 4)
+			return QIcon(":/basic/deletedfile");
                     else
                     {
                         if(itemnode->Data(11).toString().contains("fd") || itemnode->Data(11).toString().contains("fo"))

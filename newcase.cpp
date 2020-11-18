@@ -649,37 +649,6 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         fsinfo.insert("fsbyteorder", QVariant(qFromLittleEndian<int32_t>(partbuf.mid(548, 4))));
         //qDebug() << "fsbyteorder:" << QString::number(fsinfo.value("fsbyteorder").toInt(), 16);
     }
-    /*
-    for(int i=0; i < fileinfolist.count(); i++)
-    {
-        QString parentstr = "";
-        QList<QVariant> nodedata;
-        nodedata.clear();
-        if(fileinfolist.at(i).value("longname").toString().isEmpty())
-            nodedata << fileinfolist.at(i).value("aliasname");
-        else
-            nodedata << fileinfolist.at(i).value("longname");
-        nodedata << fileinfolist.at(i).value("logicalsize") << fileinfolist.at(i).value("createdate") << fileinfolist.at(i).value("accessdate") << fileinfolist.at(i).value("modifydate") << "0" << "0" << "0" << "0" << "0" << fileinfolist.at(i).value("inode");
-        mutex.lock();
-        treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(i).value("itemtype").toInt(), fileinfolist.at(i).value("isdeleted").toInt());
-        mutex.unlock();
-
-
-                //if(fsfile->name->par_addr == fsfile->fs_info->root_inum)
-                //    parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint);
-                //else
-                //    parentstr = "e" + QString::number(eint) + "-v" + QString::number(vint) + "-p" + QString::number(pint) + "-f" + QString::number(fsfile->name->par_addr);
-                //treenodemodel->AddNode(nodedata, parentstr, treeout.at(12).toInt(), treeout.at(13).toInt());
-                // 12 - 3 for dir, 5 for file...
-                // 13 - is deleted...
-        //nodedata << evidencename << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt));
-        //mutex.lock();
-        //treenodemodel->AddNode(nodedata, "-1", -1, -1);
-        //mutex.unlock();
-        //qDebug() << "fileinfo inode:" << fileinfolist.at(i).value("inode").toInt() << "fileinfo aliasname:" << fileinfolist.at(i).value("aliasname").toString();
-        //zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "MD5 Hash" << "File Category" << "File Signature" << "Tagged" << "ID"; // NAME IN FIRST COLUMN
-    }
-    */
     // need to implement iso, udf, hfs, zfs
     fsinfolist->append(fsinfo);
 }
@@ -750,7 +719,6 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
                 fileinfo.insert("isdeleted", QVariant(1));
             else
                 fileinfo.insert("isdeleted", QVariant(0));
-
             fileinfo.insert("restname", QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString()).replace(" ", ""));
             fileinfo.insert("extname", QString::fromStdString(rootdirbuf.mid(i*32 + 8, 3).toStdString()).replace(" ", ""));
             //uint8_t createtenth = rootdirbuf.at(i*32 + 13); // NOT GOING TO USE RIGHT NOW...
@@ -782,6 +750,8 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
             if(fileattr & 0x10)
                 fileinfo.insert("itemtype", QVariant(3));
+	    else if(firstchar == 0xe5 || firstchar == 0x05) // deleted
+		fileinfo.insert("itemtype", QVariant(4)); // deleted
             else
                 fileinfo.insert("itemtype", QVariant(5));
             fileinfolist->append(fileinfo);
@@ -938,6 +908,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             else
                 fileinfo.insert("longname", QVariant(""));
             fileinfo.insert("firstchar", QVariant(dirbuf.at(i*32)));
+	    // MAY NOT NEED THIS ISDELETED SINCE I CAN ASSIGN AN ITEMTYPE...
             if(firstchar == 0xe5 || firstchar == 0x05) // was allocated but now free
                 fileinfo.insert("isdeleted", QVariant(1));
             else
@@ -976,6 +947,8 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
             if(fileattr & 0x10)
                 fileinfo.insert("itemtype", QVariant(3));
+	    else if(firstchar == 0xe5 || firstchar == 0x05) // deleted
+		fileinfo.insert("itemtype", QVariant(4)); // deleted
             else
                 fileinfo.insert("itemtype", QVariant(5));
             fileinfolist->append(fileinfo);
@@ -1203,6 +1176,7 @@ void ProcessVolume(QString evidstring)
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 	    mutex.unlock();
             QList<QHash<QString, QVariant>> fileinfolist;
+	    QStringList orphanlist;
             ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist);
             //qDebug() << "fileinfolist count:" << fileinfolist.count();
             for(int j=0; j < fileinfolist.count(); j++)
