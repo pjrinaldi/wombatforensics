@@ -738,11 +738,13 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
         {
             if(!longnamestring.isEmpty())
             {
+                /*
                 // this is not valid solution to do for every character, need to figure out what FAT is doing and pull them out prior...
                 longnamestring = longnamestring.replace("\uFF00", "");
                 longnamestring = longnamestring.replace("\uFFFF", "");
                 longnamestring = longnamestring.replace("\u5500", "");
                 longnamestring = longnamestring.replace("\u7F00", "");
+                */
                 fileinfo.insert("longname", QVariant(longnamestring));
                 longnamestring = "";
             }
@@ -807,15 +809,138 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
                     qDebug() << "long string:" << longnamestring;
                     longnamestring = "";
                 }
-                longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 4).data())));
-                longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 12).data())));
-                longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 10).data())));
+                //qDebug() << "longname hex:" << rootdirbuf.mid(i*32 + 28, 4).toHex();
+                //qDebug() << "qchar 28-29:" << QChar(rootdirbuf.mid(i*32 + 28, 2).toUShort());
+                //qDebug() << "qchar 1-2:" << rootdirbuf.mid(i*32 + 1, 2).toHex() << QChar(rootdirbuf.mid(i*32 + 1, 2).toUShort());
+                //qDebug() << "longname 28-29, 30-31:" << QString::fromUtf16(reinterpret_cast<const uint16_t*>(rootdirbuf.mid(i*32 + 28, 2).data())) << QString::fromUtf16(reinterpret_cast<const uint16_t*>(rootdirbuf.mid(i*32 + 30, 2).data()));
+                QString l3 = "";
+                QString l2 = "";
+                QString l1 = "";
+                //qDebug() << "28-29:" << QString::number(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2)), 16);
+                /*
+                if(rootdirbuf.mid(i*32 + 28, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l3 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 2).data()));
+                if(rootdirbuf.mid(i*32 + 30, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l3 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 30, 2).data()));
+                if(rootdirbuf.mid(i*32 + 14, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 2).data()));
+                if(rootdirbuf.mid(i*32 + 16, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 16, 2).data()));
+                if(rootdirbuf.mid(i*32 + 18, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 18, 2).data()));
+                if(rootdirbuf.mid(i*32 + 20, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 20, 2).data()));
+                if(rootdirbuf.mid(i*32 + 22, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 22, 2).data()));
+                if(rootdirbuf.mid(i*32 + 24, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 24, 2).data()));
+                if(rootdirbuf.mid(i*32 + 1, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 2).data()));
+                if(rootdirbuf.mid(i*32 + 3, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 3, 2).data()));
+                if(rootdirbuf.mid(i*32 + 5, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 5, 2).data()));
+                if(rootdirbuf.mid(i*32 + 7, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 7, 2).data()));
+                if(rootdirbuf.mid(i*32 + 9, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 9, 2).data()));
+                */
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
+                    l3 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
+                    l3 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 30, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 16, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 18, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 20, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 22, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 24, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 3, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 5, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 7, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 9, 2).data()));
+                longnamestring.prepend(QString(l1 + l2 + l3));
+                //longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 4).data())));
+                //longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 12).data())));
+                //longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 10).data())));
             }
             else
             {
-                longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 4).data())));
-                longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 12).data())));
-                longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 10).data())));
+                QString l3 = "";
+                QString l2 = "";
+                QString l1 = "";
+                /*
+                qDebug() << "28-29:" << QString::number(rootdirbuf.mid(i*32 + 28, 2).toInt(nullptr, 16), 16);
+                if(rootdirbuf.mid(i*32 + 28, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l3 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 2).data()));
+                if(rootdirbuf.mid(i*32 + 30, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l3 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 30, 2).data()));
+                if(rootdirbuf.mid(i*32 + 14, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 2).data()));
+                if(rootdirbuf.mid(i*32 + 16, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 16, 2).data()));
+                if(rootdirbuf.mid(i*32 + 18, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 18, 2).data()));
+                if(rootdirbuf.mid(i*32 + 20, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 20, 2).data()));
+                if(rootdirbuf.mid(i*32 + 22, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 22, 2).data()));
+                if(rootdirbuf.mid(i*32 + 24, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 24, 2).data()));
+                if(rootdirbuf.mid(i*32 + 1, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 2).data()));
+                if(rootdirbuf.mid(i*32 + 3, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 3, 2).data()));
+                if(rootdirbuf.mid(i*32 + 5, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 5, 2).data()));
+                if(rootdirbuf.mid(i*32 + 7, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 7, 2).data()));
+                if(rootdirbuf.mid(i*32 + 9, 2).toInt(nullptr, 16) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 9, 2).data()));
+                */
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
+                    l3 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
+                    l3 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 30, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 16, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 18, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 20, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 22, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
+                    l2 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 24, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 3, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 5, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 7, 2).data()));
+                if(qFromBigEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
+                    l1 += QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 9, 2).data()));
+
+                longnamestring.prepend(QString(l1 + l2 + l3));
+                //longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 28, 4).data())));
+                //longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 14, 12).data())));
+                //longnamestring.prepend(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirbuf.mid(i*32 + 1, 10).data())));
             }
         }
     }
