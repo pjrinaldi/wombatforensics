@@ -1222,7 +1222,7 @@ void ProcessVolume(QString evidstring)
                     ba.append(fileinfolist.at(j).value("longname").toString().toUtf8());
                 nodedata << ba.toBase64();
                 ba.clear();
-                qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
+                //qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
                 ba.append(fileinfolist.at(j).value("path").toString().toUtf8());
                 nodedata << ba.toBase64() << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdate").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
                 if(fileinfolist.at(j).value("itemtype").toUInt() == 3)
@@ -1336,7 +1336,7 @@ void ProcessVolume(QString evidstring)
                     ba.append(fileinfolist.at(j).value("longname").toString().toUtf8());
                 nodedata << ba.toBase64();
                 ba.clear();
-                qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
+                //qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
                 ba.append(fileinfolist.at(j).value("path").toString().toUtf8());
                 nodedata << ba.toBase64() << QVariant(fileinfolist.at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist.at(j).value("createdate").toUInt()) << QVariant(fileinfolist.at(j).value("accessdate").toUInt()) << QVariant(fileinfolist.at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
                 if(fileinfolist.at(j).value("itemtype").toUInt() == 3)

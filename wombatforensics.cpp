@@ -1530,9 +1530,6 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 // OR I CAN DO IT ALL IN POPULATEHEXCONTENTS, BUT NEED TO SEE IF CURRENT HEXCONTENTS == NEW HEXCONTENTS AND THEN SKIP LOADING HEX, AND JUST GO TO LOCATING NEW OFFSET...
 void WombatForensics::PopulateHexContents()
 {
-    qDebug() << "new evidence:" << newevidence.at(0);
-    //ProcessVolume(existingevidence.at(i));
-    /*
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     QString nodeid = selectednode->Data(11).toString();
     if(nodeid.split("-f").last().startsWith("z"))
@@ -1544,14 +1541,37 @@ void WombatForensics::PopulateHexContents()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
     QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
-    //QString tmpstr = "";
-    /*
+    QString tmpstr = "";
     QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
     evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(evidfile.isOpen())
-        tmpstr = evidfile.readLine();
+        tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
     evidfile.close();
-    */
+    casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+    ui->hexview->BypassColor(false);
+    ui->hexview->setData(casedatafile);
+    if(nodeid.split("-").count() == 1) // image file
+    {
+        ui->hexview->setCursorPosition(0);
+        // need offset and the size for syntax highlighting.
+        //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+    }
+    else if(nodeid.split("-").count() == 2) // unallocated, file system, or partition, possibly carved, zip, etc...
+    {
+        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
+        //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
+        partfile.close();
+        ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()*2);
+        // need partition offset and the clusters/sectors as well as logical size for syntax highlighting...
+        //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+    }
+    else if(nodeid.split("-").count() == 3) // file/directory
+    {
+    }
+    ui->hexview->ensureVisible();
     /*
     QString datastring = wombatvariable.imgdatapath;
     if(evidname.toLower().endsWith(".aff"))
