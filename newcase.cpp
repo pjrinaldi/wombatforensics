@@ -1253,21 +1253,39 @@ void ProcessVolume(QString evidstring)
                 mutex.unlock();
             }
 	    // add virtual FS files itemtype = 10 ($MBR, $FAT1, $FAT2) functionalize so i can use if(fsinfo->value("type").toUInt() == 1) to add fs files...
+            /*
+            if(fsinfolist.at(i).value("type").toUInt() == )
+            {
+            }
+            */
 	    // add orphan directory and orphan files...
+            int curinode = fileinfolist.count();
+            QByteArray ba;
+            ba.clear();
+            nodedata.clear();
+            ba.append("orphans");
+            nodedata << ba.toBase64();
+            ba.clear();
+            ba.append("/");
+            QString parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
+            nodedata << ba.toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << QVariant("Directory") << QVariant("Virtual Directory") << "0" << QVariant(parentstr);
 	    mutex.lock();
-	    // set curinode = fileinfolist.count();
-	    //treenodemodel->AddNode(nodedata, parentstr, 11, 0); // "Orphans" directory at root fs level, id e-p-f#, where f# is fileinfolist.count(), e-p parentstr, virtualdir, not deleted.
-	    //QString parentstr = e-p-f(curinode)
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
 	    mutex.unlock();
-	    // curinode++;
-            if(orphanlist.count() > 0)
-                qDebug() << "orphanlist:" << orphanlist;
+	    curinode++;
 	    for(int j=0; j < orphanlist.count(); j++)
 	    {
-		// set nodedata here for orphan name...
-		// mutex.lock();
-		// treenodemodel->AddNode(); // nodeid is e-p-f#, where # is curinode + j, parentstr = e-p-f#
-		// mutex.unlock();
+                QString curid = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode + j));
+                nodedata.clear();
+                ba.clear();
+                ba.append(orphanlist.at(j));
+                nodedata << ba.toBase64();
+                ba.clear();
+                ba.append("/");
+                nodedata << ba.toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QVariant(curid);
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, parentstr, 4, 1);
+                mutex.unlock();
 	    }
 	    ptreecnt++;
 	    //qDebug() << "1st partition which has unalloc before...";
