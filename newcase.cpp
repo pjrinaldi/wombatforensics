@@ -656,7 +656,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
 
-void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist)
+void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QString>* orphanlist)
 {
     QHash<QString, QVariant> fileinfo;
     fileinfo.clear();
@@ -758,7 +758,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             inodecnt++;
             if(fileattr & 0x10) // sub directory
             {
-                ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf);
+                ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
                 //qDebug() << "inodecnt after subdir parse:" << inodecnt;
             }
         }
@@ -769,11 +769,12 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
                 if(!longnamestring.isEmpty()) // orphan long entry
                 {
 		    // NEED TO DECIDE IF I'M CONTINUING WITH INODECNT++ OR SOMETHING LIKE o1, o2, o3, etc...
-		    orphanlist.insert(longnamestring);
+		    orphanlist->append(longnamestring);
                     //qDebug() << "parse orphan long entry here.";
                     //qDebug() << "long string:" << longnamestring;
                     longnamestring = "";
                 }
+            }
                 QString l3 = "";
                 QString l2 = "";
                 QString l1 = "";
@@ -804,6 +805,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
                 if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
                     l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2))));
                 longnamestring.prepend(QString(l1 + l2 + l3));
+            /*
             }
             else
             {
@@ -838,11 +840,12 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
                     l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2))));
                 longnamestring.prepend(QString(l1 + l2 + l3));
             }
+            */
         }
     }
 }
 
-void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parentinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf)
+void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parentinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf, QList<QString>* orphanlist)
 {
     uint curinode = *inodecnt;
     //curinode++;
@@ -958,7 +961,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             *inodecnt = curinode;
             if(fileattr & 0x10) // sub directory
             {
-                ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf);
+                ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf, orphanlist);
             }
         }
         else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
@@ -968,11 +971,12 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
                 if(!longnamestring.isEmpty()) // orphan long entry
                 {
 		    // NEED TO DECIDE IF I'M CONTINUING WITH INODECNT++ OR SOMETHING LIKE o1, o2, o3, etc...
-		    orphanlist.insert(longnamestring);
+		    orphanlist->append(longnamestring);
                     //qDebug() << "parse orphan long entry here.";
                     //qDebug() << "long string:" << longnamestring;
                     longnamestring = "";
                 }
+            }
                 QString l3 = "";
                 QString l2 = "";
                 QString l1 = "";
@@ -1003,6 +1007,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
                 if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
                     l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2))));
                 longnamestring.prepend(QString(l1 + l2 + l3));
+            /*
             }
             else
             {
@@ -1037,6 +1042,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
                     l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2))));
                 longnamestring.prepend(QString(l1 + l2 + l3));
             }
+            */
         }
     }
 }
@@ -1180,8 +1186,8 @@ void ProcessVolume(QString evidstring)
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 	    mutex.unlock();
             QList<QHash<QString, QVariant>> fileinfolist;
-	    QStringList orphanlist;
-            ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist);
+	    QList<QString> orphanlist;
+            ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             //qDebug() << "fileinfolist count:" << fileinfolist.count();
 	    // FUNCTIONALIZE THE BELOW, SO I'M NOT DUPLICATING THE SAME CODE IN TWO PLACES FOR THE FILES SUCH AS PopulateFileSystem();
             for(int j=0; j < fileinfolist.count(); j++)
@@ -1254,6 +1260,8 @@ void ProcessVolume(QString evidstring)
 	    //QString parentstr = e-p-f(curinode)
 	    mutex.unlock();
 	    // curinode++;
+            if(orphanlist.count() > 0)
+                qDebug() << "orphanlist:" << orphanlist;
 	    for(int j=0; j < orphanlist.count(); j++)
 	    {
 		// set nodedata here for orphan name...
@@ -1311,7 +1319,8 @@ void ProcessVolume(QString evidstring)
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 	    mutex.unlock();
             QList<QHash<QString, QVariant>> fileinfolist;
-            ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist);
+            QList<QString> orphanlist;
+            ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             //qDebug() << "fileinfolist count:" << fileinfolist.count();
             for(int j=0; j < fileinfolist.count(); j++)
             {
