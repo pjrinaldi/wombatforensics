@@ -768,8 +768,10 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             {
                 if(!longnamestring.isEmpty()) // orphan long entry
                 {
-                    qDebug() << "parse orphan long entry here.";
-                    qDebug() << "long string:" << longnamestring;
+		    // NEED TO DECIDE IF I'M CONTINUING WITH INODECNT++ OR SOMETHING LIKE o1, o2, o3, etc...
+		    orphanlist.insert(longnamestring);
+                    //qDebug() << "parse orphan long entry here.";
+                    //qDebug() << "long string:" << longnamestring;
                     longnamestring = "";
                 }
                 QString l3 = "";
@@ -965,8 +967,10 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             {
                 if(!longnamestring.isEmpty()) // orphan long entry
                 {
-                    qDebug() << "parse orphan long entry here.";
-                    qDebug() << "long string:" << longnamestring;
+		    // NEED TO DECIDE IF I'M CONTINUING WITH INODECNT++ OR SOMETHING LIKE o1, o2, o3, etc...
+		    orphanlist.insert(longnamestring);
+                    //qDebug() << "parse orphan long entry here.";
+                    //qDebug() << "long string:" << longnamestring;
                     longnamestring = "";
                 }
                 QString l3 = "";
@@ -1179,6 +1183,7 @@ void ProcessVolume(QString evidstring)
 	    QStringList orphanlist;
             ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist);
             //qDebug() << "fileinfolist count:" << fileinfolist.count();
+	    // FUNCTIONALIZE THE BELOW, SO I'M NOT DUPLICATING THE SAME CODE IN TWO PLACES FOR THE FILES SUCH AS PopulateFileSystem();
             for(int j=0; j < fileinfolist.count(); j++)
             {
                 QString parentstr = "";
@@ -1241,6 +1246,21 @@ void ProcessVolume(QString evidstring)
                 treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(j).value("itemtype").toInt(), fileinfolist.at(j).value("isdeleted").toInt());
                 mutex.unlock();
             }
+	    // add virtual FS files itemtype = 10 ($MBR, $FAT1, $FAT2) functionalize so i can use if(fsinfo->value("type").toUInt() == 1) to add fs files...
+	    // add orphan directory and orphan files...
+	    mutex.lock();
+	    // set curinode = fileinfolist.count();
+	    //treenodemodel->AddNode(nodedata, parentstr, 11, 0); // "Orphans" directory at root fs level, id e-p-f#, where f# is fileinfolist.count(), e-p parentstr, virtualdir, not deleted.
+	    //QString parentstr = e-p-f(curinode)
+	    mutex.unlock();
+	    // curinode++;
+	    for(int j=0; j < orphanlist.count(); j++)
+	    {
+		// set nodedata here for orphan name...
+		// mutex.lock();
+		// treenodemodel->AddNode(); // nodeid is e-p-f#, where # is curinode + j, parentstr = e-p-f#
+		// mutex.unlock();
+	    }
 	    ptreecnt++;
 	    //qDebug() << "1st partition which has unalloc before...";
 	}
