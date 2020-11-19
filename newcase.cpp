@@ -1185,6 +1185,7 @@ void ProcessVolume(QString evidstring)
 	    mutex.lock();
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 	    mutex.unlock();
+            WriteFileSystemProperties((QHash<QString, QVariant>*)&(fsinfolist.at(i)), QString(curpartpath + "prop"));
             QList<QHash<QString, QVariant>> fileinfolist;
 	    QList<QString> orphanlist;
             ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
@@ -1278,7 +1279,7 @@ void ProcessVolume(QString evidstring)
                 QString curid = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode + j));
                 nodedata.clear();
                 ba.clear();
-                ba.append(orphanlist.at(j));
+                ba.append(orphanlist.at(j).toUtf8());
                 nodedata << ba.toBase64();
                 ba.clear();
                 ba.append("/");
@@ -1445,6 +1446,40 @@ void ProcessVolume(QString evidstring)
 	treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
 	mutex.unlock();
         */
+}
+
+void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstring)
+{
+    QFile fspropfile(pathstring);
+    if(!fspropfile.isOpen())
+        fspropfile.open(QIODevice::Append | QIODevice::Text);
+    if(fspropfile.isOpen())
+    {
+        QTextStream out;
+        out.setDevice(&fspropfile);
+        out << "File System Type|" << QString::number(fsinfo->value("type").toUInt()) << "|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|" << fsinfo->value("typestr").toString() << "|File System Type String." << Qt::endl;
+        out << "Bytes Per Sector|" << QString::number(fsinfo->value("bytespersector").toUInt()) << "|Number of Bytes per Sector, usually 512." << Qt::endl;
+        out << "Sectors Per Cluster|" << QString::number(fsinfo->value("sectorspercluster").toUInt()) << "|Number of Sectors per Cluster." << Qt::endl;
+        out << "Total Sectors|" << QString::number(fsinfo->value("totalsectors").toUInt()) << "|Number of sectors in the file system." << Qt::endl;
+        out << "Volume Label|" << fsinfo->value("vollabel").toString() << "|Volume Label for the file system." << Qt::endl;
+        if(fsinfo->value("type").toUInt() == 1) // FAT12
+        {
+            out << "Fat Count|" << QString::number(fsinfo->value("fatcount").toUInt()) << "|Number of FAT's in the file system." << Qt::endl;
+            out << "Reserved Area Size|" << QString::number(fsinfo->value("reservedareasize").toUInt()) << "|Size of the reserved area at the beginning of the file system." << Qt::endl;
+            out << "File System Sector Count|" << QString::number(fsinfo->value("fssectorcnt").toUInt()) << "|Total Sectors in the volume" << Qt::endl;
+            out << "FAT Size|" << QString::number(fsinfo->value("fatsize").toUInt()) << "|Size of the FAT." << Qt::endl;
+            out << "Root Directory Offset|" << QString::number(fsinfo->value("rootdiroffset").toUInt()) << "|Byte Offset for the root directory" << Qt::endl;
+            out << "Root Directory Max Files|" << QString::number(fsinfo->value("rootdirmaxfiles").toUInt()) << "|Maximum number of root directory entries" << Qt::endl;
+            out << "Root Directory Sectors|" << QString::number(fsinfo->value("rootdirsectors").toUInt()) << "|Number of sectors for the root directory" << Qt::endl;
+            out << "Root Directory Size|" << QString::number(fsinfo->value("rootdirsize").toUInt()) << "|Size in bytes for the root directory" << Qt::endl;
+            out << "Cluster Area Start|" << QString::number(fsinfo->value("clusterareastart").toUInt()) << "|Byte offset to the start of the cluster area" << Qt::endl;
+            out << "FAT Offset|" << QString::number(fsinfo->value("fatoffset").toUInt()) << "|Byte offset to the start of the first FAT" << Qt::endl;
+        }
+        out.flush();
+        fspropfile.close();
+    }
+    //qDebug() << "fsinfo type:" << fsinfo->value("typestr");
 }
 
 void InitializeEvidenceStructure(QString evidname)
