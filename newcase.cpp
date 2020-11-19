@@ -660,7 +660,6 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
 {
     QHash<QString, QVariant> fileinfo;
     fileinfo.clear();
-    //qDebug() << "diroffset:" << diroffset << "dirsize:" << dirsize;
     QByteArray fatbuf;
     fatbuf.clear();
     QByteArray rootdirbuf;
@@ -676,9 +675,6 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
         fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
         efile.close();
     }
-    //qDebug() << "fat size:" << fatbuf.count();
-    //qDebug() << "rootdirbuf size:" << rootdirbuf.count();
-    //qDebug() << "rootdirmaxfiles:" << fsinfo->value("rootdirmaxfiles").toUInt();
     uint inodecnt = 0;
     QString longnamestring = "";
     for(uint i=0; i < fsinfo->value("rootdirmaxfiles").toUInt(); i++)
@@ -713,8 +709,6 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             else
                 fileinfo.insert("longname", QVariant(""));
             fileinfo.insert("firstchar", QVariant(rootdirbuf.at(i*32)));
-            //if(fileinfo.value("firstchar").toUInt() == 0x00) // entry is free and all remanining are free
-            //    break;
             if(fileinfo.value("firstchar").toUInt() == 0xe5 || fileinfo.value("firstchar").toUInt() == 0x05) // was allocated but now free
                 fileinfo.insert("isdeleted", QVariant(1));
             else
@@ -740,13 +734,17 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             clusterlist.clear();
             GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), &fatbuf, &clusterlist);
             //qDebug() << "inodecnt:" << inodecnt << "alias name:" << fileinfo.value("aliasname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
-            //qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr << "cluster num:" << clusternum;
-            QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + "|";
+            QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
+	    QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
+	    QString layout = QString::number((fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
             for(int j=0; j < clusterlist.count()-1; j++)
             {
-                clusterstr += QString::number(clusterlist.at(j)) + "|";
+                clusterstr += QString::number(clusterlist.at(j)) + ",";
+		layout += QString::number((clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
             }
             fileinfo.insert("clusterlist", QVariant(clusterstr));
+	    fileinfo.insert("layout", QVariant(layout));
+	    //QStringList clusters = clusterstr.split(",", Qt::SkipEmptyParts);
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
             if(fileattr & 0x10)
                 fileinfo.insert("itemtype", QVariant(3));
@@ -759,7 +757,6 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             if(fileattr & 0x10) // sub directory
             {
                 ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
-                //qDebug() << "inodecnt after subdir parse:" << inodecnt;
             }
         }
         else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
@@ -768,79 +765,40 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             {
                 if(!longnamestring.isEmpty()) // orphan long entry
                 {
-		    // NEED TO DECIDE IF I'M CONTINUING WITH INODECNT++ OR SOMETHING LIKE o1, o2, o3, etc...
 		    orphanlist->append(longnamestring);
-                    //qDebug() << "parse orphan long entry here.";
-                    //qDebug() << "long string:" << longnamestring;
                     longnamestring = "";
                 }
             }
-                QString l3 = "";
-                QString l2 = "";
-                QString l1 = "";
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
-                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
-                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2))));
-                longnamestring.prepend(QString(l1 + l2 + l3));
-            /*
-            }
-            else
-            {
-                QString l3 = "";
-                QString l2 = "";
-                QString l1 = "";
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
-                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
-                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2))));
-                if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2))));
-                longnamestring.prepend(QString(l1 + l2 + l3));
-            }
-            */
+	    QString l3 = "";
+	    QString l2 = "";
+	    QString l1 = "";
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
+		l3 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
+		l3 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2))));
+	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2))));
+	    longnamestring.prepend(QString(l1 + l2 + l3));
         }
     }
 }
@@ -848,12 +806,11 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
 void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parentinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf, QList<QString>* orphanlist)
 {
     uint curinode = *inodecnt;
-    //curinode++;
     QHash<QString, QVariant> fileinfo;
     fileinfo.clear();
     QByteArray dirbuf;
     dirbuf.clear();
-    QStringList clusters = parentinfo->value("clusterlist").toString().split("|", Qt::SkipEmptyParts);
+    QStringList clusters = parentinfo->value("clusterlist").toString().split(",", Qt::SkipEmptyParts);
     //qDebug() << "clusters:" << clusters << "count:" << clusters.count();
     //qDebug() << "clusterstr:" << parentinfo->value("clusterlist").toString();
     QFile efile(estring);
@@ -865,8 +822,8 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
         {
             if(i == 0)
             {
-                efile.seek(((clusters.at(i).toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + 64);
-                dirbuf.append(efile.read(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt() - 64));
+                efile.seek(((clusters.at(i).toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + 64); // skips the first 2 32-byte directory entries for (. and ..) directories to avoid recursive looping.
+                dirbuf.append(efile.read(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt() - 64)); // # - 64 accounts for skipping 2 directory entries (. and ..)
             }
             else
             {
@@ -874,21 +831,16 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
                 dirbuf.append(efile.read(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
             }
         }
-        //efile.seek(((parentinfo->value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + 64);
-        //dirbuf = efile.read(parentinfo->value("physicalsize").toUInt() - 64);
         efile.close();
     }
     QString longnamestring = "";
-    //qDebug() << "dirbuf.count:" << dirbuf.count() << "dirbuf entry count:" << dirbuf.count() / 32;
     for(int i=0; i < dirbuf.count() / 32; i++)
     {
         fileinfo.insert("fileattr", QVariant(dirbuf.at(i*32 + 11)));
         uint8_t firstchar = dirbuf.at(i*32);
-        //qDebug() << "firstchar:" << firstchar;
         if(firstchar == 0x00) // entry is free and all remaining are free
             break;
         uint8_t fileattr = dirbuf.at(i*32 + 11);
-        //qDebug() << "fileattr:" << QString::number(fileattr, 16);
         QString attrstr = "";
         if(fileattr & 0x01)
             attrstr += "Read Only|";
@@ -942,13 +894,16 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             clusterlist.clear();
             GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), fatbuf, &clusterlist);
             //qDebug() << "inodecnt:" << curinode << "alias name:" << fileinfo.value("aliasname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
-            //qDebug() << "inodecnt:" << inodecnt << "alias name:" << QString(char(firstchar) + restname + "." + extname) << "name:" << longstr << "cluster num:" << clusternum;
-            QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + "|";
+	    QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
+	    QString layout = QString::number((fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
+            QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
             for(int j=0; j < clusterlist.count()-1; j++)
             {
-                clusterstr += QString::number(clusterlist.at(j)) + "|";
+                clusterstr += QString::number(clusterlist.at(j)) + ",";
+		layout += QString::number((clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
             }
             fileinfo.insert("clusterlist", QVariant(clusterstr));
+	    fileinfo.insert("layout", QVariant(layout));
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
             if(fileattr & 0x10)
                 fileinfo.insert("itemtype", QVariant(3));
@@ -970,110 +925,67 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             {
                 if(!longnamestring.isEmpty()) // orphan long entry
                 {
-		    // NEED TO DECIDE IF I'M CONTINUING WITH INODECNT++ OR SOMETHING LIKE o1, o2, o3, etc...
 		    orphanlist->append(longnamestring);
-                    //qDebug() << "parse orphan long entry here.";
-                    //qDebug() << "long string:" << longnamestring;
                     longnamestring = "";
                 }
             }
-                QString l3 = "";
-                QString l2 = "";
-                QString l1 = "";
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
-                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 28, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
-                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 30, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 14, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 16, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 18, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 20, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 22, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 24, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 1, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 3, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 5, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 7, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2))));
-                longnamestring.prepend(QString(l1 + l2 + l3));
-            /*
-            }
-            else
-            {
-                QString l3 = "";
-                QString l2 = "";
-                QString l1 = "";
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
-                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 28, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
-                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 30, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 14, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 16, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 18, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 20, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 22, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
-                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 24, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 1, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 3, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 5, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 7, 2))));
-                if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
-                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2))));
-                longnamestring.prepend(QString(l1 + l2 + l3));
-            }
-            */
+	    QString l3 = "";
+	    QString l2 = "";
+	    QString l1 = "";
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
+		l3 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 28, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
+		l3 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 30, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 14, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 16, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 18, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 20, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 22, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
+		l2 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 24, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 1, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 3, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 5, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 7, 2))));
+	    if(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
+		l1 += QString(QChar(qFromLittleEndian<uint16_t>(dirbuf.mid(i*32 + 9, 2))));
+	    longnamestring.prepend(QString(l1 + l2 + l3));
         }
     }
 }
 
 void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<uint>* clusterlist)
 {
-    //qDebug() << "fatbuf count:" << fatbuf->count();
     uint curcluster = 0;
     int fatbyte1 = 0;
     if(typestr == "FAT12") // FAT12
     {
         fatbyte1 = clusternum + (clusternum / 2);
-        //qDebug() << "clusternum:" << clusternum << "fatbyte1:" << fatbyte1;
-        //qDebug() << "first sector of cluster;" << ((clusternum - 2) * fsinfo->value("sectorspercluster").toUInt()) + fsinfo->value("clusterareastart").toUInt();
         if(clusternum & 0x0001) // ODD
             curcluster = (qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2)) >> 4);
         else // EVEN
             curcluster = (qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2)) & 0x0FFF);
-        //qDebug() << "curcluster;" << QString::number(curcluster, 16);
         clusterlist->append(curcluster);
         if(curcluster < 0xFF8)
             GetNextCluster(curcluster, typestr, fatbuf, clusterlist);
     }
     else if(typestr == "FAT16") // FAT16
     {
+	//if(fatcontent < 0xFFF8)
+	    // GetNextCluster(fatcontent);
     }
     else if(typestr == "FAT32")
     {
     }
-    //if(fatcontent < 0xFFF8)
-        // GetNextCluster(fatcontent);
 }
 
 void ProcessVolume(QString evidstring)
@@ -1082,17 +994,13 @@ void ProcessVolume(QString evidstring)
     pofflist.clear();
     QList<qint64> psizelist;
     psizelist.clear();
-    //QList<FileSystemInfo> fsinfolist;
     QList<QHash<QString, QVariant>> fsinfolist;
     fsinfolist.clear();
     qint64 imgsize = 0;
-    // if evidstring .exists, then we find dir with evidstring in it and split at evidstring -e
-    //qDebug() << "evidstring:" << evidstring;
     int evidcnt = 0;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*" + evidstring.split("/").last() + "*"), QDir::NoSymLinks | QDir::Dirs);
     evidcnt = evidfiles.first().split(QString(evidstring.split("/").last() + "-e")).last().toInt();
-    //qDebug() << "evidcnt for evidstring:" << evidcnt << evidstring;
     QString evidencename = evidstring.split("/").last();
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + "-e" + QString::number(evidcnt) + "/";
     QString emntstring = evidstring;
@@ -1119,7 +1027,6 @@ void ProcessVolume(QString evidstring)
         estatfile.close();
     }
     ParseVolume(emntstring, imgsize, &pofflist, &psizelist, &fsinfolist);
-    //int pvret = ParseVolume(emntstring, imgsize, &pofflist, &psizelist);
     if(pofflist.count() == 0)
     {	
 	// virtual attempt to process entire image as a filesystem...
@@ -1127,14 +1034,11 @@ void ProcessVolume(QString evidstring)
 	psizelist.append(imgsize/512);
         ParseFileSystemInformation(emntstring, 0, &fsinfolist);
     }
-    //qDebug() << "pofflist:" << pofflist;
-    //qDebug() << "psizelist:" << psizelist;
     // add partitions to tree and decide about stat/prop files and where to put them...
     int ptreecnt = 0;
     QString curpartpath;
     QDir dir;
     QFile pstatfile;
-    //int fstype = 0;
     for(int i=0; i < pofflist.count(); i++)
     {
         // might want to also look at having a single stat for all parts/fs and one for all files for each part/fs..
@@ -1173,15 +1077,12 @@ void ProcessVolume(QString evidstring)
                 out.setDevice(&pstatfile);
                 // FOR OUT STAT FILE, MAYBE I SHOULD JUST LOOP OVER THE HASH PROPERTIES AND STORE THEM ALL IN A COMMA LIST... OR A NAME|VALUE, LIST
                 // OR I CAN FIGURE OUT WHAT I NEED FOR EACH FILE TYPE AND GENERATE STRING ACCORDINGLY THROUGH A FUNCTION... QString GetFileSystemOutString(fsinfolist.at(i));
-                //out << QString(fsinfolist.at(i).vollabel + " [" + fsinfolist.at(i).fatlabel.left(5) + "]") << "," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
                 out << "ALLOCATED," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
                 out.flush();
                 pstatfile.close();
             }
-            //qDebug() << "allocated partition[" << i << "]:" << fsinfolist.at(i).value("vollabel").toString() << "[" << fsinfolist.at(i).value("typestr").toString() << "]";
 	    nodedata.clear();
 	    nodedata << QString(fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]") << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-	    //nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 	    mutex.unlock();
@@ -1189,7 +1090,6 @@ void ProcessVolume(QString evidstring)
             QList<QHash<QString, QVariant>> fileinfolist;
 	    QList<QString> orphanlist;
             ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
-            //qDebug() << "fileinfolist count:" << fileinfolist.count();
 	    // FUNCTIONALIZE THE BELOW, SO I'M NOT DUPLICATING THE SAME CODE IN TWO PLACES FOR THE FILES SUCH AS PopulateFileSystem();
             for(int j=0; j < fileinfolist.count(); j++)
             {
@@ -1253,15 +1153,8 @@ void ProcessVolume(QString evidstring)
                 treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(j).value("itemtype").toInt(), fileinfolist.at(j).value("isdeleted").toInt());
                 mutex.unlock();
             }
-            //WriteFileSystemProperties((QHash<QString, QVariant>*)&(fsinfolist.at(i)), QString(curpartpath + "prop"));
             int curinode = fileinfolist.count();
             AddVirtualFileSystemFiles((QHash<QString, QVariant>*)&(fsinfolist.at(i)), &curinode, curpartpath, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)));
-	    // add virtual FS files itemtype = 10 ($MBR, $FAT1, $FAT2) functionalize so i can use if(fsinfo->value("type").toUInt() == 1) to add fs files...
-            /*
-            if(fsinfolist.at(i).value("type").toUInt() == )
-            {
-            }
-            */
 	    // add orphan directory and orphan files...
             QByteArray ba;
             ba.clear();

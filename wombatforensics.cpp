@@ -1583,8 +1583,28 @@ void WombatForensics::PopulateHexContents()
         }
         else if(selectedindex.sibling(selectedindex.row(), 0).data().toString().startsWith("$FAT"))
         {
-            // open fsprop file, get the info needed for FAT offsets to get to FAT1 and FAT2, etc...
-            qDebug() << "fat number:" << selectedindex.sibling(selectedindex.row(), 0).data().toString().right(1).toInt();
+	    uint fatoffset = 0;
+	    uint fatsize = 0;
+	    uint bytespersector = 0;
+	    QFile ppropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/prop");
+	    ppropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	    if(ppropfile.isOpen())
+	    {
+		while(!ppropfile.atEnd())
+		{
+		    tmpstr = ppropfile.readLine();
+		    if(tmpstr.startsWith("FAT Offset"))
+			fatoffset = tmpstr.split("|").at(1).toUInt();
+		    else if(tmpstr.startsWith("Bytes Per Sector"))
+			bytespersector = tmpstr.split("|").at(1).toUInt();
+		    else if(tmpstr.startsWith("FAT Size"))
+			fatsize = tmpstr.split("|").at(1).toUInt() * bytespersector;
+		}
+		ppropfile.close();
+	    }
+	    uint fatnum = selectedindex.sibling(selectedindex.row(), 0).data().toString().right(1).toUInt();
+	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
+	    ui->hexview->SetColorInformation(0, bytespersector, "1", "", QString::number(fatoffset + fatsize * (fatnum-1)), fatsize, 0);
         }
     }
     ui->hexview->ensureVisible();
