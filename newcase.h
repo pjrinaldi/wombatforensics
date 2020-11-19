@@ -19,6 +19,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
 void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<uint>* clusterlist);
 //void PopulateFileSystem();
 void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstring);
+void AddVirtualFileSystemFiles(QHash<QString, QVariant>* fsinfo, int* curinode, QString parentstr);
 
 void InitializeEvidenceStructure(QString evidstring);
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partitionpath);

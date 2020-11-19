@@ -1253,6 +1253,9 @@ void ProcessVolume(QString evidstring)
                 treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(j).value("itemtype").toInt(), fileinfolist.at(j).value("isdeleted").toInt());
                 mutex.unlock();
             }
+            //WriteFileSystemProperties((QHash<QString, QVariant>*)&(fsinfolist.at(i)), QString(curpartpath + "prop"));
+            int curinode = fileinfolist.count();
+            AddVirtualFileSystemFiles((QHash<QString, QVariant>*)&(fsinfolist.at(i)), &curinode, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)));
 	    // add virtual FS files itemtype = 10 ($MBR, $FAT1, $FAT2) functionalize so i can use if(fsinfo->value("type").toUInt() == 1) to add fs files...
             /*
             if(fsinfolist.at(i).value("type").toUInt() == )
@@ -1260,7 +1263,6 @@ void ProcessVolume(QString evidstring)
             }
             */
 	    // add orphan directory and orphan files...
-            int curinode = fileinfolist.count();
             QByteArray ba;
             ba.clear();
             nodedata.clear();
@@ -1446,6 +1448,23 @@ void ProcessVolume(QString evidstring)
 	treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
 	mutex.unlock();
         */
+}
+
+void AddVirtualFileSystemFiles(QHash<QString, QVariant>* fsinfo, int* curinode, QString parentstr)
+{
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    int inode = *curinode;
+    if(fsinfo->value("type").toUInt() == 1) // FAT12
+    {
+        nodedata << QByteArray("$MBR").toBase64() << QByteArray("/").toBase64() << "512" << "0" << "0" << "0" << "0" << "0" << "System File" << "Master Boot Record" << "0" << QString(parentstr + "-f" + QString::number(inode));
+        // WriteFileProperties();
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, parentstr, 10, 0);
+        mutex.unlock();
+        inode++;
+    }
+    *curinode = inode;
 }
 
 void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstring)
