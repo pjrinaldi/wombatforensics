@@ -740,6 +740,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             for(int j=0; j < clusterlist.count()-1; j++)
             {
                 clusterstr += QString::number(clusterlist.at(j)) + ",";
+		// MIGHT BE AABLE TO GET RID OF CLUSTER SIZE, SINCE IT IS ALWAYS THE SAME... AND JUST STORE BYTEOFFSET'S
 		layout += QString::number((clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
             }
             fileinfo.insert("clusterlist", QVariant(clusterstr));
