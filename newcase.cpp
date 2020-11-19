@@ -1255,7 +1255,7 @@ void ProcessVolume(QString evidstring)
             }
             //WriteFileSystemProperties((QHash<QString, QVariant>*)&(fsinfolist.at(i)), QString(curpartpath + "prop"));
             int curinode = fileinfolist.count();
-            AddVirtualFileSystemFiles((QHash<QString, QVariant>*)&(fsinfolist.at(i)), &curinode, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)));
+            AddVirtualFileSystemFiles((QHash<QString, QVariant>*)&(fsinfolist.at(i)), &curinode, curpartpath, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)));
 	    // add virtual FS files itemtype = 10 ($MBR, $FAT1, $FAT2) functionalize so i can use if(fsinfo->value("type").toUInt() == 1) to add fs files...
             /*
             if(fsinfolist.at(i).value("type").toUInt() == )
@@ -1450,7 +1450,7 @@ void ProcessVolume(QString evidstring)
         */
 }
 
-void AddVirtualFileSystemFiles(QHash<QString, QVariant>* fsinfo, int* curinode, QString parentstr)
+void AddVirtualFileSystemFiles(QHash<QString, QVariant>* fsinfo, int* curinode, QString partpath, QString parentstr)
 {
     QList<QVariant> nodedata;
     nodedata.clear();
@@ -1458,11 +1458,22 @@ void AddVirtualFileSystemFiles(QHash<QString, QVariant>* fsinfo, int* curinode, 
     if(fsinfo->value("type").toUInt() == 1) // FAT12
     {
         nodedata << QByteArray("$MBR").toBase64() << QByteArray("/").toBase64() << "512" << "0" << "0" << "0" << "0" << "0" << "System File" << "Master Boot Record" << "0" << QString(parentstr + "-f" + QString::number(inode));
-        // WriteFileProperties();
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, 10, 0);
         mutex.unlock();
         inode++;
+        for(int i=0; i < fsinfo->value("fatcount").toInt(); i++)
+        {
+            QByteArray ba;
+            ba.clear();
+            ba.append(QString("$FAT" + QString::number(i+1)).toUtf8());
+            nodedata.clear();
+            nodedata << ba.toBase64() << QByteArray("/").toBase64() << QVariant(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt()) << "0" << "0" << "0" << "0" << "0" << "System File" << "File Allocation Table" << "0" << QString(parentstr + "-f" + QString::number(inode));
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, parentstr, 10, 0);
+            mutex.unlock();
+            inode++;
+        }
     }
     *curinode = inode;
 }

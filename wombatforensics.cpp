@@ -1570,6 +1570,22 @@ void WombatForensics::PopulateHexContents()
     }
     else if(nodeid.split("-").count() == 3) // file/directory
     {
+        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
+        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(partfile.isOpen())
+            tmpstr = partfile.readLine(); // part name, offset, size, part type, id
+        partfile.close();
+        qDebug() << "selectedindex name:" << selectedindex.sibling(selectedindex.row(), 0).data().toString();
+        if(selectedindex.sibling(selectedindex.row(), 0).data().toString() == "$MBR")
+        {
+            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toULongLong()*2);
+            ui->hexview->SetColorInformation(0, 512, "0", "", "0", 512, 0); // sort of works, need to rework this function so it is much simpler
+        }
+        else if(selectedindex.sibling(selectedindex.row(), 0).data().toString().startsWith("$FAT"))
+        {
+            // open fsprop file, get the info needed for FAT offsets to get to FAT1 and FAT2, etc...
+            qDebug() << "fat number:" << selectedindex.sibling(selectedindex.row(), 0).data().toString().right(1).toInt();
+        }
     }
     ui->hexview->ensureVisible();
     /*
