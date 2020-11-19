@@ -1606,6 +1606,26 @@ void WombatForensics::PopulateHexContents()
 	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
 	    ui->hexview->SetColorInformation(0, bytespersector, "1", "", QString::number(fatoffset + fatsize * (fatnum-1)), fatsize, 0);
         }
+        else
+        {
+            QString layout = "";
+            QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
+            fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(fpropfile.isOpen())
+            {
+                QString tmpstr = "";
+                while(!fpropfile.atEnd())
+                {
+                    tmpstr = fpropfile.readLine();
+                    if(tmpstr.startsWith("Layout"))
+                        layout = tmpstr.split("|").at(1);
+                }
+                fpropfile.close();
+            }
+            qDebug() << "initial layout:" << layout.split(";", Qt::SkipEmptyParts).at(0);
+            //ui->hexview->setCursorPosition(layout.split(",").at(0).toUInt() * 2);
+            //selectedindex.sibling(selectedindex.row(), 11).data().toString(); // nodeid
+        }
     }
     ui->hexview->ensureVisible();
     /*
