@@ -709,6 +709,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             else
                 fileinfo.insert("longname", QVariant(""));
             fileinfo.insert("firstchar", QVariant(rootdirbuf.at(i*32)));
+            // may not need this part for isdeleted...
             if(fileinfo.value("firstchar").toUInt() == 0xe5 || fileinfo.value("firstchar").toUInt() == 0x05) // was allocated but now free
                 fileinfo.insert("isdeleted", QVariant(1));
             else
@@ -741,11 +742,11 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             {
                 clusterstr += QString::number(clusterlist.at(j)) + ",";
 		// MIGHT BE AABLE TO GET RID OF CLUSTER SIZE, SINCE IT IS ALWAYS THE SAME... AND JUST STORE BYTEOFFSET'S
+                // i'll need size for some things, so leave it for now.
 		layout += QString::number((clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
             }
             fileinfo.insert("clusterlist", QVariant(clusterstr));
 	    fileinfo.insert("layout", QVariant(layout));
-	    //QStringList clusters = clusterstr.split(",", Qt::SkipEmptyParts);
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
             if(fileattr & 0x10)
                 fileinfo.insert("itemtype", QVariant(3));
@@ -1091,7 +1092,9 @@ void ProcessVolume(QString evidstring)
             QList<QHash<QString, QVariant>> fileinfolist;
 	    QList<QString> orphanlist;
             ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
 	    // FUNCTIONALIZE THE BELOW, SO I'M NOT DUPLICATING THE SAME CODE IN TWO PLACES FOR THE FILES SUCH AS PopulateFileSystem();
+            /*
             for(int j=0; j < fileinfolist.count(); j++)
             {
                 QString parentstr = "";
@@ -1184,6 +1187,7 @@ void ProcessVolume(QString evidstring)
                 treenodemodel->AddNode(nodedata, parentstr, 4, 1);
                 mutex.unlock();
 	    }
+            */
 	    ptreecnt++;
 	    //qDebug() << "1st partition which has unalloc before...";
 	}
@@ -1237,6 +1241,8 @@ void ProcessVolume(QString evidstring)
             QList<QString> orphanlist;
             ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             //qDebug() << "fileinfolist count:" << fileinfolist.count();
+            PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            /*
             for(int j=0; j < fileinfolist.count(); j++)
             {
                 QString parentstr = "";
@@ -1299,6 +1305,7 @@ void ProcessVolume(QString evidstring)
                 treenodemodel->AddNode(nodedata, parentstr, fileinfolist.at(j).value("itemtype").toInt(), fileinfolist.at(j).value("isdeleted").toInt());
                 mutex.unlock();
             }
+            */
 	    ptreecnt++;
 	}
 	if(i == pofflist.count() - 1 && ((pofflist.at(i) + psizelist.at(i))*512) < imgsize)
@@ -1342,6 +1349,104 @@ void ProcessVolume(QString evidstring)
 	treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
 	mutex.unlock();
         */
+}
+
+void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QString>* orphanlist, int evidcnt, int ptreecnt)
+{
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    for(int j=0; j < fileinfolist->count(); j++)
+    {
+        QString parentstr = "";
+        if(fileinfolist->at(j).value("parentinode").toInt() == -1)
+            parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+        else
+            parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("parentinode").toInt()));
+        //QList<QVariant> nodedata;
+        nodedata.clear();
+        QByteArray ba;
+        ba.clear();
+        if(fileinfolist->at(j).value("longname").toString().isEmpty())
+            ba.append(fileinfolist->at(j).value("aliasname").toString().toUtf8());
+        else
+            ba.append(fileinfolist->at(j).value("longname").toString().toUtf8());
+        nodedata << ba.toBase64();
+        ba.clear();
+        //qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
+        ba.append(fileinfolist->at(j).value("path").toString().toUtf8());
+        nodedata << ba.toBase64() << QVariant(fileinfolist->at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist->at(j).value("createdate").toUInt()) << QVariant(fileinfolist->at(j).value("accessdate").toUInt()) << QVariant(fileinfolist->at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
+        if(fileinfolist->at(j).value("itemtype").toUInt() == 3)
+        {
+            nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
+        }
+        else
+        {
+            QByteArray sigbuf;
+            sigbuf.clear();
+            QFile efile(emntstring);
+            if(!efile.isOpen())
+                efile.open(QIODevice::ReadOnly);
+            if(efile.isOpen())
+            {
+                efile.seek(((fileinfolist->at(j).value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()));
+                sigbuf = efile.read(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
+                efile.close();
+            }
+            QMimeDatabase mimedb;
+            const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist->at(j).value("aliasname").toString(), sigbuf);
+            QString mimestr = GenerateCategorySignature(mimetype);
+            if(mimestr.contains("Unknown")) // generate further analysis
+            {
+                if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
+                    mimestr = "Windows System/Shortcut";
+                else if(strcmp(fileinfolist->at(j).value("aliasname").toString().toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
+                    mimestr = "Windows System/Recycler";
+                else if(fileinfolist->at(j).value("aliasname").toString().startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
+                    mimestr = "Windows System/Recycle.Bin";
+                else if(fileinfolist->at(j).value("aliasname").toString().endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
+                    mimestr = "Windows System/Prefetch";
+                else if(fileinfolist->at(j).value("aliasname").toString().endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
+                    mimestr = "Windows System/Prefetch";
+                else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
+                    mimestr = "Windows System/Registry";
+            }
+            nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
+        }
+        nodedata << QVariant("0") << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("inode").toUInt())));
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, parentstr, fileinfolist->at(j).value("itemtype").toInt(), fileinfolist->at(j).value("isdeleted").toInt());
+        mutex.unlock();
+    }
+    int curinode = fileinfolist->count();
+    AddVirtualFileSystemFiles(fsinfo, &curinode, curpartpath, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)));
+    // add orphan directory and orphan files...
+    QByteArray ba;
+    ba.clear();
+    nodedata.clear();
+    ba.append("orphans");
+    nodedata << ba.toBase64();
+    ba.clear();
+    ba.append("/");
+    QString parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
+    nodedata << ba.toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << QVariant("Directory") << QVariant("Virtual Directory") << "0" << QVariant(parentstr);
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+    mutex.unlock();
+    curinode++;
+    for(int j=0; j < orphanlist->count(); j++)
+    {
+        QString curid = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode + j));
+        nodedata.clear();
+        ba.clear();
+        ba.append(orphanlist->at(j).toUtf8());
+        nodedata << ba.toBase64();
+        ba.clear();
+        ba.append("/");
+        nodedata << ba.toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QVariant(curid);
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, parentstr, 4, 1);
+        mutex.unlock();
+    }
 }
 
 void AddVirtualFileSystemFiles(QHash<QString, QVariant>* fsinfo, int* curinode, QString partpath, QString parentstr)
