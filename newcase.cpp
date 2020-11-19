@@ -897,12 +897,13 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), fatbuf, &clusterlist);
             //qDebug() << "inodecnt:" << curinode << "alias name:" << fileinfo.value("aliasname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
 	    QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
-	    QString layout = QString::number((fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
+            // (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt())
+	    QString layout = QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
             QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
             for(int j=0; j < clusterlist.count()-1; j++)
             {
                 clusterstr += QString::number(clusterlist.at(j)) + ",";
-		layout += QString::number((clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+		layout += QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
             }
             fileinfo.insert("clusterlist", QVariant(clusterstr));
 	    fileinfo.insert("layout", QVariant(layout));
