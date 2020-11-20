@@ -1579,7 +1579,8 @@ void WombatForensics::PopulateHexContents()
         if(selectedindex.sibling(selectedindex.row(), 0).data().toString() == "$MBR")
         {
             ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toULongLong()*2);
-            ui->hexview->SetColorInformation(0, 512, "0", "", "0", 512, 0); // sort of works, need to rework this function so it is much simpler
+            ui->hexview->SetColor(QString("0,512;"), 511);
+            //ui->hexview->SetColorInformation(0, 512, "0", "", "0", 512, 0); // sort of works, need to rework this function so it is much simpler
         }
         else if(selectedindex.sibling(selectedindex.row(), 0).data().toString().startsWith("$FAT"))
         {
@@ -1604,7 +1605,8 @@ void WombatForensics::PopulateHexContents()
 	    }
 	    uint fatnum = selectedindex.sibling(selectedindex.row(), 0).data().toString().right(1).toUInt();
 	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
-	    ui->hexview->SetColorInformation(0, bytespersector, "1", "", QString::number(fatoffset + fatsize * (fatnum-1)), fatsize, 0);
+            ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
+	    //ui->hexview->SetColorInformation(0, bytespersector, "1", "", QString::number(fatoffset + fatsize * (fatnum-1)), fatsize, 0);
         }
         else
         {

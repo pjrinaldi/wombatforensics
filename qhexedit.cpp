@@ -940,6 +940,19 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 qint64 posBa = _bPosFirst + bPosLine + colIdx;
                 if(!bypasscolor)
                 {
+                    for(int i=0; i < offlist.count(); i++)
+                    {
+                        if(posBa >= offlist.at(i) && posBa < (offlist.at(i) + sizlist.at(i)))
+                        {
+                            c = contentbrush.color(); // BLUE
+                            if(i == (offlist.count() - 1))
+                            {
+                                if(posBa > (offlist.at(0) + filesize))
+                                    c = slackbrush.color(); // RED
+                            }
+                        }
+                    }
+                    /*
                     if(blocklist.count() > 0)
                     {
                         if(blocklist.at(0).toLongLong() == 0) // resident attribute
@@ -1004,6 +1017,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
         		    c = slackbrush.color(); // RED
 		        }
                     }
+                    */
                 }
 
                 // color highlight carved here...
@@ -1289,10 +1303,20 @@ void QHexEdit::updateCursor()
 // (filelayout, filesize)
 void QHexEdit::SetColor(QString flayout, qint64 fsize)
 {
-    filelayout = flayout;
+    offlist.clear();
+    sizlist.clear();
+    //filelayout = flayout;
     filesize = fsize;
-    qDebug() << "filelayout:" << filelayout << "filesize:" << filesize;
+    QStringList layoutlist = flayout.split(";", Qt::SkipEmptyParts);
+    for(int i=0; i < layoutlist.count(); i++)
+    {
+        offlist.append(layoutlist.at(i).split(",").at(0).toLongLong());
+        sizlist.append(layoutlist.at(i).split(",").at(1).toLongLong());
+    }
+    qDebug() << "offlist:" << offlist << "sizlist:" << sizlist;
+    //qDebug() << "filelayout:" << filelayout << "filesize:" << filesize;
 }
+
 // Added by Pasquale J. Rinaldi, Jr. May 2018
 // Passing required information for syntax highlighting
 // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)

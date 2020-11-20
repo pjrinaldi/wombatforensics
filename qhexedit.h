@@ -460,7 +460,9 @@ private:
     bool bypasscolor = false;
 
     qint64 filesize;
-    QString filelayout;
+    //QString filelayout;
+    QList<qint64> offlist;
+    QList<qint64> sizlist;
 
     // other variables
     bool _editAreaIsAscii;                      // flag about the ascii mode edited
