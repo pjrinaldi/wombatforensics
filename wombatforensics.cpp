@@ -1553,8 +1553,7 @@ void WombatForensics::PopulateHexContents()
     if(nodeid.split("-").count() == 1) // image file
     {
         ui->hexview->setCursorPosition(0);
-        // need offset and the size for syntax highlighting.
-        //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+        ui->hexview->SetColor(QString("0," + QString::number(selectednode->Data(2).toLongLong()) + ";"), selectednode->Data(2).toLongLong());
     }
     else if(nodeid.split("-").count() == 2) // unallocated, file system, or partition, possibly carved, zip, etc...
     {
@@ -1565,8 +1564,7 @@ void WombatForensics::PopulateHexContents()
             tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
         partfile.close();
         ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()*2);
-        // need partition offset and the clusters/sectors as well as logical size for syntax highlighting...
-        //ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
+        ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(1) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(2) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(2).toLongLong());
     }
     else if(nodeid.split("-").count() == 3) // file/directory
     {
@@ -1580,7 +1578,6 @@ void WombatForensics::PopulateHexContents()
         {
             ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toULongLong()*2);
             ui->hexview->SetColor(QString("0,512;"), 511);
-            //ui->hexview->SetColorInformation(0, 512, "0", "", "0", 512, 0); // sort of works, need to rework this function so it is much simpler
         }
         else if(selectedindex.sibling(selectedindex.row(), 0).data().toString().startsWith("$FAT"))
         {
@@ -1606,7 +1603,6 @@ void WombatForensics::PopulateHexContents()
 	    uint fatnum = selectedindex.sibling(selectedindex.row(), 0).data().toString().right(1).toUInt();
 	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
             ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
-	    //ui->hexview->SetColorInformation(0, bytespersector, "1", "", QString::number(fatoffset + fatsize * (fatnum-1)), fatsize, 0);
         }
         else
         {
@@ -1627,7 +1623,6 @@ void WombatForensics::PopulateHexContents()
                 }
                 fpropfile.close();
             }
-            //qDebug() << "initial layout:" << layout.split(";", Qt::SkipEmptyParts).at(0);
             ui->hexview->setCursorPosition(layout.split(",").at(0).toUInt() * 2);
             ui->hexview->SetColor(layout, selectednode->Data(2).toLongLong());
         }

@@ -730,7 +730,6 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             fileinfo.insert("inode", QVariant(inodecnt));
             fileinfo.insert("parentinode",  QVariant(-1));
             fileinfo.insert("path", QVariant("/"));
-            fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4))));
             QList<uint> clusterlist;
             clusterlist.clear();
             GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), &fatbuf, &clusterlist);
@@ -746,6 +745,10 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             fileinfo.insert("clusterlist", QVariant(clusterstr));
 	    fileinfo.insert("layout", QVariant(layout));
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
+            if(fileattr & 0x10)
+                fileinfo.insert("logicalsize", QVariant(fileinfo.value("physicalsize").toUInt()));
+            else
+                fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4))));
             if(fileattr & 0x10)
                 fileinfo.insert("itemtype", QVariant(3));
 	    else if(firstchar == 0xe5 || firstchar == 0x05) // deleted
@@ -889,7 +892,6 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
                 fileinfo.insert("path", QVariant(QString(parentinfo->value("path").toString() + parentinfo->value("aliasname").toString() + "/")));
             else
                 fileinfo.insert("path", QVariant(QString(parentinfo->value("path").toString() + parentinfo->value("longname").toString() + "/")));
-            fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(dirbuf.mid(i*32 + 28, 4))));
             QList<uint> clusterlist;
             clusterlist.clear();
             GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), fatbuf, &clusterlist);
@@ -906,6 +908,10 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             fileinfo.insert("clusterlist", QVariant(clusterstr));
 	    fileinfo.insert("layout", QVariant(layout));
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
+            if(fileattr & 0x10)
+                fileinfo.insert("logicalsize", QVariant(fileinfo.value("physicalsize").toUInt()));
+            else
+                fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(dirbuf.mid(i*32 + 28, 4))));
             if(fileattr & 0x10)
                 fileinfo.insert("itemtype", QVariant(3));
 	    else if(firstchar == 0xe5 || firstchar == 0x05) // deleted

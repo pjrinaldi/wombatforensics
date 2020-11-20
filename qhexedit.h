@@ -460,7 +460,6 @@ private:
     bool bypasscolor = false;
 
     qint64 filesize;
-    //QString filelayout;
     QList<qint64> offlist;
     QList<qint64> sizlist;
 

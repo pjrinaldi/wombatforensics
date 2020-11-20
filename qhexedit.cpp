@@ -1305,7 +1305,6 @@ void QHexEdit::SetColor(QString flayout, qint64 fsize)
 {
     offlist.clear();
     sizlist.clear();
-    //filelayout = flayout;
     filesize = fsize;
     QStringList layoutlist = flayout.split(";", Qt::SkipEmptyParts);
     for(int i=0; i < layoutlist.count(); i++)
@@ -1313,8 +1312,6 @@ void QHexEdit::SetColor(QString flayout, qint64 fsize)
         offlist.append(layoutlist.at(i).split(",").at(0).toLongLong());
         sizlist.append(layoutlist.at(i).split(",").at(1).toLongLong());
     }
-    qDebug() << "offlist:" << offlist << "sizlist:" << sizlist;
-    //qDebug() << "filelayout:" << filelayout << "filesize:" << filesize;
 }
 
 // Added by Pasquale J. Rinaldi, Jr. May 2018
