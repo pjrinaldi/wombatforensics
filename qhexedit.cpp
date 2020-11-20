@@ -1284,6 +1284,15 @@ void QHexEdit::updateCursor()
         _blink = true;
     viewport()->update(_cursorRect);
 }
+// Added by Pasquale J. Rinaldi, Jr. Nov 2020
+// Passing Required information for more efficient syntax highlighting
+// (filelayout, filesize)
+void QHexEdit::SetColor(QString flayout, qint64 fsize)
+{
+    filelayout = flayout;
+    filesize = fsize;
+    qDebug() << "filelayout:" << filelayout << "filesize:" << filesize;
+}
 // Added by Pasquale J. Rinaldi, Jr. May 2018
 // Passing required information for syntax highlighting
 // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)

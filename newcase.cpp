@@ -737,13 +737,11 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             //qDebug() << "inodecnt:" << inodecnt << "alias name:" << fileinfo.value("aliasname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
             QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
 	    QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
-	    QString layout = QString::number((fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
+	    QString layout = QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
             for(int j=0; j < clusterlist.count()-1; j++)
             {
                 clusterstr += QString::number(clusterlist.at(j)) + ",";
-		// MIGHT BE AABLE TO GET RID OF CLUSTER SIZE, SINCE IT IS ALWAYS THE SAME... AND JUST STORE BYTEOFFSET'S
-                // i'll need size for some things, so leave it for now.
-		layout += QString::number((clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+		layout += QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
             }
             fileinfo.insert("clusterlist", QVariant(clusterstr));
 	    fileinfo.insert("layout", QVariant(layout));

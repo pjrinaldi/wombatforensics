@@ -356,6 +356,11 @@ public:
     // (fsoffset, blocksize, blockstring, residentoffset, byteoffset)
     void SetColorInformation(qint64 fsoffset, qint64 blocksize, QString blockstring, QString residentstring, QString bytestring, qint64 flength, int dataoff);
 
+    // Added by Pasquale J. Rinaldi, Jr. Nov 2020
+    // Passing Required information for more efficient syntax highlighting
+    // (filelayout, filesize)
+    void SetColor(QString flayout, qint64 fsize);
+
     // Added by Pasquale J. Rinaldi, Jr.
     // May 5, 2018
     // Enables file hex view to ignore color since it is designed for the image and not the file.
@@ -453,6 +458,9 @@ private:
     qint64 filelength;
     int dataoffset;
     bool bypasscolor = false;
+
+    qint64 filesize;
+    QString filelayout;
 
     // other variables
     bool _editAreaIsAscii;                      // flag about the ascii mode edited

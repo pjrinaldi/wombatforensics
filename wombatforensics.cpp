@@ -1618,13 +1618,16 @@ void WombatForensics::PopulateHexContents()
                 {
                     tmpstr = fpropfile.readLine();
                     if(tmpstr.startsWith("Layout"))
+                    {
                         layout = tmpstr.split("|").at(1);
+                        break;
+                    }
                 }
                 fpropfile.close();
             }
-            qDebug() << "initial layout:" << layout.split(";", Qt::SkipEmptyParts).at(0);
-            //ui->hexview->setCursorPosition(layout.split(",").at(0).toUInt() * 2);
-            //selectedindex.sibling(selectedindex.row(), 11).data().toString(); // nodeid
+            //qDebug() << "initial layout:" << layout.split(";", Qt::SkipEmptyParts).at(0);
+            ui->hexview->setCursorPosition(layout.split(",").at(0).toUInt() * 2);
+            ui->hexview->SetColor(layout, selectednode->Data(2).toLongLong());
         }
     }
     ui->hexview->ensureVisible();
