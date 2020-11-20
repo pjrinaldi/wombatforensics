@@ -728,6 +728,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             else
                 fileinfo.insert("aliasname", QVariant(QString(char(firstchar) + fileinfo.value("restname").toString())));
             fileinfo.insert("inode", QVariant(inodecnt));
+	    //qDebug() << fileinfo.value("longname").toString() << "inodecnt:" << inodecnt;
             fileinfo.insert("parentinode",  QVariant(-1));
             fileinfo.insert("path", QVariant("/"));
             QList<uint> clusterlist;
@@ -746,7 +747,35 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
 	    fileinfo.insert("layout", QVariant(layout));
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
             if(fileattr & 0x10)
-                fileinfo.insert("logicalsize", QVariant(fileinfo.value("physicalsize").toUInt()));
+	    {
+		QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+		int direntrycnt = 0;
+		int lastdirentry = 0;
+		QByteArray dirsizebuf;
+		dirsizebuf.clear();
+		if(!efile.isOpen())
+		    efile.open(QIODevice::ReadOnly);
+		if(efile.isOpen())
+		{
+		    for(int j=0; j < layoutlist.count(); j++)
+		    {
+			efile.seek(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+			dirsizebuf.append(efile.read(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+		    }
+		    efile.close();
+		}
+		direntrycnt = dirsizebuf.count() / 32;
+		for(int j=0; j < direntrycnt; j++)
+		{
+		    uint8_t firstchar = dirsizebuf.at(j*32);
+		    if(firstchar == 0x00) // entry is free and all remaining are free
+		    {
+			lastdirentry = j;
+			break;
+		    }
+		}
+		fileinfo.insert("logicalsize", QVariant(lastdirentry * 32));
+	    }
             else
                 fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4))));
             if(fileattr & 0x10)
@@ -813,27 +842,25 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
     fileinfo.clear();
     QByteArray dirbuf;
     dirbuf.clear();
-    QStringList clusters = parentinfo->value("clusterlist").toString().split(",", Qt::SkipEmptyParts);
-    //qDebug() << "clusters:" << clusters << "count:" << clusters.count();
-    //qDebug() << "clusterstr:" << parentinfo->value("clusterlist").toString();
+    QStringList layoutlist = parentinfo->value("layout").toString().split(";", Qt::SkipEmptyParts);
     QFile efile(estring);
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly);
     if(efile.isOpen())
     {
-        for(int i=0; i < clusters.count(); i++)
-        {
-            if(i == 0)
-            {
-                efile.seek(((clusters.at(i).toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + 64); // skips the first 2 32-byte directory entries for (. and ..) directories to avoid recursive looping.
-                dirbuf.append(efile.read(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt() - 64)); // # - 64 accounts for skipping 2 directory entries (. and ..)
-            }
-            else
-            {
-                efile.seek(((clusters.at(i).toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()));
-                dirbuf.append(efile.read(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
-            }
-        }
+	for(int i=0; i < layoutlist.count(); i++)
+	{
+	    if(i == 0)
+	    {
+		efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong() + 64); // # + 64 skips the first 2 dir entries of . and ..
+		dirbuf.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong() - 64)); // # - 64 accounts for skipping the first 2 dir entries of . and ..
+	    }
+	    else
+	    {
+		efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+		dirbuf.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+	    }
+	}
         efile.close();
     }
     QString longnamestring = "";
@@ -887,6 +914,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             else
                 fileinfo.insert("aliasname", QVariant(QString(char(firstchar) + fileinfo.value("restname").toString())));
             fileinfo.insert("inode", QVariant(curinode));
+	    //qDebug() << fileinfo.value("longname").toString() << "inode:" << curinode;
             fileinfo.insert("parentinode", QVariant(parentinfo->value("inode").toInt()));
             if(parentinfo->value("longname").toString().isEmpty())
                 fileinfo.insert("path", QVariant(QString(parentinfo->value("path").toString() + parentinfo->value("aliasname").toString() + "/")));
@@ -909,7 +937,35 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
 	    fileinfo.insert("layout", QVariant(layout));
             fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
             if(fileattr & 0x10)
-                fileinfo.insert("logicalsize", QVariant(fileinfo.value("physicalsize").toUInt()));
+	    {
+		QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+		int direntrycnt = 0;
+		int lastdirentry = 0;
+		QByteArray dirsizebuf;
+		dirsizebuf.clear();
+		if(!efile.isOpen())
+		    efile.open(QIODevice::ReadOnly);
+		if(efile.isOpen())
+		{
+		    for(int j=0; j < layoutlist.count(); j++)
+		    {
+			efile.seek(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+			dirsizebuf.append(efile.read(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+		    }
+		    efile.close();
+		}
+		direntrycnt = dirsizebuf.count() / 32;
+		for(int j=0; j < direntrycnt; j++)
+		{
+		    uint8_t firstchar = dirsizebuf.at(j*32);
+		    if(firstchar == 0x00) // entry is free and all remaining are free
+		    {
+			lastdirentry = j;
+			break;
+		    }
+		}
+		fileinfo.insert("logicalsize", QVariant(lastdirentry * 32));
+	    }
             else
                 fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(dirbuf.mid(i*32 + 28, 4))));
             if(fileattr & 0x10)
@@ -924,6 +980,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             if(fileattr & 0x10) // sub directory
             {
                 ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf, orphanlist);
+		curinode = *inodecnt;
             }
         }
         else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
