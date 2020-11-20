@@ -1429,9 +1429,11 @@ void WombatForensics::UpdateProperties()
 {
     QFile propfile;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-    QString evidencename = evidfiles.at(0).split(".e").first();
+    QStringList evidfiles = eviddir.entryList(QStringList("*-*" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    qDebug() << "evidfiles:" << evidfiles;
+    //QString evidencename = evidfiles.at(0).split("-e").first();
     propertylist.clear();
+    /*****
     if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 1) // evidence image
     {
         propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first() + "/prop");
@@ -1451,6 +1453,7 @@ void WombatForensics::UpdateProperties()
             propfile.setFileName(wombatvariable.tmpmntpath + "archives/" + itemid + ".prop");
         else
             propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + itemid.split("-").at(0) + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2) + "/" + itemid.split("-").at(3) + "." + itemid.split("-").at(4) + ".prop");
+    *********/
         /*
         QString tmpfvalue = "";
         //QString parentstr = "5"; // NTFS ROOT INUM
@@ -1473,6 +1476,7 @@ void WombatForensics::UpdateProperties()
             tmpfvalue = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(3);
         propfile.setFileName(wombatvariable.tmpmntpath + evidencename + "." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(1) + "/" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(2) + "/" + tmpfvalue + ".a" + parentstr + ".prop");
         */
+    /********
     }
     propfile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream in(&propfile);
@@ -1487,6 +1491,7 @@ void WombatForensics::UpdateProperties()
         propertylist << line.split("||").at(0) << tmpstr << line.split("||").at(2);
     }
     propfile.close();
+    *********/
     propertywindow->UpdateTableView();
     propertywindow->show();
 }
