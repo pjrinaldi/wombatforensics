@@ -947,7 +947,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                             c = contentbrush.color(); // BLUE
                             if(i == (offlist.count() - 1))
                             {
-                                if(posBa > (offlist.at(0) + filesize)) // this is where the error is for split files, offset at 0 + filesize isn't right
+                                if(posBa >= (offlist.at(i) + filesize - (i * sizlist.at(i)))) // this is where the error is for split files, offset at 0 + filesize isn't right
                                     c = slackbrush.color(); // RED
                             }
                         }
