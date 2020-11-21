@@ -403,23 +403,45 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 
 void LoadTreeModel(QString estring)
 {
-    qDebug() << "estring:" << estring;
+    //qDebug() << "estring:" << estring;
     /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(estring + "-e*"), QDir::Dirs | QDir::NoSymLinks);
     qDebug() << "evidfiles:" << evidfiles;
     QString epath = wombatvariable.tmpmntpath + evidfiles.at(0) + "/";
     */
+    QStringList treelist;
+    treelist.clear();
     QFile treefile(wombatvariable.tmpmntpath + "treemodel");
     if(!treefile.isOpen())
         treefile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(treefile.isOpen())
     {
-        while(!treefile.atEnd())
+        QTextStream in(&treefile);
+        while(!in.atEnd())
         {
-            qDebug() << treefile.readLine();
+            treelist.append(in.readLine());
+            //qDebug() << treefile.readLine();
         }
         treefile.close();
+    }
+    //qDebug() << "treelist count:" << treelist.count();
+    for(int i=0; i < treelist.count(); i++)
+    {
+        QString parentstr = "";
+        QStringList nodelist = treelist.at(i).split(",");
+        //qDebug() << nodelist.at(11);
+        QList<QVariant> nodedata;
+        nodedata.clear();
+        nodedata << nodelist.at(0) << nodelist.at(1) << nodelist.at(2).toLongLong() << nodelist.at(3).toInt() << nodelist.at(4).toInt() << nodelist.at(5).toInt() << nodelist.at(6).toInt() << nodelist.at(7) << nodelist.at(8) << nodelist.at(9) << nodelist.at(10) << nodelist.at(11);
+        if(nodelist.at(14).isEmpty())
+            parentstr = "-1";
+        else
+            parentstr = nodelist.at(14);
+        //qDebug() << nodelist.at(11) << parentstr;
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, parentstr, nodelist.at(12).toInt(), nodelist.at(13).toInt());
+        mutex.unlock();
     }
 }
 

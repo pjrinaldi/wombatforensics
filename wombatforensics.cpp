@@ -1049,6 +1049,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
             //ProcessVolume(existingevidence.at(i));
         }
+        OpenUpdate();
         //QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTskTree);
 	//QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
         //openwatcher.setFuture(tmpfuture);
@@ -3822,6 +3823,7 @@ void WombatForensics::SaveTreeModel(void)
     {
         QTextStream stream(&treefile);
         PrintTree(0, treenodemodel->index(0, 0), stream);
+        stream.flush();
         treefile.close();
     }
 }
@@ -3841,7 +3843,7 @@ void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream
         stream << QString::number(curnode->itemtype) << ","; // item type
         stream << QString::number(curnode->IsDeleted()) << ","; // is deleted
         stream << index.parent().sibling(index.parent().row(), 11).data().toString(); // parent str
-        stream << "\n";
+        stream << Qt::endl;
         //qDebug() << "parent id:" << index.parent().sibling(index.parent().row(), 11).data().toString();
         // WILL PROBABLY NEED TO BASE64 1, 2, AND DO SOMETHING WITH THE DATES, AND PROBABLY SAVE THE ISDELETED STATE, ETC... TO POPULATE PROPERLY...
         // ALSO NEED TO ENSURE THE LAST ITEM, DOESN'T GET A "," BECAUSE I CAN'T SKIP EMPTY, ALTHOUGH I DON'T NEED TO ACESS THE LAST ONE, I.E. 15 EVER EITHER..
@@ -3852,6 +3854,7 @@ void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream
     // print children
     for(int r=0; r < index.model()->rowCount(index); r++)
     {
+        // child() is deprecated, i apparently need to use index.model()->index(row, col, parentindex) somehow
         QModelIndex childindex = index.child(r, 0);
         PrintTree(level+1, childindex, stream);
     }
