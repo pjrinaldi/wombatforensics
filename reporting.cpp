@@ -29,7 +29,7 @@ int UpdateBookmarkItems(QString tagname)
 void UpdateEvidenceList()
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::Dirs | QDir::NoSymLinks, QDir::Type);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::Dirs | QDir::NoSymLinks);
     existingevidence.clear();
     //QStringList tmplist;
     for(int i=0; i < evidfiles.count(); i++)

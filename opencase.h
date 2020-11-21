@@ -20,6 +20,9 @@ struct AddEvidenceVariable
 void PopulateTskTree(QString evidstring);
 TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* tmpptr);
 */
+
+void LoadTreeModel(QString evidstring);
+
 void PopulateTreeModel(QString evidstring);
 void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath);
 

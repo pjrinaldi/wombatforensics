@@ -991,7 +991,7 @@ void WombatForensics::InitializeOpenCase()
         tar_extract_all(tarhand, tmparray2.data());
         tar_close(tarhand);
         wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename.split("/").last().split(".wfc").first() + "/";
-        OpenCaseMountFinished(0, QProcess::NormalExit);
+        OpenCaseMountFinished(0, QProcess::NormalExit); // REMOVE THE WEIRD PROCESS STUFF...
     }
 }
 
@@ -1045,8 +1045,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         }
         for(int i=0; i < existingevidence.count(); i++)
         {
+            LoadTreeModel(existingevidence.at(i));
             //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
-            ProcessVolume(existingevidence.at(i));
+            //ProcessVolume(existingevidence.at(i));
         }
         //QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTskTree);
 	//QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
@@ -2309,6 +2310,8 @@ void WombatForensics::CloseCurrentCase()
         qInfo() << "Password Items Saved";
         SaveImagesHash();
         qInfo() << "Thumbnailed Videos and Images Saved";
+        SaveTreeModel();
+        qInfo() << "Tree Model Saved";
         ui->dirTreeView->clearSelection();
         delete treenodemodel;
         autosavetimer->stop();
@@ -3825,9 +3828,26 @@ void WombatForensics::SaveTreeModel(void)
 
 void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream& stream)
 {
+    //selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
+    TreeNode* curnode = static_cast<TreeNode*>(index.internalPointer());
     if(index.isValid())
     {
-        qDebug() << index.sibling(index.row(), 0).data().toString();
+        //stream << QString("(" + QString::number(level) + "," + QString::number(index.row()) + ")") << ","; // parent, child
+        for(int c=0; c < 12; c++)
+        {
+            stream << curnode->Data(c).toString() << ","; // column values for id
+            //stream << index.sibling(index.row(), c).data().toString() << ",";
+        }
+        stream << QString::number(curnode->itemtype) << ","; // item type
+        stream << QString::number(curnode->IsDeleted()) << ","; // is deleted
+        stream << index.parent().sibling(index.parent().row(), 11).data().toString(); // parent str
+        stream << "\n";
+        //qDebug() << "parent id:" << index.parent().sibling(index.parent().row(), 11).data().toString();
+        // WILL PROBABLY NEED TO BASE64 1, 2, AND DO SOMETHING WITH THE DATES, AND PROBABLY SAVE THE ISDELETED STATE, ETC... TO POPULATE PROPERLY...
+        // ALSO NEED TO ENSURE THE LAST ITEM, DOESN'T GET A "," BECAUSE I CAN'T SKIP EMPTY, ALTHOUGH I DON'T NEED TO ACESS THE LAST ONE, I.E. 15 EVER EITHER..
+        // BUT CURRENTLY THIS IS INITIAL GROUNDWORK... GETTING THE ACTUAL TREENODE FROM THE INDEX, ALLOWS ME TO ACCESS ISDELETED ITEMTYPE AND OTHER ANSCILLARY VALUES
+        // THIS WOULD ALLOW ME TO THEN READ IN THE FILE AND LOOP OVER IT WITH AN ADDNODE() TYPE FUNCTION... USING THE 0 (PARNT,CHILD) VALUE AND 11 (E#-P#-F#) VALUE
+        //qDebug() << QString("(" + QString::number(level) + "," + QString::number(index.row()) + ")") << index.sibling(index.row(), 0).data().toString();
     }
     // print children
     for(int r=0; r < index.model()->rowCount(index); r++)

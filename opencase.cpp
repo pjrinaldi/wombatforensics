@@ -401,6 +401,28 @@ TSK_WALK_RET_ENUM TreeEntries(TSK_FS_FILE* tmpfile, const char* tmppath, void* t
 }
 */
 
+void LoadTreeModel(QString estring)
+{
+    qDebug() << "estring:" << estring;
+    /*
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(estring + "-e*"), QDir::Dirs | QDir::NoSymLinks);
+    qDebug() << "evidfiles:" << evidfiles;
+    QString epath = wombatvariable.tmpmntpath + evidfiles.at(0) + "/";
+    */
+    QFile treefile(wombatvariable.tmpmntpath + "treemodel");
+    if(!treefile.isOpen())
+        treefile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(treefile.isOpen())
+    {
+        while(!treefile.atEnd())
+        {
+            qDebug() << treefile.readLine();
+        }
+        treefile.close();
+    }
+}
+
 void PopulateTreeModel(QString evidstring)
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
