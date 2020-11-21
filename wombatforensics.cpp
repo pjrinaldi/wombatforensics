@@ -1622,7 +1622,7 @@ void WombatForensics::PopulateHexContents()
         if(partfile.isOpen())
             tmpstr = partfile.readLine(); // part name, offset, size, part type, id
         partfile.close();
-        qDebug() << "selectedindex name:" << selectedindex.sibling(selectedindex.row(), 0).data().toString();
+        //qDebug() << "selectedindex name:" << selectedindex.sibling(selectedindex.row(), 0).data().toString();
         if(selectedindex.sibling(selectedindex.row(), 0).data().toString() == "$MBR")
         {
             ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toULongLong()*2);
@@ -3538,7 +3538,7 @@ void WombatForensics::SaveState()
     SaveHashList();
     SavePasswordList();
     SaveImagesHash();
-    // SaveTreeModel();
+    SaveTreeModel();
     QFuture<void> tmpfuture = QtConcurrent::run(GenerateWombatCaseFile);
     savewcfwatcher.setFuture(tmpfuture);
 }
@@ -3810,7 +3810,6 @@ void WombatForensics::FinishWombatCaseFile(void)
 	StatusUpdate("Ready");
 }
 
-/*
 void WombatForensics::SaveTreeModel(void)
 {
     QFile treefile(wombatvariable.tmpmntpath + "treemodel");
@@ -3818,11 +3817,26 @@ void WombatForensics::SaveTreeModel(void)
         treefile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(treefile.isOpen())
     {
-        QTextSream stream(&treefile);
-
+        QTextStream stream(&treefile);
+        PrintTree(0, treenodemodel->index(0, 0), stream);
         treefile.close();
     }
 }
+
+void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream& stream)
+{
+    if(index.isValid())
+    {
+        qDebug() << index.sibling(index.row(), 0).data().toString();
+    }
+    // print children
+    for(int r=0; r < index.model()->rowCount(index); r++)
+    {
+        QModelIndex childindex = index.child(r, 0);
+        PrintTree(level+1, childindex, stream);
+    }
+}
+/*
 void someFunction()
 {
         QFile file(filePath);
@@ -3859,7 +3873,7 @@ void printTree( int level, const QModelIndex & index, QTextStream  & stream )
         }
 }
 
- for( int c = 0; c < index.model()->columnCount(index.parent()); c++)
+             for( int c = 0; c < index.model()->columnCount(index.parent()); c++)
              {
                      QModelIndex columnIndex = index.sibling(index.row(), c);
                      stream << columnIndex .data().toString();

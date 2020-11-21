@@ -263,6 +263,8 @@ private:
     void UpdateSelectedState(QString id);
     void TagFile(QModelIndex curindex, QString tagname);
     static void PopulateModel(const QModelIndex index);
+    void SaveTreeModel(void);
+    void PrintTree(int level, const QModelIndex& index, QTextStream& stream);
     QString InitializeSelectedState(void);
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;
