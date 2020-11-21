@@ -1429,10 +1429,44 @@ void WombatForensics::UpdateProperties()
 {
     QFile propfile;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*-*" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QString nodeid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
+    QStringList evidfiles = eviddir.entryList(QStringList("*-*" + nodeid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     qDebug() << "evidfiles:" << evidfiles;
-    //QString evidencename = evidfiles.at(0).split("-e").first();
+    QString evidencename = evidfiles.at(0).split("-e").first();
     propertylist.clear();
+    if(nodeid.split("-").count() == 1) // evidence image
+    {
+        propfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/prop"); // not implemented yet
+    }
+    else if(nodeid.split("-").count() == 2) // file system/partition or carved file (maybe)
+    {
+        propfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + nodeid.split("-").at(1) + "/prop");
+    }
+    else if(nodeid.split("-").count() == 3) // file/directory
+    {
+        if(nodeid.contains("fz")) // archive, change default directory
+            propfile.setFileName(wombatvariable.tmpmntpath + "archives" + nodeid + ".prop");
+        else
+            propfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
+    }
+
+    propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(propfile.isOpen())
+    {
+        QTextStream in(&propfile);
+        while(!in.atEnd())
+        {
+            //QString tmpstr = "";
+            QString line = in.readLine();
+            //if(line.split("||").at(1).contains("^^"))
+            //    tmpstr = QString(line.split("||").at(1)).replace(QString("^^"), QString(", "));
+            //else
+            //    tmpstr = line.split("||").at(1);
+            //propertylist << line.split("||").at(0) << tmpstr << line.split("||").at(2);
+            propertylist << line.split("|").at(0) << line.split("|").at(1) << line.split("|").at(2);
+        }
+        propfile.close();
+    }
     /*****
     if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 1) // evidence image
     {
