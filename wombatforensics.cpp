@@ -1532,6 +1532,15 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
+    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 3) // file/dir
+    {
+        bool boolok;
+	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
+        qint64 sizeval = clocale.toLongLong(curindex.sibling(curindex.row(), 2).data().toString(), &boolok);
+        if(sizeval > 0)
+            RewriteSelectedIdContent(curindex);
+    }
+    /*
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
     {
         bool boolok;
@@ -1562,6 +1571,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
     }
     //else
     //    qDebug() << "generatehex isn't setup for:" << curindex.sibling(curindex.row(), 11).data().toString() << "types yet.";
+    */
 }
 
 // MAYBE I SHOULD HAVE A POPULATEHEXCONTENTS WHICH GET'S IT FROM THE EVIDENCE IMAGE...
