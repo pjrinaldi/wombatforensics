@@ -695,6 +695,8 @@ QByteArray ReturnFileContent(QString objectid)
 {
     // STILL NEED TO HANDLE ZIP AND CARVED
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
+    qint64 filesize = curnode->Data(2).toLongLong();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*-" + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split("-e").first();
@@ -736,13 +738,27 @@ QByteArray ReturnFileContent(QString objectid)
         for(int i=0; i < layoutlist.count(); i++)
         {
             efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-            filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+            if(i == 0 && i == layoutlist.count() - 1) // first and last block
+                filecontent.append(efile.read(filesize));
+            else if(i == layoutlist.count() - 1) // last block
+            {
+                filecontent.append(efile.read(filesize - ((i-1) * layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong())));
+            }
+            else
+                filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
         }
         efile.close();
     }
 
     return filecontent;
 
+    /*
+     *
+    if((i * blocksize) <= filesize)
+        filebytes.append(imgfile.read(blocksize));
+    else
+        filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
+     */ 
     /*
     // TSK FREE METHOD IMPLEMENTATION
     QString zipid = "";
