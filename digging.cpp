@@ -743,43 +743,11 @@ QByteArray ReturnFileContent(QString objectid)
             else
                 filecontent.append(efile.read(filesize - ((i-1) * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong())));
         }
-        qDebug() << "filesize:" << filesize << "filecontent count:" << filecontent.count();
-        /*
-        for(int i=0; i < layoutlist.count(); i++)
-        {
-            qDebug() << "filesize:" << filesize;
-            qDebug() << "i:" << i * layoutlist
-            efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-            if(i == 0 && filesize < layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong())
-                filecontent.append(efile.read(filesize));
-            else if(i * layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong() <= filesize)
-                filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-            else
-                filecontent.append(efile.read(filesize - i * layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-            */
-            /*
-            if(i == 0 && i == layoutlist.count() - 1) // first and last block
-                filecontent.append(efile.read(filesize));
-            else if(i == layoutlist.count() - 1) // last block
-            {
-                filecontent.append(efile.read(filesize - ((i-1) * layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong())));
-            }
-            else
-                filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-            */
-        //}
         efile.close();
     }
 
     return filecontent;
 
-    /*
-     *
-    if((i * blocksize) <= filesize)
-        filebytes.append(imgfile.read(blocksize));
-    else
-        filebytes.append(imgfile.read(filesize - ((i-1)*blocksize)));
-     */ 
     /*
     // TSK FREE METHOD IMPLEMENTATION
     QString zipid = "";
