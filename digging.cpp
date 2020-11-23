@@ -13,6 +13,8 @@
 
 void GenerateArchiveExpansion(QString objectid)
 {
+    // NEED TO FIGURE OUT HOW I WANT TO RECORD ZIP FILES.... UNDER THE NEW ID PARADIGM
+
     // NEED TO DISTINGUISH BETWEEN ZIP AND OTHER ARCHIVE FORMATS AND PROCESS ACCORDINGLY...
     if(!isclosing)
     {
@@ -298,7 +300,8 @@ void GenerateArchiveExpansion(QString objectid)
 void GenerateHash(QString objectid)
 {
     // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
-    if((objectid.split("-").count() == 5 || objectid.contains("-c")) && !isclosing)
+    //if((objectid.split("-").count() == 5 || objectid.contains("-c")) && !isclosing)
+    if((objectid.split("-").count() == 3 || objectid.contains("-c")) && !isclosing)
     {
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         QString objectname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
@@ -690,6 +693,57 @@ void GenerateThumbnails(QString thumbid)
 
 QByteArray ReturnFileContent(QString objectid)
 {
+    // STILL NEED TO HANDLE ZIP AND CARVED
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*-" + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split("-e").first();
+    QString tmpstr = "";
+    QFile estatfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
+    if(!estatfile.isOpen())
+        estatfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(estatfile.isOpen())
+    {
+        tmpstr = estatfile.readLine();
+        estatfile.close();
+    }
+    QByteArray filecontent;
+    filecontent.clear();
+    QString layout = "";
+    QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
+    if(!fpropfile.isOpen())
+        fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(fpropfile.isOpen())
+    {
+        QString line = "";
+        while(!fpropfile.atEnd())
+        {
+            line = fpropfile.readLine();
+            if(line.startsWith("Layout"))
+            {
+                layout = line.split("|").at(1);
+                break;
+            }
+        }
+        fpropfile.close();
+    }
+    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+    QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        for(int i=0; i < layoutlist.count(); i++)
+        {
+            efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+            filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+        }
+        efile.close();
+    }
+
+    return filecontent;
+
+    /*
     // TSK FREE METHOD IMPLEMENTATION
     QString zipid = "";
     if(objectid.contains("z")) // exporting a child of a zip file
@@ -819,6 +873,7 @@ QByteArray ReturnFileContent(QString objectid)
         {
             //float mftblock = mftaddress * 1024.0/blocksize;
             //int mftblockint = floor(mftblock);
+            */
             /*
             qDebug() << "mftid:" << mftid;
             qDebug() << "mftblocklist count:" << mftblocklist.count();
@@ -826,6 +881,7 @@ QByteArray ReturnFileContent(QString objectid)
             qDebug() << "mftaddress * 1024 / blocksize:" << mftaddress << mftaddress * 1024/blocksize;
             */
             //residentoffset = (mftblocklist.at(mftblockint).toLongLong() * blocksize) + fsoffset + (blocksize * (mftblock - mftblockint));
+            /*
             residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
         }
         else // odd number, get starting block and jump the fractional amount to get to the correct entry.
@@ -953,7 +1009,7 @@ QByteArray ReturnFileContent(QString objectid)
         }
         zip_close(zfile);
     }
-    return filebytes;
+    */
 }
 
 void SaveHashList(void)

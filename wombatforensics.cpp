@@ -446,7 +446,8 @@ void WombatForensics::CreateNewTag()
 
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
 {
-    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
+    //if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
+    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 3 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
     {
         QTimeZone tmpzone = QTimeZone(reporttimezone);
         taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
@@ -3374,7 +3375,8 @@ void WombatForensics::UpdateFilterCount()
     QModelIndexList tmplist = treenodemodel->match(treenodemodel->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     for(int i=0; i < tmplist.count(); i++)
     {
-        if(tmplist.at(i).sibling(tmplist.at(i).row(), 11).data().toString().split("-").count() == 5)
+        //if(tmplist.at(i).sibling(tmplist.at(i).row(), 11).data().toString().split("-").count() == 5)
+        if(tmplist.at(i).sibling(tmplist.at(i).row(), 11).data().toString().split("-").count() == 3)
             filtercount++;
     }
     if(filtercount == filesfound)
@@ -3536,7 +3538,8 @@ void WombatForensics::SaveState()
     RemoveTmpFiles();
     UpdateCheckState();
     UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
-    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 5)
+    //if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 5)
+    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 3)
         RewriteSelectedIdContent(selectedindex);
     SaveTaggedList();
     SaveHashList();
