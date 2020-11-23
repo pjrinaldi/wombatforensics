@@ -1075,6 +1075,12 @@ void ProcessVolume(QString evidstring)
     QList<QVariant> nodedata;
     nodedata.clear();
     nodedata << evidencename << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt));
+    QString reportstring = "";
+    reportstring += "<div id='e" + QString::number(evidcnt) + "'><table width='98%'>";
+    reportstring += "<tr><th colspan='2'>Evidence Item (E" + QString::number(evidcnt) + "):" + evidstring + "</th></tr>";
+    reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString::number(imgsize) + " bytes</td></tr>";
+    //reportstring += "<tr class='even vtop'><td>Sector Size:</td><td>" + QString::number(imginfo->sector_size) + " bytes</td></tr>";
+    
     mutex.lock();
     treenodemodel->AddNode(nodedata, "-1", -1, -1);
     mutex.unlock();
@@ -1124,6 +1130,7 @@ void ProcessVolume(QString evidstring)
                     out.flush();
                     pstatfile.close();
                 }
+                reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
 		nodedata.clear();
 		nodedata << "UNALLOCATED" << "0" << QString::number(pofflist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 		mutex.lock();
@@ -1145,6 +1152,7 @@ void ProcessVolume(QString evidstring)
                 out.flush();
                 pstatfile.close();
             }
+            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>" + fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]</td></tr>";
 	    nodedata.clear();
 	    nodedata << QString(fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]") << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
@@ -1175,6 +1183,7 @@ void ProcessVolume(QString evidstring)
                     out.flush();
                     pstatfile.close();
                 }
+                reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
 		nodedata.clear();
 		nodedata << "UNALLOCATED" << "0" << QString::number(512*(pofflist.at(i) - (pofflist.at(i-1) + psizelist.at(i-1)))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 		mutex.lock();
@@ -1198,6 +1207,7 @@ void ProcessVolume(QString evidstring)
                 out.flush();
                 pstatfile.close();
             }
+            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>" + fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]</td></tr>";
 	    nodedata << QString(fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]") << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    //nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
@@ -1225,6 +1235,7 @@ void ProcessVolume(QString evidstring)
                 out.flush();
                 pstatfile.close();
             }
+            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
 	    nodedata.clear();
 	    nodedata << "UNALLOCATED" << "0" << QString::number(imgsize - 512*(pofflist.at(i) + psizelist.at(i))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
 	    mutex.lock();
@@ -1235,6 +1246,12 @@ void ProcessVolume(QString evidstring)
 	    //qDebug() << "unalloc exists after last partition...";
 	}
     }
+    reportstring += "</table></div><br/>\n";
+    EvidenceReportData tmpdata;
+    tmpdata.evidid = evidcnt;
+    tmpdata.evidname = evidencename;
+    tmpdata.evidcontent = reportstring;
+    evidrepdatalist.append(tmpdata);
     /*
         // ADD ManualCarved Folder HERE
         treeout.clear();

@@ -613,7 +613,8 @@ public:
             return Qt::NoItemFlags;
         if(index == QModelIndex())
             return Qt::NoItemFlags;
-        if(index.column() == 11 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4) // used to be 0
+        //if(index.column() == 11 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4) // used to be 0
+        if(index.column() == 11 && itemnode->Data(index.column()).toString().split("-").count() == 3) // used to be 0
             flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
         
         return flags;
@@ -732,9 +733,15 @@ public:
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
             parents[data.at(11).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
             if(checkhash.contains(data.at(11).toString())) // USED TO BE 0
-                parents.value(data.at(11).toString().split("-a").first())->SetChecked(true); // USED TO BE 0
+            {
+                parents.value(data.at(11).toString())->SetChecked(true);
+                //parents.value(data.at(11).toString().split("-a").first())->SetChecked(true); // USED TO BE 0
+            }
             if(deleted == 1)
-                parents.value(data.at(11).toString().split("-a").first())->SetDeleted(true); // USED TO BE 0
+            {
+                //parents.value(data.at(11).toString().split("-a").first())->SetDeleted(true); // USED TO BE 0
+                parents.value(data.at(11).toString())->SetDeleted(true); // USED TO BE 0
+            }
         }
     };
 
