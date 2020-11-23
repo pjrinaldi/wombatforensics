@@ -1155,6 +1155,8 @@ void QHexEdit::resetSelection()
 {
     _bSelectionBegin = _bSelectionInit;
     _bSelectionEnd = _bSelectionInit;
+
+    emit selectionChanged();
 }
 
 void QHexEdit::resetSelection(qint64 pos)
@@ -1168,6 +1170,8 @@ void QHexEdit::resetSelection(qint64 pos)
     _bSelectionInit = pos;
     _bSelectionBegin = pos;
     _bSelectionEnd = pos;
+
+    emit selectionChanged();
 }
 
 void QHexEdit::setSelection(qint64 pos)
@@ -1188,6 +1192,8 @@ void QHexEdit::setSelection(qint64 pos)
         _bSelectionBegin = pos;
         _bSelectionEnd = _bSelectionInit;
     }
+
+    emit selectionChanged();
 }
 
 qint64 QHexEdit::getSelectionBegin()
