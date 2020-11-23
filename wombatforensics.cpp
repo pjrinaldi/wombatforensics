@@ -1150,6 +1150,7 @@ void WombatForensics::OpenUpdate()
         //ui->actionExpandAll->setEnabled(true);
         //ui->actionCollapseAll->setEnabled(true);
     }
+    ui->hexview->ensureVisible();
     QApplication::restoreOverrideCursor();
     qInfo() << "Case was Opened Successfully";
     StatusUpdate("Ready");
