@@ -442,6 +442,13 @@ void LoadTreeModel(QString estring)
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, nodelist.at(12).toInt(), nodelist.at(13).toInt());
         mutex.unlock();
+        if(nodelist.at(11).split("-").count() == 3)
+        {
+            listeditems.append(nodelist.at(11));
+            filesfound++;
+            isignals->ProgUpd();
+        }
+        //listeditems.append(treeout.at(11));
     }
 }
 

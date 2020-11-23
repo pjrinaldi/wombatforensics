@@ -1335,6 +1335,13 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, fileinfolist->at(j).value("itemtype").toInt(), fileinfolist->at(j).value("isdeleted").toInt());
         mutex.unlock();
+        if(nodedata.at(11).toString().split("-").count() == 3)
+        {
+            listeditems.append(nodedata.at(11).toString());
+            //listeditems.append(treeout.at(11));
+            filesfound++;
+            isignals->ProgUpd();
+        }
         WriteFileProperties((QHash<QString, QVariant>*)&(fileinfolist->at(j)), QString(curpartpath + "f" + QString::number(fileinfolist->at(j).value("inode").toUInt()) + ".prop"));
     }
     int curinode = fileinfolist->count();
