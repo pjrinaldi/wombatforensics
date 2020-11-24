@@ -442,6 +442,11 @@ void LoadTreeModel(QString estring)
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, nodelist.at(12).toInt(), nodelist.at(13).toInt());
         mutex.unlock();
+        if(nodelist.at(11).split("-").count() == 2)
+        {
+            partitionlist.append(nodelist.at(11) + ": " + nodelist.at(0));
+	    //partitionlist.append(plist.at(10) + ": " + QString(GetFileSystemLabel(fsinfo)) + " (" + QString(tsk_fs_type_toname(fsinfo->ftype)).toUpper() + ")");
+        }
         if(nodelist.at(11).split("-").count() == 3)
         {
             listeditems.append(nodelist.at(11));
