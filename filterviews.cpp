@@ -7,6 +7,8 @@ IdFilter::IdFilter(QWidget* parent) : QFrame(parent), ui(new Ui::IdFilter)
 {
     ui->setupUi(this);
     this->hide();
+    ui->vspinBox->setVisible(false);
+    ui->vcheckBox->setVisible(false);
     ui->idlabel->setText("");
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->espinBox, SIGNAL(textChanged(QString)), this, SLOT(BuildId(QString)));
@@ -38,12 +40,14 @@ void IdFilter::DisplayFilter()
                 ui->espinBox->setEnabled(true);
                 ui->espinBox->setValue(tmplist.at(i).mid(1).toInt());
             }
+            /*
             else if(tmplist.at(i).contains("v"))
             {
                 ui->vcheckBox->setChecked(true);
                 ui->vspinBox->setEnabled(true);
                 ui->vspinBox->setValue(tmplist.at(i).mid(1).toInt());
             }
+            */
             else if(tmplist.at(i).contains("p"))
             {
                 ui->pcheckBox->setChecked(true);
@@ -58,8 +62,10 @@ void IdFilter::DisplayFilter()
             }
         }
     }
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
     if(this->pos().x() == 0)
-        this->move(this->mapFromGlobal(QCursor::pos()));
+        this->move(newpos);
     this->show();
 }
 
@@ -164,9 +170,16 @@ NameFilter::~NameFilter()
 void NameFilter::DisplayFilter()
 {
     ui->lineEdit->setText(filtervalues.namefilter);
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+    /*
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
+    */
 }
 
 void NameFilter::HideClicked()
@@ -192,9 +205,16 @@ PathFilter::~PathFilter()
 void PathFilter::DisplayFilter()
 {
     ui->lineEdit->setText(filtervalues.pathfilter);
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+    /*
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
+    */
 }
 
 void PathFilter::HideClicked()
@@ -219,9 +239,16 @@ SizeFilter::~SizeFilter()
 
 void SizeFilter::DisplayFilter()
 {
+    QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
+    QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
+    if(this->pos().x() == 0)
+        this->move(newpos);
+    this->show();
+    /*
     if(this->pos().x() == 0)
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
+    */
 }
 
 void SizeFilter::HideClicked()
@@ -526,6 +553,8 @@ void HashFilter::DisplayFilter()
 
 void HashFilter::HideClicked()
 {
+    filtervalues.hashbool = ui->checkBox->isChecked();
+    filtervalues.hashbool2 = ui->checkBox_2->isChecked();
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 7, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
     for(int i=0; i < indexlist.count(); i++)
     {
