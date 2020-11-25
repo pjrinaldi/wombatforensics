@@ -1610,14 +1610,46 @@ void WombatForensics::PopulateHexContents()
     }
     else if(nodeid.split("-").count() == 2) // unallocated, file system, or partition, possibly carved, zip, etc...
     {
-        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
-        //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
-        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(partfile.isOpen())
-            tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
-        partfile.close();
-        ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()*2);
-        ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(1) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(2) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(2).toLongLong());
+        if(nodeid.contains("-c")) // manually carved file
+        {
+            QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".prop");
+            if(!cfile.isOpen())
+                cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(cfile.isOpen())
+            {
+                tmpstr = QString(cfile.readLine()).split(";", Qt::SkipEmptyParts).at(0);
+                cfile.close();
+            }
+            //qDebug() << "offset 2:" << QString::number(tmpstr.split(",").at(0).toLongLong(), 16);
+            ui->hexview->BypassColor(true);
+            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toULongLong()*2);
+            ui->hexview->SetColor(tmpstr, selectednode->Data(2).toLongLong());
+        }
+        else
+        {
+            QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
+            partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(partfile.isOpen())
+                tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
+            partfile.close();
+            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()*2);
+            ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(1) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(2) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(2).toLongLong());
+        }
+        /*
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".stat");
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+            tmpstr = cfile.readLine();
+        cfile.close();
+        ui->hexview->BypassColor(true);
+        ui->hexview->SetColorInformation(0, 0, 0, 0, tmpstr.split(",").at(16), tmpstr.split(",").at(8).toULongLong(), 0);
+        if(tmpstr.split(",").count() > 15)
+            ui->hexview->setCursorPosition(tmpstr.split(",").at(16).toULongLong()*2);
+    }
+
+         *
+         */ 
     }
     else if(nodeid.split("-").count() == 3) // file/directory
     {

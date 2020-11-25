@@ -478,10 +478,10 @@ public:
                     return QIcon(":/basic/treeimg");
                 else if(nodetype == 2)
                 {
-                    if(itemnode->Data(11).toString().contains("-c"))
-                        return QIcon(":/basic/carveicon");
-                    else if(itemnode->Data(11).toString().contains("-mc"))
+                    if(itemnode->Data(11).toString().endsWith("-cm"))
                         return QIcon(":/basic/virtualfolder");
+                    else if(itemnode->Data(11).toString().contains("-c"))
+                        return QIcon(":/basic/carveicon");
                     else
                         return QIcon(":/basic/treevol");
                 }

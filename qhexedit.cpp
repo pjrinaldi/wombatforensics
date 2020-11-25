@@ -1019,8 +1019,17 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                     }
                     */
                 }
+                else
+                {
+                    for(int i=0; i < offlist.count(); i++)
+                    {
+                        if(posBa >= offlist.at(i) && posBa < (offlist.at(i) + filesize))
+                            c = carvebrush.color(); // GREEN
+                    }
+                }
 
                 // color highlight carved here...
+                /*
                 if(fsoffset == 0 && blocksize == 0 && residentoffset == 0)
                 {
                     if(posBa >= byteoffset && posBa <= byteoffset + filelength - 1)
@@ -1028,6 +1037,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                         c = carvebrush.color(); // GREEN
                     }
                 }
+                */
 
                 if ((getSelectionBegin() <= posBa) && (getSelectionEnd() > posBa))
                 {
