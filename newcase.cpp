@@ -1258,7 +1258,21 @@ void ProcessVolume(QString evidstring)
     tmpdata.evidname = evidencename;
     tmpdata.evidcontent = reportstring;
     evidrepdatalist.append(tmpdata);
+    nodedata.clear();
+    nodedata << QByteArray("carved manually").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Direectory" << "0" << QString("e" + QString::number(evidcnt) + "-cm");
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), 11, 0);
+    mutex.unlock();
     /*
+    // ADD ManualCarved Folder HERE
+    treeout.clear();
+    treeout << "$Manual Carved" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-mc");
+    nodedata.clear();
+    for(int i=0; i < treeout.count(); i++)
+        nodedata << treeout.at(i);
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), 3, 0);
+    mutex.unlock();
         // ADD ManualCarved Folder HERE
         treeout.clear();
         treeout << QByteArray("$Carved-Verified").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-pc"); // should make -vc for VerifiedCarved
@@ -1353,6 +1367,8 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
     int curinode = fileinfolist->count();
     AddVirtualFileSystemFiles(fsinfo, &curinode, curpartpath, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)));
     // add orphan directory and orphan files...
+    // MAYBE I WANT ORPHAN FOLDER TO NOT BE A FOUND FILE COUNT ???? BUT WHAT COULD IT BE ?????
+    // I'M GUESSING THE ORPHANS COUNT (CURINODE) AND FILESFOUND WILL BE OFF
     QByteArray ba;
     ba.clear();
     nodedata.clear();
@@ -1419,6 +1435,7 @@ void WriteFileProperties(QHash<QString, QVariant>*fileinfo, QString pathstring)
     {
         QTextStream out;
         out.setDevice(&filepropfile);
+        // might need an if(fileinfo->value("type").toUInt() == 0) // FAT12
         out << "Alias Name|" << fileinfo->value("aliasname").toString() << "|8.3 file name" << Qt::endl;
         out << "File Attributes|" << fileinfo->value("attribute").toString() << "|File attributes." << Qt::endl;
         out << "Cluster List|" << fileinfo->value("clusterlist").toString() << "|Clusters occupied by the file." << Qt::endl;

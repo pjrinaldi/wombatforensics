@@ -3394,63 +3394,33 @@ void WombatForensics::AddSection()
 
 void WombatForensics::TagSection(QString ctitle, QString ctag)
 {
-    // NEED TO GET THE CARVED OFFSET, EVIDITEM, LENGTH/SIZE, ASSIGNED TAG, TITLE/NAME
-    // THEN GENERATE WHAT NEEDS TO BE GENERATED... AND ADD IT TO TREEVIEW/ GENERATE .STAT FILE (E#-C#.STAT)/ ADD IT TO PREVIEW REPORT
-    // DETERMINE HASH BASED OFF HASH QHASH...
-    qint64 coffset = ui->hexview->GetOffset();
-    qint64 clength = ui->hexview->GetSelectionLength();
-    QString enumber = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first();
-    //char buffer[64];
-    //#if _LARGEFILE_SOURCE
-    //sprintf(buffer,"0x%llx",coffset);
-    //#else
-    //sprintf(buffer,"0x%x",coffset);
-    //#endif
-    //QString offstr = buffer;
-    QString offstr = "0x" + QString::number(coffset, 16);
-    QByteArray tmparray = ui->hexview->selectionToByteArray();
+    qint64 coffset = ui->hexview->GetOffset(); // current offset
+    qint64 clength = ui->hexview->GetSelectionLength(); // current selection length (carved size)
+    QString enumber = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first(); // current evidence item
+    QString offstr = "0x" + QString::number(coffset, 16); // offset string 0xabc
+    QByteArray tmparray = ui->hexview->selectionToByteArray(); // current carved content
     QMimeDatabase mimedb;
     const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-    QString mimestr = GenerateCategorySignature(mimetype);
-    QByteArray ba;
-    ba.clear();
-    ba.append(ctitle.toUtf8());
-    QByteArray ba2;
-    ba2.clear();
-    ba2.append(offstr.toUtf8());
-    // HASH INFO
-    QString curhash = "0";
-    QString hashval = selectedindex.sibling(selectedindex.row(), 7).data().toString();
-    if(!hashval.isEmpty()) // hash exists, determine what it is...
-    {
-        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
-        QByteArray hasharray = QByteArray::fromRawData(tmparray, clength);
-        curhash = QString(tmphash.hash(hasharray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
-    }
-    QString carvedstring = ba.toBase64() + ",5," + enumber.mid(1) + "," + ba2.toBase64() + ",0,0,0,0," + QString::number(clength) + "," + QString::number(carvedcount) + "," + mimestr + ",0," + enumber + "-c" + QString::number(carvedcount) + "," + curhash + ",0," + ctag + "," + QString::number(coffset);
-    // Add CARVED STAT FILE
-    QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".stat");
+    QString mimestr = GenerateCategorySignature(mimetype); // category/signature
+    QString layoutstr = QString::number(coffset) + "," + QString::number(clength) + ";"; // Layout property
+    QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+    QString curhash = QString(tmphash.hash(tmparray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper(); // HASH for carved content
+    // Add carved prop file
+    QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".prop");
     if(!cfile.isOpen())
         cfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(cfile.isOpen())
-        cfile.write(carvedstring.toStdString().c_str());
-    cfile.close();
-    // ADD CARVED STAT FILE TO THE TREE
+    {
+        cfile.write(layoutstr.toStdString().c_str());
+        cfile.close();
+    }
+
     QList<QVariant> nodedata;
     nodedata.clear();
-    nodedata << ba.toBase64();
-    nodedata << ba2.toBase64();
-    nodedata << QString::number(clength);
-    nodedata << "0";
-    nodedata << "0";
-    nodedata << "0";
-    nodedata << "0";
-    nodedata << curhash;
-    nodedata << mimestr.split("/").first();
-    nodedata << mimestr.split("/").last();
-    nodedata << ctag;
-    nodedata << QString(enumber + "-c" + QString::number(carvedcount));
-    treenodemodel->AddNode(nodedata, QString(enumber + "-mc"), 15, 0);
+    nodedata << QByteArray(ctitle.toUtf8()).toBase64() << QByteArray(offstr.toUtf8()).toBase64() << clength << "0" << "0" << "0" << "0" << curhash << mimestr.split("/").at(0) << mimestr.split("/").at(1) << ctag << QString(enumber + "-c" + QString::number(carvedcount));
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString(enumber + "-cm"), 15, 0);
+    mutex.unlock();
     // ADD TO PREVIEW REPORT
     QString filestr = "<td class='fitem' id='" + QString(enumber + "-c" + QString::number(carvedcount)) + "'>";
     filestr += "<table width='300px'><tr><th colspan='2'>" + ctitle + "</th></tr>";
