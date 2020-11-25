@@ -841,6 +841,7 @@ void TransferThumbnails(QString thumbid, QString reppath)
 
 void TransferFiles(QString thumbid, QString reppath)
 {
+    /*
     if(thumbid.contains("-c"))
     {
         QString estring = thumbid.split("-").at(0);
@@ -870,7 +871,7 @@ void TransferFiles(QString thumbid, QString reppath)
                 rawevidencepath = evidlist.at(3);
         }
         QString tmpstr;
-        QFile cfile(wombatvariable.tmpmntpath + "carved/" + thumbid + ".stat");
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + thumbid + ".prop");
         if(!cfile.isOpen())
             cfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(cfile.isOpen())
@@ -1097,6 +1098,7 @@ void TransferFiles(QString thumbid, QString reppath)
         }
         delete[] filebuffer;
     }
+    */
 }
 
 void TransferArtifacts(QString artifact, QString reppath)

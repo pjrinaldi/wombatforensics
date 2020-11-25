@@ -22,22 +22,36 @@ void ProcessExport(QString objectid)
     QByteArray filecontent;
     filecontent.clear();
     QString layout = "";
-    QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
-    if(!fpropfile.isOpen())
-        fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(fpropfile.isOpen())
+    if(objectid.split("-").count() == 3)
     {
-        QString line = "";
-        while(!fpropfile.atEnd())
+        QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
+        if(!fpropfile.isOpen())
+            fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(fpropfile.isOpen())
         {
-            line = fpropfile.readLine();
-            if(line.startsWith("Layout"))
+            QString line = "";
+            while(!fpropfile.atEnd())
             {
-                layout = line.split("|").at(1);
-                break;
+                line = fpropfile.readLine();
+                if(line.startsWith("Layout"))
+                {
+                    layout = line.split("|").at(1);
+                    break;
+                }
             }
+            fpropfile.close();
         }
-        fpropfile.close();
+    }
+    else if(objectid.contains("-c"))
+    {
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + objectid + ".prop");
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+        {
+            layout = cfile.readLine();
+            cfile.close();
+        }
     }
     QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
     QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));

@@ -1544,6 +1544,27 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         if(sizeval > 0)
             RewriteSelectedIdContent(curindex);
     }
+    else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-c")) // carved file
+    {
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + curindex.sibling(curindex.row(), 11).data().toString() + ".prop");
+        QString tmpstr;
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+        {
+            tmpstr = QString(cfile.readLine()).split(";").at(0);
+            cfile.close();
+        }
+        QByteArray carvebuf = ui->hexview->dataAt(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toLongLong(), tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()); // carved data
+        QFile hexfile(hexstring);
+        if(!hexfile.isOpen())
+            hexfile.open(QIODevice::WriteOnly);
+        if(hexfile.isOpen())
+        {
+            hexfile.write(carvebuf);
+            hexfile.close();
+        }
+    }
     /*
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
     {
