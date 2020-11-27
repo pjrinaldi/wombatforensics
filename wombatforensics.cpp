@@ -450,7 +450,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 3 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
     {
         QTimeZone tmpzone = QTimeZone(reporttimezone);
-        taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
+        //taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
         treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
         QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
         filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
@@ -1114,37 +1114,22 @@ void WombatForensics::OpenUpdate()
     */
     // THE ABOVE ARE REPLACED BY TREEMODEL POPULATION FROM FILE...
     // THE BELOW MAY ALSO BE REPLACED, BUT HAVE TO CHECK
-    InitializeHashList();
-    InitializeTaggedList();
+    //InitializeHashList();
+    //InitializeTaggedList();
     //PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
-    // this currently fails to load content data in the hexviewer. until it does, the char bytes are zero...
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QString curid = InitializeSelectedState();
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(curid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
     if(indexlist.count() > 0)
     {
-        //qDebug() << indexlist.at(0).sibling(indexlist.at(0).row(), 0).data().toString() << indexlist.count();
-        //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
-        //selectedindex = treenodemodel->index(0, 0, QModelIndex());
-        //oadHexContents();
-        //ui->hexview->ensureVisible();
         ui->dirTreeView->setCurrentIndex(indexlist.at(0));
-        //QThread::sleep(60);
         ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
-        //selectedindex = indexlist.first();
-        //LoadHexContents();
-        //bool test = false;
-        //qDebug() << ui->hexview->addressOffset() << selectedoffset->text().split("0x").last().toLongLong(&test, 16);
-        //test = false;
-        //ui->hexview->setCursorPosition(selectedoffset->text().split("0x").last().toLongLong(&test, 16)*2 + 56600*2);
-        //ui->hexview->setCursorPosition(ui->hexview->addressOffset()*2);
-        //ui->hexview->ensureVisible();
     }
     else
         ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
-    //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
     if(ui->dirTreeView->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);
@@ -2367,10 +2352,13 @@ void WombatForensics::CloseCurrentCase()
         qInfo() << "Selected Item Saved";
         UpdateCheckState();
         qInfo() << "Check State Saved";
+        /*
+         * THIS SHOULD BE COVERED BY THE TREE MODEL SAVE
         SaveTaggedList();
         qInfo() << "Tagged Items Saved";
         SaveHashList();
         qInfo() << "Hashed Items Saved";
+        */
         SavePasswordList();
         qInfo() << "Password Items Saved";
         SaveImagesHash();
@@ -2553,6 +2541,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                 selectfile.write("");
             selectfile.close();
             // 2.5 Remove e# entries from hashlist and taggedhash
+            /*
             QHashIterator<QString, QString> n(hashlist);
             while(n.hasNext())
             {
@@ -2569,6 +2558,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
                     taggedhash.remove(o.key());
             }
             SaveTaggedList();
+            */
             QHashIterator<QString, QString> p(passwordhash);
             while(p.hasNext())
             {
@@ -3170,7 +3160,7 @@ void WombatForensics::FinishDigging()
             treenodemodel->UpdateHeaderNode(7, "SHA1 Hash");
         else if(hashsum == 4)
             treenodemodel->UpdateHeaderNode(7, "SHA256 Hash");
-        QtConcurrent::run(SaveHashList); // save ids/hashed values to hashlist file for re-opening a case.
+        //QtConcurrent::run(SaveHashList); // save ids/hashed values to hashlist file for re-opening a case.
         hashash = false;
     }
     if(hasimg || hasvid)
@@ -3574,8 +3564,8 @@ void WombatForensics::SaveState()
     //if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 5)
     if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 3)
         RewriteSelectedIdContent(selectedindex);
-    SaveTaggedList();
-    SaveHashList();
+    //SaveTaggedList();
+    //SaveHashList();
     SavePasswordList();
     SaveImagesHash();
     SaveTreeModel();

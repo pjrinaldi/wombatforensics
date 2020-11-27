@@ -453,7 +453,7 @@ void RemoveTagItem(QString tagname)
     previewfile.close();
     isignals->ActivateReload();
 }
-
+// should be able to remove
 void InitializeTaggedList(void)
 {
     taggedhash.clear();
@@ -477,7 +477,7 @@ void InitializeTaggedList(void)
         treenodemodel->UpdateNode(i.key(), 10, i.value());
     }
 }
-
+// should be able to remove
 void SaveTaggedList(void)
 {
     QFile hfile(wombatvariable.tmpmntpath + "taggedlist");
