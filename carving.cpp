@@ -66,6 +66,7 @@ void GetCarvers(QStringList& ctypelist, QStringList flist)
 
 void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid)
 {
+    /*
     QString estring = curpartid.split("-").first();
     QString vstring = curpartid.split("-").at(1);
     QString pstring = curpartid.split("-").at(2);
@@ -114,11 +115,12 @@ void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize,
     partoffset = partlist.at(4).toLongLong();
     blocksize = evidlist.at(2).toLongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
     partsize = partlist.at(1).toLongLong() - partoffset;
-
+    */
 }
 
 void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize)
 {
+    /*
     QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
     QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
     if(!cfiles.isEmpty())
@@ -135,6 +137,7 @@ void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize)
 	    headhash.insert(curblock, "");
 	}
     }
+    */
 }
 
 void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile, qint64& blocksize, qint64& partoffset)
@@ -375,6 +378,7 @@ void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray, QString& car
     {
         QByteArray tmparray = footerarray.left(carvedstringsize);
 
+        /*
 	QString estring = curplist.split("-").at(0);
 	QString vstring = curplist.split("-").at(1);
 	QString pstring = curplist.split("-").at(2);
@@ -388,11 +392,13 @@ void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray, QString& car
         isvalidfile = tmpvid->LoadFile(tmpfstr);
         delete tmpvid;
         // NEED TO LOOK INTO POSSIBLY USING LIBMPEG2 TO VALIDATE.. OR JUST NOT VALIDATE AT ALL...
+        */
     }
 
 }
 void WriteCarvedFile(QString& curplist, qint64& carvedstringsize, qint64& blocksize, int& curblock, QString& curtypestr, bool& isvalidfile)
 {
+    /*
     QString parstr = curplist;
     QString vtype = "";
     if(isvalidfile)
@@ -419,6 +425,7 @@ void WriteCarvedFile(QString& curplist, qint64& carvedstringsize, qint64& blocks
     isignals->CarveUpd(curplist, carvedcount);
     carvedcount++;
     filesfound++;
+    */
 }
 
 void GenerateCarving(QStringList plist, QStringList flist)
