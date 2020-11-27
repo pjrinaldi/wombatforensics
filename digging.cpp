@@ -33,13 +33,17 @@ void GenerateArchiveExpansion(QString objectid)
             parstr = objectid;
             //idstring = estring;
         }
-        else if(objectid.split("-").count() == 4)
+        else if(objectid.split("-").count() == 3)
         {
-            idstring = objectid.split("-c").at(0);
-            astring = objectid.split("-").at(3);
+            if(objectid.contains("-c"))
+                idstring = objectid.split("-c").at(0);
+            else
+                idstring = objectid.split("-f").at(0);
+            astring = objectid.split("-").at(2);
             parstr = objectid;
             //estring = objectid.split("-").at(0);
         }
+        /*
         else
         {
             idstring = objectid.split("-f").at(0);
@@ -50,6 +54,7 @@ void GenerateArchiveExpansion(QString objectid)
             parstr = objectid.split("-a").first();
             //idstring = estring + "-" + vstring + "-" + pstring;
         }
+        */
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
         QString filepath = indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
