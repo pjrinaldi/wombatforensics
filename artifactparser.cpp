@@ -841,6 +841,189 @@ void TransferThumbnails(QString thumbid, QString reppath)
 
 void TransferFiles(QString thumbid, QString reppath)
 {
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt:: MatchRecursive));
+    TreeNode* curnode = static_cast<TreeNode*>(indexlist.at(0).internalPointer());
+    qulonglong filesize = curnode->Data(2).toULongLong();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*-" + thumbid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split("-e").first();
+    QString tmpstr = "";
+    QFile estatfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
+    if(!estatfile.isOpen())
+        estatfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(estatfile.isOpen())
+    {
+        tmpstr = estatfile.readLine();
+        estatfile.close();
+    }
+    QString typestr = "";
+    QByteArray filecontent;
+    filecontent.clear();
+    QString layout = "";
+    if(thumbid.split("-").count() == 3)
+    {
+        QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + thumbid.split("-").at(1) + "/" + thumbid.split("-").at(2) + ".prop");
+        if(!fpropfile.isOpen())
+            fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(fpropfile.isOpen())
+        {
+            QString line = "";
+            while(!fpropfile.atEnd())
+            {
+                line = fpropfile.readLine();
+                if(line.startsWith("Layout"))
+                {
+                    layout = line.split("|").at(1);
+                    break;
+                }
+            }
+            fpropfile.close();
+        }
+    }
+    else if(thumbid.contains("-c"))
+    {
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + thumbid + ".prop");
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+        {
+            layout = cfile.readLine();
+            cfile.close();
+        }
+    }
+    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+    QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        for(uint i=1; i <= (uint)layoutlist.count(); i++)
+        {
+            efile.seek(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+            if(i * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong() <= filesize)
+                filecontent.append(efile.read(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+            else
+                filecontent.append(efile.read(filesize - ((i-1) * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong())));
+        }
+        efile.close();
+    }
+    QString tmppath = reppath + "files/";
+    if(curnode->Data(8).toString() == "Directory")
+    {
+        // NEED TO DETERMINE IF THE FS IS NTFS, THEN I CAN WRITE $I30 AS WELL...
+        // CURRENTLY USING THE FIRST 2 OF ID DON'T WORK FOR CARVED, SINCE IT DOESN'T HAVE PARTITION...
+        // MAYBE I SHOULD INCLUDE PARTITION IN CARVED ID...
+        QDir dir;
+        bool tmpdir = dir.mkpath(QString(tmppath + thumbid));
+    }
+    else
+    {
+        QDir dir;
+        bool tmpdir = dir.mkpath(QDir::cleanPath(tmppath));
+        if(tmpdir)
+        {
+            QFile tmpfile(tmppath + thumbid);
+            if(!tmpfile.isOpen())
+                tmpfile.open(QIODevice::WriteOnly);
+            if(tmpfile.isOpen())
+            {
+                if(curnode->Data(9).toString().contains("Shortcut"))
+                {
+                    QString lnkstr = ParseLnkArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    tmpfile.write(lnkstr.toStdString().c_str());
+                }
+                else if(curnode->Data(9).toString().contains("Recycler"))
+                {
+                    QString info2str = ParseInfo2Artifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    tmpfile.write(info2str.toStdString().c_str());
+                }
+                else if(curnode->Data(9).toString().contains("Recycle.Bin"))
+                {
+                    QString idollarstr = ParseIDollarArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    tmpfile.write(idollarstr.toStdString().c_str());
+                }
+                else if(curnode->Data(9).toString().contains("Prefetch"))
+                {
+                    QString pfstr = ParsePrefetchArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    tmpfile.write(pfstr.toStdString().c_str());
+                }
+                else
+                {
+                    tmpfile.write(filecontent);
+                }
+                tmpfile.close();
+            }
+        }
+    }
+    /*
+     *
+        if(curnode->itemtype == 2 || curnode->itemtype == 11) // directory
+        {
+            //if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
+            // EXPORT I30 PARSED CONTENT TO THE NEW PATH AS WELL.
+            QDir dir;
+            bool tmpdir = dir.mkpath(QString(tmppath + thumbid));
+            if(!tmpdir)
+            {
+                qWarning() << "Creation of export directory tree for file:" << tmppath << "failed";
+                //LogMessage(QString("Creation of export directory tree for file: " + tmppath + " failed"));
+                errorcount++;
+            }
+            if(partlist.at(0).toInt() == TSK_FS_TYPE_NTFS_DETECT) // IF NTFS
+            {
+                QString i30str = ParseI30Artifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                QFile tmpfile(tmppath + thumbid);
+                if(!tmpfile.isOpen())
+                    tmpfile.open(QIODevice::WriteOnly);
+                if(tmpfile.isOpen())
+                {
+                    tmpfile.write(i30str.toStdString().c_str());
+                    tmpfile.close();
+                }
+            }
+        }
+        else
+        {
+            QDir dir;
+            bool tmpdir = dir.mkpath(QDir::cleanPath(tmppath));
+            if(tmpdir == true)
+            {
+                QFile tmpfile(tmppath + thumbid);
+                if(!tmpfile.isOpen())
+                    tmpfile.open(QIODevice::WriteOnly);
+                if(tmpfile.isOpen())
+                {
+                    if(curnode->Data(9).toString().contains("Shortcut"))
+                    {
+                        QString lnkstr = ParseLnkArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                        tmpfile.write(lnkstr.toStdString().c_str());
+                    }
+                    else if(curnode->Data(9).toString().contains("Recycler"))
+                    {
+                        QString info2str = ParseInfo2Artifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                        tmpfile.write(info2str.toStdString().c_str());
+                    }
+                    else if(curnode->Data(9).toString().contains("Recycle.Bin"))
+                    {
+                        QString idollarstr = ParseIDollarArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                        tmpfile.write(idollarstr.toStdString().c_str());
+                    }
+                    else if(curnode->Data(9).toString().contains("Prefetch"))
+                    {
+                        QString pfstr = ParsePrefetchArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                        tmpfile.write(pfstr.toStdString().c_str());
+                    }
+                    else
+                    {
+                        QDataStream outbuffer(&tmpfile);
+                        outbuffer.writeRawData(filebuffer, bufferlength);
+                    }
+                    tmpfile.close();
+                }
+            }
+        }
+
+     */ 
     /*
     if(thumbid.contains("-c"))
     {

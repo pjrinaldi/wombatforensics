@@ -1544,6 +1544,9 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         if(sizeval > 0)
             RewriteSelectedIdContent(curindex);
     }
+    else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-cm")) // manual carved virtual directory
+    {
+    }
     else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-c")) // carved file
     {
         QFile cfile(wombatvariable.tmpmntpath + "carved/" + curindex.sibling(curindex.row(), 11).data().toString() + ".prop");
