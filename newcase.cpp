@@ -1138,6 +1138,17 @@ void ProcessVolume(QString evidstring)
 		mutex.lock();
 		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 		mutex.unlock();
+                // FILE CARVING DIRECTORIES
+                nodedata.clear();
+                nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+                mutex.unlock();
+                nodedata.clear();
+                nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+                mutex.unlock();
 		ptreecnt++;
 	    }
             curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
@@ -1166,6 +1177,17 @@ void ProcessVolume(QString evidstring)
 	    QList<QString> orphanlist;
             ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            // FILE CARVING DIRECTORIES
+            nodedata.clear();
+            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+            nodedata.clear();
+            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
 	    ptreecnt++;
 	    //qDebug() << "1st partition which has unalloc before...";
 	}
@@ -1193,6 +1215,17 @@ void ProcessVolume(QString evidstring)
 		mutex.lock();
 		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 		mutex.unlock();
+                // FILE CARVING DIRECTORIES
+                nodedata.clear();
+                nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+                mutex.unlock();
+                nodedata.clear();
+                nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+                mutex.unlock();
 		ptreecnt++;
 	    }
 	    // add existing partition here...
@@ -1223,6 +1256,17 @@ void ProcessVolume(QString evidstring)
             QList<QString> orphanlist;
             ParseDirectory(emntstring, fsinfolist.at(i).value("rootdiroffset").toUInt(), fsinfolist.at(i).value("rootdirsize").toUInt(), (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            // FILE CARVING DIRECTORIES
+            nodedata.clear();
+            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+            nodedata.clear();
+            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
 	    ptreecnt++;
 	}
 	if(i == pofflist.count() - 1 && ((pofflist.at(i) + psizelist.at(i))*512) < imgsize)
@@ -1248,6 +1292,17 @@ void ProcessVolume(QString evidstring)
 	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
 	    mutex.unlock();
 	    //add final unalloc partition to tree here...
+            // FILE CARVING DIRECTORIES
+            nodedata.clear();
+            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+            nodedata.clear();
+            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
 	    ptreecnt++;
 	    //qDebug() << "unalloc exists after last partition...";
 	}
@@ -1263,31 +1318,6 @@ void ProcessVolume(QString evidstring)
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), 11, 0);
     mutex.unlock();
-    /*
-    // ADD ManualCarved Folder HERE
-    treeout.clear();
-    treeout << "$Manual Carved" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-mc");
-    nodedata.clear();
-    for(int i=0; i < treeout.count(); i++)
-        nodedata << treeout.at(i);
-    mutex.lock();
-    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), 3, 0);
-    mutex.unlock();
-        // ADD ManualCarved Folder HERE
-        treeout.clear();
-        treeout << QByteArray("$Carved-Verified").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-pc"); // should make -vc for VerifiedCarved
-        nodedata.clear();
-        for(int i=0; i < treeout.count(); i++)
-            nodedata << treeout.at(i);
-        mutex.lock();
-        treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
-        mutex.unlock();
-	nodedata.clear();
-	nodedata << QByteArray("$Carved-UnVerified").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-v0-p0-uc");
-	mutex.lock();
-	treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-v0-p0"), 3, 0);
-	mutex.unlock();
-        */
 }
 
 void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QString>* orphanlist, int evidcnt, int ptreecnt)

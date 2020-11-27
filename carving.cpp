@@ -66,61 +66,35 @@ void GetCarvers(QStringList& ctypelist, QStringList flist)
 
 void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid)
 {
-    /*
-    QString estring = curpartid.split("-").first();
-    QString vstring = curpartid.split("-").at(1);
-    QString pstring = curpartid.split("-").at(2);
-    // get offset and length to find within the mounted raw image file...
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*." + estring)), QDir::NoSymLinks | QDir::Dirs);
-    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
-    QStringList evidlist;
-    evidlist.clear();
-    if(!evidfile.isOpen())
-        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(evidfile.isOpen())
+    QStringList evidfiles = eviddir.entryList(QStringList("*-" + curpartid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QFile estatfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
+    QString tmpstr = "";
+    if(!estatfile.isOpen())
+        estatfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(estatfile.isOpen())
     {
-        evidlist = QString(evidfile.readLine()).split(",", Qt::SkipEmptyParts);
-        evidfile.close();
+        tmpstr = estatfile.readLine();
+        estatfile.close();
     }
-    QString rawevidencepath = wombatvariable.imgdatapath;
-    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
-        rawevidencepath += evidlist.at(3).split("/").last() + ".raw";
-    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
-        rawevidencepath += evidlist.at(3).split("/").last() + "/ewf1";
-    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)evidlist.at(0).toInt()))
-    {
-        QString imgext = evidlist.at(3).split("/").last().split("/").last();
-        if(imgext.contains("000"))
-            rawevidencepath += evidlist.at(3).split("/").last() + ".raw";
-        else
-            rawevidencepath = evidlist.at(3);
-    }
-    QString evidencename = evidfiles.at(0).split(".e").first();
-    QString partstr = wombatvariable.tmpmntpath + evidencename + "." + estring + "/" + vstring + "/" + pstring + "/stat";
-    QFile partfile(partstr);
-    QStringList partlist;
-    partlist.clear();
+    rawfile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+    if(!rawfile.isOpen())
+        rawfile.open(QIODevice::ReadOnly);
+    QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + curpartid.split("-").at(1) + "/stat");
     if(!partfile.isOpen())
         partfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(partfile.isOpen())
     {
-        QString tmpstr = partfile.readLine();
-        partlist = tmpstr.split(",");
+        tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
         partfile.close();
     }
-    rawfile.setFileName(rawevidencepath);
-    if(!rawfile.isOpen())
-        rawfile.open(QIODevice::ReadOnly);
-    partoffset = partlist.at(4).toLongLong();
-    blocksize = evidlist.at(2).toLongLong(); // SECTOR SIZE, RATHER THAN FS CLUSTER SIZE
-    partsize = partlist.at(1).toLongLong() - partoffset;
-    */
+    partoffset = tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong();
+    blocksize = 512;
+    partsize = tmpstr.split(",", Qt::SkipEmptyParts).at(2).toLongLong();
 }
 
 void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize)
 {
-    /*
     QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
     QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
     if(!cfiles.isEmpty())
@@ -132,12 +106,14 @@ void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize)
 	    if(!cfile.isOpen())
 		cfile.open(QIODevice::ReadOnly | QIODevice::Text);
 	    if(cfile.isOpen())
-		byteoffset = QString(cfile.readLine()).split(",").at(16).toLongLong();
+            {
+                byteoffset = QString(cfile.readLine()).split(";", Qt::SkipEmptyParts).at(0).split(",", Qt::SkipEmptyParts).at(0).toLongLong();
+                cfile.close();
+            }
 	    qint64 curblock = byteoffset / blocksize;
 	    headhash.insert(curblock, "");
 	}
     }
-    */
 }
 
 void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile, qint64& blocksize, qint64& partoffset)
@@ -377,27 +353,52 @@ void ValidateCarvedFile(bool& isvalidfile, QByteArray& footerarray, QString& car
     else if(carvetype.split(",").at(1).contains("MPEG"))
     {
         QByteArray tmparray = footerarray.left(carvedstringsize);
-
+        QFile tfile(wombatvariable.tmpfilepath + curplist + "-c" + QString::number(carvedcount) + ".tmp");
         /*
-	QString estring = curplist.split("-").at(0);
-	QString vstring = curplist.split("-").at(1);
-	QString pstring = curplist.split("-").at(2);
-        QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + vstring + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
+        QString estring = curplist.split("-").at(0);
+        QString pstring = curplist.split("-").at(1);
+        QString tmpfstr = wombatvariable.tmpfilepath + estring + "-" + "-" + pstring + "-c" + QString::number(carvedcount) + ".tmp";
         QFile tfile(tmpfstr);
+        */
         tfile.open(QIODevice::WriteOnly);
         QDataStream otbuf(&tfile);
         otbuf.writeRawData(tmparray, tmparray.count());
         tfile.close();
         VideoViewer* tmpvid = new VideoViewer();
-        isvalidfile = tmpvid->LoadFile(tmpfstr);
+        isvalidfile = tmpvid->LoadFile(wombatvariable.tmpfilepath + curplist + "-c" + QString::number(carvedcount) + ".tmp");
         delete tmpvid;
         // NEED TO LOOK INTO POSSIBLY USING LIBMPEG2 TO VALIDATE.. OR JUST NOT VALIDATE AT ALL...
-        */
     }
 
 }
 void WriteCarvedFile(QString& curplist, qint64& carvedstringsize, qint64& blocksize, int& curblock, QString& curtypestr, bool& isvalidfile)
 {
+    QString vtype = "";
+    if(isvalidfile)
+        vtype = "cv";
+    else
+        vtype = "cu";
+    QString parstr = curplist + "-" + vtype;
+    QFile cfile(wombatvariable.tmpmntpath + "carved/" + curplist + "-c" + QString::number(carvedcount) + ".prop");
+    if(!cfile.isOpen())
+        cfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(cfile.isOpen())
+    {
+        cfile.write(QString(QString::number(curblock*blocksize) + "," + QString::number(carvedstringsize) + ";").toStdString().c_str());
+        cfile.close();
+    }
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << QByteArray(QString("Carved" + QString::number(curblock) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(curblock*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << curplist + "-c" + QString::number(carvedcount);
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, parstr, 15, 0);
+    //treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-" + slist.at(17)), 15, 0);
+    mutex.unlock();
+    listeditems.append(QString(curplist + "-c" + QString::number(carvedcount)));
+    isignals->ProgUpd();
+    isignals->CarveUpd(curplist, carvedcount);
+    carvedcount++;
+    filesfound++;
     /*
     QString parstr = curplist;
     QString vtype = "";
@@ -459,6 +460,7 @@ void GenerateCarving(QStringList plist, QStringList flist)
         SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray, curplist);
 	if(rawfile.isOpen())
 	    rawfile.close();
+        /*
 	QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
 	QStringList cfiles = cdir.entryList(QStringList(plist.at(i) + "-c*"), QDir::NoSymLinks | QDir::Files);
 	if(!cfiles.isEmpty())
@@ -466,5 +468,6 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	    QFuture<void> tmpfuture = QtConcurrent::map(cfiles, PopulateCarvedFiles);
 	    tmpfuture.waitForFinished();
 	}
+        */
     }
 }

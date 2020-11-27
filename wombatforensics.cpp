@@ -1082,6 +1082,7 @@ void WombatForensics::OpenUpdate()
         QFuture<void> tmpfuture = QtConcurrent::run(LoadImagesHash); // load images hash after case open to speed up thumbnail viewing
         thashwatcher.setFuture(tmpfuture);
     }
+    /*
     // add manual carved files
     QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
     QStringList cfiles = cdir.entryList(QStringList("e*-c*"), QDir::NoSymLinks | QDir::Files);
@@ -1110,6 +1111,11 @@ void WombatForensics::OpenUpdate()
         InitializeHashList();
         InitializeTaggedList();
     }
+    */
+    // THE ABOVE ARE REPLACED BY TREEMODEL POPULATION FROM FILE...
+    // THE BELOW MAY ALSO BE REPLACED, BUT HAVE TO CHECK
+    InitializeHashList();
+    InitializeTaggedList();
     //PrepareEvidenceImage();
     ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
