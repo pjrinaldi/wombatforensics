@@ -112,7 +112,6 @@ void GenerateArchiveExpansion(QString objectid)
             }
         }
         QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
-
         QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
         QFile tmpfile(fnamestr);
         if(!tmpfile.isOpen())

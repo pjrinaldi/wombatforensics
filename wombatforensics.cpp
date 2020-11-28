@@ -1528,7 +1528,6 @@ void WombatForensics::UpdateProperties()
 void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
     QString curid = curindex.sibling(curindex.row(), 11).data().toString();
-    qDebug() << "curid:" << curid;
     if(curid.split("-").count() == 3 && !curid.contains("-c") && !curid.contains("-z")) // file/dir
     {
         bool boolok;
@@ -1563,6 +1562,34 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
     }
     else if(curid.contains("-z")) // zip file
     {
+        int err = 0;
+        RewriteSelectedIdContent(curindex.parent()); // writes parent content to use to load zip content.
+        QString fnamestr = wombatvariable.tmpfilepath + curid.split("-z").at(0) + "-fhex";
+        zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+        struct zip_stat zipstat;
+        zip_stat_init(&zipstat);
+        int zipid = curid.split("-z").at(1).toInt();
+        zip_stat_index(curzip, zipid, 0, &zipstat);
+        char* zipbuf = new char[zipstat.size];
+        zip_file_t* curfile = NULL;
+        if(zipstat.encryption_method == ZIP_EM_NONE)
+            curfile = zip_fopen_index(curzip, zipid, 0);
+        if(curfile != NULL)
+        {
+            zip_fread(curfile, zipbuf, zipstat.size);
+            zip_fclose(curfile);
+        }
+        QFile ztmp(wombatvariable.tmpfilepath + curid + "-fhex");
+        if(!ztmp.isOpen())
+            ztmp.open(QIODevice::WriteOnly);
+        if(ztmp.isOpen())
+        {
+            QDataStream zbuffer(&ztmp);
+            zbuffer.writeRawData(zipbuf, zipstat.size);
+            ztmp.close();
+        }
+        delete[] zipbuf;
+        hexstring = wombatvariable.tmpfilepath + curid + "-fhex";
     }
     /*
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
@@ -1709,6 +1736,10 @@ void WombatForensics::PopulateHexContents()
 	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
             ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
         }
+        else if(nodeid.contains("-z")) // zip file
+        {
+            qDebug() << "get zip's parent layout here...";
+        }
         else
         {
             QString layout = "";
@@ -1731,6 +1762,10 @@ void WombatForensics::PopulateHexContents()
             ui->hexview->setCursorPosition(layout.split(",").at(0).toUInt() * 2);
             ui->hexview->SetColor(layout, selectednode->Data(2).toLongLong());
         }
+    }
+    else if(nodeid.split("-").count() == 4) // zip file
+    {
+        qDebug() << "get zip's parent layout here...";
     }
     ui->hexview->ensureVisible();
     /*

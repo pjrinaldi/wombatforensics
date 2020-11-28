@@ -947,6 +947,13 @@ void TransferFiles(QString thumbid, QString reppath)
                     QString pfstr = ParsePrefetchArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
                     tmpfile.write(pfstr.toStdString().c_str());
                 }
+                /*
+                else if(curnode->Data(9).toString().contains("Zip archive"))
+                {
+                    QString zipstr = ParseArchiveArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    tmpfile.write(zipstr.toStdString().c_str());
+                }
+                */
                 else
                 {
                     tmpfile.write(filecontent);
