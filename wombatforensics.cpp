@@ -1527,7 +1527,9 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
-    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 3) // file/dir
+    QString curid = curindex.sibling(curindex.row(), 11).data().toString();
+    qDebug() << "curid:" << curid;
+    if(curid.split("-").count() == 3 && !curid.contains("-c") && !curid.contains("-z")) // file/dir
     {
         bool boolok;
 	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
@@ -1535,12 +1537,12 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         if(sizeval > 0)
             RewriteSelectedIdContent(curindex);
     }
-    else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-cm")) // manual carved virtual directory
+    else if(curid.endsWith("-cm") || curid.endsWith("-cv") || curid.endsWith("-cu")) // manual carved virtual directory
     {
     }
-    else if(curindex.sibling(curindex.row(), 11).data().toString().contains("-c")) // carved file
+    else if(curid.contains("-c")) // carved file
     {
-        QFile cfile(wombatvariable.tmpmntpath + "carved/" + curindex.sibling(curindex.row(), 11).data().toString() + ".prop");
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + curid + ".prop");
         QString tmpstr;
         if(!cfile.isOpen())
             cfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -1558,6 +1560,9 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
             hexfile.write(carvebuf);
             hexfile.close();
         }
+    }
+    else if(curid.contains("-z")) // zip file
+    {
     }
     /*
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)

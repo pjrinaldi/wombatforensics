@@ -179,6 +179,9 @@ void GenerateArchiveExpansion(QString objectid)
 			mimestr = "Windows System/Prefetch";
 		    //else if(astring.contains("fa"
 		}
+                if(QString::fromStdString(std::string(zipstat.name)).endsWith("/"))
+                    mimestr = "Directory/Directory";
+                //qDebug() << "it is a directory, update mime values";
 		//qDebug() << "mimestr:" << mimestr;
 		delete[] magicbuffer;
 		//qDebug() << outstr;
@@ -814,6 +817,10 @@ QByteArray ReturnFileContent(QString objectid)
             layout = cfile.readLine();
             cfile.close();
         }
+    }
+    else if(objectid.contains("-z"))
+    {
+        qDebug() << "do zip work here and return filecontent inside here...";
     }
     QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
     QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
