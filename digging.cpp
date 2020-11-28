@@ -200,7 +200,7 @@ void GenerateArchiveExpansion(QString objectid)
                 */
                 QList<QVariant> nodedata;
                 nodedata.clear();
-                nodedata << QByteArray(QString::fromStdString(std::string(zipstat.name)).toUtf8()).toBase64() << QByteArray(QString(filepath + filename + "/").toUtf8()) << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString(objectid + "-z" + QString::number(i));
+                nodedata << QByteArray(QString::fromStdString(std::string(zipstat.name)).toUtf8()).toBase64() << QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64() << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString(objectid + "-z" + QString::number(i));
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, objectid, 1, 0);
                 mutex.unlock();
