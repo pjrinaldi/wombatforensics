@@ -23,14 +23,14 @@ void GenerateArchiveExpansion(QString objectid)
         //QString pstring = "";
         QString astring = "";
         QString idstring = "";
-        QString parstr = "";
+        //QString parstr = "";
         // SHOULD JUST HAVE TO IF/ELSE IF CONTAINS "-" 2 FOR COUNT FOR MANUAL COUNT OTHERWISE EXPANSION SEEMS LIKE IT WILL WORK FOR PROCESSED CARVED
         // NEED TO LINK THE FZ BACK TO THE CORRECT PARENT, SO I'LL NEED MORE THAN JUST THE COUNT OF 2, MIGHT NEED A SEPARATE BIT FOR CARVED ALLTOGETHER.
         if(objectid.split("-").count() == 2)
         {
             idstring = objectid.split("-").at(0);
             astring = objectid.split("-").at(1);
-            parstr = objectid;
+            //parstr = objectid;
             //idstring = estring;
         }
         else if(objectid.split("-").count() == 3)
@@ -40,7 +40,7 @@ void GenerateArchiveExpansion(QString objectid)
             else
                 idstring = objectid.split("-f").at(0);
             astring = objectid.split("-").at(2);
-            parstr = objectid;
+            //parstr = objectid;
             //estring = objectid.split("-").at(0);
         }
         /*
@@ -62,6 +62,57 @@ void GenerateArchiveExpansion(QString objectid)
 	QByteArray filebytes;
 	filebytes.clear();
         filebytes = ReturnFileContent(objectid);
+        //get parent layout property.
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList("*-" + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+        //QString evidencename = evidfiles.at(0).split("-e").first();
+        //QString tmpstr = "";
+        /*
+        QFile estatfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
+        if(!estatfile.isOpen())
+            estatfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(estatfile.isOpen())
+        {
+            tmpstr = estatfile.readLine();
+            estatfile.close();
+        }
+        QByteArray filecontent;
+        filecontent.clear();
+        */
+        QString layout = "";
+        if(objectid.split("-").count() == 3)
+        {
+            QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
+            if(!fpropfile.isOpen())
+                fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(fpropfile.isOpen())
+            {
+                QString line = "";
+                while(!fpropfile.atEnd())
+                {
+                    line = fpropfile.readLine();
+                    if(line.startsWith("Layout"))
+                    {
+                        layout = line.split("|").at(1);
+                        break;
+                    }
+                }
+                fpropfile.close();
+            }
+        }
+        else if(objectid.contains("-c"))
+        {
+            QFile cfile(wombatvariable.tmpmntpath + "carved/" + objectid + ".prop");
+            if(!cfile.isOpen())
+                cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(cfile.isOpen())
+            {
+                layout = cfile.readLine();
+                cfile.close();
+            }
+        }
+        QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+
         QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
         QFile tmpfile(fnamestr);
         if(!tmpfile.isOpen())
@@ -78,9 +129,11 @@ void GenerateArchiveExpansion(QString objectid)
             //QString newzipid = estring + "-" + vstring + "-" + pstring + "-" + "-fz" + QString::number(i) + "-a" + astring.mid(1);
             // CURRENT METHOD DOESN'T ACCOUNT FOR DIRECTORIES IN ARCHIVES, JUST LEAVES THEM AS THE PATH...
             // ALSO DOESN'T ACCOUNT FOR ENCRYPTED ZIP..
-            QString statstr = wombatvariable.tmpmntpath + "archives/" + idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
-            QString propstr = wombatvariable.tmpmntpath + "archives/" + idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".prop";
-	    if(!QFile::exists(statstr) || !QFile::exists(propstr))
+            //QString statstr = wombatvariable.tmpmntpath + "archives/" + idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".stat";
+            QString propstr = wombatvariable.tmpmntpath + "archives/" + objectid + "-z" + QString::number(i) + ".prop";
+            //QString propstr = wombatvariable.tmpmntpath + "archives/" + idstring + "-fz" + QString::number(i) + "-a" + astring.mid(1) + ".prop";
+	    //if(!QFile::exists(statstr) || !QFile::exists(propstr))
+            if(!QFile::exists(propstr))
 	    {
 		struct zip_stat zipstat;
 		zip_stat_init(&zipstat);
@@ -99,6 +152,7 @@ void GenerateArchiveExpansion(QString objectid)
 		else
 		{
 		    // PROMPT USER FOR PASSWORD HERE....
+                    // MIGHT NEED TO MOVE THIS SOONER IN THE ZIP SO I DON'T WASTE TIME FAILING W/O A PASSWORD
 		    curfile = zip_fopen_index_encrypted(curzip, i, 0, "password"); // IF ENCRYPTED (PROMPT USER FOR PASSWORD)...
 		}
 		if(curfile != NULL)
@@ -128,6 +182,7 @@ void GenerateArchiveExpansion(QString objectid)
 		//qDebug() << "mimestr:" << mimestr;
 		delete[] magicbuffer;
 		//qDebug() << outstr;
+                /*
 		QByteArray ba;
 		ba.clear();
 		ba.append(QString::fromStdString(std::string(zipstat.name)).toUtf8());
@@ -142,6 +197,16 @@ void GenerateArchiveExpansion(QString objectid)
 		nodedata.clear();
 		for(int i=0; i < 12; i++)
 		    nodedata << treeout.at(i);
+                */
+                QList<QVariant> nodedata;
+                nodedata.clear();
+                nodedata << QByteArray(QString::fromStdString(std::string(zipstat.name)).toUtf8()).toBase64() << QByteArray(QString(filepath + filename + "/").toUtf8()) << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString(objectid + "-z" + QString::number(i));
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, objectid, 1, 0);
+                mutex.unlock();
+                filesfound++;
+                listeditems.append(QString(objectid + "-z" + QString::number(i)));
+                /*
 		if(!QFile::exists(statstr))
 		{
 		    mutex.lock();
@@ -158,6 +223,7 @@ void GenerateArchiveExpansion(QString objectid)
 			statfile.close();
 		    }
 		}
+                */
 		if(!QFile::exists(propstr))
 		{
 		    QFile propfile(propstr);
@@ -166,8 +232,8 @@ void GenerateArchiveExpansion(QString objectid)
 		    if(propfile.isOpen())
 		    {
 			QTextStream proplist(&propfile);
-			proplist << "Compressed Size||" << zipstat.comp_size << " bytes||Compressed size of the file in bytes." << Qt::endl;
-			proplist << "Compression Method||";
+			proplist << "Compressed Size|" << zipstat.comp_size << " bytes|Compressed size of the file in bytes." << Qt::endl;
+			proplist << "Compression Method|";
 			switch(zipstat.comp_method)
 			{
 			    case ZIP_CM_STORE:
@@ -231,8 +297,8 @@ void GenerateArchiveExpansion(QString objectid)
 				proplist << "DEFLATE";
 				break;
 			}
-			proplist << "||Compression Method used to add the files to the archive." << Qt::endl;
-			proplist << "Encryption Method||";
+			proplist << "|Compression Method used to add the files to the archive." << Qt::endl;
+			proplist << "Encryption Method|";
 			switch(zipstat.encryption_method)
 			{
 			    case ZIP_EM_NONE:
@@ -286,7 +352,8 @@ void GenerateArchiveExpansion(QString objectid)
 				proplist << "NOT ENCRYPTED";
 				break;
 			}
-			proplist << "||Encryption Method used to protect the contents of the files added to the archive." << Qt::endl;
+			proplist << "|Encryption Method used to protect the contents of the files added to the archive." << Qt::endl;
+                        proplist << "Layout|" << layout << "|File Content Layout based on byte offset and size." << Qt::endl;
 			proplist.flush();
 			propfile.close();
 		    }
