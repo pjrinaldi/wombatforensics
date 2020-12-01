@@ -43,7 +43,6 @@ void ProcessExport(QString objectid)
             zip_fread(curfile, zipbuf, zipstat.size);
             zip_fclose(curfile);
         }
-        // NEED TO WRITE THIS TO A BYTEARRAY AND SKIP OVER THE LAYOUT PART BELOW...
         filecontent.append(zipbuf, zipstat.size);
         delete[] zipbuf;
     }

@@ -862,14 +862,13 @@ void TransferFiles(QString thumbid, QString reppath)
     QString layout = "";
     if(thumbid.contains("-z"))
     {
-        /*
-         *        int err = 0;
-        RewriteSelectedIdContent(curindex.parent()); // writes parent content to use to load zip content.
-        QString fnamestr = wombatvariable.tmpfilepath + curid.split("-z").at(0) + "-fhex";
+        int err = 0;
+        RewriteSelectedIdContent(indexlist.at(0).parent()); // writes parent content to use to load zip content
+        QString fnamestr = wombatvariable.tmpfilepath + thumbid.split("-z").at(0) + "-fhex";
         zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
         struct zip_stat zipstat;
         zip_stat_init(&zipstat);
-        int zipid = curid.split("-z").at(1).toInt();
+        int zipid = thumbid.split("-z").at(1).toInt();
         zip_stat_index(curzip, zipid, 0, &zipstat);
         char* zipbuf = new char[zipstat.size];
         zip_file_t* curfile = NULL;
@@ -880,19 +879,8 @@ void TransferFiles(QString thumbid, QString reppath)
             zip_fread(curfile, zipbuf, zipstat.size);
             zip_fclose(curfile);
         }
-        QFile ztmp(wombatvariable.tmpfilepath + curid + "-fhex");
-        if(!ztmp.isOpen())
-            ztmp.open(QIODevice::WriteOnly);
-        if(ztmp.isOpen())
-        {
-            QDataStream zbuffer(&ztmp);
-            zbuffer.writeRawData(zipbuf, zipstat.size);
-            ztmp.close();
-        }
+        filecontent.append(zipbuf, zipstat.size);
         delete[] zipbuf;
-        hexstring = wombatvariable.tmpfilepath + curid + "-fhex";
-
-         */ 
     }
     else if(thumbid.contains("-c"))
     {
@@ -925,21 +913,24 @@ void TransferFiles(QString thumbid, QString reppath)
             fpropfile.close();
         }
     }
-    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
-    QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
-    if(!efile.isOpen())
-        efile.open(QIODevice::ReadOnly);
-    if(efile.isOpen())
+    if(!thumbid.contains("-z"))
     {
-        for(uint i=1; i <= (uint)layoutlist.count(); i++)
+        QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+        QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly);
+        if(efile.isOpen())
         {
-            efile.seek(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-            if(i * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong() <= filesize)
-                filecontent.append(efile.read(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-            else
-                filecontent.append(efile.read(filesize - ((i-1) * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong())));
+            for(uint i=1; i <= (uint)layoutlist.count(); i++)
+            {
+                efile.seek(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+                if(i * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong() <= filesize)
+                    filecontent.append(efile.read(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+                else
+                    filecontent.append(efile.read(filesize - ((i-1) * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong())));
+            }
+            efile.close();
         }
-        efile.close();
     }
     QString tmppath = reppath + "files/";
     if(curnode->Data(8).toString() == "Directory")
