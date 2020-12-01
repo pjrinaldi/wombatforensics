@@ -430,7 +430,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(67, 4))));
                 fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(71, 11).toStdString())));
                 fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(82, 8).toStdString())));
-                fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
+                fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
+                //fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
                 fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(44, 4))));
                 fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt()) + rootdirsectors) * fsinfo.value("bytespersector").toUInt()));
                 fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
@@ -1045,11 +1046,20 @@ void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<
     }
     else if(typestr == "FAT16") // FAT16
     {
-	//if(fatcontent < 0xFFF8)
-	    // GetNextCluster(fatcontent);
+        fatbyte1 = clusternum * 2;
+        curcluster = qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2));
+        clusterlist->append(curcluster);
+	if(curcluster < 0xFFF8)
+            GetNextCluster(curcluster, typestr, fatbuf, clusterlist);
+	    //GetNextCluster(fatcontent);
     }
-    else if(typestr == "FAT32")
+    else if(typestr == "FAT32") // FAT32
     {
+        fatbyte1 = clusternum * 4;
+        curcluster = (qFromLittleEndian<uint32_t>(fatbuf->mid(fatbyte1, 4)) & 0x0FFFFFFF);
+        clusterlist->append(curcluster);
+        if(curcluster < 0x0FFFFFF8)
+            GetNextCluster(curcluster, typestr, fatbuf, clusterlist);
     }
 }
 
