@@ -29,14 +29,10 @@ void ProcessExport(QString objectid)
         int err = 0;
         RewriteSelectedIdContent(indxlist.first().parent()); // writes aprent content to use to load zip content
         QString fnamestr = wombatvariable.tmpfilepath + objectid.split("-z").at(0) + "-fhex";
-        /*
-         *        int err = 0;
-        RewriteSelectedIdContent(curindex.parent()); // writes parent content to use to load zip content.
-        QString fnamestr = wombatvariable.tmpfilepath + curid.split("-z").at(0) + "-fhex";
         zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
         struct zip_stat zipstat;
         zip_stat_init(&zipstat);
-        int zipid = curid.split("-z").at(1).toInt();
+        int zipid = objectid.split("-z").at(1).toInt();
         zip_stat_index(curzip, zipid, 0, &zipstat);
         char* zipbuf = new char[zipstat.size];
         zip_file_t* curfile = NULL;
@@ -47,6 +43,10 @@ void ProcessExport(QString objectid)
             zip_fread(curfile, zipbuf, zipstat.size);
             zip_fclose(curfile);
         }
+        // NEED TO WRITE THIS TO A BYTEARRAY AND SKIP OVER THE LAYOUT PART BELOW...
+        filecontent.append(zipbuf, zipstat.size);
+        delete[] zipbuf;
+        /*
         QFile ztmp(wombatvariable.tmpfilepath + curid + "-fhex");
         if(!ztmp.isOpen())
             ztmp.open(QIODevice::WriteOnly);
@@ -92,18 +92,24 @@ void ProcessExport(QString objectid)
             fpropfile.close();
         }
     }
-    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
-    QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
-    if(!efile.isOpen())
-        efile.open(QIODevice::ReadOnly);
-    if(efile.isOpen())
+    if(objectid.contains("-z"))
     {
-        for(int i=0; i < layoutlist.count(); i++)
+    }
+    else
+    {
+        QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+        QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly);
+        if(efile.isOpen())
         {
-            efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-            filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+            for(int i=0; i < layoutlist.count(); i++)
+            {
+                efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+                filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+            }
+            efile.close();
         }
-        efile.close();
     }
     QString tmppath = "";
     QString tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
