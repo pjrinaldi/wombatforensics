@@ -16,7 +16,7 @@ void ParseExtendedPartition(QString estring, uint32_t primaryextendedoffset, uin
 void ParseFileSystemInformation(QString estring, off64_t offset, QList<QHash<QString, QVariant>> *fsinfolist);
 void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QString>* orphanlist);
 void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parfileinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf, QList<QString>* orphanlist);
-void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<uint>* clusterlist);
+void GetNextCluster(uint clusternum, uint fstype, QByteArray* fatbuf, QList<uint>* clusterlist);
 //void PopulateFileSystem();
 void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstring);
 void AddVirtualFileSystemFiles(QHash<QString, QVariant>* fsinfo, int* curinode, QString partpath, QString parentstr);

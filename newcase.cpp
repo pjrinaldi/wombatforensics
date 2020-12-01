@@ -429,9 +429,10 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
                 //fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
                 fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(44, 4))));
-                fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+		qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
+                fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
                 fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
-                fsinfo.insert("clusterareastart", QVariant(fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt())));
+                fsinfo.insert("clusterareastart", QVariant(fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())));
                 QByteArray rootfatbuf;
                 rootfatbuf.clear();
                 if(!efile.isOpen())
@@ -444,7 +445,11 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 }
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
-                GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("typestr").toString(), &rootfatbuf, &rootclusterlist);
+		qDebug() << "typestr:" << fsinfo.value("typestr").toString();
+		qDebug() << "start get next cluster";
+		qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt() / fsinfo.value("bytespersector").toUInt();
+                GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("type").toUInt(), &rootfatbuf, &rootclusterlist);
+		qDebug() << "end get next cluster";
 		QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
 		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt() + (fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()) + "," + clustersize + ";";
 		for(int j=0; j < rootclusterlist.count() - 1; j++)
@@ -780,7 +785,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             fileinfo.insert("path", QVariant("/"));
             QList<uint> clusterlist;
             clusterlist.clear();
-            GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), &fatbuf, &clusterlist);
+            GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
             QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
 	    QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
 	    QString layout = QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
@@ -969,7 +974,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
                 fileinfo.insert("path", QVariant(QString(parentinfo->value("path").toString().toUtf8() + parentinfo->value("longname").toString().toUtf8() + QString("/"))));
             QList<uint> clusterlist;
             clusterlist.clear();
-            GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), fatbuf, &clusterlist);
+            GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), fatbuf, &clusterlist);
             //qDebug() << "aliasname:" << fileinfo.value("aliasname").toString() << "path:" << fileinfo.value("path").toString() << curinode;
             //qDebug() << "inodecnt:" << curinode << "alias name:" << fileinfo.value("aliasname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
 	    QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
@@ -1075,11 +1080,11 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
     }
 }
 
-void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<uint>* clusterlist)
+void GetNextCluster(uint clusternum, uint fstype, QByteArray* fatbuf, QList<uint>* clusterlist)
 {
     uint curcluster = 0;
     int fatbyte1 = 0;
-    if(typestr == "FAT12") // FAT12
+    if(fstype == 1) // FAT12
     {
         fatbyte1 = clusternum + (clusternum / 2);
         if(clusternum & 0x0001) // ODD
@@ -1088,24 +1093,24 @@ void GetNextCluster(uint clusternum, QString typestr, QByteArray* fatbuf, QList<
             curcluster = (qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2)) & 0x0FFF);
         clusterlist->append(curcluster);
         if(curcluster < 0xFF8)
-            GetNextCluster(curcluster, typestr, fatbuf, clusterlist);
+            GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
     }
-    else if(typestr == "FAT16") // FAT16
+    else if(fstype == 2) // FAT16
     {
         fatbyte1 = clusternum * 2;
         curcluster = qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2));
         clusterlist->append(curcluster);
 	if(curcluster < 0xFFF8)
-            GetNextCluster(curcluster, typestr, fatbuf, clusterlist);
+            GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
 	    //GetNextCluster(fatcontent);
     }
-    else if(typestr == "FAT32") // FAT32
+    else if(fstype == 3) // FAT32
     {
         fatbyte1 = clusternum * 4;
         curcluster = (qFromLittleEndian<uint32_t>(fatbuf->mid(fatbyte1, 4)) & 0x0FFFFFFF);
         clusterlist->append(curcluster);
         if(curcluster < 0x0FFFFFF8)
-            GetNextCluster(curcluster, typestr, fatbuf, clusterlist);
+            GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
     }
 }
 
