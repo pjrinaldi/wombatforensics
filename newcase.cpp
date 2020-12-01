@@ -429,7 +429,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
                 //fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
                 fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(44, 4))));
-		qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
+		//qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
                 fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
                 fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
                 fsinfo.insert("clusterareastart", QVariant(fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())));
@@ -445,16 +445,17 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 }
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
-		qDebug() << "typestr:" << fsinfo.value("typestr").toString();
-		qDebug() << "start get next cluster";
+		//qDebug() << "typestr:" << fsinfo.value("typestr").toString();
+		//qDebug() << "start get next cluster";
 		qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt() / fsinfo.value("bytespersector").toUInt();
                 GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("type").toUInt(), &rootfatbuf, &rootclusterlist);
-		qDebug() << "end get next cluster";
+		//qDebug() << "end get next cluster";
 		QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
 		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt() + (fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()) + "," + clustersize + ";";
 		for(int j=0; j < rootclusterlist.count() - 1; j++)
 		    rootdirlayout += QString::number((fsinfo.value("clusterareastart").toUInt() * fsinfo.value("bytespersector").toUInt()) + (rootclusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
 		fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
+		qDebug() << "rootdirlayout:" << rootdirlayout;
                 // DON'T HAVE "ROOTDIRSECTORS" OR "ROOTDIRSIZE" YET... "ROOTDIRMAXFILES" is 0
                 //qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
                 //qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
@@ -1080,9 +1081,9 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
     }
 }
 
-void GetNextCluster(uint clusternum, uint fstype, QByteArray* fatbuf, QList<uint>* clusterlist)
+void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<uint>* clusterlist)
 {
-    uint curcluster = 0;
+    uint32_t curcluster = 0;
     int fatbyte1 = 0;
     if(fstype == 1) // FAT12
     {
@@ -1107,7 +1108,9 @@ void GetNextCluster(uint clusternum, uint fstype, QByteArray* fatbuf, QList<uint
     else if(fstype == 3) // FAT32
     {
         fatbyte1 = clusternum * 4;
+	qDebug() << "fatbyte1:" << fatbyte1;
         curcluster = (qFromLittleEndian<uint32_t>(fatbuf->mid(fatbyte1, 4)) & 0x0FFFFFFF);
+	qDebug() << "curcluster:" << QString::number(curcluster, 16);
         clusterlist->append(curcluster);
         if(curcluster < 0x0FFFFFF8)
             GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
