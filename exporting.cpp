@@ -46,20 +46,6 @@ void ProcessExport(QString objectid)
         // NEED TO WRITE THIS TO A BYTEARRAY AND SKIP OVER THE LAYOUT PART BELOW...
         filecontent.append(zipbuf, zipstat.size);
         delete[] zipbuf;
-        /*
-        QFile ztmp(wombatvariable.tmpfilepath + curid + "-fhex");
-        if(!ztmp.isOpen())
-            ztmp.open(QIODevice::WriteOnly);
-        if(ztmp.isOpen())
-        {
-            QDataStream zbuffer(&ztmp);
-            zbuffer.writeRawData(zipbuf, zipstat.size);
-            ztmp.close();
-        }
-        delete[] zipbuf;
-        hexstring = wombatvariable.tmpfilepath + curid + "-fhex";
-
-         */ 
     }
     else if(objectid.contains("-c"))
     {
@@ -92,10 +78,7 @@ void ProcessExport(QString objectid)
             fpropfile.close();
         }
     }
-    if(objectid.contains("-z"))
-    {
-    }
-    else
+    if(!objectid.contains("-z"))
     {
         QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
         QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
