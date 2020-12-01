@@ -95,10 +95,17 @@ void ProcessExport(QString objectid)
         }
     }
     QString tmppath = "";
-    QString tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
+    QString tmpname = "";
+    if(objectid.contains("-z"))
+        tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString().split("/").last();
+    else
+        tmpname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
     if(originalpath == true)
     {
-        tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+        if(objectid.contains("-z"))
+            tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString() + indxlist.first().sibling(indxlist.first().row(), 0).data().toString().split("/").first() + "/";
+        else
+            tmppath = exportpath + indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
     }
     else
         tmppath = exportpath + "/";
