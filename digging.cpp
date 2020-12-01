@@ -786,7 +786,53 @@ QByteArray ReturnFileContent(QString objectid)
     QByteArray filecontent;
     filecontent.clear();
     QString layout = "";
-    if(objectid.split("-").count() == 3)
+    if(objectid.contains("-z"))
+    {
+        /*
+         *        int err = 0;
+        RewriteSelectedIdContent(curindex.parent()); // writes parent content to use to load zip content.
+        QString fnamestr = wombatvariable.tmpfilepath + curid.split("-z").at(0) + "-fhex";
+        zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+        struct zip_stat zipstat;
+        zip_stat_init(&zipstat);
+        int zipid = curid.split("-z").at(1).toInt();
+        zip_stat_index(curzip, zipid, 0, &zipstat);
+        char* zipbuf = new char[zipstat.size];
+        zip_file_t* curfile = NULL;
+        if(zipstat.encryption_method == ZIP_EM_NONE)
+            curfile = zip_fopen_index(curzip, zipid, 0);
+        if(curfile != NULL)
+        {
+            zip_fread(curfile, zipbuf, zipstat.size);
+            zip_fclose(curfile);
+        }
+        QFile ztmp(wombatvariable.tmpfilepath + curid + "-fhex");
+        if(!ztmp.isOpen())
+            ztmp.open(QIODevice::WriteOnly);
+        if(ztmp.isOpen())
+        {
+            QDataStream zbuffer(&ztmp);
+            zbuffer.writeRawData(zipbuf, zipstat.size);
+            ztmp.close();
+        }
+        delete[] zipbuf;
+        hexstring = wombatvariable.tmpfilepath + curid + "-fhex";
+
+        qDebug() << "do zip work here and return filecontent inside here...";
+        */
+    }
+    else if(objectid.contains("-c"))
+    {
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + objectid + ".prop");
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+        {
+            layout = cfile.readLine();
+            cfile.close();
+        }
+    }
+    else if(objectid.split("-").count() == 3)
     {
         QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
         if(!fpropfile.isOpen())
@@ -805,21 +851,6 @@ QByteArray ReturnFileContent(QString objectid)
             }
             fpropfile.close();
         }
-    }
-    else if(objectid.contains("-c"))
-    {
-        QFile cfile(wombatvariable.tmpmntpath + "carved/" + objectid + ".prop");
-        if(!cfile.isOpen())
-            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(cfile.isOpen())
-        {
-            layout = cfile.readLine();
-            cfile.close();
-        }
-    }
-    else if(objectid.contains("-z"))
-    {
-        qDebug() << "do zip work here and return filecontent inside here...";
     }
     QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
     QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));

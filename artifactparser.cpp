@@ -860,7 +860,52 @@ void TransferFiles(QString thumbid, QString reppath)
     QByteArray filecontent;
     filecontent.clear();
     QString layout = "";
-    if(thumbid.split("-").count() == 3)
+    if(thumbid.contains("-z"))
+    {
+        /*
+         *        int err = 0;
+        RewriteSelectedIdContent(curindex.parent()); // writes parent content to use to load zip content.
+        QString fnamestr = wombatvariable.tmpfilepath + curid.split("-z").at(0) + "-fhex";
+        zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+        struct zip_stat zipstat;
+        zip_stat_init(&zipstat);
+        int zipid = curid.split("-z").at(1).toInt();
+        zip_stat_index(curzip, zipid, 0, &zipstat);
+        char* zipbuf = new char[zipstat.size];
+        zip_file_t* curfile = NULL;
+        if(zipstat.encryption_method == ZIP_EM_NONE)
+            curfile = zip_fopen_index(curzip, zipid, 0);
+        if(curfile != NULL)
+        {
+            zip_fread(curfile, zipbuf, zipstat.size);
+            zip_fclose(curfile);
+        }
+        QFile ztmp(wombatvariable.tmpfilepath + curid + "-fhex");
+        if(!ztmp.isOpen())
+            ztmp.open(QIODevice::WriteOnly);
+        if(ztmp.isOpen())
+        {
+            QDataStream zbuffer(&ztmp);
+            zbuffer.writeRawData(zipbuf, zipstat.size);
+            ztmp.close();
+        }
+        delete[] zipbuf;
+        hexstring = wombatvariable.tmpfilepath + curid + "-fhex";
+
+         */ 
+    }
+    else if(thumbid.contains("-c"))
+    {
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + thumbid + ".prop");
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+        {
+            layout = cfile.readLine();
+            cfile.close();
+        }
+    }
+    else if(thumbid.split("-").count() == 3)
     {
         QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + thumbid.split("-").at(1) + "/" + thumbid.split("-").at(2) + ".prop");
         if(!fpropfile.isOpen())
@@ -878,17 +923,6 @@ void TransferFiles(QString thumbid, QString reppath)
                 }
             }
             fpropfile.close();
-        }
-    }
-    else if(thumbid.contains("-c"))
-    {
-        QFile cfile(wombatvariable.tmpmntpath + "carved/" + thumbid + ".prop");
-        if(!cfile.isOpen())
-            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(cfile.isOpen())
-        {
-            layout = cfile.readLine();
-            cfile.close();
         }
     }
     QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);

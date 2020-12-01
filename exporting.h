@@ -2,6 +2,7 @@
 #define EXPORTING_H
 
 #include "wombatinclude.h"
+#include "wombatfunctions.h"
 #include "globals.h"
 #include "tskcpp.h"
 #include <zip.h>

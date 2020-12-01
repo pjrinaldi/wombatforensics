@@ -1528,39 +1528,7 @@ void WombatForensics::UpdateProperties()
 void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
     QString curid = curindex.sibling(curindex.row(), 11).data().toString();
-    if(curid.split("-").count() == 3 && !curid.contains("-c") && !curid.contains("-z")) // file/dir
-    {
-        bool boolok;
-	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
-        qint64 sizeval = clocale.toLongLong(curindex.sibling(curindex.row(), 2).data().toString(), &boolok);
-        if(sizeval > 0)
-            RewriteSelectedIdContent(curindex);
-    }
-    else if(curid.endsWith("-cm") || curid.endsWith("-cv") || curid.endsWith("-cu")) // manual carved virtual directory
-    {
-    }
-    else if(curid.contains("-c")) // carved file
-    {
-        QFile cfile(wombatvariable.tmpmntpath + "carved/" + curid + ".prop");
-        QString tmpstr;
-        if(!cfile.isOpen())
-            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(cfile.isOpen())
-        {
-            tmpstr = QString(cfile.readLine()).split(";").at(0);
-            cfile.close();
-        }
-        QByteArray carvebuf = ui->hexview->dataAt(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toLongLong(), tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()); // carved data
-        QFile hexfile(hexstring);
-        if(!hexfile.isOpen())
-            hexfile.open(QIODevice::WriteOnly);
-        if(hexfile.isOpen())
-        {
-            hexfile.write(carvebuf);
-            hexfile.close();
-        }
-    }
-    else if(curid.contains("-z")) // zip file
+    if(curid.contains("-z")) // zip file
     {
         int err = 0;
         RewriteSelectedIdContent(curindex.parent()); // writes parent content to use to load zip content.
@@ -1590,6 +1558,38 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         }
         delete[] zipbuf;
         hexstring = wombatvariable.tmpfilepath + curid + "-fhex";
+    }
+    else if(curid.endsWith("-cm") || curid.endsWith("-cv") || curid.endsWith("-cu")) // manual carved virtual directory
+    {
+    }
+    else if(curid.contains("-c")) // carved file
+    {
+        QFile cfile(wombatvariable.tmpmntpath + "carved/" + curid + ".prop");
+        QString tmpstr;
+        if(!cfile.isOpen())
+            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(cfile.isOpen())
+        {
+            tmpstr = QString(cfile.readLine()).split(";").at(0);
+            cfile.close();
+        }
+        QByteArray carvebuf = ui->hexview->dataAt(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toLongLong(), tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()); // carved data
+        QFile hexfile(hexstring);
+        if(!hexfile.isOpen())
+            hexfile.open(QIODevice::WriteOnly);
+        if(hexfile.isOpen())
+        {
+            hexfile.write(carvebuf);
+            hexfile.close();
+        }
+    }
+    else if(curid.split("-").count() == 3) // file/dir
+    {
+        bool boolok;
+	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
+        qint64 sizeval = clocale.toLongLong(curindex.sibling(curindex.row(), 2).data().toString(), &boolok);
+        if(sizeval > 0)
+            RewriteSelectedIdContent(curindex);
     }
     /*
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
@@ -1632,7 +1632,7 @@ void WombatForensics::PopulateHexContents()
 {
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     QString nodeid = selectednode->Data(11).toString();
-    if(nodeid.contains("z"))
+    if(nodeid.contains("z")) // since we can't navigate to file contents which are part of a zip due to compression, navigate to the parent.zip file instead.
     {
         selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
         nodeid = selectednode->Data(11).toString();
@@ -1682,21 +1682,6 @@ void WombatForensics::PopulateHexContents()
             ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()*2);
             ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(1) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(2) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(2).toLongLong());
         }
-        /*
-        QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".stat");
-        if(!cfile.isOpen())
-            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(cfile.isOpen())
-            tmpstr = cfile.readLine();
-        cfile.close();
-        ui->hexview->BypassColor(true);
-        ui->hexview->SetColorInformation(0, 0, 0, 0, tmpstr.split(",").at(16), tmpstr.split(",").at(8).toULongLong(), 0);
-        if(tmpstr.split(",").count() > 15)
-            ui->hexview->setCursorPosition(tmpstr.split(",").at(16).toULongLong()*2);
-    }
-
-         *
-         */ 
     }
     else if(nodeid.split("-").count() == 3) // file/directory
     {
@@ -1736,12 +1721,6 @@ void WombatForensics::PopulateHexContents()
 	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
             ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
         }
-        /*
-        else if(nodeid.contains("-z")) // zip file
-        {
-            qDebug() << "get zip's parent layout here...";
-        }
-        */
         else
         {
             QString layout = "";
