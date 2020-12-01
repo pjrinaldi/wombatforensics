@@ -411,6 +411,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("clusterareastart", QVariant(fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + fsinfo.value("rootdirsectors").toUInt()));
                 fsinfo.insert("rootdirlayout", QVariant(QString(QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";")));
                 fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
+		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";";
+		fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
                 //qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
                 //qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
                 //qDebug() << "reserved area size:" << fsinfo.value("reservedareasize").toUInt() << "fatcount:" << fsinfo.value("fatcount").toUInt() << "fatsize:" << fsinfo.value("fatsize").toUInt();
@@ -430,35 +432,24 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt())) * fsinfo.value("bytespersector").toUInt()));
                 fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
                 fsinfo.insert("clusterareastart", QVariant(fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt())));
-                QByteArray fatbuf;
-                fatbuf.clear();
+                QByteArray rootfatbuf;
+                rootfatbuf.clear();
                 if(!efile.isOpen())
                     efile.open(QIODevice::ReadOnly);
                 if(efile.isOpen())
                 {
-                    efile.seek(fsinfo->value("fatoffset").toUInt());
-                    fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
+                    efile.seek(fsinfo.value("fatoffset").toUInt());
+                    rootfatbuf = efile.read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
                     efile.close();
                 }
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
                 GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("typestr").toString(), &rootfatbuf, &rootclusterlist);
-                /*
-                 *
-                QList<uint> clusterlist;
-                clusterlist.clear();
-                GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("typestr").toString(), &fatbuf, &clusterlist);
-                QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
-                QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
-                QString layout = QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
-                for(int j=0; j < clusterlist.count()-1; j++)
-                {
-                    clusterstr += QString::number(clusterlist.at(j)) + ",";
-                    layout += QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
-                }
-                fileinfo.insert("clusterlist", QVariant(clusterstr));
-                fileinfo.insert("layout", QVariant(layout));
-                 */ 
+		QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
+		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt() + (fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()) + "," + clustersize + ";";
+		for(int j=0; j < rootclusterlist.count() - 1; j++)
+		    rootdirlayout += QString::number((fsinfo.value("clusterareastart").toUInt() * fsinfo.value("bytespersector").toUInt()) + (rootclusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+		fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
                 // DON'T HAVE "ROOTDIRSECTORS" OR "ROOTDIRSIZE" YET... "ROOTDIRMAXFILES" is 0
                 //qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
                 //qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
@@ -690,23 +681,50 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
     fatbuf.clear();
     QByteArray rootdirbuf;
     rootdirbuf.clear();
+    int rootdirentrycount = 0;
     QFile efile(estring);
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly);
     if(efile.isOpen())
     {
+	QStringList rootdirlayoutlist = fsinfo->value("rootdirlayout").toString().split(";", Qt::SkipEmptyParts);
+	for(int j=0; j < rootdirlayoutlist.count(); j++)
+	{
+	    efile.seek(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+	    rootdirbuf.append(efile.read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong()));
+	    efile.seek(fsinfo->value("fatoffset").toUInt());
+            fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
+	}
+	efile.close();
+	/*
+	 *
+	QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+	int direntrycnt = 0;
+	int lastdirentry = 0;
+	    for(int j=0; j < layoutlist.count(); j++)
+	    {
+		efile.seek(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+		dirsizebuf.append(efile.read(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+	    }
+	    efile.close();
+	}
+	direntrycnt = dirsizebuf.count() / 32;
+	 */ 
         // THE BELOW ONLY WORKS FOR FAT12/16, FOR FAT32 I NEED TO GET CLUSTERLIST FOR THE ROOT DIRECTORY
         // THEN CALCULATE THE ROOTDIRSIZE AS WELL AS THE ROOTDIRMAXFILES...
         // MAY WANT TO MODIFY FAT12/16 TO HAVE A CLUSTERLIST STRING OFFSET,SIZE; AND IMPLEMENT FOR ALL BELOW...
-        efile.seek(fsinfo->value("rootdiroffset").toUInt());
-        rootdirbuf = efile.read(fsinfo->value("rootdirsize").toUInt());
-        efile.seek(fsinfo->value("fatoffset").toUInt());
-        fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
-        efile.close();
+        //efile.seek(fsinfo->value("rootdiroffset").toUInt());
+        //rootdirbuf = efile.read(fsinfo->value("rootdirsize").toUInt());
+        //efile.seek(fsinfo->value("fatoffset").toUInt());
+        //fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
+        //efile.close();
     }
+    rootdirentrycount = rootdirbuf.count() / 32;
+    //qDebug() << "rootdirentrycount:" << rootdirentrycount;
     uint inodecnt = 0;
     QString longnamestring = "";
-    for(uint i=0; i < fsinfo->value("rootdirmaxfiles").toUInt(); i++)
+    //for(uint i=0; i < fsinfo->value("rootdirmaxfiles").toUInt(); i++)
+    for(int i=0; i < rootdirentrycount; i++)
     {
         fileinfo.insert("fileattr", QVariant(rootdirbuf.at(i*32 + 11)));
         uint8_t firstchar = rootdirbuf.at(i*32);
