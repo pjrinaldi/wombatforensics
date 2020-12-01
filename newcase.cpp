@@ -263,7 +263,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
             fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
             qDebug() << "serial num:" << QString("0x" + QString::number(fsinfo.value("serialnum").toULongLong(), 16));
-            fsinfo.insert("mftoffset", QVariant((fsinfo.value("mftstartingcluster").toUInt() * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt())));
+            fsinfo.insert("mftoffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("mftstartingcluster").toUInt() * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()))));
             qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toUInt();
             // get MFT entry for $MFT to determine cluster's that contain the MFT...
             QByteArray mftentry0;
@@ -405,12 +405,12 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 //qDebug() << "volserialnum:" << QString("0x" + QString::number(fsinfo.value("volserialnum").toUInt(), 16));
                 fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(43, 11).toStdString())));
                 fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
-                fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("rootdiroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
                 fsinfo.insert("rootdirsectors", QVariant(((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt()));
                 fsinfo.insert("rootdirsize", QVariant(fsinfo.value("rootdirsectors").toUInt() * fsinfo.value("bytespersector").toUInt()));
-                fsinfo.insert("clusterareastart", QVariant(fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + fsinfo.value("rootdirsectors").toUInt()));
+                fsinfo.insert("clusterareastart", QVariant((qulonglong)partoffset + fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + fsinfo.value("rootdirsectors").toUInt()));
                 fsinfo.insert("rootdirlayout", QVariant(QString(QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";")));
-                fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("fatoffset", QVariant((qulonglong)(partoffset * 512) + fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
 		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";";
 		fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
                 //qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
@@ -430,10 +430,10 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 //fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
                 fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(44, 4))));
 		qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
-                fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
-                fsinfo.insert("fatoffset", QVariant(fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt())));
+                fsinfo.insert("fatoffset", QVariant((qulonglong)((partoffset * 512) + fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt())));
 		qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt();
-                fsinfo.insert("clusterareastart", QVariant(fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())));
+                fsinfo.insert("clusterareastart", QVariant((qulonglong)(partoffset + fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()))));
                 QByteArray rootfatbuf;
                 rootfatbuf.clear();
                 if(!efile.isOpen())
@@ -443,8 +443,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		    // ISSUE IS THE PARTITION OFFSET IS NOT INCLUDED ANYWHERE IN HERE... I NEED TO ADD THE PARTITION OFFSET SOMEWHERE FOR THE EFILE FILE...
 		    // OR POSSIBLY INCLUDED SOMEWHERE IN THE FATOFFSET, ROOTDIROFFSET, ETC...
 		    qDebug() << "fatoffset inside efile read operation:" << fsinfo.value("fatoffset").toUInt();
-                    bool seekbool = efile.seek(fsinfo.value("fatoffset").toUInt());
-		    qDebug() << "seekbool:" << seekbool;
+                    efile.seek(fsinfo.value("fatoffset").toUInt());
 		    qDebug() << "efile pos:" << efile.pos();
                     rootfatbuf = efile.read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
                     efile.close();
