@@ -1632,7 +1632,7 @@ void WombatForensics::PopulateHexContents()
 {
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     QString nodeid = selectednode->Data(11).toString();
-    if(nodeid.split("-f").last().startsWith("z"))
+    if(nodeid.contains("z"))
     {
         selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
         nodeid = selectednode->Data(11).toString();
@@ -1736,10 +1736,12 @@ void WombatForensics::PopulateHexContents()
 	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
             ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
         }
+        /*
         else if(nodeid.contains("-z")) // zip file
         {
             qDebug() << "get zip's parent layout here...";
         }
+        */
         else
         {
             QString layout = "";
