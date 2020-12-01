@@ -788,14 +788,13 @@ QByteArray ReturnFileContent(QString objectid)
     QString layout = "";
     if(objectid.contains("-z"))
     {
-        /*
-         *        int err = 0;
-        RewriteSelectedIdContent(curindex.parent()); // writes parent content to use to load zip content.
-        QString fnamestr = wombatvariable.tmpfilepath + curid.split("-z").at(0) + "-fhex";
+        int err = 0;
+        RewriteSelectedIdContent(indexlist.at(0).parent()); // writes parent content to use to load zip content
+        QString fnamestr = wombatvariable.tmpfilepath + objectid.split("-z").at(0) + "-fhex";
         zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
         struct zip_stat zipstat;
         zip_stat_init(&zipstat);
-        int zipid = curid.split("-z").at(1).toInt();
+        int zipid = objectid.split("-z").at(1).toInt();
         zip_stat_index(curzip, zipid, 0, &zipstat);
         char* zipbuf = new char[zipstat.size];
         zip_file_t* curfile = NULL;
@@ -806,20 +805,10 @@ QByteArray ReturnFileContent(QString objectid)
             zip_fread(curfile, zipbuf, zipstat.size);
             zip_fclose(curfile);
         }
-        QFile ztmp(wombatvariable.tmpfilepath + curid + "-fhex");
-        if(!ztmp.isOpen())
-            ztmp.open(QIODevice::WriteOnly);
-        if(ztmp.isOpen())
-        {
-            QDataStream zbuffer(&ztmp);
-            zbuffer.writeRawData(zipbuf, zipstat.size);
-            ztmp.close();
-        }
+        filecontent.append(zipbuf, zipstat.size);
         delete[] zipbuf;
-        hexstring = wombatvariable.tmpfilepath + curid + "-fhex";
 
-        qDebug() << "do zip work here and return filecontent inside here...";
-        */
+        return filecontent;
     }
     else if(objectid.contains("-c"))
     {
