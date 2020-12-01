@@ -285,10 +285,11 @@ void WombatForensics::RemoveTag()
     QAction* tagaction = qobject_cast<QAction*>(sender());
     if(QString(tagaction->iconText()).contains("Selected")) // single file
     {
-        QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-f").last();
-        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList("*." + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
-        QString evidencename = evidfiles.first();
+        //QString paridstr = selectedindex.parent().sibling(selectedindex.parent().row(), 11).data().toString().split("-f").last();
+        //QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        //QStringList evidfiles = eviddir.entryList(QStringList("*-" + selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
+        //QString evidencename = evidfiles.first();
+        /*
         QString estring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(0);
         QString vstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(1);
         QString pstring = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(2);
@@ -318,7 +319,9 @@ void WombatForensics::RemoveTag()
         if(filefile.isOpen())
             tmpstr = filefile.readLine();
         filefile.close();
+        */
         RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        /*
         if(tmpstr.split(",").count() > 15)
             tmplist = tmpstr.split(",", Qt::SkipEmptyParts);
         tmplist[15] = "0";
@@ -333,6 +336,7 @@ void WombatForensics::RemoveTag()
         if(filefile.isOpen())
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
+        */
         treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, "0");
     }
     else if(QString(tagaction->iconText()).contains("Checked")) // single file
@@ -344,10 +348,11 @@ void WombatForensics::RemoveTag()
             if(indexlist.count() > 0)
             {
                 QModelIndex curindex = ((QModelIndex)indexlist.first());
+                /*
                 QModelIndex parindex = ((QModelIndex)indexlist.first()).parent();
                 QString paridstr = parindex.sibling(parindex.row(), 11).data().toString().split("-f").last();
                 QDir eviddir = QDir(wombatvariable.tmpmntpath);
-                QStringList evidfiles = eviddir.entryList(QStringList("*." + curindex.sibling(curindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
+                QStringList evidfiles = eviddir.entryList(QStringList("*-" + curindex.sibling(curindex.row(), 11).data().toString().split("-").first()), QDir::NoSymLinks | QDir::Dirs);
                 QString evidencename = evidfiles.first();
                 QString estring = curindex.sibling(curindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(0);
                 QString vstring = curindex.sibling(curindex.row(), 11).data().toString().split("-", Qt::SkipEmptyParts).at(1);
@@ -378,7 +383,9 @@ void WombatForensics::RemoveTag()
                 if(filefile.isOpen())
                     tmpstr = filefile.readLine();
                 filefile.close();
+                */
                 RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
+                /*
                 if(tmpstr.split(",").count() > 15)
                     tmplist = tmpstr.split(",", Qt::SkipEmptyParts);
                 tmplist[15] = "0";
@@ -393,6 +400,7 @@ void WombatForensics::RemoveTag()
                 if(filefile.isOpen())
                     filefile.write(tmpstr.toStdString().c_str());
                 filefile.close();
+                */
                 treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, "0");
             }
         }
@@ -447,7 +455,7 @@ void WombatForensics::CreateNewTag()
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
 {
     //if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
-    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 3 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
+    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 3 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c") || curindex.sibling(curindex.row(), 11).data().toString().contains("-z"))
     {
         QTimeZone tmpzone = QTimeZone(reporttimezone);
         //taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
