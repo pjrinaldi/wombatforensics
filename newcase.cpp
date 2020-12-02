@@ -699,6 +699,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
         efile.open(QIODevice::ReadOnly);
     if(efile.isOpen())
     {
+	qDebug() << "rootdirlayout:" << fsinfo->value("rootdirlayout").toString();
 	QStringList rootdirlayoutlist = fsinfo->value("rootdirlayout").toString().split(";", Qt::SkipEmptyParts);
 	for(int j=0; j < rootdirlayoutlist.count(); j++)
 	{
@@ -732,7 +733,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
         //efile.close();
     }
     rootdirentrycount = rootdirbuf.count() / 32;
-    //qDebug() << "rootdirentrycount:" << rootdirentrycount;
+    qDebug() << "rootdirentrycount:" << rootdirentrycount;
     uint inodecnt = 0;
     QString longnamestring = "";
     //for(uint i=0; i < fsinfo->value("rootdirmaxfiles").toUInt(); i++)
@@ -760,6 +761,13 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
 
         if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
         {
+	    if(fileattr & 0x08)
+	    {
+		qDebug() << "volume directory entry, will need to specially format it, but for now skip it.";
+		// THAT DOESN'T FAIL THE PARSING, BUT IT BREAKS OUT OF THE LOOP, SO I NEED TO DO A PROPER IF AND HANDLE THIS ATTR TYPE... AND THEN HANDLE THE OTHER'S AS BEFORE...
+		// PROBABLY JUST INDENT EVERYTHING BELOW UNDER THE ELSE TO THIS IF AND MAKE THE SIMPLE VOLUME DIRENTRY TREE ENTRY HERE.
+		break;
+	    }
             if(!longnamestring.isEmpty())
             {
                 fileinfo.insert("longname", QVariant(longnamestring));
