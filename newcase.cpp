@@ -1117,7 +1117,7 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
         curcluster = (qFromLittleEndian<uint32_t>(fatbuf->mid(fatbyte1, 4)) & 0x0FFFFFFF);
 	qDebug() << "curcluster:" << QString::number(curcluster, 16);
         clusterlist->append(curcluster);
-        if(curcluster < 0x0FFFFFF8)
+        if(curcluster < 0x0FFFFFF0)
             GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
     }
 }
