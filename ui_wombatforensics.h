@@ -284,10 +284,10 @@ public:
         hexview = new QHexEdit(splitter);
         hexview->setObjectName(QString::fromUtf8("hexview"));
         hexview->setToolTipDuration(0);
-        hexview->setBytesPerLine(49);
-        hexview->setHexCaps(true);
-        hexview->setDynamicBytesPerLine(true);
-        hexview->setReadOnly(true);
+        hexview->setProperty("bytesPerLine", QVariant(49));
+        hexview->setProperty("hexCaps", QVariant(true));
+        hexview->setProperty("dynamicBytesPerLine", QVariant(true));
+        hexview->setProperty("readOnly", QVariant(true));
         splitter->addWidget(hexview);
 
         horizontalLayout->addWidget(splitter);

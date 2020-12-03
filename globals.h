@@ -512,6 +512,8 @@ public:
                     //    return QIcon(":/basic/virtualdir");
                     if(itemtype == 3)
                         return QIcon(":/basic/treefolder");
+		    else if(itemtype == 2)
+			return QIcon(":/basic/deletedfolder");
                     else if(itemtype == 5)
                         return QIcon(":/basic/treefile");
                     else if(itemtype == 10)

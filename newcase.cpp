@@ -452,10 +452,11 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
 		//qDebug() << "typestr:" << fsinfo.value("typestr").toString();
-		qDebug() << "start get next cluster";
-		qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt() / fsinfo.value("bytespersector").toUInt();
-                GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("type").toUInt(), &rootfatbuf, &rootclusterlist);
-		qDebug() << "end get next cluster";
+		//qDebug() << "start get next cluster";
+		//qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt() / fsinfo.value("bytespersector").toUInt();
+		if(fsinfo.value("rootdircluster").toUInt() >= 2)
+		    GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("type").toUInt(), &rootfatbuf, &rootclusterlist);
+		//qDebug() << "end get next cluster";
 		QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
 		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt() + (fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()) + "," + clustersize + ";";
 		for(int j=0; j < rootclusterlist.count() - 1; j++)
@@ -732,6 +733,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
         //fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
         //efile.close();
     }
+    qDebug() << "dir fat content:" << fatbuf.mid(0, 40).toHex();
     qDebug() << "rootdirbuf.count():" << rootdirbuf.count();
     rootdirentrycount = rootdirbuf.count() / 32;
     qDebug() << "rootdirentrycount:" << rootdirentrycount;
@@ -759,13 +761,13 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
         else if(fileattr & 0x20)
             attrstr += "Archive File,";
         fileinfo.insert("attribute", QVariant(attrstr));
-	qDebug() << "attr string:" << attrstr;
+	//qDebug() << "attr string:" << attrstr;
 
         if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
         {
 	    if(fileattr & 0x08)
 	    {
-		qDebug() << "volume directory entry, will need to specially format it, but for now skip it.";
+		//qDebug() << "volume directory entry, will need to specially format it, but for now skip it.";
 		// THAT DOESN'T FAIL THE PARSING, BUT IT BREAKS OUT OF THE LOOP, SO I NEED TO DO A PROPER IF AND HANDLE THIS ATTR TYPE... AND THEN HANDLE THE OTHER'S AS BEFORE...
 		// PROBABLY JUST INDENT EVERYTHING BELOW UNDER THE ELSE TO THIS IF AND MAKE THE SIMPLE VOLUME DIRENTRY TREE ENTRY HERE.
 		//break;
@@ -778,8 +780,7 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             else
                 fileinfo.insert("longname", QVariant(""));
             fileinfo.insert("firstchar", QVariant(rootdirbuf.at(i*32)));
-            // may not need this part for isdeleted...
-            if(fileinfo.value("firstchar").toUInt() == 0xe5 || fileinfo.value("firstchar").toUInt() == 0x05) // was allocated but now free
+            if((uint8_t)fileinfo.value("firstchar").toUInt() == 0xe5 || (uint8_t)fileinfo.value("firstchar").toUInt() == 0x05) // was allocated but now free
                 fileinfo.insert("isdeleted", QVariant(1));
             else
                 fileinfo.insert("isdeleted", QVariant(0));
@@ -805,11 +806,14 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
 	    QString layout = "";
 	    if(fileattr & 0x08)
 	    {
+		//qDebug() << "name:" << fileinfo.value("aliasname").toString();
 		fileinfo.insert("physicalsize", QVariant(0));
 	    }
 	    else
 	    {
-		GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
+		//qDebug() << "name:" << fileinfo.value("aliasname").toString();
+		if(fileinfo.value("clusternum").toUInt() >= 2)
+		    GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
 		QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
 		QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
 		layout = QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
@@ -856,16 +860,22 @@ void ParseDirectory(QString estring, quint64 diroffset, uint64_t dirsize, QHash<
             else
                 fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4))));
             if(fileattr & 0x10)
-                fileinfo.insert("itemtype", QVariant(3));
+	    {
+		if(firstchar == 0xe5 || firstchar == 0x05) // deleted directory
+		    fileinfo.insert("itemtype", QVariant(2)); // deleted directory
+		else
+		    fileinfo.insert("itemtype", QVariant(3)); // directory
+	    }
 	    else if(firstchar == 0xe5 || firstchar == 0x05) // deleted
 		fileinfo.insert("itemtype", QVariant(4)); // deleted
             else
                 fileinfo.insert("itemtype", QVariant(5));
             fileinfolist->append(fileinfo);
             inodecnt++;
-            if(fileattr & 0x10) // sub directory
+            if(fileattr & 0x10 && fileinfo.value("physicalsize").toUInt() > 0) // sub directory
             {
-                //ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
+		if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
+		    ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
             }
         }
         else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
@@ -940,6 +950,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
 	}
         efile.close();
     }
+    qDebug() << "dir fat content:" << fatbuf->mid(0, 40).toHex();
     QString longnamestring = "";
     for(int i=0; i < dirbuf.count() / 32; i++)
     {
@@ -999,7 +1010,8 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
                 fileinfo.insert("path", QVariant(QString(parentinfo->value("path").toString().toUtf8() + parentinfo->value("longname").toString().toUtf8() + QString("/"))));
             QList<uint> clusterlist;
             clusterlist.clear();
-            GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), fatbuf, &clusterlist);
+	    if(fileinfo.value("clusternum").toUInt() >= 2)
+		GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), fatbuf, &clusterlist);
             //qDebug() << "aliasname:" << fileinfo.value("aliasname").toString() << "path:" << fileinfo.value("path").toString() << curinode;
             //qDebug() << "inodecnt:" << curinode << "alias name:" << fileinfo.value("aliasname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
 	    QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
@@ -1046,8 +1058,11 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
 	    }
             else
                 fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(dirbuf.mid(i*32 + 28, 4))));
-            if(fileattr & 0x10)
-                fileinfo.insert("itemtype", QVariant(3));
+            if(fileattr & 0x10) // directory
+		if(firstchar == 0xe5 || firstchar == 0x05) // deleted directory
+		    fileinfo.insert("itemtype", QVariant(2)); // deleted directory
+		else
+		    fileinfo.insert("itemtype", QVariant(3)); // directory
 	    else if(firstchar == 0xe5 || firstchar == 0x05) // deleted
 		fileinfo.insert("itemtype", QVariant(4)); // deleted
             else
@@ -1055,9 +1070,10 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             fileinfolist->append(fileinfo);
             curinode++;
             *inodecnt = curinode;
-            if(fileattr & 0x10) // sub directory
+            if(fileattr & 0x10 && fileinfo.value("physicalsize").toUInt() > 0) // sub directory
             {
-                ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf, orphanlist);
+		if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
+		    ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf, orphanlist);
 		curinode = *inodecnt;
             }
         }
@@ -1130,13 +1146,23 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
     }
     else if(fstype == 3) // FAT32
     {
-        fatbyte1 = clusternum * 4;
-	qDebug() << "fatbyte1:" << fatbyte1;
-        curcluster = (qFromLittleEndian<uint32_t>(fatbuf->mid(fatbyte1, 4)) & 0x0FFFFFFF);
-	qDebug() << "curcluster:" << QString::number(curcluster, 16);
-        clusterlist->append(curcluster);
-        if(curcluster < 0x0FFFFFF8)
-            GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
+	if(clusternum < 2)
+	{
+	    qDebug() << "out of bounds, can't be less than 2, so skip below...";
+	}
+	else
+	{
+	    //else if(clusternum == 0x0FFFFFF7)
+	    //    qDebug() << "bad cluster, so don't add to list and skip below...";
+	    fatbyte1 = clusternum * 4;
+	    //qDebug() << "fatbyte1:" << fatbyte1;
+	    curcluster = (qFromLittleEndian<uint32_t>(fatbuf->mid(fatbyte1, 4)) & 0x0FFFFFFF);
+	    //qDebug() << "curcluster:" << QString::number(curcluster, 16);
+	    if(curcluster != 0x0FFFFFF7)
+		clusterlist->append(curcluster);
+	    if(curcluster < 0x0FFFFFF7 && curcluster >= 2)
+		GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
+	}
     }
 }
 
@@ -1431,10 +1457,8 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
         //qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
         ba.append(fileinfolist->at(j).value("path").toString().toUtf8());
         nodedata << ba.toBase64() << QVariant(fileinfolist->at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist->at(j).value("createdate").toUInt()) << QVariant(fileinfolist->at(j).value("accessdate").toUInt()) << QVariant(fileinfolist->at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
-        if(fileinfolist->at(j).value("itemtype").toUInt() == 3)
-        {
+        if(fileinfolist->at(j).value("itemtype").toUInt() == 3 && fileinfolist->at(j).value("isdeleted").toInt() == 0)
             nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
-        }
         else
         {
             QByteArray sigbuf;
@@ -1451,6 +1475,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
             QMimeDatabase mimedb;
             const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist->at(j).value("aliasname").toString(), sigbuf);
             QString mimestr = GenerateCategorySignature(mimetype);
+	    qDebug() << "mimestr:" << mimestr;
             if(mimestr.contains("Unknown")) // generate further analysis
             {
                 if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
@@ -1494,7 +1519,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
     ba.clear();
     ba.append("/");
     QString parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
-    nodedata << ba.toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << QVariant("Directory") << QVariant("Virtual Directory") << "0" << QVariant(parentstr);
+    nodedata << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QVariant("Directory") << QVariant("Virtual Directory") << "0" << QVariant(parentstr);
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
     mutex.unlock();
