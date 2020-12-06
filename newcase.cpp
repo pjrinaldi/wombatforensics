@@ -473,7 +473,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             {
                 fsinfo.insert("partoffset", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(64, 8)))); // sector address
                 fsinfo.insert("vollength", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8)))); // volume size in sectors
-                fsinfo.insert("fatoffset", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(80, 4)))); // sector address of 1st FAT
+                fsinfo.insert("fatsector", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(80, 4)))); // sector address of 1st FAT
+                fsinfo.insert("fatoffset", QVariant((fsinfo.value("fatsector").toUInt() * fsinfo.value("bytespersector").toUInt()) + (qulonglong)(partoffset * 512)));
                 fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(84, 4)))); // size in sectors
                 fsinfo.insert("clusteroffset", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(88, 4)))); // sector address of cluster heap/data region
                 fsinfo.insert("clustercount", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(92, 4)))); // number of clusters in heap
@@ -487,7 +488,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 qDebug() << "cluster offset:" << fsinfo.value("clusteroffset").toUInt();
                 qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
                 qDebug() << "sectorspercluster:" << fsinfo.value("sectorspercluster").toUInt();
-                fsinfo.insert("rootdiroffset", QVariant((fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt())));
                 qDebug() << "rootdir offset (bytes):" << fsinfo.value("rootdiroffset").toUInt();
                 qDebug() << "rootdir offset (sectors):" << (fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt()));
                 QByteArray rootdirentry;
@@ -506,9 +507,9 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                     if(((uint8_t)rootdirentry.at(curoffset)) == 0x83)
                         break;
                     curoffset += 32;
-                    qDebug() << "while offset:" << curoffset;
+                    //qDebug() << "while offset:" << curoffset;
                 }
-                qDebug() << "at volume curoffset:" << curoffset;
+                //qDebug() << "at volume curoffset:" << curoffset;
                 if(curoffset < 1024)
                 {
                     if(uint8_t(rootdirentry.at(curoffset + 1)) > 0)
