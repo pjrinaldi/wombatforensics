@@ -1138,12 +1138,12 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
     {
         if(clusternum >= 2)
         {
-        fatbyte1 = clusternum * 2;
-        curcluster = qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2));
-        if(curcluster != 0xFFF7)
-            clusterlist->append(curcluster);
-	if(curcluster < 0xFFF8 && curcluster >= 2)
-            GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
+            fatbyte1 = clusternum * 2;
+            curcluster = qFromLittleEndian<uint16_t>(fatbuf->mid(fatbyte1, 2));
+            if(curcluster != 0xFFF7)
+                clusterlist->append(curcluster);
+            if(curcluster < 0xFFF8 && curcluster >= 2)
+                GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
         }
     }
     else if(fstype == 3) // FAT32
@@ -1159,6 +1159,18 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
 	    if(curcluster < 0x0FFFFFF7 && curcluster >= 2)
 		GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
 	}
+    }
+    else if(fstype == 4) // EXFAT
+    {
+        if(clusternum >= 2)
+        {
+            fatbyte1 = clusternum * 4;
+            curcluster = qFromLittleEndian<uint32_t>(fatbuf->mid(fatbyte1, 4));
+            if(curcluster != 0xFFFFFFF7)
+                clusterlist->append(curcluster);
+            if(curcluster < 0xFFFFFFF7 && curcluster >= 2)
+                GetNextCluster(curcluster, fstype, fatbuf, clusterlist);
+        }
     }
 }
 
