@@ -735,12 +735,15 @@ void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHa
     //qDebug() << "dir fat content:" << fatbuf.mid(0, 40).toHex();
     //qDebug() << "rootdirbuf.count():" << rootdirbuf.count();
     rootdirentrycount = rootdirbuf.count() / 32;
-    qDebug() << "rootdirentrycount:" << rootdirentrycount;
+    //qDebug() << "rootdirentrycount:" << rootdirentrycount;
     uint inodecnt = 0;
     QString longnamestring = "";
     //for(uint i=0; i < fsinfo->value("rootdirmaxfiles").toUInt(); i++)
     for(int i=0; i < rootdirentrycount; i++)
     {
+        if(fsinfo->value("type").toUInt() > 0 && fsinfo->value("type").toUInt() < 4) // FAT12/16/32
+        {
+            // ParseFatDirEntry();
         fileinfo.insert("fileattr", QVariant(rootdirbuf.at(i*32 + 11)));
         uint8_t firstchar = rootdirbuf.at(i*32);
         if(firstchar == 0x00) // entry is free and all remaining are free
@@ -799,6 +802,10 @@ void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHa
             else
                 fileinfo.insert("aliasname", QVariant(QString(char(firstchar) + fileinfo.value("restname").toString().toUtf8())));
             fileinfo.insert("inode", QVariant(inodecnt));
+            if(fileinfo.value("longname").toString().isEmpty())
+                fileinfo.insert("filename", fileinfo.value("aliasname"));
+            else
+                fileinfo.insert("filename", fileinfo.value("longname"));
 	    //qDebug() << fileinfo.value("longname").toString() << "inodecnt:" << inodecnt;
             fileinfo.insert("parentinode",  QVariant(-1));
             fileinfo.insert("path", QVariant("/"));
@@ -915,6 +922,12 @@ void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHa
 	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
 		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2))));
 	    longnamestring.prepend(QString(l1 + l2 + l3).toUtf8());
+        }
+        }
+        else if(fsinfo->value("type").toUInt() == 4) // EXFAT
+        {
+            qDebug() << "Parse EXFAT Dir Entry Here...";
+            //ParseExfatDirEntry();
         }
     }
 }
@@ -1300,6 +1313,7 @@ void ProcessVolume(QString evidstring)
             ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             // ELSE EXFAT THEN
             // ELSE ... THEN
+
             PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
             nodedata.clear();
@@ -1459,15 +1473,20 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
         nodedata.clear();
         QByteArray ba;
         ba.clear();
+        ba.append(fileinfolist->at(j).value("filename").toString().toUtf8());
+        /*
+        // THIS CAN BE MOVED TO PARSEDIRECTORY BY STORING THE ACTUAL FILE NAME AS FILEINFO.VALUE("NAME")
         if(fileinfolist->at(j).value("longname").toString().isEmpty())
             ba.append(fileinfolist->at(j).value("aliasname").toString().toUtf8());
         else
             ba.append(fileinfolist->at(j).value("longname").toString().toUtf8());
+        */
         nodedata << ba.toBase64();
         ba.clear();
         //qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
         ba.append(fileinfolist->at(j).value("path").toString().toUtf8());
         nodedata << ba.toBase64() << QVariant(fileinfolist->at(j).value("logicalsize").toUInt()) << QVariant(fileinfolist->at(j).value("createdate").toUInt()) << QVariant(fileinfolist->at(j).value("accessdate").toUInt()) << QVariant(fileinfolist->at(j).value("modifydate").toUInt()) << QVariant("0") << QVariant("0");
+        // THIS CAN BE MOVED TO PARSEDIRECTORY/SUBDIRECTORY SECTION....
         if(fileinfolist->at(j).value("itemtype").toUInt() == 3 && fileinfolist->at(j).value("isdeleted").toInt() == 0)
             nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
         else
@@ -1479,25 +1498,30 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
                 efile.open(QIODevice::ReadOnly);
             if(efile.isOpen())
             {
+                /*
+                 * BETTER TO MODIFY THIS TO USE THE LAYOUT FIRST ENTRY VALUE....
                 efile.seek(((fileinfolist->at(j).value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()));
                 sigbuf = efile.read(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
+                */
+                efile.seek(fileinfolist->at(j).value("layout").toString().split(";").at(0).split(",").at(0).toULongLong());
+                sigbuf = efile.read(fileinfolist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toULongLong());
                 efile.close();
             }
             QMimeDatabase mimedb;
-            const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist->at(j).value("aliasname").toString(), sigbuf);
+            const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist->at(j).value("filename").toString(), sigbuf);
             QString mimestr = GenerateCategorySignature(mimetype);
 	    qDebug() << "mimestr:" << mimestr;
             if(mimestr.contains("Unknown")) // generate further analysis
             {
                 if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
                     mimestr = "Windows System/Shortcut";
-                else if(strcmp(fileinfolist->at(j).value("aliasname").toString().toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
+                else if(strcmp(fileinfolist->at(j).value("filename").toString().toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
                     mimestr = "Windows System/Recycler";
-                else if(fileinfolist->at(j).value("aliasname").toString().startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
+                else if(fileinfolist->at(j).value("filename").toString().startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
                     mimestr = "Windows System/Recycle.Bin";
-                else if(fileinfolist->at(j).value("aliasname").toString().endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
+                else if(fileinfolist->at(j).value("filename").toString().endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
                     mimestr = "Windows System/Prefetch";
-                else if(fileinfolist->at(j).value("aliasname").toString().endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
+                else if(fileinfolist->at(j).value("filename").toString().endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
                     mimestr = "Windows System/Prefetch";
                 else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
                     mimestr = "Windows System/Registry";
