@@ -1310,6 +1310,7 @@ void ProcessVolume(QString evidstring)
             QList<QHash<QString, QVariant>> fileinfolist;
 	    QList<QString> orphanlist;
             // IF FAT12/16/32 THEN
+            // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
             ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             // ELSE EXFAT THEN
             // ELSE ... THEN
@@ -1392,7 +1393,12 @@ void ProcessVolume(QString evidstring)
             WriteFileSystemProperties((QHash<QString, QVariant>*)&(fsinfolist.at(i)), QString(curpartpath + "prop"));
             QList<QHash<QString, QVariant>> fileinfolist;
             QList<QString> orphanlist;
+            // IF FAT12/16/32 THEN
+            // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
             ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            // ELSE EXFAT THEN
+            // ELSE ... THEN
+
             PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
             nodedata.clear();
