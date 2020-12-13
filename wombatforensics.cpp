@@ -1702,7 +1702,7 @@ void WombatForensics::PopulateHexContents()
         if(selectedindex.sibling(selectedindex.row(), 0).data().toString() == "$MBR")
         {
             ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toULongLong()*2);
-            ui->hexview->SetColor(QString("0,512;"), 511);
+            ui->hexview->SetColor(QString("0,512;"), 512);
         }
         else if(selectedindex.sibling(selectedindex.row(), 0).data().toString().startsWith("$FAT"))
         {
