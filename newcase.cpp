@@ -707,7 +707,12 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
 
-void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QString>* orphanlist)
+void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QString>* orphanlist)
+{
+}
+
+//void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QString>* orphanlist)
+void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QString>* orphanlist)
 {
     QHash<QString, QVariant> fileinfo;
     fileinfo.clear();
@@ -741,9 +746,6 @@ void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHa
     //for(uint i=0; i < fsinfo->value("rootdirmaxfiles").toUInt(); i++)
     for(int i=0; i < rootdirentrycount; i++)
     {
-        if(fsinfo->value("type").toUInt() > 0 && fsinfo->value("type").toUInt() < 4) // FAT12/16/32
-        {
-            // ParseFatDirEntry();
         fileinfo.insert("fileattr", QVariant(rootdirbuf.at(i*32 + 11)));
         uint8_t firstchar = rootdirbuf.at(i*32);
         if(firstchar == 0x00) // entry is free and all remaining are free
@@ -922,12 +924,6 @@ void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHa
 	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
 		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2))));
 	    longnamestring.prepend(QString(l1 + l2 + l3).toUtf8());
-        }
-        }
-        else if(fsinfo->value("type").toUInt() == 4) // EXFAT
-        {
-            qDebug() << "Parse EXFAT Dir Entry Here...";
-            //ParseExfatDirEntry();
         }
     }
 }
@@ -1311,9 +1307,11 @@ void ProcessVolume(QString evidstring)
 	    QList<QString> orphanlist;
             // IF FAT12/16/32 THEN
             // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
-            ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
-            // ELSE EXFAT THEN
-            // ELSE ... THEN
+	    if(fsinfolist.at(i).value("type").toUInt() == 1 || fsinfolist.at(i).value("type").toUInt() == 2 || fsinfolist.at(i).value("type").toUInt() == 3) // FAT12 || FAT16 || FAT32
+		ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
+		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 
             PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
@@ -1395,7 +1393,11 @@ void ProcessVolume(QString evidstring)
             QList<QString> orphanlist;
             // IF FAT12/16/32 THEN
             // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
-            ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+	    if(fsinfolist.at(i).value("type").toUInt() == 1 || fsinfolist.at(i).value("type").toUInt() == 2 || fsinfolist.at(i).value("type").toUInt() == 3) // FAT12 || FAT16 || FAT32
+		ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
+		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             // ELSE EXFAT THEN
             // ELSE ... THEN
 
