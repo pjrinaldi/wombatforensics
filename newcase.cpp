@@ -475,7 +475,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("vollength", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8)))); // volume size in sectors
                 fsinfo.insert("fatsector", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(80, 4)))); // sector address of 1st FAT
                 fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(84, 4)))); // size in sectors
-                fsinfo.insert("clusteroffset", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(88, 4)))); // sector address of cluster heap/data region
+                fsinfo.insert("clusterstart", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(88, 4)))); // sector address of cluster heap/data region
                 fsinfo.insert("clustercount", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(92, 4)))); // number of clusters in heap
                 fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(96, 4)))); // cluster address
                 fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(100, 4))));
@@ -483,7 +483,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 fsinfo.insert("sectorspercluster", QVariant(pow(2, partbuf.at(109)))); // power of 2, so 2^(sectorspercluster)
                 fsinfo.insert("fatcount", QVariant(partbuf.at(110))); // 1 or 2, 2 if TexFAT is in use
                 fsinfo.insert("fatoffset", QVariant((fsinfo.value("fatsector").toUInt() * fsinfo.value("bytespersector").toUInt()) + (qulonglong)(partoffset * 512)));
-                fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt())));
+		fsinfo.insert("clusteroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("clusterstart").toUInt() * fsinfo.value("bytespersector").toUInt())));
+                fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("clusterstart").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt())));
                 QByteArray rootfatbuf;
                 rootfatbuf.clear();
                 if(!efile.isOpen())
@@ -501,7 +502,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
                 QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + clustersize + ";";
                 for(int j=0; j < rootclusterlist.count() - 1; j++)
-                    rootdirlayout += QString::number((fsinfo.value("clusteroffset").toUInt() * fsinfo.value("bytespersector").toUInt()) + (rootclusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+                    rootdirlayout += QString::number((fsinfo.value("clusterstart").toUInt() * fsinfo.value("bytespersector").toUInt()) + (rootclusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
                 fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
                 QByteArray rootdirentry;
                 rootdirentry.clear();
@@ -739,7 +740,55 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	uint8_t entrytype = rootdirbuf.at(i*32);
 	if(entrytype == 0x00) // cur dir entry is free and all remaining are free
 	    break;
-	qDebug() << "Entry Type:" << QString("0x" + QString::number(entrytype, 16));
+	else if(entrytype == 0x81) // ALLOC_BITMAP file
+	{
+	    fileinfo.insert("filename", QVariant("$ALLOC_BITMAP"));
+	    fileinfo.insert("clusternum", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 20, 4))));
+	    fileinfo.insert("logicalsize", QVariant((qulonglong)qFromLittleEndian<uint64_t>(rootdirbuf.mid(i*32 + 24, 8))));
+	    fileinfo.insert("inode", QVariant(inodecnt));
+	    fileinfo.insert("isdeleted", QVariant(0));
+	    fileinfo.insert("path", QVariant("/"));
+	    fileinfo.insert("parentinode", QVariant(-1));
+	    QList<uint> clusterlist;
+	    clusterlist.clear();
+	    QString layout = "";
+	    qDebug() << "1st cluster:" << fileinfo.value("clusternum").toUInt();
+	    if(fileinfo.value("clusternum").toUInt() > 1)
+		GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
+	    QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
+	    QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
+	    layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
+	    for(int j=0; j < clusterlist.count() - 1; j++)
+	    {
+		clusterstr += QString::number(clusterlist.at(j)) + ",";
+		layout += QString::number(fsinfo->value("clusteroffset").toULongLong() + (clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+	    }
+	    fileinfo.insert("clusterlist", QVariant(clusterstr));
+	    fileinfo.insert("layout", QVariant(layout));
+	    qDebug() << "clusterstr:" << clusterstr << "clusterlist:" << clusterlist;
+	    qDebug() << "file name:" << fileinfo.value("filename").toString() << "Layout:" << fileinfo.value("layout").toString();
+	}
+	else if(entrytype == 0x82) // $UPCASE_TABLE file
+	{
+	}
+	else if(entrytype == 0x83) // VOLUME_LABEL (already handles so skip...
+	{
+	}
+	else if(entrytype == 0x03) // Deleted VOLUME_LABEL
+	{
+	}
+	else if(entrytype == 0x85) // File/Dir Directory Entry
+	{
+	    // where i will sub loop for the c0,c1(s) entries
+	    qDebug() << "Entry Type:" << QString("0x" + QString::number(entrytype, 16));
+	}
+	else if(entrytype == 0x05) // Deleted File/Dir Directory Entry
+	{
+	    // where i will sub loop for the 40,41 entries
+	}
+	else if(entrytype == 0xa0) // Volume GUID Dir Entry
+	{
+	}
     }
 }
 
