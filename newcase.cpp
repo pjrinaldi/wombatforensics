@@ -709,6 +709,38 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 
 void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QString>* orphanlist)
 {
+    QHash<QString, QVariant> fileinfo;
+    fileinfo.clear();
+    QByteArray fatbuf;
+    fatbuf.clear();
+    QByteArray rootdirbuf;
+    rootdirbuf.clear();
+    int rootdirentrycount = 0;
+    QFile efile(estring);
+    if(!efile.isOpen())
+	efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+	QStringList rootdirlayoutlist = fsinfo->value("rootdirlayout").toString().split(";", Qt::SkipEmptyParts);
+	for(int i=0; i < rootdirlayoutlist.count(); i++)
+	{
+	    efile.seek(rootdirlayoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+	    rootdirbuf.append(efile.read(rootdirlayoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+	}
+	efile.seek(fsinfo->value("fatoffset").toUInt());
+	fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
+	efile.close();
+    }
+    rootdirentrycount = rootdirbuf.count() / 32;
+    uint inodecnt = 0;
+    QString filename = "";
+    for(int i=0; i < rootdirentrycount; i++)
+    {
+	uint8_t entrytype = rootdirbuf.at(i*32);
+	if(entrytype == 0x00) // cur dir entry is free and all remaining are free
+	    break;
+	qDebug() << "Entry Type:" << QString("0x" + QString::number(entrytype, 16));
+    }
 }
 
 //void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QString>* orphanlist)
