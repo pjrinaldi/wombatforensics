@@ -32,6 +32,7 @@ QString ConvertGmtHours(int gmtvar);
 #define EPOCH_DIFFERENCE 11644473600LL
 
 qint64 ConvertDosTimeToUnixTime(uint8_t t1, uint8_t t2, uint8_t d1, uint8_t d2);
+qint64 ConvertExfatTimeToUnixTime(uint8_t t1, uint8_t t2, uint8_t d1, uint8_t d2, uint8_t utc);
 QString ConvertWindowsTimeToUnixTime(uint64_t input);
 QString ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
 QString ConvertUnixTimeToString(uint32_t input);
