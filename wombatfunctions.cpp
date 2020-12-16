@@ -535,17 +535,25 @@ qint64 ConvertExfatTimeToUnixTime(uint8_t t1, uint8_t t2, uint8_t d1, uint8_t d2
     int hour = 0;
     int min = 0;
     int sec = 0;
+    int offsetsecs = 0;
     QString tmpdate = QString("%1%2").arg(d1, 8, 2, QChar('0')).arg(d2, 8, 2, QChar('0'));
     QString tmptime = QString("%1%2").arg(t1, 8, 2, QChar('0')).arg(t2, 8, 2, QChar('0'));
+    QString utcstr = QString("%1").arg(utc, 8, 2, QChar('0'));
+    qDebug() << "utcstr:" << utcstr;
     year = tmpdate.left(7).toInt(nullptr, 2) + 1980;
     month = tmpdate.mid(7, 4).toInt(nullptr, 2);
     day = tmpdate.right(5).toInt(nullptr, 2);
     hour = tmptime.left(5).toInt(nullptr, 2);
     min = tmptime.mid(5, 6).toInt(nullptr, 2);
     sec = tmptime.right(5).toInt(nullptr, 2) * 2;
+    if(utcstr.right(1).toInt(nullptr, 2) == 1) // apply utc offset
+    {
+        offsetsecs = utcstr.left(7).toInt(nullptr, 2) * 15;
+        qDebug() << "offset seconds:" << offsetsecs;
+    }
     QString datetimestring = QString("%1-%2-%3 %4:%5:%6").arg(year, 4, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(day, 2, 10, QChar('0')).arg(hour, 2, 10, QChar('0')).arg(min, 2, 10, QChar('0')).arg(sec, 2, 10, QChar('0'));
 
-    return QDateTime::fromString(datetimestring, "yyyy-MM-dd hh:mm:ss").toSecsSinceEpoch();
+    return QDateTime::fromString(datetimestring, "yyyy-MM-dd hh:mm:ss").setOffsetFromUtc(offsetsecs).toSecsSinceEpoch();
 }
 
 QString ConvertWindowsTimeToUnixTime(uint64_t input)
