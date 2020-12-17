@@ -786,20 +786,24 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
             
             // PROCESS THE REMANING 0X85 STRUCTURE HERE THEN LOOP OVER SECONDARY VALUES.
             // SECONDARY COUNT DETERMINES HOW MANY STREAM/FILENAME DIR ENTRIES FOR MY SUB LOOP...
-            qDebug() << "starting i:" << i;
+            //qDebug() << "starting i:" << i;
             for(int j=1; j <= fileinfo.value("secondarycount").toInt(); j++)
             {
                 uint8_t subentrytype = rootdirbuf.at(i*32 + j*32);
                 if(subentrytype == 0xc0) // Stream Extension Directory Entry
                 {
+		    uint8_t namelength = rootdirbuf.at((i+j)*32 + 3);
+		    qDebug() << "namelength:" << namelength << QString::number(namelength, 16) << QString::number(namelength);
+		    char flags = rootdirbuf.at((i+j)*32 + 1);
+		    qDebug() << (flags & 0x0000000F) << (flags & 0x000000F0);
                 }
                 else if(subentrytype == 0xc1) // File Name Directory Entry
                 {
                 }
-                qDebug() << "entry type:" << QString("0x" + QString::number(subentrytype, 16));
+                //qDebug() << "entry type:" << QString("0x" + QString::number(subentrytype, 16));
             }
-            qDebug() << "ending i:" << i;
-            qDebug() << "i+j ending i:" << i + fileinfo.value("secondarycount").toInt();
+            //qDebug() << "ending i:" << i;
+            //qDebug() << "i+j ending i:" << i + fileinfo.value("secondarycount").toInt();
 	}
 	else if(entrytype == 0x05) // Deleted File/Dir Directory Entry
 	{
