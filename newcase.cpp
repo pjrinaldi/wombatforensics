@@ -812,7 +812,6 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 else
                     fileinfo.insert("itemtype", QVariant(4));
             }
-            // NEED TO MODIFY THE BELOW CONVERT TO INCLUDE THE UTC OFFSET BYTE SO I CAN ENSURE IT IS STORED IN UTC TIME...
             fileinfo.insert("createdate", QVariant(ConvertExfatTimeToUnixTime(rootdirbuf.at(i*32 + 9), rootdirbuf.at(i*32 + 8), rootdirbuf.at(i*32 + 11), rootdirbuf.at(i*32 + 10), rootdirbuf.at(i*32 + 22))));
             fileinfo.insert("modifydate", QVariant(ConvertExfatTimeToUnixTime(rootdirbuf.at(i*32 + 13), rootdirbuf.at(i*32 + 12), rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 23))));
             fileinfo.insert("accessdate", QVariant(ConvertExfatTimeToUnixTime(rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16), rootdirbuf.at(i*32 + 19), rootdirbuf.at(i*32 + 18), rootdirbuf.at(i*32 + 24))));
@@ -866,7 +865,7 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	    fileinfo.insert("path", QVariant("/"));
 	    fileinfo.insert("parentinode", QVariant(-1));
 	    fileinfo.insert("inode", QVariant(inodecnt));
-	    i = i + fileinfo.value("secondarycount").toInt();
+	    //i = i + fileinfo.value("secondarycount").toInt();
             //qDebug() << "ending i:" << i;
             //qDebug() << "i+j ending i:" << i + fileinfo.value("secondarycount").toInt();
 	}
