@@ -908,13 +908,54 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
             inodecnt++;
 	    if(fileinfo.value("fileattr").toUInt() & 0x10) // Sub Directory
 	    {
-		qDebug() << "Sub directory, parse here...";
+		//qDebug() << "Sub directory, parse here...";
                 ParseExfatSubDir(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
 	    }
         }
     }
     // EXFAT ORPHAN'S ARE SEARCHING THE WHOLE FILESYSTEM SPACE FOR 0X05 FOLLOWED BY 0X40 AND 0X41'S....
     // SO I WOULD NEED TO LOOP OVER THE PARTITION AND LOOK FOR 0x05's WHICH ARE NOT ALREADY COVERED...
+
+    // USE FATBUF, AND THEN LOOP OVER THE FILEINFOLIST.COUNT(); THEN I CAN COLLECT ALL THE LAYOUT'S OR CLUSTERSTR'S FOR EACH FILE TO KNOW WHERE I CAN LOOK THAT ISN'T AN EXISTING DIRECTORY
+    // THEN I CAN SEARCH THROUGH THE RAW IMAGE FOR ALL 0x05's, WHICH SHOULD SHORTEN WHAT I NEED...., I COULD JUST DO FILEINFO'S WHERE FILEATTR == 0x10
+    qDebug() << "Start Initial Orphan Run";
+    QString olayout = fsinfo->value("rootdirlayout").toString();
+    for(int i=0; i < fileinfolist->count(); i++)
+    {
+        if(fileinfolist->at(i).value("fileattr").toUInt() & 0x10) // is a directory
+        {
+            olayout += fileinfolist->at(i).value("layout").toString();
+            //qDebug() << "dir:" << i << fileinfolist->at(i).value("clusterlist").toString() << fileinfolist->at(i).value("layout").toString();
+        }
+    }
+    qDebug() << "olayout:" << olayout;
+    QStringList olist = olayout.split(";", Qt::SkipEmptyParts);
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        int coffset = 0;
+        while(!efile.atEnd())
+        {
+            efile.seek(coffset);
+            QByteArray tmparray = efile.read(32);
+            if(tmparray.at(0) == 0x05)
+                qDebug() << "could be an orphan";
+            coffset += 32;
+            //qDebug() << "coffset before olist fix:" << coffset;
+            for(int i=0; i < olist.count(); i++)
+            {
+                if(coffset == olist.at(i).split(",").at(0).toLongLong())
+                {
+                    qDebug() << "coffset before olist fix:" << coffset;
+                    coffset += olist.at(i).split(",").at(1).toLongLong();
+                    qDebug() << "coffset after olist fix:" << coffset;
+                }
+            }
+            //qDebug() << "coffset after olist fix:" << coffset;
+        }
+        efile.close();
+    }
 }
 
 void ParseExfatSubDir(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parfileinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf, QList<QString>* orphanlist)
