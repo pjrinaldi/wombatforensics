@@ -918,7 +918,7 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
 
     // USE FATBUF, AND THEN LOOP OVER THE FILEINFOLIST.COUNT(); THEN I CAN COLLECT ALL THE LAYOUT'S OR CLUSTERSTR'S FOR EACH FILE TO KNOW WHERE I CAN LOOK THAT ISN'T AN EXISTING DIRECTORY
     // THEN I CAN SEARCH THROUGH THE RAW IMAGE FOR ALL 0x05's, WHICH SHOULD SHORTEN WHAT I NEED...., I COULD JUST DO FILEINFO'S WHERE FILEATTR == 0x10
-    qDebug() << "Start Initial Orphan Run";
+    //qDebug() << "Start Initial Orphan Run";
     QString olayout = fsinfo->value("rootdirlayout").toString();
     for(int i=0; i < fileinfolist->count(); i++)
     {
@@ -928,7 +928,7 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
             //qDebug() << "dir:" << i << fileinfolist->at(i).value("clusterlist").toString() << fileinfolist->at(i).value("layout").toString();
         }
     }
-    qDebug() << "olayout:" << olayout;
+    //qDebug() << "olayout:" << olayout;
     QStringList olist = olayout.split(";", Qt::SkipEmptyParts);
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly);
@@ -940,7 +940,10 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
             efile.seek(coffset);
             QByteArray tmparray = efile.read(32);
             if(tmparray.at(0) == 0x05)
+            {
+                qDebug() << "secondary count:" << QString::number(tmparray.at(1));
                 qDebug() << "could be an orphan";
+            }
             coffset += 32;
             //qDebug() << "coffset before olist fix:" << coffset;
             for(int i=0; i < olist.count(); i++)
