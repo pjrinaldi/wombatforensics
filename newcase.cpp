@@ -939,11 +939,111 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
         {
             efile.seek(coffset);
             QByteArray tmparray = efile.read(32);
-            if(tmparray.at(0) == 0x05)
+            if(tmparray.at(0) == 0x05 && (tmparray.at(1) >= 0 && tmparray.at(1) < 256))
             {
-                qDebug() << "secondary count:" << QString::number(tmparray.at(1));
-                qDebug() << "could be an orphan";
+                uint itemtype = 4;
+                //qDebug() << "secondary count:" << QString::number(tmparray.at(1));
+                QString attrstr = "";
+                if(tmparray.at(4) & 0x01)
+                    attrstr += "Read Only,";
+                else if(tmparray.at(4) & 0x02)
+                    attrstr += "Hidden File,";
+                else if(tmparray.at(4) & 0x04)
+                    attrstr += "System File,";
+                else if(tmparray.at(4) & 0x10)
+                {
+                    attrstr += "Sub Directory,";
+                    itemtype = 2;
+                }
+                else if(tmparray.at(4) & 0x20)
+                    attrstr += "Archive File,";
+                //qDebug() << "fileattr:" << QString::number(tmparray.at(4), 16);
+                //qDebug() << "attrstr:" << attrstr;
+                //qDebug() << "Create Date:" << ConvertExfatTimeToUnixTime(tmparray.at(9), tmparray.at(8), tmparray.at(11), tmparray.at(10), tmparray.at(22));
+                //qDebug() << "Modify Date:" << ConvertExfatTimeToUnixTime(tmparray.at(13), tmparray.at(12), tmparray.at(15), tmparray.at(14), tmparray.at(23));
+                //qDebug() << "Access Date:" << ConvertExfatTimeToUnixTime(tmparray.at(17), tmparray.at(16), tmparray.at(19), tmparray.at(18), tmparray.at(24));
+	        //qDebug() << "create date:" << QDateTime::fromSecsSinceEpoch(fileinfo.value("createdate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
+                QString filename = "";
+                uint8_t namelength = 0;
+                uint8_t curlength = 0;
+                efile.seek(coffset + 32);
+                QByteArray tmpsubarray = efile.read(tmparray.at(1) * 32);
+                for(int j=0; j < tmparray.at(1); j++)
+                {
+                    if(tmpsubarray.at(j*32) == 0x40)
+                    {
+                        namelength = tmpsubarray.at(j*32 + 3);
+                        qDebug() << "sub entrytype:" << QString::number(tmpsubarray.at(j*32), 16);
+                        qDebug() << "could be an orphan";
+                        qDebug() << "1st cluster:" << qFromLittleEndian<uint32_t>(tmpsubarray.mid(j*32 + 20, 4));
+                    }
+                    else if(tmpsubarray.at(j*32) == 0x41)
+                    {
+                        curlength += 15;
+                        if(curlength <= namelength)
+                        {
+                            for(int k=1; k < 16; k++)
+                                filename += QString(QChar(qFromLittleEndian<uint16_t>(tmpsubarray.mid(j*32 + k*2, 2))));
+                        }
+                        else
+                        {
+                            int remaining = namelength + 16 - curlength;
+                            for(int k=1; k < remaining; k++)
+                                filename += QString(QChar(qFromLittleEndian<uint16_t>(tmpsubarray.mid(j*32 + k*2, 2))));
+                        }
+                    }
+                }
+                qDebug() << "filename:" << filename;
             }
+            /*
+             *	    // FILE ATTRIBUTES
+            
+            // PROCESS THE REMANING 0X85 STRUCTURE HERE THEN LOOP OVER SECONDARY VALUES.
+            // SECONDARY COUNT DETERMINES HOW MANY STREAM/FILENAME DIR ENTRIES FOR MY SUB LOOP...
+            //qDebug() << "starting i:" << i;
+            for(int j=1; j <= fileinfo.value("secondarycount").toInt(); j++)
+            {
+                uint8_t subentrytype = rootdirbuf.at(i*32 + j*32);
+                if(subentrytype == 0xc0 || subentrytype == 0x40) // Stream Extension Directory Entry
+                {
+		    namelength = rootdirbuf.at((i+j)*32 + 3);
+		    QString flagstr = QString("%1").arg(rootdirbuf.at((i+j)*32 + 1), 8, 2, QChar('0'));
+		    //int allocpossible = flagstr.right(1).toInt(nullptr, 2);
+		    fatchain = flagstr.mid(7, 1).toInt(nullptr, 2);
+		    fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(rootdirbuf.mid((i+j)*32 + 8, 8))));
+		    fileinfo.insert("clusternum", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid((i+j)*32 + 20, 4))));
+		    fileinfo.insert("physicalsize", QVariant(qFromLittleEndian<qulonglong>(rootdirbuf.mid((i+j)*32 + 24, 8))));
+                }
+                else if(subentrytype == 0xc1 || subentrytype == 0x41) // File Name Directory Entry
+                {
+		    curlength += 15;
+		    if(curlength <= namelength)
+		    {
+			for(int k=1; k < 16; k++)
+			    filename += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid((i+j)*32 + k*2, 2))));
+		    }
+		    else
+		    {
+			int remaining = namelength + 16 - curlength;
+			//qDebug() << "remaining + 1:" << remaining;
+			for(int k=1; k < remaining; k++)
+			    filename += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid((i+j)*32 + k*2, 2))));
+		    }
+		    //qDebug() << j << "namelength:" << namelength;
+                }
+                //qDebug() << "entry type:" << QString("0x" + QString::number(subentrytype, 16));
+            }
+	    //qDebug() << "filename:" << QString("'" + filename + "'") << "curlength:" << curlength;
+	    fileinfo.insert("filename", QVariant(filename));
+            if(entrytype == 0x85)
+	        fileinfo.insert("isdeleted", QVariant(0));
+            else if(entrytype == 0x05)
+                fileinfo.insert("isdeleted", QVariant(1));
+	    fileinfo.insert("path", QVariant("/"));
+	    fileinfo.insert("parentinode", QVariant(-1));
+	    fileinfo.insert("inode", QVariant(inodecnt));
+
+             */ 
             coffset += 32;
             //qDebug() << "coffset before olist fix:" << coffset;
             for(int i=0; i < olist.count(); i++)
