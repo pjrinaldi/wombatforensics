@@ -968,6 +968,8 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 uint8_t curlength = 0;
                 efile.seek(coffset + 32);
                 QByteArray tmpsubarray = efile.read(tmparray.at(1) * 32);
+                // need to just get the next entry which should be 0x40 entry and then loop over the filenames
+                // since they are secondary count - 1..., so then get the subtmparray...
                 for(int j=0; j < tmparray.at(1); j++)
                 {
                     if(tmpsubarray.at(j*32) == 0x40)
@@ -975,7 +977,12 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                         namelength = tmpsubarray.at(j*32 + 3);
                         qDebug() << "sub entrytype:" << QString::number(tmpsubarray.at(j*32), 16);
                         qDebug() << "could be an orphan";
-                        qDebug() << "1st cluster:" << qFromLittleEndian<uint32_t>(tmpsubarray.mid(j*32 + 20, 4));
+                        qDebug() << "1st cluster:" << qFromLittleEndian<uint32_t>(tmpsubarray.mid(j*32 + 20, 4)) << "cluster count:" << fsinfo->value("clustercount").toUInt();
+                        qDebug() << "logical size:" << qFromLittleEndian<qulonglong>(tmpsubarray.mid(j*32 + 8, 8));
+                        qDebug() << "physical size:" << qFromLittleEndian<qulonglong>(tmpsubarray.mid(j*32 + 24, 8));
+                        //fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(rootdirbuf.mid((i+j)*32 + 8, 8))));
+                        //fileinfo.insert("clusternum", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid((i+j)*32 + 20, 4))));
+                        //fileinfo.insert("physicalsize", QVariant(qFromLittleEndian<qulonglong>(rootdirbuf.mid((i+j)*32 + 24, 8))));
                     }
                     else if(tmpsubarray.at(j*32) == 0x41)
                     {
