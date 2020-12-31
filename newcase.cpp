@@ -937,6 +937,8 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
         int coffset = 0;
         while(!efile.atEnd())
         {
+            QHash<QString, QVariant> orphaninfo;
+            orphaninfo.clear();
             efile.seek(coffset);
             QByteArray tmparray = efile.read(32);
             if(tmparray.at(0) == 0x05 && (tmparray.at(1) >= 0 && tmparray.at(1) < 256))
@@ -957,8 +959,13 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 }
                 else if(tmparray.at(4) & 0x20)
                     attrstr += "Archive File,";
-                //qDebug() << "fileattr:" << QString::number(tmparray.at(4), 16);
-                //qDebug() << "attrstr:" << attrstr;
+                orphaninfo.insert("secondarycount", QVariant(tmparray.at(1)));
+                orphaninfo.insert("attribute", QVariant(attrstr));
+                orphaninfo.insert("fileattr", QVariant(tmparray.at(4)));
+                orphaninfo.insert("itemtype", QVariant(itemtype));
+                orphaninfo.insert("createdate", QVariant(ConvertExfatTimeToUnixTime(tmparray.at(9), tmparray.at(8), tmparray.at(11), tmparray.at(10), tmparray.at(22))));
+                orphaninfo.insert("modifydate", QVariant(ConvertExfatTimeToUnixTime(tmparray.at(13), tmparray.at(12), tmparray.at(15), tmparray.at(14), tmparray.at(23))));
+                orphaninfo.insert("accessdate", QVariant(ConvertExfatTimeToUnixTime(tmparray.at(17), tmparray.at(16), tmparray.at(19), tmparray.at(18), tmparray.at(24))));
                 //qDebug() << "Create Date:" << ConvertExfatTimeToUnixTime(tmparray.at(9), tmparray.at(8), tmparray.at(11), tmparray.at(10), tmparray.at(22));
                 //qDebug() << "Modify Date:" << ConvertExfatTimeToUnixTime(tmparray.at(13), tmparray.at(12), tmparray.at(15), tmparray.at(14), tmparray.at(23));
                 //qDebug() << "Access Date:" << ConvertExfatTimeToUnixTime(tmparray.at(17), tmparray.at(16), tmparray.at(19), tmparray.at(18), tmparray.at(24));
@@ -971,9 +978,17 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 if(tmp40array.at(0) == 0x40)
                 {
                     namelength = tmp40array.at(3);
-                    qDebug() << "1st cluster:" << qFromLittleEndian<uint32_t>(tmp40array.mid(20, 4)) << "cluster count:" << fsinfo->value("clustercount").toUInt();
-                    qDebug() << "logical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(8, 8));
-                    qDebug() << "physical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(24, 8));
+                    QString flagstr = QString("%1").arg(tmp40array.at(1), 8, 2, QChar('0'));
+                    //int allocpossible = flagstr.right(1).toInt(nullptr, 2);
+                    int fatchain = flagstr.mid(7, 1).toInt(nullptr, 2);
+                    //qDebug() << "allocpossible:" << allocpossible;
+                    //qDebug() << "fatchain:" << fatchain;
+                    orphaninfo.insert("clusternum", QVariant(qFromLittleEndian<uint32_t>(tmp40array.mid(20, 4))));
+                    orphaninfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(tmp40array.mid(8, 8))));
+                    orphaninfo.insert("physicalsize", QVariant(qFromLittleEndian<qulonglong>(tmp40array.mid(24, 8))));
+                    //qDebug() << "1st cluster:" << qFromLittleEndian<uint32_t>(tmp40array.mid(20, 4)) << "cluster count:" << fsinfo->value("clustercount").toUInt();
+                    //qDebug() << "logical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(8, 8));
+                    //qDebug() << "physical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(24, 8));
                     if(namelength > 0 && namelength < 256)
                     {
                         efile.seek(coffset + 64);
@@ -996,104 +1011,73 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                                 }
                             }
                         }
-                    }
-                }
-                /*
-                efile.seek(coffset + 64);
-                QByteArray tmpsubarray = efile.read((tmparray.at(1)-1) * 32);
-                // need to just get the next entry which should be 0x40 entry and then loop over the filenames
-                // since they are secondary count - 1..., so then get the subtmparray...
-                for(int j=0; j < tmparray.at(1); j++)
-                {
-                    if(tmpsubarray.at(j*32) == 0x40)
-                    {
-                        namelength = tmpsubarray.at(j*32 + 3);
-                        qDebug() << "sub entrytype:" << QString::number(tmpsubarray.at(j*32), 16);
-                        qDebug() << "could be an orphan";
-                        qDebug() << "1st cluster:" << qFromLittleEndian<uint32_t>(tmpsubarray.mid(j*32 + 20, 4)) << "cluster count:" << fsinfo->value("clustercount").toUInt();
-                        qDebug() << "logical size:" << qFromLittleEndian<qulonglong>(tmpsubarray.mid(j*32 + 8, 8));
-                        qDebug() << "physical size:" << qFromLittleEndian<qulonglong>(tmpsubarray.mid(j*32 + 24, 8));
-                        //fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(rootdirbuf.mid((i+j)*32 + 8, 8))));
-                        //fileinfo.insert("clusternum", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid((i+j)*32 + 20, 4))));
-                        //fileinfo.insert("physicalsize", QVariant(qFromLittleEndian<qulonglong>(rootdirbuf.mid((i+j)*32 + 24, 8))));
-                    }
-                    else if(tmpsubarray.at(j*32) == 0x41)
-                    {
-                        curlength += 15;
-                        if(curlength <= namelength)
+                        orphaninfo.insert("filename", QVariant(filename));
+                        orphaninfo.insert("isdeleted", QVariant(1));
+                        orphaninfo.insert("path", QVariant("/"));
+                        orphaninfo.insert("parentinode", QVariant(-1));
+                        orphaninfo.insert("inode", QVariant(inodecnt));
+                        QList<uint> clusterlist;
+                        QString layout = "";
+                        clusterlist.clear();
+                        if(fatchain == 0 && orphaninfo.value("clusternum").toUInt() > 1)
                         {
-                            for(int k=1; k < 16; k++)
-                                filename += QString(QChar(qFromLittleEndian<uint16_t>(tmpsubarray.mid(j*32 + k*2, 2))));
+                            GetNextCluster(orphaninfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
+                            clusterstr = QString::number(orphaninfo.value("clusternum").toUInt()) + ",";
+                            layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (orphaninfo.value("clusternum").toUInt() - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+                            for(int m=0; m < clusterlist.count() - 1; m++)
+                            {
+                                clusterstr += QString::number(clusterlist.at(m)) + ",";
+                                layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (clusterlist.at(m) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+                            }
                         }
-                        else
+                        else if(fatchain == 1)
                         {
-                            int remaining = namelength + 16 - curlength;
-                            for(int k=1; k < remaining; k++)
-                                filename += QString(QChar(qFromLittleEndian<uint16_t>(tmpsubarray.mid(j*32 + k*2, 2))));
+                            int clustercount = (int)ceil((float)orphaninfo.value("physicalsize").toULongLong() / clustersize.toUInt());
+                            clusterstr = QString::number(orphaninfo.value("clusternum").toUInt()) + ",";
+                            layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (orphaninfo.value("clusternum").toUInt() - 2) * clustersize.toUInt()) + "," + QString::number(clustercount * clustersize.toUInt()) + ";";
                         }
-                    }
-                }
-                */
-                qDebug() << "filename:" << filename;
-            }
-            /*
-             *	    // FILE ATTRIBUTES
-            
-            // PROCESS THE REMANING 0X85 STRUCTURE HERE THEN LOOP OVER SECONDARY VALUES.
-            // SECONDARY COUNT DETERMINES HOW MANY STREAM/FILENAME DIR ENTRIES FOR MY SUB LOOP...
-            //qDebug() << "starting i:" << i;
-            for(int j=1; j <= fileinfo.value("secondarycount").toInt(); j++)
-            {
-                uint8_t subentrytype = rootdirbuf.at(i*32 + j*32);
-                if(subentrytype == 0xc0 || subentrytype == 0x40) // Stream Extension Directory Entry
-                {
-		    namelength = rootdirbuf.at((i+j)*32 + 3);
-		    QString flagstr = QString("%1").arg(rootdirbuf.at((i+j)*32 + 1), 8, 2, QChar('0'));
-		    //int allocpossible = flagstr.right(1).toInt(nullptr, 2);
-		    fatchain = flagstr.mid(7, 1).toInt(nullptr, 2);
-		    fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(rootdirbuf.mid((i+j)*32 + 8, 8))));
-		    fileinfo.insert("clusternum", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid((i+j)*32 + 20, 4))));
-		    fileinfo.insert("physicalsize", QVariant(qFromLittleEndian<qulonglong>(rootdirbuf.mid((i+j)*32 + 24, 8))));
-                }
-                else if(subentrytype == 0xc1 || subentrytype == 0x41) // File Name Directory Entry
-                {
-		    curlength += 15;
-		    if(curlength <= namelength)
-		    {
-			for(int k=1; k < 16; k++)
-			    filename += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid((i+j)*32 + k*2, 2))));
-		    }
-		    else
-		    {
-			int remaining = namelength + 16 - curlength;
-			//qDebug() << "remaining + 1:" << remaining;
-			for(int k=1; k < remaining; k++)
-			    filename += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid((i+j)*32 + k*2, 2))));
-		    }
-		    //qDebug() << j << "namelength:" << namelength;
-                }
-                //qDebug() << "entry type:" << QString("0x" + QString::number(subentrytype, 16));
-            }
-	    //qDebug() << "filename:" << QString("'" + filename + "'") << "curlength:" << curlength;
-	    fileinfo.insert("filename", QVariant(filename));
-            if(entrytype == 0x85)
-	        fileinfo.insert("isdeleted", QVariant(0));
-            else if(entrytype == 0x05)
-                fileinfo.insert("isdeleted", QVariant(1));
-	    fileinfo.insert("path", QVariant("/"));
-	    fileinfo.insert("parentinode", QVariant(-1));
-	    fileinfo.insert("inode", QVariant(inodecnt));
+                        orphaninfo.insert("clusterlist", QVariant(clusterstr));
+                        orphaninfo.insert("layout", QVariant(layout));
+                        /*
+                         *
+                        if(fatchain == 0 && fileinfo.value("clusternum").toUInt() > 1)
+                        {
+                            GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
+                            clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
+                            layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
+                            for(int j=0; j < clusterlist.count() - 1; j++)
+                            {
+                                clusterstr += QString::number(clusterlist.at(j)) + ",";
+                                layout += QString::number(fsinfo->value("clusteroffset").toULongLong() + (clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+                            }
+                        }
+                        else if(fatchain == 1)
+                        {
+                            // int myValue = (int) ceil( (float)myIntNumber / myOtherInt );
+                            int clustercount = (int)ceil((float)fileinfo.value("physicalsize").toULongLong() / clustersize.toUInt());
+                            //qDebug() << "logical size:" << fileinfo.value("logicalsize").toULongLong() << "physical size:" << fileinfo.value("physicalsize").toULongLong() << "clustercount:" << clustercount;
+                            clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
+                            layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (fileinfo.value("clusternum").toUInt() - 2) * clustersize.toUInt()) + "," + QString::number(clustercount * clustersize.toUInt()) + ";";
+                            //qDebug() << "layout:" << layout;
+                        }
+                        fileinfo.insert("clusterlist", QVariant(clusterstr));
+                        fileinfo.insert("layout", QVariant(layout));
+                         */ 
+                        //qDebug() << "filename:" << filename;
 
-             */ 
+                        //orphanlist->append(orphaninfo);
+                    }
+                }
+            }
             coffset += 32;
             //qDebug() << "coffset before olist fix:" << coffset;
             for(int i=0; i < olist.count(); i++)
             {
                 if(coffset == olist.at(i).split(",").at(0).toLongLong())
                 {
-                    qDebug() << "coffset before olist fix:" << coffset;
+                    //qDebug() << "coffset before olist fix:" << coffset;
                     coffset += olist.at(i).split(",").at(1).toLongLong();
-                    qDebug() << "coffset after olist fix:" << coffset;
+                    //qDebug() << "coffset after olist fix:" << coffset;
                 }
             }
             //qDebug() << "coffset after olist fix:" << coffset;
@@ -2108,6 +2092,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
     treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
     mutex.unlock();
     curinode++;
+    // NEED TO MODIFY ORPHANLIST TO BE A QHASH INSTEAD OF A QSTRINGLIST AND UPDATE THE FAT ORPHAN FILES ACCORDINGLY...
     for(int j=0; j < orphanlist->count(); j++)
     {
         QString curid = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode + j));
