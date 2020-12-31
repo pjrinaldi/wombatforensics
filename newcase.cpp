@@ -967,7 +967,40 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 uint8_t namelength = 0;
                 uint8_t curlength = 0;
                 efile.seek(coffset + 32);
-                QByteArray tmpsubarray = efile.read(tmparray.at(1) * 32);
+                QByteArray tmp40array = efile.read(32);
+                if(tmp40array.at(0) == 0x40)
+                {
+                    namelength = tmp40array.at(3);
+                    qDebug() << "1st cluster:" << qFromLittleEndian<uint32_t>(tmp40array.mid(20, 4)) << "cluster count:" << fsinfo->value("clustercount").toUInt();
+                    qDebug() << "logical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(8, 8));
+                    qDebug() << "physical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(24, 8));
+                    if(namelength > 0 && namelength < 256)
+                    {
+                        efile.seek(coffset + 64);
+                        QByteArray tmp41array = efile.read((tmparray.at(1)-1) * 32);
+                        for(int j=0; j < tmparray.at(1) - 1; j++)
+                        {
+                            if(tmp41array.at(j*32) == 0x41)
+                            {
+                                curlength += 15;
+                                if(curlength <= namelength)
+                                {
+                                    for(int k=1; k < 16; k++)
+                                        filename += QString(QChar(qFromLittleEndian<uint16_t>(tmp41array.mid(j*32 + k*2, 2))));
+                                }
+                                else
+                                {
+                                    int remaining = namelength + 16 - curlength;
+                                    for(int k=1; k < remaining; k++)
+                                        filename += QString(QChar(qFromLittleEndian<uint16_t>(tmp41array.mid(j*32 + k*2, 2))));
+                                }
+                            }
+                        }
+                    }
+                }
+                /*
+                efile.seek(coffset + 64);
+                QByteArray tmpsubarray = efile.read((tmparray.at(1)-1) * 32);
                 // need to just get the next entry which should be 0x40 entry and then loop over the filenames
                 // since they are secondary count - 1..., so then get the subtmparray...
                 for(int j=0; j < tmparray.at(1); j++)
@@ -1000,6 +1033,7 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                         }
                     }
                 }
+                */
                 qDebug() << "filename:" << filename;
             }
             /*
