@@ -2103,7 +2103,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
             }
             if(orphanlist->at(j).value("filename").toString().startsWith("$UPCASE_TABLE"))
                 mimestr = "System File/Up-case Table";
-            if(orphanlist->at(j).value("itemtype").toUInt() == 4)
+            if(orphanlist->at(j).value("itemtype").toUInt() == 2)
                 mimestr = "Directory/Directory";
         }
             //nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
@@ -2120,6 +2120,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, 4, 1);
         mutex.unlock();
+        WriteFileProperties((QHash<QString, QVariant>*)&(orphanlist->at(j)), QString(curpartpath + "f" + QString::number(curinode + j) + ".prop"));
     }
 }
 
