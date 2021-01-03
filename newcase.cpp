@@ -549,11 +549,12 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     else if(extsig == 0xef53) // EXT2/3/4
     {
         fsinfo.insert("type", QVariant(6));
+        fsinfo.insert("partoffset", QVariant((qulonglong)(512 * partoffset)));
         fsinfo.insert("fsinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1024, 4))));
         fsinfo.insert("fsblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1028, 4))));
         fsinfo.insert("blockgroup0startblk", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1044, 4))));
-        fsinfo.insert("blocksize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1048, 4))));
-        fsinfo.insert("fragsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1052, 4))));
+        fsinfo.insert("blocksize", QVariant(1024 * pow(2, qFromLittleEndian<uint32_t>(partbuf.mid(1048, 4)))));
+        fsinfo.insert("fragsize", QVariant(1024 * pow(2, qFromLittleEndian<uint32_t>(partbuf.mid(1052, 4)))));
         fsinfo.insert("blockgroupblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1056, 4))));
         fsinfo.insert("blockgroupfragcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1060, 4))));
         fsinfo.insert("blockgroupinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1064, 4))));
@@ -562,13 +563,28 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         fsinfo.insert("incompatflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1120, 4))));
         fsinfo.insert("readonlyflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1124, 4))));
         fsinfo.insert("vollabel", QString::fromStdString(partbuf.mid(1144, 16).toStdString()));
-        qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
+        //qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
         if(((fsinfo.value("compatflags").toUInt() & 0x00000200UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0001f7c0UL) != 0) || ((fsinfo.value("readonlyflags").toUInt() & 0x00000378UL) != 0))
             fsinfo.insert("typestr", QVariant("EXT4"));
         else if(((fsinfo.value("compatflags").toUInt() & 0x00000004UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0000000cUL) != 0))
             fsinfo.insert("typestr", QVariant("EXT3"));
         else
             fsinfo.insert("typestr", QVariant("EXT2"));
+        uint32_t blockgroupcount = fsinfo.value("fsblockcnt").toUInt() / fsinfo.value("blockgroupblockcnt").toUInt();
+        if(blockgroupcount == 0)
+            blockgroupcount = 1;
+        QString inodeaddresstable = "";
+        for(uint i=0; i < blockgroupcount; i++)
+            inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(partbuf.mid(2048 + i*32 + 8, 4))) + ",";
+        //qDebug() << "inodeaddresstable:" << inodeaddresstable;
+        fsinfo.insert("inodeaddresstable", QVariant(inodeaddresstable));
+        //qDebug() << "blocks for group descriptor table:" << (32 * (fsinfo.value("fsblockcnt").toUInt() / fsinfo.value("blockgroupblockcnt").toUInt())) / fsinfo.value("blocksize").toUInt();
+        /*
+        if(fsinfo.value("blockgroupinodecnt").toUInt() > 2)
+            fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2056, 4))));
+        else
+            fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2088, 4))));
+        */
     }
     else if(apfssig == "NXSB") // APFS Container
     {
@@ -707,6 +723,98 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
+
+void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, qulonglong curinode)
+{
+    QStringList blockgroups = fsinfo->value("inodeaddresstable").toString().split(",", Qt::SkipEmptyParts);
+    qulonglong inodetablestartingblock = 0;
+    for(int i=1; i <= blockgroups.count(); i++)
+    {
+        if(curinode < i*fsinfo->value("blockgroupinodecnt").toUInt())
+            inodetablestartingblock = blockgroups.at(i-1).toULongLong();
+            //qDebug() << "curinode is located in block group inode table at block:" << blockgroups.at(i-1);
+    }
+    //qDebug() << "curinode:" << curinode;
+    //qDebug() << "inodetablestartingblock:" << inodetablestartingblock;
+    //qDebug() << "inode table byteoffset:" << inodetablestartingblock * fsinfo->value("blocksize").toUInt();
+    //qDebug() << "inode address table:" << fsinfo->value("inodeaddresstable").toString();
+    //qDebug() << "inodes per block group:" << fsinfo->value("blockgroupinodecnt").toUInt();
+    /*
+        if(fsinfo.value("blockgroupinodecnt").toUInt() > 2)
+            fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2056, 4))));
+        else
+            fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2088, 4))));
+    */
+    QHash<QString, QVariant> fileinfo;
+    fileinfo.clear();
+    QByteArray inodetablebuf;
+    inodetablebuf.clear();
+    QFile efile(estring);
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        efile.seek(fsinfo->value("partoffset").toUInt() + (inodetablestartingblock * fsinfo->value("blocksize").toUInt()));
+        inodetablebuf = efile.read(128 * fsinfo->value("blockgroupinodecnt").toUInt());
+        efile.close();
+    }
+    // NOW I HAVE THE INODE TABLE FOR THE CURRENT BLOCK GROUP. I CAN GO THE CURINODE's OFFSET and parse it...
+    QList<uint32_t> blocklist;
+    blocklist.clear();
+    for(int i=0; i < 12; i++)
+    {
+        uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + (40 + i*4), 4));
+        if(curdirectblock > 0)
+            blocklist.append(curdirectblock);
+            //qDebug() << "direct block pointer for root inode:" << curdirectblock;
+        //qDebug() << "direct block value for i:" << i << qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + (40 + i*4), 4));
+        //if(inodetablebuf.mid((curinode - 1)*128 + (40 + i*4), 4)
+        //qDebug() << "direct block pointer for root inode...
+    }
+    qDebug() << "current block list before i get the indirect block pointers.." << blocklist;
+    uint32_t singleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 88, 4));
+    uint32_t doubleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 92, 4));
+    uint32_t tripleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 96, 4));
+    if(singleindirect > 0)
+    {
+        qDebug() << "obtain and parse to add to my blocklist...";
+    }
+    if(doubleindirect > 0)
+    {
+        qDebug() << "follow and double parse to add to my blocklist...";
+    }
+    if(tripleindirect > 0)
+    {
+        qDebug() << "follow and triple parse to add to my blocklist...";
+    }
+    QByteArray direntrybuf;
+    direntrybuf.clear();
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        for(int i=0; i < blocklist.count(); i++)
+        {
+            efile.seek(fsinfo->value("partoffset").toUInt() + (blocklist.at(i) * fsinfo->value("blocksize").toUInt()));
+            direntrybuf.append(efile.read(fsinfo->value("blocksize").toUInt()));
+        }
+        efile.close();
+    }
+    int curoffset = 0;
+    while(curoffset < direntrybuf.count())
+    {
+        qDebug() << "curoffset:" << curoffset;
+        qDebug() << "inode value:" << qFromLittleEndian<uint32_t>(direntrybuf.mid(curoffset, 4));
+        qDebug() << "entry length:" << qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2));
+        qDebug() << "name length:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
+        qDebug() << "file type:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 7));
+        qDebug() << "file name:" << QString::fromStdString(direntrybuf.mid(curoffset + 8, qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))).toStdString());
+            //fileinfo.insert("restname", QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString()).replace(" ", ""));
+        curoffset += 7 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
+    }
+    //qDebug() << "direntrybuf count:" << direntrybuf.count();
+    //qDebug() << "direntry 1st 64 bytes:" << direntrybuf.left(64).toHex();
+}
 
 void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
 {
@@ -1816,6 +1924,8 @@ void ProcessVolume(QString evidstring)
 		ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
 		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
+                ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 2);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 
             PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
@@ -1902,6 +2012,8 @@ void ProcessVolume(QString evidstring)
 		ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
 		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
+                ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 2);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             // ELSE EXFAT THEN
             // ELSE ... THEN
