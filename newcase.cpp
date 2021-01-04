@@ -775,6 +775,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
     uint32_t singleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 88, 4));
     uint32_t doubleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 92, 4));
     uint32_t tripleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 96, 4));
+    // NEED TO PARSE THESE BLOCKS TO ADD TO THE BLOCKLIST's TOTAL
     if(singleindirect > 0)
     {
         qDebug() << "obtain and parse to add to my blocklist...";
@@ -801,19 +802,46 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         efile.close();
     }
     int curoffset = 24;
-    while(curoffset < direntrybuf.count())
+    //qDebug() << "incompatflags:" << fsinfo->value("incompatflags").toUInt();
+    //fsinfo.insert("incompatflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1120, 4))));
+    while(curoffset < direntrybuf.count() - 8)
     {
-        qDebug() << "curoffset:" << curoffset;
-        qDebug() << "inode value:" << qFromLittleEndian<uint32_t>(direntrybuf.mid(curoffset, 4));
-        qDebug() << "entry length:" << qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2));
-        qDebug() << "name length:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
-        qDebug() << "file type:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 7));
-        qDebug() << "file name:" << QString::fromStdString(direntrybuf.mid(curoffset + 8, qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))).toStdString());
-        int lengthdiv = (6 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) / 4;
-        int remdiv = (6 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) % 4;
+        fileinfo.insert("inode", QVariant(qFromLittleEndian<uint32_t>(direntrybuf.mid(curoffset, 4))));
+        if(fileinfo.value("inode").toUInt() > 0)
+        {
+            int namelength = 0;
+            int filetype = 0;
+            int entrylength = qFromLittleEndian<uint16_t>(direntrybuf.at(curoffset + 4, 2));
+            if(fsinfo->value("incompatflags").toUInt() & 0x0002)
+            {
+                namelength = qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
+                filetype = qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 7));
+            }
+            else
+                namelength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 6, 2));
+            fileinfo.insert("filename", QVariant(QString::fromStdString(direntrybuf.mid(curoffset + 8, namelength).toStdString())));
+            // NEED TO USE THE INODE TO THEN GET THE RELEVANT METADATA...
+            // FILE TYPE GETS US INFO, SO IF IT'S A DIRECTORY, WE CAN PARSE THE DIRECTORY INODE, WITH THIS RECURSIVE FUNCTION...
+            
+            //qDebug() << "curoffset:" << curoffset;
+            //qDebug() << "inode value:" << qFromLittleEndian<uint32_t>(direntrybuf.mid(curoffset, 4));
+            //qDebug() << "entry length:" << qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2));
+            //qDebug() << "name length:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
+            //qDebug() << "file type:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 7));
+            //qDebug() << "file name:" << QString::fromStdString(direntrybuf.mid(curoffset + 8, qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))).toStdString());
+        }
+        int lengthdiv = (8 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) / 4;
+        int remdiv = (8 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) % 4;
         int newlength = lengthdiv * 4 + 4;
-        qDebug() << "length div:" << lengthdiv << "remdiv:" << remdiv;
-        qDebug() << "new length:" << newlength;
+        //qDebug() << "newlength:" << newlength;
+        /*
+        if(newlength == qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2)))
+            qDebug() << "not deleted";
+        else
+            qDebug() << "deleted...";
+        */
+        //qDebug() << "length div:" << lengthdiv << "remdiv:" << remdiv;
+        //qDebug() << "new length:" << newlength;
         curoffset += newlength;
             //fileinfo.insert("restname", QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString()).replace(" ", ""));
         //curoffset += 7 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
