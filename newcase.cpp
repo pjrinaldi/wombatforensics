@@ -800,7 +800,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         }
         efile.close();
     }
-    int curoffset = 0;
+    int curoffset = 24;
     while(curoffset < direntrybuf.count())
     {
         qDebug() << "curoffset:" << curoffset;
@@ -809,8 +809,14 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         qDebug() << "name length:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
         qDebug() << "file type:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 7));
         qDebug() << "file name:" << QString::fromStdString(direntrybuf.mid(curoffset + 8, qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))).toStdString());
+        int lengthdiv = (6 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) / 4;
+        int remdiv = (6 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) % 4;
+        int newlength = lengthdiv * 4 + 4;
+        qDebug() << "length div:" << lengthdiv << "remdiv:" << remdiv;
+        qDebug() << "new length:" << newlength;
+        curoffset += newlength;
             //fileinfo.insert("restname", QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString()).replace(" ", ""));
-        curoffset += 7 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
+        //curoffset += 7 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
     }
     //qDebug() << "direntrybuf count:" << direntrybuf.count();
     //qDebug() << "direntry 1st 64 bytes:" << direntrybuf.left(64).toHex();
