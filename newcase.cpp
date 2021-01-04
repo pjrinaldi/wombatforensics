@@ -806,12 +806,16 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
     //fsinfo.insert("incompatflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1120, 4))));
     while(curoffset < direntrybuf.count() - 8)
     {
+        int entrylength = 0;
+        int lengthdiv = (8 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) / 4;
+        int remdiv = (8 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) % 4;
+        int newlength = lengthdiv * 4 + 4;
         fileinfo.insert("inode", QVariant(qFromLittleEndian<uint32_t>(direntrybuf.mid(curoffset, 4))));
         if(fileinfo.value("inode").toUInt() > 0)
         {
             int namelength = 0;
             int filetype = 0;
-            int entrylength = qFromLittleEndian<uint16_t>(direntrybuf.at(curoffset + 4, 2));
+            entrylength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2));
             if(fsinfo->value("incompatflags").toUInt() & 0x0002)
             {
                 namelength = qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
@@ -820,6 +824,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             else
                 namelength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 6, 2));
             fileinfo.insert("filename", QVariant(QString::fromStdString(direntrybuf.mid(curoffset + 8, namelength).toStdString())));
+            //qDebug() << "filetype:" << filetype;
             // NEED TO USE THE INODE TO THEN GET THE RELEVANT METADATA...
             // FILE TYPE GETS US INFO, SO IF IT'S A DIRECTORY, WE CAN PARSE THE DIRECTORY INODE, WITH THIS RECURSIVE FUNCTION...
             
@@ -829,17 +834,35 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             //qDebug() << "name length:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
             //qDebug() << "file type:" << qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 7));
             //qDebug() << "file name:" << QString::fromStdString(direntrybuf.mid(curoffset + 8, qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))).toStdString());
+            if(newlength == entrylength)
+                fileinfo.insert("isdeleted", QVariant(0));
+            else
+            {
+                if(newlength < entrylength && entrylength < 264)
+                    fileinfo.insert("isdeleted", QVariant(1));
+                else
+                    fileinfo.insert("isdeleted", QVariant(0));
+            }
+            if(filetype == 1) // FILE
+            {
+                if(fileinfo.value("isdeleted").toUInt() == 0)
+                    fileinfo.insert("itemtype", QVariant(5));
+                else
+                    fileinfo.insert("itemtype", QVariant(4));
+            }
+            else if(filetype == 2) // DIR
+            {
+                if(fileinfo.value("isdeleted").toUInt() == 0)
+                    fileinfo.insert("itemtype", QVariant(3));
+                else
+                    fileinfo.insert("itemtype", QVariant(2));
+            }
+            QByteArray curinodebuf = inodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
+            //fileinfo.insert("
+            //qDebug() << "curinodebuf access time:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4));
+            //qDebug() << "item type:" << fileinfo.value("itemtype").toUInt();
+            //qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
         }
-        int lengthdiv = (8 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) / 4;
-        int remdiv = (8 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) % 4;
-        int newlength = lengthdiv * 4 + 4;
-        //qDebug() << "newlength:" << newlength;
-        /*
-        if(newlength == qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2)))
-            qDebug() << "not deleted";
-        else
-            qDebug() << "deleted...";
-        */
         //qDebug() << "length div:" << lengthdiv << "remdiv:" << remdiv;
         //qDebug() << "new length:" << newlength;
         curoffset += newlength;
