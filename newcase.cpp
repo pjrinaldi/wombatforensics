@@ -814,7 +814,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         if(fileinfo.value("inode").toUInt() > 0)
         {
             int namelength = 0;
-            int filetype = 0;
+            int filetype = -1;
             entrylength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2));
             if(fsinfo->value("incompatflags").toUInt() & 0x0002)
             {
@@ -843,7 +843,10 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 else
                     fileinfo.insert("isdeleted", QVariant(0));
             }
-            if(filetype == 1) // FILE
+            //itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
+            if(filetype == 0) // unknown type
+                fileinfo.insert("itemtype", QVariant(0));
+            else if(filetype == 1) // FILE
             {
                 if(fileinfo.value("isdeleted").toUInt() == 0)
                     fileinfo.insert("itemtype", QVariant(5));
@@ -857,8 +860,18 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 else
                     fileinfo.insert("itemtype", QVariant(2));
             }
+            else if(filetype == 3) // character device
+                fileinfo.insert("itemtype", QVariant(6));
+            else if(filetype == 4) // block device
+                fileinfo.insert("itemtype", QVariant(7));
+            else if(filetype == 5) // FIFO
+                fileinfo.insert("itemtype", QVariant(8));
+            else if(filetype == 6) // Unix socket
+                fileinfo.insert("itemtype", QVariant(9));
+            else if(filetype == 7) // Symbolic Link
+                fileinfo.insert("itemtype", QVariant(12));
+            // DETERMINE WHICH BLOCK GROUP # THE CURINODE IS IN SO I CAN READ IT'S INODE'S CONTENTS AND GET THE NECCESARY METADATA
             QByteArray curinodebuf = inodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
-            //fileinfo.insert("
             //qDebug() << "curinodebuf access time:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4));
             //qDebug() << "item type:" << fileinfo.value("itemtype").toUInt();
             //qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
