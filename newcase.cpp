@@ -871,8 +871,25 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             else if(filetype == 7) // Symbolic Link
                 fileinfo.insert("itemtype", QVariant(12));
             // DETERMINE WHICH BLOCK GROUP # THE CURINODE IS IN SO I CAN READ IT'S INODE'S CONTENTS AND GET THE NECCESARY METADATA
-            QByteArray curinodebuf = inodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
-            //qDebug() << "curinodebuf access time:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4));
+	    qulonglong curinodetablestartblock =  0;
+	    QByteArray curinodetablebuf;
+	    curinodetablebuf.clear();
+	    for(int i=1; i <= blockgroups.count(); i++)
+	    {
+		if(fileinfo.value("inode").toUInt() < i*fsinfo->value("blockgroupinodecnt").toUInt())
+		    curinodetablestartblock = blockgroups.at(i-1).toULongLong();
+	    }
+	    if(!efile.isOpen())
+		efile.open(QIODevice::ReadOnly);
+	    if(efile.isOpen())
+	    {
+		efile.seek(fsinfo->value("partoffset").toUInt() + (curinodetablestartblock * fsinfo->value("blocksize").toUInt()));
+		curinodetablebuf = efile.read(128 * fsinfo->value("blockgroupinodecnt").toUInt());
+		efile.close();
+	    }
+	    QByteArray curinodebuf = curinodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
+            //QByteArray curinodebuf = inodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
+            qDebug() << "curinodebuf access time:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4));
             //qDebug() << "item type:" << fileinfo.value("itemtype").toUInt();
             //qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
         }
