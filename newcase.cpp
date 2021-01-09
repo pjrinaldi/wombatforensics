@@ -888,10 +888,45 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 		efile.close();
 	    }
 	    QByteArray curinodebuf = curinodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
+            uint16_t filemode = qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2));
+            QString filemodestr = "---------";
+            if(filemode & 0x8000)
+                qDebug() << "regular file";
+            else if(filemode & 0x4000)
+                qDebug() << "directory";
+            //qDebug() << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2)), 16);
+            fileinfo.insert("accessdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4)));
+            fileinfo.insert("statusdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(12, 4)));
+            fileinfo.insert("modifydate", qFromLittleEndian<uint32_t>(curinodebuf.mid(16, 4)));
+            fileinfo.insert("deletedate", qFromLittleEndian<uint32_t>(curinodebuf.mid(20, 4)));
             //QByteArray curinodebuf = inodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
-            qDebug() << "curinodebuf access time:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4));
+            //qDebug() << "curinodebuf access time:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4));
             //qDebug() << "item type:" << fileinfo.value("itemtype").toUInt();
             //qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
+            // GET BLOCKLIST FOR THE CURINODEBUF
+            QList<uint32_t> curblocklist;
+            curblocklist.clear();
+            for(int i=0; i < 12; i++)
+            {
+                uint32_t curdirectblock = qFromLittleEndian<uint32_t>(curinodebuf.mid(40 + i*4, 4));
+                curblocklist.append(curdirectblock);
+            }
+            qDebug() << "current block list before i get the indirect block pointers.." << curblocklist;
+            uint32_t cursingleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(88, 4));
+            uint32_t curdoubleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(92, 4));
+            uint32_t curtripleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(96, 4));
+            if(cursingleindirect > 0)
+            {
+                qDebug() << "obtain and parse single to add to curblocklist...";
+            }
+            else if(curdoubleindirect > 0)
+            {
+                qDebug() << "obtain and parse double to add to curblocklist...";
+            }
+            else if(curtripleindirect > 0)
+            {
+                qDebug() << "obtain and parse triple to add to curblocklist...";
+            }
         }
         //qDebug() << "length div:" << lengthdiv << "remdiv:" << remdiv;
         //qDebug() << "new length:" << newlength;
