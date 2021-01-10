@@ -874,10 +874,14 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 	    qulonglong curinodetablestartblock =  0;
 	    QByteArray curinodetablebuf;
 	    curinodetablebuf.clear();
+            int blockgroupnumber = 0;
 	    for(int i=1; i <= blockgroups.count(); i++)
 	    {
 		if(fileinfo.value("inode").toUInt() < i*fsinfo->value("blockgroupinodecnt").toUInt())
+                {
 		    curinodetablestartblock = blockgroups.at(i-1).toULongLong();
+                    blockgroupnumber = i - 1;
+                }
 	    }
 	    if(!efile.isOpen())
 		efile.open(QIODevice::ReadOnly);
@@ -887,7 +891,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 		curinodetablebuf = efile.read(128 * fsinfo->value("blockgroupinodecnt").toUInt());
 		efile.close();
 	    }
-	    QByteArray curinodebuf = curinodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
+	    QByteArray curinodebuf = curinodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt())), 128);
             uint16_t filemode = qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2));
             QString filemodestr = "---------";
             if(filemode & 0x8000)
@@ -909,9 +913,10 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             for(int i=0; i < 12; i++)
             {
                 uint32_t curdirectblock = qFromLittleEndian<uint32_t>(curinodebuf.mid(40 + i*4, 4));
-                curblocklist.append(curdirectblock);
+                if(curdirectblock > 0)
+                    curblocklist.append(curdirectblock);
             }
-            qDebug() << "current block list before i get the indirect block pointers.." << curblocklist;
+            qDebug() << fileinfo.value("filename").toString() << "current block list before i get the indirect block pointers.." << curblocklist;
             uint32_t cursingleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(88, 4));
             uint32_t curdoubleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(92, 4));
             uint32_t curtripleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(96, 4));
