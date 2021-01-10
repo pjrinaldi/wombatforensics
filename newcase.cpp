@@ -895,9 +895,22 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             uint16_t filemode = qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2));
             QString filemodestr = "---------";
             if(filemode & 0x8000)
+            {
+                if(fsinfo.value("readonlyflags").toUInt() & 0x0002) // LARGE FILE SUPPORT
+                {
+                }
+                else
+                {
+                    fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
+                }
                 qDebug() << "regular file";
+            }
             else if(filemode & 0x4000)
+            {
+                fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
                 qDebug() << "directory";
+            }
+            // STILL NEED TO DO GROUP ID/USER ID, PHYSICAL SIZE, FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
             //qDebug() << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2)), 16);
             fileinfo.insert("accessdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4)));
             fileinfo.insert("statusdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(12, 4)));
