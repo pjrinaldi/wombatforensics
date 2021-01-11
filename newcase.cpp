@@ -896,7 +896,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             QString filemodestr = "---------";
             if(filemode & 0x8000)
             {
-                if(fsinfo.value("readonlyflags").toUInt() & 0x0002) // LARGE FILE SUPPORT
+                if(fsinfo->value("readonlyflags").toUInt() & 0x0002) // LARGE FILE SUPPORT
                 {
                 }
                 else
