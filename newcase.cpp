@@ -554,6 +554,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         fsinfo.insert("fsblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1028, 4))));
         fsinfo.insert("blockgroup0startblk", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1044, 4))));
         fsinfo.insert("blocksize", QVariant(1024 * pow(2, qFromLittleEndian<uint32_t>(partbuf.mid(1048, 4)))));
+        //qDebug() << "block size:" << fsinfo.value("blocksize").toUInt();
         fsinfo.insert("fragsize", QVariant(1024 * pow(2, qFromLittleEndian<uint32_t>(partbuf.mid(1052, 4)))));
         fsinfo.insert("blockgroupblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1056, 4))));
         fsinfo.insert("blockgroupfragcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1060, 4))));
@@ -575,7 +576,13 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             blockgroupcount = 1;
         QString inodeaddresstable = "";
         for(uint i=0; i < blockgroupcount; i++)
-            inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(partbuf.mid(2048 + i*32 + 8, 4))) + ",";
+        {
+            //qDebug() << "inode address table offset:" << fsinfo.value("blocksize").toUInt() + i*32 + 8;
+            if(fsinfo.value("blocksize").toUInt() == 1024)
+                inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(partbuf.mid(2*fsinfo.value("blocksize").toUInt() + i*32 + 8, 4))) + ",";
+            else
+                inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(partbuf.mid(fsinfo.value("blocksize").toUInt() + i*32 + 8, 4))) + ",";
+        }
         //qDebug() << "inodeaddresstable:" << inodeaddresstable;
         fsinfo.insert("inodeaddresstable", QVariant(inodeaddresstable));
         //qDebug() << "blocks for group descriptor table:" << (32 * (fsinfo.value("fsblockcnt").toUInt() / fsinfo.value("blockgroupblockcnt").toUInt())) / fsinfo.value("blocksize").toUInt();
@@ -727,16 +734,19 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, qulonglong curinode)
 {
     QStringList blockgroups = fsinfo->value("inodeaddresstable").toString().split(",", Qt::SkipEmptyParts);
+    qDebug() << "blockgroups:" << blockgroups;
     qulonglong inodetablestartingblock = 0;
     for(int i=1; i <= blockgroups.count(); i++)
     {
         if(curinode < i*fsinfo->value("blockgroupinodecnt").toUInt())
+        {
             inodetablestartingblock = blockgroups.at(i-1).toULongLong();
-            //qDebug() << "curinode is located in block group inode table at block:" << blockgroups.at(i-1);
+            break;
+        }
     }
-    //qDebug() << "curinode:" << curinode;
+    qDebug() << "curinode:" << curinode;
     //qDebug() << "inodetablestartingblock:" << inodetablestartingblock;
-    //qDebug() << "inode table byteoffset:" << inodetablestartingblock * fsinfo->value("blocksize").toUInt();
+    qDebug() << "inode table byteoffset:" << inodetablestartingblock << inodetablestartingblock * fsinfo->value("blocksize").toUInt();
     //qDebug() << "inode address table:" << fsinfo->value("inodeaddresstable").toString();
     //qDebug() << "inodes per block group:" << fsinfo->value("blockgroupinodecnt").toUInt();
     /*
@@ -758,12 +768,14 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         inodetablebuf = efile.read(128 * fsinfo->value("blockgroupinodecnt").toUInt());
         efile.close();
     }
+    qDebug() << "inodetablebuf entry:" << inodetablebuf.mid(128, 128).toHex();
     // NOW I HAVE THE INODE TABLE FOR THE CURRENT BLOCK GROUP. I CAN GO THE CURINODE's OFFSET and parse it...
     QList<uint32_t> blocklist;
     blocklist.clear();
     for(int i=0; i < 12; i++)
     {
         uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + (40 + i*4), 4));
+        qDebug() << "curdirectblock:" << curdirectblock;
         if(curdirectblock > 0)
             blocklist.append(curdirectblock);
             //qDebug() << "direct block pointer for root inode:" << curdirectblock;
@@ -778,6 +790,19 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
     // NEED TO PARSE THESE BLOCKS TO ADD TO THE BLOCKLIST's TOTAL
     if(singleindirect > 0)
     {
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly);
+        if(efile.isOpen())
+        {
+            efile.seek(fsinfo->value("partoffset").toUInt() + (singleindirect * fsinfo->value("blocksize").toUInt()));
+            QByteArray singlebuf = efile.read(fsinfo->value("blocksize").toUInt());
+            efile.close();
+            //int sblockcount = singlebuf.count() / 4;
+            for(int i=0; i < singlebuf.count() / 4; i++)
+            {
+                qDebug() << "i*4:" << i*4;
+            }
+        }
         qDebug() << "obtain and parse to add to my blocklist...";
     }
     if(doubleindirect > 0)
@@ -824,6 +849,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             else
                 namelength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 6, 2));
             fileinfo.insert("filename", QVariant(QString::fromStdString(direntrybuf.mid(curoffset + 8, namelength).toStdString())));
+            qDebug() << "filename:" << fileinfo.value("filename").toString();
             //qDebug() << "filetype:" << filetype;
             // NEED TO USE THE INODE TO THEN GET THE RELEVANT METADATA...
             // FILE TYPE GETS US INFO, SO IF IT'S A DIRECTORY, WE CAN PARSE THE DIRECTORY INODE, WITH THIS RECURSIVE FUNCTION...
@@ -933,8 +959,24 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             uint32_t cursingleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(88, 4));
             uint32_t curdoubleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(92, 4));
             uint32_t curtripleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(96, 4));
+            qDebug() << "cursingleindirect:" << cursingleindirect;
+            qDebug() << "curdoubleindirect:" << curdoubleindirect;
+            qDebug() << "curtripleindirect:" << curtripleindirect;
             if(cursingleindirect > 0)
             {
+                if(!efile.isOpen())
+                    efile.open(QIODevice::ReadOnly);
+                if(efile.isOpen())
+                {
+                    efile.seek(fsinfo->value("partoffset").toUInt() + (cursingleindirect * fsinfo->value("blocksize").toUInt()));
+                    QByteArray singlebuf = efile.read(fsinfo->value("blocksize").toUInt());
+                    efile.close();
+                    qDebug() << "singlebuf count:" << singlebuf.count();
+                    for(int i=0; i < singlebuf.count() / 4; i++)
+                    {
+                        qDebug() << "i*4:" << i*4;
+                    }
+                }
                 qDebug() << "obtain and parse single to add to curblocklist...";
             }
             else if(curdoubleindirect > 0)
