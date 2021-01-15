@@ -774,7 +774,8 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
     blocklist.clear();
     for(int i=0; i < 12; i++)
     {
-        uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + (40 + i*4), 4));
+	// indirect test image has inode 2 (root dir) in 0,1,2 section (256 + 128) while regular ext2 test image has inode 2 (root dir) in 1,2 (128 + 128) section???
+        uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1+1)*128 + (40 + i*4), 4));
         qDebug() << "curdirectblock:" << curdirectblock;
         if(curdirectblock > 0)
             blocklist.append(curdirectblock);
