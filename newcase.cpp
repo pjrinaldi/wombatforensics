@@ -564,7 +564,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         fsinfo.insert("incompatflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1120, 4))));
         fsinfo.insert("readonlyflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1124, 4))));
         fsinfo.insert("vollabel", QString::fromStdString(partbuf.mid(1144, 16).toStdString()));
-        qDebug() << "INODE SIZE ACCORDING TO SUPERBLOCK:" << fsinfo.value("inodesize").toUInt();
+        //qDebug() << "INODE SIZE ACCORDING TO SUPERBLOCK:" << fsinfo.value("inodesize").toUInt();
         //qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
         if(((fsinfo.value("compatflags").toUInt() & 0x00000200UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0001f7c0UL) != 0) || ((fsinfo.value("readonlyflags").toUInt() & 0x00000378UL) != 0))
             fsinfo.insert("typestr", QVariant("EXT4"));
@@ -766,17 +766,17 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
     if(efile.isOpen())
     {
         efile.seek(fsinfo->value("partoffset").toUInt() + (inodetablestartingblock * fsinfo->value("blocksize").toUInt()));
-        inodetablebuf = efile.read(128 * fsinfo->value("blockgroupinodecnt").toUInt());
+        inodetablebuf = efile.read(fsinfo->value("inodesize").toUInt() * fsinfo->value("blockgroupinodecnt").toUInt());
         efile.close();
     }
-    qDebug() << "inodetablebuf entry:" << inodetablebuf.mid(128, 128).toHex();
+    //qDebug() << "inodetablebuf entry:" << inodetablebuf.mid(128, 128).toHex();
     // NOW I HAVE THE INODE TABLE FOR THE CURRENT BLOCK GROUP. I CAN GO THE CURINODE's OFFSET and parse it...
     QList<uint32_t> blocklist;
     blocklist.clear();
     for(int i=0; i < 12; i++)
     {
 	// indirect test image has inode 2 (root dir) in 0,1,2 section (256 + 128) while regular ext2 test image has inode 2 (root dir) in 1,2 (128 + 128) section???
-        uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1+1)*128 + (40 + i*4), 4));
+        uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*fsinfo->value("inodesize").toUInt() + (40 + i*4), 4));
         qDebug() << "curdirectblock:" << curdirectblock;
         if(curdirectblock > 0)
             blocklist.append(curdirectblock);
@@ -786,9 +786,9 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         //qDebug() << "direct block pointer for root inode...
     }
     qDebug() << "current block list before i get the indirect block pointers.." << blocklist;
-    uint32_t singleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 88, 4));
-    uint32_t doubleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 92, 4));
-    uint32_t tripleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*128 + 96, 4));
+    uint32_t singleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*fsinfo->value("inodesize").toUInt() + 88, 4));
+    uint32_t doubleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*fsinfo->value("inodesize").toUInt() + 92, 4));
+    uint32_t tripleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*fsinfo->value("inodesize").toUInt() + 96, 4));
     // NEED TO PARSE THESE BLOCKS TO ADD TO THE BLOCKLIST's TOTAL
     if(singleindirect > 0)
     {
@@ -909,6 +909,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 {
 		    curinodetablestartblock = blockgroups.at(i-1).toULongLong();
                     blockgroupnumber = i - 1;
+                    break;
                 }
 	    }
 	    if(!efile.isOpen())
@@ -916,10 +917,11 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 	    if(efile.isOpen())
 	    {
 		efile.seek(fsinfo->value("partoffset").toUInt() + (curinodetablestartblock * fsinfo->value("blocksize").toUInt()));
-		curinodetablebuf = efile.read(128 * fsinfo->value("blockgroupinodecnt").toUInt());
+		curinodetablebuf = efile.read(fsinfo->value("inodesize").toUInt() * fsinfo->value("blockgroupinodecnt").toUInt());
 		efile.close();
 	    }
-	    QByteArray curinodebuf = curinodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt())), 128);
+            qDebug() << "curinodetablebuf inode entry number:" << fsinfo->value("inodesize").toUInt() * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt()));
+	    QByteArray curinodebuf = curinodetablebuf.mid(fsinfo->value("inodesize").toUInt() * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt())), fsinfo->value("inodesize").toUInt());
             uint16_t filemode = qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2));
             QString filemodestr = "---------";
             if(filemode & 0x8000)
