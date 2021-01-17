@@ -1086,7 +1086,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 }
                 //qDebug() << "obtain and parse triple to add to curblocklist...";
             }
-            qDebug() << fileinfo.value("filename").toString() << "last direct block:" << curblocklist.last();
+            //qDebug() << fileinfo.value("filename").toString() << "last direct block:" << curblocklist.last();
             //qDebug() << fileinfo.value("filename").toString() << "current block list after i get the indirect block pointers.." << curblocklist;
         }
         //qDebug() << "length div:" << lengthdiv << "remdiv:" << remdiv;
