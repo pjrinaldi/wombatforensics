@@ -909,6 +909,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         efile.close();
     }
     int curoffset = 24; // SKIP THE . AND .. ENTRIES WHICH ARE ALWAYS THE 1ST TWO ENTRIES AND ARE 12 BYTES LONG EACH
+    bool nextisdeleted = false;
     while(curoffset < direntrybuf.count() - 8)
     {
         int entrylength = 0;
@@ -942,7 +943,16 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             qDebug() << "filename:" << fileinfo.value("filename").toString();
             // NEED TO USE THE INODE TO THEN GET THE RELEVANT METADATA...
             // FILE TYPE GETS US INFO, SO IF IT'S A DIRECTORY, WE CAN PARSE THE DIRECTORY INODE, WITH THIS RECURSIVE FUNCTION...
+            if(nextisdeleted)
+                fileinfo.insert("isdeleted", QVariant(1));
+            else
+                fileinfo.insert("isdeleted", QVariant(0));
             qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
+            if(newlength < entrylength && entrylength < 264)
+                nextisdeleted = true;
+            else
+                nextisdeleted = false;
+            /*
             if(newlength == entrylength)
                 fileinfo.insert("isdeleted", QVariant(0));
             else
@@ -952,6 +962,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 else
                     fileinfo.insert("isdeleted", QVariant(0));
             }
+            */
             //itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
             if(filetype == 0) // unknown type
                 fileinfo.insert("itemtype", QVariant(0));
