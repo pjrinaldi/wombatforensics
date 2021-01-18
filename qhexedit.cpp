@@ -942,7 +942,7 @@ void QHexEdit::paintEvent(QPaintEvent *event)
                 {
                     for(int i=0; i < offlist.count(); i++)
                     {
-                        if(posBa >= offlist.at(i) && posBa < (offlist.at(i) + sizlist.at(i)))
+                        if(posBa >= offlist.at(i) && posBa < (offlist.at(i) + sizlist.at(i))) // this is also where the error is for split files.
                         {
                             c = contentbrush.color(); // BLUE
                             if(i == (offlist.count() - 1))

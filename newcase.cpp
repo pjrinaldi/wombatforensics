@@ -732,7 +732,6 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
 
-//void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, qulonglong curinode)
 void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode)
 {
     // DETERMINE WHICH BLOCK GROUP THE CUR INODE IS A PART OF.
@@ -947,7 +946,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 fileinfo.insert("isdeleted", QVariant(1));
             else
                 fileinfo.insert("isdeleted", QVariant(0));
-            qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
+            //qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
             if(newlength < entrylength && entrylength < 264)
                 nextisdeleted = true;
             else
@@ -1016,32 +1015,63 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 	    QByteArray curinodebuf = curinodetablebuf.mid(fsinfo->value("inodesize").toUInt() * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt())), fsinfo->value("inodesize").toUInt());
             uint16_t filemode = qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2));
             QString filemodestr = "---------";
-            if(filemode & 0x8000)
+            if(filemode & 0xc000) // unix socket
+                filemodestr.replace(0, 1, "s");
+            if(filemode & 0xa000) // symbolic link
+                filemodestr.replace(0, 1, "l");
+            if(filemode & 0x6000) // block device
+                filemodestr.replace(0, 1, "b");
+            if(filemode & 0x2000) // char device
+                filemodestr.replace(0, 1, "c");
+            if(filemode & 0x1000) // FIFO (pipe)
+                filemodestr.replace(0, 1, "p");
+            if(filemode & 0x8000) // regular file
             {
                 if(fsinfo->value("readonlyflags").toUInt() & 0x0002) // LARGE FILE SUPPORT
                 {
+                    qDebug() << "need to figure out how to get logical size from large file support.";
                 }
                 else
                 {
                     fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
                 }
-                qDebug() << "regular file";
+                filemodestr.replace(0, 1, "-");
+                //qDebug() << "regular file";
             }
-            else if(filemode & 0x4000)
+            else if(filemode & 0x4000) // directory
             {
                 fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
-                qDebug() << "directory";
+                filemodestr.replace(0, 1, "d");
+                //qDebug() << "directory";
             }
-            // STILL NEED TO DO GROUP ID/USER ID, PHYSICAL SIZE, FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
-            //qDebug() << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2)), 16);
+            if(filemode & 0x100) // user read
+                filemodestr.replace(1, 1, "r");
+            if(filemode & 0x080) // user write
+                filemodestr.replace(2, 1, "w");
+            if(filemode & 0x040) // user execute
+                filemodestr.replace(3, 1, "x");
+            if(filemode & 0x020) // group read
+                filemodestr.replace(4, 1, "r");
+            if(filemode & 0x010) // group write
+                filemodestr.replace(5, 1, "w");
+            if(filemode & 0x008) // group execute
+                filemodestr.replace(6, 1, "x");
+            if(filemode & 0x004) // other read
+                filemodestr.replace(7, 1, "r");
+            if(filemode & 0x002) // other write
+                filemodestr.replace(8, 1, "w");
+            if(filemode & 0x001) // other execute
+                filemodestr.replace(9, 1, "x");
+            //qDebug() << "filemodestr:" << filemodestr;
+
+
+            // STILL NEED TO DO GROUP ID/USER ID, FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
+
+
             fileinfo.insert("accessdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4)));
             fileinfo.insert("statusdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(12, 4)));
             fileinfo.insert("modifydate", qFromLittleEndian<uint32_t>(curinodebuf.mid(16, 4)));
             fileinfo.insert("deletedate", qFromLittleEndian<uint32_t>(curinodebuf.mid(20, 4)));
-            //QByteArray curinodebuf = inodetablebuf.mid(128 * (fileinfo.value("inode").toUInt() - 1), 128);
-            //qDebug() << "curinodebuf access time:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4));
-            //qDebug() << "item type:" << fileinfo.value("itemtype").toUInt();
-            //qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
             // GET BLOCKLIST FOR THE CURINODEBUF
             QList<uint32_t> curblocklist;
             curblocklist.clear();
@@ -1055,9 +1085,6 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             uint32_t cursingleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(88, 4));
             uint32_t curdoubleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(92, 4));
             uint32_t curtripleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(96, 4));
-            //qDebug() << "cursingleindirect:" << cursingleindirect;
-            //qDebug() << "curdoubleindirect:" << curdoubleindirect;
-            //qDebug() << "curtripleindirect:" << curtripleindirect;
             if(cursingleindirect > 0)
             {
                 if(!efile.isOpen())
@@ -1167,26 +1194,24 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 }
             }
             fileinfo.insert("physicalsize", QVariant(curblocklist.count() * fsinfo->value("blocksize").toUInt()));
-            qDebug() << "logical/physical size:" << fileinfo.value("logicalsize").toUInt() << fileinfo.value("physicalsize").toUInt();
+            //qDebug() << "logical/physical size:" << fileinfo.value("logicalsize").toUInt() << fileinfo.value("physicalsize").toUInt();
             QString layout = "";
             for(int i=0; i < curblocklist.count(); i++)
-                layout += QString::number(curblocklist.at(i)) + "," + QString::number(fsinfo->value("blocksize").toUInt()) + ";";
+                layout += QString::number(curblocklist.at(i) * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()) + ";";
             fileinfo.insert("layout", QVariant(layout));
             //qDebug() << "layout:" << layout;
 
             fileinfolist->append(fileinfo);
+            if(filemode & 0x4000) // directory so recurse it's value...
+            {
+                ParseExtDirectory(estring, fsinfo, fileinfolist, orphanlist, fileinfo, fileinfo.value("inode").toULongLong()); // initial attempt to recurse...
+                //ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode)
+                //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2);
+            }
 
-            //qDebug() << fileinfo.value("filename").toString() << "last direct block:" << curblocklist.last();
-            //qDebug() << fileinfo.value("filename").toString() << "current block list after i get the indirect block pointers.." << curblocklist;
         }
-        //qDebug() << "length div:" << lengthdiv << "remdiv:" << remdiv;
-        //qDebug() << "new length:" << newlength;
         curoffset += newlength;
-            //fileinfo.insert("restname", QString::fromStdString(rootdirbuf.mid(i*32 + 1, 7).toStdString()).replace(" ", ""));
-        //curoffset += 7 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
     }
-    //qDebug() << "direntrybuf count:" << direntrybuf.count();
-    //qDebug() << "direntry 1st 64 bytes:" << direntrybuf.left(64).toHex();
 }
 
 void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
@@ -2299,7 +2324,6 @@ void ProcessVolume(QString evidstring)
 		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
                 ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2);
-                //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 2);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 
             PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
@@ -2388,7 +2412,6 @@ void ProcessVolume(QString evidstring)
 		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
                 ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2);
-                //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 2);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             // ELSE EXFAT THEN
             // ELSE ... THEN
