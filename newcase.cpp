@@ -933,11 +933,15 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             entrylength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2));
             if(fsinfo->value("incompatflags").toUInt() & 0x0002)
             {
+                qDebug() << "name length where only byte offset 6 is used..";
                 namelength = qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
                 filetype = qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 7));
             }
             else
+            {
+                qDebug() << "name length where byte offset 6 and and 7 are used...";
                 namelength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 6, 2));
+            }
             fileinfo.insert("filename", QVariant(QString::fromStdString(direntrybuf.mid(curoffset + 8, namelength).toStdString())));
             qDebug() << "filename:" << fileinfo.value("filename").toString();
             // NEED TO USE THE INODE TO THEN GET THE RELEVANT METADATA...
@@ -946,7 +950,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 fileinfo.insert("isdeleted", QVariant(1));
             else
                 fileinfo.insert("isdeleted", QVariant(0));
-            //qDebug() << "newlength:" << newlength << "entrylength:" << entrylength;
+            qDebug() << "newlength:" << newlength << "entrylength:" << entrylength << "namelength:" << namelength;
             if(newlength < entrylength && entrylength < 264)
                 nextisdeleted = true;
             else
@@ -1204,7 +1208,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             fileinfolist->append(fileinfo);
             if(filemode & 0x4000) // directory so recurse it's value...
             {
-                ParseExtDirectory(estring, fsinfo, fileinfolist, orphanlist, fileinfo, fileinfo.value("inode").toULongLong()); // initial attempt to recurse...
+                ParseExtDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, fileinfo.value("inode").toULongLong()); // initial attempt to recurse...
                 //ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode)
                 //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2);
             }
