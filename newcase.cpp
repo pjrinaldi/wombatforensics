@@ -961,7 +961,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             newlength = lengthdiv * 4;
         else
             newlength = lengthdiv * 4 + 4;
-        // maybe need to make this value "extinode" and the "inode" the standard increment as teh other fiel systems...
+        // need to make this value "extinode" and the "inode" the standard increment as the other file systems...
         // then i can move the extinode to the properties such as deleted time, etc...
         fileinfo.insert("inode", QVariant(inodecnt));
         fileinfo.insert("extinode", QVariant(qFromLittleEndian<uint32_t>(direntrybuf.mid(curoffset, 4))));
@@ -1120,9 +1120,11 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             if(filemode & 0x001) // other execute
                 filemodestr.replace(9, 1, "x");
             //qDebug() << "filemodestr:" << filemodestr;
-
+            fileinfo.insert("attribute", QVariant(filemodestr));
 
             // STILL NEED TO DO GROUP ID/USER ID, FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
+            qDebug() << "lower 16 of groupid:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(24, 2));
+            qDebug() << "upper 16 of groupid:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(122, 2));
 
 
             fileinfo.insert("accessdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4)));
@@ -1262,12 +1264,10 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             inodecnt++;
             if(filemode & 0x4000) // directory so recurse it's value...
             {
-                qDebug() << "inodecnt before sub dir expansion:" << inodecnt;
+                //qDebug() << "inodecnt before sub dir expansion:" << inodecnt;
                 ParseExtDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, fileinfo.value("extinode").toULongLong(), inodecnt); // initial attempt to recurse...
                 inodecnt = fileinfolist->count();
-                qDebug() << "fileinfolist count after sub dir expansion:" << fileinfolist->count();
-                //ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode)
-                //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2);
+                //qDebug() << "fileinfolist count after sub dir expansion:" << fileinfolist->count();
             }
 
         }
@@ -2738,7 +2738,8 @@ void WriteFileProperties(QHash<QString, QVariant>*fileinfo, QString pathstring)
     {
         QTextStream out;
         out.setDevice(&filepropfile);
-        // might need an if(fileinfo->value("type").toUInt() == 1) // FAT12
+        // need to do an if(fileinfo->value("type").toUInt() == 1) // FAT12
+        // for the various custom properties i need for each filesystem.
         out << "Alias Name|" << fileinfo->value("aliasname").toString() << "|8.3 file name" << Qt::endl;
         out << "File Attributes|" << fileinfo->value("attribute").toString() << "|File attributes." << Qt::endl;
         out << "Cluster List|" << fileinfo->value("clusterlist").toString() << "|Clusters occupied by the file." << Qt::endl;
