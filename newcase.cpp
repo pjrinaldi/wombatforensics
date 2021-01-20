@@ -739,7 +739,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
 
-void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode)
+//void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode)
+void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode, qulonglong curicnt)
 {
     //qDebug() << "current inode:" << curinode;
     // DETERMINE WHICH BLOCK GROUP THE CUR INODE IS A PART OF.
@@ -747,6 +748,15 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
     QStringList blockgroups = fsinfo->value("inodeaddresstable").toString().split(",", Qt::SkipEmptyParts);
     qulonglong inodetablestartingblock = 0;
     int bgnumber = 0;
+    qulonglong inodecnt = curicnt;
+    /*
+    uint inodecnt;
+    if(parfileinfo == NULL)
+        inodecnt = 0;
+    else
+        inodecnt = fileinfolist->count();
+        //inodecnt = parfileinfo->value("inode").toUInt() + 1;
+    */
     for(int i=1; i <= blockgroups.count(); i++)
     {
         if(curinode < i*fsinfo->value("blockgroupinodecnt").toUInt())
@@ -953,8 +963,9 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             newlength = lengthdiv * 4 + 4;
         // maybe need to make this value "extinode" and the "inode" the standard increment as teh other fiel systems...
         // then i can move the extinode to the properties such as deleted time, etc...
-        fileinfo.insert("inode", QVariant(qFromLittleEndian<uint32_t>(direntrybuf.mid(curoffset, 4))));
-        if(fileinfo.value("inode").toUInt() > 0)
+        fileinfo.insert("inode", QVariant(inodecnt));
+        fileinfo.insert("extinode", QVariant(qFromLittleEndian<uint32_t>(direntrybuf.mid(curoffset, 4))));
+        if(fileinfo.value("extinode").toUInt() > 0)
         {
             if(parfileinfo == NULL)
             {
@@ -1040,7 +1051,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             int blockgroupnumber = 0;
 	    for(int i=1; i <= blockgroups.count(); i++)
 	    {
-		if(fileinfo.value("inode").toUInt() < i*fsinfo->value("blockgroupinodecnt").toUInt())
+		if(fileinfo.value("extinode").toUInt() < i*fsinfo->value("blockgroupinodecnt").toUInt())
                 {
 		    curinodetablestartblock = blockgroups.at(i-1).toULongLong();
                     blockgroupnumber = i - 1;
@@ -1057,7 +1068,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 		efile.close();
 	    }
             //qDebug() << "curinodetablebuf inode entry number:" << fsinfo->value("inodesize").toUInt() * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt()));
-	    QByteArray curinodebuf = curinodetablebuf.mid(fsinfo->value("inodesize").toUInt() * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt())), fsinfo->value("inodesize").toUInt());
+	    QByteArray curinodebuf = curinodetablebuf.mid(fsinfo->value("inodesize").toUInt() * (fileinfo.value("extinode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt())), fsinfo->value("inodesize").toUInt());
             uint16_t filemode = qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2));
             QString filemodestr = "---------";
             if(filemode & 0xc000) // unix socket
@@ -1248,9 +1259,12 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             //qDebug() << fileinfo.value("filename").toString() << "layout:" << layout;
 
             fileinfolist->append(fileinfo);
+            inodecnt++;
             if(filemode & 0x4000) // directory so recurse it's value...
             {
-                ParseExtDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, fileinfo.value("inode").toULongLong()); // initial attempt to recurse...
+                qDebug() << "inodecnt before sub dir expansion:" << inodecnt;
+                ParseExtDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, fileinfo.value("extinode").toULongLong(), inodecnt); // initial attempt to recurse...
+                qDebug() << "fileinfolist count after sub dir expansion:" << fileinfolist->count();
                 //ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode)
                 //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2);
             }
@@ -2369,7 +2383,7 @@ void ProcessVolume(QString evidstring)
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
 		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
-                ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2);
+                ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 
             PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
@@ -2457,7 +2471,7 @@ void ProcessVolume(QString evidstring)
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
 		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
-                ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2);
+                ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             // ELSE EXFAT THEN
             // ELSE ... THEN
