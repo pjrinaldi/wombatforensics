@@ -1028,7 +1028,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                     break;
                 }
 	    }
-            qDebug() << "block group number:" << curinodetablestartblock;
+            //qDebug() << "block group number:" << curinodetablestartblock;
 	    if(!efile.isOpen())
 		efile.open(QIODevice::ReadOnly);
 	    if(efile.isOpen())
@@ -1226,7 +1226,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             for(int i=0; i < curblocklist.count(); i++)
                 layout += QString::number(curblocklist.at(i) * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()) + ";";
             fileinfo.insert("layout", QVariant(layout));
-            //qDebug() << "layout:" << layout;
+            //qDebug() << fileinfo.value("filename").toString() << "layout:" << layout;
 
             fileinfolist->append(fileinfo);
             if(filemode & 0x4000) // directory so recurse it's value...
