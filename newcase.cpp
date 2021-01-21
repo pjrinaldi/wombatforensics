@@ -810,6 +810,8 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             efile.close();
         }
         // NOW I HAVE THE INODE TABLE FOR THE CURRENT BLOCK GROUP. I CAN GO THE CURINODE's OFFSET and parse it's inode table entry to get the content for the directory entry...
+        QStringList blkstrlist;
+        blkstrlist.clear();
         QList<uint32_t> blocklist;
         blocklist.clear();
         qulonglong relcurinode = curinode - 1 - (bgnumber * fsinfo->value("blockgroupinodecnt").toUInt());
@@ -818,7 +820,10 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid( fsinfo->value("inodesize").toUInt() * relcurinode + (40 + i*4), 4));
             //uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid((curinode-1)*fsinfo->value("inodesize").toUInt() + (40 + i*4), 4));
             if(curdirectblock > 0)
+            {
+                blkstrlist.append(QString::number(curdirectblock) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
                 blocklist.append(curdirectblock);
+            }
         }
         //qDebug() << "current block list before i get the indirect block pointers.." << blocklist;
         uint32_t singleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((relcurinode)*fsinfo->value("inodesize").toUInt() + 88, 4));
@@ -838,7 +843,9 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 {
                     uint32_t cursingledirect = qFromLittleEndian<uint32_t>(singlebuf.mid(i*4, 4));
                     if(cursingledirect > 0)
+                    {
                         blocklist.append(cursingledirect);
+                    }
                 }
             }
         }
@@ -873,7 +880,9 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                     {
                         uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(j*4, 4));
                         if(sdirect > 0)
+                        {
                             blocklist.append(sdirect);
+                        }
                     }
                 }
             }
@@ -927,13 +936,16 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                         {
                             uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(k*4, 4));
                             if(sdirect > 0)
+                            {
                                 blocklist.append(sdirect);
+                            }
                         }
                     }
                 }
             }
         }
         //qDebug() << "block list to compare to parfileinfo layout:" << blocklist;
+        //qDebug() << "blkstr list:" << blkstrlist;
         // GET THE DIRECTORY ENTRY CONTENT FOR THE CURRENT INODE
         direntrybuf.clear();
         if(!efile.isOpen())
@@ -1085,8 +1097,11 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             {
                 if(fsinfo->value("readonlyflags").toUInt() & 0x0002) // LARGE FILE SUPPORT
                 {
+                    uint32_t lowersize = qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4));
+                    uint32_t uppersize = qFromLittleEndian<uint32_t>(curinodebuf.mid(108, 4));
                     //qDebug() << "need to figure out how to get logical size from large file support.";
-                    fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
+                    fileinfo.insert("logicalsize", QVariant(((uint64_t)uppersize >> 32) + lowersize));
+                    //fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
                 }
                 else
                 {
@@ -1122,9 +1137,13 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             //qDebug() << "filemodestr:" << filemodestr;
             fileinfo.insert("attribute", QVariant(filemodestr));
 
-            // STILL NEED TO DO GROUP ID/USER ID, FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
-            qDebug() << "lower 16 of groupid:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(24, 2));
-            qDebug() << "upper 16 of groupid:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(122, 2));
+            // STILL NEED TO DO FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
+            uint16_t lowergroupid = qFromLittleEndian<uint16_t>(curinodebuf.mid(24, 2));
+            uint16_t uppergroupid = qFromLittleEndian<uint16_t>(curinodebuf.mid(122, 2));
+            fileinfo.insert("groupid", QVariant(((uint32_t)uppergroupid >> 16) + lowergroupid));
+            uint16_t loweruserid = qFromLittleEndian<uint16_t>(curinodebuf.mid(2, 2));
+            uint16_t upperuserid = qFromLittleEndian<uint16_t>(curinodebuf.mid(120, 2));
+            fileinfo.insert("userid", QVariant(((uint32_t)upperuserid >> 16) + loweruserid));
 
 
             fileinfo.insert("accessdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4)));
@@ -1132,13 +1151,17 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             fileinfo.insert("modifydate", qFromLittleEndian<uint32_t>(curinodebuf.mid(16, 4)));
             fileinfo.insert("deletedate", qFromLittleEndian<uint32_t>(curinodebuf.mid(20, 4)));
             // GET BLOCKLIST FOR THE CURINODEBUF
+            QStringList curblkstrlist;
+            curblkstrlist.clear();
             QList<uint32_t> curblocklist;
             curblocklist.clear();
             for(int i=0; i < 12; i++)
             {
                 uint32_t curdirectblock = qFromLittleEndian<uint32_t>(curinodebuf.mid(40 + i*4, 4));
                 if(curdirectblock > 0)
+                {
                     curblocklist.append(curdirectblock);
+                }
             }
             //qDebug() << fileinfo.value("filename").toString() << "current block list before i get the indirect block pointers.." << curblocklist;
             uint32_t cursingleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(88, 4));
@@ -1157,7 +1180,9 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                     {
                         uint32_t cursingledirect = qFromLittleEndian<uint32_t>(singlebuf.mid(i*4, 4));
                         if(cursingledirect > 0)
+                        {
                             curblocklist.append(cursingledirect);
+                        }
                     }
                 }
             }
@@ -1192,7 +1217,9 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                         {
                             uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(j*4, 4));
                             if(sdirect > 0)
+                            {
                                 curblocklist.append(sdirect);
+                            }
                         }
                     }
                 }
@@ -1246,12 +1273,16 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                             {
                                 uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(k*4, 4));
                                 if(sdirect > 0)
+                                {
                                     curblocklist.append(sdirect);
+                                }
                             }
                         }
                     }
                 }
             }
+            // qDebug() << curblkstr:" << curblkstrlist;
+            // qDebug() << "curblock list:" << curblocklist;
             fileinfo.insert("physicalsize", QVariant(curblocklist.count() * fsinfo->value("blocksize").toUInt()));
             //qDebug() << "logical/physical size:" << fileinfo.value("logicalsize").toUInt() << fileinfo.value("physicalsize").toUInt();
             QString layout = "";
