@@ -569,6 +569,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         fsinfo.insert("vollabel", QString::fromStdString(partbuf.mid(1144, 16).toStdString()));
         //qDebug() << "INODE SIZE ACCORDING TO SUPERBLOCK:" << fsinfo.value("inodesize").toUInt();
         //qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
+        if(fsinfo.value("incompatflags").toUInt() & 0x40)
+            qDebug() << "fs uses extents.";
         if(((fsinfo.value("compatflags").toUInt() & 0x00000200UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0001f7c0UL) != 0) || ((fsinfo.value("readonlyflags").toUInt() & 0x00000378UL) != 0))
             fsinfo.insert("typestr", QVariant("EXT4"));
         else if(((fsinfo.value("compatflags").toUInt() & 0x00000004UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0000000cUL) != 0))
@@ -1100,7 +1102,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                     uint32_t lowersize = qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4));
                     uint32_t uppersize = qFromLittleEndian<uint32_t>(curinodebuf.mid(108, 4));
                     //qDebug() << "need to figure out how to get logical size from large file support.";
-                    fileinfo.insert("logicalsize", QVariant(((uint64_t)uppersize >> 32) + lowersize));
+                    fileinfo.insert("logicalsize", QVariant(((qulonglong)uppersize >> 32) + lowersize));
                     //fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
                 }
                 else
