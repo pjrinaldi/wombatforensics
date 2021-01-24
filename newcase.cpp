@@ -817,6 +817,11 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         QList<uint32_t> blocklist;
         blocklist.clear();
         qulonglong relcurinode = curinode - 1 - (bgnumber * fsinfo->value("blockgroupinodecnt").toUInt());
+        uint32_t inodeflags = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 32, 4));
+        if(inodeflags & 0x80000)
+            qDebug() << "inode uses extents.";
+        else
+            qDebug() << "inode doesn't use extents.";
         for(int i=0; i < 12; i++)
         {
             uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid( fsinfo->value("inodesize").toUInt() * relcurinode + (40 + i*4), 4));
