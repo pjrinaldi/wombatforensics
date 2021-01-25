@@ -569,8 +569,10 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         fsinfo.insert("vollabel", QString::fromStdString(partbuf.mid(1144, 16).toStdString()));
         //qDebug() << "INODE SIZE ACCORDING TO SUPERBLOCK:" << fsinfo.value("inodesize").toUInt();
         //qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
+	/*
         if(fsinfo.value("incompatflags").toUInt() & 0x40)
             qDebug() << "fs uses extents.";
+	*/
         if(((fsinfo.value("compatflags").toUInt() & 0x00000200UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0001f7c0UL) != 0) || ((fsinfo.value("readonlyflags").toUInt() & 0x00000378UL) != 0))
             fsinfo.insert("typestr", QVariant("EXT4"));
         else if(((fsinfo.value("compatflags").toUInt() & 0x00000004UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0000000cUL) != 0))
@@ -818,10 +820,22 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         blocklist.clear();
         qulonglong relcurinode = curinode - 1 - (bgnumber * fsinfo->value("blockgroupinodecnt").toUInt());
         uint32_t inodeflags = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 32, 4));
+	if((fsinfo->value("incompatflags").toUInt() & 0x40) && (inodeflags & 0x80000))
+	{
+	    qDebug() << "extent header:" << QString::number(qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 40, 2)), 16);
+	    qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 42, 2));
+	    qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() & relcurinode + 46, 2));
+	    // if(extentdepth == 0) then use ext4_extent
+	    // else use ext4_extent_idx
+	}
+	/*
+        if(fsinfo.value("incompatflags").toUInt() & 0x40)
+            qDebug() << "fs uses extents.";
         if(inodeflags & 0x80000)
             qDebug() << "inode uses extents.";
         else
             qDebug() << "inode doesn't use extents.";
+	*/
         for(int i=0; i < 12; i++)
         {
             uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid( fsinfo->value("inodesize").toUInt() * relcurinode + (40 + i*4), 4));
