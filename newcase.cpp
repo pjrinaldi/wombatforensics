@@ -1234,7 +1234,58 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
                 }
                 else // use ext4_entent_idx
                 {
-                    qDebug() << "use extent idx";
+                    QList<uint32_t> leafnodes;
+                    leafnodes.clear();
+                    // NEED TO FIGURE OUT HOW TO HANDLE EXTENT DEPTH IN THE LOOP...
+                    for(int i=0; i < extententries; i++)
+                    {
+                        leafnodes.append(qFromLittleEndian<uint32_t>(curinodebuf.mid(56 + i*12, 4)));
+                        qDebug() << "ei_leaf_lo: leaf node" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56 + i*12, 4));
+                    }
+                    qDebug() << "leafnodes:" << leafnodes;
+                    for(int i=0; i < leafnodes.count(); i++)
+                    {
+                        QByteArray leafnode;
+                        leafnode.clear();
+                        if(!efile.isOpen())
+                            efile.open(QIODevice::ReadOnly);
+                        if(efile.isOpen())
+                        {
+                            efile.seek(fsinfo->value("partoffset").toUInt() + (leafnodes.at(i) * fsinfo->value("blocksize").toUInt()));
+                            leafnode = efile.read(fsinfo->value("blocksize").toUInt());
+                            efile.close();
+                            uint16_t extententries = qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
+                            uint16_t extentdepth = qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
+                            if(extentdepth == 0) // use ext4_extent
+                            {
+                                for(int j=0; j < extententries; j++)
+                                {
+                                    uint16_t blocklength = qFromLittleEndian<uint16_t>(leafnode.mid(16 + j*12, 2));
+                                    uint16_t starthi = qFromLittleEndian<uint16_t>(leafnode.mid(18 + j*12, 2));
+                                    uint32_t startlo = qFromLittleEndian<uint32_t>(leafnode.mid(20 + j*12, 4));
+                                    uint64_t startblock = (((uint64_t)starthi >> 32) + startlo) * fsinfo->value("blocksize").toUInt();
+                                    curblkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength * fsinfo->value("blocksize").toUInt()));
+                                }
+                            }
+                            else // use ext4_extent_idx
+                            {
+                                qDebug() << "repeat leafnode exercise here...";
+                            }
+                            //qDebug() << "leaf header:" << QString::number(qFromLittleEndian<uint16_t>(leafnode.mid(0, 2)), 16);
+                            //qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
+                            //qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(4, 2));
+                            //qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
+                        }
+                    }
+                    //qDebug() << "extent header:" << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(40, 2)), 16);
+                    //qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(42, 2));
+                    //qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(44, 2));
+                    //qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(46, 2));
+                    
+                    //qDebug() << "ei_block:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(52, 4));
+                    //qDebug() << "ei_leaf_lo:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56, 4));
+                    //qDebug() << "ei_leaf_hi:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(60, 2));
+                    //qDebug() << "use extent idx";
                 }
             }
             else
