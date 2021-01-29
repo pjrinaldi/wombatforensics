@@ -1339,6 +1339,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             fileinfo.insert("statusdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(12, 4)));
             fileinfo.insert("modifydate", qFromLittleEndian<uint32_t>(curinodebuf.mid(16, 4)));
             fileinfo.insert("deletedate", qFromLittleEndian<uint32_t>(curinodebuf.mid(20, 4)));
+	    fileinfo.insert("linkcount", qFromLittleEndian<uint16_t>(curinodebuf.mid(26, 2)));
 	    //qDebug() << "fsinfo type:" << fsinfo->value("typestr").toString();
 	    //qDebug() << "create date:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(144, 4));
 	    if(fsinfo->value("typestr").toString().startsWith("EXT4"))
@@ -3114,6 +3115,12 @@ void WriteFileProperties(QHash<QString, QVariant>*fileinfo, QString pathstring)
         out << "Physical Size|" << QString::number(fileinfo->value("physicalsize").toUInt()) << "|Sector Size in Bytes for the file." << Qt::endl;
 	if(fileinfo->contains("deletedate"))
 	    out << "Deleted Time|" << QDateTime::fromSecsSinceEpoch(fileinfo->value("deletedate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Deleted time for the file." << Qt::endl;
+	if(fileinfo->contains("mode"))
+	    out << "Mode|" << fileinfo->value("mode").toString() << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]" << Qt::endl;
+	if(fileinfo->contains("userid"))
+	    out << "uid / gid|" << QString(QString::number(fileinfo->value("userid").toUInt()) + " / " + QString::number(fileinfo->value("groupid").toUInt())) << "|User ID and Group ID" << Qt::endl;
+	if(fileinfo->contains("linkcount"))
+	    out << "Link Count|" << QString::number(fileinfo->value("linkcount").toUInt()) << "|Number of files pointing to this file" << Qt::endl;
         out.flush();
         filepropfile.close();
     }
