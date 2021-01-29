@@ -558,15 +558,117 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
         fsinfo.insert("fragsize", QVariant(1024 * pow(2, qFromLittleEndian<uint32_t>(partbuf.mid(1052, 4)))));
         fsinfo.insert("blockgroupblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1056, 4))));
         fsinfo.insert("blockgroupfragcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1060, 4))));
-        qDebug() << "fs blockcount:" << fsinfo.value("fsblockcnt").toUInt();
-        qDebug() << "block group block count:" << fsinfo.value("blockgroupblockcnt").toUInt();
+        //qDebug() << "fs blockcount:" << fsinfo.value("fsblockcnt").toUInt();
+        //qDebug() << "block group block count:" << fsinfo.value("blockgroupblockcnt").toUInt();
         fsinfo.insert("blockgroupinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1064, 4))));
-        qDebug() << "block group inode count:" << fsinfo.value("blockgroupinodecnt").toUInt();
+	fsinfo.insert("mounttime", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1068, 4))));
+	fsinfo.insert("writetime", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1072, 4))));
+	uint16_t fsstate = qFromLittleEndian<uint16_t>(partbuf.mid(1082, 2));
+	if(fsstate == 0x01)
+	    fsinfo.insert("state", QVariant("Cleanly unmounted"));
+	else
+	    fsinfo.insert("state", QVariant("Errors detected"));
+	fsinfo.insert("lastcheck", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1088, 4))));
+	uint32_t creatoros = qFromLittleEndian<uint32_t>(partbuf.mid(1096, 4));
+	if(creatoros == 0x00)
+	    fsinfo.insert("creator", QVariant("Linux"));
+	else if(creatoros == 0x03)
+	    fsinfo.insert("creator", QVariant("FreeBSD"));
+        //qDebug() << "block group inode count:" << fsinfo.value("blockgroupinodecnt").toUInt();
         fsinfo.insert("inodesize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(1112, 2))));
+	uint32_t compatflags = qFromLittleEndian<uint32_t>(partbuf.mid(1116, 4));
+	uint32_t incompatflags = qFromLittleEndian<uint32_t>(partbuf.mid(1120, 4));
+	uint32_t readonlyflags = qFromLittleEndian<uint32_t>(partbuf.mid(1124, 4));
+	QString compatstr = "";
+	QString incompatstr = "";
+	QString rostr = "";
+	if(compatflags & 0x200)
+	    compatstr += "Sparse Super Block,";
+	if(compatflags & 0x100)
+	    compatstr += "Exclude Bitmap,";
+	if(compatflags & 0x80)
+	    compatstr += "Exclude Inodes,";
+	if(compatflags & 0x40)
+	    compatstr += "Lazy Block Groups,";
+	if(compatflags & 0x20)
+	    compatstr += "Indexed Directories,";
+	if(compatflags & 0x10)
+	    compatstr += "Reserved GDT,";
+	if(compatflags & 0x08)
+	    compatstr += "Extended Attributes,";
+	if(compatflags & 0x04)
+	    compatstr += "Journal,";
+	if(compatflags & 0x02)
+	    compatstr += "Imagic Inodes,";
+	if(compatflags & 0x01)
+	    compatstr += "Directory preallocation";
+	fsinfo.insert("compatstr", QVariant(compatstr));
+	if(incompatflags & 0x10000)
+	    incompatstr += "Encrypted inodes,";
+	if(incompatflags & 0x8000)
+	    incompatstr += "Data in inode,";
+	if(incompatflags & 0x4000)
+	    incompatstr += "Large Directory >2GB or 3-level htree,";
+	if(incompatflags & 0x2000)
+	    incompatstr += "Metadata checksum seed in superblock,";
+	if(incompatflags & 0x1000)
+	    incompatstr += "Data in Directory Entry,";
+	if(incompatflags & 0x400)
+	    incompatstr += "Inodes can store large extended attributes,";
+	if(incompatflags & 0x200)
+	    incompatstr += "Flexible block groups,";
+	if(incompatflags & 0x100)
+	    incompatstr += "Multiple mount protection,";
+	if(incompatflags & 0x80)
+	    incompatstr += "FS size over 2^32 blocks,";
+	if(incompatflags & 0x40)
+	    incompatstr += "Files use Extents,";
+	if(incompatflags & 0x10)
+	    incompatstr += "Meta block groups,";
+	if(incompatflags & 0x08)
+	    incompatstr += "Seperate Journal device,";
+	if(incompatflags & 0x04)
+	    incompatstr += "FS needs journal recovery,";
+	if(incompatflags & 0x02)
+	    incompatstr += "Directory entries record file type,";
+	if(incompatflags & 0x01)
+	    incompatstr += "Compression";
+	fsinfo.insert("incompatstr", QVariant(incompatstr));
+	if(readonlyflags & 0x2000)
+	    rostr += "Tracks project quotas,";
+	if(readonlyflags & 0x1000)
+	    rostr += "Read only FS,";
+	if(readonlyflags & 0x800)
+	    rostr += "Replica support,";
+	if(readonlyflags & 0x400)
+	    rostr += "Metadata Checksumming support,";
+	if(readonlyflags & 0x200)
+	    rostr += "Bigalloc support,";
+	if(readonlyflags & 0x100)
+	    rostr += "Quota is handled transactionally with journal,";
+	if(readonlyflags & 0x80)
+	    rostr += "Snapshot,";
+	if(readonlyflags & 0x40)
+	    rostr += "Large Inodes exist,";
+	if(readonlyflags & 0x20)
+	    rostr += "EXT3 32k subdir limit doesn't exist,";
+	if(readonlyflags & 0x10)
+	    rostr += "Group descriptors have checksums,";
+	if(readonlyflags & 0x08)
+	    rostr += "Space usage stored in i_blocks in units of fs_blocks, not 512-byte sectors,";
+	if(readonlyflags & 0x04)
+	    rostr += "Was intented for use with htree directories,";
+	if(readonlyflags & 0x02)
+	    rostr += "Allow storing files larger than 2GB,";
+	if(readonlyflags & 0x01)
+	    rostr += "Sparse superblocks";
+	fsinfo.insert("readonlystr", QVariant(rostr));
         fsinfo.insert("compatflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1116, 4))));
         fsinfo.insert("incompatflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1120, 4))));
         fsinfo.insert("readonlyflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1124, 4))));
         fsinfo.insert("vollabel", QString::fromStdString(partbuf.mid(1144, 16).toStdString()));
+	fsinfo.insert("lastmountedpath", QString::fromStdString(partbuf.mid(1160, 64).toStdString()));
+	fsinfo.insert("mkfstime", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1288, 4))));
         //qDebug() << "INODE SIZE ACCORDING TO SUPERBLOCK:" << fsinfo.value("inodesize").toUInt();
         //qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
 	/*
@@ -783,6 +885,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 
     QFile efile(estring);
     QByteArray direntrybuf;
+    uint32_t inodeflags = 0;
     // I NEED TO DO THIS TO GET THE BLOCK LIST FOR THE CURRENT INODE SO I CAN GET IT'S CONTENT AND READ TEH DIRECTORY ENTRY, BUT THIS IS A GIVEN
     // ON SUB DIRECTORIES SINCE I WILL HAVE THE INODE'S LAYOUT AND CURBLOCKLIST, SO I CAN SKIP THIS PART WHEN THESE VALUES ARE KNOWN...
     if(parfileinfo != NULL)
@@ -819,9 +922,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         //QList<uint32_t> blocklist;
         //blocklist.clear();
         qulonglong relcurinode = curinode - 1 - (bgnumber * fsinfo->value("blockgroupinodecnt").toUInt());
-        uint32_t inodeflags = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 32, 4));
-        if(inodeflags & 0x1000)
-            qDebug() << "cur directory inode uses hashed btree rather than linear direntry reading";
+        inodeflags = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 32, 4));
 	if((fsinfo->value("incompatflags").toUInt() & 0x40) && (inodeflags & 0x80000)) // FS USES EXTENTS && INODE USES EXTENTS
 	{
             uint16_t extententries = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 42, 2));
@@ -1049,6 +1150,11 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         }
     }
     int curoffset = 24; // SKIP THE . AND .. ENTRIES WHICH ARE ALWAYS THE 1ST TWO ENTRIES AND ARE 12 BYTES LONG EACH
+    if(inodeflags & 0x1000)
+    {
+	curoffset = 40; // THIS SHOULD ACCOUNT FOR HASH TREE DEPTH OF 0, NEED TEST FOR 1 - 3
+        qDebug() << "cur directory inode uses hashed btree rather than linear direntry reading";
+    }
     bool nextisdeleted = false;
     while(curoffset < direntrybuf.count() - 8)
     {
@@ -1220,7 +1326,7 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             if(filemode & 0x001) // other execute
                 filemodestr.replace(9, 1, "x");
             //qDebug() << "filemodestr:" << filemodestr;
-            fileinfo.insert("attribute", QVariant(filemodestr));
+            fileinfo.insert("mode", QVariant(filemodestr));
 
             // STILL NEED TO DO FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
             uint16_t lowergroupid = qFromLittleEndian<uint16_t>(curinodebuf.mid(24, 2));
@@ -1229,8 +1335,6 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             uint16_t loweruserid = qFromLittleEndian<uint16_t>(curinodebuf.mid(2, 2));
             uint16_t upperuserid = qFromLittleEndian<uint16_t>(curinodebuf.mid(120, 2));
             fileinfo.insert("userid", QVariant(((uint32_t)upperuserid >> 16) + loweruserid));
-
-
             fileinfo.insert("accessdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4)));
             fileinfo.insert("statusdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(12, 4)));
             fileinfo.insert("modifydate", qFromLittleEndian<uint32_t>(curinodebuf.mid(16, 4)));
@@ -1245,12 +1349,53 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             //QList<uint32_t> curblocklist;
             //curblocklist.clear();
             
-            uint32_t inodeflags = qFromLittleEndian<uint32_t>(curinodebuf.mid(32, 4));
-            if(inodeflags & 0x1000)
-                qDebug() << "cur file inode uses hashed btree rather than linear direntry reading";
-            else
-                qDebug() << "cur file inode uses liner directory reading.";
-            if((fsinfo->value("incompatflags").toUInt() & 0x40) && (inodeflags & 0x80000)) // FS USES EXTENTS && INODE USES EXTENTS
+            uint32_t curinodeflags = qFromLittleEndian<uint32_t>(curinodebuf.mid(32, 4));
+	    QString attrstr = "";
+	    if(curinodeflags & 0x200000)
+		attrstr += "Stores a Large Extended Attribute,";
+	    if(curinodeflags & 0x80000)
+		attrstr += "Uses Extents,";
+	    if(curinodeflags & 0x40000)
+		attrstr += "Huge File,";
+	    if(curinodeflags & 0x20000)
+		attrstr += "Top of Directory,";
+	    if(curinodeflags & 0x10000)
+		attrstr += "Synchronous Data Write,";
+	    if(curinodeflags & 0x8000)
+		attrstr += "File Tail not Merged,";
+	    if(curinodeflags & 0x4000)
+		attrstr += "File Data Written through Journal,";
+	    if(curinodeflags & 0x2000)
+		attrstr += "AFS Magic Directory,";
+	    if(curinodeflags & 0x1000)
+		attrstr += "Hashed Indexed Directory,";
+	    if(curinodeflags & 0x800)
+		attrstr += "Encrypted,";
+	    if(curinodeflags & 0x400)
+		attrstr += "No Compression,";
+	    if(curinodeflags & 0x200)
+		attrstr += "Has Compression in 1 or more blocks,";
+	    if(curinodeflags & 0x100)
+		attrstr += "Dirty Compression,";
+	    if(curinodeflags & 0x80)
+		attrstr += "No Update ATIME,";
+	    if(curinodeflags & 0x40)
+		attrstr += "dump utility ignores file,";
+	    if(curinodeflags & 0x20)
+		attrstr += "Append Only,";
+	    if(curinodeflags & 0x10)
+		attrstr += "Immutable,";
+	    if(curinodeflags & 0x08)
+		attrstr += "Synchronous Writes,";
+	    if(curinodeflags & 0x04)
+		attrstr += "Compressed,";
+	    if(curinodeflags & 0x02)
+		attrstr += "Preserved for un-deletion,";
+	    if(curinodeflags & 0x01)
+		attrstr += "Requires Secure Deletion";
+	    fileinfo.insert("attribute", QVariant(attrstr));
+
+            if((fsinfo->value("incompatflags").toUInt() & 0x40) && (curinodeflags & 0x80000)) // FS USES EXTENTS && INODE USES EXTENTS
             {
                 uint16_t extententries = qFromLittleEndian<uint16_t>(curinodebuf.mid(42, 2));
                 uint16_t extentdepth = qFromLittleEndian<uint16_t>(curinodebuf.mid(46, 2));
@@ -2958,11 +3103,17 @@ void WriteFileProperties(QHash<QString, QVariant>*fileinfo, QString pathstring)
         out.setDevice(&filepropfile);
         // need to do an if(fileinfo->value("type").toUInt() == 1) // FAT12
         // for the various custom properties i need for each filesystem.
-        out << "Alias Name|" << fileinfo->value("aliasname").toString() << "|8.3 file name" << Qt::endl;
+	if(fileinfo->contains("extinode"))
+	    out << "EXTFS inode|" << fileinfo->value("extinode").toUInt() << "|EXTFS inode value to locate file in the filesystem" << Qt::endl;
+	if(fileinfo->contains("aliasname"))
+	    out << "Alias Name|" << fileinfo->value("aliasname").toString() << "|8.3 file name" << Qt::endl;
         out << "File Attributes|" << fileinfo->value("attribute").toString() << "|File attributes." << Qt::endl;
-        out << "Cluster List|" << fileinfo->value("clusterlist").toString() << "|Clusters occupied by the file." << Qt::endl;
+	if(fileinfo->contains("clusterlist"))
+	    out << "Cluster List|" << fileinfo->value("clusterlist").toString() << "|Clusters occupied by the file." << Qt::endl;
         out << "Layout|" << fileinfo->value("layout").toString() << "|File offset,size; layout." << Qt::endl;
         out << "Physical Size|" << QString::number(fileinfo->value("physicalsize").toUInt()) << "|Sector Size in Bytes for the file." << Qt::endl;
+	if(fileinfo->contains("deletedate"))
+	    out << "Deleted Time|" << QDateTime::fromSecsSinceEpoch(fileinfo->value("deletedate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Deleted time for the file." << Qt::endl;
         out.flush();
         filepropfile.close();
     }
@@ -2997,6 +3148,17 @@ void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstr
             out << "Root Directory Size|" << QString::number(fsinfo->value("rootdirsize").toUInt()) << "|Size in bytes for the root directory" << Qt::endl;
             out << "Cluster Area Start|" << QString::number(fsinfo->value("clusterareastart").toUInt()) << "|Byte offset to the start of the cluster area" << Qt::endl;
         }
+	else if(fsinfo->value("type").toUInt() == 6) // EXT2/3/4
+	{
+	    out << "Created Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("mkfstime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Creation time for the file system" << Qt::endl;
+	    out << "Mount Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("mounttime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Mount time for the file system" << Qt::endl;
+	    out << "Write Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("writetime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Write time for the file system" << Qt::endl;
+	    out << "Last Check Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("lastcheck").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Last check time for the file system" << Qt::endl;
+	    out << "Current State|" << fsinfo->value("state").toString() << "Condition of the file system at last unmount" << Qt::endl;
+	    out << "Compatible Features|" << fsinfo->value("compatstr").toString() << "File System Compatible Feature Set" << Qt::endl;
+	    out << "Incompatible Features|" << fsinfo->value("incompatstr").toString() << "File System Incompatible Feature Set" << Qt::endl;
+	    out << "Read Only Compatible Features|" << fsinfo->value("readonlystr").toString() << "File System Read Only Compatible Feature Set" << Qt::endl;
+	}
         out.flush();
         fspropfile.close();
     }
