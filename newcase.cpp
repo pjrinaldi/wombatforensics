@@ -822,8 +822,6 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
         uint32_t inodeflags = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 32, 4));
         if(inodeflags & 0x1000)
             qDebug() << "cur directory inode uses hashed btree rather than linear direntry reading";
-        else
-            qDebug() << "cur directory inode uses liner directory reading.";
 	if((fsinfo->value("incompatflags").toUInt() & 0x40) && (inodeflags & 0x80000)) // FS USES EXTENTS && INODE USES EXTENTS
 	{
             uint16_t extententries = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 42, 2));
@@ -846,16 +844,12 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             }
             else // use ext4_extent_idx
             {
-		/*
 		QList<uint32_t> leafnodes;
 		leafnodes.clear();
-		// NEED TO FIGURE OUT HOW TO HANDLE EXTENT DEPTH IN THE LOOP...
 		for(int i=0; i < extententries; i++)
 		{
-		    leafnodes.append(qFromLittleEndian<uint32_t>(curinodebuf.mid(56 + i*12, 4)));
-		    //qDebug() << "ei_leaf_lo: leaf node" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56 + i*12, 4));
+		    leafnodes.append(qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 56 + i*12, 4)));
 		}
-		//qDebug() << "leafnodes:" << leafnodes;
 		for(int i=0; i < leafnodes.count(); i++)
 		{
 		    QByteArray leafnode;
@@ -873,11 +867,11 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 			{
 			    for(int j=0; j < extententries; j++)
 			    {
-				uint16_t blocklength = qFromLittleEndian<uint16_t>(leafnode.mid(16 + j*12, 2));
+				uint16_t blocklength = qFromLittleEndian<uint16_t>(leafnode.mid(16 + j*12, 2)) * fsinfo->value("blocksize").toUInt();
 				uint16_t starthi = qFromLittleEndian<uint16_t>(leafnode.mid(18 + j*12, 2));
 				uint32_t startlo = qFromLittleEndian<uint32_t>(leafnode.mid(20 + j*12, 4));
 				uint64_t startblock = (((uint64_t)starthi >> 32) + startlo) * fsinfo->value("blocksize").toUInt();
-				curblkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength * fsinfo->value("blocksize").toUInt()));
+				blkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength));
 			    }
 			}
 			else // use ext4_extent_idx
@@ -899,8 +893,6 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 		//qDebug() << "ei_leaf_lo:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56, 4));
 		//qDebug() << "ei_leaf_hi:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(60, 2));
 		//qDebug() << "use extent idx";
-		*/
-                //qDebug() << "index";
             }
 	}
         else
