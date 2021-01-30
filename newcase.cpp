@@ -315,6 +315,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		int i=0;
 		while(curoffset < mftentrybytes) // might have to do a while < mftentrybytes and then go from there.... to build the curoffset = curoffset + 3, 4, etc...
 		{
+                    // CURRENT ISSUE WITH THE RUN CODE, IT SORT OF WORKS, BUT SEEMS LIKE THE SECOND OFFSET IS OFF BY THE OFFSET OF THE PREVIOUS OFFSET...
 		    if(mftentry0.at(curoffset) > 0)
 		    {
 			qDebug() << "1st byte:" << QString::number(mftentry0.at(curoffset), 16);
