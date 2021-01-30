@@ -261,6 +261,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             //qDebug() << "MFT starting cluster:" << fsinfo.value("mftstartingcluster").toUInt();
             fsinfo.insert("mftentrysize", QVariant(partbuf.at(64)));
 	    unsigned int mftentrybytes = fsinfo.value("mftentrysize").toUInt() * fsinfo.value("bytespersector").toUInt() * fsinfo.value("sectorspercluster").toUInt();
+            fsinfo.insert("mftentrybytes", QVariant(mftentrybytes));
 	    //qDebug() << "mft entry size in bytes:" << mftentrybytes;
             fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
             fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
@@ -865,6 +866,42 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 
 void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, qulonglong curmftentry)
 {
+    QFile efile(estring);
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        QByteArray mftarray;
+        mftarray.clear();
+        QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
+        for(int i=0; i < mftlist.count(); i++)
+        {
+            efile.seek(mftlist.at(i).split(",").at(0).toUInt());
+            mftarray.append(efile.read(mftlist.at(i).split(",").at(0).toUInt()));
+        }
+        efile.close();
+            //fsinfo.insert("mftentrysize", QVariant(partbuf.at(64)));
+        QByteArray curmftentryarray = mftarray.mid(curmftentry * fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
+        int curoffset = 0;
+        uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curmftentryarray.mid(20, 2)); // offset to first attribute
+        uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentryarray.mid(40, 2)); // next attribute id
+        uint32_t attrlength = 0;
+        curoffset = firstattroffset;
+        for(int i=0; i < attrcount; i++)
+        {
+            uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentryarray.mid(curoffset, 4)); // attribute type
+            //uint8_t namelength = qFromLittleEndian<uint8_t>(curmftentryarray.mid(curoffset + 9, 1)); // length of name
+            attrlength = qFromLittleEndian<uint32_t>(curmftentryarray.mid(curoffset + 4, 4)); // attribute length
+            qDebug() << "attr type:" << attrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
+            if(attrtype == 144) // $INDEX_ROOT
+                qDebug() << "process index root here";
+            else if(attrtype == 160) // $INDEX_ALLOCATION
+                qDebug() << "process index allocation here";
+            else if(attrtype == 4294967295)
+                break;
+            curoffset += attrlength;
+        }
+    }
     //qDebug() << "fs type str:" << fsinfo->value("typestr").toString();
     //qDebug() << "cur mft entry:" << curmftentry;
 }
