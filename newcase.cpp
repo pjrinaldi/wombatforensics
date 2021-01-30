@@ -254,6 +254,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
             fsinfo.insert("sectorspercluster", QVariant(partbuf.at(13)));
             qDebug() << "sectors per cluster:" << fsinfo.value("sectorspercluster").toUInt();
+            qDebug() << "bytes per cluster:" << fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
             fsinfo.insert("totalsectors", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(40, 8))));
             fsinfo.insert("mftstartingcluster", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(48, 8))));
             qDebug() << "MFT starting cluster:" << fsinfo.value("mftstartingcluster").toUInt();
@@ -313,6 +314,9 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		curoffset = curoffset + runlistoff;
 		qDebug() << "run list start curoffset:" << curoffset;
 		int i=0;
+                //QString runliststr = "";
+                QStringList runlist;
+                runlist.clear();
 		while(curoffset < mftentrybytes) // might have to do a while < mftentrybytes and then go from there.... to build the curoffset = curoffset + 3, 4, etc...
 		{
                     // CURRENT ISSUE WITH THE RUN CODE, IT SORT OF WORKS, BUT SEEMS LIKE THE SECOND OFFSET IS OFF BY THE OFFSET OF THE PREVIOUS OFFSET...
@@ -327,10 +331,17 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
 			int runlength = qFromLittleEndian<int>(mftentry0.mid(curoffset, runlengthbytes));
 			int runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+                        if(i > 0)
+                            runoffset = runoffset + runlist.at(i-1).split(",").at(0).toUInt();
 			qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
+                        //runliststr += QString::number(runoffset) + "," + QString::number(runlength) + ";";
+                        runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
+                        //if(i != 0)
+                            //runoffset = runoffset 
 			i++;
 			curoffset += runlengthbytes + runlengthoffset;
 			qDebug() << "current offset after run [" << i-1 << "]" << curoffset;
+                        //qDebug() << "bytes per cluster:" << fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
 			qDebug() << "mft byte start:" << runoffset * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
 			qDebug() << "mft byte count:" << runlength * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
 		    }
@@ -338,6 +349,11 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			break;
 		    //break;
 		}
+                QString runliststr = "";
+                for(int i=0; i < runlist.count(); i++)
+                    runliststr += runlist.at(i) + ";";
+                fsinfo.insert("mftlayout", QVariant(runliststr));
+                qDebug() << "mftlayout:" << fsinfo.value("mftlayout").toString();
             }
             else
                 qDebug() << "error this is not a valid MFT ENTRY...";
