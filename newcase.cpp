@@ -251,21 +251,22 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             fsinfo.insert("type", QVariant(5));
             fsinfo.insert("typestr", QVariant("NTFS"));
             fsinfo.insert("bytespersector", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(11, 2))));
-            qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
+            //qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
             fsinfo.insert("sectorspercluster", QVariant(partbuf.at(13)));
-            qDebug() << "sectors per cluster:" << fsinfo.value("sectorspercluster").toUInt();
-            qDebug() << "bytes per cluster:" << fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
+            //qDebug() << "sectors per cluster:" << fsinfo.value("sectorspercluster").toUInt();
+            //qDebug() << "bytes per cluster:" << fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
+            fsinfo.insert("bytespercluster", fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
             fsinfo.insert("totalsectors", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(40, 8))));
             fsinfo.insert("mftstartingcluster", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(48, 8))));
-            qDebug() << "MFT starting cluster:" << fsinfo.value("mftstartingcluster").toUInt();
+            //qDebug() << "MFT starting cluster:" << fsinfo.value("mftstartingcluster").toUInt();
             fsinfo.insert("mftentrysize", QVariant(partbuf.at(64)));
 	    unsigned int mftentrybytes = fsinfo.value("mftentrysize").toUInt() * fsinfo.value("bytespersector").toUInt() * fsinfo.value("sectorspercluster").toUInt();
-	    qDebug() << "mft entry size in bytes:" << mftentrybytes;
+	    //qDebug() << "mft entry size in bytes:" << mftentrybytes;
             fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
             fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
-            qDebug() << "serial num:" << QString("0x" + QString::number(fsinfo.value("serialnum").toULongLong(), 16));
+            //qDebug() << "serial num:" << QString("0x" + QString::number(fsinfo.value("serialnum").toULongLong(), 16));
             fsinfo.insert("mftoffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("mftstartingcluster").toUInt() * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()))));
-            qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toUInt();
+            //qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toUInt();
             // get MFT entry for $MFT to determine cluster's that contain the MFT...
             QByteArray mftentry0;
 	    QByteArray mftentry3;
@@ -281,7 +282,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		mftentry3 = efile.read(mftentrybytes);
                 efile.close();
             }
-            qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
+            //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
             if(QString::fromStdString(mftentry0.left(4).toStdString()) == "FILE") // a proper mft entry
             {
                 int curoffset = 0;
@@ -289,30 +290,30 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 //uint32_t mftentryusedsize = qFromLittleEndian<uint32_t>(mftentry0.mid(24, 4)); // mft entry used size
                 uint16_t attrcount = qFromLittleEndian<uint16_t>(mftentry0.mid(40, 2)); // next attribute id
 		uint32_t attrlength = 0;
-                qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
+                //qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
                 curoffset = firstattroffset;
                 for(int i=0; i < attrcount; i++)
                 {
                     uint32_t atrtype = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset, 4)); // attribute type
                     uint8_t namelength = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset + 9, 1)); // length of name
                     attrlength = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset + 4, 4)); // attribute length
-                    qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
+                    //qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
 		    if(atrtype == 128 && namelength == 0) // $DATA attribute to parse
 		    {
 			break;
 		    }
                     curoffset += attrlength;
                 }
-		qDebug() << "curoffset of $Data attribute:" << curoffset;
+		//qDebug() << "curoffset of $Data attribute:" << curoffset;
 		uint64_t vcnstart = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 16, 8));
 		uint64_t vcnend = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 24, 8));
 		uint16_t runlistoff = qFromLittleEndian<uint16_t>(mftentry0.mid(curoffset + 32, 2));
 		//uint16_t compressszunit = qFromLittleEndian<uint16_t>(mftentry0.mid(curoffset + 34, 2));
 		uint64_t actualattrcontentsize = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 48, 8));
-		qDebug() << "Starting VCN:" << vcnstart << "Ending VCN:" << vcnend;
-		qDebug() << "attrlength:" << attrlength << "runlistoff:" << runlistoff << "actual attr content size:" << actualattrcontentsize;
+		//qDebug() << "Starting VCN:" << vcnstart << "Ending VCN:" << vcnend;
+		//qDebug() << "attrlength:" << attrlength << "runlistoff:" << runlistoff << "actual attr content size:" << actualattrcontentsize;
 		curoffset = curoffset + runlistoff;
-		qDebug() << "run list start curoffset:" << curoffset;
+		//qDebug() << "run list start curoffset:" << curoffset;
 		int i=0;
                 //QString runliststr = "";
                 QStringList runlist;
@@ -322,28 +323,28 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                     // CURRENT ISSUE WITH THE RUN CODE, IT SORT OF WORKS, BUT SEEMS LIKE THE SECOND OFFSET IS OFF BY THE OFFSET OF THE PREVIOUS OFFSET...
 		    if(mftentry0.at(curoffset) > 0)
 		    {
-			qDebug() << "1st byte:" << QString::number(mftentry0.at(curoffset), 16);
+			//qDebug() << "1st byte:" << QString::number(mftentry0.at(curoffset), 16);
 			int runlengthbytes = QString(QString::number(mftentry0.at(curoffset), 16).at(1)).toInt();
 			int runlengthoffset = QString(QString::number(mftentry0.at(curoffset), 16).at(0)).toInt();
 			if(runlengthbytes == 0 && runlengthoffset == 0)
 			    break;
 			curoffset++;
-			qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
+			//qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
 			int runlength = qFromLittleEndian<int>(mftentry0.mid(curoffset, runlengthbytes));
 			int runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
                         if(i > 0)
                             runoffset = runoffset + runlist.at(i-1).split(",").at(0).toUInt();
-			qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
+			//qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
                         //runliststr += QString::number(runoffset) + "," + QString::number(runlength) + ";";
-                        runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
+                        runlist.append(QString::number((partoffset * 512) + runoffset * fsinfo.value("bytespercluster").toUInt()) + "," + QString::number(runlength * fsinfo.value("bytespercluster").toUInt()));
                         //if(i != 0)
                             //runoffset = runoffset 
 			i++;
 			curoffset += runlengthbytes + runlengthoffset;
-			qDebug() << "current offset after run [" << i-1 << "]" << curoffset;
+			//qDebug() << "current offset after run [" << i-1 << "]" << curoffset;
                         //qDebug() << "bytes per cluster:" << fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
-			qDebug() << "mft byte start:" << runoffset * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
-			qDebug() << "mft byte count:" << runlength * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
+			//qDebug() << "mft byte start:" << runoffset * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
+			//qDebug() << "mft byte count:" << runlength * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
 		    }
 		    else
 			break;
@@ -353,11 +354,11 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 for(int i=0; i < runlist.count(); i++)
                     runliststr += runlist.at(i) + ";";
                 fsinfo.insert("mftlayout", QVariant(runliststr));
-                qDebug() << "mftlayout:" << fsinfo.value("mftlayout").toString();
+                //qDebug() << "mftlayout:" << fsinfo.value("mftlayout").toString();
             }
             else
                 qDebug() << "error this is not a valid MFT ENTRY...";
-	    qDebug() << "MFT ENTRY FOR $VOLUME SIGNATURE:" << QString::fromStdString(mftentry3.left(4).toStdString());
+	    //qDebug() << "MFT ENTRY FOR $VOLUME SIGNATURE:" << QString::fromStdString(mftentry3.left(4).toStdString());
 	    if(QString::fromStdString(mftentry3.left(4).toStdString()) == "FILE") // a proper mft entry
 	    {
 		int curoffset = 0;
@@ -365,14 +366,14 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 //uint32_t mftentryusedsize = qFromLittleEndian<uint32_t>(mftentry0.mid(24, 4)); // mft entry used size
                 uint16_t attrcount = qFromLittleEndian<uint16_t>(mftentry3.mid(40, 2)); // next attribute id
 		uint32_t attrlength = 0;
-                qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
+                //qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
                 curoffset = firstattroffset;
                 for(int i=0; i < attrcount; i++)
                 {
                     uint32_t atrtype = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset, 4)); // attribute type
                     //uint8_t namelength = qFromLittleEndian<uint8_t>(mftentry3.mid(curoffset + 9, 1)); // length of name
                     attrlength = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset + 4, 4)); // attribute length
-                    qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
+                    //qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
 		    if(atrtype == 96) // $VOLUME_NAME attribute to parse (always resident)
 		    {
 			break;
@@ -381,13 +382,13 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 }
 		uint32_t contentsize = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset + 16, 4));
 		uint16_t contentoffset = qFromLittleEndian<uint16_t>(mftentry3.mid(curoffset + 20, 2));
-		qDebug() << "curoffset of $Volume attribute:" << curoffset;
-		qDebug() << "vol content offset:" << contentoffset << "vol  content size:" << contentsize;
+		//qDebug() << "curoffset of $Volume attribute:" << curoffset;
+		//qDebug() << "vol content offset:" << contentoffset << "vol  content size:" << contentsize;
 		//qDebug() << "volname name:" << QString::fromStdString(mftentry3.mid(curoffset + contentoffset, contentsize).toStdString());
 		// EASY WAY TO READ UTF16 STRING !!!!!!!!!!
 		fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()))));
 		QString volnamestr = QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()));
-		qDebug() << "volnamestr:" << volnamestr;
+		//qDebug() << "volnamestr:" << volnamestr;
 	    }
         }
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
@@ -862,9 +863,10 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
 
-void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
+void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, qulonglong curmftentry)
 {
-    qDebug() << "fs type str:" << fsinfo->value("typestr").toString();
+    //qDebug() << "fs type str:" << fsinfo->value("typestr").toString();
+    //qDebug() << "cur mft entry:" << curmftentry;
 }
 
 void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curinode, qulonglong curicnt)
@@ -2776,7 +2778,7 @@ void ProcessVolume(QString evidstring)
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
 		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
-		ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
                 ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
@@ -2866,7 +2868,7 @@ void ProcessVolume(QString evidstring)
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
 		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
-		ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
                 ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
