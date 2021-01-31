@@ -173,10 +173,11 @@ QString ParseI30Artifact(QString i30name, QString i30id)
         {
             QByteArray indxrootcontent;
             QByteArray indxalloccontent;
-            QByteArray bitmapcontent;
+            //QByteArray bitmapcontent;
             indxrootcontent.clear();
             indxalloccontent.clear();
-            bitmapcontent.clear();
+            //bitmapcontent.clear();
+            /*
             TSK_IMG_INFO* imginfo = NULL;
             std::vector<std::string> pathvector;
             pathvector.clear();
@@ -248,6 +249,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                                         }
                                     }
                                     */
+            /*
                                     if(fsattr->type == 160) // $INDEX_ALLOCATION
                                     {
                                         fscontent = new char[fsattr->size];
@@ -267,6 +269,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
             }
             tsk_img_close(imginfo);
             imginfo = NULL;
+            */
             // CONTENT FOR ROOT SLACK, INDEXALLOC AND BITMAP HAS BEEN OBTAINED, SO GO BACK TO PROCESSING INDEX ENTRIES NOW...
             int indxrecordcnt = indxalloccontent.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
             uint curpos = 0;
