@@ -914,22 +914,23 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		    uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
 		    uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10)); // offset to the attr name
 		    uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12)); // attrdata flags
-		    if(attrtype == 0x10) // $STANDARD_INFORMATION
+		    if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident
 		    {
 			qDebug() << "standard information - meta";
 		    }
-		    else if(attrtype == 0x30) // $FILE_NAME
+		    else if(attrtype == 0x30) // $FILE_NAME - always resident
 		    {
 			qDebug() << "filename - name";
 		    }
-		    else if(attrtype == 0x80) // $DATA
+		    else if(attrtype == 0x80) // $DATA - either resident or non-resident
 		    {
 			qDebug() << "data and alternate data streams, to get data layout";
 		    }
-		    else if(attrtype == 0x90) // $INDEX_ROOT
+		    else if(attrtype == 0x90) // $INDEX_ROOT - always resident
 		    {
 			qDebug() << "directory content data for layout";
 		    }
+		    else if(attrtype == 0x0A) // $INDEX_ALLOCATION - always non-resident
 		    else if(attrtype == 4294967295)
 			break;
 		    curoffset += attrlength;
