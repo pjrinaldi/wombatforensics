@@ -907,6 +907,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			qDebug() << "deleted directory";
 		    else if(attrflags == 0x03)
 			qDebug() << "allocated directory";
+                    //fileinfo.insert("isdeleted", QVariant(1));
+                    //itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, 14-encrypted file, 13-encrypted dir -1=not file (evid image, vol, part, fs), 15=carved file
 		    int curoffset = firstattroffset;
 		    for(int j=0; j < attrcount; j++)
 		    {
@@ -966,7 +968,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 72, 8))));
 			    uint8_t filenamelength = curmftentry.at(curoffset + 88);
 			    uint8_t filenamespace = curmftentry.at(curoffset + 89);
-			    qDebug() << "filenamelength:" << filenamelength << "Filenamespace:" << filenamespace;
+			    //qDebug() << "filenamelength:" << filenamelength << "Filenamespace:" << filenamespace;
 			    if(filenamespace != 0x02)
 			    {
 				QString filename = "";

@@ -539,6 +539,7 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/information.html \
 		Resources/deletedfolder.png \
 		Resources/gparted.png \
+		Resources/encryptedfile.png \
 		Resources/folder.png \
 		Resources/text-x-generic.png \
 		Resources/drive-harddisk.png \
