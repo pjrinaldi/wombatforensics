@@ -908,7 +908,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
 			uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10)); // offset to the attr name
                         QString attrname = "";
-                        qDebug() << "attr name:" << attrname;
 			uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12)); // attrdata flags
 			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
 			{
@@ -1017,7 +1016,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                             {
                                 for(int k=0; k < namelength; k++)
                                     attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
-                                //attrname = QString::fromStdString(curmftentry.mid(curoffset + nameoffset, namelength).toStdString());
                                 qDebug() << "attr name:" << attrname;
                             }
                             if(resflag == 0x00) // resident
@@ -1028,7 +1026,35 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                             }
                             else if(resflag == 0x01) // non-resident 
                             {
-                                qDebug() << "non-resident";
+                                uint16_t runlistoff = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 32, 2));
+                                curoffset = curoffset + runlistoff;
+                                int j = 0;
+                                QStringList runlist;
+                                runlist.clear();
+                                while(curoffset < fsinfo->value("mftentrybytes").toUInt())
+                                {
+                                    if(curmftentry.at(curoffset) > 0)
+                                    {
+                                        int runlengthbytes = QString(QString::number(curmftentry.at(curoffset), 16).at(1)).toInt();
+                                        int runlengthoffset = QString(QString::number(curmftentry.at(curoffset), 16).at(0)).toInt();
+			                qDebug() << "runlengthbytes:" << runlengthbytes << "runlengthoffset:" << runlengthoffset;
+                                        if(runlengthbytes == 0 && runlengthoffset == 0)
+                                            break;
+                                        curoffset ++;
+                                        int runlength = qFromLittleEndian<int>(curmftentry.mid(curoffset, runlengthbytes));
+                                        int runoffset = qFromLittleEndian<int>(curmftentry.mid(curoffset + runlengthbytes, runlengthoffset));
+                                        qDebug() << "runlength:" << runlength << "runoffset:" << runoffset;
+                                        if(j > 0)
+                                            runoffset = runoffset + runlist.at(j-1).split(",").at(0).toUInt();
+                                        runlist.append(QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runoffset * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlength * fsinfo->value("bytespercluster").toUInt()));
+                                        j++;
+                                        curoffset += runlengthbytes + runlengthoffset;
+                                    }
+                                    else
+                                        break;
+                                }
+                                qDebug() << "runlist:" << runlist;
+                                //qDebug() << "non-resident";
                             }
 			    //qDebug() << "data and alternate data streams, to get data layout";
 			}
