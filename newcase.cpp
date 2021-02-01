@@ -891,49 +891,109 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	{
 	    if(i != 5) // skip root directory cause i don't list root directory in the tree...
 	    {
-		qDebug() << QString("curmftentry[" + QString::number(i) + "]:") << curmftentry.mid(0, 4);
-		fileinfo.insert("ntinode", QVariant(i));
 		uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curmftentry.mid(20, 2)); // offset to first attribute
 		uint16_t attrflags = qFromLittleEndian<uint16_t>(curmftentry.mid(22, 2)); // attribute flags
 		uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentry.mid(40, 2)); // next attr id
-		uint32_t attrlength = 0;
-		if(attrflags == 0x00)
-		    qDebug() << "deleted file";
-		else if(attrflags == 0x01)
-		    qDebug() << "allocated file";
-		else if(attrflags == 0x02)
-		    qDebug() << "deleted directory";
-		else if(attrflags == 0x03)
-		    qDebug() << "allocated directory";
-		int curoffset = firstattroffset;
-		for(int j=0; j < attrcount; j++)
+		if(attrcount > 0)
 		{
-		    uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset, 4)); // attribute type
-		    attrlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 4, 4)); // attribute length
-		    uint8_t resflag = curmftentry.at(curoffset + 8); // resident/non-resident flag 0/1
-		    uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
-		    uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10)); // offset to the attr name
-		    uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12)); // attrdata flags
-		    if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident
+		    qDebug() << QString("curmftentry[" + QString::number(i) + "]:") << curmftentry.mid(0, 4);
+		    fileinfo.insert("ntinode", QVariant(i));
+		    uint32_t attrlength = 0;
+		    if(attrflags == 0x00)
+			qDebug() << "deleted file";
+		    else if(attrflags == 0x01)
+			qDebug() << "allocated file";
+		    else if(attrflags == 0x02)
+			qDebug() << "deleted directory";
+		    else if(attrflags == 0x03)
+			qDebug() << "allocated directory";
+		    int curoffset = firstattroffset;
+		    for(int j=0; j < attrcount; j++)
 		    {
-			qDebug() << "standard information - meta";
+			uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset, 4)); // attribute type
+			attrlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 4, 4)); // attribute length
+			uint8_t resflag = curmftentry.at(curoffset + 8); // resident/non-resident flag 0/1
+			uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
+			uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10)); // offset to the attr name
+			uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12)); // attrdata flags
+			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
+			{
+			    fileinfo.insert("createdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 8)))));
+			    fileinfo.insert("modifydate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
+			    fileinfo.insert("statusdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
+			    fileinfo.insert("accessdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
+			    uint32_t accessflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 56, 4));
+			    QString attrstr = "";
+			    if(accessflags & 0x01) // READ ONLY
+				attrstr += "Read Only,";
+			    if(accessflags & 0x02) // Hidden
+				attrstr += "Hidden,";
+			    if(accessflags & 0x04) // System
+				attrstr += "System,";
+			    if(accessflags & 0x20) // Archive
+				attrstr += "Archive,";
+			    if(accessflags & 0x40) // Device
+				attrstr += "Device";
+			    if(accessflags & 0x80) // Normal
+				attrstr += "Normal,";
+			    if(accessflags & 0x100) // Temporary
+				attrstr += "Temporary,";
+			    if(accessflags & 0x200) // Sparse File
+				attrstr += "Sparse File,";
+			    if(accessflags & 0x400) // Reparse Point
+				attrstr += "Reparse Point,";
+			    if(accessflags & 0x800) // Compresssed
+				attrstr += "Compressed,";
+			    if(accessflags & 0x1000) // Offline
+				attrstr += "Offline,";
+			    if(accessflags & 0x2000) // Not Indexed
+				attrstr += "Not Indexed,";
+			    if(accessflags & 0x4000) // Encrypted
+				attrstr += "Encrypted";
+			    qDebug() << "attrstr:" << attrstr;
+			    fileinfo.insert("attribute", QVariant(attrstr));
+			    //qDebug() << "standard information - meta";
+
+			}
+			else if(attrtype == 0x30) // $FILE_NAME - always resident
+			{
+			    fileinfo.insert("parentnode", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 24, 6))));
+			    fileinfo.insert("filecreate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
+			    fileinfo.insert("filemodify", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
+			    fileinfo.insert("filestatus", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
+			    fileinfo.insert("fileaccess", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 56, 8)))));
+			    fileinfo.insert("physicalsize", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 64, 8))));
+			    fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 72, 8))));
+			    uint8_t filenamelength = curmftentry.at(curoffset + 88);
+			    uint8_t filenamespace = curmftentry.at(curoffset + 89);
+			    qDebug() << "filenamelength:" << filenamelength << "Filenamespace:" << filenamespace;
+			    if(filenamespace != 0x02)
+			    {
+				QString filename = "";
+				for(int k=0; k < filenamelength; k++)
+				    filename += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 90 + k*2, 2))));
+				qDebug() << "filename:" << filename;
+				fileinfo.insert("filename", QVariant(filename));
+			    //filename += QString(QChar(qFromLittleEndian<uint16_t>(filenamebuf.mid(66 + j*2, 2))));
+			    }
+			    //qDebug() << "filename - name";
+			}
+			else if(attrtype == 0x80) // $DATA - either resident or non-resident
+			{
+			    qDebug() << "data and alternate data streams, to get data layout";
+			}
+			else if(attrtype == 0x90) // $INDEX_ROOT - always resident
+			{
+			    qDebug() << "directory content data for layout";
+			}
+			else if(attrtype == 0x0A) // $INDEX_ALLOCATION - always non-resident
+			{
+			    qDebug() << "indx allocation for more directory content layout to store...";
+			}
+			else if(attrtype == 4294967295)
+			    break;
+			curoffset += attrlength;
 		    }
-		    else if(attrtype == 0x30) // $FILE_NAME - always resident
-		    {
-			qDebug() << "filename - name";
-		    }
-		    else if(attrtype == 0x80) // $DATA - either resident or non-resident
-		    {
-			qDebug() << "data and alternate data streams, to get data layout";
-		    }
-		    else if(attrtype == 0x90) // $INDEX_ROOT - always resident
-		    {
-			qDebug() << "directory content data for layout";
-		    }
-		    else if(attrtype == 0x0A) // $INDEX_ALLOCATION - always non-resident
-		    else if(attrtype == 4294967295)
-			break;
-		    curoffset += attrlength;
 		}
 	    }
 	}
