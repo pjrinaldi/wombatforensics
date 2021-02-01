@@ -896,19 +896,9 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentry.mid(40, 2)); // next attr id
 		if(attrcount > 0)
 		{
-		    qDebug() << QString("curmftentry[" + QString::number(i) + "]:") << curmftentry.mid(0, 4);
+		    //qDebug() << QString("curmftentry[" + QString::number(i) + "]:") << curmftentry.mid(0, 4);
 		    fileinfo.insert("ntinode", QVariant(i));
 		    uint32_t attrlength = 0;
-		    if(attrflags == 0x00)
-			qDebug() << "deleted file";
-		    else if(attrflags == 0x01)
-			qDebug() << "allocated file";
-		    else if(attrflags == 0x02)
-			qDebug() << "deleted directory";
-		    else if(attrflags == 0x03)
-			qDebug() << "allocated directory";
-                    //fileinfo.insert("isdeleted", QVariant(1));
-                    //itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, 14-encrypted file, 13-encrypted dir -1=not file (evid image, vol, part, fs), 15=carved file
 		    int curoffset = firstattroffset;
 		    for(int j=0; j < attrcount; j++)
 		    {
@@ -917,6 +907,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			uint8_t resflag = curmftentry.at(curoffset + 8); // resident/non-resident flag 0/1
 			uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
 			uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10)); // offset to the attr name
+                        QString attrname = "";
+                        qDebug() << "attr name:" << attrname;
 			uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12)); // attrdata flags
 			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
 			{
@@ -925,6 +917,45 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    fileinfo.insert("statusdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
 			    fileinfo.insert("accessdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
 			    uint32_t accessflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 56, 4));
+                            // MAY NEED TO MOVE THIS DOWN BASED ON THE ENCRYPTED PART SO I CAN MAKE IT 13...
+                            if(attrflags == 0x00)
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    fileinfo.insert("itemtype", QVariant(13));
+                                else
+                                    fileinfo.insert("itemtype", QVariant(4));
+                                fileinfo.insert("isdeleted", QVariant(1));
+                                //qDebug() << "deleted file";
+                            }
+                            else if(attrflags == 0x01)
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    fileinfo.insert("itemtype", QVariant(13));
+                                else
+                                    fileinfo.insert("itemtype", QVariant(5));
+                                fileinfo.insert("isdeleted", QVariant(0));
+                                //qDebug() << "allocated file";
+                            }
+                            else if(attrflags == 0x02)
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    fileinfo.insert("itemtype", QVariant(13));
+                                else
+                                    fileinfo.insert("itemtype", QVariant(2));
+                                fileinfo.insert("isdeleted", QVariant(1));
+                                //qDebug() << "deleted directory";
+                            }
+                            else if(attrflags == 0x03)
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    fileinfo.insert("itemtype", QVariant(13));
+                                else
+                                    fileinfo.insert("itemtype", QVariant(3));
+                                fileinfo.insert("isdeleted", QVariant(0));
+                                //qDebug() << "allocated directory";
+                            }
+                            //fileinfo.insert("isdeleted", QVariant(1));
+                            //itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, 14-encrypted file, 13-encrypted dir -1=not file (evid image, vol, part, fs), 15=carved file
 			    QString attrstr = "";
 			    if(accessflags & 0x01) // READ ONLY
 				attrstr += "Read Only,";
@@ -952,7 +983,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 				attrstr += "Not Indexed,";
 			    if(accessflags & 0x4000) // Encrypted
 				attrstr += "Encrypted";
-			    qDebug() << "attrstr:" << attrstr;
+			    //qDebug() << "attrstr:" << attrstr;
 			    fileinfo.insert("attribute", QVariant(attrstr));
 			    //qDebug() << "standard information - meta";
 
@@ -974,7 +1005,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 				QString filename = "";
 				for(int k=0; k < filenamelength; k++)
 				    filename += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 90 + k*2, 2))));
-				qDebug() << "filename:" << filename;
+				qDebug() << QString("curmftentry[" + QString::number(i) + "]:") << "filename:" << filename;
 				fileinfo.insert("filename", QVariant(filename));
 			    //filename += QString(QChar(qFromLittleEndian<uint16_t>(filenamebuf.mid(66 + j*2, 2))));
 			    }
@@ -982,15 +1013,46 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			}
 			else if(attrtype == 0x80) // $DATA - either resident or non-resident
 			{
-			    qDebug() << "data and alternate data streams, to get data layout";
+                            if(namelength > 0) // alternate data stream
+                            {
+                                for(int k=0; k < namelength; k++)
+                                    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
+                                //attrname = QString::fromStdString(curmftentry.mid(curoffset + nameoffset, namelength).toStdString());
+                                qDebug() << "attr name:" << attrname;
+                            }
+                            if(resflag == 0x00) // resident
+                            {
+                                uint32_t contentsize = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 16, 4));
+                                uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2));
+                                qDebug() << "resident" << "size:" << contentsize << "offset:" << contentoffset;
+                            }
+                            else if(resflag == 0x01) // non-resident 
+                            {
+                                qDebug() << "non-resident";
+                            }
+			    //qDebug() << "data and alternate data streams, to get data layout";
 			}
 			else if(attrtype == 0x90) // $INDEX_ROOT - always resident
 			{
-			    qDebug() << "directory content data for layout";
+                            if(namelength > 0) // alternate data stream
+                            {
+                                for(int k=0; k < namelength; k++)
+                                    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
+                                //attrname = QString::fromStdString(curmftentry.mid(curoffset + nameoffset, namelength).toStdString());
+                                qDebug() << "attr name:" << attrname;
+                            }
+			    //qDebug() << "directory content data for layout";
 			}
 			else if(attrtype == 0x0A) // $INDEX_ALLOCATION - always non-resident
 			{
-			    qDebug() << "indx allocation for more directory content layout to store...";
+                            if(namelength > 0) // alternate data stream
+                            {
+                                for(int k=0; k < namelength; k++)
+                                    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
+                                //attrname = QString::fromStdString(curmftentry.mid(curoffset + nameoffset, namelength).toStdString());
+                                qDebug() << "attr name:" << attrname;
+                            }
+			    //qDebug() << "indx allocation for more directory content layout to store...";
 			}
 			else if(attrtype == 4294967295)
 			    break;
