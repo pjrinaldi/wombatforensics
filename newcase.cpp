@@ -866,6 +866,8 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 
 void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, qulonglong curmftentry)
 {
+    QHash<qulonglong, qulonglong> inodemap;
+    inodemap.clear();
     QHash<QString, QVariant> fileinfo;
     QByteArray mftarray;
     mftarray.clear();
@@ -882,6 +884,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         }
         efile.close();
     }
+    qulonglong curinode = 0;
     // NOW LET's PARSE THE MFT...
     int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
     for(int i=0; i < mftentrycount; i++)
@@ -898,12 +901,22 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		{
 		    //qDebug() << QString("curmftentry[" + QString::number(i) + "]:") << curmftentry.mid(0, 4);
 		    fileinfo.insert("ntinode", QVariant(i));
+		    
+
+		    // NEED TO DETERMINE WHICH ATTRIBUTE IS THE CONTENT ATTRIBUTE, THEN SET THE FILEINFO("LAYOUT") VARIABLE AND
+		    // IMPLEMENT THESE PARTS TO KEEP TRACK...
+		    //fileinfo.insert("inode", QVariant(curinode));
+		    //inodemap.insert(i, curinode);
+		    // ALSO NEED TO INCLUDE THE OTHER ATTRIBUTE VALUES AS PROPERTIES OR SUB FILES SUCH AS THE ADS...
+
+
 		    uint32_t attrlength = 0;
 		    int curoffset = firstattroffset;
 		    for(int j=0; j < attrcount; j++)
 		    {
 			uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset, 4)); // attribute type
 			attrlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 4, 4)); // attribute length
+			//qDebug() << "i:" << i << "j:" << j << "attr type:" << QString::number(attrtype, 16) << "curoffset:" << curoffset << "attr length:" << attrlength;
 			uint8_t resflag = curmftentry.at(curoffset + 8); // resident/non-resident flag 0/1
 			uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
 			uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10)); // offset to the attr name
@@ -916,7 +929,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    fileinfo.insert("statusdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
 			    fileinfo.insert("accessdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
 			    uint32_t accessflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 56, 4));
-                            // MAY NEED TO MOVE THIS DOWN BASED ON THE ENCRYPTED PART SO I CAN MAKE IT 13...
                             if(attrflags == 0x00)
                             {
                                 if(accessflags & 0x4000) // encrypted
@@ -1016,44 +1028,54 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                             {
                                 for(int k=0; k < namelength; k++)
                                     attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
-                                qDebug() << "attr name:" << attrname;
+                                qDebug() << "ADS generate as sub file of current parent:" << "attr name:" << attrname;
                             }
                             if(resflag == 0x00) // resident
                             {
                                 uint32_t contentsize = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 16, 4));
                                 uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2));
-                                qDebug() << "resident" << "size:" << contentsize << "offset:" << contentoffset;
+                                //qDebug() << "resident" << "size:" << contentsize << "offset:" << contentoffset;
                             }
                             else if(resflag == 0x01) // non-resident 
                             {
                                 uint16_t runlistoff = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 32, 2));
-                                curoffset = curoffset + runlistoff;
-                                int j = 0;
+				uint currunoff = curoffset + runlistoff;
+                                int k = 0;
                                 QStringList runlist;
                                 runlist.clear();
-                                while(curoffset < fsinfo->value("mftentrybytes").toUInt())
+                                while(currunoff < fsinfo->value("mftentrybytes").toUInt())
                                 {
-                                    if(curmftentry.at(curoffset) > 0)
+                                    if(curmftentry.at(currunoff) > 0)
                                     {
-                                        int runlengthbytes = QString(QString::number(curmftentry.at(curoffset), 16).at(1)).toInt();
-                                        int runlengthoffset = QString(QString::number(curmftentry.at(curoffset), 16).at(0)).toInt();
-			                qDebug() << "runlengthbytes:" << runlengthbytes << "runlengthoffset:" << runlengthoffset;
+					QString runstr = QString("%1").arg(curmftentry.at(currunoff), 8, 2, QChar('0'));
+					uint runlengthbytes = runstr.right(4).toInt(nullptr, 2);
+					uint runlengthoffset = runstr.left(4).toInt(nullptr, 2);
+			                //qDebug() << QString::number(curmftentry.at(currunoff), 16) << "runlengthbytes:" << runlengthbytes << "runlengthoffset:" << runlengthoffset;
                                         if(runlengthbytes == 0 && runlengthoffset == 0)
                                             break;
-                                        curoffset ++;
-                                        int runlength = qFromLittleEndian<int>(curmftentry.mid(curoffset, runlengthbytes));
-                                        int runoffset = qFromLittleEndian<int>(curmftentry.mid(curoffset + runlengthbytes, runlengthoffset));
-                                        qDebug() << "runlength:" << runlength << "runoffset:" << runoffset;
-                                        if(j > 0)
-                                            runoffset = runoffset + runlist.at(j-1).split(",").at(0).toUInt();
-                                        runlist.append(QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runoffset * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlength * fsinfo->value("bytespercluster").toUInt()));
-                                        j++;
-                                        curoffset += runlengthbytes + runlengthoffset;
+                                        currunoff++;
+					uint runlength = 0;
+					uint runoffset = 0;
+					if(runlengthbytes == 1)
+					    runlength = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff, runlengthbytes));
+					else
+					    runlength = qFromLittleEndian<uint>(curmftentry.mid(currunoff, runlengthbytes));
+					if(runlengthoffset == 1)
+					    runoffset = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
+					else
+					    runoffset = qFromLittleEndian<uint>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
+                                        if(k > 0)
+                                            runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
+                                        //qDebug() << "runlength:" << runlength << "runoffset:" << runoffset;
+                                        runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
+                                        k++;
+                                        currunoff += runlengthbytes + runlengthoffset;
                                     }
                                     else
                                         break;
                                 }
-                                qDebug() << "runlist:" << runlist;
+                                //qDebug() << "runlist:" << runlist;
+                                //runlist.append(QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runoffset * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlength * fsinfo->value("bytespercluster").toUInt()));
                                 //qDebug() << "non-resident";
                             }
 			    //qDebug() << "data and alternate data streams, to get data layout";
@@ -1065,22 +1087,22 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                                 for(int k=0; k < namelength; k++)
                                     attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
                                 //attrname = QString::fromStdString(curmftentry.mid(curoffset + nameoffset, namelength).toStdString());
-                                qDebug() << "attr name:" << attrname;
+                                qDebug() << "INDEX ROOT name:" << attrname;
                             }
 			    //qDebug() << "directory content data for layout";
 			}
-			else if(attrtype == 0x0A) // $INDEX_ALLOCATION - always non-resident
+			else if(attrtype == 0xa0) // $INDEX_ALLOCATION - always non-resident
 			{
                             if(namelength > 0) // alternate data stream
                             {
                                 for(int k=0; k < namelength; k++)
                                     attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
                                 //attrname = QString::fromStdString(curmftentry.mid(curoffset + nameoffset, namelength).toStdString());
-                                qDebug() << "attr name:" << attrname;
+                                qDebug() << "INDEX ALLOCATION name:" << attrname;
                             }
 			    //qDebug() << "indx allocation for more directory content layout to store...";
 			}
-			else if(attrtype == 4294967295)
+			else if(attrtype == 0xffffffff)
 			    break;
 			curoffset += attrlength;
 		    }
