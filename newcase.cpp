@@ -901,17 +901,27 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		{
 		    //qDebug() << QString("curmftentry[" + QString::number(i) + "]:") << curmftentry.mid(0, 4);
 		    fileinfo.insert("ntinode", QVariant(i));
+		    fileinfo.insert("inode", QVariant(curinode));
+		    // WILL NEED TO PARSE THE STANDARD INFORMATION AND FILE NAME SEPARATELY FOR THE FILE/DIR NODE
+		    // THEN I CAN PARSE THE ATTRIBUTES AGAIN FOR THE CHILD VIRTUAL FILES OF THE FILE/DIR
 		    
 
-		    // NEED TO DETERMINE WHICH ATTRIBUTE IS THE CONTENT ATTRIBUTE, THEN SET THE FILEINFO("LAYOUT") VARIABLE AND
-		    // IMPLEMENT THESE PARTS TO KEEP TRACK...
+		    // WILL INCLUDE ALL ATTRIBUTES THAT ARE NOT STANDARD_INFORMATION AND FILE_NAME
 		    //fileinfo.insert("inode", QVariant(curinode));
 		    //inodemap.insert(i, curinode);
-		    // ALSO NEED TO INCLUDE THE OTHER ATTRIBUTE VALUES AS PROPERTIES OR SUB FILES SUCH AS THE ADS...
+		    // ALSO NEED TO INCLUDE THE OTHER ATTRIBUTE VALUES AS SUB FILES SUCH AS THE ADS
+		    // AND INCLUDE OTHER ATTRIBUTES SUCH AS BITMAP, INDEX_ROOT, INDEX_ALLOCATION, DATA
 
 
 		    uint32_t attrlength = 0;
+		    int facnt = 0;
 		    int curoffset = firstattroffset;
+		    // Initial Attribute Loop to get information for the file/dir
+		    for(int j=0; j < attrcount; j++)
+		    {
+
+		    }
+		    // Secondary Attribute Loop to get the child attribute files for the tree...
 		    for(int j=0; j < attrcount; j++)
 		    {
 			uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset, 4)); // attribute type
