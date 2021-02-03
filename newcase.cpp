@@ -869,6 +869,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     QHash<qulonglong, qulonglong> inodemap;
     inodemap.clear();
     QHash<QString, QVariant> fileinfo;
+    //QHash<QString, QVariant> parfileinfo;
     QByteArray mftarray;
     mftarray.clear();
     QFile efile(estring);
@@ -890,6 +891,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     // PROBABLY NEED A MFT ENTRY LOOP TO SET THE INODEMAP PRIOR TO RUNNING ON THE FILES...
     for(int i=0; i < mftentrycount; i++)
     {
+	QHash<QString, QVariant> parfileinfo;
+	parfileinfo.clear();
 	// MIGHT NEED A BOOLEAN TO DETERMINE IF WE ARE ON 1ST PASS FOR FILE OR 2ND PASS FOR THE ATTRIBUTES OR SOMETHING LIKE THAT...
 	fileinfo.clear();
 	qulonglong attrparentinode = 0;
@@ -1021,9 +1024,15 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			{
 			    fileinfo.insert("parntinode", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 24, 6))));
 			    if(fileinfo.value("parntinode").toUInt() == 5)
+			    {
+				fileinfo.insert("path", QVariant("/"));
 				fileinfo.insert("parentinode", QVariant(-1));
+			    }
 			    else
+			    {
+				fileinfo.insert("path", QVariant("//"));
 				fileinfo.insert("parentinode", QVariant(inodemap.value(fileinfo.value("parntinode").toUInt())));
+			    }
 			    fileinfo.insert("filecreate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
 			    fileinfo.insert("filemodify", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
 			    fileinfo.insert("filestatus", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
@@ -1050,7 +1059,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		    }
 		    if(fileinfo.contains("filename"))
 		    {
-			attrparentinode = curinode;
+			//attrparentinode = curinode;
+			parfileinfo = fileinfo;
 			fileinfolist->append(fileinfo);
 			curinode++;
 		    }
@@ -1072,13 +1082,20 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
 			{
 			    fileinfo.insert("filename", QVariant("$STANDARD_INFORMATION"));
+			    fileinfo.insert("createdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 8)))));
+			    fileinfo.insert("modifydate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
+			    fileinfo.insert("statusdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
+			    fileinfo.insert("accessdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
 			    fileinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset) + "," + QString::number(attrlength) + ";")));
-			    fileinfo.insert("logicalsize", QVariant(attrlength));
+			    //fileinfo.insert("logicalsize", QVariant(attrlength));
 			    fileinfo.insert("physicalsize", QVariant(attrlength));
 			    fileinfo.insert("inode", QVariant(curinode));
-			    fileinfo.insert("parentinode", QVariant(attrparentinode));
+			    fileinfo.insert("parentinode", QVariant(parfileinfo.value("inode").toUInt()));
+			    //fileinfo.insert("parentinode", QVariant(attrparentinode));
 			    fileinfo.insert("isdeleted", QVariant(0));
 			    fileinfo.insert("itemtype", QVariant(10));
+			    fileinfo.insert("path", QVariant(QString(parfileinfo.value("path").toString() + parfileinfo.value("filename").toString() + "/")));
+			    //qDebug() << "STDINFO for:" << parfileinfo.value("inode").toUInt() << "curinode:" << curinode;
 			    fileinfolist->append(fileinfo);
 			    curinode++;
 			}
@@ -3522,51 +3539,51 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
         nodedata << ba.toBase64() << QVariant(fileinfolist->at(j).value("logicalsize").toUInt()) << fileinfolist->at(j).value("createdate", "0") << fileinfolist->at(j).value("accessdate", "0") << fileinfolist->at(j).value("modifydate", "0") << fileinfolist->at(j).value("statusdate", "0") << QVariant("0");
         if(fileinfolist->at(j).value("logicalsize").toUInt() > 0)
         {
-        if(fileinfolist->at(j).value("itemtype").toUInt() == 3 && fileinfolist->at(j).value("isdeleted").toInt() == 0)
-            nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
-        else
-        {
-            QByteArray sigbuf;
-            sigbuf.clear();
-            QFile efile(emntstring);
-            if(!efile.isOpen())
-                efile.open(QIODevice::ReadOnly);
-            if(efile.isOpen())
-            {
-                if(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).count() > 0)
-                {
-                    efile.seek(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toULongLong());
-                    sigbuf = efile.read(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(1).toULongLong());
-                }
-                efile.close();
-            }
-            QMimeDatabase mimedb;
-            const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist->at(j).value("filename").toString(), sigbuf);
-            QString mimestr = GenerateCategorySignature(mimetype);
-	    //qDebug() << "mimestr:" << mimestr;
-            if(mimestr.contains("Unknown")) // generate further analysis
-            {
-                if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
-                    mimestr = "Windows System/Shortcut";
-                else if(strcmp(fileinfolist->at(j).value("filename").toString().toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
-                    mimestr = "Windows System/Recycler";
-                else if(fileinfolist->at(j).value("filename").toString().startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
-                    mimestr = "Windows System/Recycle.Bin";
-                else if(fileinfolist->at(j).value("filename").toString().endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
-                    mimestr = "Windows System/Prefetch";
-                else if(fileinfolist->at(j).value("filename").toString().endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
-                    mimestr = "Windows System/Prefetch";
-                else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
-                    mimestr = "Windows System/Registry";
-                else if(fileinfolist->at(j).value("filename").toString().startsWith("$ALLOC_BITMAP"))
-                    mimestr = "System File/Allocation Bitmap";
-		else if(sigbuf.left(4) == "FILE")
-		    mimestr = "Windows System/MFT File Entry";
-            }
-            if(fileinfolist->at(j).value("filename").toString().startsWith("$UPCASE_TABLE"))
-                mimestr = "System File/Up-case Table";
-            nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
-        }
+	    if(fileinfolist->at(j).value("itemtype").toUInt() == 3 && fileinfolist->at(j).value("isdeleted").toInt() == 0)
+		nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
+	    else
+	    {
+		QByteArray sigbuf;
+		sigbuf.clear();
+		QFile efile(emntstring);
+		if(!efile.isOpen())
+		    efile.open(QIODevice::ReadOnly);
+		if(efile.isOpen())
+		{
+		    if(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).count() > 0)
+		    {
+			efile.seek(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toULongLong());
+			sigbuf = efile.read(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(1).toULongLong());
+		    }
+		    efile.close();
+		}
+		QMimeDatabase mimedb;
+		const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist->at(j).value("filename").toString(), sigbuf);
+		QString mimestr = GenerateCategorySignature(mimetype);
+		//qDebug() << "mimestr:" << mimestr;
+		if(mimestr.contains("Unknown")) // generate further analysis
+		{
+		    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
+			mimestr = "Windows System/Shortcut";
+		    else if(strcmp(fileinfolist->at(j).value("filename").toString().toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
+			mimestr = "Windows System/Recycler";
+		    else if(fileinfolist->at(j).value("filename").toString().startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
+			mimestr = "Windows System/Recycle.Bin";
+		    else if(fileinfolist->at(j).value("filename").toString().endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
+			mimestr = "Windows System/Prefetch";
+		    else if(fileinfolist->at(j).value("filename").toString().endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
+			mimestr = "Windows System/Prefetch";
+		    else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
+			mimestr = "Windows System/Registry";
+		    else if(fileinfolist->at(j).value("filename").toString().startsWith("$ALLOC_BITMAP"))
+			mimestr = "System File/Allocation Bitmap";
+		    else if(sigbuf.left(4) == "FILE")
+			mimestr = "Windows System/MFT File Entry";
+		}
+		if(fileinfolist->at(j).value("filename").toString().startsWith("$UPCASE_TABLE"))
+		    mimestr = "System File/Up-case Table";
+		nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
+	    }
         }
         else
             nodedata << "" << "";
