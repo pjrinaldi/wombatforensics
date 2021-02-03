@@ -36,5 +36,6 @@ qint64 ConvertExfatTimeToUnixTime(uint8_t t1, uint8_t t2, uint8_t d1, uint8_t d2
 QString ConvertWindowsTimeToUnixTime(uint64_t input);
 QString ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
 QString ConvertUnixTimeToString(uint32_t input);
+uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate);
 
 #endif // wombatfunctions.h

@@ -592,3 +592,14 @@ QString ConvertUnixTimeToString(uint32_t input)
 
     return timestr;
 }
+
+uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate)
+{
+// (369*365 + 89) * 24 * 3600 * 10000000
+#define	NSEC_BTWN_1601_1970	(uint64_t)(116444736000000000ULL)
+
+    ntdate -= (uint64_t) NSEC_BTWN_1601_1970;
+    ntdate /= (uint64_t) 10000000;
+
+    return (uint32_t) ntdate;
+}
