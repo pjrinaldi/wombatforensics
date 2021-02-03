@@ -891,11 +891,13 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     // PROBABLY NEED A MFT ENTRY LOOP TO SET THE INODEMAP PRIOR TO RUNNING ON THE FILES...
     for(int i=0; i < mftentrycount; i++)
     {
-	QHash<QString, QVariant> parfileinfo;
-	parfileinfo.clear();
+	//QHash<QString, QVariant> parfileinfo;
+	//parfileinfo.clear();
 	// MIGHT NEED A BOOLEAN TO DETERMINE IF WE ARE ON 1ST PASS FOR FILE OR 2ND PASS FOR THE ATTRIBUTES OR SOMETHING LIKE THAT...
 	fileinfo.clear();
 	qulonglong attrparentinode = 0;
+	QString attrparentpath = "";
+	QString attrparentfilename = "";
 	QByteArray curmftentry = mftarray.mid(i*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
 	// GET THE MFT ENTRY BYTE OFFSET RELATIVE TO THE FILE SYSTEM SO I CAN HIGHLIGHT IN HEX
 	qulonglong curmftentryoffset = 0;
@@ -1059,8 +1061,10 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		    }
 		    if(fileinfo.contains("filename"))
 		    {
-			//attrparentinode = curinode;
-			parfileinfo = fileinfo;
+			attrparentinode = fileinfo.value("inode").toUInt();
+			attrparentfilename = fileinfo.value("filename").toString();
+			attrparentpath = fileinfo.value("path").toString();
+			//parfileinfo = fileinfo;
 			fileinfolist->append(fileinfo);
 			curinode++;
 		    }
@@ -1081,20 +1085,20 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12)); // attrdata flags
 			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
 			{
-			    fileinfo.insert("filename", QVariant("$STANDARD_INFORMATION"));
+			    fileinfo.insert("filename", QVariant(QString("$STANDARD_INFORMATION")));
 			    fileinfo.insert("createdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 8)))));
 			    fileinfo.insert("modifydate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
 			    fileinfo.insert("statusdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
 			    fileinfo.insert("accessdate", QVariant(ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
 			    fileinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset) + "," + QString::number(attrlength) + ";")));
-			    //fileinfo.insert("logicalsize", QVariant(attrlength));
+			    fileinfo.insert("logicalsize", QVariant(attrlength));
 			    fileinfo.insert("physicalsize", QVariant(attrlength));
 			    fileinfo.insert("inode", QVariant(curinode));
-			    fileinfo.insert("parentinode", QVariant(parfileinfo.value("inode").toUInt()));
+			    fileinfo.insert("parentinode", QVariant(attrparentinode));
 			    //fileinfo.insert("parentinode", QVariant(attrparentinode));
 			    fileinfo.insert("isdeleted", QVariant(0));
 			    fileinfo.insert("itemtype", QVariant(10));
-			    fileinfo.insert("path", QVariant(QString(parfileinfo.value("path").toString() + parfileinfo.value("filename").toString() + "/")));
+			    fileinfo.insert("path", QVariant(QString(attrparentpath + attrparentfilename + "/")));
 			    //qDebug() << "STDINFO for:" << parfileinfo.value("inode").toUInt() << "curinode:" << curinode;
 			    fileinfolist->append(fileinfo);
 			    curinode++;
