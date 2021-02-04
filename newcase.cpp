@@ -869,7 +869,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     QHash<qulonglong, qulonglong> inodemap;
     inodemap.clear();
     QHash<QString, QVariant> fileinfo;
-    //QHash<QString, QVariant> parfileinfo;
     QByteArray mftarray;
     mftarray.clear();
     QFile efile(estring);
@@ -890,12 +889,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
     for(int i=0; i < mftentrycount; i++)
     {
-	//QHash<QString, QVariant> parfileinfo;
-	//parfileinfo.clear();
 	fileinfo.clear();
-	//qulonglong attrparentinode = 0;
-	//QString attrparentpath = "";
-	//QString attrparentfilename = "";
 	QByteArray curmftentry = mftarray.mid(i*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
 	// GET THE MFT ENTRY BYTE OFFSET RELATIVE TO THE FILE SYSTEM SO I CAN HIGHLIGHT IN HEX
 	qulonglong curmftentryoffset = 0;
@@ -931,8 +925,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                     // NEED TO MOVE THIS TO EITHER THE I30 OR THE DATA DEPENDING ON FILE TYPE OF EITHER DIRECTORY OR FILE
 		    //fileinfo.insert("layout", QString(QString::number(curmftentryoffset) + "," + QString::number(fsinfo->value("mftentrybytes").toUInt()) + ";"));
 
-		    // WILL NEED TO PARSE THE STANDARD INFORMATION AND FILE NAME SEPARATELY FOR THE FILE/DIR NODE
-		    // THEN I CAN PARSE THE ATTRIBUTES AGAIN FOR THE CHILD VIRTUAL FILES OF THE FILE/DIR
+                    // NEED TO ADD ADS, FIX PATH FOR CHILDREN, CATEGORY/SIGNATURE FOR SYSTEM FILES
 
 		    uint32_t attrlength = 0;
 		    int facnt = 0;
@@ -949,7 +942,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12)); // attrdata flags
 			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
 			{
-			    //uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate)
 			    fileinfo.insert("createdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 8)))));
 			    fileinfo.insert("modifydate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
 			    fileinfo.insert("statusdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
@@ -991,8 +983,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                                 fileinfo.insert("isdeleted", QVariant(0));
                                 //qDebug() << "allocated directory";
                             }
-                            //fileinfo.insert("isdeleted", QVariant(1));
-                            //itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, 14-encrypted file, 13-encrypted dir -1=not file (evid image, vol, part, fs), 15=carved file
 			    QString attrstr = "";
 			    if(accessflags & 0x01) // READ ONLY
 				attrstr += "Read Only,";
@@ -1150,7 +1140,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                             {
                                 for(int k=0; k < namelength; k++)
                                     attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
-                                fileinfo.insert("filename", QVariant(QString(fileinfo.value("filename").toString() + ":" + attrname)));
+                                if(!attrname.contains("$I30"))
+                                    fileinfo.insert("filename", QVariant(QString(fileinfo.value("filename").toString() + ":" + attrname)));
                                 //fileinfo.insert("filename", QVariant(QString("$INDEX_ROOT:" + attrname)));
                             }
                             //else
@@ -1176,7 +1167,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		    }
 		    if(fileinfo.contains("filename"))
 		    {
-                        qDebug() << fileinfo.value("filename").toString() << "layout:" << fileinfo.value("layout").toString();
+                        //qDebug() << fileinfo.value("filename").toString() << "layout:" << fileinfo.value("layout").toString();
 			//attrparentinode = fileinfo.value("inode").toUInt();
 			//attrparentfilename = fileinfo.value("filename").toString();
 			//attrparentpath = fileinfo.value("path").toString();
@@ -1352,9 +1343,13 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     for(int i=0; i < fileinfolist->count(); i++)
     {
 	QHash<QString, QVariant> curfileinfo = fileinfolist->at(i);
-        //if(curfileinfo.value("path").toString().startsWith("//"))
-        //{
-        //}
+        if(curfileinfo.value("path").toString().startsWith("//"))
+        {
+            // get parentinode, loop over all nodes with another for loop, if inode == parentinode, then path = parent path + parent filename
+            curfileinfo.insert("path", QVariant("update path/"));
+            fileinfolist->removeAt(i);
+            fileinfolist->append(curfileinfo);
+        }
 	if(curfileinfo.value("parentinode").toInt() == 0)
 	{
 	    //qDebug() << "cur file info:" << curfileinfo.value("filename").toString();
@@ -1367,6 +1362,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	    //qDebug() << "cur file info:" << fileinfolist->at(i).value("filename").toString();
 	}
     }
+    // PARSE ATTRIBUTES FOR ADS ATTRIBUTES
 /*
     int filestoparse = curinode;
     // PARSE ATTRIBUTES FOR EACH MFT ENTRY
