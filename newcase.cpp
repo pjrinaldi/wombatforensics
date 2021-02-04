@@ -1059,31 +1059,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			}
                         else if(attrtype == 0x80) // $DATA - resident or non-resident
                         {
-                        }
-                        else if(attrtype == 0x90) // $INDEX_ROOT - resident
-                        {
-                            if(attrflags == 0x02 || attrflags == 0x03) // directory
-                            {
-                            if(namelength > 0) // alternate data stream
-                            {
-                                for(int k=0; k < namelength; k++)
-                                    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
-                                fileinfo.insert("filename", QVariant(QString("$INDEX_ROOT:" + attrname)));
-                            }
-                            else
-                                fileinfo.insert("filename", QVariant(QString("$INDEX_ROOT")));
-                            fileinfo.insert("logicalsize", QVariant(attrlength));
-                            fileinfo.insert("physicalsize", QVariant(attrlength));
-                            fileinfo.insert("layout", QVariant(QString(QString::number(fileinfolist->at(i).value("layout").toString().split(";").at(0).split(",").at(0).toUInt() + curoffset) + "," + QString::number(attrlength) + ";")));
-                            fileinfo.insert("inode", QVariant(curinode));
-                            fileinfo.insert("parentinode", QVariant(fileinfolist->at(i).value("inode").toUInt()));
-                            fileinfo.insert("isdeleted", QVariant(0));
-                            fileinfo.insert("itemtype", QVariant(10));
-                            //fileinfo.insert("path", QVariant(QString(fileinfolist->at(i).value("path").toString() + fileinfolist->at(i).value("filename").toString() + "/")));
-                            }
-                        }
-                        else if(attrtype == 0xa0) // $INDEX_ALLOCATION - non-resident
-                        {
                             if(attrflags == 0x00 || attrflags == 0x01) // regular file
                             {
                             if(namelength == 0) // main file content - not alternate data stream
@@ -1094,7 +1069,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                                 //fileinfo.insert("filename", QVariant(QString("$DATA:" + attrname)));
                             //}
                             //else
-                                fileinfo.insert("filename", QVariant(QString("$DATA")));
+                                //fileinfo.insert("filename", QVariant(QString("$DATA")));
                             qulonglong logicalsize = 0;
                             qulonglong physicalsize = 0;
                             if(resflag == 0x00) // resident
@@ -1103,7 +1078,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                                 uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2));
                                 logicalsize = contentsize;
                                 physicalsize = contentsize;
-                                fileinfo.insert("layout", QVariant(QString(QString::number(fileinfolist->at(i).value("layout").toString().split(";").at(0).split(",").at(0).toUInt() + contentoffset) + "," + QString::number(contentsize) + ";")));
+                                fileinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentsize) + ";")));
+                                //fileinfo.insert("layout", QVariant(QString(QString::number(fileinfolist->at(i).value("layout").toString().split(";").at(0).split(",").at(0).toUInt() + contentoffset) + "," + QString::number(contentsize) + ";")));
                                 //qDebug() << "resident" << "size:" << contentsize << "offset:" << contentoffset;
                             }
                             else if(resflag == 0x01) // non-resident 
@@ -1155,16 +1131,44 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                             }
                             fileinfo.insert("logicalsize", QVariant(logicalsize));
                             fileinfo.insert("physicalsize", QVariant(physicalsize));
-                            fileinfo.insert("inode", QVariant(curinode));
-                            fileinfo.insert("parentinode", QVariant(fileinfolist->at(i).value("inode").toUInt()));
-                            fileinfo.insert("isdeleted", QVariant(0));
-                            fileinfo.insert("itemtype", QVariant(10));
-                            fileinfo.insert("path", QVariant(QString(fileinfolist->at(i).value("path").toString() + fileinfolist->at(i).value("filename").toString() + "/")));
-                            fileinfolist->append(fileinfo);
-                            curinode++;
+                            //fileinfo.insert("inode", QVariant(curinode));
+                            //fileinfo.insert("parentinode", QVariant(fileinfolist->at(i).value("inode").toUInt()));
+                            //fileinfo.insert("isdeleted", QVariant(0));
+                            //fileinfo.insert("itemtype", QVariant(10));
+                            //fileinfo.insert("path", QVariant(QString(fileinfolist->at(i).value("path").toString() + fileinfolist->at(i).value("filename").toString() + "/")));
+                            //fileinfolist->append(fileinfo);
+                            //curinode++;
                             }
                             //qDebug() << "data and alternate data streams, to get data layout";
                             }
+                        }
+                        else if(attrtype == 0x90) // $INDEX_ROOT - resident
+                        {
+                            if(attrflags == 0x02 || attrflags == 0x03) // directory
+                            {
+                            if(namelength > 0) // alternate data stream
+                            {
+                                for(int k=0; k < namelength; k++)
+                                    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
+                                fileinfo.insert("filename", QVariant(QString(fileinfo.value("filename").toString() + ":" + attrname)));
+                                //fileinfo.insert("filename", QVariant(QString("$INDEX_ROOT:" + attrname)));
+                            }
+                            //else
+                            //    fileinfo.insert("filename", QVariant(QString("$INDEX_ROOT")));
+                            fileinfo.insert("logicalsize", QVariant(attrlength));
+                            fileinfo.insert("physicalsize", QVariant(attrlength));
+		            //fileinfo.insert("layout", QString(QString::number(curmftentryoffset) + "," + QString::number(fsinfo->value("mftentrybytes").toUInt()) + ";"));
+                            fileinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset) + "," + QString::number(attrlength) + ";")));
+                            //fileinfo.insert("layout", QVariant(QString(QString::number(fileinfolist->at(i).value("layout").toString().split(";").at(0).split(",").at(0).toUInt() + curoffset) + "," + QString::number(attrlength) + ";")));
+                            //fileinfo.insert("inode", QVariant(curinode));
+                            //fileinfo.insert("parentinode", QVariant(fileinfolist->at(i).value("inode").toUInt()));
+                            //fileinfo.insert("isdeleted", QVariant(0));
+                            //fileinfo.insert("itemtype", QVariant(10));
+                            //fileinfo.insert("path", QVariant(QString(fileinfolist->at(i).value("path").toString() + fileinfolist->at(i).value("filename").toString() + "/")));
+                            }
+                        }
+                        else if(attrtype == 0xa0) // $INDEX_ALLOCATION - non-resident
+                        {
                         }
 			else if(attrtype == 0xffffffff)
 			    break;
@@ -1172,6 +1176,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		    }
 		    if(fileinfo.contains("filename"))
 		    {
+                        qDebug() << fileinfo.value("filename").toString() << "layout:" << fileinfo.value("layout").toString();
 			//attrparentinode = fileinfo.value("inode").toUInt();
 			//attrparentfilename = fileinfo.value("filename").toString();
 			//attrparentpath = fileinfo.value("path").toString();
@@ -1347,6 +1352,9 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     for(int i=0; i < fileinfolist->count(); i++)
     {
 	QHash<QString, QVariant> curfileinfo = fileinfolist->at(i);
+        //if(curfileinfo.value("path").toString().startsWith("//"))
+        //{
+        //}
 	if(curfileinfo.value("parentinode").toInt() == 0)
 	{
 	    //qDebug() << "cur file info:" << curfileinfo.value("filename").toString();
@@ -1359,6 +1367,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	    //qDebug() << "cur file info:" << fileinfolist->at(i).value("filename").toString();
 	}
     }
+/*
     int filestoparse = curinode;
     // PARSE ATTRIBUTES FOR EACH MFT ENTRY
     for(int i=0; i < filestoparse; i++)
@@ -1407,7 +1416,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		fileinfolist->append(fileinfo);
 		curinode++;
                 */
-	    }
+/*	    }
 	    else if(attrtype == 0x20) // $ATTRIBUTE_LIST
 	    {
 	    }
@@ -1430,7 +1439,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		fileinfolist->append(fileinfo);
 		curinode++;
                 */
-	    }
+/*	    }
 	    else if(attrtype == 0x40) // $OBJECT_ID
 	    {
 	    }
@@ -1526,6 +1535,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	    }
 	    else if(attrtype == 0x90) // $INDEX_ROOT - always resident
 	    {
+                /*
 		if(namelength > 0) // alternate data stream
 		{
 		    for(int k=0; k < namelength; k++)
@@ -1545,9 +1555,11 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		fileinfolist->append(fileinfo);
 		curinode++;
 		//qDebug() << "directory content data for layout";
-	    }
+                */
+/*	    }
 	    else if(attrtype == 0xa0) // $INDEX_ALLOCATION - always non-resident
 	    {
+                /*
 		if(namelength > 0) // alternate data stream
 		{
 		    for(int k=0; k < namelength; k++)
@@ -1626,7 +1638,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		curinode++;
 
 		//qDebug() << "indx allocation for more directory content layout to store...";
-	    }
+                */
+/*	    }
 	    else if(attrtype == 0xb0) // $BITMAP
 	    {
 	    }
@@ -1647,7 +1660,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	    curoffset += attrlength;
 	}
     }
-
+*/
 	/*
 	 * USE DIRENTRY $I30 TO PARSE TEH FILE SYSTEM, NOW I WILL TRY THE MFT PARSING METHOD, WHICH IS WHAT I SHOULD USE???
 	 *
