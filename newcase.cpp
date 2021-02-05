@@ -261,14 +261,19 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
             fsinfo.insert("totalsectors", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(40, 8))));
             fsinfo.insert("mftstartingcluster", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(48, 8))));
             //qDebug() << "MFT starting cluster:" << fsinfo.value("mftstartingcluster").toUInt();
-            fsinfo.insert("mftentrysize", QVariant(partbuf.at(64)));
-	    unsigned int mftentrybytes = fsinfo.value("mftentrysize").toUInt() * fsinfo.value("bytespersector").toUInt() * fsinfo.value("sectorspercluster").toUInt();
-            fsinfo.insert("mftentrybytes", QVariant(mftentrybytes));
+	    //qDebug() << "mftentrysize:" << (uint8_t)partbuf.at(64);
+            fsinfo.insert("mftentrysize", QVariant((uint8_t)partbuf.at(64)));
+	    qulonglong mftentrybytes = fsinfo.value("mftentrysize").toUInt() * fsinfo.value("bytespersector").toUInt() * fsinfo.value("sectorspercluster").toUInt();
+	    //qDebug() << "mftentrybytes:" << mftentrybytes;
+            //fsinfo.insert("mftentrybytes", QVariant(mftentrybytes));
+	    fsinfo.insert("mftentrybytes", QVariant(1024));
 	    //qDebug() << "mft entry size in bytes:" << mftentrybytes;
             fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
             fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
             //qDebug() << "serial num:" << QString("0x" + QString::number(fsinfo.value("serialnum").toULongLong(), 16));
+	    //qDebug() << "partoffset:" << partoffset << "sectorspercluster:" << fsinfo.value("sectorspercluster").toUInt() << "bytespersector:" << fsinfo.value("bytespersector").toUInt();
             fsinfo.insert("mftoffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("mftstartingcluster").toUInt() * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()))));
+	    //qDebug() << "mftstarting cluster;" << fsinfo.value("mftstartingcluster").toUInt();
             //qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toUInt();
             // get MFT entry for $MFT to determine cluster's that contain the MFT...
             QByteArray mftentry0;
@@ -279,10 +284,13 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 efile.open(QIODevice::ReadOnly);
             if(efile.isOpen())
             {
-                efile.seek(fsinfo.value("mftoffset").toUInt());
+		//qDebug() << "is byte array error here???";
+		//qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toULongLong();
+                efile.seek(fsinfo.value("mftoffset").toULongLong());
                 mftentry0 = efile.read(mftentrybytes);
-		efile.seek(fsinfo.value("mftoffset").toUInt() + 3 * mftentrybytes);
+		efile.seek(fsinfo.value("mftoffset").toULongLong() + 3 * mftentrybytes);
 		mftentry3 = efile.read(mftentrybytes);
+		//qDebug() << "is bytearray error here...";
                 efile.close();
             }
             //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
@@ -894,6 +902,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     {
 	//qDebug() << "mft layout:" << fsinfo->value("mftlayout").toString();
         QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
+	//qDebug() << "mft offset:" << mftlist.at(0).split(",").at(0).toULongLong() << "mft size:" << mftlist.at(0).split(",").at(1).toULongLong();
         for(int i=0; i < mftlist.count(); i++)
         {
             efile.seek(mftlist.at(i).split(",").at(0).toULongLong());
