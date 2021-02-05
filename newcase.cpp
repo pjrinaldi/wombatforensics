@@ -983,6 +983,11 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                                 fileinfo.insert("isdeleted", QVariant(0));
                                 //qDebug() << "allocated directory";
                             }
+			    else if(accessflags & 0x02 && accessflags & 0x04)
+			    {
+				fileinfo.insert("itemtype", QVariant(5));
+				fileinfo.insert("isdeleted", QVariant(0));
+			    }
 			    QString attrstr = "";
 			    if(accessflags & 0x01) // READ ONLY
 				attrstr += "Read Only,";
@@ -1033,6 +1038,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    fileinfo.insert("fileaccess", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 56, 8)))));
 			    //fileinfo.insert("physicalsize", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 64, 8))));
 			    //fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 72, 8))));
+			    //uint32_t fnflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 80, 4));
 			    uint8_t filenamelength = curmftentry.at(curoffset + 88);
 			    uint8_t filenamespace = curmftentry.at(curoffset + 89);
 			    //qDebug() << "filenamelength:" << filenamelength << "Filenamespace:" << filenamespace;
@@ -1045,6 +1051,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 				fileinfo.insert("filename", QVariant(filename));
 				//filename += QString(QChar(qFromLittleEndian<uint16_t>(filenamebuf.mid(66 + j*2, 2))));
 			    }
+			    //if(fnflags & 0x10000000) // Directory
+				//qDebug() << fileinfo.value("filename").toString() << "Directory accessflags works!!";
 			    //qDebug() << "logical size:" << fileinfo.value("logicalsize").toUInt();
 			}
                         else if(attrtype == 0x80) // $DATA - resident or non-resident
@@ -1134,13 +1142,13 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                         }
                         else if(attrtype == 0x90) // $INDEX_ROOT - resident
                         {
-                            if(attrflags == 0x02 || attrflags == 0x03) // directory
+                            if(attrflags == 0x02 || attrflags == 0x03 || (fileinfo.value("attribute").toString().contains("Hidden") && fileinfo.value("attribute").toString().contains("System"))) // directory
                             {
                             if(namelength > 0) // alternate data stream
                             {
                                 for(int k=0; k < namelength; k++)
                                     attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
-                                if(!attrname.contains("$I30"))
+                                if(!attrname.startsWith("$I30"))
                                     fileinfo.insert("filename", QVariant(QString(fileinfo.value("filename").toString() + ":" + attrname)));
                                 //fileinfo.insert("filename", QVariant(QString("$INDEX_ROOT:" + attrname)));
                             }
@@ -1160,6 +1168,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                         }
                         else if(attrtype == 0xa0) // $INDEX_ALLOCATION - non-resident
                         {
+			    // add to fileinfo so i can add to properties... maybe attrtype1, atrrname1, attrlayout1...
                         }
 			else if(attrtype == 0xffffffff)
 			    break;
