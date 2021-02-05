@@ -133,6 +133,212 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
 
 QString ParseI30Artifact(QString i30name, QString i30id)
 {
+
+    // FROM PROPERTIES FILES, I WILL NEED I CAN GET MFTRECORD LAYOUT AND ESTRING TO ACCESS DD...
+    	/*
+	 * USE DIRENTRY $I30 TO PARSE TEH FILE SYSTEM, NOW I WILL TRY THE MFT PARSING METHOD, WHICH IS WHAT I SHOULD USE???
+	 *
+	 *
+        QByteArray curmftentryarray = mftarray.mid(curmftentry * fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
+        int curoffset = 0;
+        uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curmftentryarray.mid(20, 2)); // offset to first attribute
+        uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentryarray.mid(40, 2)); // next attribute id
+        uint32_t attrlength = 0;
+	QByteArray indxrootbuf;
+	QByteArray indxallocbuf;
+	indxrootbuf.clear();
+	indxallocbuf.clear();
+        curoffset = firstattroffset;
+        for(int i=0; i < attrcount; i++)
+        {
+            uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentryarray.mid(curoffset, 4)); // attribute type
+            //uint8_t namelength = qFromLittleEndian<uint8_t>(curmftentryarray.mid(curoffset + 9, 1)); // length of name
+            attrlength = qFromLittleEndian<uint32_t>(curmftentryarray.mid(curoffset + 4, 4)); // attribute length
+	    uint16_t attroffset = qFromLittleEndian<uint16_t>(curmftentryarray.mid(curoffset + 20, 2));
+            //qDebug() << "attr type:" << attrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
+            if(attrtype == 0x90) // $INDEX_ROOT - ALWAYS RESIDENT
+	    {
+                //qDebug() << "process index root here";
+		uint32_t atlength = qFromLittleEndian<uint32_t>(curmftentryarray.mid(curoffset + 16, 4));
+		indxrootbuf = curmftentryarray.mid(curoffset + attroffset, atlength);
+	    }
+            else if(attrtype == 0xa0) // $INDEX_ALLOCATION - ALWAYS NON-RESIDENT
+	    {
+                //qDebug() << "process index allocation here";
+		//uint64_t vcnstart = qFromLittleEndian<uint64_t>(curmftentryarray.mid(curoffset + 16, 8));
+		//uint64_t vcnend = qFromLittleEndian<uint64_t>(curmftentryarray.mid(curoffset + 24, 8));
+		uint16_t runlistoff = qFromLittleEndian<uint16_t>(curmftentryarray.mid(curoffset + 32, 2));
+		//uint64_t actualattrcontentsize = qFromLittleEndian<uint64_t>(curmftentryarray.mid(curoffset + 48, 8));
+		curoffset = curoffset + runlistoff;
+		int j=0;
+		QStringList runlist;
+		runlist.clear();
+		while(curoffset < fsinfo->value("mftentrybytes").toUInt())
+		{
+		    if(curmftentryarray.at(curoffset) > 0)
+		    {
+			int runlengthbytes = QString(QString::number(curmftentryarray.at(curoffset), 16).at(1)).toInt();
+			int runlengthoffset = QString(QString::number(curmftentryarray.at(curoffset), 16).at(0)).toInt();
+			//qDebug() << "runlengthbytes:" << runlengthbytes << "runlengthoffset:" << runlengthoffset;
+			if(runlengthbytes == 0 && runlengthoffset == 0)
+			    break;
+			curoffset++;
+			int runlength = qFromLittleEndian<int>(curmftentryarray.mid(curoffset, runlengthbytes));
+			//qDebug() << "runlength:" << runlength;
+			int runoffset = qFromLittleEndian<int>(curmftentryarray.mid(curoffset + runlengthbytes, runlengthoffset));
+			if(j > 0)
+			    runoffset = runoffset + runlist.at(j-1).split(",").at(0).toUInt();
+			//qDebug() << "runoffset:" << runoffset << "runlength:" << runlength;
+			runlist.append(QString::number((fsinfo->value("partoffset").toUInt() * 512) + runoffset * fsinfo->value("bytespercluster").toUInt()) + "," + QString::number(runlength * fsinfo->value("bytespercluster").toUInt()));
+			j++;
+			curoffset += runlengthbytes + runlengthoffset;
+		    }
+		    else
+			break;
+		}
+		//qDebug() << "runlist:" << runlist;
+		if(!efile.isOpen())
+		    efile.open(QIODevice::ReadOnly);
+		if(efile.isOpen())
+		{
+		    for(j=0; j < runlist.count(); j++)
+		    {
+			efile.seek(runlist.at(j).split(",").at(0).toUInt());
+			indxallocbuf.append(efile.read(runlist.at(j).split(",").at(1).toUInt()));
+		    }
+		    efile.close();
+		}
+	    }
+            else if(attrtype == 4294967295)
+                break;
+            curoffset += attrlength;
+        }
+	qDebug() << "indxallocbuf count:" << indxallocbuf.count();
+	//uint32_t leroothdr = qFromLittleEndian<uint32_t>(indxrootbuf.left(4)); // uint 4 bytes (0-3)
+	//qDebug() << "leroothdr:" << QString::number(leroothdr, 16); // should be 0x30
+	// bytes 4-7 are collation sorting rule, which enforces filename sorting and not needed to parse.
+	uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxrootbuf.mid(8, 4)); // INDEX RECORD SIZE (BYTES)
+	// byte 12 is index record cluster size
+	// bytes 13-15 are always unused
+	uint32_t indxentryoffset = qFromLittleEndian<uint32_t>(indxrootbuf.mid(16, 4));
+	uint32_t indxentrylistsize = qFromLittleEndian<uint32_t>(indxrootbuf.mid(20, 4));
+	uint32_t indxentrylistallocated = qFromLittleEndian<uint32_t>(indxrootbuf.mid(24, 4));
+        //if((indexentrylistallocated - indexentrylistsize) > 0)
+        //    isindxrootslack = true;
+	uint8_t indxentrylistflags = indxrootbuf.at(28);
+	qDebug() << "indxentrylistflags:" << QString::number(indxentrylistflags, 16);
+	if(indxentrylistflags == 0x01) // $INDEX_ALLOC EXISTS
+	{
+	    int indxrecordcount = indxallocbuf.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
+	    uint curpos = 0;
+	    for(int i=0; i < indxrecordcount; i++)
+	    {
+		QString indxrecordheader = QString::fromStdString(indxallocbuf.mid(curpos, 4).toStdString());
+		uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxallocbuf.mid(curpos + 24, 4));
+		uint32_t indxentryendoffset = qFromLittleEndian<uint32_t>(indxallocbuf.mid(curpos + 28, 4));
+		uint32_t indxentryallocoffset = qFromLittleEndian<uint32_t>(indxallocbuf.mid(curpos + 32, 4));
+		curpos = curpos + 24 + indxentrystartoffset;
+		while(curpos < indxentryallocoffset)
+		{
+		    //qDebug() << "curpos at start of next index entry:" << curpos;
+		    uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxallocbuf.mid(curpos + 8, 2));
+		    uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxallocbuf.mid(curpos + 10, 2));
+		    //qDebug() << "filenamelength:" << filenamelength << "indexentrylength:" << indxentrylength;
+		    if(indxentrylength == 0 || filenamelength == 0)
+		    {
+			i = indxrecordcount;
+			break;
+		    }
+		    QByteArray filenamebuf = indxallocbuf.mid(curpos + 16, filenamelength);
+		    uint8_t fnametype = filenamebuf.at(65);
+		    qDebug() << "fnametype:" << fnametype;
+		    if(fnametype != 0x02)
+		    {
+		    qulonglong parentnode = qFromLittleEndian<uint64_t>(filenamebuf.mid(0, 6));
+		    //qDebug() << "parentnode:" << parentnode << "pnode:" << pnode;
+		    uint64_t parfileref = qFromLittleEndian<uint64_t>(filenamebuf.mid(0, 8));
+		    uint64_t createdate = qFromLittleEndian<uint64_t>(filenamebuf.mid(8, 8));
+		    uint64_t modifydate = qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8));
+		    uint64_t changedate = qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8));
+		    uint64_t accessdate = qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8));
+		    uint64_t logicalsize = qFromLittleEndian<uint64_t>(filenamebuf.mid(40, 8));
+		    uint64_t physicalsize = qFromLittleEndian<uint64_t>(filenamebuf.mid(48, 8));
+		    uint32_t fileflags = qFromLittleEndian<uint32_t>(filenamebuf.mid(56, 4));
+		    uint32_t filereparse = qFromLittleEndian<uint32_t>(filenamebuf.mid(60, 4));
+		    uint8_t fnamelength = filenamebuf.at(64);
+		    QString filename = "";
+		    for(int j=0; j < fnamelength; j++)
+			filename += QString(QChar(qFromLittleEndian<uint16_t>(filenamebuf.mid(66 + j*2, 2))));
+		    qDebug() << "filename:" << filename;
+		    //filename += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid((i+j)*32 + k*2, 2))));
+                    if(curpos > indxentryendoffset)
+			qDebug() << "deleted file/dir";
+		    }
+                    curpos = curpos + indxentrylength;
+		}
+	    }
+	}
+	else // 0x00 NO $INDEX_ALLOC
+	{
+
+            qDebug() << "no index allocation...";
+            // bytes 29-31 are often blank, always unused. bytes 32 starts the 1st index entry...
+            // byte 32 because header started at byte 16, and offset to 1st index entry was 16, 16+16=32
+            uint curpos = 32;
+            int a=1;
+            //if((indexentrylistallocated - indexentrylistsize) > 0)
+            //    isindxrootslack = true;
+            //MIGHT WANT TO USE THE INDEXENTRYLISTALLOCATED INSTAED OF INDEXENTRYLISTSIZE AND THEN IMPLEMENT THE TWO ZERO CHECKS TO BREAK...
+            //while(curpos < indexentrylistsize - 32) // LOOPS OVER THE INDEX ENTRIES
+            while(curpos < indexentrylistallocated - 32) // LOOPS OVER THE INDEX ENTRIES
+            {
+                if(a % 2 == 0)
+                    htmlstr += "<tr class=even>";
+                else
+                    htmlstr += "<tr class=odd>";
+                //uint64_t indxentrymftref = qFromLittleEndian<uint64_t>(indxrootba.mid(curpos, 8));
+                uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxrootba.mid(curpos + 8, 2));
+                uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxrootba.mid(curpos + 10, 2));
+                //uint16_t indxentryflags = qFromLittleEndian<uint16_t>(indxrootba.mid(curpos + 12, 4));
+                QByteArray filenameattribute = indxrootba.mid(curpos + 16, filenamelength);
+                uint64_t createdtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(8, 8));
+                uint64_t modifiedtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(16, 8));
+                uint64_t changedtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(24, 8));
+                uint64_t accessedtime = qFromLittleEndian<uint64_t>(filenameattribute.mid(32, 8));
+                uint64_t logicalsize = qFromLittleEndian<uint64_t>(filenameattribute.mid(40, 8));
+                uint64_t physicalsize = qFromLittleEndian<uint64_t>(filenameattribute.mid(48, 8));
+                //uint64_t filenameflags = qFromLittleEndian<uint64_t>(filenameattribute.mid(56, 4));
+                // 60-63 is reparse value
+                uint8_t fnamelength = qFromLittleEndian<uint8_t>(filenameattribute.mid(64, 1));
+                //uint8_t filenamespace = qFromLittleEndian<uint8_t>(filenameattribute.mid(65, 1));
+                if(indxentrylength == 0 || filenamelength == 0)
+                    break;
+                QString filename = "";
+                for(int i=0; i < fnamelength*2; i++)
+                {
+                    if(i % 2 == 0)
+                        filename.append(filenameattribute.mid(66+i, 1));
+                }
+                htmlstr += "<td>" + filename + "</td>";
+                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(createdtime) + "</td>";
+                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(modifiedtime) + "</td>";
+                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(changedtime) + "</td>";
+                htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(accessedtime) + "</td>";
+                htmlstr += "<td>" + QString::number(logicalsize) + "</td>";
+                htmlstr += "<td>" + QString::number(physicalsize) + "</td>";
+                htmlstr += "<td>&nbsp;</td>";
+                htmlstr += "</tr>";
+                curpos = curpos + indxentrylength;
+                //curpos = curpos + 16 + indxentrylength;
+                a++;
+            }
+	}
+	*/
+    //}
+    //qDebug() << "fs type str:" << fsinfo->value("typestr").toString();
+    //qDebug() << "cur mft entry:" << curmftentry;
+
+
     QString htmlstr = "";
     QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
