@@ -1031,7 +1031,17 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    }
 			    else
 			    {
-				fileinfo.insert("path", QVariant("//"));
+				QString curpath = "";
+				for(int j=0; j < fileinfolist->count(); j++)
+				{
+				    if(fileinfolist->at(j).value("ntinode").toUInt() == fileinfo.value("parntinode").toUInt())
+				    {
+					curpath = fileinfolist->at(j).value("path").toString() + fileinfolist->at(j).value("filename").toString() + "/";
+					break;
+				    }
+				}
+				fileinfo.insert("path", QVariant(curpath));
+				//fileinfo.insert("path", QVariant("//"));
 				fileinfo.insert("parentinode", QVariant(inodemap.value(fileinfo.value("parntinode").toUInt())));
 			    }
 			    fileinfo.insert("filecreate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
@@ -1161,7 +1171,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 				fileinfo.insert("physicalsize", QVariant(contentlength));
 				//fileinfo.insert("layout", QString(QString::number(curmftentryoffset) + "," + QString::number(fsinfo->value("mftentrybytes").toUInt()) + ";"));
 				fileinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentlength) + ";")));
-				qDebug() << fileinfo.value("filename").toString() << fileinfo.value("layout").toString();
+				//qDebug() << fileinfo.value("filename").toString() << fileinfo.value("layout").toString();
 				//fileinfo.insert("layout", QVariant(QString(QString::number(fileinfolist->at(i).value("layout").toString().split(";").at(0).split(",").at(0).toUInt() + curoffset) + "," + QString::number(attrlength) + ";")));
 				//fileinfo.insert("inode", QVariant(curinode));
 				//fileinfo.insert("parentinode", QVariant(fileinfolist->at(i).value("inode").toUInt()));
@@ -1356,6 +1366,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     for(int i=0; i < fileinfolist->count(); i++)
     {
 	QHash<QString, QVariant> curfileinfo = fileinfolist->at(i);
+	/*
         if(curfileinfo.value("path").toString().startsWith("//"))
         {
             // get parentinode, loop over all nodes with another for loop, if inode == parentinode, then path = parent path + parent filename
@@ -1363,16 +1374,22 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
             fileinfolist->removeAt(i);
             fileinfolist->append(curfileinfo);
         }
+	*/
 	if(curfileinfo.value("parentinode").toInt() == 0)
 	{
-	    //qDebug() << "cur file info:" << curfileinfo.value("filename").toString();
-	    //qDebug() << "parntinode:" << fileinfolist->at(i).value("parntinode").toUInt();
-	    //qDebug() << "inodemap value:" << inodemap.value(fileinfolist->at(i).value("parntinode").toUInt());
+	    QString curpath = "";
+	    for(int j=0; j < fileinfolist->count(); j++)
+	    {
+		if(fileinfolist->at(j).value("ntinode").toUInt() == curfileinfo.value("parntinode").toUInt())
+		{
+		    curpath = fileinfolist->at(j).value("path").toString() + fileinfolist->at(j).value("filename").toString() + "/";
+		    break;
+		}
+	    }
 	    curfileinfo.insert("parentinode", QVariant(inodemap.value(curfileinfo.value("parntinode").toUInt())));
+	    curfileinfo.insert("path", QVariant(curpath));
 	    fileinfolist->removeAt(i);
 	    fileinfolist->append(curfileinfo);
-	    //qDebug() << "fileinfolist parentinode:" << fileinfolist->at(i).value("parentinode").toInt();
-	    //qDebug() << "cur file info:" << fileinfolist->at(i).value("filename").toString();
 	}
     }
     // PARSE ATTRIBUTES FOR ADS ATTRIBUTES
