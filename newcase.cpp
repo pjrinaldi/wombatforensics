@@ -147,7 +147,7 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 			pofflist->append(curoffset);
         		psizelist->append(cursize);
                         ParseFileSystemInformation(estring, curoffset, fsinfolist);
-			qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+			//qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
 		    }
 		    else
 		    {
@@ -224,6 +224,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     if(winsig == 0xaa55) // FAT OR NTFS
     {
 	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
+	//qDebug() << "exfatstr:" << exfatstr;
 	QString fatstr = QString::fromStdString(partbuf.mid(54, 5).toStdString());
         QString fat32str = QString::fromStdString(partbuf.mid(82, 5).toStdString());
 	if(fatstr == "FAT12") // FAT12
@@ -877,11 +878,12 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         efile.open(QIODevice::ReadOnly);
     if(efile.isOpen())
     {
+	qDebug() << "mft layout:" << fsinfo->value("mftlayout").toString();
         QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
         for(int i=0; i < mftlist.count(); i++)
         {
-            efile.seek(mftlist.at(i).split(",").at(0).toUInt());
-            mftarray.append(efile.read(mftlist.at(i).split(",").at(0).toUInt()));
+            efile.seek(mftlist.at(i).split(",").at(0).toULongLong());
+            mftarray.append(efile.read(mftlist.at(i).split(",").at(0).toULongLong()));
         }
         efile.close();
     }
@@ -899,10 +901,10 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	qulonglong entriespersize = 0;
 	for(int j=0; j < mftlist.count(); j++)
 	{
-	    entriespersize += mftlist.at(j).split(",").at(1).toUInt() / fsinfo->value("mftentrybytes").toUInt();
+	    entriespersize += mftlist.at(j).split(",").at(1).toULongLong() / fsinfo->value("mftentrybytes").toUInt();
 	    if(i < entriespersize)
 	    {
-		curmftentryoffset = mftlist.at(j).split(",").at(0).toUInt() + mftrelativeoffset;
+		curmftentryoffset = mftlist.at(j).split(",").at(0).toULongLong() + mftrelativeoffset;
 		break;
 	    }
 	}
@@ -3260,6 +3262,7 @@ void ProcessVolume(QString evidstring)
 	psizelist.append(imgsize/512);
         ParseFileSystemInformation(emntstring, 0, &fsinfolist);
     }
+    //qDebug() << "pofflist:" << pofflist << "psizelist:" << psizelist;
     // add partitions to tree and decide about stat/prop files and where to put them...
     int ptreecnt = 0;
     QString curpartpath;
