@@ -382,6 +382,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
             indxrootcontent.clear();
             indxalloccontent.clear();
             //bitmapcontent.clear();
+	    qDebug() << "tmpmntpath:" << wombatvariable.tmpmntpath;
             /*
             TSK_IMG_INFO* imginfo = NULL;
             std::vector<std::string> pathvector;
@@ -541,6 +542,7 @@ QString ParseI30Artifact(QString i30name, QString i30id)
         else // 0x00 NO $INDEX_ALLOCATION
         {
             qDebug() << "no index allocation...";
+	    qDebug() << "tmpmntpath:" << wombatvariable.tmpmntpath;
             // bytes 29-31 are often blank, always unused. bytes 32 starts the 1st index entry...
             // byte 32 because header started at byte 16, and offset to 1st index entry was 16, 16+16=32
             uint curpos = 32;

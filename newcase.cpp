@@ -100,9 +100,9 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 		    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
 		    if((curendsector - curstartsector) > 0)
 		    {
-			pofflist->append(curstartsector);
-			psizelist->append((curendsector - curstartsector + 1));
-                        ParseFileSystemInformation(estring, curstartsector, fsinfolist);
+			pofflist->append(curstartsector * 512);
+			psizelist->append((curendsector - curstartsector + 1) * 512);
+                        ParseFileSystemInformation(estring, curstartsector * 512, fsinfolist);
 			//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
 		    }
 
@@ -187,9 +187,9 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 	    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
 	    if((curendsector - curstartsector) > 0)
 	    {
-		pofflist->append(curstartsector);
-		psizelist->append((curendsector - curstartsector + 1));
-                ParseFileSystemInformation(estring, curstartsector,fsinfolist);
+		pofflist->append(curstartsector * 512);
+		psizelist->append((curendsector - curstartsector + 1) * 512);
+                ParseFileSystemInformation(estring, curstartsector * 512,fsinfolist);
 		//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
 	    }
 	}
