@@ -3718,6 +3718,20 @@ void WriteFileProperties(QHash<QString, QVariant>*fileinfo, QString pathstring)
 	    out << "uid / gid|" << QString(QString::number(fileinfo->value("userid").toUInt()) + " / " + QString::number(fileinfo->value("groupid").toUInt())) << "|User ID and Group ID" << Qt::endl;
 	if(fileinfo->contains("linkcount"))
 	    out << "Link Count|" << QString::number(fileinfo->value("linkcount").toUInt()) << "|Number of files pointing to this file" << Qt::endl;
+	if(fileinfo->contains("ntinode"))
+	    out << "MFT Entry Record|" << QString::number(fileinfo->value("ntinode").toUInt()) << "|Entry record for the file in the Master File Table (MFT)" << Qt::endl;
+	if(fileinfo->contains("mftrecordlayout"))
+	    out << "MFT Record Layout|" << fileinfo->value("mftrecordlayout").toString() << "|Byte offset and size for the MFT Entry record" << Qt::endl;
+	if(fileinfo->contains("parntinode"))
+	    out << "Parent MFT Entry Record|" << QString::number(fileinfo->value("parntinode").toUInt()) << "|Parent Entry Record for the current entry record in the MFT" << Qt::endl;
+	if(fileinfo->contains("filecreate"))
+	    out << "$FILE_NAME Create Date|" << ConvertWindowsTimeToUnixTime(fileinfo->value("filecreate").toUInt()) << "|File Creation time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	if(fileinfo->contains("filemodify"))
+	    out << "$FILE_NAME Modified Date|" << ConvertWindowsTimeToUnixTime(fileinfo->value("filemodify").toUInt()) << "|File Modification time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	if(fileinfo->contains("filestatus"))
+	    out << "$FILE_NAME Status Changed Date|" << ConvertWindowsTimeToUnixTime(fileinfo->value("filestatus").toUInt()) << "|File Status Changed time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	if(fileinfo->contains("fileaccess"))
+	    out << "$FILE_NAME Accessed Date|" << ConvertWindowsTimeToUnixTime(fileinfo->value("fileaccess").toUInt()) << "|File Accessed time as recorded in the $FILE_NAME attribute" << Qt::endl;
         out.flush();
         filepropfile.close();
     }
@@ -3752,6 +3766,15 @@ void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstr
             out << "Root Directory Size|" << QString::number(fsinfo->value("rootdirsize").toUInt()) << "|Size in bytes for the root directory" << Qt::endl;
             out << "Cluster Area Start|" << QString::number(fsinfo->value("clusterareastart").toUInt()) << "|Byte offset to the start of the cluster area" << Qt::endl;
         }
+	else if(fsinfo->value("type").toUInt() == 5) // NTFS
+	{
+	    out << "Bytes Per Cluster|" << QString::number(fsinfo->value("bytespercluster").toUInt()) << "|Number of bytes per cluster" << Qt::endl;
+	    out << "MFT Starting Cluster|" << QString::number(fsinfo->value("mftstartingcluster").toUInt()) << "|Starting cluster number for the MFT" << Qt::endl;
+	    out << "MFT Starting Offset|" << QString::number(fsinfo->value("mftoffset").toUInt()) << "|Starting byte for the MFT" << Qt::endl;
+	    out << "MFT Entry Size|" << QString::number(fsinfo->value("mftentrysize").toUInt()) << "|Entry size in bytes for an MFT Entry, usually 1024" << Qt::endl;
+	    out << "Serial Number|" << QString::number(fsinfo->value("serialnum").toUInt(), 16) << "|Serial number for the file system volume" << Qt::endl;
+	    out << "MFT Layout|" << fsinfo->value("mftlayout").toString() << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
+	}
 	else if(fsinfo->value("type").toUInt() == 6) // EXT2/3/4
 	{
 	    out << "Created Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("mkfstime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Creation time for the file system" << Qt::endl;
