@@ -133,7 +133,6 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
 
 QString ParseI30Artifact(QString i30name, QString i30id)
 {
-    qDebug() << "i30name:" << i30name << "i30id:" << i30id;
     // FROM PROPERTIES FILES, I WILL NEED I CAN GET MFTRECORDLAYOUT AND ESTRING TO ACCESS DD...
     	/*
 	 * USE DIRENTRY $I30 TO PARSE TEH FILE SYSTEM, NOW I WILL TRY THE MFT PARSING METHOD, WHICH IS WHAT I SHOULD USE???

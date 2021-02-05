@@ -3559,8 +3559,10 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
 			mimestr = "Windows System/Registry";
 		    else if(fileinfolist->at(j).value("filename").toString().startsWith("$ALLOC_BITMAP"))
 			mimestr = "System File/Allocation Bitmap";
-		    else if(sigbuf.left(4) == "FILE")
-			mimestr = "Windows System/MFT File Entry";
+		    else if(fileinfolist->at(j).value("filename").toString().startsWith("$MFT") || fileinfolist->at(j).value("filename").toString().startsWith("$MFTMirr") || fileinfolist->at(j).value("filename").toString().startsWith("$LogFile") || fileinfolist->at(j).value("filename").toString().startsWith("$Volume") || fileinfolist->at(j).value("filename").toString().startsWith("$AttrDef") || fileinfolist->at(j).value("filename").toString().startsWith("$Bitmap") || fileinfolist->at(j).value("filename").toString().startsWith("$Boot") || fileinfolist->at(j).value("filename").toString().startsWith("$BadClus") || fileinfolist->at(j).value("filename").toString().startsWith("$Secure") || fileinfolist->at(j).value("filename").toString().startsWith("$UpCase") || fileinfolist->at(j).value("filename").toString().startsWith("$Extend"))
+			mimestr = "Windows System/System File";
+		    //else if(sigbuf.left(4) == "FILE")
+			//mimestr = "Windows System/MFT File Entry";
 		}
 		if(fileinfolist->at(j).value("filename").toString().startsWith("$UPCASE_TABLE"))
 		    mimestr = "System File/Up-case Table";
