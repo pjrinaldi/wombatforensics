@@ -331,9 +331,22 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			if(runlengthbytes == 0 && runlengthoffset == 0)
 			    break;
 			curoffset++;
+			uint runlength = 0;
+			uint runoffset = 0;
+			if(runlengthbytes == 1)
+			    runlength = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset, runlengthbytes));
+			else
+			    runlength = qFromLittleEndian<uint>(mftentry0.mid(curoffset, runlengthbytes));
+			if(runlengthoffset == 1)
+			    runoffset = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+			else
+			    runoffset = qFromLittleEndian<uint>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+			/*
+			 */ 
 			//qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
-			int runlength = qFromLittleEndian<int>(mftentry0.mid(curoffset, runlengthbytes));
-			int runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+			
+			//int runlength = qFromLittleEndian<int>(mftentry0.mid(curoffset, runlengthbytes));
+			//int runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
                         if(i > 0)
                             runoffset = runoffset + runlist.at(i-1).split(",").at(0).toUInt();
 			//qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
@@ -352,6 +365,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			break;
 		    //break;
 		}
+		//qDebug() << "runlist:" << runlist;
                 QString runliststr = "";
                 for(int i=0; i < runlist.count(); i++)
                     runliststr += runlist.at(i) + ";";
@@ -878,7 +892,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         efile.open(QIODevice::ReadOnly);
     if(efile.isOpen())
     {
-	qDebug() << "mft layout:" << fsinfo->value("mftlayout").toString();
+	//qDebug() << "mft layout:" << fsinfo->value("mftlayout").toString();
         QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
         for(int i=0; i < mftlist.count(); i++)
         {
