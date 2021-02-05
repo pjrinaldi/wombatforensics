@@ -383,6 +383,24 @@ QString ParseI30Artifact(QString i30name, QString i30id)
             indxalloccontent.clear();
             //bitmapcontent.clear();
 	    qDebug() << "tmpmntpath:" << wombatvariable.tmpmntpath;
+	    // GET CORRECT EVIDENCE DIRECTORY
+	    QString evidid = i30id.split("-").first();
+	    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+	    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
+	    qDebug() << "evidfile:" << evidfiles.at(0);
+	    /*
+	    QString evidid = nodeid.split("-").first();
+	    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+	    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
+	    QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
+	    QString tmpstr = "";
+	    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
+	    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	    if(evidfile.isOpen())
+		tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
+	    evidfile.close();
+	    */
+
             /*
             TSK_IMG_INFO* imginfo = NULL;
             std::vector<std::string> pathvector;
