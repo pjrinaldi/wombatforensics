@@ -735,7 +735,7 @@ public:
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid)));
             else
             {
-                qDebug() << "parid:" << parid << "parents value:" << parents.value(parid);
+                //qDebug() << "parid:" << parid;
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
             }
             parents[data.at(11).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
@@ -750,6 +750,13 @@ public:
                 parents.value(data.at(11).toString())->SetDeleted(true); // USED TO BE 0
             }
         }
+    };
+
+    bool ParentNodeExists(QString parid)
+    {
+        if(parents.contains(parid))
+            return true;
+        return false;
     };
 
     void UpdateNode(QString itemid, int column, QString hash)

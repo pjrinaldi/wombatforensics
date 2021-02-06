@@ -949,11 +949,11 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 //qDebug() << "mft entry:" << i << "attrcount:" << attrcount;
 		if(attrcount > 0)
 		{
-		    fileinfo.insert("ntinode", QVariant(i));
-		    fileinfo.insert("inode", QVariant(curinode));
-		    inodemap.insert(i, curinode);
-		    fileinfo.insert("logicalsize", QVariant(fsinfo->value("mftentrybytes").toUInt()));
-		    fileinfo.insert("physicalsize", QVariant(fsinfo->value("mftentrybytes").toUInt()));
+		    //fileinfo.insert("ntinode", QVariant(i));
+		    //fileinfo.insert("inode", QVariant(curinode));
+		    //inodemap.insert(i, curinode);
+		    //fileinfo.insert("logicalsize", QVariant(fsinfo->value("mftentrybytes").toUInt()));
+		    //fileinfo.insert("physicalsize", QVariant(fsinfo->value("mftentrybytes").toUInt()));
                     
                     // NEED TO MOVE THIS TO EITHER THE I30 OR THE DATA DEPENDING ON FILE TYPE OF EITHER DIRECTORY OR FILE
 		    fileinfo.insert("mftrecordlayout", QString(QString::number(curmftentryoffset) + "," + QString::number(fsinfo->value("mftentrybytes").toUInt()) + ";"));
@@ -1059,39 +1059,48 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			}
 			else if(attrtype == 0x30) // $FILE_NAME - always resident
 			{
-			    fileinfo.insert("parntinode", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 24, 6))));
-			    if(fileinfo.value("parntinode").toUInt() == 5)
-			    {
-				fileinfo.insert("path", QVariant("/"));
-				fileinfo.insert("parentinode", QVariant(-1));
-			    }
-			    else
-			    {
-				QString curpath = "";
-				for(int j=0; j < fileinfolist->count(); j++)
-				{
-				    if(fileinfolist->at(j).value("ntinode").toUInt() == fileinfo.value("parntinode").toUInt())
-				    {
-					curpath = fileinfolist->at(j).value("path").toString() + fileinfolist->at(j).value("filename").toString() + "/";
-					break;
-				    }
-				}
-				fileinfo.insert("path", QVariant(curpath));
-				fileinfo.insert("parentinode", QVariant(inodemap.value(fileinfo.value("parntinode").toUInt())));
-			    }
-			    fileinfo.insert("filecreate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
-			    fileinfo.insert("filemodify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
-			    fileinfo.insert("filestatus", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
-			    fileinfo.insert("fileaccess", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 56, 8)))));
-			    //uint32_t fnflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 80, 4));
-			    uint8_t filenamelength = curmftentry.at(curoffset + 88);
 			    uint8_t filenamespace = curmftentry.at(curoffset + 89);
+			    uint8_t filenamelength = curmftentry.at(curoffset + 88);
 			    if(filenamespace != 0x02)
 			    {
 				QString filename = "";
 				for(int k=0; k < filenamelength; k++)
 				    filename += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 90 + k*2, 2))));
 				fileinfo.insert("filename", QVariant(filename));
+                                fileinfo.insert("ntinode", QVariant(i));
+                                fileinfo.insert("inode", QVariant(curinode));
+                                inodemap.insert(i, curinode);
+                                fileinfo.insert("parntinode", QVariant(qFromLittleEndian<qulonglong>(curmftentry.mid(curoffset + 24, 6))));
+                                if(fileinfo.value("parntinode").toUInt() == 5)
+                                {
+                                    fileinfo.insert("path", QVariant("/"));
+                                    fileinfo.insert("parentinode", QVariant(-1));
+                                }
+                                else
+                                    qDebug() << filename << "mft inode:" << i << "curinode:" << curinode << "mft parent inode:" << fileinfo.value("parntinode").toUInt();
+                                /*
+                                else
+                                {
+                                    QString curpath = "";
+                                    for(int j=0; j < fileinfolist->count(); j++)
+                                    {
+                                        if(fileinfolist->at(j).value("ntinode").toUInt() == fileinfo.value("parntinode").toUInt())
+                                        {
+                                            curpath = fileinfolist->at(j).value("path").toString() + fileinfolist->at(j).value("filename").toString() + "/";
+                                            break;
+                                        }
+                                    }
+                                    fileinfo.insert("path", QVariant(curpath));
+                                    fileinfo.insert("parentinode", QVariant(inodemap.value(fileinfo.value("parntinode").toUInt())));
+                                    if(fileinfo.value("parentinode").toUInt() == 0)
+                                        qDebug() << "i:" << i << "curinode:" << curinode << "parntinode:" << fileinfo.value("parntinode").toUInt() << "inodemap:" << inodemap.value(fileinfo.value("parntinode").toUInt());
+                                }
+                                */
+                                fileinfo.insert("filecreate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
+                                fileinfo.insert("filemodify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
+                                fileinfo.insert("filestatus", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
+                                fileinfo.insert("fileaccess", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 56, 8)))));
+                                //uint32_t fnflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 80, 4));
 			    }
 			    //if(fnflags & 0x10000000) // Directory
 				//qDebug() << fileinfo.value("filename").toString() << "Directory accessflags works!!";
@@ -1198,6 +1207,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
        			fileinfolist->append(fileinfo);
 			curinode++;
 		    }
+                    else
+                        qDebug() << "no filename value:" << fileinfo.value("filename").toString();
 		}
 	    }
 	}
@@ -1206,26 +1217,41 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	    qDebug() << "a BAAD MFT to try to read... maybe an orphan..";
 	}
     }
+    //QList<QHash<QString, QVariant>> fileinfolist2;
+    //fileinfolist2 = *fileinfolist;
     // LOOP OVER FILEINFOLIST AND RESET PARENTINODE...
     for(int i=0; i < fileinfolist->count(); i++)
     {
+        //if(fileinfolist->at(i).value("inode").toUInt() == 5710)
 	QHash<QString, QVariant> curfileinfo = fileinfolist->at(i);
-	if(curfileinfo.value("parentinode").toInt() == 0)
+	//if(curfileinfo.value("parentinode").toInt() == 0)
+        if(!curfileinfo.contains("parentinode"))
 	{
-	    QString curpath = "";
-	    for(int j=0; j < fileinfolist->count(); j++)
+            //qDebug() << fileinfolist->at(i).value("filename").toString() << "parent inode:" << fileinfolist->at(i).value("parentinode").toUInt();
+	    QString curpath = "MFTMirr/";
+            qulonglong parentinode = 1;
+            /*
+	    for(int j=0; j < fileinfolist2.count(); j++)
 	    {
-		if(fileinfolist->at(j).value("ntinode").toUInt() == curfileinfo.value("parntinode").toUInt())
+		if(fileinfolist2.at(j).value("ntinode").toUInt() == curfileinfo.value("parntinode").toUInt())
 		{
-		    curpath = fileinfolist->at(j).value("path").toString() + fileinfolist->at(j).value("filename").toString() + "/";
+                    parentinode = fileinfolist2.at(j).value("inode").toULongLong();
+                    //qDebug() << parentinode;
+		    curpath = fileinfolist2.at(j).value("path").toString() + fileinfolist2.at(j).value("filename").toString() + "/";
 		    break;
 		}
 	    }
-	    curfileinfo.insert("parentinode", QVariant(inodemap.value(curfileinfo.value("parntinode").toUInt())));
+            */
+	    //curfileinfo.insert("parentinode", QVariant(inodemap.value(curfileinfo.value("parntinode").toUInt())));
+            curfileinfo.insert("parentinode", QVariant(parentinode));
 	    curfileinfo.insert("path", QVariant(curpath));
+            //qDebug() << curfileinfo.value("filename").toString() << "parent inode:" << curfileinfo.value("parentinode").toUInt();
+            //if(curfileinfo.value("inode").toUInt() == 5710)
 	    fileinfolist->removeAt(i);
 	    fileinfolist->append(curfileinfo);
 	}
+        else
+            qDebug() << curfileinfo.value("filename").toString() << "parent inode:" << curfileinfo.value("parentinode").toUInt();
     }
     // PARSE ATTRIBUTES FOR ADS ATTRIBUTES
     int filestoparse = curinode;
@@ -3546,8 +3572,10 @@ void ProcessVolume(QString evidstring)
 
 void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int evidcnt, int ptreecnt)
 {
+    QList<QHash<QString, QVariant>> overflow;
     QList<QVariant> nodedata;
     nodedata.clear();
+    overflow.clear();
     for(int j=0; j < fileinfolist->count(); j++)
     {
         QString parentstr = "";
@@ -3618,7 +3646,18 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
         else
             nodedata << "" << "";
         nodedata << QVariant("0") << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("inode").toUInt())));
-        qDebug() << "nodedata:" << nodedata;
+        /*
+        if(nodedata.at(11).toString().endsWith("3350") || parentstr.endsWith("3350"))
+        {
+            qDebug() << "nodedata id:" << nodedata.at(11).toString() << "parentstr:" << parentstr << "Has Parent Been Added Yet:" << treenodemodel->ParentNodeExists(parentstr);
+        }
+        */
+        if(!treenodemodel->ParentNodeExists(parentstr))
+        {
+            overflow.append(fileinfolist->at(j));
+        }
+        else
+        {
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, fileinfolist->at(j).value("itemtype").toInt(), fileinfolist->at(j).value("isdeleted").toInt());
         mutex.unlock();
@@ -3630,6 +3669,12 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
             isignals->ProgUpd();
         }
         WriteFileProperties((QHash<QString, QVariant>*)&(fileinfolist->at(j)), QString(curpartpath + "f" + QString::number(fileinfolist->at(j).value("inode").toUInt()) + ".prop"));
+        }
+    }
+    for(int i=0 ; i < overflow.count(); i++)
+    {
+        //qDebug() << overflow.at(i).value("filename").toString() << "inode:" << overflow.at(i).value("inode").toUInt() << "parentinode:" << overflow.at(i).value("parentinode").toUInt() << "parent mft:" << overflow.at(i).value("parntinode").toUInt();
+        //qDebug() << overflow.at(i);
     }
     int curinode = fileinfolist->count();
     AddVirtualFileSystemFiles(fsinfo, &curinode, curpartpath, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)));
