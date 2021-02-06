@@ -734,7 +734,10 @@ public:
             if(type == -1)
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid)));
             else
+            {
+                qDebug() << "parid:" << parid << "parents value:" << parents.value(parid);
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
+            }
             parents[data.at(11).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
             if(checkhash.contains(data.at(11).toString())) // USED TO BE 0
             {

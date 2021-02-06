@@ -3618,6 +3618,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
         else
             nodedata << "" << "";
         nodedata << QVariant("0") << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("inode").toUInt())));
+        qDebug() << "nodedata:" << nodedata;
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, fileinfolist->at(j).value("itemtype").toInt(), fileinfolist->at(j).value("isdeleted").toInt());
         mutex.unlock();
