@@ -524,6 +524,8 @@ public:
                         return QIcon(":/basic/carveicon");
 		    else if(itemtype == 4)
 			return QIcon(":/basic/deletedfile");
+                    else if(itemtype == 13)
+                        return QIcon(":/basic/encryptedfile");
                     /*
                     else
                     {

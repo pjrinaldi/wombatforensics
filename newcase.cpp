@@ -123,7 +123,7 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 		uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
 		if(curparttype == 0x05) // extended partition
 		{
-                    //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
+                    qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
 		    //qDebug() << "parse extended partition recurse loop here...";
                     ParseExtendedPartition(estring, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
 		}
@@ -139,21 +139,25 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 		{
 		    // parse bsd table here passing pofflist nad psizelist
 		}
+                /*
 		else
                 {
+                    // this is where xp_blake fails...
+                    qDebug() << "curoffset:" << curoffset << "cursize:" << cursize << "imgsize:" << imgsize;
 		    if(cursize <= imgsize && cursize > 0)
 		    {
                         //qDebug() << "parse primary partition here...";
 			pofflist->append(curoffset);
         		psizelist->append(cursize);
                         ParseFileSystemInformation(estring, curoffset, fsinfolist);
-			//qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+			qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
 		    }
 		    else
 		    {
 			//qDebug() << "bogus partition entry";
 		    }
                 }
+                */
 	    }
 	}
     }
@@ -267,6 +271,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 	    //qDebug() << "mftentrybytes:" << mftentrybytes;
             //fsinfo.insert("mftentrybytes", QVariant(mftentrybytes));
 	    fsinfo.insert("mftentrybytes", QVariant(1024));
+            mftentrybytes = 1024;
 	    //qDebug() << "mft entry size in bytes:" << mftentrybytes;
             fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
             fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
@@ -906,7 +911,9 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         for(int i=0; i < mftlist.count(); i++)
         {
             efile.seek(mftlist.at(i).split(",").at(0).toULongLong());
-            mftarray.append(efile.read(mftlist.at(i).split(",").at(0).toULongLong()));
+            //qDebug() << "readfile issue here line 914";
+            mftarray.append(efile.read(mftlist.at(i).split(",").at(1).toULongLong()));
+            //qDebug() << "readfile issue here line 914";
         }
         efile.close();
     }
@@ -917,6 +924,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     {
 	fileinfo.clear();
 	QByteArray curmftentry = mftarray.mid(i*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
+        //qDebug() << "curmftentry:" << curmftentry.count() << "mftentrybytes:" << fsinfo->value("mftentrybytes").toUInt();
 	// GET THE MFT ENTRY BYTE OFFSET RELATIVE TO THE FILE SYSTEM SO I CAN HIGHLIGHT IN HEX
 	qulonglong curmftentryoffset = 0;
 	qulonglong mftrelativeoffset = i * fsinfo->value("mftentrybytes").toUInt();
@@ -938,6 +946,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curmftentry.mid(20, 2)); // offset to first attribute
 		uint16_t attrflags = qFromLittleEndian<uint16_t>(curmftentry.mid(22, 2)); // attribute flags
 		uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentry.mid(40, 2)); // next attr id
+                //qDebug() << "mft entry:" << i << "attrcount:" << attrcount;
 		if(attrcount > 0)
 		{
 		    fileinfo.insert("ntinode", QVariant(i));
@@ -957,8 +966,13 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		    // Initial Attribute Loop to get information for the file/dir
 		    for(int j=0; j < attrcount; j++)
 		    {
+                        if(curoffset + 22 > fsinfo->value("mftentrybytes").toUInt())
+                            break;
 			uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset, 4)); // attribute type
 			attrlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 4, 4)); // attribute length
+                        //qDebug() << "curoffset:" << curoffset;
+                        //qDebug() << "attr:" << j << "attr length:" << attrlength;
+                        //qDebug() << "attrtype:" << QString::number(attrtype, 16);
 			uint8_t resflag = curmftentry.at(curoffset + 8); // resident/non-resident flag 0/1
 			uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
 			uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10, 2)); // offset to the attr name
@@ -1081,6 +1095,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    }
 			    //if(fnflags & 0x10000000) // Directory
 				//qDebug() << fileinfo.value("filename").toString() << "Directory accessflags works!!";
+                            //qDebug() << "filename:" << fileinfo.value("filename").toString();
 			}
                         else if(attrtype == 0x80) // $DATA - resident or non-resident
                         {
@@ -1224,10 +1239,12 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	if(efile.isOpen())
 	{
 	    efile.seek(fileinfolist->at(i).value("mftrecordlayout").toString().split(";").at(0).split(",").at(0).toUInt());
+            //qDebug() << "readfile issue here?? line 1242";
 	    mftentry = efile.read(fileinfolist->at(i).value("mftrecordlayout").toString().split(";").at(0).split(",").at(1).toUInt());
+            //qDebug() << "readfile issue here?? line 1242";
 	    efile.close();
 	}
-	qDebug() << fileinfolist->at(i).value("filename").toString() << "mftentry count:" << mftentry.count();
+	//qDebug() << fileinfolist->at(i).value("filename").toString() << "mftentry count:" << mftentry.count();
 	uint16_t firstattroffset = qFromLittleEndian<uint16_t>(mftentry.mid(20, 2)); // offset to first attribute
 	uint16_t attrflags = qFromLittleEndian<uint16_t>(mftentry.mid(22, 2)); // attribute flags
 	uint16_t attrcount = qFromLittleEndian<uint16_t>(mftentry.mid(40, 2)); // next attr id
@@ -1235,6 +1252,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	for(int j=0; j < attrcount; j++)
 	{
 	    fileinfo.clear();
+            if(curoffset + 22 > fsinfo->value("mftentrybytes").toUInt())
+                break;
 	    uint32_t attrtype = qFromLittleEndian<uint32_t>(mftentry.mid(curoffset, 4)); // attribute type
 	    uint32_t attrlength = qFromLittleEndian<uint32_t>(mftentry.mid(curoffset + 4, 4)); // attribute length;
 	    uint8_t resflag = mftentry.at(curoffset + 8); // resident/non-resident flag 0/1
