@@ -1239,7 +1239,7 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
         }
         efile.close();
     }
-    int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
+    //int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
     QByteArray curmftentry = mftarray.mid(ntinode*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
     // NOW I'VE GOT THE CURMFTENTRY FROM NTINODE AND I NEED TO PARSE THE ATTRIBUTE TO GET REST OF THE FILEINFO...
     if(QString::fromStdString(curmftentry.left(4).toStdString()) == "FILE") // a proper mft entry
@@ -1249,6 +1249,29 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
         uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentry.mid(40, 2)); // next attr id
         if(attrcount > 0)
         {
+            uint32_t attrlength = 0;
+            int curoffset = firstattroffset;
+            for(int j=0; j < attrcount; j++)
+            {
+                if(curoffset + 22 > fsinfo->value("mftentrybytes").toUInt())
+                    break;
+                uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset, 4)); // attribute type
+                attrlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 4, 4)); // attribute length
+                uint8_t resflag = curmftentry.at(curoffset + 8); // resident/non-resident flag 0/1
+                uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
+                uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10, 2)); // offset to attr name
+                QString attrname = "";
+                uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12, 2)); // attr data flags
+                uint32_t contentlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 16, 4)); // attribute content length
+                uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2)); // attribute content offset
+                if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
+                {
+                    fileinfo->insert("createdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 8)))));
+                    fileinfo->insert("modifydate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
+                    fileinfo->insert("statusdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
+                    fileinfo->insert("accessdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
+                }
+            }
         }
     }
     else if(QString::fromStdString(curmftentry.left(4).toStdString()) == "BAAD") // probably orphan
@@ -1261,36 +1284,10 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 		{
                     
                     // NEED TO MOVE THIS TO EITHER THE I30 OR THE DATA DEPENDING ON FILE TYPE OF EITHER DIRECTORY OR FILE
-		    fileinfo.insert("mftrecordlayout", QString(QString::number(curmftentryoffset) + "," + QString::number(fsinfo->value("mftentrybytes").toUInt()) + ";"));
-
                     // NEED TO ADD ADS, FIX PATH FOR CHILDREN, CATEGORY/SIGNATURE FOR SYSTEM FILES
 
-		    uint32_t attrlength = 0;
-		    int facnt = 0;
-		    int curoffset = firstattroffset;
-		    // Initial Attribute Loop to get information for the file/dir
-		    for(int j=0; j < attrcount; j++)
-		    {
-                        if(curoffset + 22 > fsinfo->value("mftentrybytes").toUInt())
-                            break;
-			uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset, 4)); // attribute type
-			attrlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 4, 4)); // attribute length
-                        //qDebug() << "curoffset:" << curoffset;
-                        //qDebug() << "attr:" << j << "attr length:" << attrlength;
-                        //qDebug() << "attrtype:" << QString::number(attrtype, 16);
-			uint8_t resflag = curmftentry.at(curoffset + 8); // resident/non-resident flag 0/1
-			uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
-			uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10, 2)); // offset to the attr name
-                        QString attrname = "";
-			uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12, 2)); // attrdata flags
-			uint32_t contentlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 16, 4)); // attribute content length
-			uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2)); // attribute content offset
 			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
 			{
-			    fileinfo.insert("createdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 8)))));
-			    fileinfo.insert("modifydate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
-			    fileinfo.insert("statusdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
-			    fileinfo.insert("accessdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
 			    uint32_t accessflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 56, 4));
                             if(attrflags == 0x00)
                             {
@@ -1684,10 +1681,10 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash
                     qulonglong parntinode = qFromLittleEndian<uint64_t>(filenamebuf.mid(0, 6)); // parent nt inode for the entry
                     fileinfo.insert("ntinode", QVariant(ntinode)); // current nt inode
                     fileinfo.insert("parntinode", QVariant(parntinode)); // current parent nt inode
-                    fileinfo.insert("i30create", qFromLittleEndian<qulonglong>(filenamebuf.mid(8, 8)));
-                    fileinfo.insert("i30modify", qFromLittleEndian<qulonglong>(filenamebuf.mid(16, 8)));
-                    fileinfo.insert("i30change", qFromLittleEndian<qulonglong>(filenamebuf.mid(24, 8)));
-                    fileinfo.insert("i30access", qFromLittleEndian<qulonglong>(filenamebuf.mid(32, 8)));
+                    fileinfo.insert("i30create", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(8, 8)))));
+                    fileinfo.insert("i30modify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8)))));
+                    fileinfo.insert("i30change", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8)))));
+                    fileinfo.insert("i30access", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8)))));
 		    //uint64_t parfileref = qFromLittleEndian<uint64_t>(filenamebuf.mid(0, 8));
 		    //uint64_t createdate = qFromLittleEndian<uint64_t>(filenamebuf.mid(8, 8));
 		    //uint64_t modifydate = qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8));
@@ -1704,7 +1701,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash
                     if(filename != "." && filename != "..")
 		        qDebug() << "filename:" << filename << "nt inode:" << ntinode << "parent nt node:" << parntinode;
                     GetMftEntryContent(estring, ntinode, &fileinfo, fsinfo);
-		    //filename += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid((i+j)*32 + k*2, 2))));
                     if(curpos > indxentryendoffset)
 			qDebug() << "deleted file/dir";
                 }
