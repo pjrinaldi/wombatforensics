@@ -1442,6 +1442,9 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
                             fileinfo->insert("logicalsize", QVariant(logicalsize));
                             fileinfo->insert("physicalsize", QVariant(physicalsize));
                         }
+                        else // alternate data stream
+                        {
+                        }
                     }
                 }
                 else if(attrtype == 0x90) // $INDEX_ROOT - always resident
@@ -1462,7 +1465,7 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
                             fileinfo->insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentlength) + ";")));
                             */
                         }
-                        else
+                        else // alternate stream
                         {
                             /*
                             fileinfo->insert("logicalsize", QVariant(0));
@@ -1473,6 +1476,7 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
                 }
                 else if(attrtype == 0xa0) // INDEX_ALLOCATION - always non-resident
                 {
+                    // need to do the same index_root for ads
                     // add to fileinfo so i can add to properties... maybe attrtype1, atrrname1, attrlayout1...
                 }
                 else if(attrtype == 0xffffffff)
