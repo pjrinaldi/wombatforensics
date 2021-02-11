@@ -1508,7 +1508,7 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 				QString layout = "";
 				for(int k=0; k < runlist.count(); k++)
 				    layout += QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(k).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()) + ";";
-				qDebug() << "layout:" << layout;
+				//qDebug() << "layout:" << layout;
 				adsinfo.insert("layout", QVariant(layout));
 			    }
 			    adsinfo.insert("logicalsize", QVariant(logicalsize));
