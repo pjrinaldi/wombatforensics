@@ -1854,7 +1854,6 @@ release/moc_verevidencedialog.o: release/moc_verevidencedialog.cpp
 install_target: all FORCE
 	@test -d $(INSTALL_ROOT)/usr/local/bin || mkdir -p $(INSTALL_ROOT)/usr/local/bin
 	$(QINSTALL_PROGRAM) release/$(QMAKE_TARGET) $(INSTALL_ROOT)/usr/local/bin/$(QMAKE_TARGET)
-	-$(STRIP) $(INSTALL_ROOT)/usr/local/bin/$(QMAKE_TARGET)
 
 uninstall_target: FORCE
 	-$(DEL_FILE) $(INSTALL_ROOT)/usr/local/bin/$(QMAKE_TARGET)
