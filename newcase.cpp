@@ -1385,8 +1385,8 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
                 }
                 else if(attrtype == 0x80) // $DATA - resident or non-resident
                 {
-                    if(attrflags == 0x00 || attrflags == 0x01) // regular file
-                    {
+                    //if(attrflags == 0x00 || attrflags == 0x01) // regular file
+                    //{
                         if(namelength == 0) // main file content - not alternate data stream
                         {
                             qulonglong logicalsize = 0;
@@ -1455,7 +1455,6 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 			    adsinfo.clear();
 			    // REPEAT ADS HERE AND ADD TO ADSINFO...
 			    adsinfo.insert("filename", QVariant(QString("$DATA:" + attrname)));
-			    qDebug() << "ads info:" << adsinfo.value("filename").toString();
 			    qulonglong logicalsize = 0;
 			    qulonglong physicalsize = 0;
 			    if(resflag == 0x00) // resident
@@ -1504,10 +1503,12 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 				    else
 					break;
 				}
+				//qDebug() << "runlist:" << runlist;
 				physicalsize = physicalsize * fsinfo->value("bytespercluster").toUInt();
 				QString layout = "";
 				for(int k=0; k < runlist.count(); k++)
-				    layout += QString((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(k).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()) + ";";
+				    layout += QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(k).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()) + ";";
+				qDebug() << "layout:" << layout;
 				adsinfo.insert("layout", QVariant(layout));
 			    }
 			    adsinfo.insert("logicalsize", QVariant(logicalsize));
@@ -1520,7 +1521,7 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 			    adsinfo.insert("path", QVariant(QString(fileinfo->value("path").toString() + fileinfo->value("filename").toString() + "/")));
 			    adsinfolist->append(adsinfo);
                         }
-                    }
+                    //}
                 }
                 else if(attrtype == 0x90) // $INDEX_ROOT - always resident
                 {
@@ -2094,6 +2095,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
 			    curadsinfo.insert("inode", QVariant(curinode));
 			    fileinfolist->append(curadsinfo);
+			    curinode++;
 			    //fileinfolist->append(adsinfolist.at(j));
 			}
 		    }
