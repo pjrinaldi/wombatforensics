@@ -1941,38 +1941,66 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	}
 	if(QString::fromStdString(curmftentry.left(4).toStdString()) == "FILE") // a proper mft entry
 	{
+            uint16_t sequenceid = qFromLittleEndian<uint16_t>(curmftentry.mid(16, 2)); // sequence number for entry
+	    //fileinfo->insert("mftsequenceid", QVariant(qFromLittleEndian<uint16_t>(curmftentry.mid(16, 2)))); // sequence number for entry
+            uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curmftentry.mid(20, 2)); // offset to first attribute
+            uint16_t attrflags = qFromLittleEndian<uint16_t>(curmftentry.mid(22, 2)); // attribute flags
+            uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentry.mid(40, 2)); // next attr id
+            if(attrflags == 0x00 || attrflags == 0x02) // not allocated file or dir
+            {
+		uint32_t attrlength = 0;
+		int curoffset = firstattroffset;
+                for(int j=0; j < attrcount; j++)
+                {
+                    if(curoffset + 22 > fsinfo->value("mftentrybytes").toUInt())
+                        break;
+                    uint32_t attrtype = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset, 4)); // attribute type
+                    attrlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 4, 4)); // attribute length
+                    uint8_t resflag = curmftentry.at(curoffset + 8); // resident/non-resident flag 0/1
+                    uint8_t namelength = curmftentry.at(curoffset + 9); // attribute name length
+		    uint16_t nameoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 10, 2)); // offset to the attr name
+                    QString attrname = "";
+		    uint16_t attrdataflags = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 12, 2)); // attrdata flags
+		    uint32_t contentlength = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 16, 4)); // attribute content length
+		    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2)); // attribute content offset
+                    if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
+                    {
+                    }
+                    else if(attrtype == 0x30) // $FILE_NAME - always resident
+                    {
+                        uint8_t filenamespace = curmftentry.at(curoffset + 89);
+                        uint8_t filenamelength = curmftentry.at(curoffset + 88);
+                        if(filenamespace != 0x02)
+                        {
+                            QString filename = "";
+                            for(int k=0; k < filenamelength; k++)
+                                filename += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 90 + k*2, 2))));
+                            qDebug() << "nt mft entry:" << i << "filename:" << filename << "sequence number:" << sequenceid;
+                        }
+                    }
+                    else if(attrtype == 0x80) // $DATA - resident or non-resident
+                    {
+                    }
+                    else if(attrtype == 0x90) // $INDEX_ROOT - always resident
+                    {
+                    }
+                    else if(attrtype == 0xa0) // $INDEX_ALLOCATION - always non-resident
+                    {
+                    }
+		    else if(attrtype == 0xffffffff)
+			break;
+		    curoffset += attrlength;
+                }
+            }
+	}
+	else if(QString::fromStdString(curmftentry.left(4).toStdString()) == "BAAD") // a proper mft entry with error
+	{
+	    qDebug() << "a BAAD MFT to try to read... maybe an orphan..";
 	}
     }
 
     /*
     // NOW LET's PARSE THE MFT...
-    int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
-    for(int i=0; i < mftentrycount; i++)
-    {
-	fileinfo.clear();
-	QByteArray curmftentry = mftarray.mid(i*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
-        //qDebug() << "curmftentry:" << curmftentry.count() << "mftentrybytes:" << fsinfo->value("mftentrybytes").toUInt();
-	// GET THE MFT ENTRY BYTE OFFSET RELATIVE TO THE FILE SYSTEM SO I CAN HIGHLIGHT IN HEX
-	qulonglong curmftentryoffset = 0;
-	qulonglong mftrelativeoffset = i * fsinfo->value("mftentrybytes").toUInt();
-	QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
-	qulonglong entriespersize = 0;
-	for(int j=0; j < mftlist.count(); j++)
-	{
-	    entriespersize += mftlist.at(j).split(",").at(1).toULongLong() / fsinfo->value("mftentrybytes").toUInt();
-	    if(i < entriespersize)
-	    {
-		curmftentryoffset = mftlist.at(j).split(",").at(0).toULongLong() + mftrelativeoffset;
-		break;
-	    }
-	}
-	if(QString::fromStdString(curmftentry.left(4).toStdString()) == "FILE") // a proper mft entry
-	{
-	    if(i != 5) // skip root directory cause i don't list root directory in the tree...
-	    {
-		uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curmftentry.mid(20, 2)); // offset to first attribute
-		uint16_t attrflags = qFromLittleEndian<uint16_t>(curmftentry.mid(22, 2)); // attribute flags
-		uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentry.mid(40, 2)); // next attr id
                 //qDebug() << "mft entry:" << i << "attrcount:" << attrcount;
 		if(attrcount > 0)
 		{
