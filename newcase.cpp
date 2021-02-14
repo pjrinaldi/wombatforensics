@@ -1262,6 +1262,21 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
      * This occurs when the file is deleted and either:
      * - The parent is no longer a directory
      * - The sequence number of the parent is no longer correct
+     *   if(parent mft entry is not a directory)
+     *   {
+     *      // ORPHAN
+     *   }
+     *   else
+     *   {
+     *      if(parsequenceid == sequenceid)
+     *      {
+     *          // DELETED FILE
+     *      }
+     *      else
+     *      {
+     *          // ORPHAN FILE
+     *      }
+     *   }
      */ 
     // NOW PARSE THE MFT TO LOOK FOR NON-ALLOCATED ENTRIES
     int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
@@ -1312,6 +1327,8 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
                     }
                     else if(attrtype == 0x30) // $FILE_NAME - always resident
                     {
+                        uint64_t parmftentry = qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 6)); // parent mft entry
+                        uint16_t parsequence = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 30, 2)); // parent sequence id
                         uint8_t filenamespace = curmftentry.at(curoffset + 89);
                         uint8_t filenamelength = curmftentry.at(curoffset + 88);
                         if(filenamespace != 0x02)
@@ -1319,7 +1336,7 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
                             QString filename = "";
                             for(int k=0; k < filenamelength; k++)
                                 filename += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 90 + k*2, 2))));
-                            qDebug() << "nt mft entry:" << i << "filename:" << filename << "sequence number:" << sequenceid;
+                            qDebug() << "nt mft entry:" << i << "filename:" << filename << "sequence number:" << sequenceid << "parmftentry:" << parmftentry << "parent sequence number;" << parsequence;
                         }
                     }
                     else if(attrtype == 0x80) // $DATA - resident or non-resident
