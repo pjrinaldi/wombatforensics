@@ -2617,6 +2617,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     //if(indxentrylistflags == 0x01) // $INDEX_ALLOC EXISTS
     if(indxalloc.count() > 0)
     {
+        // ALSO NEED TO ADD THE INDXROOT ENTRIES HERE FIRST....
+        // INDEX_ALLOC CONTAINS MORE THAN ONE INDX SO I NEED TO ENSURE I AM ACCOUNTING FOR THAT IN THE BELOW...
         int indxrecordcount = indxalloc.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
         uint curpos = 0;
         for(int i=0; i < indxrecordcount; i++)
