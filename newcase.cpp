@@ -1229,7 +1229,7 @@ void ParseMft(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, 
 
 //}
 
-void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
+void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orhanlist)
 {
     QByteArray mftarray;
     mftarray.clear();
@@ -1283,6 +1283,8 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
     qDebug() << "mft entry count:" << mftentrycount;
     for(int i=0; i < mftentrycount; i++)
     {
+        QHash<QString, QVariant> fileinfo;
+        fileinfo.clear();
 	QByteArray curmftentry = mftarray.mid(i*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
 	qulonglong curmftentryoffset = 0;
 	qulonglong mftrelativeoffset = i*fsinfo->value("mftentrybytes").toUInt();
@@ -1300,7 +1302,7 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
 	if(QString::fromStdString(curmftentry.left(4).toStdString()) == "FILE") // a proper mft entry
 	{
             uint16_t sequenceid = qFromLittleEndian<uint16_t>(curmftentry.mid(16, 2)); // sequence number for entry
-	    //fileinfo->insert("mftsequenceid", QVariant(qFromLittleEndian<uint16_t>(curmftentry.mid(16, 2)))); // sequence number for entry
+            fileinfo.insert("mftsequenceid", QVariant(qFromLittleEndian<uint16_t>(curmftentry.mid(16, 2)))); // sequence number for entry
             uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curmftentry.mid(20, 2)); // offset to first attribute
             uint16_t attrflags = qFromLittleEndian<uint16_t>(curmftentry.mid(22, 2)); // attribute flags
             uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentry.mid(40, 2)); // next attr id
@@ -1324,6 +1326,56 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
 		    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2)); // attribute content offset
                     if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
                     {
+                        fileinfo.insert("createdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 8)))));
+                        fileinfo.insert("modifydate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
+                        fileinfo.insert("statusdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
+                        fileinfo.insert("accessdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
+                        uint32_t accessflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 56, 4));
+                        QString attrstr = "";
+                        if(attrflags == 0x00) // deleted file
+                        {
+                            attrstr += "Not Allocated,";
+                            if(accessflags & 0x4000) // encrypted
+                                fileinfo.insert("itemtype", QVariant(13));
+                            else
+                                fileinfo.insert("itemtype", QVariant(4));
+                            fileinfo.insert("isdeleted", QVariant(1));
+                        }
+                        else if(attrflags == 0x02) // deleted directory
+                        {
+                            if(accessflags & 0x4000) // encrypted
+                                fileinfo.insert("itemtype", QVariant(13));
+                            else
+                                fileinfo.insert("itemtype", QVariant(2));
+                            fileinfo.insert("isdeleted", QVariant(1));
+                        }
+                        if(accessflags & 0x01) // READ ONLY
+                            attrstr += "Read Only,";
+                        if(accessflags & 0x02) // Hidden
+                            attrstr += "Hidden,";
+                        if(accessflags & 0x04) // System
+                            attrstr += "System,";
+                        if(accessflags & 0x20) // Archive
+                            attrstr += "Archive,";
+                        if(accessflags & 0x40) // Device
+                            attrstr += "Device";
+                        if(accessflags & 0x80) // Normal
+                            attrstr += "Normal,";
+                        if(accessflags & 0x100) // Temporary
+                            attrstr += "Temporary,";
+                        if(accessflags & 0x200) // Sparse File
+                            attrstr += "Sparse File,";
+                        if(accessflags & 0x400) // Reparse Point
+                            attrstr += "Reparse Point,";
+                        if(accessflags & 0x800) // Compresssed
+                            attrstr += "Compressed,";
+                        if(accessflags & 0x1000) // Offline
+                            attrstr += "Offline,";
+                        if(accessflags & 0x2000) // Not Indexed
+                            attrstr += "Not Indexed,";
+                        if(accessflags & 0x4000) // Encrypted
+                            attrstr += "Encrypted";
+                        fileinfo.insert("attribute", QVariant(attrstr));
                     }
                     else if(attrtype == 0x30) // $FILE_NAME - always resident
                     {
@@ -1336,17 +1388,27 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
                             QString filename = "";
                             for(int k=0; k < filenamelength; k++)
                                 filename += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 90 + k*2, 2))));
-                            qDebug() << "nt mft entry:" << i << "filename:" << filename << "sequence number:" << sequenceid << "parmftentry:" << parmftentry << "parent sequence number;" << parsequence;
+                            fileinfo.insert("filename", QVariant(filename));
+                            fileinfo.insert("ntinode", QVariant(i));
+                            fileinfo.insert("parntinode", QVariant((qulonglong)parmftentry));
+                            fileinfo.insert("parsequenceid", QVariant(parsequence));
+                            //fileinfo.insert("inode", QVariant(curinode));
+                            //fileinfo.insert("path", QVariant("/"));
+                            //fileinfo.insert("parentinode", QVariant(-1));
+                            //qDebug() << "nt mft entry:" << i << "filename:" << filename << "sequence number:" << sequenceid << "parmftentry:" << parmftentry << "parent sequence number;" << parsequence;
                         }
                     }
                     else if(attrtype == 0x80) // $DATA - resident or non-resident
                     {
+                        // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
                     }
                     else if(attrtype == 0x90) // $INDEX_ROOT - always resident
                     {
+                        // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
                     }
                     else if(attrtype == 0xa0) // $INDEX_ALLOCATION - always non-resident
                     {
+                        // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
                     }
 		    else if(attrtype == 0xffffffff)
 			break;
@@ -1358,6 +1420,29 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
 	{
 	    qDebug() << "a BAAD MFT to try to read... maybe an orphan..";
 	}
+        QByteArray parmftentry = mftarray.mid(fileinfo.value("parntinode").toULongLong() * fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
+        qDebug() << "parmftentry:" << parmftentry.count() << parmftentry.left(4);
+        // NOW I NEED TO GET THE DIRECTORY AND SEQUENCE ID FOR COMPARISON, THEN SEARCH FILEINFOLIST FOR A PARNTINODE MATCH TO GET THE PARENTINODE TO ADD TO THIS GUY AND THEN GET IT IN THE TREE....
+
+	//QByteArray curmftentry = mftarray.mid(i*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
+        //GetParentMftStatus();
+        /*
+         *   if(parent mft entry is not a directory)
+         *   {
+         *      // ORPHAN
+         *   }
+         *   else
+         *   {
+         *      if(parsequenceid == sequenceid)
+         *      {
+         *          // DELETED FILE
+         *      }
+         *      else
+         *      {
+         *          // ORPHAN FILE
+         *      }
+         *   }
+         *   */
     }
 
     /*
@@ -5255,7 +5340,7 @@ void ProcessVolume(QString evidstring)
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &mftentries, &fileinfolist, &orphanlist, 5);
 		ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
-                ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)));
+                ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             }
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
                 ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
@@ -5352,7 +5437,7 @@ void ProcessVolume(QString evidstring)
 		ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &mftentries, &fileinfolist, &orphanlist, 5);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
-                ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)));
+                ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             }
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
                 ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
