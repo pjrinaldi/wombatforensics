@@ -345,26 +345,38 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			    break;
 			curoffset++;
 			uint runlength = 0;
-			uint runoffset = 0;
+			qint64 runoffset = 0;
 			if(runlengthbytes == 1)
 			    runlength = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset, runlengthbytes));
 			else
 			    runlength = qFromLittleEndian<uint>(mftentry0.mid(curoffset, runlengthbytes));
 			if(runlengthoffset == 1)
-			    runoffset = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+			    runoffset = qFromLittleEndian<int8_t>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
 			else
-			    runoffset = qFromLittleEndian<uint>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+			    runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
 			/*
 			 */ 
 			//qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
 			
 			//int runlength = qFromLittleEndian<int>(mftentry0.mid(curoffset, runlengthbytes));
 			//int runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+                        qDebug() << "temporary runoffset prior to adding unlist in:" << QString::number(runoffset, 16);
                         if(i > 0)
+                        {
+                            if(i > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
+                            {
+                                qDebug() << "runoffset to make negative..." << QString::number(runoffset, 16);
+				//QString runstr = QString("%1").arg(curmftentry.at(currunoff), 8, 2, QChar('0'));
+                                qDebug() << "runoff made negative:" << QString("%1").arg(runoffset, 8, 16, QChar('f'));
+                                runoffset = QString("%1").arg(runoffset, 8, 16, QChar('f')).toLongLong();
+                                qDebug() << "runoff as negative integer:" << runoffset;
+                            }
                             runoffset = runoffset + runlist.at(i-1).split(",").at(0).toUInt();
+                        }
 			//qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
                         //runliststr += QString::number(runoffset) + "," + QString::number(runlength) + ";";
-                        runlist.append(QString::number((partoffset * 512) + runoffset * fsinfo.value("bytespercluster").toUInt()) + "," + QString::number(runlength * fsinfo.value("bytespercluster").toUInt()));
+                        runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
+                        //runlist.append(QString::number((partoffset * 512) + runoffset * fsinfo.value("bytespercluster").toUInt()) + "," + QString::number(runlength * fsinfo.value("bytespercluster").toUInt()));
                         //if(i != 0)
                             //runoffset = runoffset 
 			i++;
@@ -378,12 +390,12 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			break;
 		    //break;
 		}
-		//qDebug() << "runlist:" << runlist;
+		qDebug() << "runlist:" << runlist;
                 QString runliststr = "";
                 for(int i=0; i < runlist.count(); i++)
-                    runliststr += runlist.at(i) + ";";
+                    runliststr += QString::number((partoffset * 512) + (runlist.at(i).split(",").at(0).toULongLong() * fsinfo.value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(i).split(",").at(1).toULongLong() * fsinfo.value("bytespercluster").toUInt()) + ";";
                 fsinfo.insert("mftlayout", QVariant(runliststr));
-                //qDebug() << "mftlayout:" << fsinfo.value("mftlayout").toString();
+                qDebug() << "mftlayout:" << fsinfo.value("mftlayout").toString();
             }
             else
                 qDebug() << "error this is not a valid MFT ENTRY...";
@@ -1241,19 +1253,25 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
             mftsize += mftlist.at(i).split(",").at(1).toULongLong();
         }
         qDebug() << "mft size:" << mftsize;
-        //mftarray.resize(mftsize);
+        mftarray.resize(mftsize);
         for(int i=0; i < mftlist.count(); i++)
         {
-            QByteArray tmparray;
-            tmparray.clear();
+            //QByteArray tmparray;
+            //tmparray.clear();
 	    qDebug() << "mft offset:" << mftlist.at(i).split(",").at(0).toULongLong() << "mft size:" << mftlist.at(i).split(",").at(1).toULongLong();
 	    qDebug() << "mft cluster offset:" << mftlist.at(i).split(",").at(0).toULongLong() / fsinfo->value("bytespercluster").toUInt() << "mft size:" << mftlist.at(i).split(",").at(1).toULongLong() / fsinfo->value("bytespercluster").toUInt();
             efile.seek(mftlist.at(i).split(",").at(0).toULongLong());
             //qDebug() << "readfile issue here line 914";
-            tmparray = efile.read(mftlist.at(i).split(",").at(1).toULongLong());
-            mftarray.insert(mftarray.size(), tmparray);
+            //tmparray = efile.read(mftlist.at(i).split(",").at(1).toULongLong());
+            //qDebug() << "tmparray count:" << tmparray.count();
+            /*if(i > 0)
+                mftarray.insert(mftlist.at(i-1).split(",").at(1).toULongLong(), tmparray);
+            else
+                mftarray.insert(0, tmparray);
+            */
+            //mftarray.insert(mftarray.size(), tmparray);
             //mftarray.append(tmparray);
-            //mftarray.append(efile.read(mftlist.at(i).split(",").at(1).toULongLong()));
+            mftarray.append(efile.read(mftlist.at(i).split(",").at(1).toULongLong()));
             qDebug() << i << "mftarray count:" << mftarray.count();
             //qDebug() << "readfile issue here line 914";
         }
