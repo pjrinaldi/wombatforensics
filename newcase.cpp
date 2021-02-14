@@ -1387,14 +1387,17 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                     }
                     else if(attrtype == 0x80) // $DATA - resident or non-resident
                     {
+                        // NEED "LAYOUT"
                         // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
                     }
                     else if(attrtype == 0x90) // $INDEX_ROOT - always resident
                     {
+                        // NEED "LAYOUT"
                         // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
                     }
                     else if(attrtype == 0xa0) // $INDEX_ALLOCATION - always non-resident
                     {
+                        // NEED "LAYOUT"
                         // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
                     }
 		    else if(attrtype == 0xffffffff)
