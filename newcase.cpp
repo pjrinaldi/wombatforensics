@@ -1229,8 +1229,9 @@ void ParseMft(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, 
 
 //}
 
-void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orhanlist)
+void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
 {
+    qint64 curinode = fileinfolist->count();
     QByteArray mftarray;
     mftarray.clear();
     QFile efile(estring);
@@ -1262,25 +1263,10 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
      * This occurs when the file is deleted and either:
      * - The parent is no longer a directory
      * - The sequence number of the parent is no longer correct
-     *   if(parent mft entry is not a directory)
-     *   {
-     *      // ORPHAN
-     *   }
-     *   else
-     *   {
-     *      if(parsequenceid == sequenceid)
-     *      {
-     *          // DELETED FILE
-     *      }
-     *      else
-     *      {
-     *          // ORPHAN FILE
-     *      }
-     *   }
      */ 
     // NOW PARSE THE MFT TO LOOK FOR NON-ALLOCATED ENTRIES
     int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
-    qDebug() << "mft entry count:" << mftentrycount;
+    //qDebug() << "mft entry count:" << mftentrycount;
     for(int i=0; i < mftentrycount; i++)
     {
         QHash<QString, QVariant> fileinfo;
@@ -1343,6 +1329,7 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                         }
                         else if(attrflags == 0x02) // deleted directory
                         {
+                            attrstr += "Not Allocated,";
                             if(accessflags & 0x4000) // encrypted
                                 fileinfo.insert("itemtype", QVariant(13));
                             else
@@ -1420,10 +1407,53 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
 	{
 	    qDebug() << "a BAAD MFT to try to read... maybe an orphan..";
 	}
-        QByteArray parmftentry = mftarray.mid(fileinfo.value("parntinode").toULongLong() * fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
-        qDebug() << "parmftentry:" << parmftentry.count() << parmftentry.left(4);
-        // NOW I NEED TO GET THE DIRECTORY AND SEQUENCE ID FOR COMPARISON, THEN SEARCH FILEINFOLIST FOR A PARNTINODE MATCH TO GET THE PARENTINODE TO ADD TO THIS GUY AND THEN GET IT IN THE TREE....
-
+        if(fileinfo.contains("filename"))
+        {
+            int hasparent = 0;
+            if(fileinfo.value("parntinode").toULongLong() == 5)
+            {
+                hasparent = 1;
+                fileinfo.insert("inode", QVariant(curinode));
+                fileinfo.insert("path", QVariant("/"));
+                fileinfo.insert("parentinode", QVariant(-1));
+                fileinfolist->append(fileinfo);
+                curinode++;
+            }
+            else
+            {
+                for(int j=0; j < fileinfolist->count(); j++)
+                {
+                    if(fileinfolist->at(j).value("ntinode").toULongLong() == fileinfo.value("parntinode").toULongLong())
+                    {
+                        hasparent = 1;
+                        int paritemtype = fileinfolist->at(j).value("itemtype").toInt();
+                        QString parpath = fileinfolist->at(j).value("path").toString() + fileinfolist->at(j).value("filename").toString() + "/";
+                        qulonglong parseqid = fileinfolist->at(j).value("mftsequenceid").toULongLong();
+                        qulonglong parentinode = fileinfolist->at(j).value("inode").toULongLong();
+                        if((paritemtype == 3 || paritemtype == 2) && parseqid == fileinfo.value("parsequenceid").toULongLong()) // deleted file
+                        {
+                            fileinfo.insert("inode", QVariant(curinode));
+                            fileinfo.insert("path", QVariant(parpath));
+                            fileinfo.insert("parentinode", QVariant(parentinode));
+                            fileinfolist->append(fileinfo);
+                            curinode++;
+                            //qDebug() << "DELETED FILE:" << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong();
+                        }
+                        else // orphan but parent has been repurposed
+                        {
+                            orphanlist->append(fileinfo);
+                            //qDebug() << "ORPHAN PARENT NOT VALID:" << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong();
+                        }
+                        //qDebug() << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong() << "parent filename:" << fileinfolist->at(j).value("filename").toString() << "itemtype:" << fileinfolist->at(j).value("itemtype").toInt() << "sequence:" << fileinfolist->at(j).value("mftsequenceid").toULongLong();
+                    }
+                }
+            }
+            if(hasparent == 0) // orphan no parent exists anymore
+            {
+                orphanlist->append(fileinfo);
+                //qDebug() << "ORPHAN NO PARENT:" << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong();
+            }
+        }
 	//QByteArray curmftentry = mftarray.mid(i*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
         //GetParentMftStatus();
         /*
