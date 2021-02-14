@@ -345,7 +345,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			    break;
 			curoffset++;
 			uint runlength = 0;
-			int32_t runoffset = 0;
+			int runoffset = 0;
 			if(runlengthbytes == 1)
 			    runlength = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset, runlengthbytes));
 			else
@@ -353,7 +353,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			if(runlengthoffset == 1)
 			    runoffset = qFromLittleEndian<int8_t>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
 			else
-			    runoffset = qFromLittleEndian<int32_t>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
+			    runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
 			/*
 			 */ 
 			//qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
@@ -364,9 +364,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                         if(i > 0)
                         {
                             if(i > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
-                            {
                                 runoffset = runoffset - 0xffff - 1;
-                            }
                             runoffset = runoffset + runlist.at(i-1).split(",").at(0).toUInt();
                         }
 			//qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
@@ -1316,13 +1314,13 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo)
                     {
                         uint8_t filenamespace = curmftentry.at(curoffset + 89);
                         uint8_t filenamelength = curmftentry.at(curoffset + 88);
-                        //if(filenamespace != 0x02)
-                        //{
+                        if(filenamespace != 0x02)
+                        {
                             QString filename = "";
                             for(int k=0; k < filenamelength; k++)
                                 filename += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 90 + k*2, 2))));
                             qDebug() << "nt mft entry:" << i << "filename:" << filename << "sequence number:" << sequenceid;
-                        //}
+                        }
                     }
                     else if(attrtype == 0x80) // $DATA - resident or non-resident
                     {
@@ -2133,17 +2131,21 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 					break;
 				    currunoff++;
 				    uint runlength = 0;
-				    uint runoffset = 0;
+				    int runoffset = 0;
 				    if(runlengthbytes == 1)
 					runlength = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff, runlengthbytes));
 				    else
 					runlength = qFromLittleEndian<uint>(curmftentry.mid(currunoff, runlengthbytes));
 				    if(runlengthoffset == 1)
-					runoffset = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
+					runoffset = qFromLittleEndian<int8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
 				    else
-					runoffset = qFromLittleEndian<uint>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
+					runoffset = qFromLittleEndian<int>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
 				    if(k > 0)
+                                    {
+                                        if(k > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
+                                            runoffset = runoffset - 0xffff - 1;
 					runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
+                                    }
 				    physicalsize += runlength;
 				    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
 				    k++;
@@ -2199,17 +2201,21 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 					break;
 				    currunoff++;
 				    uint runlength = 0;
-				    uint runoffset = 0;
+				    int runoffset = 0;
 				    if(runlengthbytes == 1)
 					runlength = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff, runlengthbytes));
 				    else
 					runlength = qFromLittleEndian<uint>(curmftentry.mid(currunoff, runlengthbytes));
 				    if(runlengthoffset == 1)
-					runoffset = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
+					runoffset = qFromLittleEndian<int8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
 				    else
-					runoffset = qFromLittleEndian<uint>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
+					runoffset = qFromLittleEndian<int>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
 				    if(k > 0)
+                                    {
+                                        if(k > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
+                                            runoffset = runoffset - 0xffff - 1;
 					runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
+                                    }
 				    physicalsize += runlength;
 				    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
 				    k++;
@@ -2303,17 +2309,21 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 					break;
 				    currunoff++;
 				    uint runlength = 0;
-				    uint runoffset = 0;
+				    int runoffset = 0;
 				    if(runlengthbytes == 1)
 					runlength = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff, runlengthbytes));
 				    else
 					runlength = qFromLittleEndian<uint>(curmftentry.mid(currunoff, runlengthbytes));
 				    if(runlengthoffset == 1)
-					runoffset = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
+					runoffset = qFromLittleEndian<int8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
 				    else
-					runoffset = qFromLittleEndian<uint>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
+					runoffset = qFromLittleEndian<int>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
 				    if(k > 0)
+                                    {
+                                        if(k > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
+                                            runoffset = runoffset - 0xffff - 1;
 					runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
+                                    }
 				    physicalsize += runlength;
 				    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
 				    k++;
@@ -2419,17 +2429,21 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                         break;
                     currunoff++;
                     uint runlength = 0;
-                    uint runoffset = 0;
+                    int runoffset = 0;
                     if(runlengthbytes == 1)
                         runlength = qFromLittleEndian<uint8_t>(curmftentrybuf.mid(currunoff, runlengthbytes));
                     else
                         runlength = qFromLittleEndian<uint>(curmftentrybuf.mid(currunoff, runlengthbytes));
                     if(runlengthoffset == 1)
-                        runoffset = qFromLittleEndian<uint8_t>(curmftentrybuf.mid(currunoff + runlengthbytes, runlengthoffset));
+                        runoffset = qFromLittleEndian<int8_t>(curmftentrybuf.mid(currunoff + runlengthbytes, runlengthoffset));
                     else
-                        runoffset = qFromLittleEndian<uint>(curmftentrybuf.mid(currunoff + runlengthbytes, runlengthoffset));
+                        runoffset = qFromLittleEndian<int>(curmftentrybuf.mid(currunoff + runlengthbytes, runlengthoffset));
                     if(j > 0)
+                    {
+                        if(j > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
+                            runoffset = runoffset - 0xffff - 1;
                         runoffset = runoffset + runlist.at(j-1).split(",").at(0).toUInt();
+                    }
                     runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
                     j++;
                     currunoff += runlengthbytes + runlengthoffset;
