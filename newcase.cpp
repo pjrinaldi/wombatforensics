@@ -2582,7 +2582,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                     runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
                     j++;
                     currunoff += runlengthbytes + runlengthoffset;
-                    j++;
                 }
                 else
                     break;
@@ -2621,15 +2620,113 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         // INDEX_ALLOC CONTAINS MORE THAN ONE INDX SO I NEED TO ENSURE I AM ACCOUNTING FOR THAT IN THE BELOW...
         int indxrecordcount = indxalloc.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
         uint curpos = 0;
-        if(parfileinfo != NULL)
-            qDebug() << "current directory parsing:" << parfileinfo->value("filename").toString();
+        //if(parfileinfo != NULL)
+        //    qDebug() << "current directory parsing:" << parfileinfo->value("filename").toString();
         for(int i=0; i < indxrecordcount; i++)
         {
-            qDebug() << "indx header:" << indxalloc.mid(curpos, 4);
+            curpos = i * indxrecordsize;
+            qDebug() << "starting position for each i:" << i << curpos;
+            //qDebug() << "indx record header:" << indxalloc.mid(curpos, 4);
             fileinfo.clear();
             uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 24, 4));
             uint32_t indxentryendoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 28, 4));
             uint32_t indxentryallocoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 32, 4));
+            int entrypos = 24 + indxentrystartoffset;
+            //curpos = curpos + 24 + indxentrystartoffset;
+            qDebug() << "initial entry pos:" << entrypos << "indxentryallocoffset:" << indxentryallocoffset;
+            while(entrypos < indxentryallocoffset)
+            {
+                qulonglong ntinode = qFromLittleEndian<qulonglong>(indxalloc.mid(curpos + entrypos, 6)); // nt inode for the entry
+		fileinfo.insert("i30sequenceid", QVariant(qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 6, 2)))); // sequence number for entry
+                uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 8, 2));
+                uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 10, 2));
+                if(indxentrylength == 0 || filenamelength == 0)
+                {
+                    if(indxentrylength == 0)
+                    {
+                        qDebug() << "indxentrylength is zero at pos:" << entrypos << curpos + entrypos;
+                        //entrypos = entrypos + 24;
+                        break;
+                    }
+                    if(filenamelength == 0)
+                    {
+                        qDebug() << "indxentrylength:" << indxentrylength;
+                        //qDebug() << "cur entry pos at filename break:" << entrypos << curpos + entrypos;
+                        entrypos = entrypos + indxentrylength;
+                        //break;
+                    }
+                }
+                else
+                {
+                QByteArray filenamebuf = indxalloc.mid(curpos + entrypos + 16, filenamelength);
+                uint8_t fnametype = filenamebuf.at(65);
+                if(fnametype != 0x02)
+                {
+                    qulonglong parntinode = qFromLittleEndian<uint64_t>(filenamebuf.mid(0, 6)); // parent nt inode for the entry
+		    fileinfo.insert("i30parentsequenceid", QVariant(qFromLittleEndian<uint16_t>(filenamebuf.mid(6, 2)))); // parent sequence id for the entry
+                    fileinfo.insert("ntinode", QVariant(ntinode)); // current nt inode
+                    fileinfo.insert("parntinode", QVariant(parntinode)); // current parent nt inode
+                    fileinfo.insert("i30create", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(8, 8)))));
+                    fileinfo.insert("i30modify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8)))));
+                    fileinfo.insert("i30change", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8)))));
+                    fileinfo.insert("i30access", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8)))));
+                    if(entrypos > indxentryendoffset)
+                    {
+                        fileinfo.insert("isdeleted", QVariant(1));
+			qDebug() << "deleted file/dir";
+                    }
+                    else
+                        fileinfo.insert("isdeleted", QVariant(0));
+		    uint8_t fnamelength = filenamebuf.at(64);
+		    QString filename = "";
+		    for(int j=0; j < fnamelength; j++)
+			filename += QString(QChar(qFromLittleEndian<uint16_t>(filenamebuf.mid(66 + j*2, 2))));
+                    if(filename != "." && filename != "..")
+                    {
+			QList<QHash<QString, QVariant>> adsinfolist;
+			adsinfolist.clear();
+                        fileinfo.insert("filename", QVariant(filename));
+                        fileinfo.insert("inode", QVariant(curinode));
+		        //qDebug() << "filename:" << filename << "nt inode:" << ntinode << "parent nt node:" << parntinode;
+                        GetMftEntryContent(estring, ntinode, &fileinfo, fsinfo, &adsinfolist);
+                        if(parfileinfo == NULL)
+                        {
+                            fileinfo.insert("path", QVariant("/"));
+                            fileinfo.insert("parentinode", QVariant(-1));
+                        }
+                        else
+                        {
+                            fileinfo.insert("path", QVariant(QString(parfileinfo->value("path").toString() + parfileinfo->value("filename").toString() + "/")));
+                            fileinfo.insert("parentinode", QVariant(parfileinfo->value("inode").toULongLong()));
+                        }
+                        fileinfolist->append(fileinfo);
+                        curinode++;
+                        if(fileinfo.value("itemptype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
+                        {
+                            ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+                            curinode = fileinfolist->count();
+                        }
+			if(adsinfolist.count() > 0)
+			{
+			    for(int j=0; j < adsinfolist.count(); j++)
+			    {
+				QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
+				curadsinfo.insert("inode", QVariant(curinode));
+				fileinfolist->append(curadsinfo);
+				//fileinfolist->append(adsinfolist.at(j));
+				curinode++;
+			    }
+			}
+                    }
+                }
+                entrypos = entrypos + indxentrylength;
+                }
+                //curpos = curpos + indxentrylength;
+            }
+            /*
+            qDebug() << "indx header:" << indxalloc.mid(curpos, 4);
+            fileinfo.clear();
+            uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 24, 4));
             qDebug() << "indxentryendoffset:" << indxentryendoffset << "indxentryallocoffset:" << indxentryallocoffset;
             curpos = curpos + 24 + indxentrystartoffset;
             qDebug() << "curpos at start of i:" << i << curpos;
@@ -2706,6 +2803,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 }
                 curpos = curpos + indxentrylength;
             }
+            */
         }
     }
     else // 0x00 NO INDEX_ALLOC
