@@ -2621,14 +2621,19 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         // INDEX_ALLOC CONTAINS MORE THAN ONE INDX SO I NEED TO ENSURE I AM ACCOUNTING FOR THAT IN THE BELOW...
         int indxrecordcount = indxalloc.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
         uint curpos = 0;
+        if(parfileinfo != NULL)
+            qDebug() << "current directory parsing:" << parfileinfo->value("filename").toString();
         for(int i=0; i < indxrecordcount; i++)
         {
+            qDebug() << "indx header:" << indxalloc.mid(curpos, 4);
             fileinfo.clear();
             uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 24, 4));
             uint32_t indxentryendoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 28, 4));
             uint32_t indxentryallocoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 32, 4));
+            qDebug() << "indxentryendoffset:" << indxentryendoffset << "indxentryallocoffset:" << indxentryallocoffset;
             curpos = curpos + 24 + indxentrystartoffset;
-            while(curpos < indxentryallocoffset)
+            qDebug() << "curpos at start of i:" << i << curpos;
+            while(curpos < indxentryallocoffset) // this should probably be indxalloc.count()...
             {
 		//qDebug() << "curpos at start of next index entry:" << curpos;
                 qulonglong ntinode = qFromLittleEndian<qulonglong>(indxalloc.mid(curpos, 6)); // nt inode for the entry
@@ -2637,7 +2642,10 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + 10, 2));
                 if(indxentrylength == 0 || filenamelength == 0)
                 {
-                    i = indxrecordcount;
+                    qDebug() << "curpos at end of entries, but not at the end of the index record..." << curpos;
+                    //curpos = indxrecordsize;
+                    //curpos = indxentryallocoffset;
+                    //i = indxrecordcount;
                     break;
                 }
                 QByteArray filenamebuf = indxalloc.mid(curpos + 16, filenamelength);
