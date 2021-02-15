@@ -2645,7 +2645,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                     if(indxentrylength == 0)
                     {
                         qDebug() << "indxentrylength is zero at pos:" << entrypos << curpos + entrypos;
-                        //entrypos = entrypos + 24;
+                        //entrypos = entrypos + 16;
                         break;
                     }
                     if(filenamelength == 0)
@@ -2653,7 +2653,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                         qDebug() << "indxentrylength:" << indxentrylength;
                         //qDebug() << "cur entry pos at filename break:" << entrypos << curpos + entrypos;
                         entrypos = entrypos + indxentrylength;
-                        //break;
+                        break;
                     }
                 }
                 else
