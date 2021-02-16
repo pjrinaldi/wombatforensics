@@ -2565,6 +2565,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                     currunoff++;
                     uint runlength = 0;
                     int runoffset = 0;
+		    // I EITHER NEED TO CAST THE VALUES WITH EXTENSIVE IF'S SO I CAN GET THE NEGATIVE WHERE NEEDED
+		    // OR HAVE A RANGE OF VARIABLES AND THEN USE THE IF'S TO PICK WHICH ONE...
                     if(runlengthbytes == 1)
                         runlength = qFromLittleEndian<uint8_t>(curmftentrybuf.mid(currunoff, runlengthbytes));
                     else
