@@ -2607,6 +2607,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
     bool isindxrootslack = false;
     uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxroot.mid(8, 4)); // INDEX RECORD SIZE (Bytes)
     uint32_t indxentryoffset = qFromLittleEndian<uint32_t>(indxroot.mid(16, 4));
+    //qDebug() << "indxentryoffset:" << indxentryoffset;
     uint32_t indxentrylistsize = qFromLittleEndian<uint32_t>(indxroot.mid(20, 4));
     uint32_t indxentrylistalloc = qFromLittleEndian<uint32_t>(indxroot.mid(24, 4));
     if((indxentrylistalloc - indxentrylistsize) > 0)
@@ -2620,8 +2621,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         // INDEX_ALLOC CONTAINS MORE THAN ONE INDX SO I NEED TO ENSURE I AM ACCOUNTING FOR THAT IN THE BELOW...
         int indxrecordcount = indxalloc.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
         uint curpos = 0;
-        //if(parfileinfo != NULL)
-        //    qDebug() << "current directory parsing:" << parfileinfo->value("filename").toString();
+        if(parfileinfo != NULL)
+            qDebug() << "current directory parsing:" << parfileinfo->value("filename").toString();
         for(int i=0; i < indxrecordcount; i++)
         {
             curpos = i * indxrecordsize;
@@ -2636,6 +2637,9 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
             qDebug() << "initial entry pos:" << entrypos << "indxentryallocoffset:" << indxentryallocoffset;
             while(entrypos < indxentryallocoffset)
             {
+		// need to write out the variables for each entry and then determine acceptable values and account for those so i can jump by 16 to review
+		// the unallocated or extra space of the index records...
+		qDebug() << "currentry pos for each iteration of while:" << curpos + entrypos << entrypos;
                 qulonglong ntinode = qFromLittleEndian<qulonglong>(indxalloc.mid(curpos + entrypos, 6)); // nt inode for the entry
 		fileinfo.insert("i30sequenceid", QVariant(qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 6, 2)))); // sequence number for entry
                 uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 8, 2));
@@ -2650,10 +2654,10 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                     }
                     if(filenamelength == 0)
                     {
-                        qDebug() << "indxentrylength:" << indxentrylength;
-                        //qDebug() << "cur entry pos at filename break:" << entrypos << curpos + entrypos;
+                        qDebug() << "indxentrylength with filename 0:" << indxentrylength;
+                        qDebug() << "cur entry pos at filename break:" << entrypos << curpos + entrypos;
                         entrypos = entrypos + indxentrylength;
-                        break;
+                        //break;
                     }
                 }
                 else
