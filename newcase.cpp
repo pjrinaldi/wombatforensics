@@ -2629,6 +2629,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         for(int i=0; i < indxrecordcount; i++)
         {
             curpos = i * indxrecordsize;
+	    qDebug() << "index record size:" << indxrecordsize;
             qDebug() << "starting position for each i:" << i << curpos;
             qDebug() << "indx record header:" << indxalloc.mid(curpos, 4);
             fileinfo.clear();
@@ -2639,7 +2640,8 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
             //curpos = curpos + 24 + indxentrystartoffset;
 	    //qDebug() << "max mft entries:" << maxmftentries;
             qDebug() << "initial entry pos:" << entrypos << "indxentryallocoffset:" << indxentryallocoffset;
-            while(curpos + entrypos < indxentryallocoffset)
+            //while(curpos + entrypos < indxentryallocoffset)
+	    while(entrypos < indxrecordsize)
             {
 		// need to write out the variables for each entry and then determine acceptable values and account for those so i can jump by 16 to review
 		// the unallocated or extra space of the index records...
@@ -2648,6 +2650,10 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		uint16_t i30seqid = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 6, 2)); // sequence number for entry
                 uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 8, 2));
                 uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 10, 2));
+		// maybe i should flip this if/else to be when conditions && are met otherwise do the skipping below...
+		if(indxentrylength > 0 && filenamelength > 0 && ntinode >= 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength)
+		{
+		    /*
                 if(indxentrylength == 0 || filenamelength == 0 || ntinode < 0 || ntinode > maxmftentries || indxentrylength > indxrecordsize)
                 {
                     //if(indxentrylength == 0)
@@ -2670,7 +2676,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		    }
                 }
                 else
-                {
+                {*/
 		    QByteArray filenamebuf = indxalloc.mid(curpos + entrypos + 16, filenamelength);
 		    uint8_t fnametype = filenamebuf.at(65);
 		    if(fnametype != 0x02)
@@ -2735,6 +2741,14 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		    }
 		    entrypos = entrypos + indxentrylength;
                 }
+		else
+		{
+		    qDebug() << "not valid place, will skip to find next valid entry";
+		    if(filenamelength == 0 && indxentrylength > 0)
+			entrypos = entrypos + indxentrylength;
+		    else
+			entrypos = entrypos + 4;
+		}
                 //curpos = curpos + indxentrylength;
             }
             /*
