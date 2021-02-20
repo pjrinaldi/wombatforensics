@@ -2623,7 +2623,9 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         // ALSO NEED TO ADD THE INDXROOT ENTRIES HERE FIRST....
         // INDEX_ALLOC CONTAINS MORE THAN ONE INDX SO I NEED TO ENSURE I AM ACCOUNTING FOR THAT IN THE BELOW...
         int indxrecordcount = indxalloc.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
+        qDebug() << "indxrecord count:" << indxrecordcount;
         uint curpos = 0;
+        int zerocnt = 0;
         if(parfileinfo != NULL)
             qDebug() << "current directory parsing:" << parfileinfo->value("filename").toString();
         for(int i=0; i < indxrecordcount; i++)
@@ -2636,22 +2638,26 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
             uint32_t indxentrystartoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 24, 4));
             uint32_t indxentryendoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 28, 4));
             uint32_t indxentryallocoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 32, 4));
-            int entrypos = 24 + indxentrystartoffset;
+            curpos = curpos + 24 + indxentrystartoffset;
+            //int entrypos = 24 + indxentrystartoffset;
             //curpos = curpos + 24 + indxentrystartoffset;
 	    //qDebug() << "max mft entries:" << maxmftentries;
-            qDebug() << "initial entry pos:" << entrypos << "indxentryallocoffset:" << indxentryallocoffset;
+            //qDebug() << "initial entry pos:" << curpos << "indxentryallocoffset:" << indxentryallocoffset << "while loop max:" << i*indxrecordsize + indxentryallocoffset;
             //while(curpos + entrypos < indxentryallocoffset)
-	    while(entrypos < indxrecordsize)
+	    while(curpos < i*indxrecordsize + indxentryallocoffset)
             {
 		// need to write out the variables for each entry and then determine acceptable values and account for those so i can jump by 16 to review
 		// the unallocated or extra space of the index records...
-		qDebug() << "currentry pos for each iteration of while:" << curpos + entrypos << entrypos;
-                qint64 ntinode = qFromLittleEndian<qint64>(indxalloc.mid(curpos + entrypos, 6)); // nt inode for the entry
-		uint16_t i30seqid = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 6, 2)); // sequence number for entry
-                uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 8, 2));
-                uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + entrypos + 10, 2));
+                // IF I DON'T QDEBUG THESE VALUES, THE WHILE LOOP DOESN'T FIND ANYTHING
+                // SO A VARIABLE IS WRONG SOMEWHERE...
+		qDebug() << "currentry pos for each iteration of while:" << curpos << "<" << i*indxrecordsize + indxentryallocoffset;
+                qint64 ntinode = qFromLittleEndian<qint64>(indxalloc.mid(curpos, 6)); // nt inode for the entry
+		uint16_t i30seqid = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + 6, 2)); // sequence number for entry
+                uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + 8, 2));
+                uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + 10, 2));
+                //qDebug() << "filenamelength:" << filenamelength;
 		// maybe i should flip this if/else to be when conditions && are met otherwise do the skipping below...
-		if(indxentrylength > 0 && filenamelength > 0 && ntinode >= 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength)
+		if(indxentrylength > 0 && filenamelength > 0 && ntinode >= 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66)
 		{
 		    /*
                 if(indxentrylength == 0 || filenamelength == 0 || ntinode < 0 || ntinode > maxmftentries || indxentrylength > indxrecordsize)
@@ -2677,7 +2683,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 }
                 else
                 {*/
-		    QByteArray filenamebuf = indxalloc.mid(curpos + entrypos + 16, filenamelength);
+		    QByteArray filenamebuf = indxalloc.mid(curpos + 16, filenamelength);
 		    uint8_t fnametype = filenamebuf.at(65);
 		    if(fnametype != 0x02)
 		    {
@@ -2690,7 +2696,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			fileinfo.insert("i30modify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8)))));
 			fileinfo.insert("i30change", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8)))));
 			fileinfo.insert("i30access", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8)))));
-			if(entrypos > indxentryendoffset)
+			if(curpos > indxentryendoffset)
 			{
 			    fileinfo.insert("isdeleted", QVariant(1));
 			    qDebug() << "deleted file/dir";
@@ -2707,7 +2713,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    adsinfolist.clear();
 			    fileinfo.insert("filename", QVariant(filename));
 			    fileinfo.insert("inode", QVariant(curinode));
-			    //qDebug() << "filename:" << filename << "nt inode:" << ntinode << "parent nt node:" << parntinode;
+			    qDebug() << "filename:" << filename << "nt inode:" << ntinode << "parent nt node:" << parntinode;
 			    GetMftEntryContent(estring, ntinode, &fileinfo, fsinfo, &adsinfolist);
 			    if(parfileinfo == NULL)
 			    {
@@ -2739,18 +2745,26 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 			    }
 			}
 		    }
-		    entrypos = entrypos + indxentrylength;
+                    //qDebug() << "valid entry. do stuff here and jump to next entry";
+                    curpos = curpos + indxentrylength;
+		    //entrypos = entrypos + indxentrylength;
                 }
 		else
 		{
-		    qDebug() << "not valid place, will skip to find next valid entry";
-		    if(filenamelength == 0 && indxentrylength > 0)
-			entrypos = entrypos + indxentrylength;
-		    else
-			entrypos = entrypos + 4;
+		    //qDebug() << "not valid place, will skip to find next valid entry";
+		    //if(filenamelength == 0 && indxentrylength > 0 && indxentrylength < indxrecordsize)
+			//curpos = curpos + indxentrylength;
+		    //else
+			//curpos = curpos + 4;
+                    if(indxentrylength == 0)
+                        zerocnt++;
+                    curpos = curpos + 4;
+                    if(zerocnt == 5)
+                        break;
 		}
                 //curpos = curpos + indxentrylength;
             }
+            qDebug() << "curpos after the while loop..." << curpos;
             /*
             qDebug() << "indx header:" << indxalloc.mid(curpos, 4);
             fileinfo.clear();
