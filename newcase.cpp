@@ -2624,12 +2624,16 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
         // INDEX_ALLOC CONTAINS MORE THAN ONE INDX SO I NEED TO ENSURE I AM ACCOUNTING FOR THAT IN THE BELOW...
         int indxrecordcount = indxalloc.count() / indxrecordsize; // NUMBER OF INDEX RECORDS IN ALLOCATION
         qDebug() << "indxrecord count:" << indxrecordcount;
-        uint curpos = 0;
+        int curpos = 0;
         int zerocnt = 0;
         if(parfileinfo != NULL)
             qDebug() << "current directory parsing:" << parfileinfo->value("filename").toString();
+        else
+            qDebug() << "current directory parsing:" << "root directory";
         for(int i=0; i < indxrecordcount; i++)
         {
+            if(indxalloc.mid(curpos, 4).startsWith("INDX"))
+            {
             curpos = i * indxrecordsize;
 	    qDebug() << "index record size:" << indxrecordsize;
             qDebug() << "starting position for each i:" << i << curpos;
@@ -2639,8 +2643,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
             uint32_t indxentryendoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 28, 4));
             uint32_t indxentryallocoffset = qFromLittleEndian<uint32_t>(indxalloc.mid(curpos + 32, 4));
             curpos = curpos + 24 + indxentrystartoffset;
-            //int entrypos = 24 + indxentrystartoffset;
-            //curpos = curpos + 24 + indxentrystartoffset;
 	    //qDebug() << "max mft entries:" << maxmftentries;
             //qDebug() << "initial entry pos:" << curpos << "indxentryallocoffset:" << indxentryallocoffset << "while loop max:" << i*indxrecordsize + indxentryallocoffset;
             //while(curpos + entrypos < indxentryallocoffset)
@@ -2659,30 +2661,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
 		// maybe i should flip this if/else to be when conditions && are met otherwise do the skipping below...
 		if(indxentrylength > 0 && filenamelength > 0 && ntinode >= 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66)
 		{
-		    /*
-                if(indxentrylength == 0 || filenamelength == 0 || ntinode < 0 || ntinode > maxmftentries || indxentrylength > indxrecordsize)
-                {
-                    //if(indxentrylength == 0)
-                    //{
-                    //    qDebug() << "indxentrylength is zero at pos:" << entrypos << curpos + entrypos;
-                    //    entrypos = entrypos + 4;
-                        //break;
-                    //}
-                    if(filenamelength == 0 && indxentrylength > 0)
-                    {
-                        //qDebug() << "indxentrylength with filename 0:" << indxentrylength;
-                        //qDebug() << "cur entry pos at filename break:" << entrypos << curpos + entrypos;
-                        entrypos = entrypos + indxentrylength;
-                        //break;
-                    }
-		    else
-		    {
-			//qDebug() << "
-			entrypos = entrypos + 4;
-		    }
-                }
-                else
-                {*/
 		    QByteArray filenamebuf = indxalloc.mid(curpos + 16, filenamelength);
 		    uint8_t fnametype = filenamebuf.at(65);
 		    if(fnametype != 0x02)
@@ -2751,20 +2729,11 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 }
 		else
 		{
-		    //qDebug() << "not valid place, will skip to find next valid entry";
-		    //if(filenamelength == 0 && indxentrylength > 0 && indxentrylength < indxrecordsize)
-			//curpos = curpos + indxentrylength;
-		    //else
-			//curpos = curpos + 4;
-                    if(indxentrylength == 0)
-                        zerocnt++;
                     curpos = curpos + 4;
-                    if(zerocnt == 5)
-                        break;
 		}
-                //curpos = curpos + indxentrylength;
             }
             qDebug() << "curpos after the while loop..." << curpos;
+            }
             /*
             qDebug() << "indx header:" << indxalloc.mid(curpos, 4);
             fileinfo.clear();
