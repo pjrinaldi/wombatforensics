@@ -3448,7 +3448,8 @@ void WombatForensics::PreviousItem()
 void WombatForensics::ShowItem()
 {
     QModelIndex curindex = ui->dirTreeView->currentIndex();
-    ShowFile(curindex);
+    if(curindex.isValid())
+        ShowFile(curindex);
 }
 
 void WombatForensics::UpdateFilterCount()
