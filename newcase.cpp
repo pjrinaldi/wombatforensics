@@ -2642,6 +2642,12 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
             qDebug() << "current directory parsing:" << parfileinfo->value("filename").toString();
         else
             qDebug() << "current directory parsing:" << "root directory";
+        for(int i=0; i < indxrecordcount; i++)
+        {
+            QByteArray curindxrecord = indxalloc.mid(i*indxrecordsize, indxrecordsize);
+            qDebug() << "i:" << i << "curindxrecordcount:" << curindxrecord.count();
+        }
+        /*
         for(uint i=0; i < indxrecordcount; i++)
         {
             if(indxalloc.mid(curpos, 4).startsWith("INDX"))
@@ -2659,7 +2665,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 while(curpos < i*indxrecordsize + indxentryallocoffset)
                 {
                     qint64 ntinode = 0;
-                    qDebug() << "curpos:" << curpos;
+                    //qDebug() << "curpos:" << curpos;
                     ntinode = qFromLittleEndian<qint64>(indxalloc.mid(curpos, 6)); // nt inode for the entry
                     uint16_t i30seqid = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + 6, 2)); // sequence number for entry
                     uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxalloc.mid(curpos + 8, 2));
@@ -2681,25 +2687,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                             fileinfo.insert("i30modify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8)))));
                             fileinfo.insert("i30change", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8)))));
                             fileinfo.insert("i30access", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8)))));
-                            /*
-                            if(curpos > indxentryendoffset)
-                            {
-                                //fileinfo.insert("isdeleted", QVariant(1));
-                            }
-                            else if(parfileinfo != NULL)
-                            {
-                                if(parfileinfo->value("ntinode").toUInt() != parntinode)
-                                {
-                                    fileinfo.insert("isdeleted", QVariant(1));
-                                }
-                                else
-                                {
-                                    fileinfo.insert("isdeleted", QVariant(0));
-                                }
-                            }
-                            else
-                                fileinfo.insert("isdeleted", QVariant(0));
-                            */
                             uint8_t fnamelength = filenamebuf.at(64);
                             QString filename = "";
                             for(int j=0; j < fnamelength; j++)
@@ -2794,63 +2781,6 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                                         fileinfo.insert("isdeleted", QVariant(0));
                                     }
                                 }
-                                /*
-                                if(attrflags == 0x00) // unallocated file
-                                {
-                                    attrstr += "Not Allocated,";
-                                    /*
-                                    if(accessflags & 0x4000) // encrypted
-                                        fileinfo->insert("itemtype", QVariant(13));
-                                    else
-                                        fileinfo->insert("itemtype", QVariant(4));
-                                    fileinfo->insert("isdeleted", QVariant(1));
-                                    */
-                                    //qDebug() << "deleted file";
-                               /* }
-                                else if(attrflags == 0x01) // allocated file
-                                {
-                                    attrstr += "Allocated,";
-                                    /*
-                                    if(accessflags & 0x4000) // encrypted
-                                        fileinfo->insert("itemtype", QVariant(13));
-                                    else
-                                        fileinfo->insert("itemtype", QVariant(5));
-                                    fileinfo->insert("isdeleted", QVariant(0));
-                                    */
-                                    //qDebug() << "allocated file";
-                                /*}
-                                else if(attrflags == 0x02) // unallocated directory
-                                {
-                                    attrstr += "Not Allocated,";
-                                    /*
-                                    if(accessflags & 0x4000) // encrypted
-                                        fileinfo->insert("itemtype", QVariant(13));
-                                    else
-                                        fileinfo->insert("itemtype", QVariant(2));
-                                    fileinfo->insert("isdeleted", QVariant(1));
-                                    */
-                                    //qDebug() << "deleted directory";
-                                /*}
-                                else if(attrflags == 0x03) // allocated directory
-                                {
-                                    attrstr += "Allocated,";
-                                    /*
-                                    if(accessflags & 0x4000) // encrypted
-                                        fileinfo->insert("itemtype", QVariant(13));
-                                    else
-                                        fileinfo->insert("itemtype", QVariant(3));
-                                    fileinfo->insert("isdeleted", QVariant(0));
-                                    */
-                                    //qDebug() << "allocated directory";
-                                /*}
-                                else if(accessflags & 0x02 && accessflags & 0x04)
-                                {
-                                    /*
-                                    fileinfo->insert("itemtype", QVariant(5));
-                                    fileinfo->insert("isdeleted", QVariant(0));
-                                    */
-                                /*}
-                                */ 
                                 if(parfileinfo == NULL)
                                 {
                                     fileinfo.insert("path", QVariant("/"));
@@ -2888,6 +2818,7 @@ void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 qDebug() << "curpos after while:" << curpos;
             }
         }
+        */
 	    //qDebug() << "max mft entries:" << maxmftentries;
             //qDebug() << "initial entry pos:" << curpos << "indxentryallocoffset:" << indxentryallocoffset << "while loop max:" << i*indxrecordsize + indxentryallocoffset;
             //while(curpos + entrypos < indxentryallocoffset)
