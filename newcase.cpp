@@ -4202,8 +4202,8 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             // GET BLOCKLIST FOR THE CURINODEBUF
             QStringList curblkstrlist;
             curblkstrlist.clear();
-            //QList<uint32_t> curblocklist;
-            //curblocklist.clear();
+            QList<uint32_t> curblocklist;
+            curblocklist.clear();
             
             uint32_t curinodeflags = qFromLittleEndian<uint32_t>(curinodebuf.mid(32, 4));
 	    QString attrstr = "";
@@ -4327,136 +4327,136 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             }
             else
             {
-            for(int i=0; i < 12; i++)
-            {
-                uint32_t curdirectblock = qFromLittleEndian<uint32_t>(curinodebuf.mid(40 + i*4, 4));
-                if(curdirectblock > 0)
+                for(int i=0; i < 12; i++)
                 {
-                    //curblocklist.append(curdirectblock);
-                    curblkstrlist.append(QString::number(curdirectblock * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
-                }
-            }
-            //qDebug() << fileinfo.value("filename").toString() << "current block list before i get the indirect block pointers.." << curblocklist;
-            uint32_t cursingleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(88, 4));
-            uint32_t curdoubleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(92, 4));
-            uint32_t curtripleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(96, 4));
-            if(cursingleindirect > 0)
-            {
-                if(!efile.isOpen())
-                    efile.open(QIODevice::ReadOnly);
-                if(efile.isOpen())
-                {
-                    efile.seek(fsinfo->value("partoffset").toUInt() + (cursingleindirect * fsinfo->value("blocksize").toUInt()));
-                    QByteArray singlebuf = efile.read(fsinfo->value("blocksize").toUInt());
-                    efile.close();
-                    for(int i=0; i < singlebuf.count() / 4; i++)
+                    uint32_t curdirectblock = qFromLittleEndian<uint32_t>(curinodebuf.mid(40 + i*4, 4));
+                    if(curdirectblock > 0)
                     {
-                        uint32_t cursingledirect = qFromLittleEndian<uint32_t>(singlebuf.mid(i*4, 4));
-                        if(cursingledirect > 0)
-                        {
-                            //curblocklist.append(cursingledirect);
-                            curblkstrlist.append(QString::number(cursingledirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
-                        }
+                        curblocklist.append(curdirectblock);
+                        curblkstrlist.append(QString::number(curdirectblock * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
                     }
                 }
-            }
-            if(curdoubleindirect > 0)
-            {
-                QList<uint32_t> sinlist;
-                sinlist.clear();
-                if(!efile.isOpen())
-                    efile.open(QIODevice::ReadOnly);
-                if(efile.isOpen())
-                {
-                    efile.seek(fsinfo->value("partoffset").toUInt() + (curdoubleindirect * fsinfo->value("blocksize").toUInt()));
-                    QByteArray doublebuf = efile.read(fsinfo->value("blocksize").toUInt());
-                    efile.close();
-                    for(int i=0; i < doublebuf.count() / 4; i++)
-                    {
-                        uint32_t sindirect = qFromLittleEndian<uint32_t>(doublebuf.mid(i*4, 4));
-                        if(sindirect > 0)
-                            sinlist.append(sindirect);
-                    }
-                }
-                for(int i=0; i < sinlist.count(); i++)
+                //qDebug() << fileinfo.value("filename").toString() << "current block list before i get the indirect block pointers.." << curblocklist;
+                uint32_t cursingleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(88, 4));
+                uint32_t curdoubleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(92, 4));
+                uint32_t curtripleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(96, 4));
+                if(cursingleindirect > 0)
                 {
                     if(!efile.isOpen())
                         efile.open(QIODevice::ReadOnly);
                     if(efile.isOpen())
                     {
-                        efile.seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(i) * fsinfo->value("blocksize").toUInt()));
-                        QByteArray sinbuf = efile.read(fsinfo->value("blocksize").toUInt());
+                        efile.seek(fsinfo->value("partoffset").toUInt() + (cursingleindirect * fsinfo->value("blocksize").toUInt()));
+                        QByteArray singlebuf = efile.read(fsinfo->value("blocksize").toUInt());
                         efile.close();
-                        for(int j=0; j < sinbuf.count() / 4; j++)
+                        for(int i=0; i < singlebuf.count() / 4; i++)
                         {
-                            uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(j*4, 4));
-                            if(sdirect > 0)
+                            uint32_t cursingledirect = qFromLittleEndian<uint32_t>(singlebuf.mid(i*4, 4));
+                            if(cursingledirect > 0)
                             {
-                                curblkstrlist.append(QString::number(sdirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
-                                //curblocklist.append(sdirect);
+                                curblocklist.append(cursingledirect);
+                                curblkstrlist.append(QString::number(cursingledirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
                             }
                         }
                     }
                 }
-            }
-            if(curtripleindirect > 0)
-            {
-                QList<uint32_t> dinlist;
-                dinlist.clear();
-                QList<uint32_t> sinlist;
-                sinlist.clear();
-                if(!efile.isOpen())
-                    efile.open(QIODevice::ReadOnly);
-                if(efile.isOpen())
+                if(curdoubleindirect > 0)
                 {
-                    efile.seek(fsinfo->value("partoffset").toUInt() + (curtripleindirect * fsinfo->value("blocksize").toUInt()));
-                    QByteArray triplebuf = efile.read(fsinfo->value("blocksize").toUInt());
-                    efile.close();
-                    for(int i=0; i < triplebuf.count() / 4; i++)
-                    {
-                        uint32_t dindirect = qFromLittleEndian<uint32_t>(triplebuf.mid(i*4, 4));
-                        if(dindirect > 0)
-                            dinlist.append(dindirect);
-                    }
-                }
-                for(int i=0; i < dinlist.count(); i++)
-                {
+                    QList<uint32_t> sinlist;
+                    sinlist.clear();
                     if(!efile.isOpen())
                         efile.open(QIODevice::ReadOnly);
                     if(efile.isOpen())
                     {
-                        efile.seek(fsinfo->value("partoffset").toUInt() + (dinlist.at(i) * fsinfo->value("blocksize").toUInt()));
-                        QByteArray dinbuf = efile.read(fsinfo->value("blocksize").toUInt());
+                        efile.seek(fsinfo->value("partoffset").toUInt() + (curdoubleindirect * fsinfo->value("blocksize").toUInt()));
+                        QByteArray doublebuf = efile.read(fsinfo->value("blocksize").toUInt());
                         efile.close();
-                        for(int j=0; j < dinbuf.count() / 4; j++)
+                        for(int i=0; i < doublebuf.count() / 4; i++)
                         {
-                            uint32_t sindirect = qFromLittleEndian<uint32_t>(dinbuf.mid(j*4, 4));
+                            uint32_t sindirect = qFromLittleEndian<uint32_t>(doublebuf.mid(i*4, 4));
                             if(sindirect > 0)
                                 sinlist.append(sindirect);
                         }
                     }
-                    for(int j=0; j < sinlist.count(); j++)
+                    for(int i=0; i < sinlist.count(); i++)
                     {
                         if(!efile.isOpen())
                             efile.open(QIODevice::ReadOnly);
                         if(efile.isOpen())
                         {
-                            efile.seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(j) * fsinfo->value("blocksize").toUInt()));
+                            efile.seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(i) * fsinfo->value("blocksize").toUInt()));
                             QByteArray sinbuf = efile.read(fsinfo->value("blocksize").toUInt());
                             efile.close();
-                            for(int k=0; k < sinbuf.count() / 4; k++)
+                            for(int j=0; j < sinbuf.count() / 4; j++)
                             {
-                                uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(k*4, 4));
+                                uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(j*4, 4));
                                 if(sdirect > 0)
                                 {
-                                    //curblocklist.append(sdirect);
                                     curblkstrlist.append(QString::number(sdirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+                                    curblocklist.append(sdirect);
                                 }
                             }
                         }
                     }
                 }
-            }
+                if(curtripleindirect > 0)
+                {
+                    QList<uint32_t> dinlist;
+                    dinlist.clear();
+                    QList<uint32_t> sinlist;
+                    sinlist.clear();
+                    if(!efile.isOpen())
+                        efile.open(QIODevice::ReadOnly);
+                    if(efile.isOpen())
+                    {
+                        efile.seek(fsinfo->value("partoffset").toUInt() + (curtripleindirect * fsinfo->value("blocksize").toUInt()));
+                        QByteArray triplebuf = efile.read(fsinfo->value("blocksize").toUInt());
+                        efile.close();
+                        for(int i=0; i < triplebuf.count() / 4; i++)
+                        {
+                            uint32_t dindirect = qFromLittleEndian<uint32_t>(triplebuf.mid(i*4, 4));
+                            if(dindirect > 0)
+                                dinlist.append(dindirect);
+                        }
+                    }
+                    for(int i=0; i < dinlist.count(); i++)
+                    {
+                        if(!efile.isOpen())
+                            efile.open(QIODevice::ReadOnly);
+                        if(efile.isOpen())
+                        {
+                            efile.seek(fsinfo->value("partoffset").toUInt() + (dinlist.at(i) * fsinfo->value("blocksize").toUInt()));
+                            QByteArray dinbuf = efile.read(fsinfo->value("blocksize").toUInt());
+                            efile.close();
+                            for(int j=0; j < dinbuf.count() / 4; j++)
+                            {
+                                uint32_t sindirect = qFromLittleEndian<uint32_t>(dinbuf.mid(j*4, 4));
+                                if(sindirect > 0)
+                                    sinlist.append(sindirect);
+                            }
+                        }
+                        for(int j=0; j < sinlist.count(); j++)
+                        {
+                            if(!efile.isOpen())
+                                efile.open(QIODevice::ReadOnly);
+                            if(efile.isOpen())
+                            {
+                                efile.seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(j) * fsinfo->value("blocksize").toUInt()));
+                                QByteArray sinbuf = efile.read(fsinfo->value("blocksize").toUInt());
+                                efile.close();
+                                for(int k=0; k < sinbuf.count() / 4; k++)
+                                {
+                                    uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(k*4, 4));
+                                    if(sdirect > 0)
+                                    {
+                                        curblocklist.append(sdirect);
+                                        curblkstrlist.append(QString::number(sdirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             //qDebug() << "curblkstr:" << curblkstrlist;
 
@@ -4470,15 +4470,19 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
 	    int phyremcnt = physize % fsinfo->value("blocksize").toUInt();
 	    if(phyremcnt > 0)
 		phyblkcnt++;
-	    qDebug() << "physize:" << physize << "phyblkcnt:" << phyblkcnt * fsinfo->value("blocksize").toUInt();
+	    //qDebug() << "physize:" << physize << "phyblkcnt:" << phyblkcnt * fsinfo->value("blocksize").toUInt();
             fileinfo.insert("physicalsize", QVariant(phyblkcnt * fsinfo->value("blocksize").toUInt()));
 
             //qDebug() << "curblock list:" << curblocklist;
             //fileinfo.insert("physicalsize", QVariant(curblocklist.count() * fsinfo->value("blocksize").toUInt()));
             //qDebug() << "logical/physical size:" << fileinfo.value("logicalsize").toUInt() << fileinfo.value("physicalsize").toUInt();
+            QString layout = ConvertBlocksToExtents(curblocklist, fsinfo->value("blocksize").toUInt());
+            /*
             QString layout = "";
             for(int i=0; i < curblkstrlist.count(); i++)
                 layout += curblkstrlist.at(i) + ";";
+            */
+
             /*
             for(int i=0; i < curblocklist.count(); i++)
                 layout += QString::number(curblocklist.at(i) * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()) + ";";

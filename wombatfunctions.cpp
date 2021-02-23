@@ -659,8 +659,34 @@ uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate)
     return (uint32_t) ntdate;
 }
 
-QString ConvertBlocksToExtents(QString blkstr)
+QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
 {
+    qDebug() << "blocklist.count():" << blocklist.count();
+    //qDebug() << "blocklist:" << blocklist;
     QString extentstring = "";
+    int blkcnt = 1;
+    uint32_t startvalue = blocklist.at(0);
+    for(int i=1; i < blocklist.count(); i++)
+    {
+        // almost there, i'm missing some somewhere with my logic...
+        // but i'm close.
+        //qDebug() << "i:" << i;
+        uint32_t oldvalue = blocklist.at(i-1);
+        uint32_t newvalue = blocklist.at(i);
+        if(newvalue - oldvalue == 1)
+            blkcnt++;
+        else
+        {
+            qDebug() << "start value:" << startvalue << "blkcnt:" << blkcnt << "blkcnt * blocksize:" << blkcnt * blocksize;
+            startvalue = blocklist.at(i);
+            blkcnt = 1;
+        }
+        if(i == blocklist.count() - 1)
+        {
+            qDebug() << "start value:" << startvalue << "blkcnt:" << blkcnt << "blkcnt * blocksize:" << blkcnt * blocksize;
+            startvalue = blocklist.at(i);
+            blkcnt = 1;
+        }
+    }
     return extentstring;
 }
