@@ -459,6 +459,7 @@ void LoadTreeModel(QString estring)
 
 void PopulateTreeModel(QString evidstring)
 {
+    /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
     //qDebug() << "evidlist:" << evidlist;
@@ -768,10 +769,12 @@ void PopulateTreeModel(QString evidstring)
     tsk_img_close(imginfo);
     //InitializeHashList();
     //InitializeTaggedList();
+    */
 }
 
 void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath)
 {
+    /*
     int pathcount = partitionpath.split("/", Qt::SkipEmptyParts).count();
     QString evalue = partitionpath.split("/", Qt::SkipEmptyParts).at(pathcount - 3).split(".").last();
     QString vvalue = partitionpath.split("/", Qt::SkipEmptyParts).at(pathcount - 2);
@@ -1001,5 +1004,5 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
         }
     }
     tsk_fs_dir_close(fsdir);
+    */
 }
-

@@ -161,9 +161,11 @@ void GenerateArchiveExpansion(QString objectid)
 		}
 		mutex.unlock();
 		tmparray = QByteArray::fromRawData(magicbuffer, sigsize);
-		QMimeDatabase mimedb;
-		const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-		QString mimestr = GenerateCategorySignature(mimetype);
+		//QMimeDatabase mimedb;
+		//const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+		QString mimestr = GenerateCategorySignature(tmparray, QString::fromStdString(std::string(zipstat.name)));
+		//QString mimestr = GenerateCategorySignature(mimetype, QString::fromStdString(std::string(zipstat.name)));
+                /*
 		if(mimestr.contains("Unknown")) // generate further analysis
 		{
 		    if(tmparray.at(0) == '\x4c' && tmparray.at(1) == '\x00' && tmparray.at(2) == '\x00' && tmparray.at(3) == '\x00' && tmparray.at(4) == '\x01' && tmparray.at(5) == '\x14' && tmparray.at(6) == '\x02' && tmparray.at(7) == '\x00') // LNK File
@@ -180,6 +182,7 @@ void GenerateArchiveExpansion(QString objectid)
 		}
                 if(QString::fromStdString(std::string(zipstat.name)).endsWith("/"))
                     mimestr = "Directory/Directory";
+                */
                 //qDebug() << "it is a directory, update mime values";
 		//qDebug() << "mimestr:" << mimestr;
 		delete[] magicbuffer;

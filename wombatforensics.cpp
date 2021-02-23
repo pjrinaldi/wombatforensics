@@ -3481,9 +3481,10 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     QString enumber = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first(); // current evidence item
     QString offstr = "0x" + QString::number(coffset, 16); // offset string 0xabc
     QByteArray tmparray = ui->hexview->selectionToByteArray(); // current carved content
-    QMimeDatabase mimedb;
-    const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
-    QString mimestr = GenerateCategorySignature(mimetype); // category/signature
+    //QMimeDatabase mimedb;
+    //const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+    //QString mimestr = GenerateCategorySignature(mimetype, ""); // category/signature
+    QString mimestr = GenerateCategorySignature(tmparray, ""); // category/signature
     QString layoutstr = QString::number(coffset) + "," + QString::number(clength) + ";"; // Layout property
     QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
     QString curhash = QString(tmphash.hash(tmparray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper(); // HASH for carved content

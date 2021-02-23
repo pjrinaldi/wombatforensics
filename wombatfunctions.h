@@ -21,7 +21,8 @@ int SegmentDigits(int);
 void GenerateWombatCaseFile(void);
 void RewriteSelectedIdContent(QModelIndex selectedid);
 
-QString GenerateCategorySignature(const QMimeType mimetype);
+//QString GenerateCategorySignature(const QMimeType mimetype, QString filename);
+QString GenerateCategorySignature(QByteArray sigbuf, QString filename);
 
 void SavePasswordList(void);
 void InitializePasswordList(void);
@@ -37,5 +38,6 @@ QString ConvertWindowsTimeToUnixTime(uint64_t input);
 QString ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
 QString ConvertUnixTimeToString(uint32_t input);
 uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate);
+QString ConvertBlocksToExtents(QString blkstr);
 
 #endif // wombatfunctions.h

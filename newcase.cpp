@@ -5830,10 +5830,11 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
 		    }
 		    efile.close();
 		}
-		QMimeDatabase mimedb;
-		const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(fileinfolist->at(j).value("filename").toString(), sigbuf);
-		QString mimestr = GenerateCategorySignature(mimetype);
+		//QMimeDatabase mimedb;
+		//const QMimeType mimetype = mimedb.mimeTypeForData(sigbuf);
+		QString mimestr = GenerateCategorySignature(sigbuf, fileinfolist->at(j).value("filename").toString());
 		//qDebug() << "mimestr:" << mimestr;
+                /*
 		if(mimestr.contains("Unknown")) // generate further analysis
 		{
 		    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
@@ -5857,6 +5858,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
 		}
 		if(fileinfolist->at(j).value("filename").toString().startsWith("$UPCASE_TABLE"))
 		    mimestr = "System File/Up-case Table";
+                */
 		nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
 	    }
         }
@@ -5930,10 +5932,13 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
                 sigbuf = efile.read(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toULongLong());
                 efile.close();
             }
-            QMimeDatabase mimedb;
-            const QMimeType mimetype = mimedb.mimeTypeForFileNameAndData(orphanlist->at(j).value("filename").toString(), sigbuf);
-            mimestr = GenerateCategorySignature(mimetype);
+            //QMimeDatabase mimedb;
+            //const QMimeType mimetype = mimedb.mimeTypeForData(tmparray);
+            //const QMimeType mimetype = mimedb.mimeTypeForData(sigbuf);
+            mimestr = GenerateCategorySignature(sigbuf, orphanlist->at(j).value("filename").toString());
+            //mimestr = GenerateCategorySignature(mimetype, orphanlist->at(j).value("filename").toString());
 	    //qDebug() << "mimestr:" << mimestr;
+            /*
             if(mimestr.contains("Unknown")) // generate further analysis
             {
                 if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
@@ -5955,6 +5960,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
                 mimestr = "System File/Up-case Table";
             if(orphanlist->at(j).value("itemtype").toUInt() == 2)
                 mimestr = "Directory/Directory";
+            */
         }
             //nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
 
@@ -6730,6 +6736,7 @@ void InitializeEvidenceStructure(QString evidname)
 
 void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const char* path, int eint, int vint, int pint, QString partpath)
 {
+    /*
     TSK_FS_DIR* fsdir = NULL;
     fsdir = tsk_fs_dir_open_meta(fsinfo, dirinum);
     if(fsdir != NULL)
@@ -6960,5 +6967,6 @@ void ProcessDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirinum, const
         }
     }
     tsk_fs_dir_close(fsdir);
+    */
 }
 
