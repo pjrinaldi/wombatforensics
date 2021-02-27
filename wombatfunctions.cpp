@@ -408,6 +408,7 @@ QString GenerateCategorySignature(QByteArray sigbuf, QString filename)
     const QMimeType mimetype = mimedb.mimeTypeForData(sigbuf);
     QString geniconstr = mimetype.genericIconName();
     QString mimesignature = mimetype.comment();
+    //qDebug() << "filename:" << filename << "mimesignature:" << mimesignature;
     QString mimecategory = "";
     if(geniconstr.contains("document")) // Document
         mimecategory = "Document";
@@ -504,44 +505,21 @@ QString GenerateCategorySignature(QByteArray sigbuf, QString filename)
             mimestr = "Windows System/Registry";
         else if(filename.startsWith("$ALLOC_BITMAP"))
             mimestr = "System File/Allocation Bitmap";
-        else if(filename.startsWith("$MFT") || filename.startsWith("$MFTMirr") || filename.startsWith("$LogFile") || filename.startsWith("$Volume") || filename.startsWith("$AttrDef") || filename.startsWith("$Bitmap") || filename.startsWith("$Boot") || filename.startsWith("$BadClus") || filename.startsWith("$Secure") || filename.startsWith("$UpCase") || filename.startsWith("$Extend"))
+        else if(filename.startsWith("$MFT") || filename.startsWith("$MFTMirr") || filename.startsWith("$LogFile") || filename.startsWith("$Volume") || filename.startsWith("$AttrDef") || filename.startsWith("$Bitmap") || filename.startsWith("$Boot") || filename.startsWith("$BadClus") || filename.startsWith("$Secure") || filename.startsWith("$Extend"))
             mimestr = "Windows System/System File";
     }
     if(filename.startsWith("$UPCASE_TABLE"))
         mimestr = "System File/Up-case Table";
+    if(filename.startsWith("$UpCase"))
+        mimestr = "Windows System/System File";
     //if(orphanlist->at(j).value("itemtype").toUInt() == 2)
     //    mimestr = "Directory/Directory";
-
-    /*
-		if(mimestr.contains("Unknown")) // generate further analysis
-		{
-		    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
-			mimestr = "Windows System/Shortcut";
-		    else if(strcmp(fileinfolist->at(j).value("filename").toString().toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
-			mimestr = "Windows System/Recycler";
-		    else if(fileinfolist->at(j).value("filename").toString().startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
-			mimestr = "Windows System/Recycle.Bin";
-		    else if(fileinfolist->at(j).value("filename").toString().endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
-			mimestr = "Windows System/Prefetch";
-		    else if(fileinfolist->at(j).value("filename").toString().endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
-			mimestr = "Windows System/Prefetch";
-		    else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
-			mimestr = "Windows System/Registry";
-		    else if(fileinfolist->at(j).value("filename").toString().startsWith("$ALLOC_BITMAP"))
-			mimestr = "System File/Allocation Bitmap";
-		    else if(fileinfolist->at(j).value("filename").toString().startsWith("$MFT") || fileinfolist->at(j).value("filename").toString().startsWith("$MFTMirr") || fileinfolist->at(j).value("filename").toString().startsWith("$LogFile") || fileinfolist->at(j).value("filename").toString().startsWith("$Volume") || fileinfolist->at(j).value("filename").toString().startsWith("$AttrDef") || fileinfolist->at(j).value("filename").toString().startsWith("$Bitmap") || fileinfolist->at(j).value("filename").toString().startsWith("$Boot") || fileinfolist->at(j).value("filename").toString().startsWith("$BadClus") || fileinfolist->at(j).value("filename").toString().startsWith("$Secure") || fileinfolist->at(j).value("filename").toString().startsWith("$UpCase") || fileinfolist->at(j).value("filename").toString().startsWith("$Extend"))
-			mimestr = "Windows System/System File";
 		    //else if(sigbuf.left(4) == "FILE")
 			//mimestr = "Windows System/MFT File Entry";
-		}
-		if(fileinfolist->at(j).value("filename").toString().startsWith("$UPCASE_TABLE"))
-                mimestr = "System File/Up-case Table";
-            if(orphanlist->at(j).value("itemtype").toUInt() == 2)
-                mimestr = "Directory/Directory";
-
-    */
-
-    return QString(mimecategory + "/" + mimesignature);
+    if(mimestr.isEmpty())
+        return QString(mimecategory + "/" + mimesignature);
+    else
+        return mimestr;
 }
 
 
@@ -661,29 +639,24 @@ uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate)
 
 QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
 {
-    qDebug() << "blocklist.count():" << blocklist.count();
-    //qDebug() << "blocklist:" << blocklist;
     QString extentstring = "";
     int blkcnt = 1;
     uint32_t startvalue = blocklist.at(0);
     for(int i=1; i < blocklist.count(); i++)
     {
-        // almost there, i'm missing some somewhere with my logic...
-        // but i'm close.
-        //qDebug() << "i:" << i;
         uint32_t oldvalue = blocklist.at(i-1);
         uint32_t newvalue = blocklist.at(i);
         if(newvalue - oldvalue == 1)
             blkcnt++;
         else
         {
-            qDebug() << "start value:" << startvalue << "blkcnt:" << blkcnt << "blkcnt * blocksize:" << blkcnt * blocksize;
+            extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
             startvalue = blocklist.at(i);
             blkcnt = 1;
         }
         if(i == blocklist.count() - 1)
         {
-            qDebug() << "start value:" << startvalue << "blkcnt:" << blkcnt << "blkcnt * blocksize:" << blkcnt * blocksize;
+            extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
             startvalue = blocklist.at(i);
             blkcnt = 1;
         }

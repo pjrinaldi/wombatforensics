@@ -5867,7 +5867,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
 	    }
         }
         else
-            nodedata << "" << "";
+            nodedata << "Empty" << "Empty File";
         nodedata << QVariant("0") << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("inode").toUInt())));
         /*
         if(nodedata.at(11).toString().endsWith("3350") || parentstr.endsWith("3350"))
