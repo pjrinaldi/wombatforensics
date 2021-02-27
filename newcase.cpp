@@ -2101,6 +2101,7 @@ void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVar
 
     //int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
     QByteArray curmftentry = mftarray.mid(ntinode*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
+    fileinfo->insert("mftrecordlayout", QString(QString::number(curmftentryoffset) + "," + QString::number(fsinfo->value("mftentrybytes").toUInt()) + ";"));
     // NOW I'VE GOT THE CURMFTENTRY FROM NTINODE AND I NEED TO PARSE THE ATTRIBUTE TO GET REST OF THE FILEINFO...
     if(QString::fromStdString(curmftentry.left(4).toStdString()) == "FILE") // a proper mft entry
     {
@@ -6048,13 +6049,25 @@ void WriteFileProperties(QHash<QString, QVariant>*fileinfo, QString pathstring)
 	if(fileinfo->contains("parntinode"))
 	    out << "Parent MFT Entry Record|" << QString::number(fileinfo->value("parntinode").toUInt()) << "|Parent Entry Record for the current entry record in the MFT" << Qt::endl;
 	if(fileinfo->contains("filecreate"))
-	    out << "$FILE_NAME Create Date|" << ConvertWindowsTimeToUnixTime(fileinfo->value("filecreate").toUInt()) << "|File Creation time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	    out << "$FILE_NAME Create Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("filecreate").toUInt()) << "|File Creation time as recorded in the $FILE_NAME attribute" << Qt::endl;
 	if(fileinfo->contains("filemodify"))
-	    out << "$FILE_NAME Modified Date|" << ConvertWindowsTimeToUnixTime(fileinfo->value("filemodify").toUInt()) << "|File Modification time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	    out << "$FILE_NAME Modified Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("filemodify").toUInt()) << "|File Modification time as recorded in the $FILE_NAME attribute" << Qt::endl;
 	if(fileinfo->contains("filestatus"))
-	    out << "$FILE_NAME Status Changed Date|" << ConvertWindowsTimeToUnixTime(fileinfo->value("filestatus").toUInt()) << "|File Status Changed time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	    out << "$FILE_NAME Status Changed Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("filestatus").toUInt()) << "|File Status Changed time as recorded in the $FILE_NAME attribute" << Qt::endl;
 	if(fileinfo->contains("fileaccess"))
-	    out << "$FILE_NAME Accessed Date|" << ConvertWindowsTimeToUnixTime(fileinfo->value("fileaccess").toUInt()) << "|File Accessed time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	    out << "$FILE_NAME Accessed Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("fileaccess").toUInt()) << "|File Accessed time as recorded in the $FILE_NAME attribute" << Qt::endl;
+        if(fileinfo->contains("mftsequenceid"))
+            out << "MFT Sequence ID|" << QString::number(fileinfo->value("mftsequenceid").toUInt()) << "|Sequence ID for the file as recorded in the MFT entry" << Qt::endl;
+        if(fileinfo->contains("i30sequenceid"))
+            out << "$I30 Sequence ID|" << QString::number(fileinfo->value("i30sequenceid").toUInt()) << "|Sequence ID for the file as recorded in the $I30 entry" << Qt::endl;
+        if(fileinfo->contains("i30create"))
+            out << "$I30 Create Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("i30create").toUInt()) << "|File Creation time as recorded in the $I30 entry" << Qt::endl;
+        if(fileinfo->contains("i30modify"))
+            out << "$I30 Modify Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("i30modify").toUInt()) << "|File Modification time as recorded in the $I30 entry" << Qt::endl;
+        if(fileinfo->contains("i30status"))
+            out << "$I30 Status Changed Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("i30status").toUInt()) << "|File Status Changed time as recorded in the $I30 entry" << Qt::endl;
+        if(fileinfo->contains("i30access"))
+            out << "$I30 Accessed Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("i30access").toUInt()) << "|File Accessed time as recorded in the $I30 entry" << Qt::endl;
         out.flush();
         filepropfile.close();
     }
