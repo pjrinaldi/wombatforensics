@@ -333,6 +333,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 		int i=0;
                 //QString runliststr = "";
                 QStringList runlist;
+                uint mftsize = 0;
                 runlist.clear();
 		while(curoffset < mftentrybytes) // might have to do a while < mftentrybytes and then go from there.... to build the curoffset = curoffset + 3, 4, etc...
 		{
@@ -370,6 +371,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 			//qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
                         //runliststr += QString::number(runoffset) + "," + QString::number(runlength) + ";";
                         runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
+                        mftsize += runlength;
                         //runlist.append(QString::number((partoffset * 512) + runoffset * fsinfo.value("bytespercluster").toUInt()) + "," + QString::number(runlength * fsinfo.value("bytespercluster").toUInt()));
                         //if(i != 0)
                             //runoffset = runoffset 
@@ -389,6 +391,7 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
                 for(int i=0; i < runlist.count(); i++)
                     runliststr += QString::number((partoffset * 512) + (runlist.at(i).split(",").at(0).toULongLong() * fsinfo.value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(i).split(",").at(1).toULongLong() * fsinfo.value("bytespercluster").toUInt()) + ";";
                 fsinfo.insert("mftlayout", QVariant(runliststr));
+                fsinfo.insert("maxmftentries", (mftsize * fsinfo.value("bytespercluster").toUInt()) / mftentrybytes);
                 //qDebug() << "mftlayout:" << fsinfo.value("mftlayout").toString();
             }
             else
@@ -6110,6 +6113,7 @@ void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstr
 	    out << "MFT Entry Size|" << QString::number(fsinfo->value("mftentrysize").toUInt()) << "|Entry size in bytes for an MFT Entry, usually 1024" << Qt::endl;
 	    out << "Serial Number|" << QString::number(fsinfo->value("serialnum").toUInt(), 16) << "|Serial number for the file system volume" << Qt::endl;
 	    out << "MFT Layout|" << fsinfo->value("mftlayout").toString() << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
+            out << "Max MFT Entries|" << QString::number(fsinfo->value("maxmftentries").toUInt()) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
 	}
 	else if(fsinfo->value("type").toUInt() == 6) // EXT2/3/4
 	{
