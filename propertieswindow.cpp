@@ -32,7 +32,8 @@ void PropertiesWindow::UpdateTableView()
     ui->tableView->hideColumn(2);
     //ui->label->setText("hello");
     ui->tableView->resizeRowsToContents();
-    ui->tableView->resizeColumnsToContents();
+    ui->tableView->resizeColumnToContents(0);
+    //ui->tableView->resizeColumnsToContents();
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)));
 }
 
