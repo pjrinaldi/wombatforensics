@@ -4,7 +4,7 @@
 // SLEUTHKIT FUNCTIONS NEEDED FROM HFS.C AND YAFFS.CPP WHICH ARE NOT IN ANY AVAIALBLE H FILE
 
 #include "wombatinclude.h" // my include file code
-
+/*
 void cnid_to_array(uint32_t cnid, uint8_t array[4]);
 int hfs_cat_compare_keys(HFS_INFO* hfs, const hfs_btree_key_cat* key1, const hfs_btree_key_cat* key2);
 TSK_OFF_T hfs_cat_get_record_offset(HFS_INFO* hfs, const hfs_btree_key_cat* needle);
@@ -18,5 +18,5 @@ typedef struct {
     const hfs_btree_key_cat *targ_key;
     TSK_OFF_T off;
 } HFS_CAT_GET_RECORD_OFFSET_DATA;
-
+*/
 #endif // tskcpp.h

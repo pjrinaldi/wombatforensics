@@ -6,7 +6,7 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
-#include "tskcpp.h"
+//#include "tskcpp.h"
 #include <zip.h>
 
 void SleepLoop(const int ms);

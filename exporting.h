@@ -4,7 +4,7 @@
 #include "wombatinclude.h"
 #include "wombatfunctions.h"
 #include "globals.h"
-#include "tskcpp.h"
+//#include "tskcpp.h"
 #include <zip.h>
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.

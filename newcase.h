@@ -6,8 +6,8 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
-#include "tskcpp.h"
-#include "properties.h"
+//#include "tskcpp.h"
+//#include "properties.h"
 #include "wombatfunctions.h"
 
 void ProcessVolume(QString evidstring);

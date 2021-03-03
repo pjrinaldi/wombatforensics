@@ -24,9 +24,10 @@ struct WombatVariable
     QString casepath;
     QString selectedid;
     int segmentcount;
-    TSK_IMG_TYPE_ENUM imgtype;
+    //TSK_IMG_TYPE_ENUM imgtype;
 };
 
+/*
 typedef struct
 {
     TSK_IMG_INFO imginfo;
@@ -38,7 +39,7 @@ typedef struct
     uint8_t usedewfglob;
     tsk_lock_t readlock;
 } IMG_EWF_INFO;
-
+*/
 /*
 struct FileSystemInfo
 {
@@ -108,7 +109,7 @@ typedef struct
 */
 
 Q_DECLARE_METATYPE(WombatVariable);
-Q_DECLARE_METATYPE(IMG_EWF_INFO);
+//Q_DECLARE_METATYPE(IMG_EWF_INFO);
 //Q_DECLARE_METATYPE(FileSystemInfo);
 //Q_DECLARE_METATYPE(DirEntryInfo);
 //Q_DECLARE_METATYPE(ntfsattrfname);

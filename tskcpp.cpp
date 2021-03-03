@@ -1,6 +1,6 @@
 #include "tskcpp.h"
 // SLEUTHKIT FUNCTIONS NEEDED FROM HFS.C AND YAFFS.CPP WHICH ARE NOT IN ANY AVAIALBLE H FILE
-
+/*
 void cnid_to_array(uint32_t cnid, uint8_t array[4])
 {
     array[3] = (cnid >> 0) & 0xff;
@@ -187,7 +187,7 @@ uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
     {
         TSK_FS_INFO *fs = &(hfs->fs_info);
         uint32_t cur_node;          /* node id of the current node */
-        char *node;
+/*        char *node;
 
         uint16_t nodesize;
         uint8_t is_done = 0;
@@ -199,13 +199,13 @@ uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
             return 1;
 
         /* start at root node */
-        cur_node = tsk_getu32(fs->endian, hfs->catalog_header.rootNode);
+/*        cur_node = tsk_getu32(fs->endian, hfs->catalog_header.rootNode);
 
         /* if the root node is zero, then the extents btree is empty */
         /* if no files have overflow extents, the Extents B-tree still
            exists on disk, but is an empty B-tree containing only
            the header node */
-        if (cur_node == 0) {
+/*        if (cur_node == 0) {
             //if (tsk_verbose)
             //    tsk_fprintf(stderr, "hfs_cat_traverse: "
             //        "empty extents btree\n");
@@ -219,11 +219,11 @@ uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
         //        PRIu16 "\n", cur_node, nodesize);
 
         /* Recurse down to the needed leaf nodes and then go forward */
-        is_done = 0;
+/*        is_done = 0;
         while (is_done == 0) {
             TSK_OFF_T cur_off;      /* start address of cur_node */
-            uint16_t num_rec;       /* number of records in this node */
-            ssize_t cnt;
+/*            uint16_t num_rec;       /* number of records in this node */
+/*            ssize_t cnt;
             hfs_btree_node *node_desc;
 
             // sanity check 
@@ -277,7 +277,7 @@ uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
 
             /* With an index node, find the record with the largest key that is smaller
              * to or equal to cnid */
-            if (node_desc->type == HFS_BT_NODE_TYPE_IDX) {
+/*            if (node_desc->type == HFS_BT_NODE_TYPE_IDX) {
                 uint32_t next_node = 0;
                 int rec;
 
@@ -331,7 +331,7 @@ uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
                         return 1;
                     }
                     */
-                    retval =
+/*                    retval =
                         a_cb(hfs, HFS_BT_NODE_TYPE_IDX, key,
                         cur_off + rec_off, ptr);
                     if (retval == HFS_BTREE_CB_ERR) {
@@ -380,7 +380,7 @@ uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
             }
 
             /* With a leaf, we look for the specific record. */
-            else if (node_desc->type == HFS_BT_NODE_TYPE_LEAF) {
+/*            else if (node_desc->type == HFS_BT_NODE_TYPE_LEAF) {
                 int rec;
 
             for (rec = 0; rec < num_rec; ++rec) {
@@ -418,7 +418,7 @@ uint32_t hfs_convert_2_unix_time(uint32_t hfsdate)
                    tsk_getu32(fs->endian, key->parent_cnid));
                  */
                 //                rec_cnid = tsk_getu32(fs->endian, key->file_id);
-                retval =
+/*                retval =
                     a_cb(hfs, HFS_BT_NODE_TYPE_LEAF, key,
                     cur_off + rec_off, ptr);
                 if (retval == HFS_BTREE_CB_LEAF_STOP) {
@@ -857,7 +857,7 @@ uint16_t gLowerCaseTable[] = {
     /* F */ 0xFFF0, 0xFFF1, 0xFFF2, 0xFFF3, 0xFFF4, 0xFFF5, 0xFFF6, 0xFFF7,
     0xFFF8, 0xFFF9, 0xFFFA, 0xFFFB, 0xFFFC, 0xFFFD, 0xFFFE, 0xFFFF,
 };
-
+/*
 // FUNCTION NEEDS TO BE CHECKED WITH EACH NEW TSK RELEASE
 static int hfs_unicode_compare_int(uint16_t endian, const hfs_uni_str * uni1, const hfs_uni_str * uni2)
 {
@@ -1209,9 +1209,9 @@ uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, un
 {
     TSK_FS_INFO *fs = (TSK_FS_INFO *) & (hfs->fs_info);
     hfs_btree_key_cat key;      /* current catalog key */
-    hfs_thread thread;          /* thread record */
-    hfs_file_folder record;     /* file/folder record */
-    TSK_OFF_T off;
+/*    hfs_thread thread;          /* thread record */
+/*    hfs_file_folder record;     /* file/folder record */
+/*    TSK_OFF_T off;
 
     // Test if this is a special file that is not located in the catalog
     if ((inum == HFS_EXTENTS_FILE_ID) ||
@@ -1226,11 +1226,11 @@ uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, un
     /* first look up the thread record for the item we're searching for */
 
     /* set up the thread record key */
-    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
+/*    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     cnid_to_array((uint32_t) inum, key.parent_cnid);
 
     /* look up the thread record */
-    off = hfs_cat_get_record_offset(hfs, &key);
+/*    off = hfs_cat_get_record_offset(hfs, &key);
     if (off == 0)
     {
         // put error code here...
@@ -1238,21 +1238,21 @@ uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, un
     }
 
     /* read the thread record */
-    if (hfs_cat_read_thread_record(hfs, off, &thread))
+/*    if (hfs_cat_read_thread_record(hfs, off, &thread))
     {
         //tsk_error_set_errstr2(" hfs_cat_file_lookup: file (%" PRIuINUM ")", inum);
         return 1;
     }
 
     /* now look up the actual file/folder record */
-    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
+/*    memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     memset((char *) &key, 0, sizeof(hfs_btree_key_cat));
     memcpy((char *) key.parent_cnid, (char *) thread.parent_cnid,
     sizeof(key.parent_cnid));
     memcpy((char *) &key.name, (char *) &thread.name, sizeof(key.name));
 
     /* look up the record */
-    off = hfs_cat_get_record_offset(hfs, &key);
+/*    off = hfs_cat_get_record_offset(hfs, &key);
     if (off == 0)
     {
         // print error here
@@ -1260,21 +1260,21 @@ uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, un
     }
 
     /* read the record */
-    if (hfs_cat_read_file_folder_record(hfs, off, &record))
+/*    if (hfs_cat_read_file_folder_record(hfs, off, &record))
     {
         //tsk_error_set_errstr2(" hfs_cat_file_lookup: file (%" PRIuINUM ")", inum);
         return 1;
     }
 
     /* these memcpy can be gotten rid of, really */
-    if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD) {
+/*    if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FOLDER_RECORD) {
         memcpy((char *) &entry->cat, (char *) &record, sizeof(hfs_folder));
     }
     else if (tsk_getu16(fs->endian, record.file.std.rec_type) == HFS_FILE_RECORD) {
         memcpy((char *) &entry->cat, (char *) &record, sizeof(hfs_file));
     }
     /* other cases already caught by hfs_cat_read_file_folder_record */
-    memcpy((char *) &entry->thread, (char *) &thread, sizeof(hfs_thread));
+/*    memcpy((char *) &entry->thread, (char *) &thread, sizeof(hfs_thread));
 
     entry->flags = TSK_FS_META_FLAG_ALLOC | TSK_FS_META_FLAG_USED;
     entry->inum = inum;
@@ -1290,7 +1290,7 @@ uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, un
             ("hfs_cat_file_lookup: error occurred while following a possible hard link for "
             "inum (cnid) =  %" PRIuINUM, inum);
             */
-            return 1;
+/*            return 1;
         }
         if (target_cnid != inum) {
             // This is a hard link, and we have got the cnid of the target file, so look it up.
@@ -1303,7 +1303,7 @@ uint8_t hfs_cat_file_lookup(HFS_INFO* hfs, TSK_INUM_T inum, HFS_ENTRY* entry, un
                 "the target of inum (cnid) = %" PRIuINUM " target",
                 inum);
                 */
-            }
+/*            }
             return 1;
         }
 
@@ -1374,4 +1374,4 @@ uint8_t hfs_UTF16toUTF8(TSK_FS_INFO* fs, uint8_t* uni, int ulen, char* asc, int 
 
     return 0;
 }
-
+*/

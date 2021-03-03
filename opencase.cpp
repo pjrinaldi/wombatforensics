@@ -457,8 +457,8 @@ void LoadTreeModel(QString estring)
     }
 }
 
-void PopulateTreeModel(QString evidstring)
-{
+//void PopulateTreeModel(QString evidstring)
+//{
     /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidlist = eviddir.entryList(QStringList(evidstring.split("/").last() + ".e*"), QDir::NoSymLinks | QDir::Dirs);
@@ -770,10 +770,10 @@ void PopulateTreeModel(QString evidstring)
     //InitializeHashList();
     //InitializeTaggedList();
     */
-}
+//}
 
-void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath)
-{
+//void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const char* path, QString partitionpath)
+//{
     /*
     int pathcount = partitionpath.split("/", Qt::SkipEmptyParts).count();
     QString evalue = partitionpath.split("/", Qt::SkipEmptyParts).at(pathcount - 3).split(".").last();
@@ -1005,4 +1005,4 @@ void ParseDir(TSK_FS_INFO* fsinfo, TSK_STACK* stack, TSK_INUM_T dirnum, const ch
     }
     tsk_fs_dir_close(fsdir);
     */
-}
+//}

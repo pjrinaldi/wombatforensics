@@ -35,7 +35,7 @@
 #include "carvedialog.h"
 #include "filecarvingdialog.h"
 #include "pdfviewer.h"
-#include "properties.h"
+//#include "properties.h"
 #include "artifactparser.h"
 #include "digging.h"
 #include "carving.h"

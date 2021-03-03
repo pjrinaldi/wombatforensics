@@ -3,7 +3,7 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
-#include "tskcpp.h"
+//#include "tskcpp.h"
 #include <liblnk.h>
 #include <zip.h>
 

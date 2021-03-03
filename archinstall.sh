@@ -25,7 +25,7 @@ makepkg -si
 cd ../wombatforensics
 
 # install all the other prerequisites (when given the choice of packages, I always select the default=all)
-sudo pacman -S qt5 qtav ffmpegthumbnailer imagemagick libewf sleuthkit libtar gst-libav gst-transcoder vlc mplayer gst-plugins-bad gst-plugins-ugly gdb libzip poppler-qt5 openssl squashfuse
+sudo pacman -S qt5 qtav ffmpegthumbnailer imagemagick libewf libtar gst-libav gst-transcoder vlc mplayer gst-plugins-bad gst-plugins-ugly gdb libzip poppler-qt5 openssl squashfuse
 
 # optional archive and image formats
 sudo pacman -S zip unzip p7zip libheif
@@ -70,10 +70,10 @@ cd libregf-20200805
 cd ../wombatforensics
 
 # cp the tsk*.h files into their respective directories
-sudo cp ./tskextra/tsk_base_i.h /usr/include/tsk/base/
-sudo cp ./tskextra/tsk_fs_i.h /usr/include/tsk/fs/
-sudo cp ./tskextra/tsk_img_i.h /usr/include/tsk/img/
-sudo cp ./tskextra/tsk_vs_i.h /usr/include/tsk/vs/
+#sudo cp ./tskextra/tsk_base_i.h /usr/include/tsk/base/
+#sudo cp ./tskextra/tsk_fs_i.h /usr/include/tsk/fs/
+#sudo cp ./tskextra/tsk_img_i.h /usr/include/tsk/img/
+#sudo cp ./tskextra/tsk_vs_i.h /usr/include/tsk/vs/
 
 # need to add /usr/local/lib to ldconfig library path
 echo '/usr/local/lib' > local.conf && sudo mv ./local.conf /etc/ld.so.conf.d/

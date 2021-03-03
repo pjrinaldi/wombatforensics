@@ -90,7 +90,7 @@
 #include <new>
 #include <unistd.h>
 #include <string.h>
-
+#include <fcntl.h>
 #include <tar.h>
 #include <libtar.h>
 
@@ -106,35 +106,35 @@ extern "C" {
 //#include <videothumbnailer.h>
 //#include <Magick++.h>
 
-#include <libtsk.h>
+//#include <libtsk.h>
 #include <libewf.h>
-#include <tsk_bsd.h>
-#include <tsk_mac.h>
-#include <tsk_sun.h>
-#include <tsk_gpt.h>
-#include <tsk_ntfs.h>
-#include <tsk_exfatfs.h>
-#include <tsk_fatfs.h>
-#include <tsk_fatxxfs.h>
-#include <tsk_ffs.h>
-#include <tsk_ext2fs.h>
-#include <tsk_iso9660.h>
-#include <tsk_hfs.h>
-#include <tsk_yaffs.h>
-#include <tsk_pool.h>
-#include <pool.hpp>
-#include <apfs_pool_compat.hpp>
-#include <apfs_fs.h>
-#include <decmpfs.h>
-#include <tsk_apfs.hpp>
-#include <apfs_fs.hpp>
-#include <tsk_apfs.h>
-#include <apfs_compat.hpp>
+//#include <tsk_bsd.h>
+//#include <tsk_mac.h>
+//#include <tsk_sun.h>
+//#include <tsk_gpt.h>
+//#include <tsk_ntfs.h>
+//#include <tsk_exfatfs.h>
+//#include <tsk_fatfs.h>
+//#include <tsk_fatxxfs.h>
+//#include <tsk_ffs.h>
+//#include <tsk_ext2fs.h>
+//#include <tsk_iso9660.h>
+//#include <tsk_hfs.h>
+//#include <tsk_yaffs.h>
+//#include <tsk_pool.h>
+//#include <pool.hpp>
+//#include <apfs_pool_compat.hpp>
+//#include <apfs_fs.h>
+//#include <decmpfs.h>
+//#include <tsk_apfs.hpp>
+//#include <apfs_fs.hpp>
+//#include <tsk_apfs.h>
+//#include <apfs_compat.hpp>
 
 // THESE NEED TO BE MANUALLY UPDATED AND COPIED TO /USR/INCLUDE/TSK/../ PERIODICALLY AS NEW TSK RELEASES ARE MADE. CURRENTLY AT 4.8.0
-#include <tsk_base_i.h>
-#include <tsk_fs_i.h>
-#include <tsk_img_i.h>
-#include <tsk_vs_i.h>
+//#include <tsk_base_i.h>
+//#include <tsk_fs_i.h>
+//#include <tsk_img_i.h>
+//#include <tsk_vs_i.h>
 
 #endif // WOMBATINCLUDE_H

@@ -1250,6 +1250,7 @@ void WombatForensics::UpdateDataTable()
 
 void WombatForensics::PrepareEvidenceImage()
 {
+    /*
     QString tmpstr = "";
     QString mntstr = "";
     for(int i=0; i < existingevidence.count(); i++)
@@ -1286,7 +1287,7 @@ void WombatForensics::PrepareEvidenceImage()
 	        if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
                     SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
                 */
-	    }
+/*	    }
             else if(imagefile.endsWith(".zmg")) // ZMG
             {
 		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
@@ -1320,11 +1321,11 @@ void WombatForensics::PrepareEvidenceImage()
 		//xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them.. NEED TO FIX
 		//xmntprocess->start(mntstr, QStringList());
                 */
-	    }
+/*	    }
             //else
             //    qDebug() << "affuse command not called, function call instead..";
         }
-    }
+    }*/
 }
 
 void WombatForensics::ReadXMountOut()
@@ -2077,6 +2078,7 @@ void WombatForensics::PopulateHexContents()
 }
 void WombatForensics::LoadHexContents()
 {
+    /*
     // NEED TO GET EVIDENCE NAME FROM STAT FILE
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     QString nodeid = selectednode->Data(11).toString();
@@ -2100,7 +2102,7 @@ void WombatForensics::LoadHexContents()
         tmpstr = evidfile.readLine();
     evidfile.close();
     */
-    QString datastring = wombatvariable.imgdatapath;
+/*    QString datastring = wombatvariable.imgdatapath;
     //if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
     if(evidname.toLower().endsWith(".aff"))
     {
@@ -2138,7 +2140,7 @@ void WombatForensics::LoadHexContents()
 	//datastring = 
         //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
     //}
-    else if(datastring.endsWith(".zmg"))
+/*    else if(datastring.endsWith(".zmg"))
     {
 	datastring += evidname + "/" + evidname.split(".zmg").first() + ".dd";
         //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
@@ -2350,7 +2352,7 @@ void WombatForensics::LoadHexContents()
     }
     //else
     //    qDebug() << "count for nodeid:" << nodeid.split("-").count();
-    ui->hexview->ensureVisible();
+    ui->hexview->ensureVisible();*/
 }
 
 void WombatForensics::CloseCurrentCase()
