@@ -6,7 +6,6 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
-//#include "tskcpp.h"
 #include <zip.h>
 
 void SleepLoop(const int ms);
@@ -21,7 +20,6 @@ int SegmentDigits(int);
 void GenerateWombatCaseFile(void);
 void RewriteSelectedIdContent(QModelIndex selectedid);
 
-//QString GenerateCategorySignature(const QMimeType mimetype, QString filename);
 QString GenerateCategorySignature(QByteArray sigbuf, QString filename);
 
 void SavePasswordList(void);

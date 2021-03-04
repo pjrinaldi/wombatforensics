@@ -69,12 +69,6 @@ cd libregf-20200805
 # cd back into wombat forensics directory
 cd ../wombatforensics
 
-# cp the tsk*.h files into their respective directories
-#sudo cp ./tskextra/tsk_base_i.h /usr/include/tsk/base/
-#sudo cp ./tskextra/tsk_fs_i.h /usr/include/tsk/fs/
-#sudo cp ./tskextra/tsk_img_i.h /usr/include/tsk/img/
-#sudo cp ./tskextra/tsk_vs_i.h /usr/include/tsk/vs/
-
 # need to add /usr/local/lib to ldconfig library path
 echo '/usr/local/lib' > local.conf && sudo mv ./local.conf /etc/ld.so.conf.d/
 # update ldconfig cache
