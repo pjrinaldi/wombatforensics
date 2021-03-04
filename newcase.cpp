@@ -1219,8 +1219,7 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                     {
                         // NEED "LAYOUT"
                         // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
-                        /*
-                        if(attrflags == 0x02 || attrflags == 0x03 || (fileinfo->value("attribute").toString().contains("Hidden") && fileinfo->value("attribute").toString().contains("System"))) // directory
+                        if(attrflags == 0x02 || attrflags == 0x03 || (fileinfo.value("attribute").toString().contains("Hidden") && fileinfo.value("attribute").toString().contains("System"))) // directory
                         {
                             attrname = "";
                             if(namelength > 0) // get $I30 default dir attribute
@@ -1230,9 +1229,9 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                             }
                             if(attrname.startsWith("$I30"))
                             {
-                                fileinfo->insert("logicalsize", QVariant(contentlength));
-                                fileinfo->insert("physicalsize", QVariant(contentlength));
-                                fileinfo->insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentlength) + ";")));
+                                fileinfo.insert("logicalsize", QVariant(contentlength));
+                                fileinfo.insert("physicalsize", QVariant(contentlength));
+                                fileinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentlength) + ";")));
                             }
                             else // alternate stream
                             {
@@ -1242,24 +1241,22 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                                 adsinfo.insert("logicalsize", QVariant(contentlength));
                                 adsinfo.insert("physicalsize", QVariant(contentlength));
                                 adsinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentlength) + ";")));
-                                adsinfo.insert("ntinode", QVariant(fileinfo->value("ntinode").toUInt()));
-                                adsinfo.insert("parentinode", QVariant(fileinfo->value("inode").toUInt()));
-                                adsinfo.insert("parntinode", QVariant(fileinfo->value("ntinode").toUInt()));
-                                adsinfo.insert("isdeletd", QVariant(fileinfo->value("isdeleted").toUInt()));
+                                adsinfo.insert("ntinode", QVariant(fileinfo.value("ntinode").toUInt()));
+                                adsinfo.insert("parentinode", QVariant(fileinfo.value("inode").toUInt()));
+                                adsinfo.insert("parntinode", QVariant(fileinfo.value("ntinode").toUInt()));
+                                adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
                                 adsinfo.insert("itemtype", QVariant(10));
-                                adsinfo.insert("path", QVariant(QString(fileinfo->value("path").toString() + fileinfo->value("filename").toString() + "/")));
+                                adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
                                 // adsinfo.insert("path", "parntinode", "parentinode", "inode", "ntinode")
                                 // REPEAT THE ABOVE HERE AND ADD TO THE 
-                                adsinfolist->append(adsinfo);
+                                //adsinfolist->append(adsinfo);
                             }
                         }
-                         */ 
                     }
                     else if(attrtype == 0xa0) // $INDEX_ALLOCATION - always non-resident
                     {
                         // NEED "LAYOUT"
                         // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
-                        /*
                         attrname = "";
                         if(namelength > 0)
                         {
@@ -1319,16 +1316,15 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                                 adsinfo.insert("layout", QVariant(layout));
                                 adsinfo.insert("logicalsize", QVariant(logicalsize));
                                 adsinfo.insert("physicalsize", QVariant(physicalsize));
-                                adsinfo.insert("ntinode", QVariant(fileinfo->value("ntinode").toUInt()));
-                                adsinfo.insert("parentinode", QVariant(fileinfo->value("inode").toUInt()));
-                                adsinfo.insert("parntinode", QVariant(fileinfo->value("ntinode").toUInt()));
-                                adsinfo.insert("isdeletd", QVariant(fileinfo->value("isdeleted").toUInt()));
+                                adsinfo.insert("ntinode", QVariant(fileinfo.value("ntinode").toUInt()));
+                                adsinfo.insert("parentinode", QVariant(fileinfo.value("inode").toUInt()));
+                                adsinfo.insert("parntinode", QVariant(fileinfo.value("ntinode").toUInt()));
+                                adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
                                 adsinfo.insert("itemtype", QVariant(10));
-                                adsinfo.insert("path", QVariant(QString(fileinfo->value("path").toString() + fileinfo->value("filename").toString() + "/")));
-                                adsinfolist->append(adsinfo);
+                                adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
+                                //adsinfolist->append(adsinfo);
                             }
                         }
-                         */ 
                     }
 		    else if(attrtype == 0xffffffff)
 			break;
