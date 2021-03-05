@@ -225,6 +225,10 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
     QString btrsig = QString::fromStdString(partbuf.mid(65600, 8).toStdString());
     QString bitlcksig = QString::fromStdString(partbuf.mid(0, 8).toStdString());
     QString bfssig = QString::fromStdString(partbuf.mid(544, 4).toStdString());
+    QString isosig = QString::fromStdString(partbuf.mid(32769, 5).toStdString());
+    QString udfsig = QString::fromStdString(partbuf.mid(40961, 5).toStdString());
+    uint64_t refsig = qFromLittleEndian<uint64_t>(partbuf.mid(3, 8)); // should be 0x00 00 00 00 53 46 65 52 (0 0 0 0 S F e R) prior to endian flip
+    //QString refsig = QString::fromStdString(
     uint32_t f2fssig = qFromLittleEndian<uint32_t>(partbuf.mid(1024, 4));
 
     if(winsig == 0xaa55) // FAT OR NTFS
@@ -901,7 +905,27 @@ void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash
 	fsinfo.insert("type", QVariant(13));
 	fsinfo.insert("typestr", QVariant("F2FS"));
     }
-    // need to implement iso, udf, hfs, zfs
+    else if(isosig == "CD001" && udfsig != "BEA01") // ISO9660
+    {
+	fsinfo.insert("type", QVariant(14));
+	fsinfo.insert("typestr", QVariant("ISO9660"));
+    }
+    else if(isosig == "CD001" && udfsig == "BEA01") // UDF
+    {
+	fsinfo.insert("type", QVariant(15));
+	fsinfo.insert("typestr", QVariant("UDF"));
+    }
+    else if(hfssig == "BD") // legacy HFS
+    {
+	fsinfo.insert("type", QVariant(16));
+	fsinfo.insert("typestr", QVariant("HFS"));
+    }
+    else if(refsig == 0x5265465300000000) // ReFS
+    {
+	fsinfo.insert("type", QVariant(18));
+	fsinfo.insert("typestr", QVariant("REFS"));
+    }
+    // need to implement iso-14, udf-15, hfs-16, zfs-17, refs-18
     fsinfolist->append(fsinfo);
 }
 
