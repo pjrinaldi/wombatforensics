@@ -974,6 +974,8 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
     {
         QHash<QString, QVariant> fileinfo;
         fileinfo.clear();
+        QList<QHash<QString, QVariant>> adsinfolist;
+        adsinfolist.clear();
 	QByteArray curmftentry = mftarray.mid(i*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
 	qulonglong curmftentryoffset = 0;
 	qulonglong mftrelativeoffset = i*fsinfo->value("mftentrybytes").toUInt();
@@ -1236,7 +1238,7 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                             adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
                             adsinfo.insert("itemtype", QVariant(10));
                             adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
-                            //adsinfolist->append(adsinfo);
+                            adsinfolist.append(adsinfo);
                         }
                     }
                     else if(attrtype == 0x90) // $INDEX_ROOT - always resident
@@ -1273,7 +1275,7 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                                 adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
                                 // adsinfo.insert("path", "parntinode", "parentinode", "inode", "ntinode")
                                 // REPEAT THE ABOVE HERE AND ADD TO THE 
-                                //adsinfolist->append(adsinfo);
+                                adsinfolist.append(adsinfo);
                             }
                         }
                     }
@@ -1346,7 +1348,7 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                                 adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
                                 adsinfo.insert("itemtype", QVariant(10));
                                 adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
-                                //adsinfolist->append(adsinfo);
+                                adsinfolist.append(adsinfo);
                             }
                         }
                     }
@@ -1371,6 +1373,16 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                 fileinfo.insert("parentinode", QVariant(-1));
                 fileinfolist->append(fileinfo);
                 curinode++;
+                if(adsinfolist.count() > 0)
+                {
+                    for(int j=0; j < adsinfolist.count(); j++)
+                    {
+                        QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
+                        curadsinfo.insert("inode", QVariant(curinode));
+                        fileinfolist->append(curadsinfo);
+                        curinode++;
+                    }
+                }
             }
             else
             {
@@ -1390,11 +1402,26 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
                             fileinfo.insert("parentinode", QVariant(parentinode));
                             fileinfolist->append(fileinfo);
                             curinode++;
+                            if(adsinfolist.count() > 0)
+                            {
+                                for(int k=0; k < adsinfolist.count(); k++)
+                                {
+                                    QHash<QString, QVariant> curadsinfo = adsinfolist.at(k);
+                                    curadsinfo.insert("inode", QVariant(curinode));
+                                    fileinfolist->append(curadsinfo);
+                                    curinode++;
+                                }
+                            }
                             //qDebug() << "DELETED FILE:" << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong();
                         }
                         else // orphan but parent has been repurposed
                         {
                             orphanlist->append(fileinfo);
+                            if(adsinfolist.count() > 0)
+                            {
+                                for(int k=0; k < adsinfolist.count(); k++)
+                                    orphanlist->append(adsinfolist.at(k));
+                            }
                             //qDebug() << "ORPHAN PARENT NOT VALID:" << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong();
                         }
                     }
@@ -1403,22 +1430,14 @@ void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QSt
             if(hasparent == 0) // orphan no parent exists anymore
             {
                 orphanlist->append(fileinfo);
+                if(adsinfolist.count() > 0)
+                {
+                    for(int k=0; k < adsinfolist.count(); k++)
+                        orphanlist->append(adsinfolist.at(k));
+                }
                 //qDebug() << "ORPHAN NO PARENT:" << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong();
             }
         }
-        /*
-         * MAYBE PUT ADSINFOLIST AND THEN LOOP OVER THE ADS'S AND ADD THEM TO THE ORPHANLIST->APPEND(ADSINFO)
-        if(adsinfolist.count() > 0)
-        {
-            for(int j=0; j < adsinfolist.count(); j++)
-            {
-                QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
-                curadsinfo.insert("inode", QVariant(curinode));
-                fileinfolist->append(curadsinfo);
-                curinode++;
-            }
-        }
-         */ 
     }
 }
 
