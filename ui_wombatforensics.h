@@ -284,10 +284,10 @@ public:
         hexview = new QHexEdit(splitter);
         hexview->setObjectName(QString::fromUtf8("hexview"));
         hexview->setToolTipDuration(0);
-        hexview->setProperty("bytesPerLine", QVariant(49));
-        hexview->setProperty("hexCaps", QVariant(true));
-        hexview->setProperty("dynamicBytesPerLine", QVariant(true));
-        hexview->setProperty("readOnly", QVariant(true));
+        hexview->setBytesPerLine(49);
+        hexview->setHexCaps(true);
+        hexview->setDynamicBytesPerLine(true);
+        hexview->setReadOnly(true);
         splitter->addWidget(hexview);
 
         horizontalLayout->addWidget(splitter);
@@ -295,7 +295,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QString::fromUtf8("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 1641, 20));
+        mainMenubar->setGeometry(QRect(0, 0, 1641, 23));
         mainMenubar->setAcceptDrops(true);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
