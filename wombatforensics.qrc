@@ -1,6 +1,5 @@
 <RCC>
   <qresource prefix="/">
-    <file alias="aff4imager">Resources/aff4imager</file>
     <file alias="about">Resources/aboutwombat.png</file>
     <file alias="videoerror">Resources/videoerror.png</file>
     <file alias="xchomp">Resources/xchomp</file>
