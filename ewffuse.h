@@ -227,6 +227,8 @@ struct fuse* EwfFuser(QString imgpath, QString imgfile)
     ret = fuse_mount(ewfuser, imgpath.toStdString().c_str());
     fuse_daemonize(1);
     pthread_create(&ewfusethread, NULL, ewfuselooper, (void*) ewfuser);
+
+    return ewfuser;
 };
 
 #endif // EWFFUSE_H

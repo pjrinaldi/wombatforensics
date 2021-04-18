@@ -190,6 +190,8 @@ struct fuse* AffFuser(QString imgpath, QString imgfile)
     int retd = fuse_daemonize(1);
 
     int perr = pthread_create(&fusethread, NULL, fuselooper, (void *) affuser);
+
+    return affuser;
 };
 
 #endif // AFFUSE_H

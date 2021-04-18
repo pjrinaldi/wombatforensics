@@ -2419,6 +2419,7 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
+    qDebug() << "fuserlist count:" << fuserlist.size();
     for(int i=0; i < fuserlist.size(); i++)
     {
         struct fuse* curfuser = (struct fuse*)(fuserlist.at(i));
