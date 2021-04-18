@@ -153,7 +153,8 @@ struct fuse_args ewargs;
 struct fuse* ewfuser;
 pthread_t ewfusethread;
 
-void EwfFuser(QString imgpath, QString imgfile)
+//void EwfFuser(QString imgpath, QString imgfile)
+struct fuse* EwfFuser(QString imgpath, QString imgfile)
 {
     QString efilepath = imgfile.split(imgfile.split("/").last()).first();
     QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());

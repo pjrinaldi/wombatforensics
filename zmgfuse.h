@@ -296,7 +296,8 @@ struct fuse_args zmgargs;
 struct fuse* zmgfuser;
 pthread_t zmgfusethread;
 
-void ZmgFuser(std::string imgpath, std::string imgfile)
+//void ZmgFuser(std::string imgpath, std::string imgfile)
+struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
 {
     //printf("imgpath: %s\n", imgpath.c_str());
     char** fargv = NULL;
@@ -317,5 +318,7 @@ void ZmgFuser(std::string imgpath, std::string imgfile)
     ret = fuse_mount(zmgfuser, imgpath.c_str());
     int retd = fuse_daemonize(1);
     int perr = pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *) zmgfuser);
+
+    return zmgfuser;
 };
 #endif // ZMGFUSE_H

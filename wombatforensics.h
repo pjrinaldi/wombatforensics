@@ -332,6 +332,7 @@ private:
     QString digtotalcountstring = "";
     QString currentreportpath = "";
     QHash<QString, int>carvecounthash;
+    std::vector<struct fuse*> fuserlist;
     //pthread_t fusethread;
 };
 

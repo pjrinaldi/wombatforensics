@@ -1046,11 +1046,11 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
                 //SquashFuser(emntpath,  existingevidence.at(i));
             }
             else if(existingevidence.at(i).endsWith(".zmg"))
-                ZmgFuser(emntpath.toStdString(), existingevidence.at(i).toStdString());
+                fuserlist.push_back(ZmgFuser(emntpath.toStdString(), existingevidence.at(i).toStdString()));
             else if(existingevidence.at(i).toLower().endsWith(".aff") || existingevidence.at(i).endsWith(".000") || existingevidence.at(i).endsWith(".001"))
-                AffFuser(emntpath, existingevidence.at(i));
+                fuserlist.push_back(AffFuser(emntpath, existingevidence.at(i)));
             else if(existingevidence.at(i).toLower().endsWith(".e01"))
-                EwfFuser(emntpath, existingevidence.at(i));
+                fuserlist.push_back(EwfFuser(emntpath, existingevidence.at(i)));
         }
         for(int i=0; i < existingevidence.count(); i++)
         {
@@ -1407,11 +1407,11 @@ void WombatForensics::AddEvidence()
         // need to delete emntpath directories on close for cleanup purposes after unmount...
         ecount++;
         if(newevidence.at(i).toLower().endsWith(".zmg"))
-            ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString());
+            fuserlist.push_back(ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString()));
         else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
-            AffFuser(emntpath, newevidence.at(i));
+            fuserlist.push_back(AffFuser(emntpath, newevidence.at(i)));
         else if(newevidence.at(i).toLower().endsWith(".e01"))
-            EwfFuser(emntpath, newevidence.at(i));
+            fuserlist.push_back(EwfFuser(emntpath, newevidence.at(i)));
     }
     if(newevidence.count() > 0)
     {
@@ -2419,7 +2419,22 @@ void WombatForensics::CloseCurrentCase()
     filtercountlabel->setText("Filtered: 0");
     filecountlabel->setText("Found: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
+    for(int i=0; i < fuserlist.size(); i++)
+    {
+        struct fuse* curfuser = (struct fuse*)(fuserlist.at(i));
+        QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
+        if(imgext.endsWith(".e01") || imgext.endsWith(".aff") || imgext.endsWith(".000") || imgext.endsWith("zmg")) // ewfmount
+        {
+            if(curfuser != NULL)
+            {
+                fuse_unmount(curfuser);
+                fuse_destroy(curfuser);
+            }
+        }
+    }
     // UNMOUNT EVIDENCEIMAGEDATAFILE
+    // NEED TO CHANGE THIS LOOP FROM EXISTINGEVIDENCE.COUNT() TO FUSELIST.COUNT()
+    /*
     for(int i=0; i < existingevidence.count(); i++)
     {
         //qDebug() << "existing evidence:" << existingevidence.at(i);
@@ -2462,13 +2477,13 @@ void WombatForensics::CloseCurrentCase()
                 fuse_destroy(sqfuser);
             }
             */
-        }
+        /*}
         /*
         else // raw, so nothing to unmount
         {
         }
         */
-    }
+    /*}*/
     qInfo() << "Forensic Image(s) unmounted";
     carvecounthash.clear();
     partitionlist.clear();

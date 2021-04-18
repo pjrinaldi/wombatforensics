@@ -146,7 +146,8 @@ struct fuse_args args;
 struct fuse* affuser;
 pthread_t fusethread;
 
-void AffFuser(QString imgpath, QString imgfile)
+//void AffFuser(QString imgpath, QString imgfile)
+struct fuse* AffFuser(QString imgpath, QString imgfile)
 {
     int ret;
     char* afpath = NULL;
