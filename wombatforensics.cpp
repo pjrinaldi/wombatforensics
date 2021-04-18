@@ -2424,13 +2424,17 @@ void WombatForensics::CloseCurrentCase()
     {
         struct fuse* curfuser = (struct fuse*)(fuserlist.at(i));
         QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
-        if(imgext.endsWith(".e01") || imgext.endsWith(".aff") || imgext.endsWith(".000") || imgext.endsWith("zmg")) // ewfmount
+        qDebug() << "imgext:" << imgext;
+        if(imgext.endsWith("e01") || imgext.endsWith("aff") || imgext.endsWith("000") || imgext.endsWith("zmg")) // ewfmount
         {
             if(curfuser != NULL)
             {
+                qDebug() << "curfuser isn't null, so unmount";
                 fuse_unmount(curfuser);
                 fuse_destroy(curfuser);
             }
+            else
+                qDebug() << "curfuser is null, something went wrong with the map";
         }
     }
     // UNMOUNT EVIDENCEIMAGEDATAFILE
