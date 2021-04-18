@@ -302,6 +302,7 @@ struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
     //printf("imgpath: %s\n", imgpath.c_str());
     char** fargv = NULL;
     fargv = (char**)calloc(3, sizeof(char*));
+    fargv[0] = "./zmgfuse";
     int fargc = 1;
     int ret = 0;
     char* ipath = new char[imgpath.size() + 1];
