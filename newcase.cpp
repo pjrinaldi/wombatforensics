@@ -71,6 +71,10 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
     uint32_t bsdsig = qFromLittleEndian<uint32_t>(sector0.left(4)); // can be at start of partition entry of a dos mbr
     uint16_t sunsig = qFromLittleEndian<uint16_t>(sector0.mid(508, 2)); // worry about it later, i386 sun can be at 2nd sector of partition entry of a dos mbr
     uint64_t gptsig = qFromLittleEndian<uint64_t>(sector0.left(8));
+    QString exfatstr = QString::fromStdString(sector0.mid(3, 5).toStdString());
+    QString fatstr = QString::fromStdString(sector0.mid(54, 5).toStdString());
+    QString fat32str = QString::fromStdString(sector0.mid(82, 5).toStdString());
+
     if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
     {
         //qDebug() << "imgsize:" << imgsize;
@@ -114,51 +118,45 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
         }
 	else // MBR DISK
 	{
-	    for(int i=0; i < 4; i++)
-	    {
-		int cnt = i*16;
-		QByteArray curpart = sector0.mid(446 + cnt, 16);
-		uint8_t curparttype = curpart.at(4);
-		uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
-		uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
-		if(curparttype == 0x05) // extended partition
-		{
-                    qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
-		    //qDebug() << "parse extended partition recurse loop here...";
-                    ParseExtendedPartition(estring, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
-		}
-                else if(curparttype == 0x00)
-		{
-                    //qDebug() << "do nothing here cause it is an empty partition...";
-		}
-		else if(curparttype == 0x82) // Sun i386
-		{
-		    // parse sun table here passing pofflist and psizelist
-		}
-		else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
-		{
-		    // parse bsd table here passing pofflist nad psizelist
-		}
-                /*
-		else
+	    if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32
+            {
+                // Windows partition/fs which starts at beginning of image with no partition table
+            }
+            else
+            {
+                for(int i=0; i < 4; i++)
                 {
-                    // this is where xp_blake fails...
-                    qDebug() << "curoffset:" << curoffset << "cursize:" << cursize << "imgsize:" << imgsize;
-		    if(cursize <= imgsize && cursize > 0)
-		    {
-                        //qDebug() << "parse primary partition here...";
-			pofflist->append(curoffset);
-        		psizelist->append(cursize);
+                    int cnt = i*16;
+                    QByteArray curpart = sector0.mid(446 + cnt, 16);
+                    uint8_t curparttype = curpart.at(4);
+                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
+                    uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
+                    if(curparttype == 0x05) // extended partition
+                    {
+                        //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
+                        //qDebug() << "parse extended partition recurse loop here...";
+                        ParseExtendedPartition(estring, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+                    }
+                    else if(curparttype == 0x00)
+                    {
+                        //qDebug() << "do nothing here cause it is an empty partition...";
+                    }
+                    else if(curparttype == 0x82) // Sun i386
+                    {
+                        // parse sun table here passing pofflist and psizelist
+                    }
+                    else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
+                    {
+                        // parse bsd table here passing pofflist nad psizelist
+                    }
+                    else
+                    {
+                        pofflist->append(curoffset);
+                        psizelist->append(cursize);
                         ParseFileSystemInformation(estring, curoffset, fsinfolist);
-			qDebug() << "part[i]:" << i << "offset:" << curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
-		    }
-		    else
-		    {
-			//qDebug() << "bogus partition entry";
-		    }
+                    }
                 }
-                */
-	    }
+            }
 	}
     }
     else if(applesig == 0x504d) // APPLE PARTITION
@@ -198,6 +196,8 @@ void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList
 	    }
 	}
     }
+    else
+        qDebug() << "partition signature not found correctly";
 }
 
 void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash<QString, QVariant>> *fsinfolist)
