@@ -2442,6 +2442,8 @@ void WombatForensics::CloseCurrentCase()
     if(fuserlist.size() > 0)
     {
         // REMOVE EWFMOUNT DIRECTORIES RECURSIVELY HERE...
+        // might need to get an entrylist for the directory and then call remove() for each
+        // directory or rmdir() for each directory...
         //QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
         //edir.removeRecursively();
     }
