@@ -2430,9 +2430,20 @@ void WombatForensics::CloseCurrentCase()
             if(curfuser != NULL)
             {
                 fuse_unmount(curfuser);
-                fuse_destroy(curfuser);
+                /*
+                if(i == fuserlist.size() - 1)
+                {
+                    //fuse_destroy(curfuser);
+                }
+                */
             }
         }
+    }
+    if(fuserlist.size() > 0)
+    {
+        // REMOVE EWFMOUNT DIRECTORIES RECURSIVELY HERE...
+        //QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
+        //edir.removeRecursively();
     }
     // UNMOUNT EVIDENCEIMAGEDATAFILE
     // NEED TO CHANGE THIS LOOP FROM EXISTINGEVIDENCE.COUNT() TO FUSELIST.COUNT()
