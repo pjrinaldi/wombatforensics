@@ -300,6 +300,7 @@ pthread_t zmgfusethread;
 struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
 {
     //printf("imgpath: %s\n", imgpath.c_str());
+    //printf("imgfile: %s\n", imgfile.c_str());
     char** fargv = NULL;
     fargv = (char**)calloc(3, sizeof(char*));
     fargv[0] = "./zmgfuse";
@@ -309,6 +310,8 @@ struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
     strcpy(ipath, imgpath.c_str());
     char* iname = new char[imgfile.size() + 1];
     strcpy(iname, imgfile.c_str());
+    //printf("imgpath:  %s\n", ipath);
+    //printf("imgfile: %s\n", iname);
     zmgfd = open(iname, O_RDONLY);
     struct stat st;
     fstat(zmgfd, &st);
