@@ -292,13 +292,16 @@ void* zmgfuselooper(void *data)
     fuse_loop(fuse);
 };
 
-struct fuse_args zmgargs;
-struct fuse* zmgfuser;
-pthread_t zmgfusethread;
+//struct fuse_args zmgargs;
+//struct fuse* zmgfuser;
+//pthread_t zmgfusethread;
 
 //void ZmgFuser(std::string imgpath, std::string imgfile)
 struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
 {
+    struct fuse_args zmgargs;
+    pthread_t zmgfusethread;
+    struct fuse* zmgfuser;
     //printf("imgpath: %s\n", imgpath.c_str());
     //printf("imgfile: %s\n", imgfile.c_str());
     char** fargv = NULL;
