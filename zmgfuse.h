@@ -300,6 +300,51 @@ void* zmgfuselooper(void *data)
 struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
 {
     struct fuse_args zmgargs;
+    struct fuse_session* zmgfuser;
+    struct fuse_cmdline_opts opts;
+    //struct fuse_loop_config config;
+    //struct lo_data lo = { .debug = 0, .writeback = 0 };
+
+    char** fargv = NULL;
+    fargv = (char**)calloc(3, sizeof(char*));
+    fargv[0] = "./zmgfuse";
+    int fargc = 1;
+    char* ipath = new char[imgpath.size() + 1];
+    strcpy(ipath, imgpath.c_str());
+    char* iname = new char[imgfile.size() + 1];
+    strcpy(iname, imgfile.c_str());
+    umask(0);
+    pthread_mutex_t zmgfusethread;
+    pthread_mutex_init(&zmgfusethread, NULL);
+    //lo.root.next = lo.root.prev = &lo.root;
+    //lo.root.fd = -1;
+    //lo.cache = CACHE_NORMAL;
+    //fuse_opt_parse(&args, &lo, lo_opts, NULL);
+    //lo.root.refcount = 2;
+    //if(lo.source)
+    //{
+    //    struct stat stat;
+    //    int res;
+    //    res = lstat(lo.source, &stat);
+    //lo.source = iname;
+    //lo.timeout = 86400.0;
+    //lo.root.fd = open(lo.source, O_PATH);
+
+    zmgfuser = fuse_session_new(&zmgargs, &fuse_operations, sizeof(fuse_operations), NULL);
+    fuse_set_signal_handler(zmgfuser);
+    fuse_session_mount(zmgfuser, opts.mountpoint);
+    fuse_daemonize(opts.foreground);
+    fuse_session_loop(zmgfuser);
+    // STORE FUSE_SESSION (ZMGFUSER) BY RETURNING IT
+
+    //fuse_session_unmount(zmgfuser);
+    //fuse_session_destroy(zmgfuser);
+    //close(lo.root.fd);
+
+    //}
+
+    /*
+    struct fuse_args zmgargs;
     pthread_t zmgfusethread;
     struct fuse* zmgfuser;
     //printf("imgpath: %s\n", imgpath.c_str());
@@ -327,5 +372,6 @@ struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
     int perr = pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *) zmgfuser);
 
     return zmgfuser;
+    */
 };
 #endif // ZMGFUSE_H
