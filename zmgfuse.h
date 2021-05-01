@@ -355,32 +355,36 @@ void ZmgFuser(std::string imgpath, std::string imgfile)
     //}
     */
 
-    /*
     struct fuse_args zmgargs;
     pthread_t zmgfusethread;
     struct fuse* zmgfuser;
     char** fargv = NULL;
     fargv = (char**)calloc(3, sizeof(char*));
-    fargv[0] = "./zmgfuse";
-    int fargc = 1;
+    //fargv[0] = "./zmgfuse";
+    int fargc = 2;
     int ret = 0;
     char* iname = new char[imgfile.size() + 1];
     strcpy(iname, imgfile.c_str());
+    char* ipath = new char[imgpath.size() + 1];
+    strcpy(ipath, imgpath.c_str());
+    fargv[0] = iname;
+    fargv[1] = ipath;
+    // PROBABLY WANT TO MOVE THE BELOW STAT STUFF TO THE FUNCTION CALL BASED ON PASED VARIABLES???
     zmgfd = open(iname, O_RDONLY);
     struct stat st;
     fstat(zmgfd, &st);
     size_t size = (size_t) st.st_size;
     zmgmap = (const char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, zmgfd, 0);
     zmgargs = FUSE_ARGS_INIT(fargc, fargv);
-    zmgfuser = fuse_new(&zmgargs, &zmgfs_oper, sizeof(fuse_operations), NULL);
-    ret = fuse_mount(zmgfuser, imgpath.c_str());
-    int retd = fuse_daemonize(1);
-    int perr = pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *)zmgfuser);
+    //zmgfuser = fuse_new(&zmgargs, &zmgfs_oper, sizeof(fuse_operations), NULL);
+    //ret = fuse_mount(zmgfuser, imgpath.c_str());
+    //int retd = fuse_daemonize(1);
+    //int perr = pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *)zmgfuser);
     
-    return fuse_get_session(zmgfuser);
-    */
+    fuse_main(zmgargs.argc, zmgargs.argv, &zmgfs_oper, NULL);
+    //return fuse_get_session(zmgfuser);
 
-    system(std::string("zmgmnt " + imgfile + " " + imgpath).c_str());
+    //system(std::string("zmgmnt " + imgfile + " " + imgpath).c_str());
     //system(QString("zmgmnt " + newevidence.at(i) + " " + emntpath).toStdString().c_str());
     
     //struct fuse_session *fuse_get_session(struct fuse *f);
