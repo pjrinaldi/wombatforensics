@@ -1046,11 +1046,15 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
                 //SquashFuser(emntpath,  existingevidence.at(i));
             }
             else if(existingevidence.at(i).endsWith(".zmg"))
-                fuserlist.push_back(ZmgFuser(emntpath.toStdString(), existingevidence.at(i).toStdString()));
+            {
+                //fuserlist.push_back(ZmgFuser(emntpath.toStdString(), existingevidence.at(i).toStdString()));
+            }
+            /*
             else if(existingevidence.at(i).toLower().endsWith(".aff") || existingevidence.at(i).endsWith(".000") || existingevidence.at(i).endsWith(".001"))
                 fuserlist.push_back(AffFuser(emntpath, existingevidence.at(i)));
             else if(existingevidence.at(i).toLower().endsWith(".e01"))
                 fuserlist.push_back(EwfFuser(emntpath, existingevidence.at(i)));
+            */
         }
         for(int i=0; i < existingevidence.count(); i++)
         {
@@ -1407,11 +1411,17 @@ void WombatForensics::AddEvidence()
         // need to delete emntpath directories on close for cleanup purposes after unmount...
         ecount++;
         if(newevidence.at(i).toLower().endsWith(".zmg"))
-            fuserlist.push_back(ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString()));
+        {
+            ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString());
+            //fuserlist.push_back(ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString()));
+            //system(QString("zmgmnt " + newevidence.at(i) + " " + emntpath).toStdString().c_str());
+        }
+        /*
         else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
             fuserlist.push_back(AffFuser(emntpath, newevidence.at(i)));
         else if(newevidence.at(i).toLower().endsWith(".e01"))
             fuserlist.push_back(EwfFuser(emntpath, newevidence.at(i)));
+        */
     }
     if(newevidence.count() > 0)
     {
@@ -2423,13 +2433,13 @@ void WombatForensics::CloseCurrentCase()
     // UNMOUNT ALL FUSE MOUNTED IMAGES
     for(int i=0; i < fuserlist.size(); i++)
     {
-        struct fuse* curfuser = (struct fuse*)(fuserlist.at(i));
+        struct fuse_session* curfuser = (struct fuse_session*)(fuserlist.at(i));
         QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
         if(imgext.endsWith("e01") || imgext.endsWith("aff") || imgext.endsWith("000") || imgext.endsWith("zmg")) // ewfmount
         {
             if(curfuser != NULL)
             {
-                fuse_unmount(curfuser);
+                fuse_session_unmount(curfuser);
                 /*
                 if(i == fuserlist.size() - 1)
                 {

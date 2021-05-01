@@ -127,7 +127,7 @@ int put_cache_if_not_cached(const char *path, char *buffer) {
 struct zmg_dir_entry *open_root(const char *zmgmap) {
     return (struct zmg_dir_entry *) (zmgmap + sizeof(struct zmg_header));
 }
-
+//void (*getattr) (fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi);
 static int zmgfs_getattr(const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
 
     struct zmg_dir_entry *root = open_root(zmgmap);
@@ -278,6 +278,7 @@ zmg_opt_proc(void *data, const char *arg, int key, struct fuse_args *outargs) {
     }
 };
 
+//static struct fuse_lowlevel_ops zmgfs_oper = {
 static struct fuse_operations zmgfs_oper = {
         .getattr     = zmgfs_getattr,
         .open        = zmgfs_open,
@@ -290,6 +291,8 @@ void* zmgfuselooper(void *data)
 {
     struct fuse* fuse = (struct fuse*) data;
     fuse_loop(fuse);
+    //struct fuse_session* fuse = (struct fuse_session*) data;
+    //fuse_session_loop(fuse);
 };
 
 //struct fuse_args zmgargs;
@@ -297,8 +300,11 @@ void* zmgfuselooper(void *data)
 //pthread_t zmgfusethread;
 
 //void ZmgFuser(std::string imgpath, std::string imgfile)
-struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
+//struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
+//struct fuse_session* ZmgFuser(std::string imgpath, std::string imgfile)
+void ZmgFuser(std::string imgpath, std::string imgfile)
 {
+    /*
     struct fuse_args zmgargs;
     struct fuse_session* zmgfuser;
     struct fuse_cmdline_opts opts;
@@ -309,13 +315,14 @@ struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
     fargv = (char**)calloc(3, sizeof(char*));
     fargv[0] = "./zmgfuse";
     int fargc = 1;
+    zmgargs = FUSE_ARGS_INIT(fargc, fargv);
     char* ipath = new char[imgpath.size() + 1];
     strcpy(ipath, imgpath.c_str());
     char* iname = new char[imgfile.size() + 1];
     strcpy(iname, imgfile.c_str());
     umask(0);
-    pthread_mutex_t zmgfusethread;
-    pthread_mutex_init(&zmgfusethread, NULL);
+    //pthread_mutex_t zmgfusethread;
+    //pthread_mutex_init(&zmgfusethread, NULL);
     //lo.root.next = lo.root.prev = &lo.root;
     //lo.root.fd = -1;
     //lo.cache = CACHE_NORMAL;
@@ -329,12 +336,16 @@ struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
     //lo.source = iname;
     //lo.timeout = 86400.0;
     //lo.root.fd = open(lo.source, O_PATH);
+    pthread_t zmgfusethread;
+    pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *) zmgfuser);
+    zmgfuser = fuse_session_new(&zmgargs, &zmgfs_oper, sizeof(fuse_operations), NULL);
+    fuse_set_signal_handlers(zmgfuser);
+    fuse_session_mount(zmgfuser, imgpath.c_str());
+    fuse_daemonize(1);
 
-    zmgfuser = fuse_session_new(&zmgargs, &fuse_operations, sizeof(fuse_operations), NULL);
-    fuse_set_signal_handler(zmgfuser);
-    fuse_session_mount(zmgfuser, opts.mountpoint);
-    fuse_daemonize(opts.foreground);
-    fuse_session_loop(zmgfuser);
+    //fuse_session_loop(zmgfuser);
+
+    return zmgfuser;
     // STORE FUSE_SESSION (ZMGFUSER) BY RETURNING IT
 
     //fuse_session_unmount(zmgfuser);
@@ -342,7 +353,38 @@ struct fuse* ZmgFuser(std::string imgpath, std::string imgfile)
     //close(lo.root.fd);
 
     //}
+    */
 
+    /*
+    struct fuse_args zmgargs;
+    pthread_t zmgfusethread;
+    struct fuse* zmgfuser;
+    char** fargv = NULL;
+    fargv = (char**)calloc(3, sizeof(char*));
+    fargv[0] = "./zmgfuse";
+    int fargc = 1;
+    int ret = 0;
+    char* iname = new char[imgfile.size() + 1];
+    strcpy(iname, imgfile.c_str());
+    zmgfd = open(iname, O_RDONLY);
+    struct stat st;
+    fstat(zmgfd, &st);
+    size_t size = (size_t) st.st_size;
+    zmgmap = (const char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, zmgfd, 0);
+    zmgargs = FUSE_ARGS_INIT(fargc, fargv);
+    zmgfuser = fuse_new(&zmgargs, &zmgfs_oper, sizeof(fuse_operations), NULL);
+    ret = fuse_mount(zmgfuser, imgpath.c_str());
+    int retd = fuse_daemonize(1);
+    int perr = pthread_create(&zmgfusethread, NULL, zmgfuselooper, (void *)zmgfuser);
+    
+    return fuse_get_session(zmgfuser);
+    */
+
+    system(std::string("zmgmnt " + imgfile + " " + imgpath).c_str());
+    //system(QString("zmgmnt " + newevidence.at(i) + " " + emntpath).toStdString().c_str());
+    
+    //struct fuse_session *fuse_get_session(struct fuse *f);
+    
     /*
     struct fuse_args zmgargs;
     pthread_t zmgfusethread;
