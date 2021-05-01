@@ -449,8 +449,10 @@ QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
     QString extentstring = "";
     int blkcnt = 1;
     uint32_t startvalue = blocklist.at(0);
+    //qDebug() << "blocklist:" << blocklist;
     for(int i=1; i < blocklist.count(); i++)
     {
+        //qDebug() << "curvalue:" << blocklist.at(i);
         uint32_t oldvalue = blocklist.at(i-1);
         uint32_t newvalue = blocklist.at(i);
         if(newvalue - oldvalue == 1)
@@ -468,5 +470,10 @@ QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
             blkcnt = 1;
         }
     }
+    if(blocklist.count() == 1)
+    {
+        extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
+    }
+
     return extentstring;
 }

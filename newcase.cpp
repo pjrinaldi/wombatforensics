@@ -3131,7 +3131,10 @@ void ParseExtDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<
             //qDebug() << "curblock list:" << curblocklist;
             //fileinfo.insert("physicalsize", QVariant(curblocklist.count() * fsinfo->value("blocksize").toUInt()));
             //qDebug() << "logical/physical size:" << fileinfo.value("logicalsize").toUInt() << fileinfo.value("physicalsize").toUInt();
-            QString layout = ConvertBlocksToExtents(curblocklist, fsinfo->value("blocksize").toUInt());
+            //qDebug() << "curblocklist:" << curblocklist;
+            QString layout = "";
+            if(curblocklist.count() > 0)
+                layout = ConvertBlocksToExtents(curblocklist, fsinfo->value("blocksize").toUInt());
             /*
             QString layout = "";
             for(int i=0; i < curblkstrlist.count(); i++)
