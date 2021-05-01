@@ -1413,6 +1413,7 @@ void WombatForensics::AddEvidence()
         if(newevidence.at(i).toLower().endsWith(".zmg"))
         {
             ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString());
+            //QtConcurrent::run(ZmgFuser, emntpath.toStdString(), newevidence.at(i).toStdString());
             //fuserlist.push_back(ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString()));
             //system(QString("zmgmnt " + newevidence.at(i) + " " + emntpath).toStdString().c_str());
         }
