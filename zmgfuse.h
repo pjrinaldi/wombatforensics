@@ -304,6 +304,12 @@ void* zmgfuselooper(void *data)
 //struct fuse_session* ZmgFuser(std::string imgpath, std::string imgfile)
 void ZmgFuser(std::string imgpath, std::string imgfile)
 {
+    QString zprog = "zmgmnt";
+    QStringList args;
+    args << QString::fromStdString(imgfile) << QString::fromStdString(imgpath);
+    QProcess* zprocess = new QProcess();
+    zprocess->waitForFinished(-1);
+    zprocess->start(zprog, args);
     /*
     struct fuse_args zmgargs;
     struct fuse_session* zmgfuser;
@@ -355,6 +361,7 @@ void ZmgFuser(std::string imgpath, std::string imgfile)
     //}
     */
 
+    /*
     char** fargv = NULL;
     fargv = (char**)calloc(3, sizeof(char*));
     int fargc = 3;
@@ -373,6 +380,7 @@ void ZmgFuser(std::string imgpath, std::string imgfile)
     //fuse_set_signal_handlers(se);
     fuse_loop(fuse);
     //fuse_remove_signal_handlers(se);
+    */
     /*
     struct fuse_args zmgargs;
     pthread_t zmgfusethread;

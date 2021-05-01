@@ -4156,7 +4156,9 @@ void ProcessVolume(QString evidstring)
     QString evidencename = evidstring.split("/").last();
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + "-e" + QString::number(evidcnt) + "/";
     QString emntstring = evidstring;
-    if(evidstring.toLower().endsWith(".e01") || evidstring.toLower().endsWith(".aff") || evidstring.toLower().endsWith(".000") || evidstring.toLower().endsWith("001") || evidstring.toLower().endsWith(".zmg"))
+    if(evidstring.toLower().endsWith(".e01"))
+        emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/ewf1";
+    else if(evidstring.toLower().endsWith(".aff") || evidstring.toLower().endsWith(".000") || evidstring.toLower().endsWith("001") || evidstring.toLower().endsWith(".zmg"))
         emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
     QFileInfo efileinfo(emntstring);
     imgsize = efileinfo.size();
