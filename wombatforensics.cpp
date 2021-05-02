@@ -109,7 +109,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->analysisToolBar->addAction(ui->actionchomp);
     ui->analysisToolBar->addAction(ui->actionAbout);
 
-    connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    connect(&volwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
+    //connect(&sqlwatcher, SIGNAL(finished()), this, SLOT(UpdateStatus()), Qt::QueuedConnection);
     connect(&openwatcher, SIGNAL(finished()), this, SLOT(OpenUpdate()), Qt::QueuedConnection);
     connect(&digwatcher, SIGNAL(finished()), this, SLOT(FinishDigging()), Qt::QueuedConnection);
     connect(&predigwatcher, SIGNAL(finished()), this, SLOT(FinishPreDigging()), Qt::QueuedConnection);
@@ -1445,14 +1446,16 @@ void WombatForensics::AddEvidence()
     if(newevidence.count() > 0)
     {
         evidrepdatalist.clear();
+        /*
         for(int i=0; i < newevidence.count(); i++)
         {
             //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
             ProcessVolume(newevidence.at(i));
         }
-        //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
-        //volwatcher.setFuture(tmpfuture);
-        UpdateStatus();
+        */
+        QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
+        volwatcher.setFuture(tmpfuture);
+        //UpdateStatus();
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
         //sqlwatcher.setFuture(tmpfuture);
     }
@@ -2491,6 +2494,9 @@ void WombatForensics::CloseCurrentCase()
         if(imgext.contains("e01")) // ewfmount
         {
             QProcess::execute("fusermount", args);
+            QDir dir(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last());
+            if(dir.exists())
+                dir.rmdir(dir.absolutePath());
             /*
             if(ewfuser != NULL)
             {
@@ -2504,6 +2510,10 @@ void WombatForensics::CloseCurrentCase()
         else if(imgext.contains("aff") || imgext.contains("000") || imgext.contains("001")) // affuse
         {
             QProcess::execute("fusermount", args);
+            //QDir::rmdir(QString(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last()));
+            QDir dir(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last());
+            if(dir.exists())
+                dir.rmdir(dir.absolutePath());
             /*
             if(affuser != NULL)
             {
@@ -2517,6 +2527,10 @@ void WombatForensics::CloseCurrentCase()
         else if(imgext.contains("zmg")) // zmgfuse
         {
             QProcess::execute("fusermount", args);
+            //QDir::rmdir(QString(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last()));
+            QDir dir(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last());
+            if(dir.exists())
+                dir.rmdir(dir.absolutePath());
             /*
             if(zmgfuser != NULL)
             {

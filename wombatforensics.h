@@ -268,8 +268,9 @@ private:
     QModelIndex selectedindex;
     QModelIndex oldselectedindex;
 
-    QFuture<void> sqlfuture;
-    QFutureWatcher<void> sqlwatcher;
+    //QFuture<void> sqlfuture;
+    QFutureWatcher<void> volwatcher;
+    //QFutureWatcher<void> sqlwatcher;
     QFuture<void> digfuture;
     QFutureWatcher<void> digwatcher;
     QFuture<void> predigfuture;
