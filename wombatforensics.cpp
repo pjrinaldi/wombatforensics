@@ -1064,6 +1064,9 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
                 //fuserlist.push_back(EwfFuser(emntpath, existingevidence.at(i)));
             }
         }
+        QFuture<void> tmpfuture = QtConcurrent::run(LoadTreeModel);
+        openwatcher.setFuture(tmpfuture);
+        /*
         for(int i=0; i < existingevidence.count(); i++)
         {
             LoadTreeModel(existingevidence.at(i));
@@ -1071,6 +1074,10 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
             //ProcessVolume(existingevidence.at(i));
         }
         OpenUpdate();
+        */
+        
+        //QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, LoadTreeModel);
+        //openwatcher.setFuture(tmpfuture);
         //QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTskTree);
 	//QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
         //openwatcher.setFuture(tmpfuture);
@@ -3967,7 +3974,12 @@ void WombatForensics::SaveTreeModel(void)
     if(treefile.isOpen())
     {
         QTextStream stream(&treefile);
-        PrintTree(0, treenodemodel->index(0, 0), stream);
+        for(int i=0; i < existingevidence.count(); i++)
+        {
+            //qDebug() << "existingevidence:" << existingevidence.at(i);
+            PrintTree(0, treenodemodel->index(i, 0), stream);
+        }
+        //PrintTree(0, treenodemodel->index(0, 0), stream);
         stream.flush();
         treefile.close();
     }

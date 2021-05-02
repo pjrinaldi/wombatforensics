@@ -8,6 +8,6 @@
 // Copyright 2013-2021 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-void LoadTreeModel(QString evidstring);
+void LoadTreeModel(void);
 
 #endif // opencase.h
