@@ -17,7 +17,7 @@ AboutBox::AboutBox(QWidget* parent) : QDialog(parent), ui(new Ui::AboutBox)
     abouttext += " Used libfwnt library from Joachim Metz (LGPLv3) to uncompress the MAM prefetch file format.";
     abouttext += " PDF page generation and display provided by the Poppler Qt5 library which is released under the GPL.";
     abouttext += " Make use of libudev to get a list of devices to select for creating a forensic imager.";
-    abouttext += " Forensic imager generates either raw or a raw inside a read only zmg file system making use of zmg-utils code (public domain)."
+    abouttext += " Forensic imager generates either raw or a raw inside a read only zmg file system making use of zmg-utils code (public domain).";
     abouttext += " Registry parsing provided by libregf library from Joachim Metz provided under the LGPLv3.";
     abouttext += " Image thumbnails were generated using the Magick++ library which is provided under a modified Apache 2.0. Video thumbnails were generated using the libffmpegthumbnailer library and Magick++.";
     abouttext += " The libffmpegthumbnailer library is provided under the GPLv2. Video player makes use of the QtAV library.";
