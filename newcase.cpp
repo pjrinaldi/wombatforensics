@@ -86,9 +86,11 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
     */
     }
     //QByteArray sector0 = rawforimg.peek(512);
+    tmpimg->open(QIODevice::ReadOnly);
     tmpimg->seek(0);
     //rawforimg->seek(0);
     QByteArray sector0 = tmpimg->read(512);
+    tmpimg->close();
     //QByteArray sector0 = rawforimg->read(512);
     //rawforimg->close();
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector0.mid(510, 2));
@@ -110,8 +112,10 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
                 rawforimg.open(QIODevice::ReadOnly);
             */
             //rawforimg->seek(512);
+            tmpimg->open(QIODevice::ReadOnly);
             tmpimg->seek(512);
             QByteArray sector1 = tmpimg->read(512);
+            tmpimg->close();
             //QByteArray sector1 = rawforimg->read(512);
             //rawforimg.close();
 	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
@@ -125,10 +129,12 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
 		if(!rawforimg.isOpen())
 		    rawforimg.open(QIODevice::ReadOnly);
                 */
+                tmpimg->open(QIODevice::ReadOnly);
 		tmpimg->seek((parttablestart*512));
 		//rawforimg->seek((parttablestart*512));
 		//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
 		QByteArray partentries = tmpimg->read((partentrycount*partentrysize));
+                tmpimg->close();
 		//rawforimg.close();
 		for(int i=0; i < partentrycount; i++)
 		{
@@ -216,8 +222,10 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
         */
 	//rawforimg->seek((parttablestart*512));
 	//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
+        tmpimg->open(QIODevice::ReadOnly);
 	tmpimg->seek((parttablestart*512));
 	QByteArray partentries = tmpimg->read((partentrycount*partentrysize));
+        tmpimg->close();
 	//rawforimg.close();
 	for(int i=0; i < partentrycount; i++)
 	{
@@ -4184,6 +4192,7 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
 void ProcessVolume(ForensicImage* tmpimg)
 {
     QString evidstring = tmpimg->ImgPath();
+    qDebug() << "imgpath at start of processvolume:" << evidstring;
     QList<qint64> pofflist;
     pofflist.clear();
     QList<qint64> psizelist;

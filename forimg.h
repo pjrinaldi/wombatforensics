@@ -26,6 +26,7 @@ public:
         else if(imgfile.split("/").last().toLower().endsWith(".zmg"))
             imgtype = 3; // ZMG
         imgpath = imgfile;
+        qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
 
         QString efilepath = imgfile.split(imgfile.split("/").last()).first();
         QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
@@ -49,7 +50,22 @@ public:
         retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
-        libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
+        //open(QIODevice::ReadOnly);
+        if(imgtype == 0)
+        {
+            retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+            libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
+            libewf_handle_close(ewfhandle, &ewferror);
+        }
+        else if(imgtype == 1)
+        {
+            char* iname = new char[imgpath.toStdString().size() + 1];
+            strcpy(iname, imgpath.toStdString().c_str());
+            afimage = af_open(iname, O_RDONLY|O_EXCL,0);
+            imgsize = af_get_imagesize(afimage);
+            af_close(afimage);
+        }
+        //close();
     };
 
     ~ForensicImage()
@@ -67,6 +83,8 @@ public:
         off64_t res = 0;
         if(imgtype == 0)
             res = libewf_handle_read_buffer(ewfhandle, data, maxSize, &ewferror);
+        else if(imgtype == 1)
+	    res = af_read(afimage, (unsigned char*)data, maxSize);
         return res;
         /*
         int res = 0;
@@ -89,6 +107,11 @@ public:
         QIODevice::seek(pos);
         if(imgtype == 0)
             imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
+        else if(imgtype == 1)
+        {
+            imgoffset = pos;
+	    af_seek(afimage, pos, SEEK_SET);
+        }
         if(imgoffset == -1)
             return false;
         else
@@ -134,6 +157,12 @@ public:
             else
                 printf("libewf_handle_open was successful %d\n", retopen);
         }
+        else if(imgtype == 1)
+        {
+            char* iname = new char[imgpath.toStdString().size() + 1];
+            strcpy(iname, imgpath.toStdString().c_str());
+            afimage = af_open(iname, O_RDONLY|O_EXCL,0);
+        }
     };
 
     void close()
@@ -148,12 +177,14 @@ private:
     libewf_error_t* ewferror = NULL;
     char** globfiles = NULL;
     int globfilecnt = 0;
+    // AFF Variables
+    AFFILE* afimage = NULL;
     //off64_t erawsize = 0;
     //qint64 ewfoffset = 0;
     off64_t imgsize = 0;
     qint64 imgoffset = 0;
     QString imgpath = "";
-    int imgtype = 0;
+    int imgtype = -1;
 };
 
 #endif // FORIMG_H
