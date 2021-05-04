@@ -61,6 +61,17 @@ void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offse
 void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
 {
     //qDebug() << "estring:" << estring;
+    if(estring.toLower().endsWith(".e01"))
+    {
+        char* tdata = new char[512];
+        //char* zipbuf = new char[zipstat.size];
+        testimage->seek(0);
+        qint64 retval = testimage->readData(tdata, 512);
+        qDebug() << "retval:" << retval;
+        qDebug() << "1st sector:" << QByteArray::fromRawData((const char*)tdata, 512).toHex();
+        // THIS WORKS!!!!! SO I NEED TO SET A GLOBAL VECTOR WHICH CONTAINS THESE IMAGES TO LOOP OVER IT AS SUCH...
+        // ALSO NEED TO MODIFY THE ENTIRE CODE TO ACCOUNT FOR THIS SOMEHOW....
+    }
     QFile rawforimg(estring);
     if(!rawforimg.isOpen())
 	rawforimg.open(QIODevice::ReadOnly);
@@ -3913,7 +3924,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
 	}
         efile.close();
     }
-    qDebug() << "dir fat content:" << fatbuf->mid(0, 40).toHex();
+    //qDebug() << "dir fat content:" << fatbuf->mid(0, 40).toHex();
     QString longnamestring = "";
     for(int i=0; i < dirbuf.count() / 32; i++)
     {
@@ -4160,11 +4171,19 @@ void ProcessVolume(QString evidstring)
     QString evidencepath = wombatvariable.tmpmntpath + evidencename + "-e" + QString::number(evidcnt) + "/";
     QString emntstring = evidstring;
     if(evidstring.toLower().endsWith(".e01"))
-        emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/ewf1";
+    {
+        emntstring = evidstring;
+        //emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/ewf1";
+    }
     else if(evidstring.toLower().endsWith(".aff") || evidstring.toLower().endsWith(".000") || evidstring.toLower().endsWith("001") || evidstring.toLower().endsWith(".zmg"))
         emntstring = wombatvariable.imgdatapath + evidstring.split("/").last() + "/" + evidstring.split("/").last() + ".raw";
     QFileInfo efileinfo(emntstring);
-    imgsize = efileinfo.size();
+    if(evidstring.toLower().endsWith(".e01"))
+    {
+        imgsize = testimage->size();
+    }
+    else
+        imgsize = efileinfo.size();
     QList<QVariant> nodedata;
     nodedata.clear();
     nodedata << evidencename << "0" << QString::number(imgsize) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt));

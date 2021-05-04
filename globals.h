@@ -3,6 +3,7 @@
 
 #include "wombatinclude.h"
 #include "wombatvariable.h"
+#include "ewfimage.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -64,6 +65,7 @@ extern QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 extern QHash<QString, QString> mftblockhash; // list of mft blockstrings for each partition for each evidence item
 extern QHash<QString, QString> passwordhash; // list of passwords for encrypted pool volume's/fs's
 extern QMutex mutex; // mutex so my code will work when multithreaded (mainly for adding treeview nodes)
+extern EwfImage* testimage;
 
 struct dosdate
 {

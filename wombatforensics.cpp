@@ -1442,9 +1442,10 @@ void WombatForensics::AddEvidence()
         }
         else if(newevidence.at(i).toLower().endsWith(".e01"))
         {
-            EwfImage* testimage = new EwfImage(newevidence.at(i));
-            testimage->size();
-            QProcess::execute("ewfmount", args);
+            testimage = new EwfImage(newevidence.at(i));
+            //testimage->size();
+            //ui->hexview->setData(*testimage);
+            //QProcess::execute("ewfmount", args);
         }
         /*
         else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
