@@ -44,7 +44,6 @@
 #include "registryviewer.h"
 #include "newforimg.h"
 #include "verevidencedialog.h"
-//#include "forimg.h"
 
 class StatusLabel : public QLabel
 {

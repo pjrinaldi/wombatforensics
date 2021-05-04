@@ -104,9 +104,11 @@ public:
 
     bool seek(qint64 pos)
     {
-        QIODevice::seek(pos);
+        //QIODevice::seek(pos);
         if(imgtype == 0)
+        {
             imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
+        }
         else if(imgtype == 1)
         {
             imgoffset = pos;
