@@ -1442,7 +1442,8 @@ void WombatForensics::AddEvidence()
         }
         else if(newevidence.at(i).toLower().endsWith(".e01"))
         {
-            testimage = new EwfImage(newevidence.at(i));
+            EwfImage* tmpimage = new EwfImage(newevidence.at(i));
+            evidimglist.push_back(tmpimage);
             //testimage->size();
             //ui->hexview->setData(*testimage);
             //QProcess::execute("ewfmount", args);
@@ -1464,7 +1465,8 @@ void WombatForensics::AddEvidence()
             ProcessVolume(newevidence.at(i));
         }
         */
-        QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
+        //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
+        QFuture<void> tmpfuture = QtConcurrent::map(evidimglist, ProcessVolume);
         volwatcher.setFuture(tmpfuture);
         //UpdateStatus();
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);

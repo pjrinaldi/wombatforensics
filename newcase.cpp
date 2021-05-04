@@ -58,24 +58,30 @@ void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offse
         //qDebug() << "i screwed up the math somewhere...";
 }
 
-void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
+//void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
+void ParseVolume(QIODevice* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
 {
+    QString estring = ((EwfImage*)tmpimg)->ImgPath();
     //qDebug() << "estring:" << estring;
     if(estring.toLower().endsWith(".e01"))
     {
-        char* tdata = new char[512];
+        //char* tdata = new char[512];
         //char* zipbuf = new char[zipstat.size];
-        testimage->seek(0);
-        qint64 retval = testimage->readData(tdata, 512);
-        qDebug() << "retval:" << retval;
-        qDebug() << "1st sector:" << QByteArray::fromRawData((const char*)tdata, 512).toHex();
+        //testimage->seek(0);
+        //QByteArray tmparray = testimage->read(512);
+        //qDebug() << "1st sector:" << tmparray.toHex();
+        //qint64 retval = testimage->readData(tdata, 512);
+        //qDebug() << "retval:" << retval;
+        //qDebug() << "1st sector:" << QByteArray::fromRawData((const char*)tdata, 512).toHex();
         // THIS WORKS!!!!! SO I NEED TO SET A GLOBAL VECTOR WHICH CONTAINS THESE IMAGES TO LOOP OVER IT AS SUCH...
         // ALSO NEED TO MODIFY THE ENTIRE CODE TO ACCOUNT FOR THIS SOMEHOW....
     }
     QFile rawforimg(estring);
     if(!rawforimg.isOpen())
 	rawforimg.open(QIODevice::ReadOnly);
-    QByteArray sector0 = rawforimg.peek(512);
+    //QByteArray sector0 = rawforimg.peek(512);
+    rawforimg.seek(0);
+    QByteArray sector0 = rawforimg.read(512);
     rawforimg.close();
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector0.mid(510, 2));
     uint16_t applesig = qFromLittleEndian<uint16_t>(sector0.left(2)); // should be in 2nd sector, powerpc mac's not intel mac's
@@ -4154,8 +4160,10 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
     }
 }
 
-void ProcessVolume(QString evidstring)
+//void ProcessVolume(QString evidstring)
+void ProcessVolume(QIODevice* tmpimg)
 {
+    QString evidstring = ((EwfImage*)tmpimg)->ImgPath();
     QList<qint64> pofflist;
     pofflist.clear();
     QList<qint64> psizelist;
@@ -4180,7 +4188,8 @@ void ProcessVolume(QString evidstring)
     QFileInfo efileinfo(emntstring);
     if(evidstring.toLower().endsWith(".e01"))
     {
-        imgsize = testimage->size();
+        imgsize = tmpimg->size();
+        //imgsize = testimage->size();
     }
     else
         imgsize = efileinfo.size();
@@ -4208,7 +4217,8 @@ void ProcessVolume(QString evidstring)
         out.flush();
         estatfile.close();
     }
-    ParseVolume(emntstring, imgsize, &pofflist, &psizelist, &fsinfolist);
+    ParseVolume(tmpimg, imgsize, &pofflist, &psizelist, &fsinfolist);
+    //ParseVolume(emntstring, imgsize, &pofflist, &psizelist, &fsinfolist);
     if(pofflist.count() == 0)
     {	
 	// virtual attempt to process entire image as a filesystem...

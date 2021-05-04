@@ -16,6 +16,7 @@ public:
 
     EwfImage(QString imgfile)
     {
+        imgpath = imgfile;
         QString efilepath = imgfile.split(imgfile.split("/").last()).first();
         QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
         QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
@@ -90,6 +91,25 @@ public:
         return erawsize;
     };
 
+    QString ImgPath()
+    {
+        return imgpath;
+    };
+
+    QByteArray read(qint64 maxSize)
+    {
+        char* tdata = new char[maxSize];
+        qint64 retval = readData(tdata, maxSize);
+        if(retval > 0)
+            return QByteArray::fromRawData((const char*)tdata, maxSize);
+        //qint64 retval = testimage->readData(tdata, 512);
+        //qDebug() << "retval:" << retval;
+        //qDebug() << "1st sector:" << QByteArray::fromRawData((const char*)tdata, 512).toHex();
+    };
+    qint64 write(const char *data)
+    {
+    };
+
 private:
     libewf_handle_t* ewfhandle = NULL;
     libewf_error_t* ewferror = NULL;
@@ -97,6 +117,7 @@ private:
     qint64 ewfoffset = 0;
     char** globfiles = NULL;
     int globfilecnt = 0;
+    QString imgpath = "";
 };
 
 #endif // EWFREAD_H

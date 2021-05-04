@@ -589,6 +589,7 @@ release/moc_wombatforensics.cpp: wombatforensics.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
+		ewfimage.h \
 		carving.h \
 		videoviewer.h \
 		ui_videoviewer.h \
@@ -677,6 +678,7 @@ release/moc_exportdialog.cpp: exportdialog.h \
 release/moc_globals.cpp: globals.h \
 		wombatinclude.h \
 		wombatvariable.h \
+		ewfimage.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/release/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include globals.h -o release/moc_globals.cpp
@@ -686,6 +688,7 @@ release/moc_propertieswindow.cpp: propertieswindow.h \
 		ui_propertieswindow.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/release/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include propertieswindow.h -o release/moc_propertieswindow.cpp
@@ -698,6 +701,7 @@ release/moc_fileviewer.cpp: fileviewer.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		searchdialog.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
@@ -707,6 +711,7 @@ release/moc_filterviews.cpp: filterviews.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_accesseddatefilter.h \
 		ui_analysistypefilter.h \
 		ui_changeddatefilter.h \
@@ -730,6 +735,7 @@ release/moc_imageviewer.cpp: imageviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
@@ -743,6 +749,7 @@ release/moc_videoviewer.cpp: videoviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_videoviewer.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
@@ -752,6 +759,7 @@ release/moc_viewermanager.cpp: viewermanager.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_viewermanager.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
@@ -761,6 +769,7 @@ release/moc_textviewer.cpp: textviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_textviewer.h \
 		wombatfunctions.h \
 		release/moc_predefs.h \
@@ -771,6 +780,7 @@ release/moc_htmlviewer.cpp: htmlviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		artifactparser.h \
 		wombatfunctions.h \
 		ui_htmlviewer.h \
@@ -782,6 +792,7 @@ release/moc_messageviewer.cpp: messageviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_messageviewer.h \
 		wombatfunctions.h \
 		release/moc_predefs.h \
@@ -792,6 +803,7 @@ release/moc_byteconverter.cpp: byteconverter.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_byteconverter.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
@@ -808,6 +820,7 @@ release/moc_aboutbox.cpp: aboutbox.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_aboutbox.h \
 		release/moc_predefs.h \
@@ -820,6 +833,7 @@ release/moc_qhexedit.cpp: qhexedit.h \
 		globals.h \
 		wombatinclude.h \
 		wombatvariable.h \
+		ewfimage.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/release/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include qhexedit.h -o release/moc_qhexedit.cpp
@@ -839,6 +853,7 @@ release/moc_settingsdialog.cpp: settingsdialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_settingsdialog.h \
 		carvingfiletypesdialog.h \
@@ -851,6 +866,7 @@ release/moc_addevidencedialog.cpp: addevidencedialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_addevidencedialog.h \
 		release/moc_predefs.h \
@@ -861,6 +877,7 @@ release/moc_remevidencedialog.cpp: remevidencedialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_remevidencedialog.h \
 		release/moc_predefs.h \
@@ -871,6 +888,7 @@ release/moc_tagmanager.cpp: tagmanager.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		reporting.h \
 		ui_tagmanager.h \
@@ -885,6 +903,7 @@ release/moc_searchdialog.cpp: searchdialog.h \
 		globals.h \
 		wombatinclude.h \
 		wombatvariable.h \
+		ewfimage.h \
 		release/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/release/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include searchdialog.h -o release/moc_searchdialog.cpp
@@ -893,6 +912,7 @@ release/moc_carvedialog.cpp: carvedialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_carvedialog.h \
 		release/moc_predefs.h \
@@ -910,6 +930,7 @@ release/moc_carvingfiletypesdialog.cpp: carvingfiletypesdialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_carvingfiletypesdialog.h \
 		wombatfunctions.h \
 		release/moc_predefs.h \
@@ -920,6 +941,7 @@ release/moc_pdfviewer.cpp: pdfviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_pdfviewer.h \
 		videoviewer.h \
@@ -932,6 +954,7 @@ release/moc_registryviewer.cpp: registryviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_registryviewer.h \
 		tagging.h \
@@ -944,6 +967,7 @@ release/moc_newforimg.cpp: newforimg.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_newforimg.h \
 		release/moc_predefs.h \
@@ -954,6 +978,7 @@ release/moc_verevidencedialog.cpp: verevidencedialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_verifyevidencedialog.h \
 		imagefunctions.h \
@@ -1015,7 +1040,8 @@ ui_fileviewer.h: fileviewer.ui \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	/usr/bin/uic fileviewer.ui -o ui_fileviewer.h
 
 ui_hashcategoryfilter.h: hashcategoryfilter.ui \
@@ -1090,7 +1116,8 @@ ui_wombatforensics.h: wombatforensics.ui \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	/usr/bin/uic wombatforensics.ui -o ui_wombatforensics.h
 
 ui_jumphex.h: jumphex.ui \
@@ -1160,6 +1187,7 @@ release/main.o: main.cpp wombatinclude.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
+		ewfimage.h \
 		carving.h \
 		videoviewer.h \
 		ui_videoviewer.h \
@@ -1241,6 +1269,7 @@ release/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
+		ewfimage.h \
 		carving.h \
 		videoviewer.h \
 		ui_videoviewer.h \
@@ -1320,7 +1349,8 @@ release/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 release/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
 		wombatinclude.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/wombatfunctions.o wombatfunctions.cpp
 
 release/exportdialog.o: exportdialog.cpp exportdialog.h \
@@ -1331,14 +1361,16 @@ release/exportdialog.o: exportdialog.cpp exportdialog.h \
 
 release/globals.o: globals.cpp globals.h \
 		wombatinclude.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/globals.o globals.cpp
 
 release/propertieswindow.o: propertieswindow.cpp propertieswindow.h \
 		wombatinclude.h \
 		ui_propertieswindow.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/propertieswindow.o propertieswindow.cpp
 
 release/fileviewer.o: fileviewer.cpp fileviewer.h \
@@ -1349,6 +1381,7 @@ release/fileviewer.o: fileviewer.cpp fileviewer.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		searchdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/fileviewer.o fileviewer.cpp
 
@@ -1356,6 +1389,7 @@ release/filterviews.o: filterviews.cpp filterviews.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_accesseddatefilter.h \
 		ui_analysistypefilter.h \
 		ui_changeddatefilter.h \
@@ -1377,6 +1411,7 @@ release/imageviewer.o: imageviewer.cpp imageviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
@@ -1388,6 +1423,7 @@ release/videoviewer.o: videoviewer.cpp videoviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_videoviewer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/videoviewer.o videoviewer.cpp
 
@@ -1395,6 +1431,7 @@ release/viewermanager.o: viewermanager.cpp viewermanager.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_viewermanager.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/viewermanager.o viewermanager.cpp
 
@@ -1402,6 +1439,7 @@ release/textviewer.o: textviewer.cpp textviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_textviewer.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/textviewer.o textviewer.cpp
@@ -1410,6 +1448,7 @@ release/htmlviewer.o: htmlviewer.cpp htmlviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		artifactparser.h \
 		wombatfunctions.h \
 		ui_htmlviewer.h
@@ -1419,6 +1458,7 @@ release/messageviewer.o: messageviewer.cpp messageviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_messageviewer.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/messageviewer.o messageviewer.cpp
@@ -1427,6 +1467,7 @@ release/byteconverter.o: byteconverter.cpp byteconverter.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_byteconverter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/byteconverter.o byteconverter.cpp
 
@@ -1440,6 +1481,7 @@ release/aboutbox.o: aboutbox.cpp aboutbox.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_aboutbox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/aboutbox.o aboutbox.cpp
@@ -1449,7 +1491,8 @@ release/qhexedit.o: qhexedit.cpp qhexedit.h \
 		commands.h \
 		globals.h \
 		wombatinclude.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/qhexedit.o qhexedit.cpp
 
 release/chunks.o: chunks.cpp chunks.h
@@ -1463,6 +1506,7 @@ release/settingsdialog.o: settingsdialog.cpp settingsdialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_settingsdialog.h \
 		carvingfiletypesdialog.h \
@@ -1473,6 +1517,7 @@ release/addevidencedialog.o: addevidencedialog.cpp addevidencedialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_addevidencedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/addevidencedialog.o addevidencedialog.cpp
@@ -1481,6 +1526,7 @@ release/remevidencedialog.o: remevidencedialog.cpp remevidencedialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_remevidencedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/remevidencedialog.o remevidencedialog.cpp
@@ -1489,6 +1535,7 @@ release/tagmanager.o: tagmanager.cpp tagmanager.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		reporting.h \
 		ui_tagmanager.h
@@ -1501,6 +1548,7 @@ release/searchdialog.o: searchdialog.cpp searchdialog.h \
 		globals.h \
 		wombatinclude.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_searchdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/searchdialog.o searchdialog.cpp
 
@@ -1508,6 +1556,7 @@ release/carvedialog.o: carvedialog.cpp carvedialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_carvedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/carvedialog.o carvedialog.cpp
@@ -1522,6 +1571,7 @@ release/carvingfiletypesdialog.o: carvingfiletypesdialog.cpp carvingfiletypesdia
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		ui_carvingfiletypesdialog.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/carvingfiletypesdialog.o carvingfiletypesdialog.cpp
@@ -1530,6 +1580,7 @@ release/pdfviewer.o: pdfviewer.cpp pdfviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_pdfviewer.h \
 		videoviewer.h \
@@ -1540,6 +1591,7 @@ release/carving.o: carving.cpp carving.h \
 		globals.h \
 		wombatinclude.h \
 		wombatvariable.h \
+		ewfimage.h \
 		videoviewer.h \
 		ui_videoviewer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/carving.o carving.cpp
@@ -1548,33 +1600,38 @@ release/digging.o: digging.cpp digging.h \
 		wombatinclude.h \
 		wombatfunctions.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/digging.o digging.cpp
 
 release/reporting.o: reporting.cpp reporting.h \
 		wombatinclude.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/reporting.o reporting.cpp
 
 release/artifactparser.o: artifactparser.cpp artifactparser.h \
 		wombatinclude.h \
 		wombatfunctions.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/artifactparser.o artifactparser.cpp
 
 release/exporting.o: exporting.cpp exporting.h \
 		wombatinclude.h \
 		wombatfunctions.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/exporting.o exporting.cpp
 
 release/newcase.o: newcase.cpp newcase.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/newcase.o newcase.cpp
 
@@ -1582,6 +1639,7 @@ release/opencase.o: opencase.cpp opencase.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/opencase.o opencase.cpp
 
@@ -1589,6 +1647,7 @@ release/registryviewer.o: registryviewer.cpp registryviewer.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_registryviewer.h \
 		tagging.h \
@@ -1599,6 +1658,7 @@ release/newforimg.o: newforimg.cpp newforimg.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_newforimg.h \
 		imagefunctions.h
@@ -1616,13 +1676,15 @@ release/tagging.o: tagging.cpp tagging.h \
 		wombatinclude.h \
 		wombatfunctions.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		ewfimage.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release/tagging.o tagging.cpp
 
 release/verevidencedialog.o: verevidencedialog.cpp verevidencedialog.h \
 		wombatinclude.h \
 		globals.h \
 		wombatvariable.h \
+		ewfimage.h \
 		wombatfunctions.h \
 		ui_verifyevidencedialog.h \
 		imagefunctions.h

@@ -63,6 +63,6 @@ QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 QHash<QString, QString> mftblockhash; //  list of mft blockstrings for each partition for each evidence item
 QHash<QString, QString> passwordhash; // list of passwords for encrypted pool volume's/fs's
 QMutex mutex;
-EwfImage* testimage;
+//EwfImage* testimage;
 FilterValues filtervalues;
 QList<EvidenceReportData> evidrepdatalist;
