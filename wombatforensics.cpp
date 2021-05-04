@@ -2500,7 +2500,11 @@ void WombatForensics::CloseCurrentCase()
     */
     // UNMOUNT EVIDENCEIMAGEDATAFILE
     // NEED TO CHANGE THIS LOOP FROM EXISTINGEVIDENCE.COUNT() TO FUSELIST.COUNT()
-    
+    for(int i=0; i < evidimglist.size(); i++)
+    {
+        delete evidimglist.at(i);
+    }
+    /*
     for(int i=0; i < existingevidence.count(); i++)
     {
         QStringList args;
@@ -2510,10 +2514,12 @@ void WombatForensics::CloseCurrentCase()
         //qDebug() << "imgext:" << imgext;
         if(imgext.contains("e01")) // ewfmount
         {
+            /*
             QProcess::execute("fusermount", args);
             QDir dir(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last());
             if(dir.exists())
                 dir.rmdir(dir.absolutePath());
+            */
             /*
             if(ewfuser != NULL)
             {
@@ -2523,7 +2529,7 @@ void WombatForensics::CloseCurrentCase()
             else
                 qDebug() << "ewfuser was null";
             */
-        }
+       /* }
         else if(imgext.contains("aff") || imgext.contains("000") || imgext.contains("001")) // affuse
         {
             QProcess::execute("fusermount", args);
@@ -2540,7 +2546,7 @@ void WombatForensics::CloseCurrentCase()
             else
                 qDebug() << "affuser was null";
             */
-        }
+        /*}
         else if(imgext.contains("zmg")) // zmgfuse
         {
             QProcess::execute("fusermount", args);
@@ -2555,7 +2561,7 @@ void WombatForensics::CloseCurrentCase()
                 fuse_destroy(zmgfuser);
             }
             */
-        }
+        /*}
         else if(imgext.contains("sfs")) // squashfuse
         {
             /*
@@ -2565,14 +2571,15 @@ void WombatForensics::CloseCurrentCase()
                 fuse_destroy(sqfuser);
             }
             */
-        }
+        /*}
         /*
         else // raw, so nothing to unmount
         {
         }
         */
-    }
+    /*}
     qInfo() << "Forensic Image(s) unmounted";
+    */
     carvecounthash.clear();
     partitionlist.clear();
     existingevidence.clear();
