@@ -1442,6 +1442,8 @@ void WombatForensics::AddEvidence()
         }
         else if(newevidence.at(i).toLower().endsWith(".e01"))
         {
+            EwfImage* testimage = new EwfImage(newevidence.at(i));
+            testimage->size();
             QProcess::execute("ewfmount", args);
         }
         /*

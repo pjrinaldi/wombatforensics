@@ -43,20 +43,22 @@ public:
             libewf_error_fprint(ewferror, stdout);
         else
             printf("libewf_handle_open was successful %d\n", retopen);
-        //libewf_handle_get_media_size(ewfhandle, (size64_t*)&erawsize, &ewferror);
+        libewf_handle_get_media_size(ewfhandle, (size64_t*)&erawsize, &ewferror);
+        qDebug() << "erawsize:" << erawsize;
     };
 
     ~EwfImage()
     {
-        /*
         libewf_handle_close(ewfhandle, &ewferror);
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
-        */
     };
 
     qint64 readData(char *data, qint64 maxSize)
     {
+        off64_t res = 0;
+        res = libewf_handle_read_buffer(ewfhandle, data, maxSize, &ewferror);
+        return res;
         /*
         int res = 0;
 	(void) fi;
@@ -76,7 +78,7 @@ public:
     bool seek(qint64 pos)
     {
         QIODevice::seek(pos);
-        int res = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
+        off64_t res = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
         if(res == -1)
             return false;
         else
@@ -85,14 +87,13 @@ public:
 
     qint64 size() const
     {
+        return erawsize;
     };
 
 private:
     libewf_handle_t* ewfhandle = NULL;
     libewf_error_t* ewferror = NULL;
-    //static char* erawpath = NULL;
-    //static off_t erawsize = 0;
-    //static const char* erawext = ".raw";
+    off64_t erawsize = 0;
     char** globfiles = NULL;
     int globfilecnt = 0;
 };
