@@ -1701,6 +1701,7 @@ void WombatForensics::PopulateHexContents()
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
     evidfile.close();
+    // need to get the imgpath from the correct img from the vector of qiodevices
     casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     ui->hexview->BypassColor(false);
     ui->hexview->setData(casedatafile);
