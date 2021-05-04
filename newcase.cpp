@@ -59,12 +59,14 @@ void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offse
 }
 
 //void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
-void ParseVolume(QIODevice* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
+void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
 {
-    QString estring = ((EwfImage*)tmpimg)->ImgPath();
+    //QIODevice* rawforimg = tmpimg;
+    QString estring = tmpimg->ImgPath();
     //qDebug() << "estring:" << estring;
     if(estring.toLower().endsWith(".e01"))
     {
+        //EwfImage* rawforimg2 = (EwfImage*)tmpimg;
         //char* tdata = new char[512];
         //char* zipbuf = new char[zipstat.size];
         //testimage->seek(0);
@@ -76,13 +78,19 @@ void ParseVolume(QIODevice* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QLi
         // THIS WORKS!!!!! SO I NEED TO SET A GLOBAL VECTOR WHICH CONTAINS THESE IMAGES TO LOOP OVER IT AS SUCH...
         // ALSO NEED TO MODIFY THE ENTIRE CODE TO ACCOUNT FOR THIS SOMEHOW....
     }
-    QFile rawforimg(estring);
+    else
+    {
+    /*QFile rawforimg(estring);
     if(!rawforimg.isOpen())
 	rawforimg.open(QIODevice::ReadOnly);
+    */
+    }
     //QByteArray sector0 = rawforimg.peek(512);
-    rawforimg.seek(0);
-    QByteArray sector0 = rawforimg.read(512);
-    rawforimg.close();
+    tmpimg->seek(0);
+    //rawforimg->seek(0);
+    QByteArray sector0 = tmpimg->read(512);
+    //QByteArray sector0 = rawforimg->read(512);
+    //rawforimg->close();
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector0.mid(510, 2));
     uint16_t applesig = qFromLittleEndian<uint16_t>(sector0.left(2)); // should be in 2nd sector, powerpc mac's not intel mac's
     uint32_t bsdsig = qFromLittleEndian<uint32_t>(sector0.left(4)); // can be at start of partition entry of a dos mbr
@@ -97,11 +105,15 @@ void ParseVolume(QIODevice* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QLi
         //qDebug() << "imgsize:" << imgsize;
 	if((uint8_t)sector0.at(450) == 0xee) // GPT DISK
         {
+            /*
             if(!rawforimg.isOpen())
                 rawforimg.open(QIODevice::ReadOnly);
-            rawforimg.seek(512);
-            QByteArray sector1 = rawforimg.read(512);
-            rawforimg.close();
+            */
+            //rawforimg->seek(512);
+            tmpimg->seek(512);
+            QByteArray sector1 = tmpimg->read(512);
+            //QByteArray sector1 = rawforimg->read(512);
+            //rawforimg.close();
 	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
 	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
 	    {
@@ -109,11 +121,15 @@ void ParseVolume(QIODevice* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QLi
 		uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector1.mid(72, 8));
 		uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector1.mid(80, 4));
 		uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector1.mid(84, 4));
+                /*
 		if(!rawforimg.isOpen())
 		    rawforimg.open(QIODevice::ReadOnly);
-		rawforimg.seek((parttablestart*512));
-		QByteArray partentries = rawforimg.read((partentrycount*partentrysize));
-		rawforimg.close();
+                */
+		tmpimg->seek((parttablestart*512));
+		//rawforimg->seek((parttablestart*512));
+		//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
+		QByteArray partentries = tmpimg->read((partentrycount*partentrysize));
+		//rawforimg.close();
 		for(int i=0; i < partentrycount; i++)
 		{
 		    int cnt = i*partentrysize;
@@ -194,11 +210,15 @@ void ParseVolume(QIODevice* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QLi
 	uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector0.mid(72, 8));
 	uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector0.mid(80, 4));
 	uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector0.mid(84, 4));
+        /*
 	if(!rawforimg.isOpen())
 	    rawforimg.open(QIODevice::ReadOnly);
-	rawforimg.seek((parttablestart*512));
-	QByteArray partentries = rawforimg.read((partentrycount*partentrysize));
-	rawforimg.close();
+        */
+	//rawforimg->seek((parttablestart*512));
+	//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
+	tmpimg->seek((parttablestart*512));
+	QByteArray partentries = tmpimg->read((partentrycount*partentrysize));
+	//rawforimg.close();
 	for(int i=0; i < partentrycount; i++)
 	{
 	    int cnt = i*partentrysize;
@@ -4161,9 +4181,9 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
 }
 
 //void ProcessVolume(QString evidstring)
-void ProcessVolume(QIODevice* tmpimg)
+void ProcessVolume(ForensicImage* tmpimg)
 {
-    QString evidstring = ((EwfImage*)tmpimg)->ImgPath();
+    QString evidstring = tmpimg->ImgPath();
     QList<qint64> pofflist;
     pofflist.clear();
     QList<qint64> psizelist;

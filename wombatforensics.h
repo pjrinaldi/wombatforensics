@@ -44,6 +44,7 @@
 #include "registryviewer.h"
 #include "newforimg.h"
 #include "verevidencedialog.h"
+//#include "forimg.h"
 
 class StatusLabel : public QLabel
 {
@@ -334,7 +335,7 @@ private:
     QString currentreportpath = "";
     QHash<QString, int>carvecounthash;
     //std::vector<struct fuse_session*> fuserlist;
-    std::vector<QIODevice*> evidimglist;
+    std::vector<ForensicImage*> evidimglist;
     //std::vector<struct fuse*> fuserlist;
     //pthread_t fusethread;
 };

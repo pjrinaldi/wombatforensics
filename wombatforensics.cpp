@@ -5,6 +5,7 @@
 //#include "sqfuse.h"
 //#include "zmgfuse.h"
 #include "ewfimage.h"
+//#include "forimg.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -1442,8 +1443,10 @@ void WombatForensics::AddEvidence()
         }
         else if(newevidence.at(i).toLower().endsWith(".e01"))
         {
-            EwfImage* tmpimage = new EwfImage(newevidence.at(i));
+            ForensicImage* tmpimage = new ForensicImage(newevidence.at(i));
             evidimglist.push_back(tmpimage);
+            //EwfImage* tmpimage = new EwfImage(newevidence.at(i));
+            //evidimglist.push_back(tmpimage);
             //testimage->size();
             //ui->hexview->setData(*testimage);
             //QProcess::execute("ewfmount", args);
@@ -1701,7 +1704,7 @@ void WombatForensics::PopulateHexContents()
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
     evidfile.close();
-    // need to get the imgpath from the correct img from the vector of qiodevices
+    // EwfImage need to get the imgpath from the correct img from the vector of qiodevices
     casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     ui->hexview->BypassColor(false);
     ui->hexview->setData(casedatafile);
