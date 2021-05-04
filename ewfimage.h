@@ -78,8 +78,8 @@ public:
     bool seek(qint64 pos)
     {
         QIODevice::seek(pos);
-        off64_t res = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
-        if(res == -1)
+        ewfoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
+        if(ewfoffset == -1)
             return false;
         else
             return true;
@@ -94,6 +94,7 @@ private:
     libewf_handle_t* ewfhandle = NULL;
     libewf_error_t* ewferror = NULL;
     off64_t erawsize = 0;
+    qint64 ewfoffset = 0;
     char** globfiles = NULL;
     int globfilecnt = 0;
 };
