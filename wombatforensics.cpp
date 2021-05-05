@@ -1408,6 +1408,7 @@ void WombatForensics::UpdateStatus()
 
 void WombatForensics::AddEvidence()
 {
+    newevid.clear();
     newevidence.clear();
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
@@ -1443,8 +1444,8 @@ void WombatForensics::AddEvidence()
         }
         else if(newevidence.at(i).toLower().endsWith(".e01"))
         {
-            ForensicImage* tmpimage = new ForensicImage(newevidence.at(i));
-            evidimglist.push_back(tmpimage);
+            //ForensicImage* tmpimage = new ForensicImage(newevidence.at(i));
+            //evidimglist.push_back(tmpimage);
             //EwfImage* tmpimage = new EwfImage(newevidence.at(i));
             //evidimglist.push_back(tmpimage);
             //testimage->size();
@@ -1469,7 +1470,7 @@ void WombatForensics::AddEvidence()
         }
         */
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
-        QFuture<void> tmpfuture = QtConcurrent::map(evidimglist, ProcessVolume);
+        QFuture<void> tmpfuture = QtConcurrent::map(newevid, ProcessVolume);
         volwatcher.setFuture(tmpfuture);
         //UpdateStatus();
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
@@ -1705,9 +1706,13 @@ void WombatForensics::PopulateHexContents()
         tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
     evidfile.close();
     // EwfImage need to get the imgpath from the correct img from the vector of qiodevices
-    casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+    //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     ui->hexview->BypassColor(false);
     ui->hexview->setData(casedatafile);
+    //ui->hexview->setData(casedatafile);
+    (newevid.at(0))->open(QIODevice::ReadOnly);
+    ui->hexview->setData((*newevid.at(0)));
+    (newevid.at(0))->close();
     if(nodeid.split("-").count() == 1) // image file
     {
         ui->hexview->setCursorPosition(0);
@@ -2500,10 +2505,12 @@ void WombatForensics::CloseCurrentCase()
     */
     // UNMOUNT EVIDENCEIMAGEDATAFILE
     // NEED TO CHANGE THIS LOOP FROM EXISTINGEVIDENCE.COUNT() TO FUSELIST.COUNT()
+    /*
     for(int i=0; i < evidimglist.size(); i++)
     {
         delete evidimglist.at(i);
     }
+    */
     /*
     for(int i=0; i < existingevidence.count(); i++)
     {
@@ -2584,6 +2591,8 @@ void WombatForensics::CloseCurrentCase()
     partitionlist.clear();
     existingevidence.clear();
     newevidence.clear();
+    newevid.clear();
+    existingevid.clear();
     // BEGIN TAR METHOD
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
     QString oldtmptar = tmptar + ".old";

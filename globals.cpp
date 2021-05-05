@@ -66,3 +66,5 @@ QMutex mutex;
 //EwfImage* testimage;
 FilterValues filtervalues;
 QList<EvidenceReportData> evidrepdatalist;
+QList<ForensicImage*> newevid;
+QList<ForensicImage*> existingevid;
