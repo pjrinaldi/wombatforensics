@@ -1708,11 +1708,9 @@ void WombatForensics::PopulateHexContents()
     // EwfImage need to get the imgpath from the correct img from the vector of qiodevices
     //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     ui->hexview->BypassColor(false);
-    ui->hexview->setData(casedatafile);
     //ui->hexview->setData(casedatafile);
     (newevid.at(0))->open(QIODevice::ReadOnly);
     ui->hexview->setData((*newevid.at(0)));
-    (newevid.at(0))->close();
     if(nodeid.split("-").count() == 1) // image file
     {
         ui->hexview->setCursorPosition(0);
@@ -1812,6 +1810,7 @@ void WombatForensics::PopulateHexContents()
         qDebug() << "get zip's parent layout here...";
     }
     ui->hexview->ensureVisible();
+    //(newevid.at(0))->close();
     /*
     QString datastring = wombatvariable.imgdatapath;
     if(evidname.toLower().endsWith(".aff"))
