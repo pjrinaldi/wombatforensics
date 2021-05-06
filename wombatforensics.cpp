@@ -1371,7 +1371,14 @@ void WombatForensics::UpdateStatus()
     StatusUpdate("Building Initial Evidence Tree...");
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
-    UpdateEvidenceList();
+    //UpdateEvidenceList();
+    for(int i=0; i < newevid.count(); i++)
+    {
+	existingevid.append(newevid.at(i));
+	existingevidence.append(newevidence.at(i));
+    }
+    newevid.clear();
+    newevidence.clear();
     //PrepareEvidenceImage();
     //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
     for(int i=0; i < evidrepdatalist.count(); i++)
@@ -1421,13 +1428,16 @@ void WombatForensics::AddEvidence()
 	QString emntpath = "";
         QDir dir;
         dir.mkpath(evidencepath);
+	/*
 	if(newevidence.at(i).toLower().endsWith(".zmg") || newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001") || newevidence.at(i).toLower().endsWith(".e01"))
 	{
             emntpath = wombatvariable.imgdatapath + newevidence.at(i).split("/").last() + "/";
 	    dir.mkpath(emntpath);
 	}
+	*/
         // need to delete emntpath directories on close for cleanup purposes after unmount...
         ecount++;
+	/*
         QStringList args;
         args << newevidence.at(i) << emntpath;
         if(newevidence.at(i).toLower().endsWith(".zmg"))
@@ -1452,6 +1462,7 @@ void WombatForensics::AddEvidence()
             //ui->hexview->setData(*testimage);
             //QProcess::execute("ewfmount", args);
         }
+	*/
         /*
         else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
             fuserlist.push_back(AffFuser(emntpath, newevidence.at(i)));
@@ -1705,12 +1716,19 @@ void WombatForensics::PopulateHexContents()
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
     evidfile.close();
+    //qDebug() << "tmpstr:" << tmpstr;
+    for(int i=0; i < existingevid.count(); i++)
+    {
+	if(tmpstr.split(",", Qt::SkipEmptyParts).at(1) == existingevid.at(i)->ImgPath())
+	    ui->hexview->setData(*existingevid.at(i));
+	//qDebug() << QString("newevid " + QString::number(i) + ":") << newevid.at(i)->ImgPath();
+    }
     // EwfImage need to get the imgpath from the correct img from the vector of qiodevices
     //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     ui->hexview->BypassColor(false);
     //ui->hexview->setData(casedatafile);
     //(newevid.at(0))->open(QIODevice::ReadOnly);
-    ui->hexview->setData((*newevid.at(0)));
+    //ui->hexview->setData((*newevid.at(0)));
     if(nodeid.split("-").count() == 1) // image file
     {
         ui->hexview->setCursorPosition(0);

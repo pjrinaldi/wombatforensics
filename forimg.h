@@ -28,31 +28,31 @@ public:
         imgpath = imgfile;
         qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
 
-        QString efilepath = imgfile.split(imgfile.split("/").last()).first();
-        QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
-        QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
-        char* filenames[efiles.count()] = {NULL};
-        for(int i=0; i < efiles.count(); i++)
-        {
-            filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
-            printf("filenames[%d] = %s\n", i, filenames[i]);
-        }
-        globfilecnt = efiles.count();
-        printf("globfilecnt: %d\n", globfilecnt);
-        int retopen = 0;
-
-        retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
-        else
-            printf("libewf glob was successful: %d\n", retopen);
-
-        retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
         //open(QIODevice::ReadOnly);
         if(imgtype == 0) // EWF
         {
+	    QString efilepath = imgfile.split(imgfile.split("/").last()).first();
+	    QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
+	    QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
+	    char* filenames[efiles.count()] = {NULL};
+	    for(int i=0; i < efiles.count(); i++)
+	    {
+		filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
+		printf("filenames[%d] = %s\n", i, filenames[i]);
+	    }
+	    globfilecnt = efiles.count();
+	    printf("globfilecnt: %d\n", globfilecnt);
+	    int retopen = 0;
+
+	    retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
+	    if(retopen == -1)
+		libewf_error_fprint(ewferror, stdout);
+	    else
+		printf("libewf glob was successful: %d\n", retopen);
+
+	    retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
+	    if(retopen == -1)
+		libewf_error_fprint(ewferror, stdout);
             retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
             if(retopen == -1)
                 libewf_error_fprint(ewferror, stdout);
@@ -108,6 +108,8 @@ public:
 
     qint64 writeData(const char *data, qint64 maxSize)
     {
+
+	return maxSize;
     };
 
     bool seek(qint64 pos)
