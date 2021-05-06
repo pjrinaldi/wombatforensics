@@ -51,31 +51,39 @@ public:
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
         //open(QIODevice::ReadOnly);
-        if(imgtype == 0)
+        if(imgtype == 0) // EWF
         {
             retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+            if(retopen == -1)
+                libewf_error_fprint(ewferror, stdout);
+            else
+                printf("libewf_handle_open was successful %d\n", retopen);
             libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
-            libewf_handle_close(ewfhandle, &ewferror);
+            //libewf_handle_close(ewfhandle, &ewferror);
         }
-        else if(imgtype == 1)
+        else if(imgtype == 1) // AFF
         {
             char* iname = new char[imgpath.toStdString().size() + 1];
             strcpy(iname, imgpath.toStdString().c_str());
             afimage = af_open(iname, O_RDONLY|O_EXCL,0);
             imgsize = af_get_imagesize(afimage);
-            af_close(afimage);
+            //af_close(afimage);
         }
         //close();
     };
 
     ~ForensicImage()
     {
-        if(imgtype == 0)
+        if(imgtype == 0) // EWF
         {
-            //libewf_handle_close(ewfhandle, &ewferror);
+            libewf_handle_close(ewfhandle, &ewferror);
             libewf_handle_free(&ewfhandle, &ewferror);
             libewf_glob_free(globfiles, globfilecnt, &ewferror);
         }
+	else if(imgtype == 1) // AFF
+	{
+	    af_close(afimage);
+	}
     };
 
     qint64 readData(char *data, qint64 maxSize)
@@ -124,7 +132,7 @@ public:
     {
         //if(imgtype == 0)
         //    libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
-        qDebug() << "erawsize:" << imgsize;
+        //qDebug() << "erawsize:" << imgsize;
         return imgsize;
     };
 
@@ -148,6 +156,7 @@ public:
     {
     };
     
+    /*
     bool open(QIODevice::OpenMode mode)
     {
         int retopen = 0;
@@ -172,6 +181,7 @@ public:
         if(imgtype == 0)
             libewf_handle_close(ewfhandle, &ewferror);
     };
+    */
 
 private:
     // EWF Variables

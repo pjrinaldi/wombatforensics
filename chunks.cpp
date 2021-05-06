@@ -23,7 +23,10 @@ Chunks::Chunks(QIODevice &ioDevice, QObject *parent): QObject(parent)
 
 bool Chunks::setIODevice(QIODevice &ioDevice)
 {
+    _ioDevice2 = (ForensicImage*)&ioDevice;
     _ioDevice = &ioDevice;
+    _size = _ioDevice->size();
+    /*
     bool ok = _ioDevice->open(QIODevice::ReadOnly);
     if (ok)   // Try to open IODevice
     {
@@ -36,9 +39,11 @@ bool Chunks::setIODevice(QIODevice &ioDevice)
         _ioDevice = buf;
         _size = 0;
     }
+    */
     _chunks.clear();
     _pos = 0;
-    return ok;
+    return true;
+    //return ok;
 }
 
 
@@ -65,7 +70,7 @@ QByteArray Chunks::data(qint64 pos, qint64 maxSize, QByteArray *highlighted)
         if ((pos + maxSize) > _size)
             maxSize = _size - pos;
 
-    _ioDevice->open(QIODevice::ReadOnly);
+    //_ioDevice->open(QIODevice::ReadOnly);
 
     while (maxSize > 0)
     {
@@ -117,8 +122,8 @@ QByteArray Chunks::data(qint64 pos, qint64 maxSize, QByteArray *highlighted)
                 byteCount = chunk.absPos - pos;
 
             maxSize -= byteCount;
-            _ioDevice->seek(pos + ioDelta);
-            readBuffer = _ioDevice->read(byteCount);
+            _ioDevice2->seek(pos + ioDelta);
+            readBuffer = _ioDevice2->read(byteCount);
             buffer += readBuffer;
             if (highlighted)
                 *highlighted += QByteArray(readBuffer.size(), NORMAL);
@@ -301,10 +306,10 @@ int Chunks::getChunkIndex(qint64 absPos)
         Chunk newChunk;
         qint64 readAbsPos = absPos - ioDelta;
         qint64 readPos = (readAbsPos & READ_CHUNK_MASK);
-        _ioDevice->open(QIODevice::ReadOnly);
-        _ioDevice->seek(readPos);
-        newChunk.data = _ioDevice->read(CHUNK_SIZE);
-        _ioDevice->close();
+        //_ioDevice->open(QIODevice::ReadOnly);
+        _ioDevice2->seek(readPos);
+        newChunk.data = _ioDevice2->read(CHUNK_SIZE);
+        //_ioDevice->close();
         newChunk.absPos = absPos - (readAbsPos - readPos);
         newChunk.dataChanged = QByteArray(newChunk.data.size(), char(0));
         _chunks.insert(insertIdx, newChunk);

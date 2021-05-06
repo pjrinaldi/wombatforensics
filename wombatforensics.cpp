@@ -1709,7 +1709,7 @@ void WombatForensics::PopulateHexContents()
     //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     ui->hexview->BypassColor(false);
     //ui->hexview->setData(casedatafile);
-    (newevid.at(0))->open(QIODevice::ReadOnly);
+    //(newevid.at(0))->open(QIODevice::ReadOnly);
     ui->hexview->setData((*newevid.at(0)));
     if(nodeid.split("-").count() == 1) // image file
     {

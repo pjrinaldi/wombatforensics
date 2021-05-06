@@ -19,13 +19,13 @@ void ParseExtendedPartition(ForensicImage* curimg, uint32_t primextoff, uint32_t
     QByteArray sector = rawforimg.peek(512);
     rawforimg.close();
     */
-    curimg->open(QIODevice::ReadOnly);
+    //curimg->open(QIODevice::ReadOnly);
     if(primextoff == offset)
         curimg->seek(offset * 512);
     else
         curimg->seek((primextoff + offset)*512);
     QByteArray sector = curimg->read(512);
-    curimg->close();
+    //curimg->close();
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector.mid(510,2));
     if(mbrsig == 0xaa55)
     {
@@ -98,11 +98,11 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
     */
     }
     //QByteArray sector0 = rawforimg.peek(512);
-    tmpimg->open(QIODevice::ReadOnly);
+    //tmpimg->open(QIODevice::ReadOnly);
     tmpimg->seek(0);
     //rawforimg->seek(0);
     QByteArray sector0 = tmpimg->read(512);
-    tmpimg->close();
+    //tmpimg->close();
     //QByteArray sector0 = rawforimg->read(512);
     //rawforimg->close();
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector0.mid(510, 2));
@@ -124,10 +124,10 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
                 rawforimg.open(QIODevice::ReadOnly);
             */
             //rawforimg->seek(512);
-            tmpimg->open(QIODevice::ReadOnly);
+            //tmpimg->open(QIODevice::ReadOnly);
             tmpimg->seek(512);
             QByteArray sector1 = tmpimg->read(512);
-            tmpimg->close();
+            //tmpimg->close();
             //QByteArray sector1 = rawforimg->read(512);
             //rawforimg.close();
 	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
@@ -141,12 +141,12 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
 		if(!rawforimg.isOpen())
 		    rawforimg.open(QIODevice::ReadOnly);
                 */
-                tmpimg->open(QIODevice::ReadOnly);
+                //tmpimg->open(QIODevice::ReadOnly);
 		tmpimg->seek((parttablestart*512));
 		//rawforimg->seek((parttablestart*512));
 		//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
 		QByteArray partentries = tmpimg->read((partentrycount*partentrysize));
-                tmpimg->close();
+                //tmpimg->close();
 		//rawforimg.close();
 		for(int i=0; i < partentrycount; i++)
 		{
@@ -237,10 +237,10 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
         */
 	//rawforimg->seek((parttablestart*512));
 	//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
-        tmpimg->open(QIODevice::ReadOnly);
+        //tmpimg->open(QIODevice::ReadOnly);
 	tmpimg->seek((parttablestart*512));
 	QByteArray partentries = tmpimg->read((partentrycount*partentrysize));
-        tmpimg->close();
+        //tmpimg->close();
 	//rawforimg.close();
 	for(int i=0; i < partentrycount; i++)
 	{
@@ -280,10 +280,10 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
         efile.close();
     }
     */
-    curimg->open(QIODevice::ReadOnly);
+    //curimg->open(QIODevice::ReadOnly);
     curimg->seek(partoffset*512);
     partbuf = curimg->read(69120);
-    curimg->close();
+    //curimg->close();
     // check for various FS's
     uint16_t winsig = qFromLittleEndian<uint16_t>(partbuf.mid(510, 2));
     uint16_t extsig = qFromLittleEndian<uint16_t>(partbuf.mid(1080, 2));
@@ -374,12 +374,12 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                 efile.close();
             }
             */
-            curimg->open(QIODevice::ReadOnly);
+            //curimg->open(QIODevice::ReadOnly);
             curimg->seek(fsinfo.value("mftoffset").toULongLong());
             mftentry0 = curimg->read(mftentrybytes);
             curimg->seek(fsinfo.value("mftoffset").toULongLong() + 3*mftentrybytes);
             mftentry3 = curimg->read(mftentrybytes);
-            curimg->close();
+            //curimg->close();
             //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
             if(QString::fromStdString(mftentry0.left(4).toStdString()) == "FILE") // a proper mft entry
             {
@@ -586,10 +586,10 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
-                curimg->open(QIODevice::ReadOnly);
+                //curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo.value("fatoffset").toUInt());
                 rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
-                curimg->close();
+                //curimg->close();
 		//qDebug() << "root fat content:" << rootfatbuf.mid(0, 40).toHex();
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
@@ -641,10 +641,10 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
-                curimg->open(QIODevice::ReadOnly);
+                //curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo.value("fatoffset").toUInt());
                 rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
-                curimg->close();
+                //curimg->close();
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
                 if(fsinfo.value("rootdircluster").toUInt() >= 2)
@@ -670,7 +670,7 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
-                curimg->open(QIODevice::ReadOnly);
+                //curimg->open(QIODevice::ReadOnly);
                 QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
                 for(int j=0; j < rootdirlayoutlist.count(); j++)
                 {
@@ -1055,14 +1055,14 @@ void ParseMFT(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHa
         efile.close();
     }
     */
-    curimg->open(QIODevice::ReadOnly);
+    //curimg->open(QIODevice::ReadOnly);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
     {
         curimg->seek(mftlist.at(i).split(",").at(0).toULongLong());
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
-    curimg->close();
+    //curimg->close();
 
     //qDebug() << "mft layout:" << fsinfo->value("mftlayout").toString();
     //qDebug() << "final mftarray count:" << mftarray.count();
@@ -1570,14 +1570,14 @@ void GetMftEntryContent(ForensicImage* curimg, qulonglong ntinode, QHash<QString
         efile.close();
     }
     */
-    curimg->open(QIODevice::ReadOnly);
+    //curimg->open(QIODevice::ReadOnly);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
     {
         curimg->seek(mftlist.at(i).split(",").at(0).toULongLong());
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
-    curimg->close();
+    //curimg->close();
 
     // GET THE MFT ENTRY BYTE OFFSET RELATIVE TO THE FILE SYSTEM SO I CAN HIGHLIGHT IN HEX
     qulonglong curmftentryoffset = 0;
@@ -2011,14 +2011,14 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
     QHash<QString, QVariant> fileinfo;
     QByteArray mftarray;
     mftarray.clear();
-    curimg->open(QIODevice::ReadOnly);
+    //curimg->open(QIODevice::ReadOnly);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
     {
         curimg->seek(mftlist.at(i).split(",").at(0).toULongLong());
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
-    curimg->close();
+    //curimg->close();
     /*
     QFile efile(estring);
     if(!efile.isOpen())
@@ -2119,13 +2119,13 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
                 efile.close();
             }
             */
-            curimg->open(QIODevice::ReadOnly);
+            //curimg->open(QIODevice::ReadOnly);
             for(j=0; j < runlist.count(); j++)
             {
                 curimg->seek((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(j).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt()));
                 indxalloc.append(curimg->read(runlist.at(j).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()));
             }
-            curimg->close();
+            //curimg->close();
         }
         else if(attrtype == 0xffffffff)
             break;
