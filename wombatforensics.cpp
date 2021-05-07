@@ -2475,6 +2475,7 @@ void WombatForensics::CloseCurrentCase()
     }
     if(ui->hexview->data().size() > 0)
     {
+        // maybe i want to run this but also load a small empty image maybe...
         ui->hexview->Reset();
     /*
         casedatafile.setFileName(QDir::tempPath() + "/zfile");
