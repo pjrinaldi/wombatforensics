@@ -21,7 +21,7 @@ public:
             imgtype = 0; // EWF
         else if(imgfile.split("/").last().toLower().endsWith(".aff"))
             imgtype = 1; // AFF
-        else if(imgfile.split("/").last().toLower().endsWith(".001"))
+        else if(imgfile.split("/").last().toLower().endsWith(".001") || imgfile.split("/").last().toLower().endsWith(".000") || imgfile.split("/").last().toLower().endsWith(".dd") || imgfile.split("/").last().toLower().endsWith(".raw") || imgfile.split("/").last().toLower().endsWith("aaa"))
             imgtype = 2; // split raw or raw
         else if(imgfile.split("/").last().toLower().endsWith(".zmg"))
             imgtype = 3; // ZMG
@@ -65,7 +65,7 @@ public:
         {
             char* iname = new char[imgpath.toStdString().size() + 1];
             strcpy(iname, imgpath.toStdString().c_str());
-            afimage = af_open(iname, O_RDONLY|O_EXCL,0);
+            afimage = af_open(iname, O_RDONLY|O_EXCL, 0);
             imgsize = af_get_imagesize(afimage);
             //af_close(afimage);
         }
@@ -121,6 +121,7 @@ public:
         }
         else if(imgtype == 1)
         {
+            QIODevice::seek(pos);
             imgoffset = pos;
 	    af_seek(afimage, pos, SEEK_SET);
         }
@@ -147,8 +148,10 @@ public:
     {
         char* tdata = new char[maxSize];
         qint64 retval = readData(tdata, maxSize);
-        if(retval > 0)
-            return QByteArray::fromRawData((const char*)tdata, maxSize);
+        //if(retval > 0)
+        
+        return QByteArray::fromRawData((const char*)tdata, maxSize);
+
         //qint64 retval = testimage->readData(tdata, 512);
         //qDebug() << "retval:" << retval;
         //qDebug() << "1st sector:" << QByteArray::fromRawData((const char*)tdata, 512).toHex();
@@ -156,6 +159,8 @@ public:
 
     qint64 write(const char *data)
     {
+        qint64 dsize = 0;
+        return dsize;
     };
     
     /*

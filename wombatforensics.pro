@@ -19,8 +19,15 @@ RESOURCES += wombatforensics.qrc
 release: DESTDIR = release
 debug:   DESTDIR = debug
 linux:LIBS = -lewf -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -lz `pkg-config fuse3 --cflags --libs`
-linux:LIBS += /home/pasquale/Projects/wombatforensics/libzmg.a
-#linux:LIBS += /usr/local/lib/libewf.so
+#linux:LIBS = -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -lzip -lpoppler-qt5 -lcrypto -ludev -llzo2 -lz
+linux:LIBS += /home/pasquale/Projects/wombatforensics/staticlinked/libzmg.a
+#linux:LIBS += /home/pasquale/Projects/wombatforensics/staticlinked/libewf.a
+#linux:LIBS += /home/pasquale/Projects/wombatforensics/staticlinked/libafflib.a
+#linux:LIBS += /home/pasquale/Projects/wombatforensics/staticlinked/liblnk.a
+#linux:LIBS += /home/pasquale/Projects/wombatforensics/staticlinked/libfwnt.a
+#linux:LIBS += /home/pasquale/Projects/wombatforensics/staticlinked/libregf.a
+#linux:LIBS += /home/pasquale/Projects/wombatforensics/staticlinked/libsmraw.a
+#linux:LIBS += /home/pasquale/Projects/wombatforensics/staticlinked/libsquash.a
 if(!debug_and_release|build_pass):CONFIG(debug, debug|release) {
 }
 #linux:

@@ -1036,6 +1036,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     UpdateEvidenceList();
     if(existingevidence.count() > 0)
     {
+        /*
         for(int i=0; i < existingevidence.count(); i++)
         {
             QString emntpath = wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
@@ -1066,6 +1067,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
                 //fuserlist.push_back(EwfFuser(emntpath, existingevidence.at(i)));
             }
         }
+        */
         QFuture<void> tmpfuture = QtConcurrent::run(LoadTreeModel);
         openwatcher.setFuture(tmpfuture);
         /*
@@ -2473,6 +2475,8 @@ void WombatForensics::CloseCurrentCase()
     }
     if(ui->hexview->data().size() > 0)
     {
+        ui->hexview->Reset();
+    /*
         casedatafile.setFileName(QDir::tempPath() + "/zfile");
         casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
         casedatafile.write("dummy zerofile");
@@ -2481,6 +2485,7 @@ void WombatForensics::CloseCurrentCase()
 	//qInfo() << "start of error?";
         ui->hexview->setData(casedatafile);
 	//qInfo() << "end of error?";
+    */
     }
     qInfo() << "Hexviewer Reset";
     setWindowTitle("WombatForensics");

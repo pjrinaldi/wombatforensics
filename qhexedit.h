@@ -375,6 +375,10 @@ public:
     {
         return getSelectionBegin();
     };
+    // Added by Pasquale J. Rinaldi, Jr.
+    // May 6, 2021
+    // Resets the hexviewer upon closing
+    void Reset(void);
 
 protected:
     // Handle events

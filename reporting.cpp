@@ -35,6 +35,19 @@ void UpdateEvidenceList()
     //QStringList tmplist;
     for(int i=0; i < evidfiles.count(); i++)
     {
+        qDebug() << "evid:" << evidfiles.at(i);
+        QString tmpstr = "";
+        QFile efile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(efile.isOpen())
+        {
+            tmpstr = efile.readLine();
+        }
+        efile.close();
+        qDebug() << "tmpstr:" << tmpstr.split(",").at(0);
+        ForensicImage* tmpimage = new ForensicImage(tmpstr.split(",").at(0));
+        existingevid.append(tmpimage);
         //ForensicImage* tmpimage = new ForensicImage(evidfiles.at(i).split("-e" + QString::number(i)).first());
         //existingevid.append(tmpimage);
         existingevidence.append(evidfiles.at(i).split("-e" + QString::number(i)).first());

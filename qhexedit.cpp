@@ -1348,3 +1348,8 @@ void QHexEdit::SetColorInformation(qint64 fsoff, qint64 blksize, QString blockst
         //qDebug() << "blockstring F/L:" << blockstring.split("^^", QString::SkipEmptyParts).first() << blockstring.split("^^", QString::SkipEmptyParts).last();
     //qDebug() << "fsoffset:" << fsoffset << "blocksize:" << blocksize << "residentoffset:" << residentoffset << "byteoffset:" << byteoffset << "filelength:" << filelength << "dataoffset:" << dataoffset;
 }
+
+void QHexEdit::Reset()
+{
+    init();
+}
