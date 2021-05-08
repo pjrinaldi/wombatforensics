@@ -3389,7 +3389,8 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
     }
 }
 
-void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
+//void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
+void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
 {
     QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
     QString clusterstr = "";
@@ -3400,6 +3401,7 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
     QByteArray rootdirbuf;
     rootdirbuf.clear();
     int rootdirentrycount = 0;
+    /*
     QFile efile(estring);
     if(!efile.isOpen())
 	efile.open(QIODevice::ReadOnly);
@@ -3415,6 +3417,15 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
 	efile.close();
     }
+    */
+    QStringList rootdirlayoutlist = fsinfo->value("rootdirlayout").toString().split(";", Qt::SkipEmptyParts);
+    for(int i=0; i < rootdirlayoutlist.count(); i++)
+    {
+        curimg->seek(rootdirlayoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+        rootdirbuf.append(curimg->read(rootdirlayoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+    }
+    curimg->seek(fsinfo->value("fatoffset").toUInt());
+    fatbuf = curimg->read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
     rootdirentrycount = rootdirbuf.count() / 32;
     uint inodecnt = 0;
     for(int i=0; i < rootdirentrycount; i++)
@@ -3590,7 +3601,8 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
 	    if(fileinfo.value("fileattr").toUInt() & 0x10) // Sub Directory
 	    {
 		//qDebug() << "Sub directory, parse here...";
-                ParseExfatSubDir(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf);
+                ParseExfatSubDir(curimg, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf);
+                //ParseExfatSubDir(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf);
 	    }
         }
     }
@@ -3611,17 +3623,20 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
     }
     //qDebug() << "olayout:" << olayout;
     QStringList olist = olayout.split(";", Qt::SkipEmptyParts);
-    if(!efile.isOpen())
-        efile.open(QIODevice::ReadOnly);
-    if(efile.isOpen())
-    {
+    //if(!efile.isOpen())
+    //    efile.open(QIODevice::ReadOnly);
+    //if(efile.isOpen())
+    //{
         int coffset = 0;
-        while(!efile.atEnd())
+        //while(!efile.atEnd())
+        while(coffset <= curimg->size())
         {
             QHash<QString, QVariant> orphaninfo;
             orphaninfo.clear();
-            efile.seek(coffset);
-            QByteArray tmparray = efile.read(32);
+            //efile.seek(coffset);
+            curimg->seek(coffset);
+            QByteArray tmparray = curimg->read(32);
+            //QByteArray tmparray = efile.read(32);
             if(tmparray.at(0) == 0x05 && (tmparray.at(1) >= 0 && tmparray.at(1) < 256))
             {
                 uint itemtype = 4;
@@ -3654,8 +3669,10 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                 QString filename = "";
                 uint8_t namelength = 0;
                 uint8_t curlength = 0;
-                efile.seek(coffset + 32);
-                QByteArray tmp40array = efile.read(32);
+                curimg->seek(coffset + 32);
+                QByteArray tmp40array = curimg->read(32);
+                //efile.seek(coffset + 32);
+                //QByteArray tmp40array = efile.read(32);
                 if(tmp40array.at(0) == 0x40)
                 {
                     namelength = tmp40array.at(3);
@@ -3672,8 +3689,10 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
                     //qDebug() << "physical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(24, 8));
                     if(namelength > 0)
                     {
-                        efile.seek(coffset + 64);
-                        QByteArray tmp41array = efile.read((tmparray.at(1)-1) * 32);
+                        curimg->seek(coffset + 64);
+                        QByteArray tmp41array = curimg->read((tmparray.at(1)-1) * 32);
+                        //efile.seek(coffset + 64);
+                        //QByteArray tmp41array = efile.read((tmparray.at(1)-1) * 32);
                         for(int j=0; j < tmparray.at(1) - 1; j++)
                         {
                             if(tmp41array.at(j*32) == 0x41)
@@ -3739,11 +3758,12 @@ void ParseExFatDirEntry(QString estring, QHash<QString, QVariant>* fsinfo, QList
             }
             //qDebug() << "coffset after olist fix:" << coffset;
         }
-        efile.close();
-    }
+        //efile.close();
+    //}
 }
 
-void ParseExfatSubDir(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parfileinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf)
+//void ParseExfatSubDir(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parfileinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf)
+void ParseExfatSubDir(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parfileinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf)
 {
     QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
     QString clusterstr = "";
@@ -3753,6 +3773,7 @@ void ParseExfatSubDir(QString estring, QHash<QString, QVariant>* fsinfo, QHash<Q
     QByteArray dirbuf;
     dirbuf.clear();
     QStringList layoutlist = parfileinfo->value("layout").toString().split(";", Qt::SkipEmptyParts);
+    /*
     QFile efile(estring);
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly);
@@ -3764,6 +3785,12 @@ void ParseExfatSubDir(QString estring, QHash<QString, QVariant>* fsinfo, QHash<Q
             dirbuf.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
         }
         efile.close();
+    }
+    */
+    for(int i=0; i < layoutlist.count(); i++)
+    {
+        curimg->seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+        dirbuf.append(curimg->read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
     }
     //qDebug() << "dir fat content:" << dirbuf.mid(0, 40).toHex();
     int direntrycount = dirbuf.count() / 32;
@@ -3881,7 +3908,8 @@ void ParseExfatSubDir(QString estring, QHash<QString, QVariant>* fsinfo, QHash<Q
             if(fileinfo.value("fileattr").toUInt() & 0x10 && fileinfo.value("physicalsize").toUInt() > 0) // Sub Directory
             {
                 //qDebug() << "Sub directory, parse here...";
-                ParseExfatSubDir(estring, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf);
+                ParseExfatSubDir(curimg, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf);
+                //ParseExfatSubDir(estring, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf);
                 curinode = *inodecnt;
             }
         }
@@ -3889,7 +3917,8 @@ void ParseExfatSubDir(QString estring, QHash<QString, QVariant>* fsinfo, QHash<Q
 }
 
 //void ParseDirectory(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QString>* orphanlist)
-void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
+//void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
+void ParseFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant> *fsinfo, QList<QHash<QString, QVariant>> *fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
 {
     QHash<QString, QVariant> fileinfo;
     QHash<QString, QVariant> orphaninfo;
@@ -3899,6 +3928,13 @@ void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<Q
     QByteArray rootdirbuf;
     rootdirbuf.clear();
     int rootdirentrycount = 0;
+    QStringList rootdirlayoutlist = fsinfo->value("rootdirlayout").toString().split(";", Qt::SkipEmptyParts);
+    for(int j=0; j < rootdirlayoutlist.count(); j++)
+    {
+        curimg->seek(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+        rootdirbuf.append(curimg->read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+    }
+    /*
     QFile efile(estring);
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly);
@@ -3915,6 +3951,7 @@ void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<Q
         fatbuf = efile.read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
 	efile.close();
     }
+    */
     //qDebug() << "dir fat content:" << fatbuf.mid(0, 40).toHex();
     //qDebug() << "rootdirbuf.count():" << rootdirbuf.count();
     rootdirentrycount = rootdirbuf.count() / 32;
@@ -4018,6 +4055,7 @@ void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<Q
 		int lastdirentry = 0;
 		QByteArray dirsizebuf;
 		dirsizebuf.clear();
+                /*
 		if(!efile.isOpen())
 		    efile.open(QIODevice::ReadOnly);
 		if(efile.isOpen())
@@ -4029,6 +4067,12 @@ void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<Q
 		    }
 		    efile.close();
 		}
+                */
+                for(int j=0; j < layoutlist.count(); j++)
+                {
+                    curimg->seek(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+                    dirsizebuf.append(curimg->read(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+                }
 		direntrycnt = dirsizebuf.count() / 32;
 		for(int j=0; j < direntrycnt; j++)
 		{
@@ -4060,7 +4104,8 @@ void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<Q
             {
                 // POSSIBLY REMOVE THIS IF SO IT WILL PROCESS DELETED AS WELL IF THEY CONTAIN CHILDREN...
 		if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
-		    ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
+		    ParseSubDirectory(curimg, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
+		    //ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
             }
         }
         else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
@@ -4110,7 +4155,8 @@ void ParseFatDirEntry(QString estring, QHash<QString, QVariant> *fsinfo, QList<Q
     }
 }
 
-void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parentinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf, QList<QHash<QString, QVariant>>* orphanlist)
+//void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parentinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf, QList<QHash<QString, QVariant>>* orphanlist)
+void ParseSubDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QHash<QString, QVariant>* parentinfo, QList<QHash<QString, QVariant>>* fileinfolist, uint* inodecnt, QByteArray* fatbuf, QList<QHash<QString, QVariant>>* orphanlist)
 {
     uint curinode = *inodecnt;
     QHash<QString, QVariant> fileinfo;
@@ -4119,6 +4165,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
     QByteArray dirbuf;
     dirbuf.clear();
     QStringList layoutlist = parentinfo->value("layout").toString().split(";", Qt::SkipEmptyParts);
+    /*
     QFile efile(estring);
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly);
@@ -4138,6 +4185,20 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
 	    }
 	}
         efile.close();
+    }
+    */
+    for(int i=0; i < layoutlist.count(); i++)
+    {
+        if(i ==0)
+        {
+            curimg->seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong() + 64); // # + 64 skips the first 2 dir entries of . and ..
+            dirbuf.append(curimg->read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong() - 64)); // # - 64 accounts for skipping the first 2 dir entries of . and ..
+        }
+        else
+        {
+            curimg->seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+            dirbuf.append(curimg->read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(i).toULongLong()));
+        }
     }
     //qDebug() << "dir fat content:" << fatbuf->mid(0, 40).toHex();
     QString longnamestring = "";
@@ -4222,6 +4283,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
 		int lastdirentry = 0;
 		QByteArray dirsizebuf;
 		dirsizebuf.clear();
+                /*
 		if(!efile.isOpen())
 		    efile.open(QIODevice::ReadOnly);
 		if(efile.isOpen())
@@ -4233,6 +4295,12 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
 		    }
 		    efile.close();
 		}
+                */
+                for(int j=0; j < layoutlist.count(); j++)
+                {
+                    curimg->seek(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+                    dirsizebuf.append(curimg->read(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+                }
 		direntrycnt = dirsizebuf.count() / 32;
 		for(int j=0; j < direntrycnt; j++)
 		{
@@ -4262,7 +4330,7 @@ void ParseSubDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QHash<
             if(fileattr & 0x10 && fileinfo.value("physicalsize").toUInt() > 0) // sub directory
             {
 		if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
-		    ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf, orphanlist);
+		    ParseSubDirectory(curimg, fsinfo, &fileinfo, fileinfolist, inodecnt, fatbuf, orphanlist);
 		curinode = *inodecnt;
             }
         }
@@ -4513,12 +4581,13 @@ void ProcessVolume(ForensicImage* tmpimg)
             // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
 	    if(fsinfolist.at(i).value("type").toUInt() == 1 || fsinfolist.at(i).value("type").toUInt() == 2 || fsinfolist.at(i).value("type").toUInt() == 3) // FAT12 || FAT16 || FAT32
             {
-		//ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
-		ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             }
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
             {
-		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		ParseExFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             }
 	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
             {
@@ -4534,7 +4603,8 @@ void ProcessVolume(ForensicImage* tmpimg)
                 //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 
-            PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            //PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
             nodedata.clear();
             nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
@@ -4616,9 +4686,15 @@ void ProcessVolume(ForensicImage* tmpimg)
             // IF FAT12/16/32 THEN
             // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
 	    if(fsinfolist.at(i).value("type").toUInt() == 1 || fsinfolist.at(i).value("type").toUInt() == 2 || fsinfolist.at(i).value("type").toUInt() == 3) // FAT12 || FAT16 || FAT32
-		ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            {
+		ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            }
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
-		ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            {
+		ParseExFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            }
 	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
             {
 		ParseNtfsDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
@@ -4635,7 +4711,8 @@ void ProcessVolume(ForensicImage* tmpimg)
             // ELSE EXFAT THEN
             // ELSE ... THEN
 
-            PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            //PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
             nodedata.clear();
             nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
@@ -4700,7 +4777,8 @@ void ProcessVolume(ForensicImage* tmpimg)
     mutex.unlock();
 }
 
-void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int evidcnt, int ptreecnt)
+//void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int evidcnt, int ptreecnt)
+void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int evidcnt, int ptreecnt)
 {
     //QList<QHash<QString, QVariant>> overflow;
     QList<QVariant> nodedata;
@@ -4731,6 +4809,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
 	    {
 		QByteArray sigbuf;
 		sigbuf.clear();
+                /*
 		QFile efile(emntstring);
 		if(!efile.isOpen())
 		    efile.open(QIODevice::ReadOnly);
@@ -4743,6 +4822,12 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
 		    }
 		    efile.close();
 		}
+                */
+                if(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toULongLong())
+                {
+                    curimg->seek(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toULongLong());
+                    sigbuf = curimg->read(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(1).toULongLong());
+                }
 		QString mimestr = GenerateCategorySignature(sigbuf, fileinfolist->at(j).value("filename").toString());
 		nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
 	    }
@@ -4787,6 +4872,7 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
         {
             QByteArray sigbuf;
             sigbuf.clear();
+            /*
             QFile efile(emntstring);
             if(!efile.isOpen())
                 efile.open(QIODevice::ReadOnly);
@@ -4796,6 +4882,9 @@ void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVari
                 sigbuf = efile.read(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toULongLong());
                 efile.close();
             }
+            */
+            curimg->seek(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(0).toULongLong());
+            sigbuf = curimg->read(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toULongLong());
             mimestr = GenerateCategorySignature(sigbuf, orphanlist->at(j).value("filename").toString());
         }
 
