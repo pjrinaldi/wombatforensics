@@ -4,7 +4,7 @@
 //#include "ewffuse.h"
 //#include "sqfuse.h"
 //#include "zmgfuse.h"
-#include "ewfimage.h"
+//#include "ewfimage.h"
 //#include "forimg.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.

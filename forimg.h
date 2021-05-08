@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <QIODevice>
+#include <libsmraw.h>
 
 #ifndef FORIMG_H
 #define FORIMG_H
@@ -69,6 +70,16 @@ public:
             imgsize = af_get_imagesize(afimage);
             //af_close(afimage);
         }
+        else if(imgtype == 2) // SPLIT RAW
+        {
+            qDebug() << "imgfile:" << imgfile;
+            QString rfilepath = imgfile.split(imgfile.split("/").last()).first();
+            QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
+            //QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".
+        }
+        else if(imgtype == 3) // ZMG
+        {
+        }
         //close();
     };
 
@@ -84,6 +95,15 @@ public:
 	{
 	    af_close(afimage);
 	}
+        else if(imgtype == 2) // SMRAW
+        {
+            libsmraw_handle_close(rawhandle, &rawerror);
+            libsmraw_handle_free(&rawhandle, &rawerror);
+            libsmraw_glob_free(rawglobfiles, rawglobfilecnt, &rawerror);
+        }
+        else if(imgtype == 3) // ZMG
+        {
+        }
     };
 
     qint64 readData(char *data, qint64 maxSize)
@@ -198,8 +218,14 @@ private:
     int globfilecnt = 0;
     // AFF Variables
     AFFILE* afimage = NULL;
+    // SMRAW Variables
+    libsmraw_handle_t* rawhandle = NULL;
+    libsmraw_error_t* rawerror = NULL;
+    char** rawglobfiles = NULL;
+    int rawglobfilecnt = 0;
     //off64_t erawsize = 0;
     //qint64 ewfoffset = 0;
+    // ALL VARIABLES
     off64_t imgsize = 0;
     qint64 imgoffset = 0;
     QString imgpath = "";
