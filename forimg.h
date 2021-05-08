@@ -75,7 +75,7 @@ public:
             //qDebug() << "imgfile:" << imgfile;
             QString rfilepath = imgfile.split(imgfile.split("/").last()).first();
             QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
-            QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".000").first() + ".???") << QString(imgfile.split("/").last().toLower().split(".aaa").first() + ".???"), QDir::NoSymLinks | QDir::Files);
+            QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".000").first() + ".???") << QString(imgfile.split("/").last().toLower().split(".aaa").first() + ".???") << QString(imgfile.split("/").last()), QDir::NoSymLinks | QDir::Files);
             //qDebug() << "efiles:" << efiles;
             char* filenames[efiles.count()] = {NULL};
             for(int i=0; i < efiles.count(); i++)
