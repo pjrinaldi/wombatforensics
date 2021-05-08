@@ -72,11 +72,11 @@ public:
         }
         else if(imgtype == 2) // SPLIT RAW
         {
-            qDebug() << "imgfile:" << imgfile;
+            //qDebug() << "imgfile:" << imgfile;
             QString rfilepath = imgfile.split(imgfile.split("/").last()).first();
             QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
             QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".000").first() + ".???") << QString(imgfile.split("/").last().toLower().split(".aaa").first() + ".???"), QDir::NoSymLinks | QDir::Files);
-            qDebug() << "efiles:" << efiles;
+            //qDebug() << "efiles:" << efiles;
             char* filenames[efiles.count()] = {NULL};
             for(int i=0; i < efiles.count(); i++)
             {
@@ -84,7 +84,7 @@ public:
                 printf("filenames[%d] = %s\n", i, filenames[i]);
             }
             rawglobfilecnt = efiles.count();
-            printf("globfilecnt: $d\n", rawglobfilecnt);
+            printf("globfilecnt: %d\n", rawglobfilecnt);
             int retopen = 0;
             retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &rawglobfiles, &rawglobfilecnt, &rawerror);
             if(retopen == -1)
