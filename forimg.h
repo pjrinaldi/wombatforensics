@@ -75,7 +75,31 @@ public:
             qDebug() << "imgfile:" << imgfile;
             QString rfilepath = imgfile.split(imgfile.split("/").last()).first();
             QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
-            //QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".
+            QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".000").first() + ".???") << QString(imgfile.split("/").last().toLower().split(".aaa").first() + ".???"), QDir::NoSymLinks | QDir::Files);
+            qDebug() << "efiles:" << efiles;
+            char* filenames[efiles.count()] = {NULL};
+            for(int i=0; i < efiles.count(); i++)
+            {
+                filenames[i] = QString(rfilepath + efiles.at(i)).toLatin1().data();
+                printf("filenames[%d] = %s\n", i, filenames[i]);
+            }
+            rawglobfilecnt = efiles.count();
+            printf("globfilecnt: $d\n", rawglobfilecnt);
+            int retopen = 0;
+            retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &rawglobfiles, &rawglobfilecnt, &rawerror);
+            if(retopen == -1)
+                libsmraw_error_fprint(rawerror, stdout);
+            else
+                printf("libsmraw glob was successful: %d\n", retopen);
+            retopen = libsmraw_handle_initialize(&rawhandle, &rawerror);
+            if(retopen == -1)
+                libsmraw_error_fprint(rawerror, stdout);
+            retopen = libsmraw_handle_open(rawhandle, rawglobfiles, rawglobfilecnt, LIBSMRAW_OPEN_READ, &rawerror);
+            if(retopen == -1)
+                libsmraw_error_fprint(rawerror, stdout);
+            else
+                printf("libraw_handle_open was successful %d\n", retopen);
+            libsmraw_handle_get_media_size(rawhandle, (size64_t*)&imgsize, &rawerror);
         }
         else if(imgtype == 3) // ZMG
         {
@@ -109,10 +133,16 @@ public:
     qint64 readData(char *data, qint64 maxSize)
     {
         off64_t res = 0;
-        if(imgtype == 0)
+        if(imgtype == 0) // EWF
             res = libewf_handle_read_buffer(ewfhandle, data, maxSize, &ewferror);
-        else if(imgtype == 1)
+        else if(imgtype == 1) // AFF
 	    res = af_read(afimage, (unsigned char*)data, maxSize);
+        else if(imgtype == 2) // RAW
+        {
+        }
+        else if(imgtype == 3) // ZMG
+        {
+        }
         return res;
         /*
         int res = 0;
@@ -135,15 +165,22 @@ public:
     bool seek(qint64 pos)
     {
         //QIODevice::seek(pos);
-        if(imgtype == 0)
+        if(imgtype == 0) // EWF
         {
             imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
         }
-        else if(imgtype == 1)
+        else if(imgtype == 1) // AFF
         {
             QIODevice::seek(pos);
             imgoffset = pos;
 	    af_seek(afimage, pos, SEEK_SET);
+        }
+        else if(imgtype == 2) // RAW
+        {
+            imgoffset = libsmraw_handle_seek_offset(rawhandle, pos, SEEK_SET, &rawerror);
+        }
+        else if(imgtype == 3) // ZMG
+        {
         }
         if(imgoffset == -1)
             return false;
