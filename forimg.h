@@ -98,8 +98,8 @@ public:
             retopen = libsmraw_handle_open(rawhandle, rawglobfiles, rawglobfilecnt, LIBSMRAW_OPEN_READ, &rawerror);
             if(retopen == -1)
                 libsmraw_error_fprint(rawerror, stdout);
-            else
-                printf("libraw_handle_open was successful %d\n", retopen);
+            //else
+            //    printf("libraw_handle_open was successful %d\n", retopen);
             libsmraw_handle_get_media_size(rawhandle, (size64_t*)&imgsize, &rawerror);
             libsmraw_handle_close(rawhandle, &rawerror);
         }
@@ -231,8 +231,8 @@ public:
             retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
             if(retopen == -1)
                 libewf_error_fprint(ewferror, stdout);
-            else
-                printf("libewf_handle_open was successful %d\n", retopen);
+            //else
+            //    printf("libewf_handle_open was successful %d\n", retopen);
         }
         else if(imgtype == 1)
         {
@@ -254,6 +254,11 @@ public:
             af_close(afimage);
         else if(imgtype == 2) // RAW
             libsmraw_handle_close(rawhandle, &rawerror);
+    };
+
+    bool atEnd()
+    {
+        return QIODevice::atEnd();
     };
 
 private:
