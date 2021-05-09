@@ -84,7 +84,7 @@ public:
                 printf("filenames[%d] = %s\n", i, filenames[i]);
             }
             rawglobfilecnt = efiles.count();
-            printf("globfilecnt: %d\n", rawglobfilecnt);
+            //printf("globfilecnt: %d\n", rawglobfilecnt);
             int retopen = 0;
             retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &rawglobfiles, &rawglobfilecnt, &rawerror);
             if(retopen == -1)
@@ -94,6 +94,7 @@ public:
             retopen = libsmraw_handle_initialize(&rawhandle, &rawerror);
             if(retopen == -1)
                 libsmraw_error_fprint(rawerror, stdout);
+            //retopen = libsmraw_handle_open(rawhandle, filenames, rawglobfilecnt, LIBSMRAW_OPEN_READ, &rawerror);
             retopen = libsmraw_handle_open(rawhandle, rawglobfiles, rawglobfilecnt, LIBSMRAW_OPEN_READ, &rawerror);
             if(retopen == -1)
                 libsmraw_error_fprint(rawerror, stdout);
@@ -139,6 +140,7 @@ public:
 	    res = af_read(afimage, (unsigned char*)data, maxSize);
         else if(imgtype == 2) // RAW
         {
+            res = libsmraw_handle_read_buffer(rawhandle, data, maxSize, &rawerror);
         }
         else if(imgtype == 3) // ZMG
         {
