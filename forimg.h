@@ -29,7 +29,7 @@ public:
         imgpath = imgfile;
         qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
 
-        //open(QIODevice::ReadOnly);
+        open(QIODevice::ReadOnly);
         if(imgtype == 0) // EWF
         {
 	    QString efilepath = imgfile.split(imgfile.split("/").last()).first();
@@ -60,7 +60,7 @@ public:
             else
                 printf("libewf_handle_open was successful %d\n", retopen);
             libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
-            //libewf_handle_close(ewfhandle, &ewferror);
+            libewf_handle_close(ewfhandle, &ewferror);
         }
         else if(imgtype == 1) // AFF
         {
@@ -68,7 +68,7 @@ public:
             strcpy(iname, imgpath.toStdString().c_str());
             afimage = af_open(iname, O_RDONLY|O_EXCL, 0);
             imgsize = af_get_imagesize(afimage);
-            //af_close(afimage);
+            af_close(afimage);
         }
         else if(imgtype == 2) // SPLIT RAW
         {
@@ -101,6 +101,7 @@ public:
             else
                 printf("libraw_handle_open was successful %d\n", retopen);
             libsmraw_handle_get_media_size(rawhandle, (size64_t*)&imgsize, &rawerror);
+            libsmraw_handle_close(rawhandle, &rawerror);
         }
         else if(imgtype == 3) // ZMG
         {
@@ -112,17 +113,17 @@ public:
     {
         if(imgtype == 0) // EWF
         {
-            libewf_handle_close(ewfhandle, &ewferror);
+            //libewf_handle_close(ewfhandle, &ewferror);
             libewf_handle_free(&ewfhandle, &ewferror);
             libewf_glob_free(globfiles, globfilecnt, &ewferror);
         }
 	else if(imgtype == 1) // AFF
 	{
-	    af_close(afimage);
+	    //af_close(afimage);
 	}
         else if(imgtype == 2) // SMRAW
         {
-            libsmraw_handle_close(rawhandle, &rawerror);
+            //libsmraw_handle_close(rawhandle, &rawerror);
             libsmraw_handle_free(&rawhandle, &rawerror);
             libsmraw_glob_free(rawglobfiles, rawglobfilecnt, &rawerror);
         }
@@ -222,7 +223,6 @@ public:
         return dsize;
     };
     
-    /*
     bool open(QIODevice::OpenMode mode)
     {
         int retopen = 0;
@@ -240,14 +240,21 @@ public:
             strcpy(iname, imgpath.toStdString().c_str());
             afimage = af_open(iname, O_RDONLY|O_EXCL,0);
         }
+        else if(imgtype == 2)
+        {
+            retopen = libsmraw_handle_open(rawhandle, rawglobfiles, rawglobfilecnt, LIBSMRAW_OPEN_READ, &rawerror);
+        }
     };
 
     void close()
     {
         if(imgtype == 0)
             libewf_handle_close(ewfhandle, &ewferror);
+        else if(imgtype == 1) // AFF
+            af_close(afimage);
+        else if(imgtype == 2) // RAW
+            libsmraw_handle_close(rawhandle, &rawerror);
     };
-    */
 
 private:
     // EWF Variables

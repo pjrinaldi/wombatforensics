@@ -19,13 +19,13 @@ void ParseExtendedPartition(ForensicImage* curimg, uint32_t primextoff, uint32_t
     QByteArray sector = rawforimg.peek(512);
     rawforimg.close();
     */
-    //curimg->open(QIODevice::ReadOnly);
+    curimg->open(QIODevice::ReadOnly);
     if(primextoff == offset)
         curimg->seek(offset * 512);
     else
         curimg->seek((primextoff + offset)*512);
     QByteArray sector = curimg->read(512);
-    //curimg->close();
+    curimg->close();
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector.mid(510,2));
     if(mbrsig == 0xaa55)
     {
@@ -280,10 +280,10 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
         efile.close();
     }
     */
-    //curimg->open(QIODevice::ReadOnly);
+    curimg->open(QIODevice::ReadOnly);
     curimg->seek(partoffset*512);
     partbuf = curimg->read(69120);
-    //curimg->close();
+    curimg->close();
     // check for various FS's
     uint16_t winsig = qFromLittleEndian<uint16_t>(partbuf.mid(510, 2));
     uint16_t extsig = qFromLittleEndian<uint16_t>(partbuf.mid(1080, 2));
@@ -374,12 +374,12 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                 efile.close();
             }
             */
-            //curimg->open(QIODevice::ReadOnly);
+            curimg->open(QIODevice::ReadOnly);
             curimg->seek(fsinfo.value("mftoffset").toULongLong());
             mftentry0 = curimg->read(mftentrybytes);
             curimg->seek(fsinfo.value("mftoffset").toULongLong() + 3*mftentrybytes);
             mftentry3 = curimg->read(mftentrybytes);
-            //curimg->close();
+            curimg->close();
             //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
             if(QString::fromStdString(mftentry0.left(4).toStdString()) == "FILE") // a proper mft entry
             {
@@ -586,10 +586,10 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
-                //curimg->open(QIODevice::ReadOnly);
+                curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo.value("fatoffset").toUInt());
                 rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
-                //curimg->close();
+                curimg->close();
 		//qDebug() << "root fat content:" << rootfatbuf.mid(0, 40).toHex();
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
@@ -641,10 +641,10 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
-                //curimg->open(QIODevice::ReadOnly);
+                curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo.value("fatoffset").toUInt());
                 rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
-                //curimg->close();
+                curimg->close();
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
                 if(fsinfo.value("rootdircluster").toUInt() >= 2)
@@ -670,13 +670,14 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
-                //curimg->open(QIODevice::ReadOnly);
+                curimg->open(QIODevice::ReadOnly);
                 QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
                 for(int j=0; j < rootdirlayoutlist.count(); j++)
                 {
                     curimg->seek(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
                     rootdirentry.append(curimg->read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
                 }
+                curimg->close();
                 int curoffset = 0;
                 while(curoffset < rootdirentry.count())
                 {
@@ -1055,14 +1056,14 @@ void ParseMFT(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHa
         efile.close();
     }
     */
-    //curimg->open(QIODevice::ReadOnly);
+    curimg->open(QIODevice::ReadOnly);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
     {
         curimg->seek(mftlist.at(i).split(",").at(0).toULongLong());
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
-    //curimg->close();
+    curimg->close();
 
     //qDebug() << "mft layout:" << fsinfo->value("mftlayout").toString();
     //qDebug() << "final mftarray count:" << mftarray.count();
@@ -1570,14 +1571,14 @@ void GetMftEntryContent(ForensicImage* curimg, qulonglong ntinode, QHash<QString
         efile.close();
     }
     */
-    //curimg->open(QIODevice::ReadOnly);
+    curimg->open(QIODevice::ReadOnly);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
     {
         curimg->seek(mftlist.at(i).split(",").at(0).toULongLong());
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
-    //curimg->close();
+    curimg->close();
 
     // GET THE MFT ENTRY BYTE OFFSET RELATIVE TO THE FILE SYSTEM SO I CAN HIGHLIGHT IN HEX
     qulonglong curmftentryoffset = 0;
@@ -2011,14 +2012,14 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
     QHash<QString, QVariant> fileinfo;
     QByteArray mftarray;
     mftarray.clear();
-    //curimg->open(QIODevice::ReadOnly);
+    curimg->open(QIODevice::ReadOnly);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
     {
         curimg->seek(mftlist.at(i).split(",").at(0).toULongLong());
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
-    //curimg->close();
+    curimg->close();
     /*
     QFile efile(estring);
     if(!efile.isOpen())
@@ -2119,13 +2120,13 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
                 efile.close();
             }
             */
-            //curimg->open(QIODevice::ReadOnly);
+            curimg->open(QIODevice::ReadOnly);
             for(j=0; j < runlist.count(); j++)
             {
                 curimg->seek((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(j).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt()));
                 indxalloc.append(curimg->read(runlist.at(j).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()));
             }
-            //curimg->close();
+            curimg->close();
         }
         else if(attrtype == 0xffffffff)
             break;
@@ -2561,12 +2562,14 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
             efile.close();
         }
         */
+        curimg->open(QIODevice::ReadOnly);
         QStringList layoutlist = parfileinfo->value("layout").toString().split(";", Qt::SkipEmptyParts);
         for(int i=0; i < layoutlist.count(); i++)
         {
             curimg->seek(layoutlist.at(i).split(",").at(0).toUInt());
             direntrybuf.append(curimg->read(layoutlist.at(i).split(",").at(1).toUInt()));
         }
+        curimg->close();
     }
     else
     {
@@ -2582,8 +2585,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
             efile.close();
         }
         */
+        curimg->open(QIODevice::ReadOnly);
         curimg->seek(fsinfo->value("partoffset").toUInt() + (inodetablestartingblock * fsinfo->value("blocksize").toUInt()));
         inodetablebuf = curimg->read(fsinfo->value("inodesize").toUInt() * fsinfo->value("blockgroupinodecnt").toUInt());
+        curimg->close();
         // NOW I HAVE THE INODE TABLE FOR THE CURRENT BLOCK GROUP. I CAN GO THE CURINODE's OFFSET and parse it's inode table entry to get the content for the directory entry...
         QStringList blkstrlist;
         blkstrlist.clear();
@@ -2632,8 +2637,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 			leafnode = efile.read(fsinfo->value("blocksize").toUInt());
 			efile.close();
                         */
+                    curimg->open(QIODevice::ReadOnly);
                     curimg->seek(fsinfo->value("partoffset").toUInt() + (leafnodes.at(i) * fsinfo->value("blocksize").toUInt()));
                     leafnode = curimg->read(fsinfo->value("blockszie").toUInt());
+                    curimg->close();
 			uint16_t extententries = qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
 			uint16_t extentdepth = qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
 			if(extentdepth == 0) // use ext4_extent
@@ -2695,8 +2702,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 		    QByteArray singlebuf = efile.read(fsinfo->value("blocksize").toUInt());
 		    efile.close();
                     */
+                curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo->value("partoffset").toUInt() + (singleindirect * fsinfo->value("blocksize").toUInt()));
                 QByteArray singlebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                curimg->close();
 		    for(int i=0; i < singlebuf.count() / 4; i++)
 		    {
 			uint32_t cursingledirect = qFromLittleEndian<uint32_t>(singlebuf.mid(i*4, 4));
@@ -2721,8 +2730,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 		    QByteArray doublebuf = efile.read(fsinfo->value("blocksize").toUInt());
 		    efile.close();
                     */
+                curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo->value("partoffset").toUInt() + (doubleindirect * fsinfo->value("blocksize").toUInt()));
                 QByteArray doublebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                curimg->close();
 		    for(int i=0; i < doublebuf.count() / 4; i++)
 		    {
 			uint32_t sindirect = qFromLittleEndian<uint32_t>(doublebuf.mid(i*4, 4));
@@ -2741,8 +2752,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 			QByteArray sinbuf = efile.read(fsinfo->value("blocksize").toUInt());
 			efile.close();
                         */
+                    curimg->open(QIODevice::ReadOnly);
                     curimg->seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(i) * fsinfo->value("blocksize").toUInt()));
                     QByteArray sinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
 			for(int j=0; j < sinbuf.count() / 4; j++)
 			{
 			    uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(j*4, 4));
@@ -2770,8 +2783,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 		    QByteArray triplebuf = efile.read(fsinfo->value("blocksize").toUInt());
 		    efile.close();
                     */
+                curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo->value("partoffset").toUInt() + (tripleindirect * fsinfo->value("blocksize").toUInt()));
                 QByteArray triplebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                curimg->close();
 		    for(int i=0; i < triplebuf.count() / 4; i++)
 		    {
 			uint32_t dindirect = qFromLittleEndian<uint32_t>(triplebuf.mid(i*4, 4));
@@ -2790,8 +2805,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 			QByteArray dinbuf = efile.read(fsinfo->value("blocksize").toUInt());
 			efile.close();
                         */
+                    curimg->open(QIODevice::ReadOnly);
                     curimg->seek(fsinfo->value("partoffset").toUInt() + (dinlist.at(i) * fsinfo->value("blocksize").toUInt()));
                     QByteArray dinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
 			for(int j=0; j < dinbuf.count() / 4; j++)
 			{
 			    uint32_t sindirect = qFromLittleEndian<uint32_t>(dinbuf.mid(j*4, 4));
@@ -2810,8 +2827,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 			    QByteArray sinbuf = efile.read(fsinfo->value("blocksize").toUInt());
 			    efile.close();
                             */
+                        curimg->open(QIODevice::ReadOnly);
                         curimg->seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(j) * fsinfo->value("blocksize").toUInt()));
                         QByteArray sinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                        curimg->close();
 			    for(int k=0; k < sinbuf.count() / 4; k++)
 			    {
 				uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(k*4, 4));
@@ -2846,11 +2865,13 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
             efile.close();
         }
         */
+        curimg->open(QIODevice::ReadOnly);
         for(int i=0; i < blkstrlist.count(); i++)
         {
             curimg->seek(fsinfo->value("partoffset").toUInt() + blkstrlist.at(i).split(",").at(0).toUInt());
             direntrybuf.append(curimg->read(blkstrlist.at(i).split(",").at(1).toUInt()));
         }
+        curimg->close();
     }
     int curoffset = 24; // SKIP THE . AND .. ENTRIES WHICH ARE ALWAYS THE 1ST TWO ENTRIES AND ARE 12 BYTES LONG EACH
     if(inodeflags & 0x1000)
@@ -2979,8 +3000,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 		efile.close();
 	    }
             */
+            curimg->open(QIODevice::ReadOnly);
             curimg->seek(fsinfo->value("partoffset").toUInt() + (curinodetablestartblock * fsinfo->value("blocksize").toUInt()));
             curinodetablebuf = curimg->read(fsinfo->value("inodesize").toUInt() * fsinfo->value("blockgroupinodecnt").toUInt());
+            curimg->close();
             //qDebug() << "curinodetablebuf inode entry number:" << fsinfo->value("inodesize").toUInt() * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt()));
 	    QByteArray curinodebuf = curinodetablebuf.mid(fsinfo->value("inodesize").toUInt() * (fileinfo.value("extinode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt())), fsinfo->value("inodesize").toUInt());
             uint16_t filemode = qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2));
@@ -3144,8 +3167,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
                             leafnode = efile.read(fsinfo->value("blocksize").toUInt());
                             efile.close();
                             */
+                        curimg->open(QIODevice::ReadOnly);
                         curimg->seek(fsinfo->value("partoffset").toUInt() + (leafnodes.at(i) * fsinfo->value("blocksize").toUInt()));
                         leafnode = curimg->read(fsinfo->value("blocksize").toUInt());
+                        curimg->close();
                             uint16_t extententries = qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
                             uint16_t extentdepth = qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
                             if(extentdepth == 0) // use ext4_extent
@@ -3207,8 +3232,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
                         QByteArray singlebuf = efile.read(fsinfo->value("blocksize").toUInt());
                         efile.close();
                         */
+                    curimg->open(QIODevice::ReadOnly);
                     curimg->seek(fsinfo->value("partoffset").toUInt() + (cursingleindirect * fsinfo->value("blocksize").toUInt()));
                     QByteArray singlebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
                         for(int i=0; i < singlebuf.count() / 4; i++)
                         {
                             uint32_t cursingledirect = qFromLittleEndian<uint32_t>(singlebuf.mid(i*4, 4));
@@ -3233,8 +3260,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
                         QByteArray doublebuf = efile.read(fsinfo->value("blocksize").toUInt());
                         efile.close();
                         */
+                    curimg->open(QIODevice::ReadOnly);
                     curimg->seek(fsinfo->value("partoffset").toUInt() + (curdoubleindirect * fsinfo->value("blocksize").toUInt()));
                     QByteArray doublebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
                         for(int i=0; i < doublebuf.count() / 4; i++)
                         {
                             uint32_t sindirect = qFromLittleEndian<uint32_t>(doublebuf.mid(i*4, 4));
@@ -3253,8 +3282,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
                             QByteArray sinbuf = efile.read(fsinfo->value("blocksize").toUInt());
                             efile.close();
                             */
+                        curimg->open(QIODevice::ReadOnly);
                         curimg->seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(i) * fsinfo->value("blocksize").toUInt()));
                         QByteArray sinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                        curimg->close();
                             for(int j=0; j < sinbuf.count() / 4; j++)
                             {
                                 uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(j*4, 4));
@@ -3282,8 +3313,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
                         QByteArray triplebuf = efile.read(fsinfo->value("blocksize").toUInt());
                         efile.close();
                         */
+                    curimg->open(QIODevice::ReadOnly);
                     curimg->seek(fsinfo->value("partoffset").toUInt() + (curtripleindirect * fsinfo->value("blocksize").toUInt()));
                     QByteArray triplebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
                         for(int i=0; i < triplebuf.count() / 4; i++)
                         {
                             uint32_t dindirect = qFromLittleEndian<uint32_t>(triplebuf.mid(i*4, 4));
@@ -3302,8 +3335,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
                             QByteArray dinbuf = efile.read(fsinfo->value("blocksize").toUInt());
                             efile.close();
                             */
+                        curimg->open(QIODevice::ReadOnly);
                         curimg->seek(fsinfo->value("partoffset").toUInt() + (dinlist.at(i) * fsinfo->value("blocksize").toUInt()));
                         QByteArray dinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                        curimg->close();
                             for(int j=0; j < dinbuf.count() / 4; j++)
                             {
                                 uint32_t sindirect = qFromLittleEndian<uint32_t>(dinbuf.mid(j*4, 4));
@@ -3322,8 +3357,10 @@ void ParseExtDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
                                 QByteArray sinbuf = efile.read(fsinfo->value("blocksize").toUInt());
                                 efile.close();
                                 */
+                            curimg->open(QIODevice::ReadOnly);
                             curimg->seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(j) * fsinfo->value("blocksize").toUInt()));
                             QByteArray sinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                            curimg->close();
                                 for(int k=0; k < sinbuf.count() / 4; k++)
                                 {
                                     uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(k*4, 4));
@@ -3419,6 +3456,7 @@ void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
     }
     */
     QStringList rootdirlayoutlist = fsinfo->value("rootdirlayout").toString().split(";", Qt::SkipEmptyParts);
+    curimg->open(QIODevice::ReadOnly);
     for(int i=0; i < rootdirlayoutlist.count(); i++)
     {
         curimg->seek(rootdirlayoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
@@ -3426,6 +3464,7 @@ void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
     }
     curimg->seek(fsinfo->value("fatoffset").toUInt());
     fatbuf = curimg->read(fsinfo->value("fatsize").toUInt() * fsinfo->value("bytespersector").toUInt());
+    curimg->close();
     rootdirentrycount = rootdirbuf.count() / 32;
     uint inodecnt = 0;
     for(int i=0; i < rootdirentrycount; i++)
@@ -3629,6 +3668,7 @@ void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
     //{
         int coffset = 0;
         //while(!efile.atEnd())
+        curimg->open(QIODevice::ReadOnly);
         while(coffset <= curimg->size())
         {
             QHash<QString, QVariant> orphaninfo;
@@ -3758,6 +3798,7 @@ void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
             }
             //qDebug() << "coffset after olist fix:" << coffset;
         }
+        curimg->close();
         //efile.close();
     //}
 }
@@ -3787,11 +3828,13 @@ void ParseExfatSubDir(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, Q
         efile.close();
     }
     */
+    curimg->open(QIODevice::ReadOnly);
     for(int i=0; i < layoutlist.count(); i++)
     {
         curimg->seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
         dirbuf.append(curimg->read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
     }
+    curimg->close();
     //qDebug() << "dir fat content:" << dirbuf.mid(0, 40).toHex();
     int direntrycount = dirbuf.count() / 32;
     for(int i=0; i < direntrycount; i++)
@@ -3929,11 +3972,13 @@ void ParseFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant> *fsinfo, Q
     rootdirbuf.clear();
     int rootdirentrycount = 0;
     QStringList rootdirlayoutlist = fsinfo->value("rootdirlayout").toString().split(";", Qt::SkipEmptyParts);
+    curimg->open(QIODevice::ReadOnly);
     for(int j=0; j < rootdirlayoutlist.count(); j++)
     {
         curimg->seek(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
         rootdirbuf.append(curimg->read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
     }
+    curimg->close();
     /*
     QFile efile(estring);
     if(!efile.isOpen())
@@ -4068,11 +4113,13 @@ void ParseFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant> *fsinfo, Q
 		    efile.close();
 		}
                 */
+                curimg->open(QIODevice::ReadOnly);
                 for(int j=0; j < layoutlist.count(); j++)
                 {
                     curimg->seek(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
                     dirsizebuf.append(curimg->read(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
                 }
+                curimg->close();
 		direntrycnt = dirsizebuf.count() / 32;
 		for(int j=0; j < direntrycnt; j++)
 		{
@@ -4187,6 +4234,7 @@ void ParseSubDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
         efile.close();
     }
     */
+    curimg->open(QIODevice::ReadOnly);
     for(int i=0; i < layoutlist.count(); i++)
     {
         if(i ==0)
@@ -4200,6 +4248,7 @@ void ParseSubDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
             dirbuf.append(curimg->read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(i).toULongLong()));
         }
     }
+    curimg->close();
     //qDebug() << "dir fat content:" << fatbuf->mid(0, 40).toHex();
     QString longnamestring = "";
     for(int i=0; i < dirbuf.count() / 32; i++)
@@ -4296,11 +4345,13 @@ void ParseSubDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, 
 		    efile.close();
 		}
                 */
+                curimg->open(QIODevice::ReadOnly);
                 for(int j=0; j < layoutlist.count(); j++)
                 {
                     curimg->seek(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
                     dirsizebuf.append(curimg->read(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
                 }
+                curimg->close();
 		direntrycnt = dirsizebuf.count() / 32;
 		for(int j=0; j < direntrycnt; j++)
 		{
@@ -4823,11 +4874,13 @@ void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QV
 		    efile.close();
 		}
                 */
+                curimg->open(QIODevice::ReadOnly);
                 if(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toULongLong())
                 {
                     curimg->seek(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toULongLong());
                     sigbuf = curimg->read(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(1).toULongLong());
                 }
+                curimg->close();
 		QString mimestr = GenerateCategorySignature(sigbuf, fileinfolist->at(j).value("filename").toString());
 		nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
 	    }
@@ -4883,8 +4936,10 @@ void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QV
                 efile.close();
             }
             */
+            curimg->open(QIODevice::ReadOnly);
             curimg->seek(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(0).toULongLong());
             sigbuf = curimg->read(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toULongLong());
+            curimg->close();
             mimestr = GenerateCategorySignature(sigbuf, orphanlist->at(j).value("filename").toString());
         }
 

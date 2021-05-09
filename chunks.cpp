@@ -71,6 +71,7 @@ QByteArray Chunks::data(qint64 pos, qint64 maxSize, QByteArray *highlighted)
             maxSize = _size - pos;
 
     //_ioDevice->open(QIODevice::ReadOnly);
+    _ioDevice2->open(QIODevice::ReadOnly);
 
     while (maxSize > 0)
     {
@@ -130,7 +131,7 @@ QByteArray Chunks::data(qint64 pos, qint64 maxSize, QByteArray *highlighted)
             pos += readBuffer.size();
         }
     }
-    _ioDevice->close();
+    _ioDevice2->close();
     return buffer;
 }
 
@@ -307,9 +308,11 @@ int Chunks::getChunkIndex(qint64 absPos)
         qint64 readAbsPos = absPos - ioDelta;
         qint64 readPos = (readAbsPos & READ_CHUNK_MASK);
         //_ioDevice->open(QIODevice::ReadOnly);
+        _ioDevice2->open(QIODevice::ReadOnly);
         _ioDevice2->seek(readPos);
         newChunk.data = _ioDevice2->read(CHUNK_SIZE);
         //_ioDevice->close();
+        _ioDevice2->close();
         newChunk.absPos = absPos - (readAbsPos - readPos);
         newChunk.dataChanged = QByteArray(newChunk.data.size(), char(0));
         _chunks.insert(insertIdx, newChunk);
