@@ -1398,7 +1398,7 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
                             adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
                             adsinfo.insert("itemtype", QVariant(10));
                             adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
-                            adsinfolist.append(adsinfo);
+                            //adsinfolist.append(adsinfo);
                         }
                     }
                     else if(attrtype == 0x90) // $INDEX_ROOT - always resident
@@ -1435,7 +1435,7 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
                                 adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
                                 // adsinfo.insert("path", "parntinode", "parentinode", "inode", "ntinode")
                                 // REPEAT THE ABOVE HERE AND ADD TO THE 
-                                adsinfolist.append(adsinfo);
+                                //adsinfolist.append(adsinfo);
                             }
                         }
                     }
@@ -1508,7 +1508,7 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
                                 adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
                                 adsinfo.insert("itemtype", QVariant(10));
                                 adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
-                                adsinfolist.append(adsinfo);
+                                //adsinfolist.append(adsinfo);
                             }
                         }
                     }
@@ -1531,7 +1531,7 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
                 fileinfo.insert("inode", QVariant(curinode));
                 fileinfo.insert("path", QVariant("/"));
                 fileinfo.insert("parentinode", QVariant(-1));
-                fileinfolist->append(fileinfo);
+                //fileinfolist->append(fileinfo);
                 curinode++;
                 if(adsinfolist.count() > 0)
                 {
@@ -1539,7 +1539,7 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
                     {
                         QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
                         curadsinfo.insert("inode", QVariant(curinode));
-                        fileinfolist->append(curadsinfo);
+                        //fileinfolist->append(curadsinfo);
                         curinode++;
                     }
                 }
@@ -1560,7 +1560,7 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
                             fileinfo.insert("inode", QVariant(curinode));
                             fileinfo.insert("path", QVariant(parpath));
                             fileinfo.insert("parentinode", QVariant(parentinode));
-                            fileinfolist->append(fileinfo);
+                            //fileinfolist->append(fileinfo);
                             curinode++;
                             if(adsinfolist.count() > 0)
                             {
@@ -1568,7 +1568,7 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
                                 {
                                     QHash<QString, QVariant> curadsinfo = adsinfolist.at(k);
                                     curadsinfo.insert("inode", QVariant(curinode));
-                                    fileinfolist->append(curadsinfo);
+                                    //fileinfolist->append(curadsinfo);
                                     curinode++;
                                 }
                             }
@@ -1576,11 +1576,13 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
                         }
                         else // orphan but parent has been repurposed
                         {
-                            orphanlist->append(fileinfo);
+                            //orphanlist->append(fileinfo);
                             if(adsinfolist.count() > 0)
                             {
                                 for(int k=0; k < adsinfolist.count(); k++)
-                                    orphanlist->append(adsinfolist.at(k));
+                                {
+                                    //orphanlist->append(adsinfolist.at(k));
+                                }
                             }
                             //qDebug() << "ORPHAN PARENT NOT VALID:" << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong();
                         }
@@ -1589,11 +1591,13 @@ void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QStr
             }
             if(hasparent == 0) // orphan no parent exists anymore
             {
-                orphanlist->append(fileinfo);
+                //orphanlist->append(fileinfo);
                 if(adsinfolist.count() > 0)
                 {
                     for(int k=0; k < adsinfolist.count(); k++)
-                        orphanlist->append(adsinfolist.at(k));
+                    {
+                        //orphanlist->append(adsinfolist.at(k));
+                    }
                 }
                 //qDebug() << "ORPHAN NO PARENT:" << "fileinfo filename:" << fileinfo.value("filename").toString() << "parent seqid:" << fileinfo.value("parsequenceid").toULongLong();
             }
@@ -1941,7 +1945,7 @@ void GetMftEntryContent(ForImg* curimg, qulonglong ntinode, QHash<QString, QVari
 			adsinfo.insert("isdeletd", QVariant(fileinfo->value("isdeleted").toUInt()));
 			adsinfo.insert("itemtype", QVariant(10));
 			adsinfo.insert("path", QVariant(QString(fileinfo->value("path").toString() + fileinfo->value("filename").toString() + "/")));
-			adsinfolist->append(adsinfo);
+			//adsinfolist->append(adsinfo);
 		    }
                 }
                 else if(attrtype == 0x90) // $INDEX_ROOT - always resident
@@ -1976,7 +1980,7 @@ void GetMftEntryContent(ForImg* curimg, qulonglong ntinode, QHash<QString, QVari
 			    adsinfo.insert("path", QVariant(QString(fileinfo->value("path").toString() + fileinfo->value("filename").toString() + "/")));
 			    // adsinfo.insert("path", "parntinode", "parentinode", "inode", "ntinode")
 			    // REPEAT THE ABOVE HERE AND ADD TO THE 
-			    adsinfolist->append(adsinfo);
+			    //adsinfolist->append(adsinfo);
                         }
                     }
                 }
@@ -2047,7 +2051,7 @@ void GetMftEntryContent(ForImg* curimg, qulonglong ntinode, QHash<QString, QVari
 			    adsinfo.insert("isdeletd", QVariant(fileinfo->value("isdeleted").toUInt()));
 			    adsinfo.insert("itemtype", QVariant(10));
 			    adsinfo.insert("path", QVariant(QString(fileinfo->value("path").toString() + fileinfo->value("filename").toString() + "/")));
-			    adsinfolist->append(adsinfo);
+			    //adsinfolist->append(adsinfo);
 			}
 		    }
                 }
@@ -2364,7 +2368,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                                         fileinfo.insert("path", QVariant(QString(parfileinfo->value("path").toString() + parfileinfo->value("filename").toString() + "/")));
                                         fileinfo.insert("parentinode", QVariant(parfileinfo->value("inode").toULongLong()));
                                     }
-                                    fileinfolist->append(fileinfo);
+                                    //fileinfolist->append(fileinfo);
                                     curinode++;
                                     if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
                                     {
@@ -2378,7 +2382,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                                         {
                                             QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
                                             curadsinfo.insert("inode", QVariant(curinode));
-                                            fileinfolist->append(curadsinfo);
+                                            //fileinfolist->append(curadsinfo);
                                             curinode++;
                                         }
                                     }
@@ -2543,7 +2547,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                             fileinfo.insert("path", QVariant(QString(parfileinfo->value("path").toString() + parfileinfo->value("filename").toString() + "/")));
                             fileinfo.insert("parentinode", QVariant(parfileinfo->value("inode").toULongLong()));
                         }
-                        fileinfolist->append(fileinfo);
+                        //fileinfolist->append(fileinfo);
                         curinode++;
                         if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
                         {
@@ -2557,7 +2561,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                             {
                                 QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
                                 curadsinfo.insert("inode", QVariant(curinode));
-                                fileinfolist->append(curadsinfo);
+                                //fileinfolist->append(curadsinfo);
                                 curinode++;
                             }
                         }
