@@ -1653,6 +1653,7 @@ void GetMftEntryContent(ForImg* curimg, qulonglong ntinode, QHash<QString, QVari
 
     //int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
     QByteArray curmftentry = mftarray.mid(ntinode*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
+    mftarray.clear();
     fileinfo->insert("mftrecordlayout", QString(QString::number(curmftentryoffset) + "," + QString::number(fsinfo->value("mftentrybytes").toUInt()) + ";"));
     // NOW I'VE GOT THE CURMFTENTRY FROM NTINODE AND I NEED TO PARSE THE ATTRIBUTE TO GET REST OF THE FILEINFO...
     if(QString::fromStdString(curmftentry.left(4).toStdString()) == "FILE") // a proper mft entry
@@ -2391,6 +2392,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                 }
             }
         }
+        indxalloc.clear();
     }
     else // 0x00 NO INDEX_ALLOC
     {
@@ -2566,6 +2568,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
             else
                 curpos = curpos + 4;
         }
+        indxroot.clear();
     }
 }
 
