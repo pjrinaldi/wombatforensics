@@ -2303,7 +2303,7 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
                                     curinode++;
                                     if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
                                     {
-                                        ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+                                        //ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                                         //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                                         curinode = fileinfolist->count();
                                     }
@@ -2481,7 +2481,7 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
                         curinode++;
                         if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
                         {
-                            ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+                            //ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                             //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                             curinode = fileinfolist->count();
                         }
@@ -4954,11 +4954,15 @@ void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QV
                 efile.close();
             }
             */
-            curimg->open(QIODevice::ReadOnly);
-            curimg->seek(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(0).toULongLong());
-            sigbuf = curimg->read(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toULongLong());
-            curimg->close();
-            mimestr = GenerateCategorySignature(sigbuf, orphanlist->at(j).value("filename").toString());
+            qDebug() << "orphanlist:" << orphanlist->at(j).value("filename").toString() << orphanlist->at(j).value("layout").toString();
+            if(orphanlist->at(j).value("layout").toString().split(";").count() > 1)
+            {
+                curimg->open(QIODevice::ReadOnly);
+                curimg->seek(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(0).toULongLong());
+                sigbuf = curimg->read(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toULongLong());
+                curimg->close();
+                mimestr = GenerateCategorySignature(sigbuf, orphanlist->at(j).value("filename").toString());
+            }
         }
 
         QString curid = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode + j));
