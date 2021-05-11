@@ -15,6 +15,7 @@
 #include <afflib/afflib.h>
 #include <QString>
 #include <QDebug>
+#include <QDir>
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
@@ -30,3 +31,26 @@ unsigned long long GetTotalBytes(std::string infile);
 void ReadBytes(std::string infile, std::string outfile);
 std::string Verify(QString outstr);
 void StartImaging(std::string instr, std::string outpath, std::string outstr, int radio); 
+
+class ForImg
+{
+    public:
+        ForImg(QString imgfile);
+        ~ForImg();
+        QByteArray ReadContent(qint64 pos, qint64 size);
+        qint64 Size();
+        QString ImgPath();
+
+    private:
+
+        // EWF Variables
+        libewf_handle_t* ewfhandle = NULL;
+        libewf_error_t* ewferror = NULL;
+        char** globfiles = NULL;
+        int globfilecnt = 0;
+        // ALL Variables
+        off64_t imgsize = 0;
+        qint64 imgoffset = 0;
+        QString imgpath = "";
+        int imgtype = -1;
+};

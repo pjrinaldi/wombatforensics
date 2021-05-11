@@ -3,6 +3,7 @@
 
 #include "wombatinclude.h"
 #include "wombatvariable.h"
+#include "imagefunctions.h"
 //#include "ewfimage.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
@@ -68,6 +69,8 @@ extern QMutex mutex; // mutex so my code will work when multithreaded (mainly fo
 //extern EwfImage* testimage;
 extern QList<ForensicImage*> newevid;
 extern QList<ForensicImage*> existingevid;
+extern QList<ForImg*> newforimglist;
+extern QList<ForImg*> existingforimglist;
 
 struct dosdate
 {

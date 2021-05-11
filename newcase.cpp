@@ -4494,7 +4494,8 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
 }
 
 //void ProcessVolume(QString evidstring)
-void ProcessVolume(ForensicImage* tmpimg)
+//void ProcessVolume(ForensicImage* tmpimg)
+void ProcessVolume(ForImg* tmpimg)
 {
     QString evidstring = tmpimg->ImgPath();
     qDebug() << "imgpath at start of processvolume:" << evidstring;

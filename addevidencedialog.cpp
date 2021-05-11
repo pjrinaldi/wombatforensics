@@ -73,6 +73,7 @@ void AddEvidenceDialog::RemoveEvidence()
 void AddEvidenceDialog::Cancel()
 {
     newevid.clear();
+    newforimglist.clear();
     newevidence.clear();
     // clear passwordhash
     this->close();
@@ -81,11 +82,14 @@ void AddEvidenceDialog::Cancel()
 void AddEvidenceDialog::StartProcess()
 {
     newevid.clear();
+    newforimglist.clear();
     newevidence.clear();
     for(int i=0; i < ui->evidencelist->count(); i++)
     {
-        ForensicImage* tmpimage = new ForensicImage(ui->evidencelist->item(i)->text());
-        newevid.append(tmpimage);
+        //ForensicImage* tmpimage = new ForensicImage(ui->evidencelist->item(i)->text());
+        ForImg* tmpimage = new ForImg(ui->evidencelist->item(i)->text());
+        newforimglist.append(tmpimage);
+        //newevid.append(tmpimage);
         newevidence.append(ui->evidencelist->item(i)->text());
 
     }

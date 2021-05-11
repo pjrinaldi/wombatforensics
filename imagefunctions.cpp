@@ -327,3 +327,107 @@ std::string Verify(QString outstr)
  }
  *
  */ 
+ForImg::ForImg(QString imgfile)
+{
+    if(imgfile.split("/").last().toLower().endsWith(".e01"))
+        imgtype = 0; // EWF
+    else if(imgfile.split("/").last().toLower().endsWith(".aff"))
+        imgtype = 1; // AFF
+    else if(imgfile.split("/").last().toLower().endsWith(".001") || imgfile.split("/").last().toLower().endsWith(".000") || imgfile.split("/").last().toLower().endsWith(".dd") || imgfile.split("/").last().toLower().endsWith(".raw") || imgfile.split("/").last().toLower().endsWith("aaa"))
+        imgtype = 2; // split raw or raw
+    else if(imgfile.split("/").last().toLower().endsWith(".zmg"))
+        imgtype = 3; // ZMG
+    imgpath = imgfile;
+    qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
+    if(imgtype == 0) // EWF
+    {
+        QString efilepath = imgfile.split(imgfile.split("/").last()).first();
+        QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
+        QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
+        char* filenames[efiles.count()] = {NULL};
+        for(int i=0; i < efiles.count(); i++)
+        {
+            filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
+            printf("filenames[%d] = %s\n", i, filenames[i]);
+        }
+        globfilecnt = efiles.count();
+        printf("globfilecnt: %d\n", globfilecnt);
+        int retopen = 0;
+
+        retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        else
+            printf("libewf glob was successful: %d\n", retopen);
+
+        retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        else
+            printf("libewf_handle_open was successful %d\n", retopen);
+        libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
+        libewf_handle_close(ewfhandle, &ewferror);
+    }
+
+}
+
+ForImg::~ForImg()
+{
+    if(imgtype == 0) // EWF
+    {
+        //libewf_handle_close(ewfhandle, &ewferror);
+        libewf_handle_free(&ewfhandle, &ewferror);
+        libewf_glob_free(globfiles, globfilecnt, &ewferror);
+    }
+}
+
+QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
+{
+    char* data = new char[size];
+    QByteArray tmparray;
+    tmparray.clear();
+    int retopen = 0;
+    if(imgtype == 0)
+    {
+        retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        qint64 res = 0;
+        imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
+        res = libewf_handle_read_buffer(ewfhandle, data, size, &ewferror);
+        tmparray = QByteArray::fromRawData((const char*)data, size);
+        libewf_handle_close(ewfhandle, &ewferror);
+    }
+    return tmparray;
+    /*
+            retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+            if(retopen == -1)
+                libewf_error_fprint(ewferror, stdout);
+            //else
+            //    printf("libewf_handle_open was successful %d\n", retopen);
+     *        off64_t res = 0;
+            imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
+        if(imgtype == 0) // EWF
+            res = libewf_handle_read_buffer(ewfhandle, data, maxSize, &ewferror);
+        char* tdata = new char[maxSize];
+        qint64 retval = readData(tdata, maxSize);
+        //if(retval > 0)
+        
+        return QByteArray::fromRawData((const char*)tdata, maxSize);
+
+            libewf_handle_close(ewfhandle, &ewferror);
+     */ 
+}
+
+qint64 ForImg::Size()
+{
+    return imgsize;
+}
+
+QString ForImg::ImgPath()
+{
+    return imgpath;
+}

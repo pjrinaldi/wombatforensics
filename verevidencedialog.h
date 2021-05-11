@@ -8,7 +8,7 @@
 #include "globals.h"
 #include "wombatfunctions.h"
 #include "ui_verifyevidencedialog.h"
-#include "imagefunctions.h"
+//#include "imagefunctions.h"
 
 namespace Ui
 {

@@ -8,7 +8,8 @@
 #include "globals.h"
 #include "wombatfunctions.h"
 
-void ProcessVolume(ForensicImage* tmpimage);
+void ProcessVolume(ForImg* tmpimage);
+//void ProcessVolume(ForensicImage* tmpimage);
 //void ProcessVolume(QString evidstring);
 //void ParseVolume(QString estring, qint64 imgsize, QList<qint64> *offlist, QList<qint64> *sizlist, QList<QHash<QString, QVariant>> *fsinfolist);
 void ParseVolume(ForensicImage* tmpimage, qint64 imgsize, QList<qint64> *offlist, QList<qint64> *sizlist, QList<QHash<QString, QVariant>> *fsinfolist);

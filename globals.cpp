@@ -68,3 +68,5 @@ FilterValues filtervalues;
 QList<EvidenceReportData> evidrepdatalist;
 QList<ForensicImage*> newevid;
 QList<ForensicImage*> existingevid;
+QList<ForImg*> newforimglist;
+QList<ForImg*> existingforimglist;

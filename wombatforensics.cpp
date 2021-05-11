@@ -1229,7 +1229,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        PopulateHexContents();
+        //PopulateHexContents();
         //LoadHexContents();
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
@@ -1417,7 +1417,12 @@ void WombatForensics::UpdateStatus()
 
 void WombatForensics::AddEvidence()
 {
+    /*
+QList<ForImg*> newforimglist;
+QList<ForImg*> existingforimglist;
+     */ 
     newevid.clear();
+    newforimglist.clear();
     newevidence.clear();
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
@@ -1483,7 +1488,8 @@ void WombatForensics::AddEvidence()
         }
         */
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
-        QFuture<void> tmpfuture = QtConcurrent::map(newevid, ProcessVolume);
+        QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
+        //QFuture<void> tmpfuture = QtConcurrent::map(newevid, ProcessVolume);
         volwatcher.setFuture(tmpfuture);
         //UpdateStatus();
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
