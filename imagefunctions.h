@@ -1,3 +1,6 @@
+#ifndef IMAGEFUNCTIONS_H
+#define IMAGEFUNCTIONS_H
+
 #include <fcntl.h>
 #include <linux/fs.h>
 #include <sys/ioctl.h>
@@ -54,3 +57,5 @@ class ForImg
         QString imgpath = "";
         int imgtype = -1;
 };
+
+#endif // IMAGEFUNCTIONS_H

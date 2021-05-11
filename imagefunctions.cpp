@@ -402,24 +402,6 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         libewf_handle_close(ewfhandle, &ewferror);
     }
     return tmparray;
-    /*
-            retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
-            if(retopen == -1)
-                libewf_error_fprint(ewferror, stdout);
-            //else
-            //    printf("libewf_handle_open was successful %d\n", retopen);
-     *        off64_t res = 0;
-            imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
-        if(imgtype == 0) // EWF
-            res = libewf_handle_read_buffer(ewfhandle, data, maxSize, &ewferror);
-        char* tdata = new char[maxSize];
-        qint64 retval = readData(tdata, maxSize);
-        //if(retval > 0)
-        
-        return QByteArray::fromRawData((const char*)tdata, maxSize);
-
-            libewf_handle_close(ewfhandle, &ewferror);
-     */ 
 }
 
 qint64 ForImg::Size()

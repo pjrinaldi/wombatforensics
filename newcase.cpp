@@ -5,7 +5,8 @@
 
 // ONCE THE TREE IS FULLY LOADED AND I START TO SAVE CASE, I NEED TO SAVE TREE TO A SINGLE FILE TO LOAD FROM...
 //void ParseExtendedPartition(QString estring, uint32_t primextoff, uint32_t offset, uint32_t size, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist)
-void ParseExtendedPartition(ForensicImage* curimg, uint32_t primextoff, uint32_t offset, uint32_t size, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist)
+//void ParseExtendedPartition(ForensicImage* curimg, uint32_t primextoff, uint32_t offset, uint32_t size, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist)
+void ParseExtendedPartition(ForImg* curimg, uint32_t primextoff, uint32_t offset, uint32_t size, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist)
 {
     //qDebug() << "primary extended size in bytes:" << size*512;
     /*
@@ -19,6 +20,7 @@ void ParseExtendedPartition(ForensicImage* curimg, uint32_t primextoff, uint32_t
     QByteArray sector = rawforimg.peek(512);
     rawforimg.close();
     */
+    /*
     curimg->open(QIODevice::ReadOnly);
     if(primextoff == offset)
         curimg->seek(offset * 512);
@@ -26,6 +28,8 @@ void ParseExtendedPartition(ForensicImage* curimg, uint32_t primextoff, uint32_t
         curimg->seek((primextoff + offset)*512);
     QByteArray sector = curimg->read(512);
     curimg->close();
+    */
+    QByteArray sector = curimg->ReadContent(offset*512, 512);
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector.mid(510,2));
     if(mbrsig == 0xaa55)
     {
@@ -62,6 +66,7 @@ void ParseExtendedPartition(ForensicImage* curimg, uint32_t primextoff, uint32_t
 		}
 		psizelist->append(cursize);
                 ParseFileSystemInformation(curimg, curoff, fsinfolist);
+                //ParseFileSystemInformation(curimg, curoff, fsinfolist);
                 //ParseFileSystemInformation(estring, curoff, fsinfolist);
 	    }
 	}
@@ -71,10 +76,11 @@ void ParseExtendedPartition(ForensicImage* curimg, uint32_t primextoff, uint32_t
 }
 
 //void ParseVolume(QString estring, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
-void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
+//void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
+void ParseVolume(ForImg* curimg, qint64 imgsize, QList<qint64>* pofflist, QList<qint64>* psizelist, QList<QHash<QString, QVariant>>* fsinfolist) // would have to add &fsinfolist here...
 {
     //QIODevice* rawforimg = tmpimg;
-    QString estring = tmpimg->ImgPath();
+    QString estring = curimg->ImgPath();
     //qDebug() << "estring:" << estring;
     if(estring.toLower().endsWith(".e01"))
     {
@@ -98,13 +104,16 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
     */
     }
     //QByteArray sector0 = rawforimg.peek(512);
+    /*
     tmpimg->open(QIODevice::ReadOnly);
     tmpimg->seek(0);
     //rawforimg->seek(0);
     QByteArray sector0 = tmpimg->read(512);
     tmpimg->close();
+    */
     //QByteArray sector0 = rawforimg->read(512);
     //rawforimg->close();
+    QByteArray sector0 = curimg->ReadContent(0, 512);
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(sector0.mid(510, 2));
     uint16_t applesig = qFromLittleEndian<uint16_t>(sector0.left(2)); // should be in 2nd sector, powerpc mac's not intel mac's
     uint32_t bsdsig = qFromLittleEndian<uint32_t>(sector0.left(4)); // can be at start of partition entry of a dos mbr
@@ -124,10 +133,13 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
                 rawforimg.open(QIODevice::ReadOnly);
             */
             //rawforimg->seek(512);
+            /*
             tmpimg->open(QIODevice::ReadOnly);
             tmpimg->seek(512);
             QByteArray sector1 = tmpimg->read(512);
             tmpimg->close();
+            */
+            QByteArray sector1 = curimg->ReadContent(512, 512);
             //QByteArray sector1 = rawforimg->read(512);
             //rawforimg.close();
 	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
@@ -141,12 +153,15 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
 		if(!rawforimg.isOpen())
 		    rawforimg.open(QIODevice::ReadOnly);
                 */
+                /*
                 tmpimg->open(QIODevice::ReadOnly);
 		tmpimg->seek((parttablestart*512));
 		//rawforimg->seek((parttablestart*512));
 		//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
 		QByteArray partentries = tmpimg->read((partentrycount*partentrysize));
                 tmpimg->close();
+                */
+                QByteArray partentries = curimg->ReadContent(parttablestart*512, partentrycount*partentrysize);
 		//rawforimg.close();
 		for(int i=0; i < partentrycount; i++)
 		{
@@ -157,8 +172,9 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
 		    {
 			pofflist->append(curstartsector);
 			psizelist->append((curendsector - curstartsector + 1));
-                        qDebug() << "begin parse file system information";
-                        ParseFileSystemInformation(tmpimg, curstartsector, fsinfolist);
+                        //qDebug() << "begin parse file system information";
+                        ParseFileSystemInformation(curimg, curstartsector, fsinfolist);
+                        //ParseFileSystemInformation(tmpimg, curstartsector, fsinfolist);
                         //ParseFileSystemInformation(estring, curstartsector, fsinfolist);
 			//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
 		    }
@@ -189,7 +205,8 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
                         //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
                         //qDebug() << "parse extended partition recurse loop here...";
                         //ParseExtendedPartition(estring, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
-                        ParseExtendedPartition(tmpimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+                        //ParseExtendedPartition(tmpimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+                        ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
                     }
                     else if(curparttype == 0x00)
                     {
@@ -208,7 +225,8 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
                         pofflist->append(curoffset);
                         psizelist->append(cursize);
                         qDebug() << "begin parse file system information";
-                        ParseFileSystemInformation(tmpimg, curoffset, fsinfolist);
+                        ParseFileSystemInformation(curimg, curoffset, fsinfolist);
+                        //ParseFileSystemInformation(tmpimg, curoffset, fsinfolist);
                         //ParseFileSystemInformation(estring, curoffset, fsinfolist);
                     }
                 }
@@ -239,10 +257,13 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
         */
 	//rawforimg->seek((parttablestart*512));
 	//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
+        /*
         tmpimg->open(QIODevice::ReadOnly);
 	tmpimg->seek((parttablestart*512));
 	QByteArray partentries = tmpimg->read((partentrycount*partentrysize));
         tmpimg->close();
+        */
+        QByteArray partentries = curimg->ReadContent(parttablestart*512, partentrycount*partentrysize);
 	//rawforimg.close();
 	for(int i=0; i < partentrycount; i++)
 	{
@@ -253,8 +274,9 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
 	    {
 		pofflist->append(curstartsector);
 		psizelist->append((curendsector - curstartsector + 1));
-                qDebug() << "begin parse file system information";
-                ParseFileSystemInformation(tmpimg, curstartsector, fsinfolist);
+                //qDebug() << "begin parse file system information";
+                ParseFileSystemInformation(curimg, curstartsector, fsinfolist);
+                //ParseFileSystemInformation(tmpimg, curstartsector, fsinfolist);
                 //ParseFileSystemInformation(estring, curstartsector,fsinfolist);
 		//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
 	    }
@@ -265,7 +287,8 @@ void ParseVolume(ForensicImage* tmpimg, qint64 imgsize, QList<qint64>* pofflist,
 }
 
 //void ParseFileSystemInformation(QString estring, off64_t partoffset, QList<QHash<QString, QVariant>> *fsinfolist)
-void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList<QHash<QString, QVariant>> *fsinfolist)
+//void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList<QHash<QString, QVariant>> *fsinfolist)
+void ParseFileSystemInformation(ForImg* curimg, off64_t partoffset, QList<QHash<QString, QVariant>> *fsinfolist)
 {
     //QList<QHash<QString, QVariant>> fileinfolist;
     QHash<QString, QVariant> fsinfo;
@@ -283,10 +306,13 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
         efile.close();
     }
     */
+    /*
     curimg->open(QIODevice::ReadOnly);
     curimg->seek(partoffset*512);
     partbuf = curimg->read(69120);
     curimg->close();
+    */
+    partbuf = curimg->ReadContent(partoffset*512, 69120);
     // check for various FS's
     uint16_t winsig = qFromLittleEndian<uint16_t>(partbuf.mid(510, 2));
     uint16_t extsig = qFromLittleEndian<uint16_t>(partbuf.mid(1080, 2));
@@ -377,12 +403,16 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                 efile.close();
             }
             */
+            /*
             curimg->open(QIODevice::ReadOnly);
             curimg->seek(fsinfo.value("mftoffset").toULongLong());
             mftentry0 = curimg->read(mftentrybytes);
             curimg->seek(fsinfo.value("mftoffset").toULongLong() + 3*mftentrybytes);
             mftentry3 = curimg->read(mftentrybytes);
             curimg->close();
+            */
+            mftentry0 = curimg->ReadContent(fsinfo.value("mftoffset").toLongLong(), mftentrybytes);
+            mftentry3 = curimg->ReadContent(fsinfo.value("mftoffset").toLongLong() + 3*mftentrybytes, mftentrybytes);
             //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
             if(QString::fromStdString(mftentry0.left(4).toStdString()) == "FILE") // a proper mft entry
             {
@@ -589,10 +619,13 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
+                /*
                 curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo.value("fatoffset").toUInt());
                 rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
                 curimg->close();
+                */
+                rootfatbuf = curimg->ReadContent(fsinfo.value("fatoffset").toLongLong(), fsinfo.value("fatsize").toLongLong() * fsinfo.value("bytespersector").toLongLong());
 		//qDebug() << "root fat content:" << rootfatbuf.mid(0, 40).toHex();
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
@@ -644,10 +677,13 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
+                /*
                 curimg->open(QIODevice::ReadOnly);
                 curimg->seek(fsinfo.value("fatoffset").toUInt());
                 rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
                 curimg->close();
+                */
+                rootfatbuf = curimg->ReadContent(fsinfo.value("fatoffset").toLongLong(), fsinfo.value("fatsize").toLongLong() * fsinfo.value("bytespersector").toLongLong());
                 QList<uint> rootclusterlist;
                 rootclusterlist.clear();
                 if(fsinfo.value("rootdircluster").toUInt() >= 2)
@@ -673,6 +709,7 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     efile.close();
                 }
                 */
+                /*
                 curimg->open(QIODevice::ReadOnly);
                 QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
                 for(int j=0; j < rootdirlayoutlist.count(); j++)
@@ -681,6 +718,10 @@ void ParseFileSystemInformation(ForensicImage* curimg, off64_t partoffset, QList
                     rootdirentry.append(curimg->read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
                 }
                 curimg->close();
+                */
+                QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
+                for(int j=0; j < rootdirlayoutlist.count(); j++)
+                    rootdirentry.append(curimg->ReadContent(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toLongLong(), rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toLongLong()));
                 int curoffset = 0;
                 while(curoffset < rootdirentry.count())
                 {
@@ -4495,9 +4536,10 @@ void GetNextCluster(uint32_t clusternum, uint fstype, QByteArray* fatbuf, QList<
 
 //void ProcessVolume(QString evidstring)
 //void ProcessVolume(ForensicImage* tmpimg)
-void ProcessVolume(ForImg* tmpimg)
+void ProcessVolume(ForImg* curimg)
 {
-    QString evidstring = tmpimg->ImgPath();
+    QString evidstring = curimg->ImgPath();
+    //QString evidstring = tmpimg->ImgPath();
     qDebug() << "imgpath at start of processvolume:" << evidstring;
     QList<qint64> pofflist;
     pofflist.clear();
@@ -4523,7 +4565,8 @@ void ProcessVolume(ForImg* tmpimg)
     QFileInfo efileinfo(emntstring);
     if(evidstring.toLower().endsWith(".e01"))
     {
-        imgsize = tmpimg->size();
+        imgsize = curimg->Size();
+        //imgsize = tmpimg->size();
         //imgsize = testimage->size();
     }
     else
@@ -4553,7 +4596,8 @@ void ProcessVolume(ForImg* tmpimg)
         estatfile.close();
     }
     qDebug() << "Starting Parse Volume";
-    ParseVolume(tmpimg, imgsize, &pofflist, &psizelist, &fsinfolist);
+    ParseVolume(curimg, imgsize, &pofflist, &psizelist, &fsinfolist);
+    //ParseVolume(tmpimg, imgsize, &pofflist, &psizelist, &fsinfolist);
     qDebug() << "Ending Parse Volume";
     //ParseVolume(emntstring, imgsize, &pofflist, &psizelist, &fsinfolist);
     if(pofflist.count() == 0)
@@ -4561,8 +4605,9 @@ void ProcessVolume(ForImg* tmpimg)
 	// virtual attempt to process entire image as a filesystem...
 	pofflist.append(0);
 	psizelist.append(imgsize/512);
+        ParseFileSystemInformation(curimg, 0, &fsinfolist);
         //ParseFileSystemInformation(emntstring, 0, &fsinfolist);
-        ParseFileSystemInformation(tmpimg, 0, &fsinfolist);
+        //ParseFileSystemInformation(tmpimg, 0, &fsinfolist);
     }
     //qDebug() << "pofflist:" << pofflist << "psizelist:" << psizelist;
     // add partitions to tree and decide about stat/prop files and where to put them...
@@ -4640,34 +4685,34 @@ void ProcessVolume(ForImg* tmpimg)
             // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
 	    if(fsinfolist.at(i).value("type").toUInt() == 1 || fsinfolist.at(i).value("type").toUInt() == 2 || fsinfolist.at(i).value("type").toUInt() == 3) // FAT12 || FAT16 || FAT32
             {
-		ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 		//ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             }
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
             {
-		ParseExFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseExFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 		//ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             }
 	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
             {
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &mftentries, &fileinfolist, &orphanlist, 5);
                 qDebug() << "begin parse ntfs directory";
-		ParseNtfsDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
+		//ParseNtfsDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
                 qDebug() << "end parse ntfs directory";
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
                 qDebug() << "begin parse mft";
-                ParseMFT(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);// may need to pass adsinfolist here...
+                //ParseMFT(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);// may need to pass adsinfolist here...
                 qDebug() << "end parse mft";
                 //ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);// may need to pass adsinfolist here...
             }
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
-                ParseExtDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
+                //ParseExtDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
                 //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 
             qDebug() << "begin populate files";
-            PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            //PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             qDebug() << "end populate files";
             //PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
@@ -4752,36 +4797,36 @@ void ProcessVolume(ForImg* tmpimg)
             // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
 	    if(fsinfolist.at(i).value("type").toUInt() == 1 || fsinfolist.at(i).value("type").toUInt() == 2 || fsinfolist.at(i).value("type").toUInt() == 3) // FAT12 || FAT16 || FAT32
             {
-		ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 		//ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             }
 	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
             {
-		ParseExFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseExFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 		//ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             }
 	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
             {
                 qDebug() << "begin parse ntfs directory";
-		ParseNtfsDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
+		//ParseNtfsDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
                 qDebug() << "end parse ntfs directory";
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &mftentries, &fileinfolist, &orphanlist, 5);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
                 qDebug() << "begin parse mft";
-                ParseMFT(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist); // may need to pass adsinfolist here...
+                //ParseMFT(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist); // may need to pass adsinfolist here...
                 qDebug() << "end parse mft";
                 //ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist); // may need to pass adsinfolist here...
             }
             else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
-                ParseExtDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
+                //ParseExtDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
                 //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
             // ELSE EXFAT THEN
             // ELSE ... THEN
 
             qDebug() << "begin populate files";
-            PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            //PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             qDebug() << "end populate files";
             //PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
