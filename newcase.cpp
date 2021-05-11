@@ -2015,7 +2015,7 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
     QHash<QString, QVariant> fileinfo;
     QByteArray mftarray;
     mftarray.clear();
-    curimg->open(QIODevice::ReadOnly);
+    curimg->open(QIODevice::ReadOnly | QIODevice::Unbuffered);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
     {
@@ -2044,6 +2044,7 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
     qulonglong curinode = curicnt;
     // PARSE CURRENT MFT ENTRY RECORD INDEX_ROOT AND INDEX_ALLOCATION TO GET DIRECTORY ENTRIES...
     QByteArray curmftentrybuf = mftarray.mid(curmftentry * fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
+    mftarray.clear();
     int curoffset = 0;
     uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curmftentrybuf.mid(20, 2)); // offset to first attribute
     uint16_t attrcount = qFromLittleEndian<uint16_t>(curmftentrybuf.mid(40, 2)); // next attribute id
