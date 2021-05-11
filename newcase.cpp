@@ -1075,7 +1075,8 @@ void ParseFileSystemInformation(ForImg* curimg, off64_t partoffset, QList<QHash<
 //ParseFileSystemInformation(QByteArray* initbuffer, int fstype, QList<FileSystemInfo>* fsinfolist)
 
 //void ParseMFT(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
-void ParseMFT(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
+//void ParseMFT(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
+void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
 {
     qint64 curinode = fileinfolist->count();
     QByteArray mftarray;
@@ -1100,6 +1101,7 @@ void ParseMFT(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHa
         efile.close();
     }
     */
+    /*
     curimg->open(QIODevice::ReadOnly);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
@@ -1108,6 +1110,10 @@ void ParseMFT(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHa
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
     curimg->close();
+    */
+    QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
+    for(int i=0; i < mftlist.count(); i++)
+        mftarray.append(curimg->ReadContent(mftlist.at(i).split(",").at(0).toLongLong(), mftlist.at(i).split(",").at(1).toLongLong()));
 
     //qDebug() << "mft layout:" << fsinfo->value("mftlayout").toString();
     //qDebug() << "final mftarray count:" << mftarray.count();
@@ -1596,7 +1602,8 @@ void ParseMFT(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHa
 }
 
 //void GetMftEntryContent(QString estring, qulonglong ntinode, QHash<QString, QVariant>* fileinfo, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* adsinfolist)
-void GetMftEntryContent(ForensicImage* curimg, qulonglong ntinode, QHash<QString, QVariant>* fileinfo, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* adsinfolist)
+//void GetMftEntryContent(ForensicImage* curimg, qulonglong ntinode, QHash<QString, QVariant>* fileinfo, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* adsinfolist)
+void GetMftEntryContent(ForImg* curimg, qulonglong ntinode, QHash<QString, QVariant>* fileinfo, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* adsinfolist)
 {
     QByteArray mftarray;
     mftarray.clear();
@@ -1615,6 +1622,7 @@ void GetMftEntryContent(ForensicImage* curimg, qulonglong ntinode, QHash<QString
         efile.close();
     }
     */
+    /*
     curimg->open(QIODevice::ReadOnly);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
@@ -1623,6 +1631,10 @@ void GetMftEntryContent(ForensicImage* curimg, qulonglong ntinode, QHash<QString
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
     curimg->close();
+    */
+    QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
+    for(int i=0; i < mftlist.count(); i++)
+        mftarray.append(curimg->ReadContent(mftlist.at(i).split(",").at(0).toLongLong(), mftlist.at(i).split(",").at(1).toLongLong()));
 
     // GET THE MFT ENTRY BYTE OFFSET RELATIVE TO THE FILE SYSTEM SO I CAN HIGHLIGHT IN HEX
     qulonglong curmftentryoffset = 0;
@@ -2051,11 +2063,16 @@ void GetMftEntryContent(ForensicImage* curimg, qulonglong ntinode, QHash<QString
 }
 
 //void ParseNtfsDirectory(QString estring, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curmftentry, qulonglong curicnt)
-void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curmftentry, qulonglong curicnt)
+//void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curmftentry, qulonglong curicnt)
+void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, QHash<QString, QVariant>* parfileinfo, qulonglong curmftentry, qulonglong curicnt)
 {
     QHash<QString, QVariant> fileinfo;
     QByteArray mftarray;
     mftarray.clear();
+    QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
+    for(int i=0; i < mftlist.count(); i++)
+        mftarray.append(curimg->ReadContent(mftlist.at(i).split(",").at(0).toLongLong(), mftlist.at(i).split(",").at(1).toLongLong()));
+    /*
     curimg->open(QIODevice::ReadOnly | QIODevice::Unbuffered);
     QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
     for(int i=0; i < mftlist.count(); i++)
@@ -2064,6 +2081,7 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
         mftarray.append(curimg->read(mftlist.at(i).split(",").at(1).toULongLong()));
     }
     curimg->close();
+    */
     /*
     QFile efile(estring);
     if(!efile.isOpen())
@@ -2165,6 +2183,7 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
                 efile.close();
             }
             */
+            /*
             curimg->open(QIODevice::ReadOnly);
             for(j=0; j < runlist.count(); j++)
             {
@@ -2172,6 +2191,9 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
                 indxalloc.append(curimg->read(runlist.at(j).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()));
             }
             curimg->close();
+            */
+            for(j=0; j < runlist.count(); j++)
+                indxalloc.append(curimg->ReadContent(((fsinfo->value("partoffset").toLongLong()*512) + (runlist.at(j).split(",").at(0).toLongLong()*fsinfo->value("bytespercluster").toLongLong())), (runlist.at(j).split(",").at(1).toLongLong() * fsinfo->value("bytespercluster").toLongLong())));
         }
         else if(attrtype == 0xffffffff)
             break;
@@ -2345,7 +2367,7 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
                                     curinode++;
                                     if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
                                     {
-                                        //ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+                                        ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                                         //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                                         curinode = fileinfolist->count();
                                     }
@@ -2523,7 +2545,7 @@ void ParseNtfsDirectory(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo,
                         curinode++;
                         if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
                         {
-                            //ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+                            ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                             //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                             curinode = fileinfolist->count();
                         }
@@ -4697,12 +4719,12 @@ void ProcessVolume(ForImg* curimg)
             {
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &mftentries, &fileinfolist, &orphanlist, 5);
                 qDebug() << "begin parse ntfs directory";
-		//ParseNtfsDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
+		ParseNtfsDirectory(curimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
                 qDebug() << "end parse ntfs directory";
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
                 qDebug() << "begin parse mft";
-                //ParseMFT(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);// may need to pass adsinfolist here...
+                ParseMFT(curimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);// may need to pass adsinfolist here...
                 qDebug() << "end parse mft";
                 //ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);// may need to pass adsinfolist here...
             }
@@ -4808,13 +4830,13 @@ void ProcessVolume(ForImg* curimg)
 	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
             {
                 qDebug() << "begin parse ntfs directory";
-		//ParseNtfsDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
+		ParseNtfsDirectory(curimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
                 qDebug() << "end parse ntfs directory";
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &mftentries, &fileinfolist, &orphanlist, 5);
 		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
                 qDebug() << "begin parse mft";
-                //ParseMFT(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist); // may need to pass adsinfolist here...
+                ParseMFT(curimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist); // may need to pass adsinfolist here...
                 qDebug() << "end parse mft";
                 //ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist); // may need to pass adsinfolist here...
             }
