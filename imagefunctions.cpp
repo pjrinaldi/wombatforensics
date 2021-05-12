@@ -341,6 +341,10 @@ ForImg::ForImg(QString imgfile)
     qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
     {
+    libewf_handle_t* ewfhandle = NULL;
+    libewf_error_t* ewferror = NULL;
+    char** globfiles = NULL;
+    int globfilecnt = 0;
         QString efilepath = imgfile.split(imgfile.split("/").last()).first();
         QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
         QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
@@ -370,6 +374,8 @@ ForImg::ForImg(QString imgfile)
             printf("libewf_handle_open was successful %d\n", retopen);
         libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
         libewf_handle_close(ewfhandle, &ewferror);
+        libewf_handle_free(&ewfhandle, &ewferror);
+        libewf_glob_free(globfiles, globfilecnt, &ewferror);
     }
 
 }
@@ -379,8 +385,8 @@ ForImg::~ForImg()
     if(imgtype == 0) // EWF
     {
         //libewf_handle_close(ewfhandle, &ewferror);
-        libewf_handle_free(&ewfhandle, &ewferror);
-        libewf_glob_free(globfiles, globfilecnt, &ewferror);
+        //libewf_handle_free(&ewfhandle, &ewferror);
+        //libewf_glob_free(globfiles, globfilecnt, &ewferror);
     }
 }
 
@@ -392,6 +398,30 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     int retopen = 0;
     if(imgtype == 0)
     {
+    libewf_handle_t* ewfhandle = NULL;
+    libewf_error_t* ewferror = NULL;
+    char** globfiles = NULL;
+    int globfilecnt = 0;
+        QString efilepath = imgpath.split(imgpath.split("/").last()).first();
+        QDir edir = QDir(imgpath.split(imgpath.split("/").last()).first());
+        QStringList efiles = edir.entryList(QStringList() << QString(imgpath.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgpath.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
+        char* filenames[efiles.count()] = {NULL};
+        for(int i=0; i < efiles.count(); i++)
+        {
+            filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
+            printf("filenames[%d] = %s\n", i, filenames[i]);
+        }
+        globfilecnt = efiles.count();
+        printf("globfilecnt: %d\n", globfilecnt);
+        int retopen = 0;
+
+        retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        else
+            printf("libewf glob was successful: %d\n", retopen);
+
+        retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
         retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
@@ -400,6 +430,8 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         res = libewf_handle_read_buffer(ewfhandle, data, size, &ewferror);
         tmparray = QByteArray::fromRawData((const char*)data, size);
         libewf_handle_close(ewfhandle, &ewferror);
+        libewf_handle_free(&ewfhandle, &ewferror);
+        libewf_glob_free(globfiles, globfilecnt, &ewferror);
     }
     return tmparray;
 }

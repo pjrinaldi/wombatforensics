@@ -47,10 +47,11 @@ class ForImg
     private:
 
         // EWF Variables
-        libewf_handle_t* ewfhandle = NULL;
+/*        libewf_handle_t* ewfhandle = NULL;
         libewf_error_t* ewferror = NULL;
         char** globfiles = NULL;
         int globfilecnt = 0;
+*/
         // ALL Variables
         off64_t imgsize = 0;
         qint64 imgoffset = 0;
