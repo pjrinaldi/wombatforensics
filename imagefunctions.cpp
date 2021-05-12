@@ -433,6 +433,25 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
     }
+    else if(imgtype == 1)
+    {
+    }
+    else if(imgtype == 2) // SMRAW
+    {
+	QFile tmpfile(imgpath);
+	if(!tmpfile.isOpen())
+	    tmpfile.open(QIODevice::ReadOnly);
+	if(tmpfile.isOpen())
+	{
+	    tmpfile.seek(pos);
+	    tmparray = tmpfile.read(size);
+	    tmpfile.close();
+	}
+    }
+    else if(imgtype == 3)
+    {
+    }
+
     return tmparray;
 }
 
