@@ -409,17 +409,17 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         for(int i=0; i < efiles.count(); i++)
         {
             filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
-            printf("filenames[%d] = %s\n", i, filenames[i]);
+            //printf("filenames[%d] = %s\n", i, filenames[i]);
         }
         globfilecnt = efiles.count();
-        printf("globfilecnt: %d\n", globfilecnt);
+        //printf("globfilecnt: %d\n", globfilecnt);
         int retopen = 0;
 
         retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
-        else
-            printf("libewf glob was successful: %d\n", retopen);
+        //else
+        //    printf("libewf glob was successful: %d\n", retopen);
 
         retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
         retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
@@ -444,4 +444,19 @@ qint64 ForImg::Size()
 QString ForImg::ImgPath()
 {
     return imgpath;
+}
+
+MyIODevice::MyIODevice(QString imgfile)
+{
+    imgpath = imgfile;
+    qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
+}
+MyIODevice::~MyIODevice()
+{
+}
+qint64 MyIODevice::readData(char *data, qint64 maxSize)
+{
+}
+qint64 MyIODevice::writeData(char* data, qint64 maxSize)
+{
 }

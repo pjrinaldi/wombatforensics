@@ -59,4 +59,19 @@ class ForImg
         int imgtype = -1;
 };
 
+class MyIODevice : public QIODevice
+{
+    public:
+
+        MyIODevice(QString imgfile);
+        ~MyIODevice();
+        qint64 readData(char *data, qint64 maxSize);
+        qint64 writeData(char* data, qint64 maxSize);
+    private:
+        qint64 imgoffset = 0;
+        QString imgpath = "";
+        int imgtype = -1;
+        qint64 imgsize = 0;
+};
+
 #endif // IMAGEFUNCTIONS_H
