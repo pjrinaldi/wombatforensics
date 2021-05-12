@@ -1069,6 +1069,7 @@ void ParseFileSystemInformation(ForImg* curimg, off64_t partoffset, QList<QHash<
     }
     // need to implement iso-14, udf-15, hfs-16, zfs-17, refs-18
     fsinfolist->append(fsinfo);
+    partbuf.clear();
 }
 
 // QtConcurrent::map(QList<DirEntryInfo> direntrylist, ProcessFileInformation);
@@ -2376,6 +2377,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                                         //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                                         curinode = fileinfolist->count();
                                     }
+                                    fileinfo.clear();
                                     if(adsinfolist.count() > 0)
                                     {
                                         for(int j=0; j < adsinfolist.count(); j++)
@@ -2385,6 +2387,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                                             fileinfolist->append(curadsinfo);
                                             curinode++;
                                         }
+                                        adsinfolist.clear();
                                     }
                                 }
                             }
@@ -2555,6 +2558,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                             //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
                             curinode = fileinfolist->count();
                         }
+                        fileinfo.clear();
                         if(adsinfolist.count() > 0)
                         {
                             for(int j=0; j < adsinfolist.count(); j++)
@@ -2564,6 +2568,7 @@ void ParseNtfsDirectory(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<
                                 fileinfolist->append(curadsinfo);
                                 curinode++;
                             }
+                            adsinfolist.clear();
                         }
                     }
                 }
@@ -4741,7 +4746,10 @@ void ProcessVolume(ForImg* curimg)
             //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
 
             qDebug() << "begin populate files";
+            fileinfolist.clear();
+            orphanlist.clear();
             //PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            PopulateFiles(curimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             qDebug() << "end populate files";
             //PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
@@ -4855,7 +4863,10 @@ void ProcessVolume(ForImg* curimg)
             // ELSE ... THEN
 
             qDebug() << "begin populate files";
+            fileinfolist.clear();
+            orphanlist.clear();
             //PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            PopulateFiles(curimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             qDebug() << "end populate files";
             //PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
             // FILE CARVING DIRECTORIES
@@ -4923,7 +4934,8 @@ void ProcessVolume(ForImg* curimg)
 }
 
 //void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int evidcnt, int ptreecnt)
-void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int evidcnt, int ptreecnt)
+//void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int evidcnt, int ptreecnt)
+void PopulateFiles(ForImg* curimg, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int evidcnt, int ptreecnt)
 {
     //QList<QHash<QString, QVariant>> overflow;
     QList<QVariant> nodedata;
@@ -4968,6 +4980,7 @@ void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QV
 		    efile.close();
 		}
                 */
+                /*
                 curimg->open(QIODevice::ReadOnly);
                 if(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).count() > 0)
                 {
@@ -4975,7 +4988,11 @@ void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QV
                     sigbuf = curimg->read(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(1).toULongLong());
                 }
                 curimg->close();
+                */
+                if(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).count() > 0)
+                    sigbuf = curimg->ReadContent(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toLongLong(), fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(1).toLongLong());
 		QString mimestr = GenerateCategorySignature(sigbuf, fileinfolist->at(j).value("filename").toString());
+                sigbuf.clear();
 		nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
 	    }
         }
@@ -5033,11 +5050,15 @@ void PopulateFiles(ForensicImage* curimg, QString curpartpath, QHash<QString, QV
             qDebug() << "orphanlist:" << orphanlist->at(j).value("filename").toString() << orphanlist->at(j).value("layout").toString();
             if(orphanlist->at(j).value("layout").toString().split(";").count() > 1)
             {
+                /*
                 curimg->open(QIODevice::ReadOnly);
                 curimg->seek(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(0).toULongLong());
                 sigbuf = curimg->read(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toULongLong());
                 curimg->close();
+                */
+                sigbuf = curimg->ReadContent(orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(0).toLongLong(), orphanlist->at(j).value("layout").toString().split(";").at(0).split(",").at(1).toLongLong());
                 mimestr = GenerateCategorySignature(sigbuf, orphanlist->at(j).value("filename").toString());
+                sigbuf.clear();
             }
         }
 
@@ -5080,6 +5101,7 @@ void AddVirtualFileSystemFiles(QHash<QString, QVariant>* fsinfo, int* curinode, 
             mutex.unlock();
             inode++;
         }
+        // NEED TO WRITE THE FILE PROPERTIES FOR THE 3 FILES
         //if(fsinfo->value("type").toUInt() == 4) // Might Need to Add the Alloc_Bitmap, and the Other special's, but I think they are taken care when parsing root directory...
     }
     *curinode = inode;

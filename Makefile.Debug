@@ -203,40 +203,16 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/g++-base.conf \
 		/usr/lib/qt/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt/mkspecs/qconfig.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KIdleTime.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KScreen.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KWaylandClient.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KWaylandServer.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3drender.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_3drender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_av_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_avwidgets_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bluetooth_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_bodymovin_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_charts_private.pri \
@@ -244,8 +220,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_core_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_datavisualization_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_dbus_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_designer.pri \
@@ -259,14 +233,11 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_eventdispatcher_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fb_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_fontdatabase_support_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_gamepad_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_glx_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_gui_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_help_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_hunspellinputmethod_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_input_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_kms_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_linuxaccessibility_support_private.pri \
@@ -279,10 +250,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_multimediawidgets_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_network_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_networkauth_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_nfc.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_nfc_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_opengl_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_openglextensions.pri \
@@ -299,8 +266,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_positioningquick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_printsupport_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_purchasing_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qml_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmldebug_private.pri \
@@ -314,30 +279,12 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickshapes_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_quicktemplates2_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickwidgets_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_remoteobjects_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_repparser.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_repparser_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_script.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_script_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scxml_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_sensors.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_sensors_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialbus_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialport.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql_private.pri \
@@ -351,8 +298,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_uitools_private.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard.pri \
-		/usr/lib/qt/mkspecs/modules/qt_lib_virtualkeyboard_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_vulkan_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_waylandclient_private.pri \
@@ -645,6 +590,7 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
+		imagefunctions.h \
 		carving.h \
 		videoviewer.h \
 		ui_videoviewer.h \
@@ -718,7 +664,6 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 		ui_newforimg.h \
 		verevidencedialog.h \
 		ui_verifyevidencedialog.h \
-		imagefunctions.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/local/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include wombatforensics.h -o debug/moc_wombatforensics.cpp
@@ -735,6 +680,7 @@ debug/moc_globals.cpp: globals.h \
 		wombatinclude.h \
 		forimg.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/local/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include globals.h -o debug/moc_globals.cpp
@@ -745,6 +691,7 @@ debug/moc_propertieswindow.cpp: propertieswindow.h \
 		ui_propertieswindow.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/local/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include propertieswindow.h -o debug/moc_propertieswindow.cpp
@@ -758,6 +705,7 @@ debug/moc_fileviewer.cpp: fileviewer.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		searchdialog.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -768,6 +716,7 @@ debug/moc_filterviews.cpp: filterviews.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_accesseddatefilter.h \
 		ui_analysistypefilter.h \
 		ui_changeddatefilter.h \
@@ -792,6 +741,7 @@ debug/moc_imageviewer.cpp: imageviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
@@ -806,6 +756,7 @@ debug/moc_videoviewer.cpp: videoviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_videoviewer.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -816,6 +767,7 @@ debug/moc_viewermanager.cpp: viewermanager.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_viewermanager.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -826,6 +778,7 @@ debug/moc_textviewer.cpp: textviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_textviewer.h \
 		wombatfunctions.h \
 		debug/moc_predefs.h \
@@ -837,6 +790,7 @@ debug/moc_htmlviewer.cpp: htmlviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		artifactparser.h \
 		wombatfunctions.h \
 		ui_htmlviewer.h \
@@ -849,6 +803,7 @@ debug/moc_messageviewer.cpp: messageviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_messageviewer.h \
 		wombatfunctions.h \
 		debug/moc_predefs.h \
@@ -860,6 +815,7 @@ debug/moc_byteconverter.cpp: byteconverter.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_byteconverter.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -878,6 +834,7 @@ debug/moc_aboutbox.cpp: aboutbox.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_aboutbox.h \
 		debug/moc_predefs.h \
@@ -891,6 +848,7 @@ debug/moc_qhexedit.cpp: qhexedit.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/local/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include qhexedit.h -o debug/moc_qhexedit.cpp
@@ -915,6 +873,7 @@ debug/moc_settingsdialog.cpp: settingsdialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_settingsdialog.h \
 		carvingfiletypesdialog.h \
@@ -928,6 +887,7 @@ debug/moc_addevidencedialog.cpp: addevidencedialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_addevidencedialog.h \
 		debug/moc_predefs.h \
@@ -939,6 +899,7 @@ debug/moc_remevidencedialog.cpp: remevidencedialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_remevidencedialog.h \
 		debug/moc_predefs.h \
@@ -950,6 +911,7 @@ debug/moc_tagmanager.cpp: tagmanager.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		reporting.h \
 		ui_tagmanager.h \
@@ -965,6 +927,7 @@ debug/moc_searchdialog.cpp: searchdialog.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/local/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include searchdialog.h -o debug/moc_searchdialog.cpp
@@ -974,6 +937,7 @@ debug/moc_carvedialog.cpp: carvedialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_carvedialog.h \
 		debug/moc_predefs.h \
@@ -993,6 +957,7 @@ debug/moc_carvingfiletypesdialog.cpp: carvingfiletypesdialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_carvingfiletypesdialog.h \
 		wombatfunctions.h \
 		debug/moc_predefs.h \
@@ -1004,6 +969,7 @@ debug/moc_pdfviewer.cpp: pdfviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_pdfviewer.h \
 		videoviewer.h \
@@ -1017,6 +983,7 @@ debug/moc_registryviewer.cpp: registryviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_registryviewer.h \
 		tagging.h \
@@ -1030,6 +997,7 @@ debug/moc_newforimg.cpp: newforimg.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_newforimg.h \
 		debug/moc_predefs.h \
@@ -1041,9 +1009,9 @@ debug/moc_verevidencedialog.cpp: verevidencedialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_verifyevidencedialog.h \
-		imagefunctions.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/local/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include verevidencedialog.h -o debug/moc_verevidencedialog.cpp
@@ -1103,7 +1071,8 @@ ui_fileviewer.h: fileviewer.ui \
 		forimg.h \
 		commands.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	/usr/bin/uic fileviewer.ui -o ui_fileviewer.h
 
 ui_hashcategoryfilter.h: hashcategoryfilter.ui \
@@ -1179,7 +1148,8 @@ ui_wombatforensics.h: wombatforensics.ui \
 		forimg.h \
 		commands.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	/usr/bin/uic wombatforensics.ui -o ui_wombatforensics.h
 
 ui_jumphex.h: jumphex.ui \
@@ -1250,6 +1220,7 @@ debug/main.o: main.cpp wombatinclude.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
+		imagefunctions.h \
 		carving.h \
 		videoviewer.h \
 		ui_videoviewer.h \
@@ -1322,8 +1293,7 @@ debug/main.o: main.cpp wombatinclude.h \
 		newforimg.h \
 		ui_newforimg.h \
 		verevidencedialog.h \
-		ui_verifyevidencedialog.h \
-		imagefunctions.h
+		ui_verifyevidencedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/main.o main.cpp
 
 debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
@@ -1332,6 +1302,7 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
+		imagefunctions.h \
 		carving.h \
 		videoviewer.h \
 		ui_videoviewer.h \
@@ -1404,15 +1375,15 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		newforimg.h \
 		ui_newforimg.h \
 		verevidencedialog.h \
-		ui_verifyevidencedialog.h \
-		imagefunctions.h
+		ui_verifyevidencedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/wombatforensics.o wombatforensics.cpp
 
 debug/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
 		wombatinclude.h \
 		forimg.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/wombatfunctions.o wombatfunctions.cpp
 
 debug/exportdialog.o: exportdialog.cpp exportdialog.h \
@@ -1425,7 +1396,8 @@ debug/exportdialog.o: exportdialog.cpp exportdialog.h \
 debug/globals.o: globals.cpp globals.h \
 		wombatinclude.h \
 		forimg.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/globals.o globals.cpp
 
 debug/propertieswindow.o: propertieswindow.cpp propertieswindow.h \
@@ -1433,7 +1405,8 @@ debug/propertieswindow.o: propertieswindow.cpp propertieswindow.h \
 		forimg.h \
 		ui_propertieswindow.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/propertieswindow.o propertieswindow.cpp
 
 debug/fileviewer.o: fileviewer.cpp fileviewer.h \
@@ -1445,6 +1418,7 @@ debug/fileviewer.o: fileviewer.cpp fileviewer.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		searchdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/fileviewer.o fileviewer.cpp
 
@@ -1453,6 +1427,7 @@ debug/filterviews.o: filterviews.cpp filterviews.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_accesseddatefilter.h \
 		ui_analysistypefilter.h \
 		ui_changeddatefilter.h \
@@ -1475,6 +1450,7 @@ debug/imageviewer.o: imageviewer.cpp imageviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_imageviewer.h \
 		ui_imagewindow.h \
@@ -1487,6 +1463,7 @@ debug/videoviewer.o: videoviewer.cpp videoviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_videoviewer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/videoviewer.o videoviewer.cpp
 
@@ -1495,6 +1472,7 @@ debug/viewermanager.o: viewermanager.cpp viewermanager.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_viewermanager.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/viewermanager.o viewermanager.cpp
 
@@ -1503,6 +1481,7 @@ debug/textviewer.o: textviewer.cpp textviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_textviewer.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/textviewer.o textviewer.cpp
@@ -1512,6 +1491,7 @@ debug/htmlviewer.o: htmlviewer.cpp htmlviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		artifactparser.h \
 		wombatfunctions.h \
 		ui_htmlviewer.h
@@ -1522,6 +1502,7 @@ debug/messageviewer.o: messageviewer.cpp messageviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_messageviewer.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/messageviewer.o messageviewer.cpp
@@ -1531,6 +1512,7 @@ debug/byteconverter.o: byteconverter.cpp byteconverter.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_byteconverter.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/byteconverter.o byteconverter.cpp
 
@@ -1546,6 +1528,7 @@ debug/aboutbox.o: aboutbox.cpp aboutbox.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_aboutbox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/aboutbox.o aboutbox.cpp
@@ -1556,7 +1539,8 @@ debug/qhexedit.o: qhexedit.cpp qhexedit.h \
 		forimg.h \
 		commands.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/qhexedit.o qhexedit.cpp
 
 debug/chunks.o: chunks.cpp chunks.h \
@@ -1575,6 +1559,7 @@ debug/settingsdialog.o: settingsdialog.cpp settingsdialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_settingsdialog.h \
 		carvingfiletypesdialog.h \
@@ -1586,6 +1571,7 @@ debug/addevidencedialog.o: addevidencedialog.cpp addevidencedialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_addevidencedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/addevidencedialog.o addevidencedialog.cpp
@@ -1595,6 +1581,7 @@ debug/remevidencedialog.o: remevidencedialog.cpp remevidencedialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_remevidencedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/remevidencedialog.o remevidencedialog.cpp
@@ -1604,6 +1591,7 @@ debug/tagmanager.o: tagmanager.cpp tagmanager.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		reporting.h \
 		ui_tagmanager.h
@@ -1617,6 +1605,7 @@ debug/searchdialog.o: searchdialog.cpp searchdialog.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_searchdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/searchdialog.o searchdialog.cpp
 
@@ -1625,6 +1614,7 @@ debug/carvedialog.o: carvedialog.cpp carvedialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_carvedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/carvedialog.o carvedialog.cpp
@@ -1641,6 +1631,7 @@ debug/carvingfiletypesdialog.o: carvingfiletypesdialog.cpp carvingfiletypesdialo
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		ui_carvingfiletypesdialog.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/carvingfiletypesdialog.o carvingfiletypesdialog.cpp
@@ -1650,6 +1641,7 @@ debug/pdfviewer.o: pdfviewer.cpp pdfviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_pdfviewer.h \
 		videoviewer.h \
@@ -1661,6 +1653,7 @@ debug/carving.o: carving.cpp carving.h \
 		wombatinclude.h \
 		forimg.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		videoviewer.h \
 		ui_videoviewer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/carving.o carving.cpp
@@ -1670,14 +1663,16 @@ debug/digging.o: digging.cpp digging.h \
 		forimg.h \
 		wombatfunctions.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/digging.o digging.cpp
 
 debug/reporting.o: reporting.cpp reporting.h \
 		wombatinclude.h \
 		forimg.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/reporting.o reporting.cpp
 
 debug/artifactparser.o: artifactparser.cpp artifactparser.h \
@@ -1685,7 +1680,8 @@ debug/artifactparser.o: artifactparser.cpp artifactparser.h \
 		forimg.h \
 		wombatfunctions.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/artifactparser.o artifactparser.cpp
 
 debug/exporting.o: exporting.cpp exporting.h \
@@ -1693,7 +1689,8 @@ debug/exporting.o: exporting.cpp exporting.h \
 		forimg.h \
 		wombatfunctions.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/exporting.o exporting.cpp
 
 debug/newcase.o: newcase.cpp newcase.h \
@@ -1701,6 +1698,7 @@ debug/newcase.o: newcase.cpp newcase.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/newcase.o newcase.cpp
 
@@ -1709,6 +1707,7 @@ debug/opencase.o: opencase.cpp opencase.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/opencase.o opencase.cpp
 
@@ -1717,6 +1716,7 @@ debug/registryviewer.o: registryviewer.cpp registryviewer.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
 		ui_registryviewer.h \
 		tagging.h \
@@ -1728,9 +1728,9 @@ debug/newforimg.o: newforimg.cpp newforimg.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
-		ui_newforimg.h \
-		imagefunctions.h
+		ui_newforimg.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/newforimg.o newforimg.cpp
 
 debug/imagefunctions.o: imagefunctions.cpp imagefunctions.h \
@@ -1746,7 +1746,8 @@ debug/tagging.o: tagging.cpp tagging.h \
 		forimg.h \
 		wombatfunctions.h \
 		globals.h \
-		wombatvariable.h
+		wombatvariable.h \
+		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/tagging.o tagging.cpp
 
 debug/verevidencedialog.o: verevidencedialog.cpp verevidencedialog.h \
@@ -1754,9 +1755,9 @@ debug/verevidencedialog.o: verevidencedialog.cpp verevidencedialog.h \
 		forimg.h \
 		globals.h \
 		wombatvariable.h \
+		imagefunctions.h \
 		wombatfunctions.h \
-		ui_verifyevidencedialog.h \
-		imagefunctions.h
+		ui_verifyevidencedialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/verevidencedialog.o verevidencedialog.cpp
 
 debug/qrc_wombatforensics.o: debug/qrc_wombatforensics.cpp 
