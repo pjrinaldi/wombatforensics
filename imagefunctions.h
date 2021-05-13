@@ -43,6 +43,8 @@ class ForImg
         QByteArray ReadContent(qint64 pos, qint64 size);
         qint64 Size();
         QString ImgPath();
+        QString MountPath();
+        void SetMountPath(QString mountpath);
 
     private:
 
@@ -56,6 +58,7 @@ class ForImg
         off64_t imgsize = 0;
         qint64 imgoffset = 0;
         QString imgpath = "";
+        QString mntpath = "";
         int imgtype = -1;
 };
 

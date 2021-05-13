@@ -99,6 +99,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(CarveUpdate(QString, int)), this, SLOT(UpdateCarve(QString, int)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(StatUpdate(QString)), this, SLOT(StatusUpdate(QString)), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
     bookmarkmenu->setTitle("Tag Selected As");
@@ -1435,6 +1436,7 @@ QList<ForImg*> existingforimglist;
 	QString emntpath = "";
         QDir dir;
         dir.mkpath(evidencepath);
+        newforimglist.at(i)->SetMountPath(evidencepath);
 	/*
 	if(newevidence.at(i).toLower().endsWith(".zmg") || newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001") || newevidence.at(i).toLower().endsWith(".e01"))
 	{
@@ -1488,7 +1490,8 @@ QList<ForImg*> existingforimglist;
         }
         */
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
-        QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
+        QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessForensicImage);
+        //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
         //QFuture<void> tmpfuture = QtConcurrent::map(newevid, ProcessVolume);
         volwatcher.setFuture(tmpfuture);
         //UpdateStatus();

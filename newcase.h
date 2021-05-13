@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "wombatfunctions.h"
 
+void ProcessForensicImage(ForImg* curimg);
 void ProcessVolume(ForImg* tmpimage);
 //void ProcessVolume(ForensicImage* tmpimage);
 //void ProcessVolume(QString evidstring);

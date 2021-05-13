@@ -5222,3 +5222,229 @@ void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstr
     }
     //qDebug() << "fsinfo type:" << fsinfo->value("typestr");
 }
+
+void ProcessForensicImage(ForImg* curimg)
+{
+    qInfo() << "Parsing Forensic Image:" << curimg->ImgPath();
+    isignals->StatUp("Parsing Forensic Image");
+    qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
+    qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
+    QList<qint64> pofflist;
+    pofflist.clear();
+    QList<qint64> psizelist;
+    psizelist.clear();
+    qDebug() << "imgsize:" << curimg->Size();
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << curimg->ImgPath().split("/").last() << "0" << QString::number(curimg->Size()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last());
+    /*
+     * NEED TO WRITE THIS AS I GO.... AND CLEAR STRING AS I GO
+    QString reportstring = "";
+    reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table width='98%'>";
+    reportstring += "<tr><th colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "):" + curimg->ImgPath() + "</th></tr>";
+    reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString::number(curimg->Size()) + " bytes</td></tr>";
+    EvidenceReportData tmpdata;
+    tmpdata.evidid = evidcnt;
+    tmpdata.evidname = evidencename;
+    tmpdata.evidcontent = reportstring;
+    evidrepdatalist.append(tmpdata);
+    AddELinkItem(evidrepdatalist.at(i).evidid, evidrepdatalist.at(i).evidname);
+    AddEvidItem(evidrepdatalist.at(i).evidcontent);
+    */
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, "-1", -1, -1);
+    mutex.unlock();
+    nodedata.clear();
+    QFile estatfile(curimg->MountPath() + "/stat");
+    QTextStream out;
+    if(!estatfile.isOpen())
+        estatfile.open(QIODevice::Append | QIODevice::Text);
+    if(estatfile.isOpen())
+    {
+        out.setDevice(&estatfile);
+        // original evidence filename, evidence mount string, imgsize, id is in the mount string
+        out << curimg->ImgPath() << "," << curimg->MountPath() << "," << curimg->Size();
+        out.flush();
+        estatfile.close();
+    }
+
+    /*
+    qDebug() << "Starting Parse Volume";
+    ParseVolume(curimg, imgsize, &pofflist, &psizelist, &fsinfolist);
+    */
+    qInfo() << "Reading Partition Table...";
+    //QByteArray sector0 = curimg->ReadContent(0, 512)
+    uint16_t mbrsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(510, 2));
+    uint16_t applesig = qFromLittleEndian<uint16_t>(curimg->ReadContent(0, 2)); // should be in 2nd sector, powerpc mac's not intel mac's
+    uint32_t bsdsig = qFromLittleEndian<uint32_t>(curimg->ReadContent(0, 4)); // can be at start of partition entry of a dos mbr
+    uint16_t sunsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(508, 2)); // worry about it later, i386 sun can be at 2nd sector of partition entry of a dos mbr
+    uint64_t gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(0, 8));
+    if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
+    {
+        if((uint8_t)qFromLittleEndian<uint8_t>(curimg->ReadContent(450, 1)) == 0xee) // GPT DISK
+        {
+            gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(512, 8));
+	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
+            {
+                uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
+                uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
+                uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
+                for(int i=0; i < partentrycount; i++)
+                {
+                    int cnt = i*partentrysize;
+                    uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+                    uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+                    if(curendsector - curstartsector > 0)
+                    {
+                        pofflist.append(curstartsector);
+                        psizelist.append(curendsector - curstartsector + 1);
+			qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
+                    }
+                }
+            }
+        }
+        else // MBR DISK
+        {
+        }
+    }
+    else
+        qDebug() << "partition signature not found correctly";
+    /*
+    QByteArray sector0 = curimg->ReadContent(0, 512);
+
+    QString exfatstr = QString::fromStdString(sector0.mid(3, 5).toStdString());
+    QString fatstr = QString::fromStdString(sector0.mid(54, 5).toStdString());
+    QString fat32str = QString::fromStdString(sector0.mid(82, 5).toStdString());
+    if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
+    {
+        //qDebug() << "imgsize:" << imgsize;
+	if((uint8_t)sector0.at(450) == 0xee) // GPT DISK
+        {
+                 QByteArray sector1 = curimg->ReadContent(512, 512);
+            //QByteArray sector1 = rawforimg->read(512);
+            //rawforimg.close();
+	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
+	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
+	    {
+		//qDebug() << "gpt found, parse table now...";
+		uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector1.mid(72, 8));
+		uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector1.mid(80, 4));
+		uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector1.mid(84, 4));
+                QByteArray partentries = curimg->ReadContent(parttablestart*512, partentrycount*partentrysize);
+		//rawforimg.close();
+		for(int i=0; i < partentrycount; i++)
+		{
+		    int cnt = i*partentrysize;
+		    uint32_t curstartsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 32, 8));
+		    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
+		    if((curendsector - curstartsector) > 0)
+		    {
+			pofflist->append(curstartsector);
+			psizelist->append((curendsector - curstartsector + 1));
+                        //qDebug() << "begin parse file system information";
+                        ParseFileSystemInformation(curimg, curstartsector, fsinfolist);
+                        //ParseFileSystemInformation(tmpimg, curstartsector, fsinfolist);
+                        //ParseFileSystemInformation(estring, curstartsector, fsinfolist);
+			//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
+		    }
+
+		}
+		//qDebug() << "gpt table start sector:" << parttablestart << "partentry count:" << partentrycount << "partentrysize:" << partentrysize;
+	    }
+	    else
+		qDebug() << "gpt should have been there, math is off...";
+        }
+	else // MBR DISK
+	{
+	    if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32
+            {
+                // Windows partition/fs which starts at beginning of image with no partition table
+            }
+            else
+            {
+                for(int i=0; i < 4; i++)
+                {
+                    int cnt = i*16;
+                    QByteArray curpart = sector0.mid(446 + cnt, 16);
+                    uint8_t curparttype = curpart.at(4);
+                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
+                    uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
+                    if(curparttype == 0x05) // extended partition
+                    {
+                        //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
+                        //qDebug() << "parse extended partition recurse loop here...";
+                        //ParseExtendedPartition(estring, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+                        //ParseExtendedPartition(tmpimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+                        ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+                    }
+                    else if(curparttype == 0x00)
+                    {
+                        //qDebug() << "do nothing here cause it is an empty partition...";
+                    }
+                    else if(curparttype == 0x82) // Sun i386
+                    {
+                        // parse sun table here passing pofflist and psizelist
+                    }
+                    else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
+                    {
+                        // parse bsd table here passing pofflist nad psizelist
+                    }
+                    else
+                    {
+                        pofflist->append(curoffset);
+                        psizelist->append(cursize);
+                        qDebug() << "begin parse file system information";
+                        ParseFileSystemInformation(curimg, curoffset, fsinfolist);
+                        //ParseFileSystemInformation(tmpimg, curoffset, fsinfolist);
+                        //ParseFileSystemInformation(estring, curoffset, fsinfolist);
+                    }
+                }
+            }
+	}
+    }
+    else if(applesig == 0x504d) // APPLE PARTITION
+    {
+        qDebug() << "apple sig here...";
+    }
+    else if(bsdsig == 0x82564557) // BSD PARTITION
+    {
+        qDebug() << "bsd part here...";
+    }
+    else if(sunsig == 0xDABE) // SUN PARTITION
+    {
+        qDebug() << "determine if sparc or i386 and then process partitions.";
+    }
+    else if(gptsig == 0x5452415020494645) // GPT PARTITION
+    {
+        //qDebug() << "gpt and parse accordingly.";
+	uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector0.mid(72, 8));
+	uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector0.mid(80, 4));
+	uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector0.mid(84, 4));
+	//rawforimg->seek((parttablestart*512));
+	//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
+        QByteArray partentries = curimg->ReadContent(parttablestart*512, partentrycount*partentrysize);
+	//rawforimg.close();
+	for(int i=0; i < partentrycount; i++)
+	{
+	    int cnt = i*partentrysize;
+	    uint32_t curstartsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 32, 8));
+	    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
+	    if((curendsector - curstartsector) > 0)
+	    {
+		pofflist->append(curstartsector);
+		psizelist->append((curendsector - curstartsector + 1));
+                //qDebug() << "begin parse file system information";
+                ParseFileSystemInformation(curimg, curstartsector, fsinfolist);
+                //ParseFileSystemInformation(tmpimg, curstartsector, fsinfolist);
+                //ParseFileSystemInformation(estring, curstartsector,fsinfolist);
+		//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
+	    }
+	}
+    }
+    else
+        qDebug() << "partition signature not found correctly";
+    */
+
+    //FindPartitions(curimg, &pofflist, &psizelist);
+
+}

@@ -10,6 +10,10 @@ unsigned long long GetTotalBytes(std::string instr)
     return totbyt;
 }
 
+/*
+ * SHOULD INCORPORATE THE LOG INTO THE RAW DD IMAGE FILE AND CALL IT A NEW FILETYPE EXTENTSION
+ * </HEADER>CASENUMBER|EVIDENCENUMBER|EXAMINER|DESCRIPTION|STARTDATE</HEADER>RAWIMAGECONTENT</FOOTER><MD5></MD5><SHA1></SHA1><SHA256></SHA256>ENDDATE</FOOTER>
+ */ 
 void StartImaging(std::string instring, std::string outpath, std::string outstr, int radio) 
 {
     if(radio == 0) // RAW
@@ -341,10 +345,10 @@ ForImg::ForImg(QString imgfile)
     qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
     {
-    libewf_handle_t* ewfhandle = NULL;
-    libewf_error_t* ewferror = NULL;
-    char** globfiles = NULL;
-    int globfilecnt = 0;
+        libewf_handle_t* ewfhandle = NULL;
+        libewf_error_t* ewferror = NULL;
+        char** globfiles = NULL;
+        int globfilecnt = 0;
         QString efilepath = imgfile.split(imgfile.split("/").last()).first();
         QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
         QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
@@ -377,6 +381,11 @@ ForImg::ForImg(QString imgfile)
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
     }
+    else if(imgtype == 2) // RAW
+    {
+        QFileInfo efileinfo(imgpath);
+        imgsize = efileinfo.size();
+    }
 
 }
 
@@ -398,10 +407,10 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     int retopen = 0;
     if(imgtype == 0)
     {
-    libewf_handle_t* ewfhandle = NULL;
-    libewf_error_t* ewferror = NULL;
-    char** globfiles = NULL;
-    int globfilecnt = 0;
+        libewf_handle_t* ewfhandle = NULL;
+        libewf_error_t* ewferror = NULL;
+        char** globfiles = NULL;
+        int globfilecnt = 0;
         QString efilepath = imgpath.split(imgpath.split("/").last()).first();
         QDir edir = QDir(imgpath.split(imgpath.split("/").last()).first());
         QStringList efiles = edir.entryList(QStringList() << QString(imgpath.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgpath.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
@@ -463,6 +472,16 @@ qint64 ForImg::Size()
 QString ForImg::ImgPath()
 {
     return imgpath;
+}
+
+QString ForImg::MountPath()
+{
+    return mntpath;
+}
+void ForImg::SetMountPath(QString mountpath)
+{
+    mntpath = mountpath;
+    mntpath.chop(1);
 }
 
 MyIODevice::MyIODevice(QString imgfile)

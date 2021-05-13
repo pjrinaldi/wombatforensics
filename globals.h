@@ -154,6 +154,7 @@ public:
     void DigUpd(int digid, int digcnt) { emit(DigUpdate(digid, digcnt)); }
     void ActivateReload(void) { emit(ReloadPreview()); }
     void CarveUpd(QString pid, int carvecnt) { emit(CarveUpdate(pid, carvecnt)); }
+    void StatUp(QString status) { emit(StatUpdate(status)); }
     //void ImageUpd(void) { emit(ImageUpdate()); }
 
 signals:
@@ -162,6 +163,7 @@ signals:
     void DigUpdate(int digid, int digcnt);
     void ReloadPreview(void);
     void CarveUpdate(QString pid, int carvecnt);
+    void StatUpdate(QString status);
     //void ImageUpdate(void);
 
 };
