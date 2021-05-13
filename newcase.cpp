@@ -5273,7 +5273,6 @@ void ProcessForensicImage(ForImg* curimg)
     ParseVolume(curimg, imgsize, &pofflist, &psizelist, &fsinfolist);
     */
     qInfo() << "Reading Partition Table...";
-    //QByteArray sector0 = curimg->ReadContent(0, 512)
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(510, 2));
     uint16_t applesig = qFromLittleEndian<uint16_t>(curimg->ReadContent(0, 2)); // should be in 2nd sector, powerpc mac's not intel mac's
     uint32_t bsdsig = qFromLittleEndian<uint32_t>(curimg->ReadContent(0, 4)); // can be at start of partition entry of a dos mbr
@@ -5289,74 +5288,36 @@ void ProcessForensicImage(ForImg* curimg)
                 uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
                 uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
                 uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
+                int ptreecnt = 0; // partition counter to add unallocated in..
+                QString curpartpath; // current partition path
+                QDir dir; // current partition directory
+                QFile pstatfile; // current statfile
                 for(int i=0; i < partentrycount; i++)
                 {
-                    int cnt = i*partentrysize;
-                    uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
-                    uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-                    if(curendsector - curstartsector > 0)
+                    if(i == 0) // INITIAL PARTITION
                     {
-                        // LOOK TO INCORPORATE UNALLOCATED SPACE IN REAL TIME HERE AND GET RID OFF THE QLISTS FOR POFFLIST AND PSIZELIST...
-                        pofflist.append(curstartsector);
-                        psizelist.append(curendsector - curstartsector + 1);
-			qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
+                        int cnt = i*partentrysize;
+                        uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+                        uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+                        if(curstartsector > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+                        {
+                        }
+                        if(curendsector - curstartsector > 0)
+                        {
+                            // LOOK TO INCORPORATE UNALLOCATED SPACE IN REAL TIME HERE AND GET RID OFF THE QLISTS FOR POFFLIST AND PSIZELIST...
+                            //pofflist.append(curstartsector);
+                            //psizelist.append(curendsector - curstartsector + 1);
+                            qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
+                        }
                     }
                 }
             }
         }
         else // MBR DISK
         {
-        }
-    }
-    else
-        qDebug() << "partition signature not found correctly";
-    /*
-    QByteArray sector0 = curimg->ReadContent(0, 512);
-
-    QString exfatstr = QString::fromStdString(sector0.mid(3, 5).toStdString());
-    QString fatstr = QString::fromStdString(sector0.mid(54, 5).toStdString());
-    QString fat32str = QString::fromStdString(sector0.mid(82, 5).toStdString());
-    if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
-    {
-        //qDebug() << "imgsize:" << imgsize;
-	if((uint8_t)sector0.at(450) == 0xee) // GPT DISK
-        {
-                 QByteArray sector1 = curimg->ReadContent(512, 512);
-            //QByteArray sector1 = rawforimg->read(512);
-            //rawforimg.close();
-	    gptsig = qFromLittleEndian<uint64_t>(sector1.left(8));
-	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
-	    {
-		//qDebug() << "gpt found, parse table now...";
-		uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector1.mid(72, 8));
-		uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector1.mid(80, 4));
-		uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector1.mid(84, 4));
-                QByteArray partentries = curimg->ReadContent(parttablestart*512, partentrycount*partentrysize);
-		//rawforimg.close();
-		for(int i=0; i < partentrycount; i++)
-		{
-		    int cnt = i*partentrysize;
-		    uint32_t curstartsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 32, 8));
-		    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
-		    if((curendsector - curstartsector) > 0)
-		    {
-			pofflist->append(curstartsector);
-			psizelist->append((curendsector - curstartsector + 1));
-                        //qDebug() << "begin parse file system information";
-                        ParseFileSystemInformation(curimg, curstartsector, fsinfolist);
-                        //ParseFileSystemInformation(tmpimg, curstartsector, fsinfolist);
-                        //ParseFileSystemInformation(estring, curstartsector, fsinfolist);
-			//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
-		    }
-
-		}
-		//qDebug() << "gpt table start sector:" << parttablestart << "partentry count:" << partentrycount << "partentrysize:" << partentrysize;
-	    }
-	    else
-		qDebug() << "gpt should have been there, math is off...";
-        }
-	else // MBR DISK
-	{
+            QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
+            QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
+            QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
 	    if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32
             {
                 // Windows partition/fs which starts at beginning of image with no partition table
@@ -5366,17 +5327,15 @@ void ProcessForensicImage(ForImg* curimg)
                 for(int i=0; i < 4; i++)
                 {
                     int cnt = i*16;
-                    QByteArray curpart = sector0.mid(446 + cnt, 16);
-                    uint8_t curparttype = curpart.at(4);
-                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curpart.mid(8, 4));
-                    uint32_t cursize = qFromLittleEndian<uint32_t>(curpart.mid(12, 4));
+                    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + cnt, 1));
+                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + cnt, 4));
+                    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + cnt, 4));
                     if(curparttype == 0x05) // extended partition
                     {
                         //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
                         //qDebug() << "parse extended partition recurse loop here...";
-                        //ParseExtendedPartition(estring, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
-                        //ParseExtendedPartition(tmpimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
-                        ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+                        //ParseExtentedPartition(curimg, curoffset, cursize, j);
+                        //ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
                     }
                     else if(curparttype == 0x00)
                     {
@@ -5392,16 +5351,14 @@ void ProcessForensicImage(ForImg* curimg)
                     }
                     else
                     {
-                        pofflist->append(curoffset);
-                        psizelist->append(cursize);
+                        //pofflist->append(curoffset);
+                        //psizelist->append(cursize);
                         qDebug() << "begin parse file system information";
-                        ParseFileSystemInformation(curimg, curoffset, fsinfolist);
-                        //ParseFileSystemInformation(tmpimg, curoffset, fsinfolist);
-                        //ParseFileSystemInformation(estring, curoffset, fsinfolist);
+                        //ParseFileSystemInformation(curimg, curoffset, fsinfolist);
                     }
                 }
             }
-	}
+        }
     }
     else if(applesig == 0x504d) // APPLE PARTITION
     {
@@ -5417,6 +5374,7 @@ void ProcessForensicImage(ForImg* curimg)
     }
     else if(gptsig == 0x5452415020494645) // GPT PARTITION
     {
+        /*
         //qDebug() << "gpt and parse accordingly.";
 	uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector0.mid(72, 8));
 	uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector0.mid(80, 4));
@@ -5441,11 +5399,297 @@ void ProcessForensicImage(ForImg* curimg)
 		//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
 	    }
 	}
+        */
     }
     else
         qDebug() << "partition signature not found correctly";
-    */
-
     //FindPartitions(curimg, &pofflist, &psizelist);
-
 }
+/*
+    int ptreecnt = 0;
+    QString curpartpath;
+    QDir dir;
+    QFile pstatfile;
+    for(int i=0; i < pofflist.count(); i++)
+    {
+        // might want to also look at having a single stat for all parts/fs and one for all files for each part/fs..
+        // probably should write tree out to a file for easy loading on case open...
+	if(i == 0) // INITIAL PARTITION
+	{
+	    if(pofflist.at(i)*512 > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+	    {
+                curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+                dir.mkpath(curpartpath);
+                pstatfile.setFileName(curpartpath + "stat");
+                if(!pstatfile.isOpen())
+                    pstatfile.open(QIODevice::Append | QIODevice::Text);
+                if(pstatfile.isOpen())
+                {
+                    out.setDevice(&pstatfile);
+                    // partition name, offset, size, partition type, id
+                    out << "UNALLOCATED,0," << QString::number(pofflist.at(i)*512) << ",0," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                    out.flush();
+                    pstatfile.close();
+                }
+                reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
+                partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
+		nodedata.clear();
+		nodedata << "UNALLOCATED" << "0" << QString::number(pofflist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+		mutex.lock();
+		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+		mutex.unlock();
+                // FILE CARVING DIRECTORIES
+                nodedata.clear();
+                nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+                mutex.unlock();
+                nodedata.clear();
+                nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+                mutex.unlock();
+		ptreecnt++;
+	    }
+            curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+            dir.mkpath(curpartpath);
+            pstatfile.setFileName(curpartpath + "stat");
+            if(!pstatfile.isOpen())
+                pstatfile.open(QIODevice::Append | QIODevice::Text);
+            if(pstatfile.isOpen())
+            {
+                out.setDevice(&pstatfile);
+                // FOR OUT STAT FILE, MAYBE I SHOULD JUST LOOP OVER THE HASH PROPERTIES AND STORE THEM ALL IN A COMMA LIST... OR A NAME|VALUE, LIST
+                // OR I CAN FIGURE OUT WHAT I NEED FOR EACH FILE TYPE AND GENERATE STRING ACCORDINGLY THROUGH A FUNCTION... QString GetFileSystemOutString(fsinfolist.at(i));
+                out << "ALLOCATED," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                out.flush();
+                pstatfile.close();
+            }
+            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>" + fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]</td></tr>";
+            partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": " + fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]");
+	    nodedata.clear();
+	    nodedata << QString(fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]") << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    mutex.lock();
+	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+	    mutex.unlock();
+            WriteFileSystemProperties((QHash<QString, QVariant>*)&(fsinfolist.at(i)), QString(curpartpath + "prop"));
+            QList<QHash<QString, QVariant>> fileinfolist;
+            QHash<QString, QHash<QString, QVariant>> mftentries;
+	    QList<QHash<QString, QVariant>> orphanlist;
+            // IF FAT12/16/32 THEN
+            // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
+	    if(fsinfolist.at(i).value("type").toUInt() == 1 || fsinfolist.at(i).value("type").toUInt() == 2 || fsinfolist.at(i).value("type").toUInt() == 3) // FAT12 || FAT16 || FAT32
+            {
+		//ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            }
+	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
+            {
+		//ParseExFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            }
+	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
+            {
+		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &mftentries, &fileinfolist, &orphanlist, 5);
+                qDebug() << "begin parse ntfs directory";
+		ParseNtfsDirectory(curimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
+                qDebug() << "end parse ntfs directory";
+		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
+		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
+                qDebug() << "begin parse mft";
+                ParseMFT(curimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);// may need to pass adsinfolist here...
+                qDebug() << "end parse mft";
+                //ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);// may need to pass adsinfolist here...
+            }
+            else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
+                //ParseExtDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
+                //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
+            //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+
+            qDebug() << "begin populate files";
+            fileinfolist.clear();
+            orphanlist.clear();
+            //PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            PopulateFiles(curimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            qDebug() << "end populate files";
+            //PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            // FILE CARVING DIRECTORIES
+            nodedata.clear();
+            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+            nodedata.clear();
+            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+	    ptreecnt++;
+	    //qDebug() << "1st partition which has unalloc before...";
+	}
+	if(i > 0 && i < pofflist.count()) // MIDDLE PARTITIONS
+	{
+	    if(pofflist.at(i) > (pofflist.at(i-1) + psizelist.at(i-1)))
+	    {
+                curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+                dir.mkpath(curpartpath);
+                pstatfile.setFileName(curpartpath + "stat");
+                if(!pstatfile.isOpen())
+                    pstatfile.open(QIODevice::Append | QIODevice::Text);
+                if(pstatfile.isOpen())
+                {
+                    out.setDevice(&pstatfile);
+                    // partition name, offset, size, partition type, id
+                    out << "UNALLOCATED," << QString::number((pofflist.at(i-1) + psizelist.at(i-1))*512) << "," << QString::number(512*(pofflist.at(i) - (pofflist.at(i-1) + psizelist.at(i-1)))) << ",0," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                    out.flush();
+                    pstatfile.close();
+                }
+                reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
+                partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
+		nodedata.clear();
+		nodedata << "UNALLOCATED" << "0" << QString::number(512*(pofflist.at(i) - (pofflist.at(i-1) + psizelist.at(i-1)))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+		mutex.lock();
+		treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+		mutex.unlock();
+                // FILE CARVING DIRECTORIES
+                nodedata.clear();
+                nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+                mutex.unlock();
+                nodedata.clear();
+                nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+                mutex.unlock();
+		ptreecnt++;
+	    }
+	    // add existing partition here...
+	    nodedata.clear();
+	    //nodedata << fsvolname << "0" << QString::number(psizelist.at(i)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+            curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+            dir.mkpath(curpartpath);
+            pstatfile.setFileName(curpartpath + "stat");
+            if(!pstatfile.isOpen())
+                pstatfile.open(QIODevice::Append | QIODevice::Text);
+            if(pstatfile.isOpen())
+            {
+                out.setDevice(&pstatfile);
+                // partition name, offset, size, partition type, id
+                out << "ALLOCATED," << QString::number(pofflist.at(i)*512) << "," << QString::number(psizelist.at(i)*512) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                out.flush();
+                pstatfile.close();
+            }
+            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>" + fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]</td></tr>";
+            partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": " + fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]");
+	    nodedata << QString(fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]") << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    //nodedata << "ALLOCATED" << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    mutex.lock();
+	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+	    mutex.unlock();
+            WriteFileSystemProperties((QHash<QString, QVariant>*)&(fsinfolist.at(i)), QString(curpartpath + "prop"));
+            QList<QHash<QString, QVariant>> fileinfolist;
+            QHash<QString, QHash<QString, QVariant>> mftentries;
+            QList<QHash<QString, QVariant>> orphanlist;
+            // IF FAT12/16/32 THEN
+            // MAYBE CHANGE NAME FROM PARSEDIRECTORY TO PARSEFATDIRENTRY
+	    if(fsinfolist.at(i).value("type").toUInt() == 1 || fsinfolist.at(i).value("type").toUInt() == 2 || fsinfolist.at(i).value("type").toUInt() == 3) // FAT12 || FAT16 || FAT32
+            {
+		//ParseFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            }
+	    else if(fsinfolist.at(i).value("type").toUInt() == 4) // EXFAT
+            {
+		//ParseExFatDirEntry(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+		//ParseExFatDirEntry(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            }
+	    else if(fsinfolist.at(i).value("type").toUInt() == 5) // NTFS
+            {
+                qDebug() << "begin parse ntfs directory";
+		ParseNtfsDirectory(curimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
+                qDebug() << "end parse ntfs directory";
+		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 5, 0);
+		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &mftentries, &fileinfolist, &orphanlist, 5);
+		//ParseNtfsDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, 5);
+                qDebug() << "begin parse mft";
+                ParseMFT(curimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist); // may need to pass adsinfolist here...
+                qDebug() << "end parse mft";
+                //ParseMFT(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist); // may need to pass adsinfolist here...
+            }
+            else if(fsinfolist.at(i).value("type").toUInt() == 6) // EXT2/3/4
+                //ParseExtDirectory(tmpimg, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
+                //ParseExtDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, NULL, 2, 0);
+            //ParseDirectory(emntstring, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist);
+            // ELSE EXFAT THEN
+            // ELSE ... THEN
+
+            qDebug() << "begin populate files";
+            fileinfolist.clear();
+            orphanlist.clear();
+            //PopulateFiles(tmpimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            PopulateFiles(curimg, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            qDebug() << "end populate files";
+            //PopulateFiles(emntstring, curpartpath, (QHash<QString, QVariant>*)&(fsinfolist.at(i)), &fileinfolist, &orphanlist, evidcnt, ptreecnt); 
+            // FILE CARVING DIRECTORIES
+            nodedata.clear();
+            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+            nodedata.clear();
+            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+	    ptreecnt++;
+	}
+	if(i == pofflist.count() - 1 && ((pofflist.at(i) + psizelist.at(i))*512) < imgsize)
+	{
+            curpartpath = evidencepath + "p" + QString::number(ptreecnt) + "/";
+            dir.mkpath(curpartpath);
+            pstatfile.setFileName(curpartpath + "stat");
+            if(!pstatfile.isOpen())
+                pstatfile.open(QIODevice::Append | QIODevice::Text);
+            if(pstatfile.isOpen())
+            {
+                out.setDevice(&pstatfile);
+                // partition name, offset, size, partition type, id
+                out << "UNALLOCATED," << QString::number((psizelist.at(i) + pofflist.at(i))*512) << "," << QString::number(imgsize - 512*(pofflist.at(i) + psizelist.at(i))) << ",1," << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+                out.flush();
+                pstatfile.close();
+            }
+            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
+            partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
+	    nodedata.clear();
+	    nodedata << "UNALLOCATED" << "0" << QString::number(imgsize - 512*(pofflist.at(i) + psizelist.at(i))) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+	    mutex.lock();
+	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+	    mutex.unlock();
+	    //add final unalloc partition to tree here...
+            // FILE CARVING DIRECTORIES
+            nodedata.clear();
+            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+            nodedata.clear();
+            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+            mutex.lock();
+            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+            mutex.unlock();
+	    ptreecnt++;
+	    //qDebug() << "unalloc exists after last partition...";
+	}
+    }
+    reportstring += "</table></div><br/>\n";
+    EvidenceReportData tmpdata;
+    tmpdata.evidid = evidcnt;
+    tmpdata.evidname = evidencename;
+    tmpdata.evidcontent = reportstring;
+    evidrepdatalist.append(tmpdata);
+    nodedata.clear();
+    nodedata << QByteArray("carved manually").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-cm");
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), 11, 0);
+    mutex.unlock();
+*/
