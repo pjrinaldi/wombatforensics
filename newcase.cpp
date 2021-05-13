@@ -5300,6 +5300,7 @@ void ProcessForensicImage(ForImg* curimg)
                         uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
                         if(curstartsector > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
                         {
+                            // ADD THE UNALLOCATED PARTITION
                             dir.mkpath(curimg->MountPath() + "/" + QString::number(ptreecnt) + "/");
                             pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
                             if(!pstatfile.isOpen())
@@ -5311,10 +5312,8 @@ void ProcessForensicImage(ForImg* curimg)
                                 out << "UNALLOCATED,0," << QString::number(curstartsector*512) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
                                 out.flush();
                                 pstatfile.close();
-		                //pofflist->append(curstartsector);
-		                //psizelist->append((curendsector - curstartsector + 1));
                             }
-                            qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                            //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
                             /*
                             reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
                             partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
@@ -5337,6 +5336,8 @@ void ProcessForensicImage(ForImg* curimg)
                             ptreecnt++;
                             */
                         }
+                        // ADD INITIAL PARTITION FROM THE PARTITION TABLE
+                        /*
                         if(curendsector - curstartsector > 0)
                         {
                             // LOOK TO INCORPORATE UNALLOCATED SPACE IN REAL TIME HERE AND GET RID OFF THE QLISTS FOR POFFLIST AND PSIZELIST...
@@ -5344,6 +5345,7 @@ void ProcessForensicImage(ForImg* curimg)
                             //psizelist.append(curendsector - curstartsector + 1);
                             qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
                         }
+                        */
                     }
                 }
             }
