@@ -5296,6 +5296,7 @@ void ProcessForensicImage(ForImg* curimg)
                     uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
                     if(curendsector - curstartsector > 0)
                     {
+                        // LOOK TO INCORPORATE UNALLOCATED SPACE IN REAL TIME HERE AND GET RID OFF THE QLISTS FOR POFFLIST AND PSIZELIST...
                         pofflist.append(curstartsector);
                         psizelist.append(curendsector - curstartsector + 1);
 			qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
