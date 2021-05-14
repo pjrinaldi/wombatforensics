@@ -5462,6 +5462,13 @@ void ProcessForensicImage(ForImg* curimg)
 
 QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsector, int ptreecnt)
 {
+    QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
+    QTextStream out;
+    if(!propfile.isOpen())
+	propfile.open(QIODevice::Append | QIODevice::Text);
+    out.setDevice(&propfile);
+
+    QString partitionname = "";
     uint16_t winsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 510, 2));
     uint16_t extsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 1080, 2));
     QString apfsig = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 32, 4).toStdString());
@@ -5474,93 +5481,57 @@ QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsect
     QString udfsig = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 40961, 5).toStdString());
     uint64_t refsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 3, 8)); // should be 0x00 00 00 00 53 46 65 52 (0 0 0 0 S F e R) prior to endian flip
     uint32_t f2fsig = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1024, 4));
-
-    /*
-    // check for various FS's
+    // WILL WRITE FILE SYSTEM INFORMATION IN THIS FUNCTION AND ONLY RETURN THE QSTRING(FILESYSTEMNAME,FILESYSTEMTYPE) TO BE USED BY THE PARTITION
     if(winsig == 0xaa55) // FAT OR NTFS
     {
-	QString exfatstr = QString::fromStdString(partbuf.mid(3, 5).toStdString());
-	//qDebug() << "exfatstr:" << exfatstr;
-	QString fatstr = QString::fromStdString(partbuf.mid(54, 5).toStdString());
-        QString fat32str = QString::fromStdString(partbuf.mid(82, 5).toStdString());
-	if(fatstr == "FAT12") // FAT12
-        {
-            fsinfo.insert("type", QVariant(1));
-            fsinfo.insert("typestr", QVariant("FAT12"));
-        }
-	else if(fatstr == "FAT16") // FAT16
-        {
-            fsinfo.insert("type", QVariant(2));
-            fsinfo.insert("typestr", QVariant("FAT16"));
-        }
-	else if(fat32str == "FAT32") // FAT32
-        {
-            fsinfo.insert("type", QVariant(3));
-            fsinfo.insert("typestr", QVariant("FAT32"));
-        }
-	else if(exfatstr == "EXFAT") // EXFAT
-        {
-            fsinfo.insert("type", QVariant(4));
-            fsinfo.insert("typestr", QVariant("EXFAT"));
-        }
+	QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
+	QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
+	QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
+	if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || exfatstr == "EXFAT") // FAT12 | FAT16 | FAT32 | EXFAT
+	{
+	    /*
+            out << "Fat Count|" << QString::number(fsinfo->value("fatcount").toUInt()) << "|Number of FAT's in the file system." << Qt::endl;
+            out << "FAT Offset|" << QString::number(fsinfo->value("fatoffset").toUInt()) << "|Byte offset to the start of the first FAT" << Qt::endl;
+            out << "FAT Size|" << QString::number(fsinfo->value("fatsize").toUInt()) << "|Size of the FAT." << Qt::endl;
+            out << "Reserved Area Size|" << QString::number(fsinfo->value("reservedareasize").toUInt()) << "|Size of the reserved area at the beginning of the file system." << Qt::endl;
+            out << "File System Sector Count|" << QString::number(fsinfo->value("fssectorcnt").toUInt()) << "|Total Sectors in the volume" << Qt::endl;
+            out << "Root Directory Offset|" << QString::number(fsinfo->value("rootdiroffset").toUInt()) << "|Byte Offset for the root directory" << Qt::endl;
+            out << "Root Directory Max Files|" << QString::number(fsinfo->value("rootdirmaxfiles").toUInt()) << "|Maximum number of root directory entries" << Qt::endl;
+            out << "Root Directory Sectors|" << QString::number(fsinfo->value("rootdirsectors").toUInt()) << "|Number of sectors for the root directory" << Qt::endl;
+            out << "Root Directory Size|" << QString::number(fsinfo->value("rootdirsize").toUInt()) << "|Size in bytes for the root directory" << Qt::endl;
+            out << "Cluster Area Start|" << QString::number(fsinfo->value("clusterareastart").toUInt()) << "|Byte offset to the start of the cluster area" << Qt::endl;
+	     */ 
+	}
 	else if(exfatstr.startsWith("NTFS")) // NTFS
-        {
-            fsinfo.insert("type", QVariant(5));
-            fsinfo.insert("typestr", QVariant("NTFS"));
-	    fsinfo.insert("partoffset", QVariant((qulonglong)partoffset));
-            fsinfo.insert("bytespersector", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(11, 2))));
-            //qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
-            fsinfo.insert("sectorspercluster", QVariant(partbuf.at(13)));
-            //qDebug() << "sectors per cluster:" << fsinfo.value("sectorspercluster").toUInt();
-            //qDebug() << "bytes per cluster:" << fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
-            fsinfo.insert("bytespercluster", fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
-            fsinfo.insert("totalsectors", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(40, 8))));
-            fsinfo.insert("mftstartingcluster", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(48, 8))));
-            //qDebug() << "MFT starting cluster:" << fsinfo.value("mftstartingcluster").toUInt();
-	    //qDebug() << "mftentrysize:" << (uint8_t)partbuf.at(64);
-            fsinfo.insert("mftentrysize", QVariant((uint8_t)partbuf.at(64)));
-	    qulonglong mftentrybytes = fsinfo.value("mftentrysize").toUInt() * fsinfo.value("bytespersector").toUInt() * fsinfo.value("sectorspercluster").toUInt();
-	    //qDebug() << "mftentrybytes:" << mftentrybytes;
-            //fsinfo.insert("mftentrybytes", QVariant(mftentrybytes));
-	    fsinfo.insert("mftentrybytes", QVariant(1024));
+	{
+	    out << "File System Type|" << QString::number(5) << "|Internal File System Type represented as an integer." << Qt::endl;
+	    out << "File System Type|" << "NTFS" << "|File System Type String." << Qt::endl;
+	    out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(11, 2))) << "|Number of Bytes Per Sector, usually 512." << Qt::endl;
+	    out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(13, 1))) << "|Number of Sectors per Cluster." << Qt::endl;
+	    out << "Total Sectors|" << QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(40, 8))) << "|Number of sectors in the file system." << Qt::endl;
+	    out << "Volume Label|" << "" << "|Volume Label for the file system." << Qt::endl;
+	    out << "Bytes Per Cluster|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(13, 1))) << "|Number of bytes per cluster" << Qt::endl;
+	    out << "MFT Starting Cluster|" << QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(48, 8))) << "|Starting cluster number for the MFT" << Qt::endl;
+	    out << "MFT Starting Offset|" << QString::number(curstartsector*512 + qFromLittleEndian<qulonglong>(curimg->ReadContent(48, 8)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(13, 1))) << "|Starting byte for the MFT" << Qt::endl;
+	    out << "MFT Entry Size|" << QString::number((uint8_t)curimg->ReadContent(64, 1)) << "|Entry size in clusters for an MFT Entry" << Qt::endl;
+            out << "MFT Entry Bytes|1024| Entry size in bytes for an MFT Entry" << Qt::endl; // entrysize is stored at offset 64, then it should be entrysize * bytespercluster
+	    out << "Serial Number|" << QString("0x" + QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(72, 8)), 16)) << "|Serial number for the file system volume" << Qt::endl;
+	    out << "MFT Layout|" << "" << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
+            out << "Max MFT Entries|" << QString::number() << "|Max MFT Entries allowed in the MFT" << Qt::endl;
+	    //qulonglong mftoffset = 0;
+	    //uint mftentrybytes = 1024;
+
+
+
+	    //fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()))));
+	    /*
             mftentrybytes = 1024;
-	    //qDebug() << "mft entry size in bytes:" << mftentrybytes;
             fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
-            fsinfo.insert("serialnum", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8))));
-            //qDebug() << "serial num:" << QString("0x" + QString::number(fsinfo.value("serialnum").toULongLong(), 16));
-	    //qDebug() << "partoffset:" << partoffset << "sectorspercluster:" << fsinfo.value("sectorspercluster").toUInt() << "bytespersector:" << fsinfo.value("bytespersector").toUInt();
-            fsinfo.insert("mftoffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("mftstartingcluster").toUInt() * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()))));
-	    //qDebug() << "mftstarting cluster;" << fsinfo.value("mftstartingcluster").toUInt();
-            //qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toUInt();
             // get MFT entry for $MFT to determine cluster's that contain the MFT...
             QByteArray mftentry0;
 	    QByteArray mftentry3;
             mftentry0.clear();
 	    mftentry3.clear();
-            /*
-            if(!efile.isOpen())
-                efile.open(QIODevice::ReadOnly);
-            if(efile.isOpen())
-            {
-		//qDebug() << "is byte array error here???";
-		//qDebug() << "mftoffset:" << fsinfo.value("mftoffset").toULongLong();
-                efile.seek(fsinfo.value("mftoffset").toULongLong());
-                mftentry0 = efile.read(mftentrybytes);
-		efile.seek(fsinfo.value("mftoffset").toULongLong() + 3 * mftentrybytes);
-		mftentry3 = efile.read(mftentrybytes);
-		//qDebug() << "is bytearray error here...";
-                efile.close();
-            }
-            */
-            /*
-            curimg->open(QIODevice::ReadOnly);
-            curimg->seek(fsinfo.value("mftoffset").toULongLong());
-            mftentry0 = curimg->read(mftentrybytes);
-            curimg->seek(fsinfo.value("mftoffset").toULongLong() + 3*mftentrybytes);
-            mftentry3 = curimg->read(mftentrybytes);
-            curimg->close();
-            */
-/*
             mftentry0 = curimg->ReadContent(fsinfo.value("mftoffset").toLongLong(), mftentrybytes);
             mftentry3 = curimg->ReadContent(fsinfo.value("mftoffset").toLongLong() + 3*mftentrybytes, mftentrybytes);
             //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
@@ -5620,14 +5591,11 @@ QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsect
 			    runoffset = qFromLittleEndian<int8_t>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
 			else
 			    runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
-			/*
-			 */ 
 			//qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
 			
 			//int runlength = qFromLittleEndian<int>(mftentry0.mid(curoffset, runlengthbytes));
 			//int runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
                         //qDebug() << "temporary runoffset prior to adding unlist in:" << QString::number(runoffset, 16);
-/*
                         if(i > 0)
                         {
                             if(i > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
@@ -5694,7 +5662,31 @@ QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsect
 		QString volnamestr = QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()));
 		//qDebug() << "volnamestr:" << volnamestr;
 	    }
-        }
+
+	     */ 
+	}
+    }
+    else if(extsig == 0xef53) // EXT2/3/4
+    {
+	/*
+	out << "Created Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("mkfstime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Creation time for the file system" << Qt::endl;
+	out << "Mount Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("mounttime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Mount time for the file system" << Qt::endl;
+	out << "Write Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("writetime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Write time for the file system" << Qt::endl;
+	out << "Last Check Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("lastcheck").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Last check time for the file system" << Qt::endl;
+	out << "Current State|" << fsinfo->value("state").toString() << "Condition of the file system at last unmount" << Qt::endl;
+	out << "Compatible Features|" << fsinfo->value("compatstr").toString() << "File System Compatible Feature Set" << Qt::endl;
+	out << "Incompatible Features|" << fsinfo->value("incompatstr").toString() << "File System Incompatible Feature Set" << Qt::endl;
+	out << "Read Only Compatible Features|" << fsinfo->value("readonlystr").toString() << "File System Read Only Compatible Feature Set" << Qt::endl;
+	 */ 
+    }
+    else if(apfsig == "NXSB") // APFS Container
+    {
+    }
+
+    /*
+    // check for various FS's
+    if(winsig == 0xaa55) // FAT OR NTFS
+    {
         // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
         // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
         if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || exfatstr == "EXFAT")
@@ -6230,6 +6222,10 @@ QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsect
     partbuf.clear();
 
      */ 
+    out.flush();
+    propfile.close();
+
+    return partitionname;
 }
 
 
