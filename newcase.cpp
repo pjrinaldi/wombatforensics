@@ -5229,10 +5229,12 @@ void ProcessForensicImage(ForImg* curimg)
     isignals->StatUp("Parsing Forensic Image");
     qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
     qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
+    /*
     QList<qint64> pofflist;
     pofflist.clear();
     QList<qint64> psizelist;
     psizelist.clear();
+    */
     qDebug() << "imgsize:" << curimg->Size();
     QList<QVariant> nodedata;
     nodedata.clear();
@@ -5298,54 +5300,67 @@ void ProcessForensicImage(ForImg* curimg)
                         int cnt = i*partentrysize;
                         uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
                         uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-                        if(curstartsector > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
-                        {
-                            // ADD THE UNALLOCATED PARTITION
-                            dir.mkpath(curimg->MountPath() + "/" + QString::number(ptreecnt) + "/");
-                            pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
-                            if(!pstatfile.isOpen())
-                                pstatfile.open(QIODevice::Append | QIODevice::Text);
-                            if(pstatfile.isOpen())
-                            {
-                                out.setDevice(&pstatfile);
-                                // partition name, offset, size, partition type, id
-                                out << "UNALLOCATED,0," << QString::number(curstartsector*512) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                                out.flush();
-                                pstatfile.close();
-                            }
-                            //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                            /*
-                            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
-                            partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
-                            nodedata.clear();
-                            nodedata << "UNALLOCATED" << "0" << QString::number(pofflist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
-                            mutex.unlock();
-                            // FILE CARVING DIRECTORIES
-                            nodedata.clear();
-                            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
-                            mutex.unlock();
-                            nodedata.clear();
-                            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
-                            mutex.unlock();
-                            ptreecnt++;
-                            */
-                        }
+			if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+			{
+			    if(curstartsector > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+			    {
+				// ADD THE UNALLOCATED PARTITION
+				dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
+				pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
+				if(!pstatfile.isOpen())
+				    pstatfile.open(QIODevice::Append | QIODevice::Text);
+				if(pstatfile.isOpen())
+				{
+				    out.setDevice(&pstatfile);
+				    // partition name, offset, size, partition type, id
+				    out << "UNALLOCATED,0," << QString::number(curstartsector*512) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+				    out.flush();
+				    pstatfile.close();
+				}
+				//qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+				/*
+				reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
+				*/
+				//partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
+				nodedata.clear();
+				nodedata << "UNALLOCATED" << "0" << QString::number(curstartsector*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+				mutex.lock();
+				treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
+				mutex.unlock();
+				// FILE CARVING DIRECTORIES
+				nodedata.clear();
+				nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cv");
+				mutex.lock();
+				treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+				mutex.unlock();
+				nodedata.clear();
+				nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-cu");
+				mutex.lock();
+				treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+				mutex.unlock();
+				ptreecnt++;
+				// NOW ADD THE 1ST ALLOCATED PARTITION READ FROM THE PARTITION TABLE
+				dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
+				pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
+				if(!pstatfile.isOpen())
+				    pstatfile.open(QIODevice::Append | QIODevice::Text);
+				if(pstatfile.isOpen())
+				{
+				    out.setDevice(&pstatfile);
+				    // partition name, offset, size, partition type, id
+				    // NEED TO FIND AND FIX THE VALUES IN THIS OUT STATEMENT...
+				    out << "PARTITION NAME[TYPE],offset," << QString::number(curendsector - curstartsector + 1) << ",type," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+				    out.flush();
+				    pstatfile.close();
+				}
+			    }
+			}
+			else // INVALID PARTITION ENTRY
+			{
+			    // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
+			    // shouldn't need this section so populate later.
+			}
                         // ADD INITIAL PARTITION FROM THE PARTITION TABLE
-                        /*
-                        if(curendsector - curstartsector > 0)
-                        {
-                            // LOOK TO INCORPORATE UNALLOCATED SPACE IN REAL TIME HERE AND GET RID OFF THE QLISTS FOR POFFLIST AND PSIZELIST...
-                            //pofflist.append(curstartsector);
-                            //psizelist.append(curendsector - curstartsector + 1);
-                            qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
-                        }
-                        */
                     }
                 }
             }
