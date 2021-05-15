@@ -5295,73 +5295,77 @@ void ProcessForensicImage(ForImg* curimg)
                 QFile pstatfile; // current statfile
                 for(int i=0; i < partentrycount; i++)
                 {
-                    if(i == 0) // INITIAL PARTITION
-                    {
+                    uint32_t sectorcheck = 0;
                         int cnt = i*partentrysize;
                         uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
                         uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-			if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-			{
-			    if(curstartsector > 0) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
-			    {
-				// ADD THE UNALLOCATED PARTITION
-				dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
-				pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
-				if(!pstatfile.isOpen())
-				    pstatfile.open(QIODevice::Append | QIODevice::Text);
-				if(pstatfile.isOpen())
-				{
-				    out.setDevice(&pstatfile);
-				    // partition name, offset, size, partition type, id
-				    out << "UNALLOCATED,0," << QString::number(curstartsector*512) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-				    out.flush();
-				    pstatfile.close();
-				}
-				//qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-				/*
-				reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
-				*/
-				//partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
-				nodedata.clear();
-				nodedata << "UNALLOCATED" << "0" << QString::number(curstartsector*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-				mutex.lock();
-				treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
-				mutex.unlock();
-				// FILE CARVING DIRECTORIES
-				nodedata.clear();
-				nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
-				mutex.lock();
-				treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-				mutex.unlock();
-				nodedata.clear();
-				nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cu");
-				mutex.lock();
-				treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-				mutex.unlock();
-				ptreecnt++;
-				// NOW ADD THE 1ST ALLOCATED PARTITION READ FROM THE PARTITION TABLE
-				dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
-				pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
-				QString tmpstring = ParseFileSystem(curimg, curstartsector, curendsector, ptreecnt);
-				if(!pstatfile.isOpen())
-				    pstatfile.open(QIODevice::Append | QIODevice::Text);
-				if(pstatfile.isOpen())
-				{
-				    out.setDevice(&pstatfile);
-				    // partition name, offset, size, partition type, id
-				    // NEED TO FIND AND FIX THE VALUES IN THIS OUT STATEMENT FOR THE FILESYSTEM AND TYPE
-				    out << "PARTITION NAME[TYPE],offset," << QString::number(curendsector - curstartsector + 1) << ",type," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-				    out.flush();
-				    pstatfile.close();
-				}
-			    }
-			}
-			else // INVALID PARTITION ENTRY
-			{
-			    // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
-			    // shouldn't need this section so populate later.
-			}
-                        // ADD INITIAL PARTITION FROM THE PARTITION TABLE
+                    if(i ==0) // INITIAL PARTITION
+                        sectorcheck = 0;
+                    else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
+                        sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
+                    else if(i == partentrycount - 1 && curstartsector + curendsector < curimg->Size()) // UNALLOCATED AFTER END PARTITION
+                        sectorcheck = curimg->Size();
+                    if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+                    {
+                        if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+                        {
+                            // ADD THE UNALLOCATED PARTITION
+                            dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
+                            pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
+                            if(!pstatfile.isOpen())
+                                pstatfile.open(QIODevice::Append | QIODevice::Text);
+                            if(pstatfile.isOpen())
+                            {
+                                out.setDevice(&pstatfile);
+                                // partition name, offset, size, partition type, id
+                                out << "UNALLOCATED,0," << QString::number(curstartsector*512) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                                out.flush();
+                                pstatfile.close();
+                            }
+                            //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                            /*
+                            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
+                            */
+                            //partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
+                            nodedata.clear();
+                            nodedata << "UNALLOCATED" << "0" << QString::number(curstartsector*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                            mutex.lock();
+                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
+                            mutex.unlock();
+                            // FILE CARVING DIRECTORIES
+                            nodedata.clear();
+                            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
+                            mutex.lock();
+                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
+                            mutex.unlock();
+                            nodedata.clear();
+                            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cu");
+                            mutex.lock();
+                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
+                            mutex.unlock();
+                            ptreecnt++;
+                        }
+                        qDebug() << "begin parsing the allocated partition...";
+                        // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
+                        dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
+                        pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
+                        QString tmpstring = ParseFileSystem(curimg, curstartsector, curendsector, ptreecnt);
+                        if(!pstatfile.isOpen())
+                            pstatfile.open(QIODevice::Append | QIODevice::Text);
+                        if(pstatfile.isOpen())
+                        {
+                            out.setDevice(&pstatfile);
+                            // partition name, offset, size, partition type, id
+                            // NEED TO FIND AND FIX THE VALUES IN THIS OUT STATEMENT FOR THE FILESYSTEM AND TYPE
+                            out << "PARTITION NAME[TYPE],offset," << QString::number(curendsector - curstartsector + 1) << ",type," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                            out.flush();
+                            pstatfile.close();
+                        }
+                    }
+                    else // INVALID PARTITION ENTRY
+                    {
+                        // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
+                        // shouldn't need this section so populate later.
                     }
                 }
             }
@@ -5484,9 +5488,9 @@ QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsect
     // WILL WRITE FILE SYSTEM INFORMATION IN THIS FUNCTION AND ONLY RETURN THE QSTRING(FILESYSTEMNAME,FILESYSTEMTYPE) TO BE USED BY THE PARTITION
     if(winsig == 0xaa55) // FAT OR NTFS
     {
-	QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
-	QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
-	QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
+	QString exfatstr = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 3, 5).toStdString());
+	QString fatstr = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 54, 5).toStdString());
+	QString fat32str = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 82, 5).toStdString());
 	if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || exfatstr == "EXFAT") // FAT12 | FAT16 | FAT32 | EXFAT
 	{
 	    /*
@@ -5506,152 +5510,98 @@ QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsect
 	{
 	    out << "File System Type|" << QString::number(5) << "|Internal File System Type represented as an integer." << Qt::endl;
 	    out << "File System Type|" << "NTFS" << "|File System Type String." << Qt::endl;
-	    out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(11, 2))) << "|Number of Bytes Per Sector, usually 512." << Qt::endl;
-	    out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(13, 1))) << "|Number of Sectors per Cluster." << Qt::endl;
-	    out << "Total Sectors|" << QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(40, 8))) << "|Number of sectors in the file system." << Qt::endl;
-	    out << "Volume Label|" << "" << "|Volume Label for the file system." << Qt::endl;
-	    out << "Bytes Per Cluster|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(13, 1))) << "|Number of bytes per cluster" << Qt::endl;
-	    out << "MFT Starting Cluster|" << QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(48, 8))) << "|Starting cluster number for the MFT" << Qt::endl;
-	    out << "MFT Starting Offset|" << QString::number(curstartsector*512 + qFromLittleEndian<qulonglong>(curimg->ReadContent(48, 8)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(13, 1))) << "|Starting byte for the MFT" << Qt::endl;
-	    out << "MFT Entry Size|" << QString::number((uint8_t)curimg->ReadContent(64, 1)) << "|Entry size in clusters for an MFT Entry" << Qt::endl;
+	    out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of Bytes Per Sector, usually 512." << Qt::endl;
+	    out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of Sectors per Cluster." << Qt::endl;
+	    out << "Total Sectors|" << QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 40, 8))) << "|Number of sectors in the file system." << Qt::endl;
+	    out << "Bytes Per Cluster|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of bytes per cluster" << Qt::endl;
+	    out << "MFT Starting Cluster|" << QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 48, 8))) << "|Starting cluster number for the MFT" << Qt::endl;
+	    out << "MFT Starting Offset|" << QString::number(curstartsector*512 + qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 48, 8)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Starting byte for the MFT" << Qt::endl;
+	    out << "MFT Entry Size|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 64, 1))) << "|Entry size in clusters for an MFT Entry" << Qt::endl;
             out << "MFT Entry Bytes|1024| Entry size in bytes for an MFT Entry" << Qt::endl; // entrysize is stored at offset 64, then it should be entrysize * bytespercluster
-	    out << "Serial Number|" << QString("0x" + QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(72, 8)), 16)) << "|Serial number for the file system volume" << Qt::endl;
-	    out << "MFT Layout|" << "" << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
-            out << "Max MFT Entries|" << QString::number() << "|Max MFT Entries allowed in the MFT" << Qt::endl;
+	    out << "Serial Number|" << QString("0x" + QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 72, 8)), 16)) << "|Serial number for the file system volume" << Qt::endl;
+            out << "Index Record Size|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 68, 1))) << "|Index record size for an index record." << Qt::endl;
+
+            uint bytespercluster = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1));
+            qint64 mftoffset = curstartsector*512 + qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 48, 8)) * bytespercluster;
+            // GET THE MFT LAYOUT TO WRITE TO PROP FILE
+            if(QString::fromStdString(curimg->ReadContent(mftoffset, 4).toStdString()) == "FILE") // a proper MFT entry
+            {
+                int curoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 20, 2)); // mft offset + offset to first attribute
+                for(int i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 40, 2)); i++) // loop over attributes until hit attribute before the next attribute id
+                {
+                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + curoffset, 4)) == 0x80 && qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset + 9, 1)) == 0) // attrtype | namelength > default$DATA attribute to parse
+                        break;
+                    curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + curoffset + 4, 4)); // attribute length
+                }
+                curoffset += qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + curoffset + 32, 2)); // move the current offset to the start of the runlist
+                int runlistinc = 0;
+                QStringList runlist;
+                runlist.clear();
+                uint mftsize = 0;
+                while(curoffset < 1024) // curoffset < mftentrybytes
+                {
+                    if(qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset, 1)) > 0)
+                    {
+                        int runlengthbytes = QString(QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset, 1)), 16).at(1)).toInt();
+                        int runlengthoffset = QString(QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset, 1)), 16).at(0)).toInt();
+                        if(runlengthbytes == 0 && runlengthoffset == 0)
+                            break;
+                        curoffset++;
+                        uint runlength = 0;
+                        int runoffset = 0;
+                        if(runlengthbytes == 1)
+                            runlength = qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset, runlengthbytes));
+                        else
+                            runlength = qFromLittleEndian<uint>(curimg->ReadContent(mftoffset + curoffset, runlengthbytes));
+                        if(runlengthoffset == 1)
+                            runoffset = qFromLittleEndian<int8_t>(curimg->ReadContent(mftoffset + curoffset + runlengthbytes, runlengthoffset));
+                        else
+                        {
+                            QString runstr = "";
+                            for(int i=runlengthoffset-1; i >= 0; i--)
+                                runstr += QString(curimg->ReadContent(mftoffset + curoffset + runlengthbytes + i, 1).toHex());
+                            runoffset = runstr.toInt(nullptr, 16);
+                        }
+                        if(runlistinc > 0)
+                        {
+                            if(runlistinc > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
+                                runoffset = runoffset - 0xffff - 1;
+                            runoffset = runoffset + runlist.at(runlistinc-1).split(",").at(0).toUInt();
+                        }
+                        runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
+                        mftsize += runlength;
+                        runlistinc++;
+                        curoffset += runlengthbytes + runlengthoffset;
+                    }
+                    else
+                        break;
+                }
+                QString runliststr = "";
+                for(int i=0; i < runlist.count(); i++)
+                    runliststr += QString::number(curstartsector*512 + runlist.at(i).split(",").at(0).toULongLong() * bytespercluster) + "," + QString::number(runlist.at(i).split(",").at(1).toULongLong() * bytespercluster);
+	        out << "MFT Layout|" << runliststr << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
+                out << "Max MFT Entries|" << QString::number((mftsize * bytespercluster)/1024) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
+                runliststr = "";
+            }
+            // GET VOLUME LABEL FROM THE $VOLUME_NAME SYSTEM FILE
+            if(QString::fromStdString(curimg->ReadContent(mftoffset + 3 * 1024, 4).toStdString()) == "FILE") // a proper MFT entry
+            {
+                int curoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 20, 2)); // offset to first attribute
+                for(int i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 40, 2)); i++) // loop over attributes until get to next attribute id
+                {
+                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset, 4)) == 0x60) // $VOLUME_NAME attribute to parse (always resident)
+                        break;
+                    curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 4, 4));
+                }
+                qDebug() << "vollabel:" << QString::fromUtf16(reinterpret_cast<const ushort*>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4)), qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2))).data()));
+            }
+
+	    //out << "Volume Label|" << "" << "|Volume Label for the file system." << Qt::endl;
+	    //fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()))));
 	    //qulonglong mftoffset = 0;
 	    //uint mftentrybytes = 1024;
 
-
-
-	    //fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()))));
 	    /*
-            mftentrybytes = 1024;
-            fsinfo.insert("indexrecordsize", QVariant(partbuf.at(68)));
-            // get MFT entry for $MFT to determine cluster's that contain the MFT...
-            QByteArray mftentry0;
-	    QByteArray mftentry3;
-            mftentry0.clear();
-	    mftentry3.clear();
-            mftentry0 = curimg->ReadContent(fsinfo.value("mftoffset").toLongLong(), mftentrybytes);
-            mftentry3 = curimg->ReadContent(fsinfo.value("mftoffset").toLongLong() + 3*mftentrybytes, mftentrybytes);
-            //qDebug() << "MFT ENTRY SIGNATURE:" << QString::fromStdString(mftentry0.left(4).toStdString());
-            if(QString::fromStdString(mftentry0.left(4).toStdString()) == "FILE") // a proper mft entry
-            {
-                int curoffset = 0;
-                uint16_t firstattroffset = qFromLittleEndian<uint16_t>(mftentry0.mid(20, 2)); // offset to first attribute
-                //uint32_t mftentryusedsize = qFromLittleEndian<uint32_t>(mftentry0.mid(24, 4)); // mft entry used size
-                uint16_t attrcount = qFromLittleEndian<uint16_t>(mftentry0.mid(40, 2)); // next attribute id
-		uint32_t attrlength = 0;
-                //qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
-                curoffset = firstattroffset;
-                for(int i=0; i < attrcount; i++)
-                {
-                    uint32_t atrtype = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset, 4)); // attribute type
-                    uint8_t namelength = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset + 9, 1)); // length of name
-                    attrlength = qFromLittleEndian<uint32_t>(mftentry0.mid(curoffset + 4, 4)); // attribute length
-                    //qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
-		    if(atrtype == 128 && namelength == 0) // $DATA attribute to parse
-		    {
-			break;
-		    }
-                    curoffset += attrlength;
-                }
-		//qDebug() << "curoffset of $Data attribute:" << curoffset;
-		uint64_t vcnstart = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 16, 8));
-		uint64_t vcnend = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 24, 8));
-		uint16_t runlistoff = qFromLittleEndian<uint16_t>(mftentry0.mid(curoffset + 32, 2));
-		//uint16_t compressszunit = qFromLittleEndian<uint16_t>(mftentry0.mid(curoffset + 34, 2));
-		uint64_t actualattrcontentsize = qFromLittleEndian<uint64_t>(mftentry0.mid(curoffset + 48, 8));
-		//qDebug() << "Starting VCN:" << vcnstart << "Ending VCN:" << vcnend;
-		//qDebug() << "attrlength:" << attrlength << "runlistoff:" << runlistoff << "actual attr content size:" << actualattrcontentsize;
-		curoffset = curoffset + runlistoff;
-		//qDebug() << "run list start curoffset:" << curoffset;
-		int i=0;
-                //QString runliststr = "";
-                QStringList runlist;
-                uint mftsize = 0;
-                runlist.clear();
-		while(curoffset < mftentrybytes) // might have to do a while < mftentrybytes and then go from there.... to build the curoffset = curoffset + 3, 4, etc...
-		{
-		    if(mftentry0.at(curoffset) > 0)
-		    {
-			//qDebug() << "1st byte:" << QString::number(mftentry0.at(curoffset), 16);
-			int runlengthbytes = QString(QString::number(mftentry0.at(curoffset), 16).at(1)).toInt();
-			int runlengthoffset = QString(QString::number(mftentry0.at(curoffset), 16).at(0)).toInt();
-			if(runlengthbytes == 0 && runlengthoffset == 0)
-			    break;
-			curoffset++;
-			uint runlength = 0;
-			int runoffset = 0;
-			if(runlengthbytes == 1)
-			    runlength = qFromLittleEndian<uint8_t>(mftentry0.mid(curoffset, runlengthbytes));
-			else
-			    runlength = qFromLittleEndian<uint>(mftentry0.mid(curoffset, runlengthbytes));
-			if(runlengthoffset == 1)
-			    runoffset = qFromLittleEndian<int8_t>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
-			else
-			    runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
-			//qDebug() << "run [" << i << "] length:" << runlengthbytes << "run [" << i << "] offset:" << runlengthoffset;
-			
-			//int runlength = qFromLittleEndian<int>(mftentry0.mid(curoffset, runlengthbytes));
-			//int runoffset = qFromLittleEndian<int>(mftentry0.mid(curoffset + runlengthbytes, runlengthoffset));
-                        //qDebug() << "temporary runoffset prior to adding unlist in:" << QString::number(runoffset, 16);
-                        if(i > 0)
-                        {
-                            if(i > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
-                                runoffset = runoffset - 0xffff - 1;
-                            runoffset = runoffset + runlist.at(i-1).split(",").at(0).toUInt();
-                        }
-			//qDebug() << "runoffset cluster:" << runoffset << "runlength (clusters):" << runlength;
-                        //runliststr += QString::number(runoffset) + "," + QString::number(runlength) + ";";
-                        runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
-                        mftsize += runlength;
-                        //runlist.append(QString::number((partoffset * 512) + runoffset * fsinfo.value("bytespercluster").toUInt()) + "," + QString::number(runlength * fsinfo.value("bytespercluster").toUInt()));
-                        //if(i != 0)
-                            //runoffset = runoffset 
-			i++;
-			curoffset += runlengthbytes + runlengthoffset;
-			//qDebug() << "current offset after run [" << i-1 << "]" << curoffset;
-                        //qDebug() << "bytes per cluster:" << fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
-			//qDebug() << "mft byte start:" << runoffset * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
-			//qDebug() << "mft byte count:" << runlength * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt();
-		    }
-		    else
-			break;
-		    //break;
-		}
-		//qDebug() << "runlist:" << runlist;
-                QString runliststr = "";
-                for(int i=0; i < runlist.count(); i++)
-                    runliststr += QString::number((partoffset * 512) + (runlist.at(i).split(",").at(0).toULongLong() * fsinfo.value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(i).split(",").at(1).toULongLong() * fsinfo.value("bytespercluster").toUInt()) + ";";
-                fsinfo.insert("mftlayout", QVariant(runliststr));
-                fsinfo.insert("maxmftentries", (mftsize * fsinfo.value("bytespercluster").toUInt()) / mftentrybytes);
-                //qDebug() << "mftlayout:" << fsinfo.value("mftlayout").toString();
-            }
-            else
-                qDebug() << "error this is not a valid MFT ENTRY...";
-	    //qDebug() << "MFT ENTRY FOR $VOLUME SIGNATURE:" << QString::fromStdString(mftentry3.left(4).toStdString());
-	    if(QString::fromStdString(mftentry3.left(4).toStdString()) == "FILE") // a proper mft entry
-	    {
-		int curoffset = 0;
-                uint16_t firstattroffset = qFromLittleEndian<uint16_t>(mftentry3.mid(20, 2)); // offset to first attribute
-                //uint32_t mftentryusedsize = qFromLittleEndian<uint32_t>(mftentry0.mid(24, 4)); // mft entry used size
-                uint16_t attrcount = qFromLittleEndian<uint16_t>(mftentry3.mid(40, 2)); // next attribute id
-		uint32_t attrlength = 0;
-                //qDebug() << "first attr offset:" << firstattroffset << "attr count:" << attrcount;
-                curoffset = firstattroffset;
-                for(int i=0; i < attrcount; i++)
-                {
-                    uint32_t atrtype = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset, 4)); // attribute type
-                    //uint8_t namelength = qFromLittleEndian<uint8_t>(mftentry3.mid(curoffset + 9, 1)); // length of name
-                    attrlength = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset + 4, 4)); // attribute length
-                    //qDebug() << "attr type:" << atrtype << "curoffset:" << curoffset << "attrlength:" << attrlength;
-		    if(atrtype == 96) // $VOLUME_NAME attribute to parse (always resident)
-		    {
-			break;
-		    }
-                    curoffset += attrlength;
-                }
 		uint32_t contentsize = qFromLittleEndian<uint32_t>(mftentry3.mid(curoffset + 16, 4));
 		uint16_t contentoffset = qFromLittleEndian<uint16_t>(mftentry3.mid(curoffset + 20, 2));
 		//qDebug() << "curoffset of $Volume attribute:" << curoffset;
@@ -5661,8 +5611,6 @@ QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsect
 		fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()))));
 		QString volnamestr = QString::fromUtf16(reinterpret_cast<const ushort*>(mftentry3.mid(curoffset + contentoffset, contentsize).data()));
 		//qDebug() << "volnamestr:" << volnamestr;
-	    }
-
 	     */ 
 	}
     }
