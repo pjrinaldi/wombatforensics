@@ -5293,7 +5293,16 @@ void ProcessForensicImage(ForImg* curimg)
                 int ptreecnt = 0; // partition counter to add unallocated in..
                 QDir dir; // current partition directory
                 QFile pstatfile; // current statfile
+                int pcount = 0;
                 for(int i=0; i < partentrycount; i++)
+                {
+                    int cnt = i*partentrysize;
+                    uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+                    uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+                    if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+                        pcount++;
+                }
+                for(int i=0; i < pcount; i++)
                 {
                     uint32_t sectorcheck = 0;
                     int cnt = i*partentrysize;
@@ -5303,9 +5312,8 @@ void ProcessForensicImage(ForImg* curimg)
                         sectorcheck = 0;
                     else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
                         sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
-                    //else if(i == partentrycount - 1 && curendsector < curimg->Size()) // UNALLOCATED AFTER END PARTITION
-                    //  sectorcheck = curimg->Size();
-                    //qDebug() << "sectorcheck:" << sectorcheck;
+                    else if(i == pcount - 1)
+                        sectorcheck = curimg->Size()/512;
                     if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
                     {
                         if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
@@ -5378,94 +5386,46 @@ void ProcessForensicImage(ForImg* curimg)
                             treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
                             mutex.unlock();
                             ptreecnt++;
-                            /*
-	    nodedata.clear();
-	    nodedata << QString(fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]") << "0" << QString::number(psizelist.at(i)*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-	    mutex.lock();
-	    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt)), -1, 0);
-	    mutex.unlock();
-            WriteFileSystemProperties((QHash<QString, QVariant>*)&(fsinfolist.at(i)), QString(curpartpath + "prop"));
-                             */ 
                         }
-                        qDebug() << "curendsector:" << curendsector << "curimg->Size():" << curimg->Size()/512;
-                        if(i == partentrycount - 1 && (curendsector*512) < curimg->Size()) // unallocated partition at the end
+                        if(i == pcount - 1)
                         {
-                            qDebug() << "need to fix this check for final unallocated between the last partition and the imgsize";
-                            // ADD THE UNALLOCATED PARTITION
-                            dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
-                            pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
-                            if(!pstatfile.isOpen())
-                                pstatfile.open(QIODevice::Append | QIODevice::Text);
-                            if(pstatfile.isOpen())
+                            if(curendsector < curimg->Size())
                             {
-                                out.setDevice(&pstatfile);
-                                // partition name, offset, size, partition type, id
-                                out << "UNALLOCATED," << QString::number((curendsector + 1)*512) << "," << QString::number(curimg->Size() - 512*curendsector) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                                out.flush();
-                                pstatfile.close();
+                                dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
+                                pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
+                                if(!pstatfile.isOpen())
+                                    pstatfile.open(QIODevice::Append | QIODevice::Text);
+                                if(pstatfile.isOpen())
+                                {
+                                    out.setDevice(&pstatfile);
+                                    // partition name, offset, size, partition type, id
+                                    out << "UNALLOCATED," << QString::number((curendsector + 1)*512) << "," << QString::number(curimg->Size() - 512*(curendsector+1)) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                                    out.flush();
+                                    pstatfile.close();
+                                }
+                                /*
+                                reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
+                                */
+                                //partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
+                                nodedata.clear();
+                                nodedata << "UNALLOCATED" << "0" << QString::number(curimg->Size() - 512*(curendsector+1)) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                                mutex.lock();
+                                treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
+                                mutex.unlock();
+                                // FILE CARVING DIRECTORIES
+                                nodedata.clear();
+                                nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
+                                mutex.lock();
+                                treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
+                                mutex.unlock();
+                                nodedata.clear();
+                                nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cu");
+                                mutex.lock();
+                                treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
+                                mutex.unlock();
                             }
-                            //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                            /*
-                            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
-                            */
-                            //partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
-                            nodedata.clear(); //QString::number(imgsize - 512*(pofflist.at(i) + psizelist.at(i)))
-                            nodedata << "UNALLOCATED" << "0" << QString::number(curimg->Size() - 512*curendsector) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
-                            mutex.unlock();
-                            // FILE CARVING DIRECTORIES
-                            nodedata.clear();
-                            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-                            mutex.unlock();
-                            nodedata.clear();
-                            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cu");
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-                            mutex.unlock();
                         }
                     }
-                        qDebug() << "curendsector:" << curendsector << "curimg->Size():" << curimg->Size()/512;
-                        if(i == partentrycount - 1 && (curendsector*512) < curimg->Size()) // unallocated partition at the end
-                        {
-                            qDebug() << "need to fix this check for final unallocated between the last partition and the imgsize";
-                            // ADD THE UNALLOCATED PARTITION
-                            dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
-                            pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
-                            if(!pstatfile.isOpen())
-                                pstatfile.open(QIODevice::Append | QIODevice::Text);
-                            if(pstatfile.isOpen())
-                            {
-                                out.setDevice(&pstatfile);
-                                // partition name, offset, size, partition type, id
-                                out << "UNALLOCATED," << QString::number((curendsector + 1)*512) << "," << QString::number(curimg->Size() - 512*curendsector) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                                out.flush();
-                                pstatfile.close();
-                            }
-                            //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                            /*
-                            reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
-                            */
-                            //partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
-                            nodedata.clear(); //QString::number(imgsize - 512*(pofflist.at(i) + psizelist.at(i)))
-                            nodedata << "UNALLOCATED" << "0" << QString::number(curimg->Size() - 512*curendsector) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
-                            mutex.unlock();
-                            // FILE CARVING DIRECTORIES
-                            nodedata.clear();
-                            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-                            mutex.unlock();
-                            nodedata.clear();
-                            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cu");
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-                            mutex.unlock();
-                        }
                     else // INVALID PARTITION ENTRY
                     {
                         // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
@@ -5697,15 +5657,10 @@ QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsect
                         break;
                     curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 4, 4));
                 }
-                /*
-                QString vollabel = "";
-                for(int k=0; k < qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4)); k++)
-                    vollabel += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2)) + k*2, 2)))); // need to fix
-                qDebug() << "vollabel char method:" << vollabel;
-                */
-		// EASY WAY TO READ UTF16 STRING !!!!!!!!!!
-                out << "Volume Label|" << QString::fromUtf16(reinterpret_cast<const ushort*>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2)), qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4))).data())) << "|Volume Label for the file system." << Qt::endl;
-                partitionname = QString::fromUtf16(reinterpret_cast<const ushort*>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2)), qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4))).data())) + " [NTFS]";
+                for(int k=0; k < qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4))/2; k++)
+                    partitionname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2)) + k*2, 2))));
+                out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+                partitionname += " [NTFS]";
             }
 	}
     }
