@@ -5229,12 +5229,6 @@ void ProcessForensicImage(ForImg* curimg)
     isignals->StatUp("Parsing Forensic Image");
     qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
     qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
-    /*
-    QList<qint64> pofflist;
-    pofflist.clear();
-    QList<qint64> psizelist;
-    psizelist.clear();
-    */
     qDebug() << "imgsize:" << curimg->Size();
     QList<QVariant> nodedata;
     nodedata.clear();
