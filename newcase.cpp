@@ -5475,12 +5475,35 @@ void ProcessForensicImage(ForImg* curimg)
             }
             else // MBR
             {
+                int pcount = 0;
                 for(int i=0; i < 4; i++)
+                {
+                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
+                        pcount++;
+                }
+                for(int i=0; i < pcount; i++)
                 {
                     int cnt = i*16;
                     uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + cnt, 1));
                     uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + cnt, 4));
                     uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + cnt, 4));
+                    qint64 sectorcheck = 0;
+                    if(i == 0) // INITIAL PARTITION
+                        sectorcheck = 0;
+                    else if(i > 0 && i < 3) // MIDDLE PARTITIONS
+                        sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
+                    else if(i == 3) // LAST PARTITION
+                        sectorcheck = curimg->Size()/512;
+                    //qDebug() << "curoffset:" << curoffset << "cursize:" << cursize;
+                    if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
+                    {
+                        //qDebug() << "unallocated partition before:" << i;
+                    }
+                    if(curoffset + cursize < curimg->Size()) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
+                    {
+                        //qDebug() << "add unallocated partition after last partition" << i;
+                    }
+
                     if(curparttype == 0x05) // extended partition
                     {
                         //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
@@ -5504,7 +5527,7 @@ void ProcessForensicImage(ForImg* curimg)
                     {
                         //pofflist->append(curoffset);
                         //psizelist->append(cursize);
-                        qDebug() << "begin parse file system information";
+                        //qDebug() << "begin parse file system information";
                         //ParseFileSystemInformation(curimg, curoffset, fsinfolist);
                     }
                 }

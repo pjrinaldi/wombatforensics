@@ -356,17 +356,17 @@ ForImg::ForImg(QString imgfile)
         for(int i=0; i < efiles.count(); i++)
         {
             filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
-            printf("filenames[%d] = %s\n", i, filenames[i]);
+            //printf("filenames[%d] = %s\n", i, filenames[i]);
         }
         globfilecnt = efiles.count();
-        printf("globfilecnt: %d\n", globfilecnt);
+        //printf("globfilecnt: %d\n", globfilecnt);
         int retopen = 0;
 
         retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
-        else
-            printf("libewf glob was successful: %d\n", retopen);
+        //else
+        //    printf("libewf glob was successful: %d\n", retopen);
 
         retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
         if(retopen == -1)
@@ -374,8 +374,8 @@ ForImg::ForImg(QString imgfile)
         retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
-        else
-            printf("libewf_handle_open was successful %d\n", retopen);
+        //else
+        //    printf("libewf_handle_open was successful %d\n", retopen);
         libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
         libewf_handle_close(ewfhandle, &ewferror);
         libewf_handle_free(&ewfhandle, &ewferror);
@@ -400,12 +400,12 @@ ForImg::ForImg(QString imgfile)
 
 ForImg::~ForImg()
 {
-    if(imgtype == 0) // EWF
-    {
+    //if(imgtype == 0) // EWF
+    //{
         //libewf_handle_close(ewfhandle, &ewferror);
         //libewf_handle_free(&ewfhandle, &ewferror);
         //libewf_glob_free(globfiles, globfilecnt, &ewferror);
-    }
+    //}
 }
 
 QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
@@ -459,9 +459,6 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         qint64 res = 0;
         res = af_read(afimage, (unsigned char*)data, size);
         tmparray = QByteArray::fromRawData((const char*)data, size);
-	//af_seek(afimage, pos, SEEK_SET);
-	//res = af_read(afimage, (unsigned char*)data, maxSize);
-        //imgsize = af_get_imagesize(afimage);
         af_close(afimage);
     }
     else if(imgtype == 2) // SMRAW
