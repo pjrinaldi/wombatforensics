@@ -381,6 +381,15 @@ ForImg::ForImg(QString imgfile)
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
     }
+    else if(imgtype == 1) // AFF
+    {
+        //char* iname = new char[imgpath.toStdString().size() + 1];
+        //strcpy(iname, imgpath.toStdString().c_str());
+        AFFILE* afimage = NULL;
+        afimage = af_open(imgpath.toStdString().c_str(), O_RDONLY|O_EXCL, 0);
+        imgsize = af_get_imagesize(afimage);
+        af_close(afimage);
+    }
     else if(imgtype == 2) // RAW
     {
         QFileInfo efileinfo(imgpath);
@@ -442,8 +451,18 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
     }
-    else if(imgtype == 1)
+    else if(imgtype == 1) // AFF
     {
+        AFFILE* afimage = NULL;
+        afimage = af_open(imgpath.toStdString().c_str(), O_RDONLY|O_EXCL, 0);
+        af_seek(afimage, pos, SEEK_SET);
+        qint64 res = 0;
+        res = af_read(afimage, (unsigned char*)data, size);
+        tmparray = QByteArray::fromRawData((const char*)data, size);
+	//af_seek(afimage, pos, SEEK_SET);
+	//res = af_read(afimage, (unsigned char*)data, maxSize);
+        //imgsize = af_get_imagesize(afimage);
+        af_close(afimage);
     }
     else if(imgtype == 2) // SMRAW
     {

@@ -5235,6 +5235,9 @@ void ProcessForensicImage(ForImg* curimg)
     nodedata << curimg->ImgPath().split("/").last() << "0" << QString::number(curimg->Size()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last());
     /*
      * NEED TO WRITE THIS AS I GO.... AND CLEAR STRING AS I GO
+     *
+     * MIGHT BE BETTER TO GENERATE THE PREVIEW REPORT AFTER ALL THIS WITHIN THE "UPDATESTATUS()" FUNCTION
+     *
     QString reportstring = "";
     reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table width='98%'>";
     reportstring += "<tr><th colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "):" + curimg->ImgPath() + "</th></tr>";
@@ -5348,7 +5351,7 @@ void ProcessForensicImage(ForImg* curimg)
                             mutex.unlock();
                             ptreecnt++;
                         }
-                        qDebug() << "begin parsing the allocated partition...";
+                        //qDebug() << "begin parsing the allocated partition...";
                         // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
                         dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
                         pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
@@ -5436,8 +5439,41 @@ void ProcessForensicImage(ForImg* curimg)
 	    if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32
             {
                 // Windows partition/fs which starts at beginning of image with no partition table
+                QDir dir; // current partition directory
+                QFile pstatfile; // current statfile
+                dir.mkpath(curimg->MountPath() + "/p0/");
+                pstatfile.setFileName(curimg->MountPath() + "/p0/stat");
+                QString tmpstring = ParseFileSystem(curimg, 0, curimg->Size()/512, 0);
+                if(!pstatfile.isOpen())
+                    pstatfile.open(QIODevice::Append | QIODevice::Text);
+                if(pstatfile.isOpen())
+                {
+                    out.setDevice(&pstatfile);
+                    // partition name, offset, size, partition type, id
+                    // NEED TO FIND AND FIX THE VALUES IN THIS OUT STATEMENT FOR THE FILESYSTEM AND TYPE
+                    out << tmpstring << "," << QString::number(0) << "," << QString::number(curimg->Size()) << ",type," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0");
+                    out.flush();
+                    pstatfile.close();
+                    nodedata.clear();
+                    nodedata << tmpstring << "0" << QString::number(curimg->Size()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0");
+                    mutex.lock();
+                    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
+                    mutex.unlock();
+                    // FILE CARVING DIRECTORIES
+                    nodedata.clear();
+                    nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0-cv");
+                    mutex.lock();
+                    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0"), 11, 0);
+                    mutex.unlock();
+                    nodedata.clear();
+                    nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0-cu");
+                    mutex.lock();
+                    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0"), 11, 0);
+                    mutex.unlock();
+                    //ptreecnt++;
+                }
             }
-            else
+            else // MBR
             {
                 for(int i=0; i < 4; i++)
                 {
