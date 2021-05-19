@@ -5513,24 +5513,30 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
 
 uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint32_t curstartsector, uint32_t cursectorsize, uint8_t ptreecnt)
 {
-    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 510, 2)) == 0xaa55)
+    uint32_t actualsector = 0;
+    if(initialstartsector == curstartsector)
+        actualsector = curstartsector;
+    else
+        actualsector = curstartsector + initialstartsector;
+
+    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2)) == 0xaa55)
     {
 	uint8_t pcount = 0;
 	for(int i=0; i < 4; i++)
 	{
-	    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 458 + i*16, 4)) > 0)
+	    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 458 + i*16, 4)) > 0)
 		pcount++;
 	}
 	for(uint8_t i; i < pcount; i++)
 	{
-	    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 450 + i*16, 1));
-	    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 454 + i*16, 4));
-	    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 458 + i*16, 4));
+	    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(actualsector*512 + 450 + i*16, 1));
+	    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(actualsector*512 + 454 + i*16, 4));
+	    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(actualsector*512 + 458 + i*16, 4));
 	    uint32_t sectorcheck = 0;
 	    if(i == 0) // INITIAL PARTITION
 		sectorcheck = 0;
 	    else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
-		sectorcheck =  qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
+		sectorcheck =  qFromLittleEndian<uint32_t>(curimg->ReadContent(actualsector*512 + 454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(actualsector*512 + 458 + (i-1)*16, 4));
 	    else if(i == pcount - 1) // LAST PARTITION
 		sectorcheck = cursectorsize;
 	    qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
@@ -5559,12 +5565,11 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint
 	    {
 		if(cursize > 0)
 		{
-		    uint32_t cursector = 0;
-		    if(initialstartsector == curstartsector)
-			cursector = curstartsector + curoffset;
-		    else
-			cursector = initialstartsector + curstartsector + curoffset;
 		    /*
+    if(primextoff == offset)
+        rawforimg.seek(offset * 512);
+    else
+        rawforimg.seek((primextoff + offset)*512);
 		     * primextoff === initialstartsector
 		    off64_t curoff = 0;
 		    if(primextoff == offset)
@@ -5582,7 +5587,7 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint
 		    psizelist->append(cursize);
 		    ParseFileSystemInformation(curimg, curoff, fsinfolist);
 		     */ 
-		    ParsePartition(curimg, cursector, cursize, ptreecnt, 1);
+		    ParsePartition(curimg, actualsector + curoffset, cursize, ptreecnt, 1);
 		    ptreecnt++;
 		}
 	    }
