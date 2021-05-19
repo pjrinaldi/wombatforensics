@@ -5347,7 +5347,13 @@ void ProcessForensicImage(ForImg* curimg)
             else // MBR
             {
                 int ptreecnt = 0;
-                for(int i=0; i < 4; i++)
+		int pcount = 0;
+		for(int i=0; i < 4; i++)
+		{
+		    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
+			pcount++;
+		}
+                for(int i=0; i < pcount; i++)
                 {
                     int cnt = i*16;
                     uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + cnt, 1));
@@ -5356,14 +5362,14 @@ void ProcessForensicImage(ForImg* curimg)
                     qint64 sectorcheck = 0;
                     if(i == 0) // INITIAL PARTITION
                         sectorcheck = 0;
-                    else if(i > 0 && i < 3) // MIDDLE PARTITIONS
+                    else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
                         sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
-                    else if(i == 3) // LAST PARTITION
+                    else if(i == pcount - 1) // LAST PARTITION
                         sectorcheck = curimg->Size()/512;
                     qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
                     if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
                     {
-                        qDebug() << "unallocated partition before:" << i;
+                        //qDebug() << "unallocated partition before:" << i;
 			ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
                         ptreecnt++;
                     }
@@ -5391,50 +5397,15 @@ void ProcessForensicImage(ForImg* curimg)
                     {
                         if(cursize > 0)
                         {
-                            qDebug() << "begin parse file system information";
+                            //qDebug() << "begin parse file system information";
 			    ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
-			    /*
-                            QDir dir;
-                            QFile pstatfile;
-                            dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
-                            pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
-			    QString tmpstring = "";
-                            //QString tmpstring = ParseFileSystem(curimg, curoffset, cursize, ptreecnt);
-                            if(!pstatfile.isOpen())
-                                pstatfile.open(QIODevice::Append | QIODevice::Text);
-                            if(pstatfile.isOpen())
-                            {
-                                out.setDevice(&pstatfile);
-                                out << tmpstring << "," << QString::number(curoffset) << "," << QString::number(cursize) << "," << "type" << "," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                                out.flush();
-                                pstatfile.close();
-                            }
-                            nodedata.clear();
-                            // NEED TO CONVERT ALL UINT32_T TO QINT64 WHEN CALCULATING IN SIZE FOR BYTES
-                            nodedata << tmpstring << "0" << QString::number((qint64)cursize*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
-                            mutex.unlock();
-                            // FILE CARVING DIRECTORIES
-                            nodedata.clear();
-                            nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-                            mutex.unlock();
-                            nodedata.clear();
-                            nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cu");
-                            mutex.lock();
-                            treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-                            mutex.unlock();
-                            nodedata.clear();
-			    */
                             ptreecnt++;
                         }
                     }
-                    if(i == 3 && curoffset + cursize < curimg->Size()/512) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
+                    if(i == pcount - 1 && curoffset + cursize < curimg->Size()/512 - 1) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
                     {
-                        qDebug() << "add unallocated partition after last partition" << i;
-			ParsePartition(curimg, curoffset + cursize + 1, curimg->Size()/512 - 1 - (curoffset + cursize), ptreecnt, 0);
+                        //qDebug() << "add unallocated partition after last partition" << i;
+			ParsePartition(curimg, curoffset + cursize, curimg->Size()/512 - (curoffset + cursize), ptreecnt, 0);
 			//ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
                         //ptreecnt++;
                     }
