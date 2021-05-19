@@ -5375,9 +5375,9 @@ void ProcessForensicImage(ForImg* curimg)
                     }
                     if(curparttype == 0x05) // extended partition
                     {
-                        ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
-                        //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
                         qDebug() << "parse extended partition recurse loop here...";
+                        ptreecnt = ParseExtendedPartition(curimg, curoffset, curoffset, cursize, ptreecnt);
+                        //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
                         //ParseExtentedPartition(curimg, curoffset, cursize, j);
                         //ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
                     }
@@ -5511,7 +5511,7 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     mutex.unlock();
 }
 
-uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t curstartsector, uint32_t cursectorsize, uint8_t ptreecnt)
+uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint32_t curstartsector, uint32_t cursectorsize, uint8_t ptreecnt)
 {
     if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 510, 2)) == 0xaa55)
     {
@@ -5533,7 +5533,7 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t curstartsector, uint32_t
 		sectorcheck =  qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
 	    else if(i == pcount - 1) // LAST PARTITION
 		sectorcheck = cursectorsize;
-	    //qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
+	    qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
 	    if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
 	    {
 		//qDebug() << "unallocated partition before:" << i;
@@ -5542,7 +5542,7 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t curstartsector, uint32_t
 	    }
 	    if(curparttype == 0x05) // another extended partition
 	    {
-		ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
+		ptreecnt = ParseExtendedPartition(curimg, initialstartsector, curoffset, cursize, ptreecnt);
 	    }
 	    else if(curparttype == 0x00) // do nothing, it's empty
 	    {
@@ -5559,7 +5559,30 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t curstartsector, uint32_t
 	    {
 		if(cursize > 0)
 		{
-		    ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
+		    uint32_t cursector = 0;
+		    if(initialstartsector == curstartsector)
+			cursector = curstartsector + curoffset;
+		    else
+			cursector = initialstartsector + curstartsector + curoffset;
+		    /*
+		     * primextoff === initialstartsector
+		    off64_t curoff = 0;
+		    if(primextoff == offset)
+		    {
+			pofflist->append(offset+curoffset);
+			curoff = offset + curoffset;
+			//qDebug() << "part[i]:" << i << "offset:" << offset + curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+		    }
+		    else
+		    {
+			pofflist->append(primextoff + offset + curoffset);
+			curoff = primextoff + offset + curoffset;
+			//qDebug() << "part[i]:" << i << "offset:" << primextoff + offset + curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
+		    }
+		    psizelist->append(cursize);
+		    ParseFileSystemInformation(curimg, curoff, fsinfolist);
+		     */ 
+		    ParsePartition(curimg, cursector, cursize, ptreecnt, 1);
 		    ptreecnt++;
 		}
 	    }
@@ -5569,8 +5592,8 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t curstartsector, uint32_t
 	    }
 	}
     }
-    //else
-	//qDebug() << "i screwed up the math somewhere...";
+    else
+	qDebug() << "i screwed up the math somewhere...";
     return ptreecnt;
 }
 
