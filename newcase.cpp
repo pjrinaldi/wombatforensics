@@ -5522,7 +5522,9 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint
     //qDebug() << "actualsector:" << actualsector;
 
     qDebug() << "header check:" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2)), 16);
+    uint16_t headtest = qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2));
     //if(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2)) == 0xaa55)
+    if(headtest == 0xaa55)
     {
 	uint8_t pcount = 0;
 	for(int i=0; i < 4; i++)
