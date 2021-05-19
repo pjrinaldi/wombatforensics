@@ -5514,12 +5514,15 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
 uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint32_t curstartsector, uint32_t cursectorsize, uint8_t ptreecnt)
 {
     uint32_t actualsector = 0;
+    //qDebug() << "initialstartsector:" << initialstartsector << "curstartesctor:" << curstartsector;
     if(initialstartsector == curstartsector)
         actualsector = curstartsector;
     else
         actualsector = curstartsector + initialstartsector;
+    //qDebug() << "actualsector:" << actualsector;
 
-    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2)) == 0xaa55)
+    qDebug() << "header check:" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2)), 16);
+    //if(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2)) == 0xaa55)
     {
 	uint8_t pcount = 0;
 	for(int i=0; i < 4; i++)
@@ -5548,6 +5551,7 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint
 	    }
 	    if(curparttype == 0x05) // another extended partition
 	    {
+                qDebug() << "parse another extended partition layer";
 		ptreecnt = ParseExtendedPartition(curimg, initialstartsector, curoffset, cursize, ptreecnt);
 	    }
 	    else if(curparttype == 0x00) // do nothing, it's empty
@@ -5597,8 +5601,8 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint
 	    }
 	}
     }
-    else
-	qDebug() << "i screwed up the math somewhere...";
+    //else
+	//qDebug() << "i screwed up the math somewhere...";
     return ptreecnt;
 }
 
