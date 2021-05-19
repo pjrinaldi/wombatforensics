@@ -5340,47 +5340,9 @@ void ProcessForensicImage(ForImg* curimg)
             QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
             QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
             QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
-	    if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32
+	    if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 W/O PARTITION TABLE
             {
-                qDebug() << "windows fs without partition";
 		ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
-                // Windows partition/fs which starts at beginning of image with no partition table
-		/*
-                QDir dir; // current partition directory
-                QFile pstatfile; // current statfile
-                dir.mkpath(curimg->MountPath() + "/p0/");
-                pstatfile.setFileName(curimg->MountPath() + "/p0/stat");
-		QString tmpstring = "";
-                //QString tmpstring = ParseFileSystem(curimg, 0, curimg->Size()/512, 0);
-                if(!pstatfile.isOpen())
-                    pstatfile.open(QIODevice::Append | QIODevice::Text);
-                if(pstatfile.isOpen())
-                {
-                    out.setDevice(&pstatfile);
-                    // partition name, offset, size, partition type, id
-                    // NEED TO FIND AND FIX THE VALUES IN THIS OUT STATEMENT FOR THE FILESYSTEM AND TYPE
-                    out << tmpstring << "," << QString::number(0) << "," << QString::number(curimg->Size()) << ",type," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0");
-                    out.flush();
-                    pstatfile.close();
-                    nodedata.clear();
-                    nodedata << tmpstring << "0" << QString::number(curimg->Size()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0");
-                    mutex.lock();
-                    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
-                    mutex.unlock();
-                    // FILE CARVING DIRECTORIES
-                    nodedata.clear();
-                    nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0-cv");
-                    mutex.lock();
-                    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0"), 11, 0);
-                    mutex.unlock();
-                    nodedata.clear();
-                    nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0-cu");
-                    mutex.lock();
-                    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p0"), 11, 0);
-                    mutex.unlock();
-                    //ptreecnt++;
-                }
-		*/
             }
             else // MBR
             {
@@ -5402,11 +5364,12 @@ void ProcessForensicImage(ForImg* curimg)
                     if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
                     {
                         qDebug() << "unallocated partition before:" << i;
+			ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
                         ptreecnt++;
                     }
                     if(curparttype == 0x05) // extended partition
                     {
-                        //ParseExtendedPartition(curimg, curoffset, cursize, i);
+                        //ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
                         //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
                         qDebug() << "parse extended partition recurse loop here...";
                         //ParseExtentedPartition(curimg, curoffset, cursize, j);
@@ -5429,6 +5392,8 @@ void ProcessForensicImage(ForImg* curimg)
                         if(cursize > 0)
                         {
                             qDebug() << "begin parse file system information";
+			    ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
+			    /*
                             QDir dir;
                             QFile pstatfile;
                             dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
@@ -5462,13 +5427,16 @@ void ProcessForensicImage(ForImg* curimg)
                             treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
                             mutex.unlock();
                             nodedata.clear();
+			    */
                             ptreecnt++;
                         }
                     }
                     if(i == 3 && curoffset + cursize < curimg->Size()/512) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
                     {
                         qDebug() << "add unallocated partition after last partition" << i;
-                        ptreecnt++;
+			ParsePartition(curimg, curoffset + cursize + 1, curimg->Size()/512 - 1 - (curoffset + cursize), ptreecnt, 0);
+			//ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
+                        //ptreecnt++;
                     }
                 }
             }
@@ -5555,7 +5523,7 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
 	nodedata << "UNALLOCATED";
     else if(allocstatus == 1)
 	nodedata << ParseFileSystem(curimg, cursectoroffset, ptreecnt);
-    nodedata << "0" << QString::number(cursectorsize*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+    nodedata << "0" << QString::number((qint64)cursectorsize*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
     mutex.unlock();
