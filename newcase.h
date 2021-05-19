@@ -9,8 +9,9 @@
 #include "wombatfunctions.h"
 
 void ProcessForensicImage(ForImg* curimg);
-QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsector, int ptreecnt);
-
+QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, int ptreecnt);
+//QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsector, int ptreecnt);
+void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursectorsize, int ptreecnt, uint8_t allocstatus);
 
 
 void ProcessVolume(ForImg* tmpimage);
