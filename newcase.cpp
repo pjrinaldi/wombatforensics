@@ -5318,7 +5318,6 @@ void ProcessForensicImage(ForImg* curimg)
 			    ParsePartition(curimg, sectorcheck, curstartsector, ptreecnt, 0);
                             ptreecnt++;
                         }
-                        //qDebug() << "begin parsing the allocated partition...";
                         // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
 			ParsePartition(curimg, curstartsector, (curendsector - curstartsector + 1), ptreecnt, 1);
                         ptreecnt++;
@@ -5344,7 +5343,9 @@ void ProcessForensicImage(ForImg* curimg)
 	    if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32
             {
                 qDebug() << "windows fs without partition";
+		ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
                 // Windows partition/fs which starts at beginning of image with no partition table
+		/*
                 QDir dir; // current partition directory
                 QFile pstatfile; // current statfile
                 dir.mkpath(curimg->MountPath() + "/p0/");
@@ -5379,6 +5380,7 @@ void ProcessForensicImage(ForImg* curimg)
                     mutex.unlock();
                     //ptreecnt++;
                 }
+		*/
             }
             else // MBR
             {
