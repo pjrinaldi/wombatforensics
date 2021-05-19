@@ -5287,7 +5287,7 @@ void ProcessForensicImage(ForImg* curimg)
                 uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
                 uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
                 uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
-                int ptreecnt = 0; // partition counter to add unallocated in..
+                uint8_t ptreecnt = 0; // partition counter to add unallocated in..
                 QDir dir; // current partition directory
                 QFile pstatfile; // current statfile
                 int pcount = 0;
@@ -5346,19 +5346,19 @@ void ProcessForensicImage(ForImg* curimg)
             }
             else // MBR
             {
-                int ptreecnt = 0;
-		int pcount = 0;
+                uint8_t ptreecnt = 0;
+		uint8_t pcount = 0;
 		for(int i=0; i < 4; i++)
 		{
 		    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
 			pcount++;
 		}
-                for(int i=0; i < pcount; i++)
+                for(uint8_t i=0; i < pcount; i++)
                 {
-                    int cnt = i*16;
-                    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + cnt, 1));
-                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + cnt, 4));
-                    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + cnt, 4));
+                    //int cnt = i*16;
+                    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + (i*16), 1));
+                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i*16), 4));
+                    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i*16), 4));
                     qint64 sectorcheck = 0;
                     if(i == 0) // INITIAL PARTITION
                         sectorcheck = 0;
@@ -5375,7 +5375,7 @@ void ProcessForensicImage(ForImg* curimg)
                     }
                     if(curparttype == 0x05) // extended partition
                     {
-                        //ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
+                        ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
                         //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
                         qDebug() << "parse extended partition recurse loop here...";
                         //ParseExtentedPartition(curimg, curoffset, cursize, j);
@@ -5459,7 +5459,7 @@ void ProcessForensicImage(ForImg* curimg)
     //FindPartitions(curimg, &pofflist, &psizelist);
 }
 
-void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursectorsize, int ptreecnt, uint8_t allocstatus)
+void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursectorsize, uint8_t ptreecnt, uint8_t allocstatus)
 {
     // ADD THE UNALLOCATED/ALLOCATED PARTITION
     QDir dir; // current partition directory
@@ -5511,8 +5511,70 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     mutex.unlock();
 }
 
-//QString ParseFileSystem(ForImg* curimg, qint64 curstartsector, qint64 curendsector, int ptreecnt)
-QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, int ptreecnt)
+uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t curstartsector, uint32_t cursectorsize, uint8_t ptreecnt)
+{
+    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 510, 2)) == 0xaa55)
+    {
+	uint8_t pcount = 0;
+	for(int i=0; i < 4; i++)
+	{
+	    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 458 + i*16, 4)) > 0)
+		pcount++;
+	}
+	for(uint8_t i; i < pcount; i++)
+	{
+	    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 450 + i*16, 1));
+	    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 454 + i*16, 4));
+	    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 458 + i*16, 4));
+	    uint32_t sectorcheck = 0;
+	    if(i == 0) // INITIAL PARTITION
+		sectorcheck = 0;
+	    else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
+		sectorcheck =  qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
+	    else if(i == pcount - 1) // LAST PARTITION
+		sectorcheck = cursectorsize;
+	    //qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
+	    if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
+	    {
+		//qDebug() << "unallocated partition before:" << i;
+		ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
+		ptreecnt++;
+	    }
+	    if(curparttype == 0x05) // another extended partition
+	    {
+		ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
+	    }
+	    else if(curparttype == 0x00) // do nothing, it's empty
+	    {
+	    }
+	    else if(curparttype == 0x82) // Sun i386
+	    {
+		// parse sun table here passing pofflist and psizelist
+	    }
+	    else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
+	    {
+		// parse bsd table here passing pofflist nad psizelist
+	    }
+	    else // primary partition to process
+	    {
+		if(cursize > 0)
+		{
+		    ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
+		    ptreecnt++;
+		}
+	    }
+	    if(i == pcount - 1 && curoffset + cursize < sectorcheck) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
+	    {
+		ParsePartition(curimg, curoffset + cursize, sectorcheck - (curoffset + cursize), ptreecnt, 0);
+	    }
+	}
+    }
+    //else
+	//qDebug() << "i screwed up the math somewhere...";
+    return ptreecnt;
+}
+
+QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     QTextStream out;
