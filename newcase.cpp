@@ -5366,16 +5366,16 @@ void ProcessForensicImage(ForImg* curimg)
                         sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
                     else if(i == pcount - 1) // LAST PARTITION
                         sectorcheck = curimg->Size()/512;
-                    qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
                     if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
                     {
                         //qDebug() << "unallocated partition before:" << i;
+			qDebug() << "unalloc:" << ptreecnt << "curoffset:" << sectorcheck << "curend:" << (curoffset + sectorcheck - 1) << "cursize:" << sectorcheck + curoffset;
 			ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
                         ptreecnt++;
                     }
                     if(curparttype == 0x05) // extended partition
                     {
-                        qDebug() << "parse extended partition recurse loop here...";
+			//qDebug() << "extendedpartition:" << curoffset << cursize;
                         ptreecnt = ParseExtendedPartition(curimg, curoffset, curoffset, cursize, ptreecnt);
                         //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
                         //ParseExtentedPartition(curimg, curoffset, cursize, j);
@@ -5397,6 +5397,7 @@ void ProcessForensicImage(ForImg* curimg)
                     {
                         if(cursize > 0)
                         {
+			    qDebug() << "ppart:" << ptreecnt << "curoffset:" << curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize;
                             //qDebug() << "begin parse file system information";
 			    ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
                             ptreecnt++;
@@ -5513,6 +5514,46 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
 
 uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint32_t curstartsector, uint32_t cursectorsize, uint8_t ptreecnt)
 {
+    uint8_t pcount = 0;
+    for(int i=0; i < 4; i++)
+    {
+	if(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 458 + i*16, 4)) > 0)
+	    pcount++;
+    }
+    for(uint8_t i = 0; i < pcount; i++)
+    {
+	uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 450 + i*16, 1));
+	uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 454 + i*16, 4));
+	uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 458 + i*16, 4));
+	if(i == 0 && curoffset > 0) // ADD INITIAL UNALLOCATED PARTITION
+	{
+	    qDebug() << "unalloc:" << ptreecnt << "curoffset:" << curstartsector << "curend:" << curstartsector + curoffset - 1 << "cursize:" << curoffset;
+	    //qDebug() << "unalloc:" << ptreecnt << "curoffset:" << 0 << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize;
+	    ParsePartition(curimg, curstartsector, curoffset, ptreecnt, 0);
+	    ptreecnt++;
+	}
+	if(curparttype == 0x05) // ANOTHER EXTENDED PARTITION
+	{
+	    qDebug() << "extended partition found:" << ptreecnt << "curglobal offset:" << curstartsector + curoffset;
+	    ptreecnt = ParseExtendedPartition(curimg, curstartsector, curstartsector + curoffset, cursize, ptreecnt);
+	}
+	else if(curparttype == 0x00) // do nothing
+	{
+	}
+	else // some other allocated partition
+	{
+	    qDebug() << "epart:" << ptreecnt << "globaloff:" << curstartsector + curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize << "curoffset:" << curoffset;
+	    ParsePartition(curimg, curstartsector + curoffset, cursize, ptreecnt, 1);
+	    ptreecnt++;
+	}
+	if(i == pcount - 1 && curstartsector + curoffset + cursize < cursectorsize)
+	{
+	    qDebug() << "unalloc:" << ptreecnt << "curoffset:" << curstartsector << "curend:" << curstartsector + curoffset - 1 << "cursize:" << curoffset;
+	    ParsePartition(curimg, curstartsector + curoffset + cursize, cursectorsize - (curstartsector + curoffset + cursize), ptreecnt, 0);
+	}
+    }
+    return ptreecnt;
+    /*
     uint32_t actualsector = 0;
     //qDebug() << "initialstartsector:" << initialstartsector << "curstartesctor:" << curstartsector;
     if(initialstartsector == curstartsector)
@@ -5520,41 +5561,40 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint
     else
         actualsector = curstartsector + initialstartsector;
     //qDebug() << "actualsector:" << actualsector;
-
-    qDebug() << "header check:" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2)), 16);
-    uint16_t headtest = qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2));
+    */
+    //qDebug() << "header check:" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 510, 2)), 16);
+    //uint16_t headtest = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 510, 2));
     //if(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 510, 2)) == 0xaa55)
-    if(headtest == 0xaa55)
+    //if(headtest == 0xaa55)
+    /*
     {
 	uint8_t pcount = 0;
 	for(int i=0; i < 4; i++)
 	{
-	    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(actualsector*512 + 458 + i*16, 4)) > 0)
+	    if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 458 + i*16, 4)) > 0)
 		pcount++;
 	}
+	qDebug() << "partitions within extended partition:" << pcount << "ptreecnt:" << ptreecnt;
 	for(uint8_t i; i < pcount; i++)
 	{
-	    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(actualsector*512 + 450 + i*16, 1));
-	    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(actualsector*512 + 454 + i*16, 4));
-	    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(actualsector*512 + 458 + i*16, 4));
-	    uint32_t sectorcheck = 0;
-	    if(i == 0) // INITIAL PARTITION
-		sectorcheck = 0;
-	    else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
-		sectorcheck =  qFromLittleEndian<uint32_t>(curimg->ReadContent(actualsector*512 + 454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(actualsector*512 + 458 + (i-1)*16, 4));
-	    else if(i == pcount - 1) // LAST PARTITION
-		sectorcheck = cursectorsize;
-	    qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
-	    if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
+	    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 450 + i*16, 1));
+	    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 454 + i*16, 4));
+	    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 458 + i*16, 4));
+	    qDebug() << "extended partition:" << "i:" << ptreecnt << "curstartsector:" << curstartsector << "curoffset:" << curoffset << "global current offset:" << curstartsector + curoffset << "curend:" << curstartsector + curoffset + cursize - 1 << "cursize:" << cursize;
+	    if(i == 0 && curoffset > 0) // ADD UNALLOCATED PARTITION
 	    {
+		qDebug() << "add initial unallocated partition:" << curstartsector << curstartsector + curoffset << ptreecnt;
 		//qDebug() << "unallocated partition before:" << i;
-		ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
+		ParsePartition(curimg, curstartsector, curstartsector + curoffset, ptreecnt, 0);
+		//ParsePartition(curimg, curstartsector + sectorcheck, curstartsector + curoffset, ptreecnt, 0);
 		ptreecnt++;
 	    }
 	    if(curparttype == 0x05) // another extended partition
 	    {
-                qDebug() << "parse another extended partition layer";
-		ptreecnt = ParseExtendedPartition(curimg, initialstartsector, curoffset, cursize, ptreecnt);
+                //qDebug() << "parse another extended partition layer";
+		//qDebug() << "extendedpartition:" << curstartsector << curoffset << cursize;
+		ptreecnt = ParseExtendedPartition(curimg, curstartsector, curstartsector + curoffset, cursize, ptreecnt);
+		//ptreecnt = ParseExtendedPartition(curimg, initialstartsector + curstartsector, curstartsector + curoffset, cursize, ptreecnt);
 	    }
 	    else if(curparttype == 0x00) // do nothing, it's empty
 	    {
@@ -5571,40 +5611,23 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint
 	    {
 		if(cursize > 0)
 		{
-		    /*
-    if(primextoff == offset)
-        rawforimg.seek(offset * 512);
-    else
-        rawforimg.seek((primextoff + offset)*512);
-		     * primextoff === initialstartsector
-		    off64_t curoff = 0;
-		    if(primextoff == offset)
-		    {
-			pofflist->append(offset+curoffset);
-			curoff = offset + curoffset;
-			//qDebug() << "part[i]:" << i << "offset:" << offset + curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
-		    }
-		    else
-		    {
-			pofflist->append(primextoff + offset + curoffset);
-			curoff = primextoff + offset + curoffset;
-			//qDebug() << "part[i]:" << i << "offset:" << primextoff + offset + curoffset << "cursize:" << cursize << "part type:" << QString::number(curparttype, 16);
-		    }
-		    psizelist->append(cursize);
-		    ParseFileSystemInformation(curimg, curoff, fsinfolist);
-		     */ 
-		    ParsePartition(curimg, actualsector + curoffset, cursize, ptreecnt, 1);
+		    qDebug() << "add allocated extended partition:" << "curstartsecctor:" << curstartsector << "global offset:" << curstartsector + curoffset << "cursize:" << cursize << "i:" << ptreecnt;
+		    ParsePartition(curimg, curstartsector + curoffset, cursize, ptreecnt, 1);
 		    ptreecnt++;
 		}
 	    }
-	    if(i == pcount - 1 && curoffset + cursize < sectorcheck) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
+	    //if(i == pcount - 1 && curoffset + cursize < sectorcheck) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
+	    if(i == pcount - 1 && curoffset + cursize < cursectorsize) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
 	    {
-		ParsePartition(curimg, curoffset + cursize, sectorcheck - (curoffset + cursize), ptreecnt, 0);
+		qDebug() << "add final unallocated partition:" << curstartsector << curstartsector + curoffset << cursectorsize << ptreecnt;
+		//ParsePartition(curimg, curoffset + cursize, sectorcheck - (curoffset + cursize), ptreecnt, 0);
+		ParsePartition(curimg, curoffset + cursize, cursectorsize - (curoffset + cursize), ptreecnt, 0);
 	    }
 	}
     }
     //else
 	//qDebug() << "i screwed up the math somewhere...";
+    */
     return ptreecnt;
 }
 
