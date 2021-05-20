@@ -5514,6 +5514,7 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
 
 uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint32_t curstartsector, uint32_t cursectorsize, uint8_t ptreecnt)
 {
+    // CURRENTLY WORKING, JUST NEED TO ACCOUNT FOR UNALLOC PARTITIONS AT END AND IN MIDDLE BETWEEN PARTITIONS
     uint8_t pcount = 0;
     for(int i=0; i < 4; i++)
     {
@@ -5542,6 +5543,7 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t initialstartsector, uint
 	}
 	else // some other allocated partition
 	{
+	    //if(i > 0 && i 
 	    qDebug() << "epart:" << ptreecnt << "globaloff:" << curstartsector + curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize << "curoffset:" << curoffset;
 	    ParsePartition(curimg, curstartsector + curoffset, cursize, ptreecnt, 1);
 	    ptreecnt++;
