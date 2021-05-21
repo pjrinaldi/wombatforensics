@@ -5635,14 +5635,28 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             else
                 out << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 19, 2)));
             out << "|Total sectors in the volume." << Qt::endl;
+            qulonglong rootdiroffset = 0;
+            if(fatstr == "FAT12" || fatstr == "FAT16")
+            {
+                //rootdiroffset = curstartsector*512 + // reserved area size;
+            }
+            else if(fat32str == "FAT32")
+            {
+                //rootdiroffset = curstartsector*512 + // reserved area size;
+            }
+            else if(exfatstr == "EXFAT")
+            {
+                //rootdiroffset = curstartsector*512 + // reserved area size;
+            }
             // different for all 3 - out << "Root Directory Offset|" << QString::number(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * 
-            //out << "FAT Offset|" << QString::number(curstartsector*512 + 
 
 	    /*
             fsinfo.insert("mediatype", QVariant(partbuf.at(21)));
             fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(43, 11).toStdString())));
             fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
-            fsinfo.insert("rootdiroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+            16-fsinfo.insert("rootdiroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+            32-fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt())));
+            ex-fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset* 512) + (fsinfo.value("clusterstart").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt())));
             fsinfo.insert("rootdirsectors", QVariant(((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt()));
             fsinfo.insert("rootdirsize", QVariant(fsinfo.value("rootdirsectors").toUInt() * fsinfo.value("bytespersector").toUInt()));
             fsinfo.insert("clusterareastart", QVariant((qulonglong)partoffset + fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + fsinfo.value("rootdirsectors").toUInt()));
