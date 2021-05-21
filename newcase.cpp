@@ -5909,8 +5909,32 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         else
             out << "Errors detected";
         out << "|Condition of the file system at lsat unmount." << Qt::endl;
+        out << "Compatible Features|";
+        uint32_t compatflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1116, 4));
+        if(compatflags & 0x200)
+            out << "Sparse Super Block,";
+        if(compatflags & 0x100)
+            out << "Exclude Bitmap,";
+        if(compatflags & 0x80)
+            out << "Exclude Inodes,";
+        if(compatflags & 0x40)
+            out << "Lazy Block Groups,";
+        if(compatflags & 0x20)
+            out << "Indexed Directories,";
+        if(compatflags & 0x10)
+            out << "Reserved GDT,";
+        if(compatflags & 0x08)
+            out << "Extended Attributes,";
+        if(compatflags & 0x04)
+            out << "Journal,";
+        if(compatflags & 0x02)
+            out << "Imagic Inodes,";
+        if(compatflags & 0x01)
+            out << "Directory preallocation";
+        out << "File system compatible feature set." << Qt::endl;
+        uint32_t incompatflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1120, 4));
+        uint32_t readonlyflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1124, 4));
 	/*
-	out << "Compatible Features|" << fsinfo->value("compatstr").toString() << "File System Compatible Feature Set" << Qt::endl;
 	out << "Incompatible Features|" << fsinfo->value("incompatstr").toString() << "File System Incompatible Feature Set" << Qt::endl;
 	out << "Read Only Compatible Features|" << fsinfo->value("readonlystr").toString() << "File System Read Only Compatible Feature Set" << Qt::endl;
         fsinfo.insert("partoffset", QVariant((qulonglong)(512 * partoffset)));
@@ -5938,27 +5962,6 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	QString compatstr = "";
 	QString incompatstr = "";
 	QString rostr = "";
-	if(compatflags & 0x200)
-	    compatstr += "Sparse Super Block,";
-	if(compatflags & 0x100)
-	    compatstr += "Exclude Bitmap,";
-	if(compatflags & 0x80)
-	    compatstr += "Exclude Inodes,";
-	if(compatflags & 0x40)
-	    compatstr += "Lazy Block Groups,";
-	if(compatflags & 0x20)
-	    compatstr += "Indexed Directories,";
-	if(compatflags & 0x10)
-	    compatstr += "Reserved GDT,";
-	if(compatflags & 0x08)
-	    compatstr += "Extended Attributes,";
-	if(compatflags & 0x04)
-	    compatstr += "Journal,";
-	if(compatflags & 0x02)
-	    compatstr += "Imagic Inodes,";
-	if(compatflags & 0x01)
-	    compatstr += "Directory preallocation";
-	fsinfo.insert("compatstr", QVariant(compatstr));
 	if(incompatflags & 0x10000)
 	    incompatstr += "Encrypted inodes,";
 	if(incompatflags & 0x8000)
