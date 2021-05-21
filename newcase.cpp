@@ -5593,17 +5593,53 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	QString fat32str = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 82, 5).toStdString());
 	if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || exfatstr == "EXFAT") // FAT12 | FAT16 | FAT32 | EXFAT
 	{
-            out << "Fat Count|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1))) << "| Number of FAT's in the file system." << Qt::endl;
-            out << "Fat Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2))) << "|Size of the FAT." << Qt::endl;
             partitionname = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 43, 11).toStdString()) + " [";
             if(fatstr == "FAT12" || fatstr == "FAT16")
+            {
+                if(fatstr == "FAT12")
+                {
+                    out << "File System Type|1|Internal File System Type represented as an integer." << Qt::endl;
+	            out << "File System Type|FAT12|File System Type String." << Qt::endl;
+                }
+                else if(fatstr == "FAT16")
+                {
+                    out << "File System Type|2|Internal File System Type represented as an integer." << Qt::endl;
+	            out << "File System Type|FAT16|File System Type String." << Qt::endl;
+                }
                 partitionname += fatstr;
+                out << "FAT Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2))) << "|Size of the FAT." << Qt::endl;
+            }
             else if(fat32str == "FAT32")
+            {
+                out << "File System Type|3|Internal File System Type represented as an integer." << Qt::endl;
+	        out << "File System Type|FAT32|File System Type String." << Qt::endl;
+                out << "FAT Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4))) << "|Size of the FAT." << Qt::endl;
                 partitionname += fat32str;
+            }
             else if(exfatstr == "EXFAT")
+            {
+                out << "File System Type|4|Internal File System Type represented as an integer." << Qt::endl;
+	        out << "File System Type|EXFAT|File System Type String." << Qt::endl;
+                out << "FAT Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4))) << "|Size of the FAT." << Qt::endl;
                 partitionname += exfatstr;
+            }
             partitionname += "]";
+            out << "Fat Count|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1))) << "| Number of FAT's in the file system." << Qt::endl;
+            out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of bytes per sector, usually 512." << Qt::endl;
+            out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of sectors per cluster." << Qt::endl;
+            out << "Reserved Area Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2))) << "|Size of the reserved area at the beginning of the file system." << Qt::endl;
+            out << "Root Directory Max Files|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 17, 2))) << "|Maximum number of root directory entries." << Qt::endl;
+            out << "File System Sector Count|";
+            if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 19, 2)) == 0)
+                out << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32, 4)));
+            else
+                out << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 19, 2)));
+            out << "|Total sectors in the volume." << Qt::endl;
+            //out << "Root Directory Offset|" << QString::number(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * 
+            //out << "FAT Offset|" << QString::number(curstartsector*512 + 
+
 	    /*
+            fsinfo.insert("mediatype", QVariant(partbuf.at(21)));
             fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(43, 11).toStdString())));
             fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
             fsinfo.insert("rootdiroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
@@ -5617,9 +5653,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             out << "FAT Offset|" << QString::number(fsinfo->value("fatoffset").toUInt()) << "|Byte offset to the start of the first FAT" << Qt::endl;
             out << "FAT Size|" << QString::number(fsinfo->value("fatsize").toUInt()) << "|Size of the FAT." << Qt::endl;
             out << "Reserved Area Size|" << QString::number(fsinfo->value("reservedareasize").toUInt()) << "|Size of the reserved area at the beginning of the file system." << Qt::endl;
-            out << "File System Sector Count|" << QString::number(fsinfo->value("fssectorcnt").toUInt()) << "|Total Sectors in the volume" << Qt::endl;
             out << "Root Directory Offset|" << QString::number(fsinfo->value("rootdiroffset").toUInt()) << "|Byte Offset for the root directory" << Qt::endl;
-            out << "Root Directory Max Files|" << QString::number(fsinfo->value("rootdirmaxfiles").toUInt()) << "|Maximum number of root directory entries" << Qt::endl;
             out << "Root Directory Sectors|" << QString::number(fsinfo->value("rootdirsectors").toUInt()) << "|Number of sectors for the root directory" << Qt::endl;
             out << "Root Directory Size|" << QString::number(fsinfo->value("rootdirsize").toUInt()) << "|Size in bytes for the root directory" << Qt::endl;
             out << "Cluster Area Start|" << QString::number(fsinfo->value("clusterareastart").toUInt()) << "|Byte offset to the start of the cluster area" << Qt::endl;
@@ -5627,10 +5661,10 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	}
 	else if(exfatstr.startsWith("NTFS")) // NTFS
 	{
-	    out << "File System Type|" << QString::number(5) << "|Internal File System Type represented as an integer." << Qt::endl;
-	    out << "File System Type|" << "NTFS" << "|File System Type String." << Qt::endl;
-	    out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of Bytes Per Sector, usually 512." << Qt::endl;
-	    out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of Sectors per Cluster." << Qt::endl;
+	    out << "File System Type|5|Internal File System Type represented as an integer." << Qt::endl;
+	    out << "File System Type|NTFS|File System Type String." << Qt::endl;
+	    out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of bytes per sector, usually 512." << Qt::endl;
+	    out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of sectors per cluster." << Qt::endl;
 	    out << "Total Sectors|" << QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 40, 8))) << "|Number of sectors in the file system." << Qt::endl;
 	    out << "Bytes Per Cluster|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of bytes per cluster" << Qt::endl;
 	    out << "MFT Starting Cluster|" << QString::number(qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 48, 8))) << "|Starting cluster number for the MFT" << Qt::endl;
