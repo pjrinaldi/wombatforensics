@@ -5593,7 +5593,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	QString fat32str = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 82, 5).toStdString());
 	if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || exfatstr == "EXFAT") // FAT12 | FAT16 | FAT32 | EXFAT
 	{
-            partitionname = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 43, 11).toStdString()) + " [";
+            //partitionname = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 43, 11).toStdString()) + " [";
             if(fatstr == "FAT12" || fatstr == "FAT16")
             {
                 if(fatstr == "FAT12")
@@ -5606,7 +5606,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                     out << "File System Type|2|Internal File System Type represented as an integer." << Qt::endl;
 	            out << "File System Type|FAT16|File System Type String." << Qt::endl;
                 }
-                partitionname += fatstr;
+                //partitionname += fatstr;
                 out << "FAT Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2))) << "|Size of the FAT." << Qt::endl;
             }
             else if(fat32str == "FAT32")
@@ -5614,22 +5614,32 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                 out << "File System Type|3|Internal File System Type represented as an integer." << Qt::endl;
 	        out << "File System Type|FAT32|File System Type String." << Qt::endl;
                 out << "FAT Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4))) << "|Size of the FAT." << Qt::endl;
-                partitionname += fat32str;
+                //partitionname += fat32str;
             }
             else if(exfatstr == "EXFAT")
             {
                 out << "File System Type|4|Internal File System Type represented as an integer." << Qt::endl;
 	        out << "File System Type|EXFAT|File System Type String." << Qt::endl;
                 out << "FAT Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4))) << "|Size of the FAT." << Qt::endl;
-                partitionname += exfatstr;
+                //partitionname += exfatstr;
             }
-            partitionname += "]";
+            //partitionname += "]";
             out << "Fat Count|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1))) << "| Number of FAT's in the file system." << Qt::endl;
             out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of bytes per sector, usually 512." << Qt::endl;
             out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of sectors per cluster." << Qt::endl;
             out << "Reserved Area Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2))) << "|Size of the reserved area at the beginning of the file system." << Qt::endl;
             out << "Root Directory Max Files|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 17, 2))) << "|Maximum number of root directory entries." << Qt::endl;
             out << "File System Sector Count|";
+            /* POSSIBLY COMMON BETWEEN THE 4 FAT VERSIONS
+            fsinfo.insert("bytespersector", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(11, 2))));
+            fsinfo.insert("sectorspercluster", QVariant(partbuf.at(13)));
+            fsinfo.insert("reservedareasize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(14, 2))));
+            fsinfo.insert("fatcount", QVariant(partbuf.at(16)));
+            fsinfo.insert("rootdirmaxfiles", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(17, 2))));
+            fsinfo.insert("fssectorcnt", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(19, 2))));
+            fsinfo.insert("mediatype", QVariant(partbuf.at(21)));
+            fsinfo.insert("fs32sectorcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(32, 4))));
+             */ 
             if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 19, 2)) == 0)
                 out << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32, 4)));
             else
@@ -5638,40 +5648,154 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             qulonglong rootdiroffset = 0;
             if(fatstr == "FAT12" || fatstr == "FAT16")
             {
-                //rootdiroffset = curstartsector*512 + // reserved area size;
+                /*
+                fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(22, 2))));
+                //rootdirsectors = ((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt();
+                fsinfo.insert("extbootsig", QVariant(partbuf.at(38)));
+                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(39, 4))));
+                //qDebug() << "volserialnum:" << QString("0x" + QString::number(fsinfo.value("volserialnum").toUInt(), 16));
+                fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(43, 11).toStdString())));
+                fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
+                fsinfo.insert("rootdiroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("rootdirsectors", QVariant(((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("rootdirsize", QVariant(fsinfo.value("rootdirsectors").toUInt() * fsinfo.value("bytespersector").toUInt()));
+                fsinfo.insert("clusterareastart", QVariant((qulonglong)partoffset + fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + fsinfo.value("rootdirsectors").toUInt()));
+                fsinfo.insert("rootdirlayout", QVariant(QString(QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";")));
+                fsinfo.insert("fatoffset", QVariant((qulonglong)(partoffset * 512) + fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
+		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";";
+		fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
+                //qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
+                //qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
+                //qDebug() << "reserved area size:" << fsinfo.value("reservedareasize").toUInt() << "fatcount:" << fsinfo.value("fatcount").toUInt() << "fatsize:" << fsinfo.value("fatsize").toUInt();
+                //qDebug() << "root dir start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt());
+                //qDebug() << "root dir sectors:" << fsinfo.value("rootdirsectors").toUInt();
+                //qDebug() << "cluster area/data start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + rootdirsectors;
+
+                 */ 
+                //rootdiroffset = (qulonglong)(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)));
             }
             else if(fat32str == "FAT32")
             {
-                //rootdiroffset = curstartsector*512 + // reserved area size;
+                /*
+                fsinfo.insert("extbootsig", QVariant(partbuf.at(66)));
+                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(67, 4))));
+                fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(71, 11).toStdString())));
+                fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(82, 8).toStdString())));
+                fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
+                //fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
+                fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(44, 4))));
+		//qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
+                fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt())));
+                fsinfo.insert("fatoffset", QVariant((qulonglong)((partoffset * 512) + fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt())));
+		//qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt();
+                fsinfo.insert("clusterareastart", QVariant((qulonglong)(partoffset + fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()))));
+                QByteArray rootfatbuf;
+                rootfatbuf.clear();
+                curimg->open(QIODevice::ReadOnly);
+                curimg->seek(fsinfo.value("fatoffset").toUInt());
+                rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
+                curimg->close();
+		rootfatbuf = curimg->ReadContent(fsinfo.value("fatoffset").toLongLong(), fsinfo.value("fatsize").toLongLong() * fsinfo.value("bytespersector").toLongLong());
+		//qDebug() << "root fat content:" << rootfatbuf.mid(0, 40).toHex();
+                QList<uint> rootclusterlist;
+                rootclusterlist.clear();
+		//qDebug() << "typestr:" << fsinfo.value("typestr").toString();
+		//qDebug() << "start get next cluster";
+		//qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt() / fsinfo.value("bytespersector").toUInt();
+		if(fsinfo.value("rootdircluster").toUInt() >= 2)
+		    GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("type").toUInt(), &rootfatbuf, &rootclusterlist);
+		//qDebug() << "end get next cluster";
+		QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
+		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt() + (fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()) + "," + clustersize + ";";
+		for(int j=0; j < rootclusterlist.count() - 1; j++)
+		    rootdirlayout += QString::number((fsinfo.value("clusterareastart").toUInt() * fsinfo.value("bytespersector").toUInt()) + (rootclusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+		fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
+		//qDebug() << "rootdirlayout:" << rootdirlayout;
+                // DON'T HAVE "ROOTDIRSECTORS" OR "ROOTDIRSIZE" YET... "ROOTDIRMAXFILES" is 0
+                //qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
+                //qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
+                //qDebug() << "reserved area size:" << fsinfo.value("reservedareasize").toUInt() << "fatcount:" << fsinfo.value("fatcount").toUInt() << "fatsize:" << fsinfo.value("fat32size").toUInt();
+                //qDebug() << "rootdirsectors:" << rootdirsectors;
+                //qDebug() << "cluster area/data start (also root dir):" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt()) + rootdirsectors;
+                // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
+
+                 */ 
+                //rootdiroffset = (qulonglong)(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)));
             }
             else if(exfatstr == "EXFAT")
             {
-                //rootdiroffset = curstartsector*512 + // reserved area size;
+                /*
+                fsinfo.insert("partoffset", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(64, 8)))); // sector address
+                fsinfo.insert("vollength", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8)))); // volume size in sectors
+                fsinfo.insert("fatsector", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(80, 4)))); // sector address of 1st FAT
+                fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(84, 4)))); // size in sectors
+                fsinfo.insert("clusterstart", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(88, 4)))); // sector address of cluster heap/data region
+                fsinfo.insert("clustercount", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(92, 4)))); // number of clusters in heap
+                fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(96, 4)))); // cluster address
+                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(100, 4))));
+                fsinfo.insert("bytespersector", QVariant(pow(2, partbuf.at(108)))); // power of 2, so 2^(bytespersector)
+                fsinfo.insert("sectorspercluster", QVariant(pow(2, partbuf.at(109)))); // power of 2, so 2^(sectorspercluster)
+                fsinfo.insert("fatcount", QVariant(partbuf.at(110))); // 1 or 2, 2 if TexFAT is in use
+                fsinfo.insert("fatoffset", QVariant((fsinfo.value("fatsector").toUInt() * fsinfo.value("bytespersector").toUInt()) + (qulonglong)(partoffset * 512)));
+		fsinfo.insert("clusteroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("clusterstart").toUInt() * fsinfo.value("bytespersector").toUInt())));
+                fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("clusterstart").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt())));
+                QByteArray rootfatbuf;
+                rootfatbuf.clear();
+                curimg->open(QIODevice::ReadOnly);
+                curimg->seek(fsinfo.value("fatoffset").toUInt());
+                rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
+                curimg->close();
+		rootfatbuf = curimg->ReadContent(fsinfo.value("fatoffset").toLongLong(), fsinfo.value("fatsize").toLongLong() * fsinfo.value("bytespersector").toLongLong());
+                QList<uint> rootclusterlist;
+                rootclusterlist.clear();
+                if(fsinfo.value("rootdircluster").toUInt() >= 2)
+                    GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("type").toUInt(), &rootfatbuf, &rootclusterlist);
+                QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
+                QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + clustersize + ";";
+                for(int j=0; j < rootclusterlist.count() - 1; j++)
+                    rootdirlayout += QString::number((fsinfo.value("clusterstart").toUInt() * fsinfo.value("bytespersector").toUInt()) + (rootclusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+                fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
+                QByteArray rootdirentry;
+                rootdirentry.clear();
+                curimg->open(QIODevice::ReadOnly);
+                QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
+                for(int j=0; j < rootdirlayoutlist.count(); j++)
+                {
+                    curimg->seek(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+                    rootdirentry.append(curimg->read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+                }
+                curimg->close();
+		QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
+                for(int j=0; j < rootdirlayoutlist.count(); j++)
+                    rootdirentry.append(curimg->ReadContent(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toLongLong(), rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toLongLong()));
+                int curoffset = 0;
+                while(curoffset < rootdirentry.count())
+                {
+                    if(((uint8_t)rootdirentry.at(curoffset)) == 0x83)
+                        break;
+                    curoffset += 32;
+                }
+                if(curoffset < rootdirentry.count())
+                {
+                    if(uint8_t(rootdirentry.at(curoffset + 1)) > 0)
+                        fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirentry.mid(curoffset + 2, 2*((uint8_t(rootdirentry.at(curoffset + 1))))).data()))));
+                    else
+                        fsinfo.insert("vollabel", QVariant(""));
+                }
+                else
+                    fsinfo.insert("vollabel", QVariant(""));
+                qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt();
+                qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
+                qDebug() << "cluster offset:" << fsinfo.value("clusteroffset").toUInt();
+                qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
+                qDebug() << "sectorspercluster:" << fsinfo.value("sectorspercluster").toUInt();
+                qDebug() << "rootdir offset (bytes):" << fsinfo.value("rootdiroffset").toUInt();
+                qDebug() << "rootdir offset (sectors):" << (fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt()));
+                 */ 
+                //rootdiroffset = (qulonglong)(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)));
+            //ex-fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset* 512) + (fsinfo.value("clusterstart").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt())));
             }
-            // different for all 3 - out << "Root Directory Offset|" << QString::number(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * 
-
-	    /*
-            fsinfo.insert("mediatype", QVariant(partbuf.at(21)));
-            fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(43, 11).toStdString())));
-            fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
-            16-fsinfo.insert("rootdiroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
-            32-fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt())));
-            ex-fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset* 512) + (fsinfo.value("clusterstart").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt())));
-            fsinfo.insert("rootdirsectors", QVariant(((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt()));
-            fsinfo.insert("rootdirsize", QVariant(fsinfo.value("rootdirsectors").toUInt() * fsinfo.value("bytespersector").toUInt()));
-            fsinfo.insert("clusterareastart", QVariant((qulonglong)partoffset + fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + fsinfo.value("rootdirsectors").toUInt()));
-            fsinfo.insert("rootdirlayout", QVariant(QString(QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";")));
-            fsinfo.insert("fatoffset", QVariant((qulonglong)(partoffset * 512) + fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
-            QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";";
-            fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
-            out << "FAT Offset|" << QString::number(fsinfo->value("fatoffset").toUInt()) << "|Byte offset to the start of the first FAT" << Qt::endl;
-            out << "FAT Size|" << QString::number(fsinfo->value("fatsize").toUInt()) << "|Size of the FAT." << Qt::endl;
-            out << "Reserved Area Size|" << QString::number(fsinfo->value("reservedareasize").toUInt()) << "|Size of the reserved area at the beginning of the file system." << Qt::endl;
-            out << "Root Directory Offset|" << QString::number(fsinfo->value("rootdiroffset").toUInt()) << "|Byte Offset for the root directory" << Qt::endl;
-            out << "Root Directory Sectors|" << QString::number(fsinfo->value("rootdirsectors").toUInt()) << "|Number of sectors for the root directory" << Qt::endl;
-            out << "Root Directory Size|" << QString::number(fsinfo->value("rootdirsize").toUInt()) << "|Size in bytes for the root directory" << Qt::endl;
-            out << "Cluster Area Start|" << QString::number(fsinfo->value("clusterareastart").toUInt()) << "|Byte offset to the start of the cluster area" << Qt::endl;
-	     */ 
+            //out << "Root Directory Offset|" << QString::number(rootdiroffset) << "|Byte offset for the root directory." << Qt::endl; 
 	}
 	else if(exfatstr.startsWith("NTFS")) // NTFS
 	{
@@ -5769,239 +5893,26 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(extsig == 0xef53) // EXT2/3/4
     {
+        out << "File System Type|6|Internal File System Type represented as an integer." << Qt::endl;
+        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 1144, 16).toStdString());
+        out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        // NEED TO IF THESE...
+        out << "File System Type|NTFS|File System Type String." << Qt::endl;
+        partitionname += " [EXT2/3/4]";
+        out << "Created Time|" << QDateTime::fromSecsSinceEpoch(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1288, 4)), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Creation time for the file system." << Qt::endl;
+        out << "Mount Time|" << QDateTime::fromSecsSinceEpoch(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1068, 4)), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Mount time for the file system." << Qt::endl;
+        out << "Write Time|" << QDateTime::fromSecsSinceEpoch(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1072, 4)), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Write time for the file system." << Qt::endl;
+        out << "Last Check Time|" << QDateTime::fromSecsSinceEpoch(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1088, 4)), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Last check time for the file system." << Qt::endl;
+        out << "Current State|";
+        if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 1082, 2)) == 0x01)
+            out << "Cleanly unmounted";
+        else
+            out << "Errors detected";
+        out << "|Condition of the file system at lsat unmount." << Qt::endl;
 	/*
-	out << "Created Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("mkfstime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Creation time for the file system" << Qt::endl;
-	out << "Mount Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("mounttime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Mount time for the file system" << Qt::endl;
-	out << "Write Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("writetime").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Write time for the file system" << Qt::endl;
-	out << "Last Check Time|" << QDateTime::fromSecsSinceEpoch(fsinfo->value("lastcheck").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Last check time for the file system" << Qt::endl;
-	out << "Current State|" << fsinfo->value("state").toString() << "Condition of the file system at last unmount" << Qt::endl;
 	out << "Compatible Features|" << fsinfo->value("compatstr").toString() << "File System Compatible Feature Set" << Qt::endl;
 	out << "Incompatible Features|" << fsinfo->value("incompatstr").toString() << "File System Incompatible Feature Set" << Qt::endl;
 	out << "Read Only Compatible Features|" << fsinfo->value("readonlystr").toString() << "File System Read Only Compatible Feature Set" << Qt::endl;
-	 */ 
-    }
-    else if(apfsig == "NXSB") // APFS Container
-    {
-    }
-
-    /*
-    // check for various FS's
-    if(winsig == 0xaa55) // FAT OR NTFS
-    {
-        // CAN MOVE BELOW TO A FUNCTION PROBABLY FOR CLEANLINESS...
-        // SAME WITH WHEN I RUN THROUGH ALL THE DIRECTORY ENTRIES...
-        if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || exfatstr == "EXFAT")
-        {
-            fsinfo.insert("bytespersector", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(11, 2))));
-            fsinfo.insert("sectorspercluster", QVariant(partbuf.at(13)));
-            fsinfo.insert("reservedareasize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(14, 2))));
-            fsinfo.insert("fatcount", QVariant(partbuf.at(16)));
-            fsinfo.insert("rootdirmaxfiles", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(17, 2))));
-            fsinfo.insert("fssectorcnt", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(19, 2))));
-            fsinfo.insert("mediatype", QVariant(partbuf.at(21)));
-            fsinfo.insert("fs32sectorcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(32, 4))));
-            //int fatmultiplier = 0;
-            /*
-            if(fatstr == "FAT12")
-                fsinfo.insert("fatmutliplier", QVariant(1));
-            else if(fatstr == "FAT16")
-                //fatmultiplier = 2;
-            else if(fat32str == "FAT32")
-                //fatmultiplier = 4;
-            */
-            //qDebug() << "fat multiplier:" << fatmultiplier;
-            //int rootdirsectors = 0;
-/*
-	    if(fatstr == "FAT12" || fatstr == "FAT16")
-            {
-		fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(22, 2))));
-                //rootdirsectors = ((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt();
-                fsinfo.insert("extbootsig", QVariant(partbuf.at(38)));
-                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(39, 4))));
-                //qDebug() << "volserialnum:" << QString("0x" + QString::number(fsinfo.value("volserialnum").toUInt(), 16));
-                fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(43, 11).toStdString())));
-                fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
-                fsinfo.insert("rootdiroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt()));
-                fsinfo.insert("rootdirsectors", QVariant(((fsinfo.value("rootdirmaxfiles").toUInt() * 32) + (fsinfo.value("bytespersector").toUInt() - 1)) / fsinfo.value("bytespersector").toUInt()));
-                fsinfo.insert("rootdirsize", QVariant(fsinfo.value("rootdirsectors").toUInt() * fsinfo.value("bytespersector").toUInt()));
-                fsinfo.insert("clusterareastart", QVariant((qulonglong)partoffset + fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + fsinfo.value("rootdirsectors").toUInt()));
-                fsinfo.insert("rootdirlayout", QVariant(QString(QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";")));
-                fsinfo.insert("fatoffset", QVariant((qulonglong)(partoffset * 512) + fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt()));
-		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + QString::number(fsinfo.value("rootdirsize").toUInt()) + ";";
-		fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
-                //qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
-                //qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
-                //qDebug() << "reserved area size:" << fsinfo.value("reservedareasize").toUInt() << "fatcount:" << fsinfo.value("fatcount").toUInt() << "fatsize:" << fsinfo.value("fatsize").toUInt();
-                //qDebug() << "root dir start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt());
-                //qDebug() << "root dir sectors:" << fsinfo.value("rootdirsectors").toUInt();
-                //qDebug() << "cluster area/data start:" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()) + rootdirsectors;
-            }
-            else if(fat32str == "FAT32")
-            {
-                fsinfo.insert("extbootsig", QVariant(partbuf.at(66)));
-                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(67, 4))));
-                fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(71, 11).toStdString())));
-                fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(82, 8).toStdString())));
-                fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
-                //fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
-                fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(44, 4))));
-		//qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
-                fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt())));
-                fsinfo.insert("fatoffset", QVariant((qulonglong)((partoffset * 512) + fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt())));
-		//qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt();
-                fsinfo.insert("clusterareastart", QVariant((qulonglong)(partoffset + fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt()))));
-                QByteArray rootfatbuf;
-                rootfatbuf.clear();
-                /*
-                if(!efile.isOpen())
-                    efile.open(QIODevice::ReadOnly);
-                if(efile.isOpen())
-                {
-		    //qDebug() << "fatoffset inside efile read operation:" << fsinfo.value("fatoffset").toUInt();
-                    efile.seek(fsinfo.value("fatoffset").toUInt());
-		    //qDebug() << "efile pos:" << efile.pos();
-                    rootfatbuf = efile.read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
-                    efile.close();
-                }
-                */
-                /*
-                curimg->open(QIODevice::ReadOnly);
-                curimg->seek(fsinfo.value("fatoffset").toUInt());
-                rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
-                curimg->close();
-                */
-/*
-		rootfatbuf = curimg->ReadContent(fsinfo.value("fatoffset").toLongLong(), fsinfo.value("fatsize").toLongLong() * fsinfo.value("bytespersector").toLongLong());
-		//qDebug() << "root fat content:" << rootfatbuf.mid(0, 40).toHex();
-                QList<uint> rootclusterlist;
-                rootclusterlist.clear();
-		//qDebug() << "typestr:" << fsinfo.value("typestr").toString();
-		//qDebug() << "start get next cluster";
-		//qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt() / fsinfo.value("bytespersector").toUInt();
-		if(fsinfo.value("rootdircluster").toUInt() >= 2)
-		    GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("type").toUInt(), &rootfatbuf, &rootclusterlist);
-		//qDebug() << "end get next cluster";
-		QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
-		QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt() + (fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt()) + "," + clustersize + ";";
-		for(int j=0; j < rootclusterlist.count() - 1; j++)
-		    rootdirlayout += QString::number((fsinfo.value("clusterareastart").toUInt() * fsinfo.value("bytespersector").toUInt()) + (rootclusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
-		fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
-		//qDebug() << "rootdirlayout:" << rootdirlayout;
-                // DON'T HAVE "ROOTDIRSECTORS" OR "ROOTDIRSIZE" YET... "ROOTDIRMAXFILES" is 0
-                //qDebug() << "rootdiroffset:" << fsinfo.value("rootdiroffset").toUInt() << fsinfo.value("rootdiroffset").toUInt()/fsinfo.value("bytespersector").toUInt();
-                //qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt() << fsinfo.value("fatoffset").toUInt()/fsinfo.value("bytespersector").toUInt();
-                //qDebug() << "reserved area size:" << fsinfo.value("reservedareasize").toUInt() << "fatcount:" << fsinfo.value("fatcount").toUInt() << "fatsize:" << fsinfo.value("fat32size").toUInt();
-                //qDebug() << "rootdirsectors:" << rootdirsectors;
-                //qDebug() << "cluster area/data start (also root dir):" << fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fat32size").toUInt()) + rootdirsectors;
-                // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
-            }
-            else if(exfatstr == "EXFAT")
-            {
-                fsinfo.insert("partoffset", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(64, 8)))); // sector address
-                fsinfo.insert("vollength", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8)))); // volume size in sectors
-                fsinfo.insert("fatsector", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(80, 4)))); // sector address of 1st FAT
-                fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(84, 4)))); // size in sectors
-                fsinfo.insert("clusterstart", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(88, 4)))); // sector address of cluster heap/data region
-                fsinfo.insert("clustercount", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(92, 4)))); // number of clusters in heap
-                fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(96, 4)))); // cluster address
-                fsinfo.insert("volserialnum", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(100, 4))));
-                fsinfo.insert("bytespersector", QVariant(pow(2, partbuf.at(108)))); // power of 2, so 2^(bytespersector)
-                fsinfo.insert("sectorspercluster", QVariant(pow(2, partbuf.at(109)))); // power of 2, so 2^(sectorspercluster)
-                fsinfo.insert("fatcount", QVariant(partbuf.at(110))); // 1 or 2, 2 if TexFAT is in use
-                fsinfo.insert("fatoffset", QVariant((fsinfo.value("fatsector").toUInt() * fsinfo.value("bytespersector").toUInt()) + (qulonglong)(partoffset * 512)));
-		fsinfo.insert("clusteroffset", QVariant((qulonglong)(partoffset * 512) + (fsinfo.value("clusterstart").toUInt() * fsinfo.value("bytespersector").toUInt())));
-                fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("clusterstart").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt())) * fsinfo.value("bytespersector").toUInt())));
-                QByteArray rootfatbuf;
-                rootfatbuf.clear();
-                /*
-                if(!efile.isOpen())
-                    efile.open(QIODevice::ReadOnly);
-                if(efile.isOpen())
-                {
-                    efile.seek(fsinfo.value("fatoffset").toUInt());
-                    rootfatbuf = efile.read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
-                    efile.close();
-                }
-                */
-                /*
-                curimg->open(QIODevice::ReadOnly);
-                curimg->seek(fsinfo.value("fatoffset").toUInt());
-                rootfatbuf = curimg->read(fsinfo.value("fatsize").toUInt() * fsinfo.value("bytespersector").toUInt());
-                curimg->close();
-                */
-/*
-		rootfatbuf = curimg->ReadContent(fsinfo.value("fatoffset").toLongLong(), fsinfo.value("fatsize").toLongLong() * fsinfo.value("bytespersector").toLongLong());
-                QList<uint> rootclusterlist;
-                rootclusterlist.clear();
-                if(fsinfo.value("rootdircluster").toUInt() >= 2)
-                    GetNextCluster(fsinfo.value("rootdircluster").toUInt(), fsinfo.value("type").toUInt(), &rootfatbuf, &rootclusterlist);
-                QString clustersize = QString::number(fsinfo.value("sectorspercluster").toUInt() * fsinfo.value("bytespersector").toUInt());
-                QString rootdirlayout = QString::number(fsinfo.value("rootdiroffset").toUInt()) + "," + clustersize + ";";
-                for(int j=0; j < rootclusterlist.count() - 1; j++)
-                    rootdirlayout += QString::number((fsinfo.value("clusterstart").toUInt() * fsinfo.value("bytespersector").toUInt()) + (rootclusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
-                fsinfo.insert("rootdirlayout", QVariant(rootdirlayout));
-                QByteArray rootdirentry;
-                rootdirentry.clear();
-                /*
-                if(!efile.isOpen())
-                    efile.open(QIODevice::ReadOnly);
-                if(efile.isOpen())
-                {
-                    QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
-                    for(int j=0; j < rootdirlayoutlist.count(); j++)
-                    {
-                        efile.seek(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-                        rootdirentry.append(efile.read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-                    }
-                    efile.close();
-                }
-                */
-                /*
-                curimg->open(QIODevice::ReadOnly);
-                QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
-                for(int j=0; j < rootdirlayoutlist.count(); j++)
-                {
-                    curimg->seek(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-                    rootdirentry.append(curimg->read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-                }
-                curimg->close();
-                */
-/*                
-		QStringList rootdirlayoutlist = rootdirlayout.split(";", Qt::SkipEmptyParts);
-                for(int j=0; j < rootdirlayoutlist.count(); j++)
-                    rootdirentry.append(curimg->ReadContent(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toLongLong(), rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toLongLong()));
-                int curoffset = 0;
-                while(curoffset < rootdirentry.count())
-                {
-                    if(((uint8_t)rootdirentry.at(curoffset)) == 0x83)
-                        break;
-                    curoffset += 32;
-                }
-                if(curoffset < rootdirentry.count())
-                {
-                    if(uint8_t(rootdirentry.at(curoffset + 1)) > 0)
-                        fsinfo.insert("vollabel", QVariant(QString::fromUtf16(reinterpret_cast<const ushort*>(rootdirentry.mid(curoffset + 2, 2*((uint8_t(rootdirentry.at(curoffset + 1))))).data()))));
-                    else
-                        fsinfo.insert("vollabel", QVariant(""));
-                }
-                else
-                    fsinfo.insert("vollabel", QVariant(""));
-                /*
-                qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt();
-                qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
-                qDebug() << "cluster offset:" << fsinfo.value("clusteroffset").toUInt();
-                qDebug() << "bytes per sector:" << fsinfo.value("bytespersector").toUInt();
-                qDebug() << "sectorspercluster:" << fsinfo.value("sectorspercluster").toUInt();
-                qDebug() << "rootdir offset (bytes):" << fsinfo.value("rootdiroffset").toUInt();
-                qDebug() << "rootdir offset (sectors):" << (fsinfo.value("clusteroffset").toUInt() + ((fsinfo.value("rootdircluster").toUInt() - 2) * fsinfo.value("sectorspercluster").toUInt()));
-                */
-/*
-            }
-        }
-    }
-    else if(extsig == 0xef53) // EXT2/3/4
-    {
-        fsinfo.insert("type", QVariant(6));
         fsinfo.insert("partoffset", QVariant((qulonglong)(512 * partoffset)));
         fsinfo.insert("fsinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1024, 4))));
         fsinfo.insert("fsblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1028, 4))));
@@ -6014,14 +5925,6 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         //qDebug() << "fs blockcount:" << fsinfo.value("fsblockcnt").toUInt();
         //qDebug() << "block group block count:" << fsinfo.value("blockgroupblockcnt").toUInt();
         fsinfo.insert("blockgroupinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1064, 4))));
-	fsinfo.insert("mounttime", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1068, 4))));
-	fsinfo.insert("writetime", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1072, 4))));
-	uint16_t fsstate = qFromLittleEndian<uint16_t>(partbuf.mid(1082, 2));
-	if(fsstate == 0x01)
-	    fsinfo.insert("state", QVariant("Cleanly unmounted"));
-	else
-	    fsinfo.insert("state", QVariant("Errors detected"));
-	fsinfo.insert("lastcheck", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1088, 4))));
 	uint32_t creatoros = qFromLittleEndian<uint32_t>(partbuf.mid(1096, 4));
 	if(creatoros == 0x00)
 	    fsinfo.insert("creator", QVariant("Linux"));
@@ -6121,14 +6024,10 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         fsinfo.insert("readonlyflags", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1124, 4))));
         fsinfo.insert("vollabel", QString::fromStdString(partbuf.mid(1144, 16).toStdString()));
 	fsinfo.insert("lastmountedpath", QString::fromStdString(partbuf.mid(1160, 64).toStdString()));
-	fsinfo.insert("mkfstime", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1288, 4))));
         //qDebug() << "INODE SIZE ACCORDING TO SUPERBLOCK:" << fsinfo.value("inodesize").toUInt();
         //qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
-	/*
-        if(fsinfo.value("incompatflags").toUInt() & 0x40)
-            qDebug() << "fs uses extents.";
-	*/
-/*
+        //if(fsinfo.value("incompatflags").toUInt() & 0x40)
+        //    qDebug() << "fs uses extents.";
         if(((fsinfo.value("compatflags").toUInt() & 0x00000200UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0001f7c0UL) != 0) || ((fsinfo.value("readonlyflags").toUInt() & 0x00000378UL) != 0))
             fsinfo.insert("typestr", QVariant("EXT4"));
         else if(((fsinfo.value("compatflags").toUInt() & 0x00000004UL) != 0) || ((fsinfo.value("incompatflags").toUInt() & 0x0000000cUL) != 0))
@@ -6154,16 +6053,19 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         //qDebug() << "inodeaddresstable:" << inodeaddresstable;
         fsinfo.insert("inodeaddresstable", QVariant(inodeaddresstable));
         //qDebug() << "blocks for group descriptor table:" << (32 * (fsinfo.value("fsblockcnt").toUInt() / fsinfo.value("blockgroupblockcnt").toUInt())) / fsinfo.value("blocksize").toUInt();
-        /*
-        if(fsinfo.value("blockgroupinodecnt").toUInt() > 2)
-            fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2056, 4))));
-        else
-            fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2088, 4))));
-        */
-/*
+        //if(fsinfo.value("blockgroupinodecnt").toUInt() > 2)
+        //    fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2056, 4))));
+        //else
+        //    fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2088, 4))));
+
+	 */ 
     }
-    else if(apfssig == "NXSB") // APFS Container
+    else if(apfsig == "NXSB") // APFS Container
     {
+        out << "File System Type|7|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|APFS|File System Type String." << Qt::endl;
+        partitionname += " [APFS]";
+        /*
         fsinfo.insert("type", QVariant(7));
         fsinfo.insert("typestr", QVariant("APFS"));
         fsinfo.insert("blocksize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
@@ -6197,9 +6099,23 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	// libfsapfs_object_map_descriptor_t *object_map_descriptor = NULL;
 	// libfsapfs_object_map_btree_get_descriptor_by_object_identifier(internal_container->object_map_btree,internal_container->file_io_handle,internal_container->superblock->volume_object_identifiers[ volume_index ],&object_map_descriptor,error )
 	// file_offset = (off64_t) ( object_map_descriptor->physical_address * internal_container->io_handle->block_size )
+        */
     }
     else if(hfssig == "H+" || hfssig == "HX") // HFS+/HFSX
     {
+        out << "File System Type|8|Internal File System Type represented as an integer." << Qt::endl;
+        //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        if(hfssig == "H+")
+        {
+            partitionname += " [HFS+]";
+            out << "File System Type|HFS+|File System Type String." << Qt::endl;
+        }
+        else if(hfssig == "HX")
+        {
+            partitionname += " [HFSX]";
+            out << "File System Type|HFSX|File System Type String." << Qt::endl;
+        }
+        /*
         int curoffset = 1024;
         fsinfo.insert("type", QVariant(8));
         if(hfssig == "H+")
@@ -6221,9 +6137,16 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         qDebug() << "catalog startblk:" << fsinfo.value("catalogextent0startblk").toUInt();
         qDebug() << "catalog blkcnt:" << fsinfo.value("catalogextent0blkcnt").toUInt();
         // 995344 is where the volume name is stored.... in sector 1944
+        */
     }
     else if(xfssig == "XFSB") // XFS
     {
+        out << "File System Type|9|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|XFS|File System Type String." << Qt::endl;
+        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 108, 12).toStdString());
+        out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [XFS]";
+        /*
         fsinfo.insert("type", QVariant(9));
         fsinfo.insert("typestr", QVariant("XFS"));
         fsinfo.insert("blocksize", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(4, 4))));
@@ -6237,9 +6160,16 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(108, 12).toStdString())));
         qDebug() << "vollabel:" << fsinfo.value("vollabel").toString();
         qDebug() << "block size:" << fsinfo.value("blocksize").toUInt() << "root inode:" << fsinfo.value("rootinode").toUInt() << "sectorsize:" << fsinfo.value("sectorsize").toUInt() << "inodesize:" << fsinfo.value("inodesize").toUInt() << "inodesperblock:" << fsinfo.value("inodesperblock").toUInt();
+        */
     }
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
+        out << "File System Type|10|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|BTRFS|File System Type String." << Qt::endl;
+        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 65536 + 0x12b, 100).toStdString());
+        out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [BTRFS]";
+        /*
         int curoffset = 65536;
         fsinfo.insert("type", QVariant(10));
         fsinfo.insert("typestr", QVariant("BTRFS"));
@@ -6251,9 +6181,16 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(curoffset + 0x12b, 100).toStdString())));
         qDebug() << "sectorsize:" << fsinfo.value("sectorsize").toUInt();
         qDebug() << "rootdirobjid:" << fsinfo.value("rootdirobjid").toUInt();
+        */
     }
-    else if(bitlcksig == "-FVE-FS-") // BITLOCKER
+    else if(btlsig == "-FVE-FS-") // BITLOCKER
     {
+        out << "File System Type|11|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|BITLOCKER|File System Type String." << Qt::endl;
+        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 118, qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 112, 2)) - 8).toStdString());
+        out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [BITLOCKER]";
+        /*
         // NEED AN IMAGE TO TEST BITLOCKER
         fsinfo.insert("type", QVariant(11));
         fsinfo.insert("typestr", QVariant("BITLOCKER"));
@@ -6284,45 +6221,57 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             fsinfo.insert("algoname", QVariant("256-bit AES"));
         else
             fsinfo.insert("algoname", QVariant("NOT DEFINED"));
+        */
     }
     else if(bfssig == "1SFB") // BFS
     {
-        fsinfo.insert("type", QVariant(12));
-        fsinfo.insert("typestr", QVariant("BFS"));
+        out << "File System Type|12|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|BFS|File System Type String." << Qt::endl;
+        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 512, 32).toStdString());
+        out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [BFS]";
+        /*
         fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(512, 32).toStdString())));
         fsinfo.insert("fsbyteorder", QVariant(qFromLittleEndian<int32_t>(partbuf.mid(548, 4))));
         //qDebug() << "fsbyteorder:" << QString::number(fsinfo.value("fsbyteorder").toInt(), 16);
+        */
     }
-    else if(f2fssig == 0xf2f52010) // F2FS
+    else if(f2fsig == 0xf2f52010) // F2FS
     {
-	fsinfo.insert("type", QVariant(13));
-	fsinfo.insert("typestr", QVariant("F2FS"));
+        out << "File System Type|13|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|F2FS|File System Type String." << Qt::endl;
+        //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [F2FS]";
     }
     else if(isosig == "CD001" && udfsig != "BEA01") // ISO9660
     {
-	fsinfo.insert("type", QVariant(14));
-	fsinfo.insert("typestr", QVariant("ISO9660"));
+        out << "File System Type|14|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|ISO9660|File System Type String." << Qt::endl;
+        //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [ISO9660]";
     }
     else if(isosig == "CD001" && udfsig == "BEA01") // UDF
     {
-	fsinfo.insert("type", QVariant(15));
-	fsinfo.insert("typestr", QVariant("UDF"));
+        out << "File System Type|15|Internal File System Type represented as an integer." << Qt::endl;
+	out << "File System Type|UDF|File System Type String." << Qt::endl;
+        //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [UDF]";
     }
     else if(hfssig == "BD") // legacy HFS
     {
-	fsinfo.insert("type", QVariant(16));
-	fsinfo.insert("typestr", QVariant("HFS"));
+        out << "File System Type|16|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|HFS|File System Type String." << Qt::endl;
+        //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [HFS]";
     }
     else if(refsig == 0x5265465300000000) // ReFS
     {
-	fsinfo.insert("type", QVariant(18));
-	fsinfo.insert("typestr", QVariant("REFS"));
+        out << "File System Type|18|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|RES|File System Type String." << Qt::endl;
+        //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += " [REFS]";
     }
     // need to implement iso-14, udf-15, hfs-16, zfs-17, refs-18
-    fsinfolist->append(fsinfo);
-    partbuf.clear();
-
-     */ 
     out.flush();
     propfile.close();
 
