@@ -5635,7 +5635,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             else
                 out << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 19, 2)));
             out << "|Total sectors in the volume." << Qt::endl;
-            //out << "Root Directory Offset|" << QString::number(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * 
+            // different for all 3 - out << "Root Directory Offset|" << QString::number(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * 
             //out << "FAT Offset|" << QString::number(curstartsector*512 + 
 
 	    /*
