@@ -5477,32 +5477,6 @@ void ProcessForensicImage(ForImg* curimg)
                 // shouldn't need this section so populate later.
             }
         }
-        /*
-        //qDebug() << "gpt and parse accordingly.";
-	uint32_t parttablestart = qFromLittleEndian<uint32_t>(sector0.mid(72, 8));
-	uint16_t partentrycount = qFromLittleEndian<uint16_t>(sector0.mid(80, 4));
-	uint16_t partentrysize = qFromLittleEndian<uint16_t>(sector0.mid(84, 4));
-	//rawforimg->seek((parttablestart*512));
-	//QByteArray partentries = rawforimg->read((partentrycount*partentrysize));
-        QByteArray partentries = curimg->ReadContent(parttablestart*512, partentrycount*partentrysize);
-	//rawforimg.close();
-	for(int i=0; i < partentrycount; i++)
-	{
-	    int cnt = i*partentrysize;
-	    uint32_t curstartsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 32, 8));
-	    uint32_t curendsector = qFromLittleEndian<uint32_t>(partentries.mid(cnt + 40, 8));
-	    if((curendsector - curstartsector) > 0)
-	    {
-		pofflist->append(curstartsector);
-		psizelist->append((curendsector - curstartsector + 1));
-                //qDebug() << "begin parse file system information";
-                ParseFileSystemInformation(curimg, curstartsector, fsinfolist);
-                //ParseFileSystemInformation(tmpimg, curstartsector, fsinfolist);
-                //ParseFileSystemInformation(estring, curstartsector,fsinfolist);
-		//qDebug() << "partition[" << i << "] start sector:" << curstartsector << "end sector:" << curendsector << "cur size:" << curendsector - curstartsector + 1;
-	    }
-	}
-        */
     }
     else
         qDebug() << "partition signature not found correctly";
