@@ -5680,6 +5680,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                 out << "Volume Label|" << partitionname << "Label for the file system volume." << Qt::endl;
                 partitionname += " [FAT32]";
                 out << "Volume Serial Number|0x" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 67, 4))) << "|Serial number for the volume." << Qt::endl;
+                //out << "FAT Offset|" << QString::number((qulonglong)(curstartsector*512 + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + (qFromLittleEndian<
                 /*
                 fsinfo.insert("extbootsig", QVariant(partbuf.at(66)));
                 fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(82, 8).toStdString())));
