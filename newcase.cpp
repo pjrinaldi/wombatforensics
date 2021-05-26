@@ -5661,14 +5661,14 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             {
                 out << "Volume Serial Number|0x" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 39, 4)), 16) << "|Serial number for the volume." << Qt::endl;
                 partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 43, 11).toStdString());
-                out << "Volume Label|" << partitionname << "Label for the file system volume." << Qt::endl;
+                out << "Volume Label|" << partitionname << "|Label for the file system volume." << Qt::endl;
                 partitionname +=  " [" + fatstr + "]";
                 out << "FAT Offset|" << QString::number((qulonglong)(curstartsector*512 + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)))) << "|Byte offset to the start of the first FAT" << Qt::endl;
                 out << "Root Directory Offset|" << QString::number((qulonglong)(curstartsector*512 + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2))) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)))) << "|Byte offset for the root directory" << Qt::endl;
                 out << "Root Directory Sectors|" << QString::number(((qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 17, 2)) * 32) + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) - 1)) / qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of sectors for the root directory." << Qt::endl;
                 out << "Root Directory Size|" << QString::number((qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 17, 2)) * 32) + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) - 1)) << "|Size in bytes for the root directory." << Qt::endl;
-                out << "Cluster Area Start|" << QString::number((qulonglong)(curstartsector + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2)) + ((qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 17, 2)) * 32) + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) - 1)) / qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)))) << "Byte offset to the start of the cluster area." << Qt::endl;
-                out << "Root Directory Layout|" << QString(QString::number((qulonglong)(curstartsector*512 + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2))) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)))) + "," + QString::number((qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 17, 2)) * 32) + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) - 1)) + ";") << "Layout for the root directory." << Qt::endl;
+                out << "Cluster Area Start|" << QString::number((qulonglong)(curstartsector + qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2)) + ((qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 17, 2)) * 32) + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) - 1)) / qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)))) << "|Byte offset to the start of the cluster area." << Qt::endl;
+                out << "Root Directory Layout|" << QString(QString::number((qulonglong)(curstartsector*512 + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 22, 2))) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)))) + "," + QString::number((qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 17, 2)) * 32) + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) - 1)) + ";") << "|Layout for the root directory." << Qt::endl;
                 /*
                 fsinfo.insert("extbootsig", QVariant(partbuf.at(38)));
                 fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(54, 8).toStdString())));
@@ -5677,19 +5677,20 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             else if(fat32str == "FAT32")
             {
                 partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 71, 11).toStdString());
-                out << "Volume Label|" << partitionname << "Label for the file system volume." << Qt::endl;
+                out << "Volume Label|" << partitionname << "|Label for the file system volume." << Qt::endl;
                 partitionname += " [FAT32]";
                 out << "Volume Serial Number|0x" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 67, 4))) << "|Serial number for the volume." << Qt::endl;
-                //out << "FAT Offset|" << QString::number((qulonglong)(curstartsector*512 + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + (qFromLittleEndian<
+                out << "FAT Offset|" << QString::number((qulonglong)(curstartsector*512 + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))))) << "|Byte offset to the start of the first FAT." << Qt::endl;
+		out << "Root Directory Cluster|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 44, 4))) << "|Clutser offset to the start of the root directory." << Qt::endl;
+		out << "Root Directory Offset|" << QString::number((qulonglong)(curstartsector*512 + (qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 14, 2)) + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 16, 1)) * qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4))) * qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)))) << "|Byte offset to the start of the root directory." << Qt::endl;
+
+
+
                 /*
                 fsinfo.insert("extbootsig", QVariant(partbuf.at(66)));
                 fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(82, 8).toStdString())));
                 */
                 /*
-                fsinfo.insert("fatsize", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
-                //fsinfo.insert("fat32size", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(36, 4))));
-                fsinfo.insert("rootdircluster", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(44, 4))));
-		//qDebug() << "rootdircluster:" << fsinfo.value("rootdircluster").toUInt();
                 fsinfo.insert("rootdiroffset", QVariant((qulonglong)((partoffset * 512) + (fsinfo.value("reservedareasize").toUInt() + (fsinfo.value("fatcount").toUInt() * fsinfo.value("fatsize").toUInt())) * fsinfo.value("bytespersector").toUInt())));
                 fsinfo.insert("fatoffset", QVariant((qulonglong)((partoffset * 512) + fsinfo.value("reservedareasize").toUInt() * fsinfo.value("bytespersector").toUInt())));
 		//qDebug() << "fatoffset:" << fsinfo.value("fatoffset").toUInt();
