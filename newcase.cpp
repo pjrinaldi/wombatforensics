@@ -5705,6 +5705,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                     GetNextCluster(curimg, rootdircluster, 3, fatoffset, &clusterlist);
                 }
                 // NEED TO REDUCE THE CLUSTERLIST TO EXTENTS STYLE PRIOR TO PIECING TOGETHER FOR THE ROOTDIRLAYOUT STRING!!!!!!!!
+                // PROBABLY WANT TO NOT WRITE THE CLUSTER END TO THE LIST AND WRITE THE 1ST CLUSTER TO THE CLUSTER LIST BEFORE RATHER THAN AFTER, SO I CAN BE CONSISTENT WITH EXT2/3 AND THE EXTENTS FUNCTION...
                 QString rootdirlayout = QString::number(rootdiroffset + ((rootdircluster - 2) * sectorspercluster * bytespersector)) + "," + QString::number(sectorspercluster * bytespersector) + ";";
                 for(int i=0; i < clusterlist.count() - 1; i++)
                 {
