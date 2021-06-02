@@ -5525,6 +5525,8 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     mutex.unlock();
     // FILE CARVING DIRECTORIES
     nodedata.clear();
+    if(allocstatus == 1)
+        ParseDirectoryStructure(curimg, cursectoroffset, ptreecnt);
     nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
@@ -6360,6 +6362,12 @@ QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong
     }
 
     return extentstring;
+}
+
+void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
+{
+    qDebug() << "Figure out how to start parsing root directory here and what i need to do that...";
+    // i should only need the rootdirectorylayout from the fs prop file...
 }
 
 /*
