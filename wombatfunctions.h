@@ -36,6 +36,6 @@ QString ConvertWindowsTimeToUnixTime(uint64_t input);
 QString ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
 QString ConvertUnixTimeToString(uint32_t input);
 uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate);
-//QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize);
+QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize);
 
 #endif // wombatfunctions.h

@@ -5705,18 +5705,8 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                     clusterlist.append(rootdircluster);
                     GetNextCluster(curimg, rootdircluster, 3, fatoffset, &clusterlist);
                 }
-                // NEED TO REDUCE THE CLUSTERLIST TO EXTENTS STYLE PRIOR TO PIECING TOGETHER FOR THE ROOTDIRLAYOUT STRING!!!!!!!!
-                // PROBABLY WANT TO NOT WRITE THE CLUSTER END TO THE LIST AND WRITE THE 1ST CLUSTER TO THE CLUSTER LIST BEFORE RATHER THAN AFTER, SO I CAN BE CONSISTENT WITH EXT2/3 AND THE EXTENTS FUNCTION...
-                /*
-                QString rootdirlayout = QString::number(rootdiroffset + ((rootdircluster - 2) * sectorspercluster * bytespersector)) + "," + QString::number(sectorspercluster * bytespersector) + ";";
-                for(int i=0; i < clusterlist.count() - 1; i++)
-                {
-                    rootdirlayout += QString::number(clusterareastart * bytespersector + (clusterlist.at(i) - 2) * bytespersector * sectorspercluster) + "," + QString::number(bytespersector * sectorspercluster) + ";";
-                }
-                */
-                //out << "Root Directory Layout|" << rootdirlayout << "|Layout for the root directory";
-                out << "Root Directory Layout|" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector) << "|Layout for the root directory";
-                qDebug() << "Extent String:" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector);
+                out << "Root Directory Layout|" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, rootdiroffset) << "|Layout for the root directory";
+                //qDebug() << "Extent String:" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, rootdiroffset);
                 clusterlist.clear();
                 /*
                 fsinfo.insert("extbootsig", QVariant(partbuf.at(66)));
@@ -5727,7 +5717,6 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             {
                 uint32_t fatsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4));
                 out << "FAT Size|" << QString::number(fatsize) << "|Size of the FAT." << Qt::endl;
-                //out << "FAT Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4))) << "|Size of the FAT." << Qt::endl;
                 /*
                 fsinfo.insert("partoffset", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(64, 8)))); // sector address
                 fsinfo.insert("vollength", QVariant(qFromLittleEndian<qulonglong>(partbuf.mid(72, 8)))); // volume size in sectors
@@ -6352,10 +6341,9 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulongl
     }
 }
 
-QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize)
+QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong rootdiroffset)
 {
-    // THIS IS PROBABLY WRONG RIGHT NOW AND WILL NEED TO BE ADJUSTED ACCORDINGLY...
-    // if fat then
+    // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
     //QString rootdirlayout = QString::number(rootdiroffset + ((rootdircluster - 2) * sectorspercluster * bytespersector)) + "," + QString::number(sectorspercluster * bytespersector) + ";";
     QString extentstring = "";
     int blkcnt = 1;
@@ -6368,19 +6356,30 @@ QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize)
             blkcnt++;
         else
         {
-            extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
+            if(rootdiroffset > 0)
+                extentstring += QString::number(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + QString::number(blkcnt * blocksize) + ";";
+            else
+                extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
             startvalue = blocklist.at(i);
             blkcnt = 1;
         }
         if(i == blocklist.count() - 1)
         {
-            extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
+            if(rootdiroffset > 0)
+                extentstring += QString::number(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + QString::number(blkcnt * blocksize) + ";";
+            else
+                extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
             startvalue = blocklist.at(i);
             blkcnt = 1;
         }
     }
     if(blocklist.count() == 1)
-        extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
+    {
+        if(rootdiroffset > 0)
+            extentstring += QString::number(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + QString::number(blkcnt * blocksize) + ";";
+        else
+            extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
+    }
 
     return extentstring;
 }
