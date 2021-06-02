@@ -444,7 +444,7 @@ uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate)
     return (uint32_t) ntdate;
 }
 
-QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
+/*QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
 {
     QString extentstring = "";
     int blkcnt = 1;
@@ -476,4 +476,4 @@ QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
     }
 
     return extentstring;
-}
+}*/

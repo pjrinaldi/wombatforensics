@@ -5702,17 +5702,22 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                 // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
                 if(rootdircluster >= 2)
                 {
+                    clusterlist.append(rootdircluster);
                     GetNextCluster(curimg, rootdircluster, 3, fatoffset, &clusterlist);
                 }
                 // NEED TO REDUCE THE CLUSTERLIST TO EXTENTS STYLE PRIOR TO PIECING TOGETHER FOR THE ROOTDIRLAYOUT STRING!!!!!!!!
                 // PROBABLY WANT TO NOT WRITE THE CLUSTER END TO THE LIST AND WRITE THE 1ST CLUSTER TO THE CLUSTER LIST BEFORE RATHER THAN AFTER, SO I CAN BE CONSISTENT WITH EXT2/3 AND THE EXTENTS FUNCTION...
+                /*
                 QString rootdirlayout = QString::number(rootdiroffset + ((rootdircluster - 2) * sectorspercluster * bytespersector)) + "," + QString::number(sectorspercluster * bytespersector) + ";";
                 for(int i=0; i < clusterlist.count() - 1; i++)
                 {
                     rootdirlayout += QString::number(clusterareastart * bytespersector + (clusterlist.at(i) - 2) * bytespersector * sectorspercluster) + "," + QString::number(bytespersector * sectorspercluster) + ";";
                 }
+                */
+                //out << "Root Directory Layout|" << rootdirlayout << "|Layout for the root directory";
+                out << "Root Directory Layout|" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector) << "|Layout for the root directory";
+                qDebug() << "Extent String:" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector);
                 clusterlist.clear();
-                out << "Root Directory Layout|" << rootdirlayout << "|Layout for the root directory";
                 /*
                 fsinfo.insert("extbootsig", QVariant(partbuf.at(66)));
                 fsinfo.insert("fatlabel", QVariant(QString::fromStdString(partbuf.mid(82, 8).toStdString())));
@@ -6290,10 +6295,14 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulongl
             curcluster = (qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2)) >> 4);
         else // EVEN
             curcluster = (qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2)) & 0x0FFF);
-        if(curcluster != 0x0FF7)
+        //if(curcluster != 0x0FF7)
+        //    clusterlist->append(curcluster);
+        //if(curcluster < 0x0FF8 && curcluster >= 2)
+        if(curcluster < 0x0FF7 && curcluster >= 2)
+        {
             clusterlist->append(curcluster);
-        if(curcluster < 0x0FF8 && curcluster >= 2)
             GetNextCluster(curimg, curcluster, fstype, fatoffset, clusterlist);
+        }
     }
     else if(fstype == 2) // FAT16
     {
@@ -6301,10 +6310,14 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulongl
         {
             fatbyte1 = clusternum * 2;
             curcluster = qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2));
-            if(curcluster != 0xFFF7)
+            //if(curcluster != 0xFFF7)
+            //    clusterlist->append(curcluster);
+            //if(curcluster < 0xFFF8 && curcluster >= 2)
+            if(curcluster < 0xFFF7 && curcluster >= 2)
+            {
                 clusterlist->append(curcluster);
-            if(curcluster < 0xFFF8 && curcluster >= 2)
                 GetNextCluster(curimg, curcluster, fstype, fatoffset, clusterlist);
+            }
         }
     }
     else if(fstype == 3) // FAT32
@@ -6313,10 +6326,13 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulongl
         {
             fatbyte1 = clusternum* 4;
             curcluster = (qFromLittleEndian<uint32_t>(curimg->ReadContent(fatoffset + fatbyte1, 4)) & 0x0FFFFFFF);
-	    if(curcluster != 0x0FFFFFF7)
-		clusterlist->append(curcluster);
+	    //if(curcluster != 0x0FFFFFF7)
+		//clusterlist->append(curcluster);
 	    if(curcluster < 0x0FFFFFF7 && curcluster >= 2)
+            {
+                clusterlist->append(curcluster);
 		GetNextCluster(curimg, curcluster, fstype, fatoffset, clusterlist);
+            }
         }
     }
     else if(fstype == 4) // EXFAT
@@ -6325,26 +6341,29 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulongl
         {
             fatbyte1 = clusternum * 4;
             curcluster = qFromLittleEndian<uint32_t>(curimg->ReadContent(fatoffset + fatbyte1, 4));
-	    if(curcluster != 0xFFFFFFF7)
-		clusterlist->append(curcluster);
+	    //if(curcluster != 0xFFFFFFF7)
+		//clusterlist->append(curcluster);
 	    if(curcluster < 0xFFFFFFF7 && curcluster >= 2)
+            {
+                clusterlist->append(curcluster);
 		GetNextCluster(curimg, curcluster, fstype, fatoffset, clusterlist);
+            }
         }
     }
 }
 
-/*
-QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
+QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize)
 {
+    // THIS IS PROBABLY WRONG RIGHT NOW AND WILL NEED TO BE ADJUSTED ACCORDINGLY...
+    // if fat then
+    //QString rootdirlayout = QString::number(rootdiroffset + ((rootdircluster - 2) * sectorspercluster * bytespersector)) + "," + QString::number(sectorspercluster * bytespersector) + ";";
     QString extentstring = "";
     int blkcnt = 1;
-    uint32_t startvalue = blocklist.at(0);
-    //qDebug() << "blocklist:" << blocklist;
+    uint startvalue = blocklist.at(0);
     for(int i=1; i < blocklist.count(); i++)
     {
-        //qDebug() << "curvalue:" << blocklist.at(i);
-        uint32_t oldvalue = blocklist.at(i-1);
-        uint32_t newvalue = blocklist.at(i);
+        uint oldvalue = blocklist.at(i-1);
+        uint newvalue = blocklist.at(i);
         if(newvalue - oldvalue == 1)
             blkcnt++;
         else
@@ -6361,13 +6380,10 @@ QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
         }
     }
     if(blocklist.count() == 1)
-    {
         extentstring += QString::number(startvalue * blocksize) + "," + QString::number(blkcnt * blocksize) + ";";
-    }
 
     return extentstring;
 }
- */ 
 
 /*
     int ptreecnt = 0;

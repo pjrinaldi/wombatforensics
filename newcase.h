@@ -13,7 +13,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursectorsize, uint8_t ptreecnt, uint8_t allocstatus);
 uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t curstartsector, uint32_t cursectorsize, uint8_t ptreecnt);
 void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulonglong fatoffset, QList<uint>* clusterlist);
-//QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize);
+QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize);
 
 
 void ProcessVolume(ForImg* tmpimage);
