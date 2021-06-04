@@ -6349,19 +6349,6 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
             QString line = propfile.readLine();
             if(line.startsWith("File System Type Int|"))
                 fstype = line.split("|").at(1).toUInt();
-            /*
-            else if(line.startsWith("Bytes Per Sector|"))
-                bytespersector = line.split("|").at(1).toUInt();
-            if(fstype > 0 && fstype < 5)
-            {
-                if(line.startsWith("Root Directory Layout|"))
-                    rootdirlayout = line.split("|").at(1);
-                else if(line.startsWith("FAT Offset|"))
-                    fatoffset = line.split("|").at(1).toULongLong();
-                else if(line.startsWith("FAT Size|"))
-                    fatsize = line.split("|").at(1).toUInt();
-            }
-            */
         }
         propfile.close();
     }
@@ -6410,8 +6397,81 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
         propfile.close();
     }
     qDebug() << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
+    for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
+    {
+        qDebug() << "root dir entry:" << i;
+        qulonglong rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
+        qulonglong rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
+        uint rootdirentrycount = rootdirsize / 32;
+        qDebug() << "current rootdirentrycount:" << rootdirentrycount;
+        uint inodecnt = 0;
+        QString longnamestring = "";
+        for(uint j=0; j < rootdirentrycount; j++)
+        {
+            QTextStream out;
+            QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+            if(!fileprop.isOpen())
+                fileprop.open(QIODevice::Append | QIODevice::Text);
+            out.setDevice(&fileprop);
+
+            uint8_t firstchar = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32, 1));
+            if(firstchar == 0x00) // entry is free and all remaining are free
+                break;
+            uint8_t fileattr = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 11, 1));
+            out << "File Attributes|" << "POPULATE ATTRIBUTE IF STRING HERE..." << "|File attributes." << Qt::endl;
+            qDebug() << "rootdirentry:" << j << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
+            inodecnt++;
+            out.flush();
+            fileprop.close();
+        }
+    }
     //void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulonglong fatoffset, QList<uint>* clusterlist);
     //QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong rootdiroffset);
+    /*	if(fileinfo->contains("extinode"))
+	    out << "EXTFS inode|" << fileinfo->value("extinode").toUInt() << "|EXTFS inode value to locate file in the filesystem" << Qt::endl;
+	if(fileinfo->contains("aliasname"))
+	    out << "Alias Name|" << fileinfo->value("aliasname").toString() << "|8.3 file name" << Qt::endl;
+        out << "File Attributes|" << fileinfo->value("attribute").toString() << "|File attributes." << Qt::endl;
+	if(fileinfo->contains("clusterlist"))
+	    out << "Cluster List|" << fileinfo->value("clusterlist").toString() << "|Clusters occupied by the file." << Qt::endl;
+        out << "Layout|" << fileinfo->value("layout").toString() << "|File offset,size; layout." << Qt::endl;
+        out << "Physical Size|" << QString::number(fileinfo->value("physicalsize").toUInt()) << "|Sector Size in Bytes for the file." << Qt::endl;
+	if(fileinfo->contains("deletedate"))
+	    out << "Deleted Time|" << QDateTime::fromSecsSinceEpoch(fileinfo->value("deletedate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Deleted time for the file." << Qt::endl;
+	if(fileinfo->contains("mode"))
+	    out << "Mode|" << fileinfo->value("mode").toString() << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]" << Qt::endl;
+	if(fileinfo->contains("userid"))
+	    out << "uid / gid|" << QString(QString::number(fileinfo->value("userid").toUInt()) + " / " + QString::number(fileinfo->value("groupid").toUInt())) << "|User ID and Group ID" << Qt::endl;
+	if(fileinfo->contains("linkcount"))
+	    out << "Link Count|" << QString::number(fileinfo->value("linkcount").toUInt()) << "|Number of files pointing to this file" << Qt::endl;
+	if(fileinfo->contains("ntinode"))
+	    out << "MFT Entry Record|" << QString::number(fileinfo->value("ntinode").toUInt()) << "|Entry record for the file in the Master File Table (MFT)" << Qt::endl;
+	if(fileinfo->contains("mftrecordlayout"))
+	    out << "MFT Record Layout|" << fileinfo->value("mftrecordlayout").toString() << "|Byte offset and size for the MFT Entry record" << Qt::endl;
+	if(fileinfo->contains("parntinode"))
+	    out << "Parent MFT Entry Record|" << QString::number(fileinfo->value("parntinode").toUInt()) << "|Parent Entry Record for the current entry record in the MFT" << Qt::endl;
+	if(fileinfo->contains("filecreate"))
+	    out << "$FILE_NAME Create Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("filecreate").toUInt()) << "|File Creation time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	if(fileinfo->contains("filemodify"))
+	    out << "$FILE_NAME Modified Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("filemodify").toUInt()) << "|File Modification time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	if(fileinfo->contains("filestatus"))
+	    out << "$FILE_NAME Status Changed Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("filestatus").toUInt()) << "|File Status Changed time as recorded in the $FILE_NAME attribute" << Qt::endl;
+	if(fileinfo->contains("fileaccess"))
+	    out << "$FILE_NAME Accessed Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("fileaccess").toUInt()) << "|File Accessed time as recorded in the $FILE_NAME attribute" << Qt::endl;
+        if(fileinfo->contains("mftsequenceid"))
+            out << "MFT Sequence ID|" << QString::number(fileinfo->value("mftsequenceid").toUInt()) << "|Sequence ID for the file as recorded in the MFT entry" << Qt::endl;
+        if(fileinfo->contains("i30sequenceid"))
+            out << "$I30 Sequence ID|" << QString::number(fileinfo->value("i30sequenceid").toUInt()) << "|Sequence ID for the file as recorded in the $I30 entry" << Qt::endl;
+        if(fileinfo->contains("i30create"))
+            out << "$I30 Create Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("i30create").toUInt()) << "|File Creation time as recorded in the $I30 entry" << Qt::endl;
+        if(fileinfo->contains("i30modify"))
+            out << "$I30 Modify Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("i30modify").toUInt()) << "|File Modification time as recorded in the $I30 entry" << Qt::endl;
+        if(fileinfo->contains("i30status"))
+            out << "$I30 Status Changed Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("i30status").toUInt()) << "|File Status Changed time as recorded in the $I30 entry" << Qt::endl;
+        if(fileinfo->contains("i30access"))
+            out << "$I30 Accessed Date|" << ConvertWindowsTimeToUnixTimeUTC(fileinfo->value("i30access").toUInt()) << "|File Accessed time as recorded in the $I30 entry" << Qt::endl;
+
+     */ 
 }
 
 /*
@@ -6423,25 +6483,8 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
     QByteArray rootdirbuf;
     rootdirbuf.clear();
     int rootdirentrycount = 0;
-    QStringList rootdirlayoutlist = fsinfo->value("rootdirlayout").toString().split(";", Qt::SkipEmptyParts);
-    curimg->open(QIODevice::ReadOnly);
-    for(int j=0; j < rootdirlayoutlist.count(); j++)
-    {
-        curimg->seek(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-        rootdirbuf.append(curimg->read(rootdirlayoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-    }
-    curimg->close();
-    rootdirentrycount = rootdirbuf.count() / 32;
-    //qDebug() << "rootdirentrycount:" << rootdirentrycount;
-    uint inodecnt = 0;
-    QString longnamestring = "";
     for(int i=0; i < rootdirentrycount; i++)
     {
-        fileinfo.insert("fileattr", QVariant(rootdirbuf.at(i*32 + 11)));
-        uint8_t firstchar = rootdirbuf.at(i*32);
-        if(firstchar == 0x00) // entry is free and all remaining are free
-            break;
-        uint8_t fileattr = rootdirbuf.at(i*32 + 11);
         QString attrstr = "";
         if(fileattr & 0x01)
             attrstr += "Read Only,";
