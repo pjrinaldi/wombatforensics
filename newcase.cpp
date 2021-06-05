@@ -6376,6 +6376,7 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
     uint32_t fatsize = 0;
     qulonglong fatoffset = 0;
     uint16_t bytespersector = 0;
+    uint8_t sectorspercluster = 0;
     QString rootdirlayout = "";
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -6387,6 +6388,8 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
             QString line = propfile.readLine();
             if(line.startsWith("Bytes Per Sector|"))
                 bytespersector = line.split("|").at(1).toUInt();
+            else if(line.startsWith("Sectors Per Cluster|"))
+                sectorspercluster = line.split("|").at(1).toUInt();
             else if(line.startsWith("Root Directory Layout|"))
                 rootdirlayout = line.split("|").at(1);
             else if(line.startsWith("FAT Offset|"))
@@ -6423,7 +6426,7 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                 if(!longnamestring.isEmpty())
                 {
                     out << "Long Name|" << longnamestring << "|Long name for the file." << Qt::endl;
-                    longnamestring = "";
+                    //longnamestring = "";
                 }
                 else
                     out << "Long Name| |Long name for the file." << Qt::endl;
@@ -6446,18 +6449,86 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                     isdeleted = 1;
                 QString restname = QString::fromStdString(curimg->ReadContent(rootdiroffset + j*32 + 1, 7).toStdString()).replace(" ", "");
                 QString extname = QString::fromStdString(curimg->ReadContent(rootdiroffset + j*32 + 8, 3).toStdString()).replace(" ", "");
+                QString aliasname = QString(char(firstchar));
                 out << "Alias Name|";
                 if(extname.count() > 0)
-                    out << QString(char(firstchar) + restname.toUtf8() + "." + extname.toUtf8());
+                {
+                    aliasname += QString(restname.toUtf8() + "." + extname.toUtf8());
+                    //out << QString(char(firstchar) + restname.toUtf8() + "." + extname.toUtf8());
+                }
                 else
-                    out << QString(char(firstchar) + restname.toUtf8());
-                out << "|8.3 file name." << Qt::endl;
-	//if(fileinfo->contains("aliasname"))
-	//    out << "Alias Name|" << fileinfo->value("aliasname").toString() << "|8.3 file name" << Qt::endl;
+                {
+                    aliasname += QString(restname.toUtf8());
+                    //out << QString(char(firstchar) + restname.toUtf8());
+                }
+                out << aliasname << "|8.3 file name." << Qt::endl;
+                qint64 createdate = ConvertDosTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 15, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 14, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 17, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 16, 1)));
+                qint64 accessdate = ConvertDosTimeToUnixTime(0x00, 0x00, qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 19, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 18, 1)));
+                qint64 modifydate = ConvertDosTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 23, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 22, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 25, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 24, 1)));
+                uint16_t hiclusternum = qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 20, 2)); // always zero for fat12/16
+                uint16_t loclusternum = qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 26, 2));
+                uint32_t clusternum = ((uint32_t)hiclusternum >> 16) + loclusternum;
+                QList<uint> clusterlist;
+                clusterlist.clear();
+                if(clusternum >= 2)
+                {
+                    clusterlist.append(clusternum);
+                    GetNextCluster(curimg, clusternum, 3, fatoffset, &clusterlist);
+                }
+                qDebug() << "aliasname:" << longnamestring << aliasname << "Extent String:" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, rootdiroffset);
+                qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
+                clusterlist.clear();
+                uint32_t logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(rootdiroffset + j*32 + 28, 4));
                 inodecnt++;
                 out.flush();
                 fileprop.close();
                 qDebug() << "rootdirentry:" << j << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
+            }
+            else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
+            {
+                //if(rootdirbuf.at(i*32) & 0x40)
+                if(firstchar & 0x40)
+                {
+                    if(!longnamestring.isEmpty()) // orphan long entry
+                    {
+                        qDebug() << "orphan:" << longnamestring;
+                        //orphaninfo.clear();
+                        //orphaninfo.insert("filename", QVariant(longnamestring));
+                        //orphanlist->append(orphaninfo);
+                        //orphanlist->append(longnamestring);
+                        longnamestring = "";
+                    }
+                }
+                QString l3 = "";
+                QString l2 = "";
+                QString l1 = "";
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 28, 2)) < 0xFFFF)
+                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 28, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 30, 2)) < 0xFFFF)
+                    l3 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 30, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 14, 2)) < 0xFFFF)
+                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 14, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 16, 2)) < 0xFFFF)
+                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 16, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 18, 2)) < 0xFFFF)
+                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 18, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 20, 2)) < 0xFFFF)
+                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 20, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 22, 2)) < 0xFFFF)
+                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 22, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 24, 2)) < 0xFFFF)
+                    l2 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 24, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 1, 2)) < 0xFFFF)
+                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 1, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 3, 2)) < 0xFFFF)
+                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 3, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 5, 2)) < 0xFFFF)
+                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 5, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 7, 2)) < 0xFFFF)
+                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 7, 2))));
+                if(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 9, 2)) < 0xFFFF)
+                    l1 += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 9, 2))));
+                longnamestring.prepend(QString(l1 + l2 + l3).toUtf8());
             }
         }
     }
@@ -6480,9 +6551,6 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
         if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
         {
             //uint8_t createtenth = rootdirbuf.at(i*32 + 13); // NOT GOING TO USE RIGHT NOW...
-            fileinfo.insert("createdate", QVariant(ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 15), rootdirbuf.at(i*32 + 14), rootdirbuf.at(i*32 + 17), rootdirbuf.at(i*32 + 16))));
-            fileinfo.insert("accessdate", QVariant(ConvertDosTimeToUnixTime(0x00, 0x00, rootdirbuf.at(i*32 + 19), rootdirbuf.at(i*32 + 18))));
-            fileinfo.insert("modifydate", QVariant(ConvertDosTimeToUnixTime(rootdirbuf.at(i*32 + 23), rootdirbuf.at(i*32 + 22), rootdirbuf.at(i*32 + 25), rootdirbuf.at(i*32 + 24))));
             uint16_t hiclusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)); // always zero for fat12/16
             uint16_t loclusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
             fileinfo.insert("clusternum", QVariant(((uint32_t)hiclusternum >> 16) + loclusternum));
