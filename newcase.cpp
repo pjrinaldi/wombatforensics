@@ -6510,6 +6510,11 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 		nodedata << QByteArray("/").toBase64() << logicalsize << createdate << accessdate << modifydate << 0 << 0;
 		if(logicalsize > 0) // Get Category/Signature
 		{
+		    if(itemtype == 3 && isdeleted == 0)
+			nodedata << "Directory" << "Directory"; // category << signature
+		    else
+		    {
+		    }
 		}
 
 
