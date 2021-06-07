@@ -6354,7 +6354,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     }
     if(fstype > 0 and fstype < 4) // FAT12 || FAT16 || FAT32
     {
-        ParseFatDirectory(curimg, curstartsector, ptreecnt);
+        ParseFatDirectory(curimg, curstartsector, ptreecnt, -1);
     }
     else if(fstype == 4) // EXFAT
     {
@@ -6371,7 +6371,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }
 
-void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
+void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qint64 parinode)
 {
     uint32_t fatsize = 0;
     qulonglong fatoffset = 0;
@@ -6411,6 +6411,7 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
         QString longnamestring = "";
         for(uint j=0; j < rootdirentrycount; j++)
         {
+	    QString longname = "";
             QTextStream out;
             QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
             if(!fileprop.isOpen())
@@ -6426,7 +6427,8 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                 if(!longnamestring.isEmpty())
                 {
                     out << "Long Name|" << longnamestring << "|Long name for the file." << Qt::endl;
-                    //longnamestring = "";
+		    longname = longnamestring;
+                    longnamestring = "";
                 }
                 else
                     out << "Long Name| |Long name for the file." << Qt::endl;
@@ -6462,6 +6464,7 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                     //out << QString(char(firstchar) + restname.toUtf8());
                 }
                 out << aliasname << "|8.3 file name." << Qt::endl;
+		//uint8_t createtenth = rootdirbuf.at(i*32 + 13); // NOT GOING TO USE RIGHT NOW...
                 qint64 createdate = ConvertDosTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 15, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 14, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 17, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 16, 1)));
                 qint64 accessdate = ConvertDosTimeToUnixTime(0x00, 0x00, qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 19, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 18, 1)));
                 qint64 modifydate = ConvertDosTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 23, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 22, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 25, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 24, 1)));
@@ -6475,14 +6478,91 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                     clusterlist.append(clusternum);
                     GetNextCluster(curimg, clusternum, 3, fatoffset, &clusterlist);
                 }
-                qDebug() << "aliasname:" << longnamestring << aliasname << "Extent String:" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, rootdiroffset);
+                //qDebug() << "name:" << longnamestring << aliasname << "ExtentString:" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, rootdiroffset);
                 qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
+		out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
                 clusterlist.clear();
-                uint32_t logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(rootdiroffset + j*32 + 28, 4));
+		uint32_t logicalsize = 0;
+		uint8_t itemtype = 0;
+		if(fileattr & 0x10) // sub directory attribute
+		{
+		    if(firstchar == 0xe5 || firstchar == 0x05) // deleted directory
+			itemtype = 2;
+		    else // directory
+			itemtype = 3;
+		}
+		else
+		{
+		    if(firstchar == 0xe5 || firstchar == 0x05) // deleted file
+			itemtype = 4;
+		    else
+			itemtype = 5;
+		    logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(rootdiroffset + j*32 + 28, 4));
+		}
+		//qDebug() << "logicalsize:" << logicalsize;
+		// ADD FILE INFO TO THE NODE TREE...
+		QList<QVariant> nodedata;
+		nodedata.clear();
+		if(longname.isEmpty())
+		    nodedata << QByteArray(aliasname.toStdString().c_str()).toBase64();
+		else
+		    nodedata << QByteArray(longname.toStdString().c_str()).toBase64();
+		nodedata << QByteArray("/").toBase64() << logicalsize << createdate << accessdate << modifydate << 0 << 0;
+		if(logicalsize > 0) // Get Category/Signature
+		{
+		}
+
+
                 inodecnt++;
                 out.flush();
                 fileprop.close();
-                qDebug() << "rootdirentry:" << j << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
+                //qDebug() << "rootdirentry:" << j << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
+		/*
+	QString parentstr = "";
+        if(fileinfolist->at(j).value("parentinode").toInt() == -1)
+            parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
+        else
+            parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("parentinode").toInt()));
+        nodedata.clear();
+        QByteArray ba;
+        ba.clear();
+        ba.append(fileinfolist->at(j).value("filename").toString().toUtf8());
+        nodedata << ba.toBase64();
+        ba.clear();
+        //qDebug() << "filename:" << fileinfolist->at(j).value("filename").toString();
+        //qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
+        ba.append(fileinfolist->at(j).value("path").toString().toUtf8());
+        nodedata << ba.toBase64() << QVariant(fileinfolist->at(j).value("logicalsize").toUInt()) << fileinfolist->at(j).value("createdate", "0") << fileinfolist->at(j).value("accessdate", "0") << fileinfolist->at(j).value("modifydate", "0") << fileinfolist->at(j).value("statusdate", "0") << QVariant("0");
+        if(fileinfolist->at(j).value("logicalsize").toUInt() > 0)
+        {
+	    if(fileinfolist->at(j).value("itemtype").toUInt() == 3 && fileinfolist->at(j).value("isdeleted").toInt() == 0)
+		nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
+	    else
+	    {
+		QByteArray sigbuf;
+		sigbuf.clear();
+                if(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).count() > 0)
+                    sigbuf = curimg->ReadContent(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toLongLong(), fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(1).toLongLong());
+		QString mimestr = GenerateCategorySignature(sigbuf, fileinfolist->at(j).value("filename").toString());
+                sigbuf.clear();
+		nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
+	    }
+        }
+        else
+            nodedata << "Empty" << "Empty File";
+        nodedata << QVariant("0") << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("inode").toUInt())));
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, parentstr, fileinfolist->at(j).value("itemtype").toInt(), fileinfolist->at(j).value("isdeleted").toInt());
+        mutex.unlock();
+        if(nodedata.at(11).toString().split("-").count() == 3)
+        {
+            listeditems.append(nodedata.at(11).toString());
+            filesfound++;
+            isignals->ProgUpd();
+        }
+
+		 *
+		 */ 
             }
             else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
             {
@@ -6537,31 +6617,14 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 }
 
 /*
- QHash<QString, QVariant> fileinfo;
-    QHash<QString, QVariant> orphaninfo;
-    fileinfo.clear();
-    QByteArray fatbuf;
-    fatbuf.clear();
-    QByteArray rootdirbuf;
-    rootdirbuf.clear();
-    int rootdirentrycount = 0;
     for(int i=0; i < rootdirentrycount; i++)
     {
 
         if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
         {
-            //uint8_t createtenth = rootdirbuf.at(i*32 + 13); // NOT GOING TO USE RIGHT NOW...
-            uint16_t hiclusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)); // always zero for fat12/16
-            uint16_t loclusternum = qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 26, 2));
             fileinfo.insert("clusternum", QVariant(((uint32_t)hiclusternum >> 16) + loclusternum));
             fileinfo.insert("inode", QVariant(inodecnt));
-            if(fileinfo.value("longname").toString().isEmpty())
-                fileinfo.insert("filename", fileinfo.value("aliasname"));
-            else
-                fileinfo.insert("filename", fileinfo.value("longname"));
-	    //qDebug() << fileinfo.value("longname").toString() << "inodecnt:" << inodecnt;
             fileinfo.insert("parentinode",  QVariant(-1));
-            fileinfo.insert("path", QVariant("/"));
 	    QList<uint> clusterlist;
 	    clusterlist.clear();
 	    QString layout = "";
@@ -6583,7 +6646,6 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 		fileinfo.insert("layout", QVariant(layout));
 		fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
 	    }
-            //qDebug() << "inodecnt:" << inodecnt << "alias name:" << fileinfo.value("aliasname").toString() << "clusternum:" << fileinfo.value("clusternum").toUInt();
             if(fileattr & 0x10) // sub directory attribute
 	    {
 		QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
@@ -6633,51 +6695,6 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 		    //ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
             }
         }
-        else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
-        {
-            if(rootdirbuf.at(i*32) & 0x40)
-            {
-                if(!longnamestring.isEmpty()) // orphan long entry
-                {
-                    orphaninfo.clear();
-                    orphaninfo.insert("filename", QVariant(longnamestring));
-                    orphanlist->append(orphaninfo);
-		    //orphanlist->append(longnamestring);
-                    longnamestring = "";
-                }
-            }
-	    QString l3 = "";
-	    QString l2 = "";
-	    QString l1 = "";
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2)) < 0xFFFF)
-		l3 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 28, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2)) < 0xFFFF)
-		l3 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 30, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2)) < 0xFFFF)
-		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 14, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2)) < 0xFFFF)
-		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 16, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2)) < 0xFFFF)
-		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 18, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2)) < 0xFFFF)
-		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 20, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2)) < 0xFFFF)
-		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 22, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2)) < 0xFFFF)
-		l2 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 24, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2)) < 0xFFFF)
-		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 1, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2)) < 0xFFFF)
-		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 3, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2)) < 0xFFFF)
-		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 5, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2)) < 0xFFFF)
-		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 7, 2))));
-	    if(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2)) < 0xFFFF)
-		l1 += QString(QChar(qFromLittleEndian<uint16_t>(rootdirbuf.mid(i*32 + 9, 2))));
-	    longnamestring.prepend(QString(l1 + l2 + l3).toUtf8());
-        }
-    }
  */ 
     /*
 	if(fileinfo->contains("clusterlist"))
