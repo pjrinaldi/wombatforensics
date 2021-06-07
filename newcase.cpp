@@ -6514,6 +6514,8 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 			nodedata << "Directory" << "Directory"; // category << signature
 		    else
 		    {
+			// GENERATECATEGORYSIGNATURE SHOULD GET SENT THE CURIMG, FILENAME, AND OFFSET
+			// NEED TO REDO THIS FUNCTION
 		    }
 		}
 
