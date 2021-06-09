@@ -6478,7 +6478,24 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                     clusterlist.append(clusternum);
                     GetNextCluster(curimg, clusternum, 3, fatoffset, &clusterlist);
                 }
+		QString layout = ConvertBlocksToExtents(clusterlist, bytespersector, clusterareastart);
+		qDebug() << "file layout:" << layout;
                 //qDebug() << "name:" << longnamestring << aliasname << "ExtentString:" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, rootdiroffset);
+		/*
+		if(fileinfo.value("clusternum").toUInt() >= 2)
+		    GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
+		QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
+		QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
+		layout = QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
+		for(int j=0; j < clusterlist.count()-1; j++)
+		{
+		    clusterstr += QString::number(clusterlist.at(j)) + ",";
+		    layout += QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
+		}
+		fileinfo.insert("clusterlist", QVariant(clusterstr));
+		fileinfo.insert("layout", QVariant(layout));
+		fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
+		 */ 
                 qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
 		out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
                 clusterlist.clear();
@@ -6514,6 +6531,7 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 			nodedata << "Directory" << "Directory"; // category << signature
 		    else
 		    {
+			//  QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong fileoffset);
 			// GENERATECATEGORYSIGNATURE SHOULD GET SENT THE CURIMG, FILENAME, AND OFFSET
 			// NEED TO REDO THIS FUNCTION
 		    }

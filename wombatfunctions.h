@@ -22,6 +22,8 @@ void RewriteSelectedIdContent(QModelIndex selectedid);
 
 QString GenerateCategorySignature(QByteArray sigbuf, QString filename);
 
+QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong fileoffset);
+
 void SavePasswordList(void);
 void InitializePasswordList(void);
 
