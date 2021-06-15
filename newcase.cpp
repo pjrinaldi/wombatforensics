@@ -6377,6 +6377,7 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
     qulonglong fatoffset = 0;
     uint16_t bytespersector = 0;
     uint8_t sectorspercluster = 0;
+    qulonglong clusterareastart = 0;
     QString rootdirlayout = "";
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -6396,6 +6397,8 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                 fatoffset = line.split("|").at(1).toULongLong();
             else if(line.startsWith("FAT Size|"))
                 fatsize = line.split("|").at(1).toUInt();
+            else if(line.startsWith("Cluster Area Start|"))
+                clusterareastart = line.split("|").at(1).toULongLong();
         }
         propfile.close();
     }
