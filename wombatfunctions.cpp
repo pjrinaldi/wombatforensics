@@ -344,6 +344,10 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
     QString mimestr = "";
     QString mimecategory = "";
     // WILL NEED TO REIMPLEMENT ALL THE BELOW BASED ON THE NEW LIBMAGIC STUFF
+    if(mimesignature.contains("text"))
+	mimecategory = "Text";
+    else
+	mimecategory = "Unknown";
 
     return mimesignature;
 

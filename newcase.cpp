@@ -6526,7 +6526,9 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 			nodedata << "Directory" << "Directory"; // category << signature
 		    else
 		    {
-			qDebug() << filename << GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
+			QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
+			qDebug() << filename.left(20) << catsig;
+			//qDebug() << filename << GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
 			//QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong fileoffset);
 			// GENERATECATEGORYSIGNATURE SHOULD GET SENT THE CURIMG, FILENAME, AND OFFSET
 			// NEED TO REDO THIS FUNCTION
