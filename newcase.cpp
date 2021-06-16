@@ -5820,13 +5820,13 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             if(QString::fromStdString(curimg->ReadContent(mftoffset + 3 * 1024, 4).toStdString()) == "FILE") // a proper MFT entry
             {
                 int curoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 20, 2)); // offset to first attribute
-                for(int i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 40, 2)); i++) // loop over attributes until get to next attribute id
+                for(uint i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 40, 2)); i++) // loop over attributes until get to next attribute id
                 {
                     if(qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset, 4)) == 0x60) // $VOLUME_NAME attribute to parse (always resident)
                         break;
                     curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 4, 4));
                 }
-                for(int k=0; k < qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4))/2; k++)
+                for(uint k=0; k < qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4))/2; k++)
                     partitionname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2)) + k*2, 2))));
                 out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
                 partitionname += " [NTFS]";
@@ -6481,24 +6481,8 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                     clusterlist.append(clusternum);
                     GetNextCluster(curimg, clusternum, 3, fatoffset, &clusterlist);
                 }
-		QString layout = ConvertBlocksToExtents(clusterlist, bytespersector, clusterareastart);
-		qDebug() << "file layout:" << layout;
-                //qDebug() << "name:" << longnamestring << aliasname << "ExtentString:" << ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, rootdiroffset);
-		/*
-		if(fileinfo.value("clusternum").toUInt() >= 2)
-		    GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
-		QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
-		QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
-		layout = QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
-		for(int j=0; j < clusterlist.count()-1; j++)
-		{
-		    clusterstr += QString::number(clusterlist.at(j)) + ",";
-		    layout += QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
-		}
-		fileinfo.insert("clusterlist", QVariant(clusterstr));
-		fileinfo.insert("layout", QVariant(layout));
-		fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
-		 */ 
+		QString layout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
+		out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
                 qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
 		out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
                 clusterlist.clear();
@@ -6521,12 +6505,20 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 		}
 		//qDebug() << "logicalsize:" << logicalsize;
 		// ADD FILE INFO TO THE NODE TREE...
+		QString filename = "";
+		if(longname.isEmpty())
+		    filename = aliasname;
+		else
+		    filename = longname;
 		QList<QVariant> nodedata;
 		nodedata.clear();
+		nodedata << QByteArray(filename.toStdString().c_str()).toBase64();
+		/*
 		if(longname.isEmpty())
 		    nodedata << QByteArray(aliasname.toStdString().c_str()).toBase64();
 		else
 		    nodedata << QByteArray(longname.toStdString().c_str()).toBase64();
+		*/
 		nodedata << QByteArray("/").toBase64() << logicalsize << createdate << accessdate << modifydate << 0 << 0;
 		if(logicalsize > 0) // Get Category/Signature
 		{
@@ -6534,7 +6526,8 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 			nodedata << "Directory" << "Directory"; // category << signature
 		    else
 		    {
-			//  QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong fileoffset);
+			qDebug() << filename << GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
+			//QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong fileoffset);
 			// GENERATECATEGORYSIGNATURE SHOULD GET SENT THE CURIMG, FILENAME, AND OFFSET
 			// NEED TO REDO THIS FUNCTION
 		    }

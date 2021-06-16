@@ -331,9 +331,27 @@ QString GenerateCategorySignature(QByteArray sigbuf, QString filename)
 
 QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong fileoffset)
 {
+    // NON-QT WAY USING LIBMAGIC
+    QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
+    magic_t magical;
+    const char* catsig;
+    magical = magic_open(MAGIC_NONE);
+    magic_load(magical, NULL);
+    catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
+    std::string catsigstr(catsig);
+    QString mimesignature = QString::fromStdString(catsigstr);
+    magic_close(magical);
+    QString mimestr = "";
+    QString mimecategory = "";
+    // WILL NEED TO REIMPLEMENT ALL THE BELOW BASED ON THE NEW LIBMAGIC STUFF
+
+    return mimesignature;
+
+    /*
     QString mimestr = "";
     // maybe a problem with file size requested being larger than the actual file size..
     QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
+    qDebug() << filename << QString::fromStdString(sigbuf.left(6).toStdString());
     QMimeDatabase mimedb;
     const QMimeType mimetype = mimedb.mimeTypeForData(sigbuf);
     QString geniconstr = mimetype.genericIconName();
@@ -450,6 +468,7 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
         return QString(mimecategory + "/" + mimesignature);
     else
         return mimestr;
+    */
 }
 
 
