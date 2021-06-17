@@ -6528,17 +6528,30 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 		    {
 			QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
 			qDebug() << filename.left(20) << catsig;
-			//qDebug() << filename << GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
-			//QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong fileoffset);
-			// GENERATECATEGORYSIGNATURE SHOULD GET SENT THE CURIMG, FILENAME, AND OFFSET
-			// NEED TO REDO THIS FUNCTION
+                        nodedata << catsig.split("/").first() << catsig.split("/").last();
 		    }
 		}
-
-
+                else
+                    nodedata << "Empty" << "Zero File";
+                nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+                QString parentstr = "";
+                if(parinode == -1)
+                    parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                else
+                    parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(parinode));
+                mutex.lock();
+                treenodemodel->AddNode(nodedata, parentstr, itemtype, isdeleted);
+                mutex.unlock();
+                if(nodedata.at(11).toString().split("-").count() == 3)
+                {
+                    listeditems.append(nodedata.at(11).toString());
+                    filesfound++;
+                    isignals->ProgUpd();
+                }
                 inodecnt++;
                 out.flush();
                 fileprop.close();
+                nodedata.clear();
                 //qDebug() << "rootdirentry:" << j << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
 		/*
 	QString parentstr = "";

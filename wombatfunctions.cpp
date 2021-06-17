@@ -335,21 +335,40 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
     QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
     magic_t magical;
     const char* catsig;
-    magical = magic_open(MAGIC_NONE);
+    magical = magic_open(MAGIC_MIME_TYPE);
     magic_load(magical, NULL);
     catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
     std::string catsigstr(catsig);
     QString mimesignature = QString::fromStdString(catsigstr);
+    /*
+     *    int check=0;                // ststus of space
+    int i=0;                    // for loop
+    //change the string below to convert it in required format
+    char str[]="Hi i am from codespeedy";       //string
+    cout<<"previous string: "<<str<<endl;
+    while(str[i]){                      
+        if(check==0){
+            str[i]=toupper(str[i]);     //conversion of string takes place here
+            check=1;
+        }else if(isspace(str[i]))       // change status of check if move to another word
+            check=0;
+        i++;
+     */ 
     magic_close(magical);
-    QString mimestr = "";
-    QString mimecategory = "";
-    // WILL NEED TO REIMPLEMENT ALL THE BELOW BASED ON THE NEW LIBMAGIC STUFF
-    if(mimesignature.contains("text"))
-	mimecategory = "Text";
-    else
-	mimecategory = "Unknown";
+    //QString mimestr = "";
+    //QString mimecategory = "";
 
     return mimesignature;
+    // WILL NEED TO REIMPLEMENT ALL THE BELOW BASED ON THE NEW LIBMAGIC STUFF
+    //if(mimesignature.contains("text"))
+//	mimecategory = "Text";
+//    else
+//	mimecategory = "Unknown";
+
+//    if(mimestr.isEmpty())
+//        return QString(mimecategory + "/" + mimesignature);
+//    else
+//        return mimestr;
 
     /*
     QString mimestr = "";
