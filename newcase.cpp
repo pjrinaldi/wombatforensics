@@ -6354,7 +6354,8 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     }
     if(fstype > 0 and fstype < 4) // FAT12 || FAT16 || FAT32
     {
-        ParseFatDirectory(curimg, curstartsector, ptreecnt, -1);
+        qulonglong curinode = 0;
+        ParseFatDirectory(curimg, curstartsector, ptreecnt, -1, &curinode);
     }
     else if(fstype == 4) // EXFAT
     {
@@ -6371,7 +6372,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }
 
-void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qint64 parinode)
+void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qint64 parinode, qulonglong* curinode)
 {
     uint32_t fatsize = 0;
     qulonglong fatoffset = 0;
@@ -6402,21 +6403,22 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
         }
         propfile.close();
     }
-    qDebug() << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
+    //qDebug() << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
     for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
-        qDebug() << "root dir entry:" << i;
+        //qDebug() << "root dir entry:" << i;
         qulonglong rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
         qulonglong rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
         uint rootdirentrycount = rootdirsize / 32;
-        qDebug() << "current rootdirentrycount:" << rootdirentrycount;
-        uint inodecnt = 0;
+        //qDebug() << "current rootdirentrycount:" << rootdirentrycount;
+        //uint inodecnt = curinode;
         QString longnamestring = "";
         for(uint j=0; j < rootdirentrycount; j++)
         {
 	    QString longname = "";
             QTextStream out;
-            QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+            QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(*curinode) + ".prop");
+            //QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
             if(!fileprop.isOpen())
                 fileprop.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&fileprop);
@@ -6459,12 +6461,10 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                 if(extname.count() > 0)
                 {
                     aliasname += QString(restname.toUtf8() + "." + extname.toUtf8());
-                    //out << QString(char(firstchar) + restname.toUtf8() + "." + extname.toUtf8());
                 }
                 else
                 {
                     aliasname += QString(restname.toUtf8());
-                    //out << QString(char(firstchar) + restname.toUtf8());
                 }
                 out << aliasname << "|8.3 file name." << Qt::endl;
 		//uint8_t createtenth = rootdirbuf.at(i*32 + 13); // NOT GOING TO USE RIGHT NOW...
@@ -6494,6 +6494,27 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 			itemtype = 2;
 		    else // directory
 			itemtype = 3;
+                    qulonglong curdirsize = 0;
+                    int lastdirentry = 0;
+                    int curdircnt = 0;
+                    for(int k = 0; k < layout.split(";", Qt::SkipEmptyParts).count(); k++)
+                    {
+                        curdirsize += layout.split(";").at(k).split(",").at(1).toULongLong();
+                    }
+                    for(int k=0; k < layout.split(";", Qt::SkipEmptyParts).count(); k++)
+                    {
+                        for(uint m=0; m < curdirsize / 32; m++)
+                        {
+                            uint8_t curfirstchar = qFromLittleEndian<uint8_t>(curimg->ReadContent(layout.split(";").at(k).split(",").at(0).toULongLong() + m*32, 1));
+                            if(curfirstchar == 0x00) // entry is free and all remaining are free
+                            {
+                                lastdirentry = curdircnt;
+                                break;
+                            }
+                            curdircnt++;
+                        }
+                    }
+                    logicalsize = lastdirentry * 32;
 		}
 		else
 		{
@@ -6527,13 +6548,14 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 		    else
 		    {
 			QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
-			qDebug() << filename.left(20) << catsig;
+			//qDebug() << filename.left(20) << catsig;
                         nodedata << catsig.split("/").first() << catsig.split("/").last();
 		    }
 		}
                 else
                     nodedata << "Empty" << "Zero File";
-                nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+                nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(*curinode));
+                //nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
                 QString parentstr = "";
                 if(parinode == -1)
                     parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
@@ -6548,57 +6570,28 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                     filesfound++;
                     isignals->ProgUpd();
                 }
-                inodecnt++;
+                curinode++;
+                //inodecnt++;
                 out.flush();
                 fileprop.close();
                 nodedata.clear();
+                if(fileattr & 0x10 && logicalsize > 0) // sub directory
+                {
+                    if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
+                        ParseFatDirectory(curimg, curstartsector, ptreecnt, *curinode, curinode);
+                        //ParseFatDirectory(curimg, curstartsector, ptreecnt, curinode, inodecnt);
+                        //void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qint64 parinode)
+                }
+                /*
+                if(fileattr & 0x10 && fileinfo.value("physicalsize").toUInt() > 0) // sub directory
+                {
+                    // POSSIBLY REMOVE THIS IF SO IT WILL PROCESS DELETED AS WELL IF THEY CONTAIN CHILDREN...
+                    if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
+                        ParseSubDirectory(curimg, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
+                        //ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
+                }
+                 */ 
                 //qDebug() << "rootdirentry:" << j << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
-		/*
-	QString parentstr = "";
-        if(fileinfolist->at(j).value("parentinode").toInt() == -1)
-            parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt));
-        else
-            parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("parentinode").toInt()));
-        nodedata.clear();
-        QByteArray ba;
-        ba.clear();
-        ba.append(fileinfolist->at(j).value("filename").toString().toUtf8());
-        nodedata << ba.toBase64();
-        ba.clear();
-        //qDebug() << "filename:" << fileinfolist->at(j).value("filename").toString();
-        //qDebug() << "alias name:" << fileinfolist.at(j).value("aliasname").toString() << "long name:" << fileinfolist.at(j).value("longname").toString();
-        ba.append(fileinfolist->at(j).value("path").toString().toUtf8());
-        nodedata << ba.toBase64() << QVariant(fileinfolist->at(j).value("logicalsize").toUInt()) << fileinfolist->at(j).value("createdate", "0") << fileinfolist->at(j).value("accessdate", "0") << fileinfolist->at(j).value("modifydate", "0") << fileinfolist->at(j).value("statusdate", "0") << QVariant("0");
-        if(fileinfolist->at(j).value("logicalsize").toUInt() > 0)
-        {
-	    if(fileinfolist->at(j).value("itemtype").toUInt() == 3 && fileinfolist->at(j).value("isdeleted").toInt() == 0)
-		nodedata << QVariant("Directory") << QVariant("Directory"); // category << signature
-	    else
-	    {
-		QByteArray sigbuf;
-		sigbuf.clear();
-                if(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).count() > 0)
-                    sigbuf = curimg->ReadContent(fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toLongLong(), fileinfolist->at(j).value("layout").toString().split(";", Qt::SkipEmptyParts).at(0).split(",").at(1).toLongLong());
-		QString mimestr = GenerateCategorySignature(sigbuf, fileinfolist->at(j).value("filename").toString());
-                sigbuf.clear();
-		nodedata << QVariant(mimestr.split("/").at(0)) << QVariant(mimestr.split("/").at(1)); // category << signature
-	    }
-        }
-        else
-            nodedata << "Empty" << "Empty File";
-        nodedata << QVariant("0") << QVariant(QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(fileinfolist->at(j).value("inode").toUInt())));
-        mutex.lock();
-        treenodemodel->AddNode(nodedata, parentstr, fileinfolist->at(j).value("itemtype").toInt(), fileinfolist->at(j).value("isdeleted").toInt());
-        mutex.unlock();
-        if(nodedata.at(11).toString().split("-").count() == 3)
-        {
-            listeditems.append(nodedata.at(11).toString());
-            filesfound++;
-            isignals->ProgUpd();
-        }
-
-		 *
-		 */ 
             }
             else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
             {

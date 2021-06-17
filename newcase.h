@@ -15,7 +15,7 @@ uint8_t ParseExtendedPartition(ForImg* curimg, uint32_t curstartsector, uint32_t
 void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulonglong fatoffset, QList<uint>* clusterlist);
 QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong rootdiroffset);
 void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
-void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qint64 parinode);
+void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qint64 parinode, qulonglong* curinode);
 
 
 void ProcessVolume(ForImg* tmpimage);
