@@ -6354,8 +6354,12 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     }
     if(fstype > 0 and fstype < 4) // FAT12 || FAT16 || FAT32
     {
-        qulonglong curinode = 0;
-        ParseFatDirectory(curimg, curstartsector, ptreecnt, -1, &curinode);
+	qulonglong curinode = 0;
+	curinode = ParseFatDirectory(curimg, curstartsector, ptreecnt, -1, "", "");
+	qDebug() << "curinode at end:" << curinode;
+        //qulonglong cinode = 0;
+        //ParseFatDirectory(curimg, curstartsector, ptreecnt, -1, cinode);
+	//qDebug() << "cinode:" << cinode;
     }
     else if(fstype == 4) // EXFAT
     {
@@ -6372,8 +6376,12 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }
 
-void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qint64 parinode, qulonglong* curinode)
+//void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, qulonglong& curinode)
+qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout)
 {
+    //qulonglong parentinode = parinode;
+    //qulonglong currentinode = curinode;
+    qulonglong inodecnt = 0;
     uint32_t fatsize = 0;
     qulonglong fatoffset = 0;
     uint16_t bytespersector = 0;
@@ -6403,22 +6411,43 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
         }
         propfile.close();
     }
+    if(!dirlayout.isEmpty())
+	rootdirlayout = dirlayout;
+    qDebug() << "rootdirlayout:" << rootdirlayout;
     //qDebug() << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
     for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
         //qDebug() << "root dir entry:" << i;
-        qulonglong rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
-        qulonglong rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
+	qulonglong rootdiroffset = 0;
+	qulonglong rootdirsize = 0;
+	if(i == 0)
+	{
+	    if(dirlayout.isEmpty()) // root directory
+	    {
+	        rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
+		rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
+	    }
+	    else // sub directory
+	    {
+		rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong() + 64; // skip . and .. directories
+		rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() - 64; // adjust read size for the 64 byte skip
+	    }
+	}
         uint rootdirentrycount = rootdirsize / 32;
         //qDebug() << "current rootdirentrycount:" << rootdirentrycount;
+	if(parinode == -1)
+	    inodecnt = 0;
+	else
+	    inodecnt = parinode;
+	qDebug() << "inodecnt at start of parent comparison:" << inodecnt;
         //uint inodecnt = curinode;
         QString longnamestring = "";
         for(uint j=0; j < rootdirentrycount; j++)
         {
 	    QString longname = "";
             QTextStream out;
-            QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(*curinode) + ".prop");
-            //QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+            //QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(currentinode) + ".prop");
+            QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
             if(!fileprop.isOpen())
                 fileprop.open(QIODevice::Append | QIODevice::Text);
             out.setDevice(&fileprop);
@@ -6554,8 +6583,8 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 		}
                 else
                     nodedata << "Empty" << "Zero File";
-                nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(*curinode));
-                //nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+                //nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(currentinode));
+                nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
                 QString parentstr = "";
                 if(parinode == -1)
                     parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
@@ -6570,15 +6599,18 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
                     filesfound++;
                     isignals->ProgUpd();
                 }
-                curinode++;
-                //inodecnt++;
+                //currentinode++;
+                inodecnt++;
                 out.flush();
                 fileprop.close();
                 nodedata.clear();
+		//qDebug() << "curinode:" << currentinode;
+		qDebug() << "inodecnt:" << inodecnt << filename << layout;
                 if(fileattr & 0x10 && logicalsize > 0) // sub directory
                 {
                     if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
-                        ParseFatDirectory(curimg, curstartsector, ptreecnt, *curinode, curinode);
+			inodecnt = ParseFatDirectory(curimg, curstartsector, ptreecnt, inodecnt-1, filename, layout);
+                        //ParseFatDirectory(curimg, curstartsector, ptreecnt, currentinode, currentinode);
                         //ParseFatDirectory(curimg, curstartsector, ptreecnt, curinode, inodecnt);
                         //void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qint64 parinode)
                 }
@@ -6641,6 +6673,7 @@ void ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
             }
         }
     }
+    return inodecnt;
     //void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulonglong fatoffset, QList<uint>* clusterlist);
     //QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong rootdiroffset);
 }
