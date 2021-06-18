@@ -16,6 +16,7 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulongl
 QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong rootdiroffset);
 void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
 qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout);
+qulonglong AddVirtualFileSystemFiles(ForImg* curimg, uint8_t ptreecnt, uint8_t fatcount, qulonglong fatsize, qulonglong curinode);
 
 
 void ProcessVolume(ForImg* tmpimage);

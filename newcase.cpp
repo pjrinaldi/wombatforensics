@@ -5621,7 +5621,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             out << "Root Directory Max Files|" << QString::number(rootdirmaxfiles) << "|Maximum number of root directory entries." << Qt::endl;
             if(fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32")
             {
-                out << "Fat Count|" << QString::number(fatcount) << "| Number of FAT's in the file system." << Qt::endl;
+                out << "FAT Count|" << QString::number(fatcount) << "| Number of FAT's in the file system." << Qt::endl;
                 out << "Bytes Per Sector|" << QString::number(bytespersector) << "|Number of bytes per sector, usually 512." << Qt::endl;
                 out << "Sectors Per Cluster|" << QString::number(sectorspercluster) << "|Number of sectors per cluster." << Qt::endl;
                 /* POSSIBLY COMMON BETWEEN THE 4 FAT VERSIONS
@@ -6333,12 +6333,39 @@ QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong
     return extentstring;
 }
 
+qulonglong AddVirtualFileSystemFiles(ForImg* curimg, uint8_t ptreecnt, uint8_t fatcount, qulonglong fatsize, qulonglong curinode)
+{
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << QByteArray("$MBR").toBase64() << QByteArray("/").toBase64() << "512" << "0" << "0" << "0" << "0" << "0" << "System File" << "Master Boot Record" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 10, 0);
+    mutex.unlock();
+    nodedata.clear();
+    curinode++;
+    for(int i=0; i < fatcount; i++)
+    {
+	nodedata.clear();
+	nodedata << QByteArray(QString("$FAT" + QString::number(i+1)).toUtf8()).toBase64() << QByteArray("/").toBase64() << fatsize << "0" << "0" << "0" << "0" << "0" << "System File" << "File Allocation Table" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
+	mutex.lock();
+	treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 10, 0);
+	mutex.unlock();
+	curinode++;
+    }
+    // NEED TO WRITE THE FILE PROPERTIES FOR THE 3 FILES - ALL I WOULD ADD WOULD BE THE LAYOUT VARIABLE, BUT THAT IS ACCOUNTED FOR IN THE PopulateHexContents() function
+    return curinode;
+}
+
 void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
     // NEED TO FIGURE OUT WHAT IS NEEDED TO PARSE AN ENTRY FOR EACH FILE SYSTEM TYPE
     // THEN I NEED TO READ THAT INFORMATION FROM THE PROPRETIES FILE SO I CAN PARSE THE DIRECTORIES
     // ALSO SEE IF THERE IS A WAY TO AUTOMATE THE CALL FOR EACH FILE/DIRECTORY
     uint8_t fstype = 0;
+    uint8_t fatcount = 0;
+    uint32_t fatsize = 0;
+    uint16_t bytespersector = 0;
+
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
 	propfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -6349,6 +6376,12 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
             QString line = propfile.readLine();
             if(line.startsWith("File System Type Int|"))
                 fstype = line.split("|").at(1).toUInt();
+	    else if(line.startsWith("FAT Count|"))
+		fatcount = line.split("|").at(1).toUInt();
+	    else if(line.startsWith("FAT Size|"))
+		fatsize = line.split("|").at(1).toUInt();
+	    else if(line.startsWith("Bytes Per Sector|"))
+		bytespersector = line.split("|").at(1).toUInt();
         }
         propfile.close();
     }
@@ -6356,8 +6389,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     {
 	qulonglong curinode = 0;
 	curinode = ParseFatDirectory(curimg, curstartsector, ptreecnt, -1, "", "");
-	qDebug() << "curinode at end:" << curinode;
-	// ADD VIRTUAL ROOT DIRECTORY FILES HERE...
+	curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
     }
     else if(fstype == 4) // EXFAT
     {
@@ -6560,12 +6592,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 		if(parfilename.isEmpty())
 		    filepath = "/";
 		else
-		{
-		    if(fileattr & 0x10)
-			filepath = parfilename + filename + "/";
-		    else
-			filepath = parfilename;
-		}
+		    filepath = parfilename;
 		nodedata << QByteArray(filepath.toUtf8()).toBase64() << logicalsize << createdate << accessdate << modifydate << 0 << 0;
 		if(logicalsize > 0) // Get Category/Signature
 		{
@@ -6599,30 +6626,20 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 out.flush();
                 fileprop.close();
                 nodedata.clear();
-		qDebug() << "inodecnt:" << inodecnt << filename << layout;
+		//qDebug() << "inodecnt:" << inodecnt << filename << layout;
                 if(fileattr & 0x10 && logicalsize > 0) // sub directory
                 {
                     if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
-			inodecnt = ParseFatDirectory(curimg, curstartsector, ptreecnt, inodecnt-1, filepath, layout);
+			inodecnt = ParseFatDirectory(curimg, curstartsector, ptreecnt, inodecnt-1, QString(filepath + filename + "/"), layout);
                 }
-                /*
-                if(fileattr & 0x10 && fileinfo.value("physicalsize").toUInt() > 0) // sub directory
-                {
-                    // POSSIBLY REMOVE THIS IF SO IT WILL PROCESS DELETED AS WELL IF THEY CONTAIN CHILDREN...
-                    if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
-                        ParseSubDirectory(curimg, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
-                        //ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
-                }
-                 */ 
-                //qDebug() << "rootdirentry:" << j << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
             }
             else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
             {
-                //if(rootdirbuf.at(i*32) & 0x40)
                 if(firstchar & 0x40)
                 {
                     if(!longnamestring.isEmpty()) // orphan long entry
                     {
+			// NEED TO POPULATE THE ORPHANS HERE TO THE NODE TREE/PROP FILE AS NECESSARY
                         qDebug() << "orphan:" << longnamestring;
                         //orphaninfo.clear();
                         //orphaninfo.insert("filename", QVariant(longnamestring));
@@ -6665,90 +6682,8 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
         }
     }
     return inodecnt;
-    //void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulonglong fatoffset, QList<uint>* clusterlist);
-    //QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong rootdiroffset);
 }
 
-/*
-    for(int i=0; i < rootdirentrycount; i++)
-    {
-
-        if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub-component
-        {
-            fileinfo.insert("clusternum", QVariant(((uint32_t)hiclusternum >> 16) + loclusternum));
-            fileinfo.insert("inode", QVariant(inodecnt));
-            fileinfo.insert("parentinode",  QVariant(-1));
-	    QList<uint> clusterlist;
-	    clusterlist.clear();
-	    QString layout = "";
-	    if(fileattr & 0x08) // volume id attribute
-		fileinfo.insert("physicalsize", QVariant(0));
-	    else
-	    {
-		if(fileinfo.value("clusternum").toUInt() >= 2)
-		    GetNextCluster(fileinfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
-		QString clusterstr = QString::number(fileinfo.value("clusternum").toUInt()) + ",";
-		QString clustersize = QString::number(fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt());
-		layout = QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (fileinfo.value("clusternum").toUInt() - 2) * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()) + "," + clustersize + ";";
-		for(int j=0; j < clusterlist.count()-1; j++)
-		{
-		    clusterstr += QString::number(clusterlist.at(j)) + ",";
-		    layout += QString::number((fsinfo->value("clusterareastart").toUInt() * fsinfo->value("bytespersector").toUInt()) + (clusterlist.at(j) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
-		}
-		fileinfo.insert("clusterlist", QVariant(clusterstr));
-		fileinfo.insert("layout", QVariant(layout));
-		fileinfo.insert("physicalsize", QVariant(clusterlist.count() * fsinfo->value("sectorspercluster").toUInt() * fsinfo->value("bytespersector").toUInt()));
-	    }
-            if(fileattr & 0x10) // sub directory attribute
-	    {
-		QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
-		int direntrycnt = 0;
-		int lastdirentry = 0;
-		QByteArray dirsizebuf;
-		dirsizebuf.clear();
-                curimg->open(QIODevice::ReadOnly);
-                for(int j=0; j < layoutlist.count(); j++)
-                {
-                    curimg->seek(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-                    dirsizebuf.append(curimg->read(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-                }
-                curimg->close();
-		direntrycnt = dirsizebuf.count() / 32;
-		for(int j=0; j < direntrycnt; j++)
-		{
-		    uint8_t firstchar = dirsizebuf.at(j*32);
-		    if(firstchar == 0x00) // entry is free and all remaining are free
-		    {
-			lastdirentry = j;
-			break;
-		    }
-		}
-		fileinfo.insert("logicalsize", QVariant(lastdirentry * 32));
-	    }
-            else
-                fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(rootdirbuf.mid(i*32 + 28, 4))));
-            if(fileattr & 0x10) // sub directory attribute
-	    {
-		if(firstchar == 0xe5 || firstchar == 0x05) // deleted directory
-		    fileinfo.insert("itemtype", QVariant(2)); // deleted directory
-		else
-		    fileinfo.insert("itemtype", QVariant(3)); // directory
-	    }
-	    else if(firstchar == 0xe5 || firstchar == 0x05) // deleted file
-		fileinfo.insert("itemtype", QVariant(4)); // deleted file
-            else
-                fileinfo.insert("itemtype", QVariant(5)); // regular file
-            fileinfolist->append(fileinfo);
-            inodecnt++;
-            if(fileattr & 0x10 && fileinfo.value("physicalsize").toUInt() > 0) // sub directory
-            {
-                // POSSIBLY REMOVE THIS IF SO IT WILL PROCESS DELETED AS WELL IF THEY CONTAIN CHILDREN...
-		if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
-		    ParseSubDirectory(curimg, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
-		    //ParseSubDirectory(estring, fsinfo, &fileinfo, fileinfolist, &inodecnt, &fatbuf, orphanlist);
-            }
-        }
- */ 
     /*
 	if(fileinfo->contains("clusterlist"))
 	    out << "Cluster List|" << fileinfo->value("clusterlist").toString() << "|Clusters occupied by the file." << Qt::endl;
