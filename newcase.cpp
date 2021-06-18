@@ -6352,6 +6352,7 @@ qulonglong AddVirtualFileSystemFiles(ForImg* curimg, uint8_t ptreecnt, uint8_t f
 	mutex.unlock();
 	curinode++;
     }
+    nodedata.clear();
     // NEED TO WRITE THE FILE PROPERTIES FOR THE 3 FILES - ALL I WOULD ADD WOULD BE THE LAYOUT VARIABLE, BUT THAT IS ACCOUNTED FOR IN THE PopulateHexContents() function
     return curinode;
 }
@@ -6388,7 +6389,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     if(fstype > 0 and fstype < 4) // FAT12 || FAT16 || FAT32
     {
 	qulonglong curinode = 0;
-	curinode = ParseFatDirectory(curimg, curstartsector, ptreecnt, -1, "", "");
+	curinode = ParseFatDirectory(curimg, curstartsector, ptreecnt, 0, -1, "", "");
 	curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
     }
     else if(fstype == 4) // EXFAT
@@ -6406,7 +6407,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }
 
-qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout)
+qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout)
 {
     qulonglong inodecnt = 0;
     uint32_t fatsize = 0;
@@ -6630,7 +6631,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 if(fileattr & 0x10 && logicalsize > 0) // sub directory
                 {
                     if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
-			inodecnt = ParseFatDirectory(curimg, curstartsector, ptreecnt, inodecnt-1, QString(filepath + filename + "/"), layout);
+			inodecnt = ParseFatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt-1, QString(filepath + filename + "/"), layout);
                 }
             }
             else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
@@ -6639,6 +6640,39 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 {
                     if(!longnamestring.isEmpty()) // orphan long entry
                     {
+			QList<QVariant> nodedata;
+			if(orphandirexists == 0) // orphans dir doesn't exists, so create it
+			{
+			    nodedata.clear();
+			    nodedata << QByteArray("orphans").toBase64() << QByteArray("/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o");
+			    mutex.lock();
+			    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
+			    mutex.unlock();
+			    /*
+			    QByteArray ba;
+			    ba.clear();
+			    nodedata.clear();
+			    ba.append("orphans");
+			    nodedata << ba.toBase64();
+			    ba.clear();
+			    ba.append("/");
+			    QString parentstr = QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
+			    nodedata << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QVariant("Directory") << QVariant("Virtual Directory") << "0" << QVariant(parentstr);
+			    mutex.lock();
+			    treenodemodel->AddNode(nodedata, QString("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt)), 11, 0);
+			    mutex.unlock();
+			    curinode++;
+			     */
+			    nodedata.clear();
+			    orphandirexists = 1;
+			}
+			nodedata.clear();
+			nodedata << QByteArray(longnamestring.toUtf8()).toBase64() << QByteArray("/orphans/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Empty" << "Empty File" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+			mutex.lock();
+			treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"), 4, 1);
+			mutex.unlock();
+			nodedata.clear();
+			inodecnt++;
 			// NEED TO POPULATE THE ORPHANS HERE TO THE NODE TREE/PROP FILE AS NECESSARY
                         qDebug() << "orphan:" << longnamestring;
                         //orphaninfo.clear();
