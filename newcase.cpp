@@ -6223,7 +6223,6 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 
 void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulonglong fatoffset, QList<uint>* clusterlist)
 {
-    //qDebug() << "clusternum:" << clusternum << "fatoffset:" << fatoffset << "clusterlist:" << clusterlist;
     uint32_t curcluster = 0;
     int fatbyte1 = 0;
     if(fstype == 1) // FAT12
@@ -6262,7 +6261,7 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, qulongl
     {
         if(clusternum >= 2)
         {
-            fatbyte1 = clusternum* 4;
+            fatbyte1 = clusternum * 4;
             curcluster = (qFromLittleEndian<uint32_t>(curimg->ReadContent(fatoffset + fatbyte1, 4)) & 0x0FFFFFFF);
 	    //if(curcluster != 0x0FFFFFF7)
 		//clusterlist->append(curcluster);
@@ -6414,6 +6413,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     qulonglong fatoffset = 0;
     uint16_t bytespersector = 0;
     uint8_t sectorspercluster = 0;
+    uint8_t fstype = 0;
     qulonglong clusterareastart = 0;
     QString rootdirlayout = "";
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
@@ -6436,6 +6436,8 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 fatsize = line.split("|").at(1).toUInt();
             else if(line.startsWith("Cluster Area Start|"))
                 clusterareastart = line.split("|").at(1).toULongLong();
+	    else if(line.startsWith("File System Type Int|"))
+		fstype = line.split("|").at(1).toUInt();
         }
         propfile.close();
     }
@@ -6534,7 +6536,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 if(clusternum >= 2)
                 {
                     clusterlist.append(clusternum);
-                    GetNextCluster(curimg, clusternum, 3, fatoffset, &clusterlist);
+                    GetNextCluster(curimg, clusternum, fstype, fatoffset, &clusterlist);
                 }
 		QString layout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
 		out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
