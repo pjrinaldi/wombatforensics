@@ -6745,6 +6745,7 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
     }
     if(!dirlayout.isEmpty())
 	rootdirlayout = dirlayout;
+    qDebug() << "parinode:" << parinode << "parfilename:" << parfilename << "dirlayout:" << rootdirlayout;
     //qDebug() << "bps:" << bytespersector << "spc:" << sectorspercluster << "rdl:" << rootdirlayout << "fatoffset:" << fatoffset << "cas:" << clusterareastart;
     for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
@@ -6890,7 +6891,7 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 	    {
 		// skip for now
 	    }
-	    //qDebug() << "filename:" << filename << "clusternum:" << clusternum;
+	    qDebug() << "filename:" << filename << "clusternum:" << clusternum;
 	    if(fatchain == 0 && clusternum > 1)
 	    {
 		QList<uint32_t> clusterlist;
@@ -6903,10 +6904,10 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 	    else if(fatchain == 1)
 	    {
 		uint clustercount = (uint)ceil((float)physicalsize / (bytespersector * sectorspercluster));
-		layout = QString::number(clusterareastart + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + QString::number(clustercount * bytespersector * sectorspercluster) + ";";
+		layout = QString::number(clusterareastart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + QString::number(clustercount * bytespersector * sectorspercluster) + ";";
 		//qDebug() << "clustercount:" << clustercount;
 	    }
-	    //qDebug() << "filename:" << filename << "layout:" << layout;
+	    qDebug() << "filename:" << filename << "layout:" << layout;
 
 	    if(entrytype == 0x85 || entrytype == 0x05 || entrytype == 0x81 || entrytype == 0x82)
 	    {
@@ -6947,7 +6948,6 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
                 nodedata.clear();
 		if(fileattr & 0x10) // Sub Directory
 		{
-                    qDebug() << "parse sub directory for:" << filename;
 		    ParseExfatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt - 1, QString(filepath + filename + "/"), layout);
 		}
 		nodedata.clear();
