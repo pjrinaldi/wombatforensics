@@ -6401,7 +6401,8 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
         qulonglong curinode = 0;
 	curinode = ParseExfatDirectory(curimg, curstartsector, ptreecnt, 0, -1, "", "", &orphanoffsets);
         curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
-	qDebug() << "orphanoffsets:" << orphanoffsets;
+	//qDebug() << "orphanoffsets:" << orphanoffsets;
+	ParseExfatOrphans(curimg, ptreecnt, curstartsector, curinode, &orphanoffsets);
     }
     else if(fstype == 5) // NTFS
     {
@@ -6974,6 +6975,11 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
     }
     //qDebug() << "orphanoffsets:" << orphanoffsets;
     return inodecnt;
+}
+
+void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector, qulonglong curinode, QList<qulonglong>* orphanoffsets)
+{
+    qDebug() << "orphanoffsets:" << *orphanoffsets;
 }
 /*
  *void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)

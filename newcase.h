@@ -18,6 +18,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout);
 qulonglong AddVirtualFileSystemFiles(ForImg* curimg, uint8_t ptreecnt, uint8_t fatcount, qulonglong fatsize, qulonglong curinode);
 qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout, QList<qulonglong>* orphanoffsets);
+void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector, qulonglong curinode, QList<qulonglong>* orphanoffsets);
 
 
 void ProcessVolume(ForImg* tmpimage);
