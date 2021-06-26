@@ -17,7 +17,7 @@ QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong
 void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
 qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout);
 qulonglong AddVirtualFileSystemFiles(ForImg* curimg, uint8_t ptreecnt, uint8_t fatcount, qulonglong fatsize, qulonglong curinode);
-qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout);
+qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout, QList<qulonglong>* orphanoffsets);
 
 
 void ProcessVolume(ForImg* tmpimage);

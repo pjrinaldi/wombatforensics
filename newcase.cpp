@@ -6396,9 +6396,12 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     }
     else if(fstype == 4) // EXFAT
     {
+	QList<qulonglong> orphanoffsets;
+	orphanoffsets.clear();
         qulonglong curinode = 0;
-	curinode = ParseExfatDirectory(curimg, curstartsector, ptreecnt, 0, -1, "", "");
+	curinode = ParseExfatDirectory(curimg, curstartsector, ptreecnt, 0, -1, "", "", &orphanoffsets);
         curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
+	qDebug() << "orphanoffsets:" << orphanoffsets;
     }
     else if(fstype == 5) // NTFS
     {
@@ -6711,10 +6714,10 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     return inodecnt;
 }
 
-qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout)
+qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout, QList<qulonglong>* orphanoffsets)
 {
-    QList<qulonglong> orphanoffsets;
-    orphanoffsets.clear();
+    //QList<qulonglong> orphanoffsets;
+    //orphanoffsets.clear();
     qulonglong inodecnt = 0;
     //uint32_t fatsize = 0;
     qulonglong fatoffset = 0;
@@ -6755,6 +6758,11 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 	qulonglong rootdirsize = 0;
 	rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
 	rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
+	if(dirlayout.isEmpty())
+	{
+	    orphanoffsets->append(rootdiroffset);
+	    orphanoffsets->append(rootdirsize);
+	}
 	uint rootdirentrycount = rootdirsize / 32;
         //qDebug() << "current rootdirentrycount:" << rootdirentrycount;
 	if(parinode == -1)
@@ -6913,6 +6921,11 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 
 	    if(entrytype == 0x85 || entrytype == 0x05 || entrytype == 0x81 || entrytype == 0x82)
 	    {
+		for(int c=0; c < layout.split(";", Qt::SkipEmptyParts).count(); c++)
+		{
+		    orphanoffsets->append(layout.split(";", Qt::SkipEmptyParts).at(c).split(",").at(0).toULongLong());
+		    orphanoffsets->append(layout.split(";", Qt::SkipEmptyParts).at(c).split(",").at(1).toULongLong());
+		}
 		out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
 		out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
 		if(!parfilename.isEmpty())
@@ -6951,7 +6964,7 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
                 nodedata.clear();
 		if(fileattr & 0x10 && logicalsize > 0) // Sub Directory
 		{
-		    ParseExfatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt - 1, QString(filepath + filename + "/"), layout);
+		    ParseExfatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt - 1, QString(filepath + filename + "/"), layout, orphanoffsets);
 		}
 		nodedata.clear();
 	    }
@@ -6959,6 +6972,7 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 	    fileprop.close();
 	}
     }
+    //qDebug() << "orphanoffsets:" << orphanoffsets;
     return inodecnt;
 }
 /*
