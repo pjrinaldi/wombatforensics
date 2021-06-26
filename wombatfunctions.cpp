@@ -339,31 +339,32 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
     magic_load(magical, NULL);
     catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
     std::string catsigstr(catsig);
-    // ATTEMPTING TO REDO WIHT ONE FOR LOOP AND THEN SPLITTING THE SINGLE STRING ""/"" AS NEEDED
-    /*
-    QString mimecategory = "";
-    QString mimesignature = "";
-    mimecategory = QString::fromStdString(catsigstr).split("/").first();
-    mimesignature = QString::fromStdString(catsigstr).split("/").last();
+    QString mimestr = QString::fromStdString(catsigstr);
     magic_close(magical);
-    // capitalize 1st letter of each word for both files
-    for(int i=0; i < mimecategory.count(); i++)
+    for(int i=0; i < mimestr.count(); i++)
     {
-        if(i == 0)
-            mimecategory[i] = mimecategory[i].toUpper();
-        else if(mimecategory.at(i-1) == ' ' || mimecategory.at(i-1) == '-')
-            mimecategory[i] = mimecategory[i].toUpper();
+	if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
+	    mimestr[i] = mimestr[i].toUpper();
     }
-    for(int i=0; i < mimesignature.count(); i++)
-    {
-        if(i == 0)
-            mimesignature[i] = mimesignature[i].toUpper();
-        else if(mimesignature.at(i-1) == ' ' || mimesignature.at(i-1) == '-')
-            mimesignature[i] = mimesignature[i].toUpper();
-    }
-    */
+    if(filename.startsWith("$UPCASE_TABLE"))
+	mimestr = "System File/Up-case Table";
+    else if(filename.startsWith("$ALLOC_BITMAP"))
+	mimestr = "System File/Allocation Bitmap";
+    else if(filename.startsWith("$UpCase"))
+	mimestr = "Windows System/System File";
+    //QString mimecategory = mimestr.split("/").first();
+    //QString mimesignature = mimestr.split("/").last();
+    /*
+    if(filename.startsWith("$UPCASE_TABLE"))
+        mimestr = "System File/Up-case Table";
+    if(filename.startsWith("$UpCase"))
+        mimestr = "Windows System/System File";
+        else if(filename.startsWith("$ALLOC_BITMAP"))
+            mimestr = "System File/Allocation Bitmap";
+     */ 
 
-    return QString(mimecategory + "/" + mimesignature);
+    return mimestr;
+    //return QString(mimecategory + "/" + mimesignature);
     // WILL NEED TO REIMPLEMENT ALL THE BELOW BASED ON THE NEW LIBMAGIC STUFF
     //if(mimesignature.contains("text"))
 //	mimecategory = "Text";
