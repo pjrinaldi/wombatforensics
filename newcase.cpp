@@ -6979,7 +6979,24 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 
 void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector, qulonglong curinode, QList<qulonglong>* orphanoffsets)
 {
-    qDebug() << "orphanoffsets:" << *orphanoffsets;
+    //qDebug() << "orphanoffsets:" << *orphanoffsets;
+    qulonglong curoffset = 0;
+    while(curoffset < curimg->Size())
+    {
+	uint8_t entrytype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset, 1));
+	if(entrytype == 0x05)
+	{
+	    //qDebug() << "coffset:" << curoffset << "possible orphan.";
+	}
+	curoffset += 32;
+	//qDebug() << "curoffset before fix:" << curoffset;
+	for(int i=0; i < orphanoffsets->count() / 2; i++)
+	{
+	    if(curoffset == orphanoffsets->at(i))
+		curoffset += orphanoffsets->at(i+1);
+	}
+	//qDebug() << "curoffset after fix:" << curoffset;
+    }
 }
 /*
  *void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
