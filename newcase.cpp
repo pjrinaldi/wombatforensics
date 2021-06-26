@@ -6396,9 +6396,9 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     }
     else if(fstype == 4) // EXFAT
     {
-	ParseExfatDirectory(curimg, curstartsector, ptreecnt, 0, -1, "", "");
-        //ParseExfatDirectory(curimg, curstartsector, ptreecnt);
-	//ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
+        qulonglong curinode = 0;
+	curinode = ParseExfatDirectory(curimg, curstartsector, ptreecnt, 0, -1, "", "");
+        curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
     }
     else if(fstype == 5) // NTFS
     {
@@ -6543,7 +6543,9 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                     clusterlist.append(clusternum);
                     GetNextCluster(curimg, clusternum, fstype, fatoffset, &clusterlist);
                 }
-		QString layout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
+                QString layout = "";
+                if(clusterlist.count() > 0)
+		    layout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
 		out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
                 qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
 		out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
@@ -6709,7 +6711,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     return inodecnt;
 }
 
-void ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout)
+qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout)
 {
     qulonglong inodecnt = 0;
     //uint32_t fatsize = 0;
@@ -6942,8 +6944,10 @@ void ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreec
 		    isignals->ProgUpd();
 		}
 		inodecnt++;
+                nodedata.clear();
 		if(fileattr & 0x10) // Sub Directory
 		{
+                    qDebug() << "parse sub directory for:" << filename;
 		    ParseExfatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt - 1, QString(filepath + filename + "/"), layout);
 		}
 		nodedata.clear();
@@ -6967,6 +6971,7 @@ void ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreec
                 }
 	 */ 
     }
+    return inodecnt;
 }
 /*
  *void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)

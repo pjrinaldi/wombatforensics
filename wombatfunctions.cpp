@@ -339,26 +339,31 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
     magic_load(magical, NULL);
     catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
     std::string catsigstr(catsig);
-    QString mimesignature = QString::fromStdString(catsigstr);
+    // ATTEMPTING TO REDO WIHT ONE FOR LOOP AND THEN SPLITTING THE SINGLE STRING ""/"" AS NEEDED
     /*
-     *    int check=0;                // ststus of space
-    int i=0;                    // for loop
-    //change the string below to convert it in required format
-    char str[]="Hi i am from codespeedy";       //string
-    cout<<"previous string: "<<str<<endl;
-    while(str[i]){                      
-        if(check==0){
-            str[i]=toupper(str[i]);     //conversion of string takes place here
-            check=1;
-        }else if(isspace(str[i]))       // change status of check if move to another word
-            check=0;
-        i++;
-     */ 
+    QString mimecategory = "";
+    QString mimesignature = "";
+    mimecategory = QString::fromStdString(catsigstr).split("/").first();
+    mimesignature = QString::fromStdString(catsigstr).split("/").last();
     magic_close(magical);
-    //QString mimestr = "";
-    //QString mimecategory = "";
+    // capitalize 1st letter of each word for both files
+    for(int i=0; i < mimecategory.count(); i++)
+    {
+        if(i == 0)
+            mimecategory[i] = mimecategory[i].toUpper();
+        else if(mimecategory.at(i-1) == ' ' || mimecategory.at(i-1) == '-')
+            mimecategory[i] = mimecategory[i].toUpper();
+    }
+    for(int i=0; i < mimesignature.count(); i++)
+    {
+        if(i == 0)
+            mimesignature[i] = mimesignature[i].toUpper();
+        else if(mimesignature.at(i-1) == ' ' || mimesignature.at(i-1) == '-')
+            mimesignature[i] = mimesignature[i].toUpper();
+    }
+    */
 
-    return mimesignature;
+    return QString(mimecategory + "/" + mimesignature);
     // WILL NEED TO REIMPLEMENT ALL THE BELOW BASED ON THE NEW LIBMAGIC STUFF
     //if(mimesignature.contains("text"))
 //	mimecategory = "Text";
