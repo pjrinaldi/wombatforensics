@@ -6411,7 +6411,8 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     }
     else if(fstype == 6) // EXT2/3/4
     {
-        //ParseExtDirectory(curimg, curstartsector, ptreecnt);
+	quint64 curinode = 0;
+	curinode = ParseExtDirectory(curimg, curstartsector, ptreecnt, 0, "", "");
     }
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }
@@ -7141,6 +7142,727 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 	//qDebug() << "curoffset after fix:" << curoffset;
     }
 }
+
+quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout)
+{
+}
+
+
+/*
+ *    //qDebug() << "current inode:" << curinode;
+    // DETERMINE WHICH BLOCK GROUP THE CUR INODE IS A PART OF.
+    //qDebug() << "inode address table:" << fsinfo->value("inodeaddresstable").toString();
+    QStringList blockgroups = fsinfo->value("inodeaddresstable").toString().split(",", Qt::SkipEmptyParts);
+    qulonglong inodetablestartingblock = 0;
+    int bgnumber = 0;
+    qulonglong inodecnt = curicnt;
+
+    for(int i=1; i <= blockgroups.count(); i++)
+    {
+        if(curinode < i*fsinfo->value("blockgroupinodecnt").toUInt())
+        {
+            inodetablestartingblock = blockgroups.at(i-1).toULongLong();
+            bgnumber = i - 1;
+            break;
+        }
+    }
+    //qDebug() << "blockgroups:" << blockgroups;
+    //qDebug() << "inode table starting block:" << inodetablestartingblock;
+
+    QHash<QString, QVariant> fileinfo;
+    fileinfo.clear();
+
+    //QFile efile(estring);
+    QByteArray direntrybuf;
+    uint32_t inodeflags = 0;
+    // I NEED TO DO THIS TO GET THE BLOCK LIST FOR THE CURRENT INODE SO I CAN GET IT'S CONTENT AND READ TEH DIRECTORY ENTRY, BUT THIS IS A GIVEN
+    // ON SUB DIRECTORIES SINCE I WILL HAVE THE INODE'S LAYOUT AND CURBLOCKLIST, SO I CAN SKIP THIS PART WHEN THESE VALUES ARE KNOWN...
+    if(parfileinfo != NULL)
+    {
+        direntrybuf.clear();
+        curimg->open(QIODevice::ReadOnly);
+        QStringList layoutlist = parfileinfo->value("layout").toString().split(";", Qt::SkipEmptyParts);
+        for(int i=0; i < layoutlist.count(); i++)
+        {
+            curimg->seek(layoutlist.at(i).split(",").at(0).toUInt());
+            direntrybuf.append(curimg->read(layoutlist.at(i).split(",").at(1).toUInt()));
+        }
+        curimg->close();
+    }
+    else
+    {
+        QByteArray inodetablebuf;
+        inodetablebuf.clear();
+        curimg->open(QIODevice::ReadOnly);
+        curimg->seek(fsinfo->value("partoffset").toUInt() + (inodetablestartingblock * fsinfo->value("blocksize").toUInt()));
+        inodetablebuf = curimg->read(fsinfo->value("inodesize").toUInt() * fsinfo->value("blockgroupinodecnt").toUInt());
+        curimg->close();
+        // NOW I HAVE THE INODE TABLE FOR THE CURRENT BLOCK GROUP. I CAN GO THE CURINODE's OFFSET and parse it's inode table entry to get the content for the directory entry...
+        QStringList blkstrlist;
+        blkstrlist.clear();
+        //QList<uint32_t> blocklist;
+        //blocklist.clear();
+        qulonglong relcurinode = curinode - 1 - (bgnumber * fsinfo->value("blockgroupinodecnt").toUInt());
+        inodeflags = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 32, 4));
+	if((fsinfo->value("incompatflags").toUInt() & 0x40) && (inodeflags & 0x80000)) // FS USES EXTENTS && INODE USES EXTENTS
+	{
+            uint16_t extententries = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 42, 2));
+            uint16_t extentdepth = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 46, 2));
+            if(extentdepth == 0) // use ext4_extent
+            {
+                for(int i=0; i < extententries; i++)
+                {
+                    //qDebug() << "ee_block:" << qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 52 + i*12, 4));
+                    //qDebug() << "ee_length:" << qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 56 + i*12, 2));
+                    //qDebug() << "ee_start_hi:" << qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 58 + i*12, 2));
+                    //qDebug() << "ee_start_lo:" << qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 60 + i*12, 4));
+                    uint16_t blocklength = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 56 + i*12, 2));
+                    uint16_t starthi = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 58 + i*12, 2));
+                    uint32_t startlo = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 60 + i*12, 4));
+                    uint64_t startblock = (((uint64_t)starthi >> 32) + startlo) * fsinfo->value("blocksize").toUInt();
+                    //qDebug() << "startblock:" << startblock;
+                    blkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength * fsinfo->value("blocksize").toUInt()));
+                }
+            }
+            else // use ext4_extent_idx
+            {
+		QList<uint32_t> leafnodes;
+		leafnodes.clear();
+		for(int i=0; i < extententries; i++)
+		{
+		    leafnodes.append(qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 56 + i*12, 4)));
+		}
+		for(int i=0; i < leafnodes.count(); i++)
+		{
+		    QByteArray leafnode;
+		    leafnode.clear();
+                    curimg->open(QIODevice::ReadOnly);
+                    curimg->seek(fsinfo->value("partoffset").toUInt() + (leafnodes.at(i) * fsinfo->value("blocksize").toUInt()));
+                    leafnode = curimg->read(fsinfo->value("blockszie").toUInt());
+                    curimg->close();
+			uint16_t extententries = qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
+			uint16_t extentdepth = qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
+			if(extentdepth == 0) // use ext4_extent
+			{
+			    for(int j=0; j < extententries; j++)
+			    {
+				uint16_t blocklength = qFromLittleEndian<uint16_t>(leafnode.mid(16 + j*12, 2));
+				uint16_t starthi = qFromLittleEndian<uint16_t>(leafnode.mid(18 + j*12, 2));
+				uint32_t startlo = qFromLittleEndian<uint32_t>(leafnode.mid(20 + j*12, 4));
+				uint64_t startblock = (((uint64_t)starthi >> 32) + startlo) * fsinfo->value("blocksize").toUInt();
+				blkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength * fsinfo->value("blocksize").toUInt()));
+			    }
+			}
+			else // use ext4_extent_idx
+			{
+			    qDebug() << "repeat leafnode exercise here...";
+			}
+			//qDebug() << "leaf header:" << QString::number(qFromLittleEndian<uint16_t>(leafnode.mid(0, 2)), 16);
+			//qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
+			//qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(4, 2));
+			//qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
+		    //}
+		}
+		//qDebug() << "extent header:" << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(40, 2)), 16);
+		//qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(42, 2));
+		//qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(44, 2));
+		//qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(46, 2));
+		
+		//qDebug() << "ei_block:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(52, 4));
+		//qDebug() << "ei_leaf_lo:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56, 4));
+		//qDebug() << "ei_leaf_hi:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(60, 2));
+		//qDebug() << "use extent idx";
+            }
+	}
+        else
+        {
+	    for(int i=0; i < 12; i++)
+	    {
+		uint32_t curdirectblock = qFromLittleEndian<uint32_t>(inodetablebuf.mid( fsinfo->value("inodesize").toUInt() * relcurinode + (40 + i*4), 4));
+		if(curdirectblock > 0)
+		{
+		    blkstrlist.append(QString::number(curdirectblock * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+		    //blocklist.append(curdirectblock);
+		}
+	    }
+	    //qDebug() << "current block list before i get the indirect block pointers.." << blocklist;
+	    uint32_t singleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((relcurinode)*fsinfo->value("inodesize").toUInt() + 88, 4));
+	    uint32_t doubleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((relcurinode)*fsinfo->value("inodesize").toUInt() + 92, 4));
+	    uint32_t tripleindirect = qFromLittleEndian<uint32_t>(inodetablebuf.mid((relcurinode)*fsinfo->value("inodesize").toUInt() + 96, 4));
+	    // NEED TO PARSE THESE BLOCKS TO ADD TO THE BLOCKLIST's TOTAL
+	    if(singleindirect > 0)
+	    {
+                curimg->open(QIODevice::ReadOnly);
+                curimg->seek(fsinfo->value("partoffset").toUInt() + (singleindirect * fsinfo->value("blocksize").toUInt()));
+                QByteArray singlebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                curimg->close();
+		    for(int i=0; i < singlebuf.count() / 4; i++)
+		    {
+			uint32_t cursingledirect = qFromLittleEndian<uint32_t>(singlebuf.mid(i*4, 4));
+			if(cursingledirect > 0)
+			{
+			    blkstrlist.append(QString::number(cursingledirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+			    //blocklist.append(cursingledirect);
+			}
+		    }
+		//}
+	    }
+	    if(doubleindirect > 0)
+	    {
+		QList<uint32_t> sinlist;
+		sinlist.clear();
+                curimg->open(QIODevice::ReadOnly);
+                curimg->seek(fsinfo->value("partoffset").toUInt() + (doubleindirect * fsinfo->value("blocksize").toUInt()));
+                QByteArray doublebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                curimg->close();
+		    for(int i=0; i < doublebuf.count() / 4; i++)
+		    {
+			uint32_t sindirect = qFromLittleEndian<uint32_t>(doublebuf.mid(i*4, 4));
+			if(sindirect > 0)
+			    sinlist.append(sindirect);
+		    }
+		//}
+		for(int i=0; i < sinlist.count(); i++)
+		{
+                    curimg->open(QIODevice::ReadOnly);
+                    curimg->seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(i) * fsinfo->value("blocksize").toUInt()));
+                    QByteArray sinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
+			for(int j=0; j < sinbuf.count() / 4; j++)
+			{
+			    uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(j*4, 4));
+			    if(sdirect > 0)
+			    {
+				blkstrlist.append(QString::number(sdirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+				//blocklist.append(sdirect);
+			    }
+			}
+		    //}
+		}
+	    }
+	    if(tripleindirect > 0)
+	    {
+		QList<uint32_t> dinlist;
+		dinlist.clear();
+		QList<uint32_t> sinlist;
+		sinlist.clear();
+                curimg->open(QIODevice::ReadOnly);
+                curimg->seek(fsinfo->value("partoffset").toUInt() + (tripleindirect * fsinfo->value("blocksize").toUInt()));
+                QByteArray triplebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                curimg->close();
+		    for(int i=0; i < triplebuf.count() / 4; i++)
+		    {
+			uint32_t dindirect = qFromLittleEndian<uint32_t>(triplebuf.mid(i*4, 4));
+			if(dindirect > 0)
+			    dinlist.append(dindirect);
+		    }
+		//}
+		for(int i=0; i < dinlist.count(); i++)
+		{
+                    curimg->open(QIODevice::ReadOnly);
+                    curimg->seek(fsinfo->value("partoffset").toUInt() + (dinlist.at(i) * fsinfo->value("blocksize").toUInt()));
+                    QByteArray dinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
+			for(int j=0; j < dinbuf.count() / 4; j++)
+			{
+			    uint32_t sindirect = qFromLittleEndian<uint32_t>(dinbuf.mid(j*4, 4));
+			    if(sindirect > 0)
+				sinlist.append(sindirect);
+			}
+		    //}
+		    for(int j=0; j < sinlist.count(); j++)
+		    {
+                        curimg->open(QIODevice::ReadOnly);
+                        curimg->seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(j) * fsinfo->value("blocksize").toUInt()));
+                        QByteArray sinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                        curimg->close();
+			    for(int k=0; k < sinbuf.count() / 4; k++)
+			    {
+				uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(k*4, 4));
+				if(sdirect > 0)
+				{
+				    blkstrlist.append(QString::number(sdirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+				    //blocklist.append(sdirect);
+				}
+			    }
+			//}
+		    }
+		}
+	    }
+        }
+        //qDebug() << "block list to compare to parfileinfo layout:" << blocklist;
+        //qDebug() << "blkstr list:" << blkstrlist;
+        // GET THE DIRECTORY ENTRY CONTENT FOR THE CURRENT INODE
+        direntrybuf.clear();
+        curimg->open(QIODevice::ReadOnly);
+        for(int i=0; i < blkstrlist.count(); i++)
+        {
+            curimg->seek(fsinfo->value("partoffset").toUInt() + blkstrlist.at(i).split(",").at(0).toUInt());
+            direntrybuf.append(curimg->read(blkstrlist.at(i).split(",").at(1).toUInt()));
+        }
+        curimg->close();
+    }
+    int curoffset = 24; // SKIP THE . AND .. ENTRIES WHICH ARE ALWAYS THE 1ST TWO ENTRIES AND ARE 12 BYTES LONG EACH
+    if(inodeflags & 0x1000)
+    {
+	curoffset = 40; // THIS SHOULD ACCOUNT FOR HASH TREE DEPTH OF 0, NEED TEST FOR 1 - 3
+        qDebug() << "cur directory inode uses hashed btree rather than linear direntry reading";
+    }
+    bool nextisdeleted = false;
+    while(curoffset < direntrybuf.count() - 8)
+    {
+        fileinfo.clear();
+        int entrylength = 0;
+        int lengthdiv = (8 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) / 4;
+        int remdiv = (8 + qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6))) % 4;
+        int newlength = 0;
+        if(remdiv == 0)
+            newlength = lengthdiv * 4;
+        else
+            newlength = lengthdiv * 4 + 4;
+        // need to make this value "extinode" and the "inode" the standard increment as the other file systems...
+        // then i can move the extinode to the properties such as deleted time, etc...
+        fileinfo.insert("inode", QVariant(inodecnt));
+        fileinfo.insert("extinode", QVariant(qFromLittleEndian<int32_t>(direntrybuf.mid(curoffset, 4))));
+        if(fileinfo.value("extinode").toInt() > 0)
+        {
+	    //qDebug() << "extinode:" << QString::number(fileinfo.value("extinode").toUInt(), 16);
+            if(parfileinfo == NULL)
+            {
+	        fileinfo.insert("path", QVariant("/"));
+	        fileinfo.insert("parentinode", QVariant(-1));
+            }
+            else
+            {
+                fileinfo.insert("path", QVariant(QString(parfileinfo->value("path").toString() + parfileinfo->value("filename").toString() + QString("/"))));
+                fileinfo.insert("parentinode", QVariant(parfileinfo->value("inode").toUInt()));
+            }
+            int namelength = 0;
+            int filetype = -1;
+            entrylength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 4, 2));
+            if(fsinfo->value("incompatflags").toUInt() & 0x0002)
+            {
+                //qDebug() << "name length where only byte offset 6 is used..";
+                namelength = qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 6));
+                filetype = qFromLittleEndian<uint8_t>(direntrybuf.at(curoffset + 7));
+            }
+            else
+            {
+                //qDebug() << "name length where byte offset 6 and and 7 are used...";
+                namelength = qFromLittleEndian<uint16_t>(direntrybuf.mid(curoffset + 6, 2));
+            }
+            fileinfo.insert("filename", QVariant(QString::fromStdString(direntrybuf.mid(curoffset + 8, namelength).toStdString())));
+            //qDebug() << "filename:" << fileinfo.value("filename").toString();
+            // NEED TO USE THE INODE TO THEN GET THE RELEVANT METADATA...
+            // FILE TYPE GETS US INFO, SO IF IT'S A DIRECTORY, WE CAN PARSE THE DIRECTORY INODE, WITH THIS RECURSIVE FUNCTION...
+            if(nextisdeleted)
+                fileinfo.insert("isdeleted", QVariant(1));
+            else
+                fileinfo.insert("isdeleted", QVariant(0));
+            //qDebug() << "newlength:" << newlength << "entrylength:" << entrylength << "namelength:" << namelength;
+            //if(newlength < entrylength && entrylength < 264)
+            if(newlength < entrylength)
+                nextisdeleted = true;
+            else
+                nextisdeleted = false;
+            //qDebug() << "nextisdeleted:" << nextisdeleted;
+            //itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
+            if(filetype == 0) // unknown type
+                fileinfo.insert("itemtype", QVariant(0));
+            else if(filetype == 1) // FILE
+            {
+                if(fileinfo.value("isdeleted").toUInt() == 0)
+                    fileinfo.insert("itemtype", QVariant(5));
+                else
+                    fileinfo.insert("itemtype", QVariant(4));
+            }
+            else if(filetype == 2) // DIR
+            {
+                if(fileinfo.value("isdeleted").toUInt() == 0)
+                    fileinfo.insert("itemtype", QVariant(3));
+                else
+                    fileinfo.insert("itemtype", QVariant(2));
+            }
+            else if(filetype == 3) // character device
+                fileinfo.insert("itemtype", QVariant(6));
+            else if(filetype == 4) // block device
+                fileinfo.insert("itemtype", QVariant(7));
+            else if(filetype == 5) // FIFO
+                fileinfo.insert("itemtype", QVariant(8));
+            else if(filetype == 6) // Unix socket
+                fileinfo.insert("itemtype", QVariant(9));
+            else if(filetype == 7) // Symbolic Link
+                fileinfo.insert("itemtype", QVariant(12));
+            // DETERMINE WHICH BLOCK GROUP # THE CURINODE IS IN SO I CAN READ IT'S INODE'S CONTENTS AND GET THE NECCESARY METADATA
+	    qulonglong curinodetablestartblock =  0;
+	    QByteArray curinodetablebuf;
+	    curinodetablebuf.clear();
+            int blockgroupnumber = 0;
+	    for(int i=1; i <= blockgroups.count(); i++)
+	    {
+		if(fileinfo.value("extinode").toUInt() < i*fsinfo->value("blockgroupinodecnt").toUInt())
+                {
+		    curinodetablestartblock = blockgroups.at(i-1).toULongLong();
+                    blockgroupnumber = i - 1;
+                    break;
+                }
+	    }
+            //qDebug() << "block group number:" << curinodetablestartblock;
+            curimg->open(QIODevice::ReadOnly);
+            curimg->seek(fsinfo->value("partoffset").toUInt() + (curinodetablestartblock * fsinfo->value("blocksize").toUInt()));
+            curinodetablebuf = curimg->read(fsinfo->value("inodesize").toUInt() * fsinfo->value("blockgroupinodecnt").toUInt());
+            curimg->close();
+            //qDebug() << "curinodetablebuf inode entry number:" << fsinfo->value("inodesize").toUInt() * (fileinfo.value("inode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt()));
+	    QByteArray curinodebuf = curinodetablebuf.mid(fsinfo->value("inodesize").toUInt() * (fileinfo.value("extinode").toUInt() - 1 - (blockgroupnumber * fsinfo->value("blockgroupinodecnt").toUInt())), fsinfo->value("inodesize").toUInt());
+            uint16_t filemode = qFromLittleEndian<uint16_t>(curinodebuf.mid(0, 2));
+            QString filemodestr = "---------";
+            if(filemode & 0xc000) // unix socket
+                filemodestr.replace(0, 1, "s");
+            if(filemode & 0xa000) // symbolic link
+                filemodestr.replace(0, 1, "l");
+            if(filemode & 0x6000) // block device
+                filemodestr.replace(0, 1, "b");
+            if(filemode & 0x2000) // char device
+                filemodestr.replace(0, 1, "c");
+            if(filemode & 0x1000) // FIFO (pipe)
+                filemodestr.replace(0, 1, "p");
+            if(filemode & 0x8000) // regular file
+            {
+                if(fsinfo->value("readonlyflags").toUInt() & 0x0002) // LARGE FILE SUPPORT
+                {
+                    uint32_t lowersize = qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4));
+                    uint32_t uppersize = qFromLittleEndian<uint32_t>(curinodebuf.mid(108, 4));
+                    fileinfo.insert("logicalsize", QVariant(((qulonglong)uppersize >> 32) + lowersize));
+                }
+                else
+                {
+                    fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
+                }
+                filemodestr.replace(0, 1, "-");
+            }
+            else if(filemode & 0x4000) // directory
+            {
+                fileinfo.insert("logicalsize", QVariant(qFromLittleEndian<uint32_t>(curinodebuf.mid(4, 4))));
+                filemodestr.replace(0, 1, "d");
+            }
+            if(filemode & 0x100) // user read
+                filemodestr.replace(1, 1, "r");
+            if(filemode & 0x080) // user write
+                filemodestr.replace(2, 1, "w");
+            if(filemode & 0x040) // user execute
+                filemodestr.replace(3, 1, "x");
+            if(filemode & 0x020) // group read
+                filemodestr.replace(4, 1, "r");
+            if(filemode & 0x010) // group write
+                filemodestr.replace(5, 1, "w");
+            if(filemode & 0x008) // group execute
+                filemodestr.replace(6, 1, "x");
+            if(filemode & 0x004) // other read
+                filemodestr.replace(7, 1, "r");
+            if(filemode & 0x002) // other write
+                filemodestr.replace(8, 1, "w");
+            if(filemode & 0x001) // other execute
+                filemodestr.replace(9, 1, "x");
+            //qDebug() << "filemodestr:" << filemodestr;
+            fileinfo.insert("mode", QVariant(filemodestr));
+
+            // STILL NEED TO DO FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
+            uint16_t lowergroupid = qFromLittleEndian<uint16_t>(curinodebuf.mid(24, 2));
+            uint16_t uppergroupid = qFromLittleEndian<uint16_t>(curinodebuf.mid(122, 2));
+            fileinfo.insert("groupid", QVariant(((uint32_t)uppergroupid >> 16) + lowergroupid));
+            uint16_t loweruserid = qFromLittleEndian<uint16_t>(curinodebuf.mid(2, 2));
+            uint16_t upperuserid = qFromLittleEndian<uint16_t>(curinodebuf.mid(120, 2));
+            fileinfo.insert("userid", QVariant(((uint32_t)upperuserid >> 16) + loweruserid));
+            fileinfo.insert("accessdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(8, 4)));
+            fileinfo.insert("statusdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(12, 4)));
+            fileinfo.insert("modifydate", qFromLittleEndian<uint32_t>(curinodebuf.mid(16, 4)));
+            fileinfo.insert("deletedate", qFromLittleEndian<uint32_t>(curinodebuf.mid(20, 4)));
+	    fileinfo.insert("linkcount", qFromLittleEndian<uint16_t>(curinodebuf.mid(26, 2)));
+	    //qDebug() << "fsinfo type:" << fsinfo->value("typestr").toString();
+	    //qDebug() << "create date:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(144, 4));
+	    if(fsinfo->value("typestr").toString().startsWith("EXT4"))
+		fileinfo.insert("createdate", qFromLittleEndian<uint32_t>(curinodebuf.mid(144, 4)));
+            // GET BLOCKLIST FOR THE CURINODEBUF
+            QStringList curblkstrlist;
+            curblkstrlist.clear();
+            QList<uint32_t> curblocklist;
+            curblocklist.clear();
+            
+            uint32_t curinodeflags = qFromLittleEndian<uint32_t>(curinodebuf.mid(32, 4));
+	    QString attrstr = "";
+	    if(curinodeflags & 0x200000)
+		attrstr += "Stores a Large Extended Attribute,";
+	    if(curinodeflags & 0x80000)
+		attrstr += "Uses Extents,";
+	    if(curinodeflags & 0x40000)
+		attrstr += "Huge File,";
+	    if(curinodeflags & 0x20000)
+		attrstr += "Top of Directory,";
+	    if(curinodeflags & 0x10000)
+		attrstr += "Synchronous Data Write,";
+	    if(curinodeflags & 0x8000)
+		attrstr += "File Tail not Merged,";
+	    if(curinodeflags & 0x4000)
+		attrstr += "File Data Written through Journal,";
+	    if(curinodeflags & 0x2000)
+		attrstr += "AFS Magic Directory,";
+	    if(curinodeflags & 0x1000)
+		attrstr += "Hashed Indexed Directory,";
+	    if(curinodeflags & 0x800)
+		attrstr += "Encrypted,";
+	    if(curinodeflags & 0x400)
+		attrstr += "No Compression,";
+	    if(curinodeflags & 0x200)
+		attrstr += "Has Compression in 1 or more blocks,";
+	    if(curinodeflags & 0x100)
+		attrstr += "Dirty Compression,";
+	    if(curinodeflags & 0x80)
+		attrstr += "No Update ATIME,";
+	    if(curinodeflags & 0x40)
+		attrstr += "dump utility ignores file,";
+	    if(curinodeflags & 0x20)
+		attrstr += "Append Only,";
+	    if(curinodeflags & 0x10)
+		attrstr += "Immutable,";
+	    if(curinodeflags & 0x08)
+		attrstr += "Synchronous Writes,";
+	    if(curinodeflags & 0x04)
+		attrstr += "Compressed,";
+	    if(curinodeflags & 0x02)
+		attrstr += "Preserved for un-deletion,";
+	    if(curinodeflags & 0x01)
+		attrstr += "Requires Secure Deletion";
+	    fileinfo.insert("attribute", QVariant(attrstr));
+
+            if((fsinfo->value("incompatflags").toUInt() & 0x40) && (curinodeflags & 0x80000)) // FS USES EXTENTS && INODE USES EXTENTS
+            {
+                uint16_t extententries = qFromLittleEndian<uint16_t>(curinodebuf.mid(42, 2));
+                uint16_t extentdepth = qFromLittleEndian<uint16_t>(curinodebuf.mid(46, 2));
+                if(extentdepth == 0) // use ext4_extent
+                {
+                    for(int i=0; i < extententries; i++)
+                    {
+			//qDebug() << "logical block:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(52 + i*12, 4));
+                        uint16_t blocklength = qFromLittleEndian<uint16_t>(curinodebuf.mid(56 + i*12, 2));
+                        uint16_t starthi = qFromLittleEndian<uint16_t>(curinodebuf.mid(58 + i*12, 2));
+                        uint32_t startlo = qFromLittleEndian<uint32_t>(curinodebuf.mid(60 + i*12, 4));
+                        uint64_t startblock = (((uint64_t)starthi >> 32) + startlo) * fsinfo->value("blocksize").toUInt();
+                        curblkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength * fsinfo->value("blocksize").toUInt()));
+                    }
+                }
+                else // use ext4_entent_idx
+                {
+                    QList<uint32_t> leafnodes;
+                    leafnodes.clear();
+                    // NEED TO FIGURE OUT HOW TO HANDLE EXTENT DEPTH IN THE LOOP...
+                    for(int i=0; i < extententries; i++)
+                    {
+			//qDebug() << "logical block:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(52 + i*12, 4));
+                        leafnodes.append(qFromLittleEndian<uint32_t>(curinodebuf.mid(56 + i*12, 4)));
+                        //qDebug() << "ei_leaf_lo: leaf node" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56 + i*12, 4));
+                    }
+                    //qDebug() << "leafnodes:" << leafnodes;
+                    for(int i=0; i < leafnodes.count(); i++)
+                    {
+                        QByteArray leafnode;
+                        leafnode.clear();
+                        curimg->open(QIODevice::ReadOnly);
+                        curimg->seek(fsinfo->value("partoffset").toUInt() + (leafnodes.at(i) * fsinfo->value("blocksize").toUInt()));
+                        leafnode = curimg->read(fsinfo->value("blocksize").toUInt());
+                        curimg->close();
+                            uint16_t extententries = qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
+                            uint16_t extentdepth = qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
+                            if(extentdepth == 0) // use ext4_extent
+                            {
+                                for(int j=0; j < extententries; j++)
+                                {
+				    //qDebug() << "logical block:" << qFromLittleEndian<uint32_t>(leafnode.mid(12 + j*12, 4));
+                                    uint16_t blocklength = qFromLittleEndian<uint16_t>(leafnode.mid(16 + j*12, 2));
+                                    uint16_t starthi = qFromLittleEndian<uint16_t>(leafnode.mid(18 + j*12, 2));
+                                    uint32_t startlo = qFromLittleEndian<uint32_t>(leafnode.mid(20 + j*12, 4));
+                                    uint64_t startblock = (((uint64_t)starthi >> 32) + startlo) * fsinfo->value("blocksize").toUInt();
+                                    curblkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength * fsinfo->value("blocksize").toUInt()));
+                                }
+                            }
+                            else // use ext4_extent_idx
+                            {
+                                qDebug() << "repeat leafnode exercise here...";
+                            }
+                            //qDebug() << "leaf header:" << QString::number(qFromLittleEndian<uint16_t>(leafnode.mid(0, 2)), 16);
+                            //qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
+                            //qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(4, 2));
+                            //qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
+                        //}
+                    }
+                    //qDebug() << "extent header:" << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(40, 2)), 16);
+                    //qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(42, 2));
+                    //qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(44, 2));
+                    //qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(46, 2));
+                    
+                    //qDebug() << "ei_block:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(52, 4));
+                    //qDebug() << "ei_leaf_lo:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56, 4));
+                    //qDebug() << "ei_leaf_hi:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(60, 2));
+                    //qDebug() << "use extent idx";
+                }
+            }
+            else
+            {
+                for(int i=0; i < 12; i++)
+                {
+                    uint32_t curdirectblock = qFromLittleEndian<uint32_t>(curinodebuf.mid(40 + i*4, 4));
+                    if(curdirectblock > 0)
+                    {
+                        curblocklist.append(curdirectblock);
+                        curblkstrlist.append(QString::number(curdirectblock * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+                    }
+                }
+                //qDebug() << fileinfo.value("filename").toString() << "current block list before i get the indirect block pointers.." << curblocklist;
+                uint32_t cursingleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(88, 4));
+                uint32_t curdoubleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(92, 4));
+                uint32_t curtripleindirect = qFromLittleEndian<uint32_t>(curinodebuf.mid(96, 4));
+                if(cursingleindirect > 0)
+                {
+                    curimg->open(QIODevice::ReadOnly);
+                    curimg->seek(fsinfo->value("partoffset").toUInt() + (cursingleindirect * fsinfo->value("blocksize").toUInt()));
+                    QByteArray singlebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
+                        for(int i=0; i < singlebuf.count() / 4; i++)
+                        {
+                            uint32_t cursingledirect = qFromLittleEndian<uint32_t>(singlebuf.mid(i*4, 4));
+                            if(cursingledirect > 0)
+                            {
+                                curblocklist.append(cursingledirect);
+                                curblkstrlist.append(QString::number(cursingledirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+                            }
+                        }
+                    //}
+                }
+                if(curdoubleindirect > 0)
+                {
+                    QList<uint32_t> sinlist;
+                    sinlist.clear();
+                    curimg->open(QIODevice::ReadOnly);
+                    curimg->seek(fsinfo->value("partoffset").toUInt() + (curdoubleindirect * fsinfo->value("blocksize").toUInt()));
+                    QByteArray doublebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
+                        for(int i=0; i < doublebuf.count() / 4; i++)
+                        {
+                            uint32_t sindirect = qFromLittleEndian<uint32_t>(doublebuf.mid(i*4, 4));
+                            if(sindirect > 0)
+                                sinlist.append(sindirect);
+                        }
+                    //}
+                    for(int i=0; i < sinlist.count(); i++)
+                    {
+                        curimg->open(QIODevice::ReadOnly);
+                        curimg->seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(i) * fsinfo->value("blocksize").toUInt()));
+                        QByteArray sinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                        curimg->close();
+                            for(int j=0; j < sinbuf.count() / 4; j++)
+                            {
+                                uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(j*4, 4));
+                                if(sdirect > 0)
+                                {
+                                    curblkstrlist.append(QString::number(sdirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+                                    curblocklist.append(sdirect);
+                                }
+                            }
+                        //}
+                    }
+                }
+                if(curtripleindirect > 0)
+                {
+                    QList<uint32_t> dinlist;
+                    dinlist.clear();
+                    QList<uint32_t> sinlist;
+                    sinlist.clear();
+                    curimg->open(QIODevice::ReadOnly);
+                    curimg->seek(fsinfo->value("partoffset").toUInt() + (curtripleindirect * fsinfo->value("blocksize").toUInt()));
+                    QByteArray triplebuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                    curimg->close();
+                        for(int i=0; i < triplebuf.count() / 4; i++)
+                        {
+                            uint32_t dindirect = qFromLittleEndian<uint32_t>(triplebuf.mid(i*4, 4));
+                            if(dindirect > 0)
+                                dinlist.append(dindirect);
+                        }
+                    //}
+                    for(int i=0; i < dinlist.count(); i++)
+                    {
+                        curimg->open(QIODevice::ReadOnly);
+                        curimg->seek(fsinfo->value("partoffset").toUInt() + (dinlist.at(i) * fsinfo->value("blocksize").toUInt()));
+                        QByteArray dinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                        curimg->close();
+                            for(int j=0; j < dinbuf.count() / 4; j++)
+                            {
+                                uint32_t sindirect = qFromLittleEndian<uint32_t>(dinbuf.mid(j*4, 4));
+                                if(sindirect > 0)
+                                    sinlist.append(sindirect);
+                            }
+                        //}
+                        for(int j=0; j < sinlist.count(); j++)
+                        {
+                            curimg->open(QIODevice::ReadOnly);
+                            curimg->seek(fsinfo->value("partoffset").toUInt() + (sinlist.at(j) * fsinfo->value("blocksize").toUInt()));
+                            QByteArray sinbuf = curimg->read(fsinfo->value("blocksize").toUInt());
+                            curimg->close();
+                                for(int k=0; k < sinbuf.count() / 4; k++)
+                                {
+                                    uint32_t sdirect = qFromLittleEndian<uint32_t>(sinbuf.mid(k*4, 4));
+                                    if(sdirect > 0)
+                                    {
+                                        curblocklist.append(sdirect);
+                                        curblkstrlist.append(QString::number(sdirect * fsinfo->value("blocksize").toUInt()) + "," + QString::number(fsinfo->value("blocksize").toUInt()));
+                                    }
+                                }
+                            //}
+                        }
+                    }
+                }
+            }
+            //qDebug() << "curblkstr:" << curblkstrlist;
+
+            // the physical size is wrong for extent's since it's sum of the length's / blocksize -> that # + 1 (if remainder) * blocksize...
+	    qulonglong physize = 0;
+	    for(int i=0; i < curblkstrlist.count(); i++)
+	    {
+		physize += curblkstrlist.at(i).split(",").at(1).toUInt();
+	    }
+	    int phyblkcnt = physize / fsinfo->value("blocksize").toUInt();
+	    int phyremcnt = physize % fsinfo->value("blocksize").toUInt();
+	    if(phyremcnt > 0)
+		phyblkcnt++;
+	    //qDebug() << "physize:" << physize << "phyblkcnt:" << phyblkcnt * fsinfo->value("blocksize").toUInt();
+            fileinfo.insert("physicalsize", QVariant(phyblkcnt * fsinfo->value("blocksize").toUInt()));
+
+            //qDebug() << "curblock list:" << curblocklist;
+            //fileinfo.insert("physicalsize", QVariant(curblocklist.count() * fsinfo->value("blocksize").toUInt()));
+            //qDebug() << "logical/physical size:" << fileinfo.value("logicalsize").toUInt() << fileinfo.value("physicalsize").toUInt();
+            //qDebug() << "curblocklist:" << curblocklist;
+            QString layout = "";
+            if(curblocklist.count() > 0)
+                layout = ConvertBlocksToExtents(curblocklist, fsinfo->value("blocksize").toUInt());
+            fileinfo.insert("layout", QVariant(layout));
+            //qDebug() << fileinfo.value("filename").toString() << "layout:" << layout;
+
+            fileinfolist->append(fileinfo);
+            inodecnt++;
+            if(filemode & 0x4000) // directory so recurse it's value...
+            {
+                //qDebug() << "inodecnt before sub dir expansion:" << inodecnt;
+                ParseExtDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, fileinfo.value("extinode").toULongLong(), inodecnt); // initial attempt to recurse...
+                //ParseExtDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, fileinfo.value("extinode").toULongLong(), inodecnt); // initial attempt to recurse...
+                inodecnt = fileinfolist->count();
+                //qDebug() << "fileinfolist count after sub dir expansion:" << fileinfolist->count();
+            }
+
+        }
+        curoffset += newlength;
+    }
+
+ */ 
+
+
 //qDebug() << "create date:" << QDateTime::fromSecsSinceEpoch(fileinfo.value("createdate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
     /*
      *	if(fileinfo->contains("extinode"))
