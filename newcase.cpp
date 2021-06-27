@@ -6399,7 +6399,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 	QList<qulonglong> orphanoffsets;
 	orphanoffsets.clear();
         qulonglong curinode = 0;
-	curinode = ParseExfatDirectory(curimg, curstartsector, ptreecnt, 0, -1, "", "", &orphanoffsets);
+	curinode = ParseExfatDirectory(curimg, curstartsector, ptreecnt, -1, "", "", &orphanoffsets);
         curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
 	//qDebug() << "orphanoffsets:" << orphanoffsets;
 	ParseExfatOrphans(curimg, ptreecnt, curstartsector, curinode, &orphanoffsets);
@@ -6715,7 +6715,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     return inodecnt;
 }
 
-qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout, QList<qulonglong>* orphanoffsets)
+qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout, QList<qulonglong>* orphanoffsets)
 {
     //QList<qulonglong> orphanoffsets;
     //orphanoffsets.clear();
@@ -6965,7 +6965,7 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
                 nodedata.clear();
 		if(fileattr & 0x10 && logicalsize > 0) // Sub Directory
 		{
-		    inodecnt = ParseExfatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt - 1, QString(filepath + filename + "/"), layout, orphanoffsets);
+		    inodecnt = ParseExfatDirectory(curimg, curstartsector, ptreecnt, inodecnt - 1, QString(filepath + filename + "/"), layout, orphanoffsets);
 		}
 		nodedata.clear();
 	    }
@@ -6979,6 +6979,8 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 
 void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector, qulonglong curinode, QList<qulonglong>* orphanoffsets)
 {
+    //qDebug() << "start orphan processing with curinode:" << curinode;
+    uint8_t orphandirexists = 0;
     uint16_t bytespersector = 0;
     uint8_t sectorspercluster = 0;
     //qulonglong clusterareastart = 0;
@@ -7071,6 +7073,27 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector
 		    uint8_t isdeleted = 1;
 		    QString path = "/";
 		    // add "/orphans/" directory and the bool here somewhere
+		    /*
+		     *	QList<QVariant> nodedata;
+			if(orphandirexists == 0) // orphans dir doesn't exists, so create it
+			{
+			    nodedata.clear();
+			    nodedata << QByteArray("orphans").toBase64() << QByteArray("/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o");
+			    mutex.lock();
+			    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
+			    mutex.unlock();
+			    nodedata.clear();
+			    orphandirexists = 1;
+			}
+			nodedata.clear();
+			nodedata << QByteArray(longnamestring.toUtf8()).toBase64() << QByteArray("/orphans/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Empty" << "Empty File" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+			mutex.lock();
+			treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"), 4, 1);
+			mutex.unlock();
+			nodedata.clear();
+			inodecnt++;
+
+		     */
 		    qulonglong parentinode = 0;
 		    qulonglong inode = curinode;
 		    QString layout = "";
@@ -7102,72 +7125,6 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector
     }
 }
 //qDebug() << "create date:" << QDateTime::fromSecsSinceEpoch(fileinfo.value("createdate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
-/*
- *void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
-{
-    }
-    // EXFAT ORPHAN'S ARE SEARCHING THE WHOLE FILESYSTEM SPACE FOR 0X05 FOLLOWED BY 0X40 AND 0X41'S....
-    // SO I WOULD NEED TO LOOP OVER THE PARTITION AND LOOK FOR 0x05's WHICH ARE NOT ALREADY COVERED...
-
-    // USE FATBUF, AND THEN LOOP OVER THE FILEINFOLIST.COUNT(); THEN I CAN COLLECT ALL THE LAYOUT'S OR CLUSTERSTR'S FOR EACH FILE TO KNOW WHERE I CAN LOOK THAT ISN'T AN EXISTING DIRECTORY
-    // THEN I CAN SEARCH THROUGH THE RAW IMAGE FOR ALL 0x05's, WHICH SHOULD SHORTEN WHAT I NEED...., I COULD JUST DO FILEINFO'S WHERE FILEATTR == 0x10
-    //qDebug() << "Start Initial Orphan Run";
-    //{
-        int coffset = 0;
-        while(coffset <= curimg->size())
-        {
-            if(tmparray.at(0) == 0x05 && (tmparray.at(1) >= 0 && tmparray.at(1) < 256))
-            {
-                if(tmp40array.at(0) == 0x40)
-                {
-                    //int allocpossible = flagstr.right(1).toInt(nullptr, 2);
-                    //qDebug() << "allocpossible:" << allocpossible;
-                    if(namelength > 0)
-                    {
-                        if(fatchain == 0 && orphaninfo.value("clusternum").toUInt() > 1)
-                        {
-                            GetNextCluster(orphaninfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
-                            clusterstr = QString::number(orphaninfo.value("clusternum").toUInt()) + ",";
-                            layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (orphaninfo.value("clusternum").toUInt() - 2) * clustersize.toUInt()) + "," + clustersize + ";";
-                            for(int m=0; m < clusterlist.count() - 1; m++)
-                            {
-                                clusterstr += QString::number(clusterlist.at(m)) + ",";
-                                layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (clusterlist.at(m) - 2) * clustersize.toUInt()) + "," + clustersize + ";";
-                            }
-                        }
-                        else if(fatchain == 1)
-                        {
-                            int clustercount = (int)ceil((float)orphaninfo.value("physicalsize").toULongLong() / clustersize.toUInt());
-                            clusterstr = QString::number(orphaninfo.value("clusternum").toUInt()) + ",";
-                            layout = QString::number(fsinfo->value("clusteroffset").toULongLong() + (orphaninfo.value("clusternum").toUInt() - 2) * clustersize.toUInt()) + "," + QString::number(clustercount * clustersize.toUInt()) + ";";
-                        }
-                        orphaninfo.insert("clusterlist", QVariant(clusterstr));
-                        orphaninfo.insert("layout", QVariant(layout));
-
-                        //qDebug() << "filename:" << filename;
-
-                        orphanlist->append(orphaninfo);
-                    }
-                }
-            }
-            coffset += 32;
-            //qDebug() << "coffset before olist fix:" << coffset;
-            for(int i=0; i < olist.count(); i++)
-            {
-                if(coffset == olist.at(i).split(",").at(0).toLongLong())
-                {
-                    //qDebug() << "coffset before olist fix:" << coffset;
-                    coffset += olist.at(i).split(",").at(1).toLongLong();
-                    //qDebug() << "coffset after olist fix:" << coffset;
-                }
-            }
-            //qDebug() << "coffset after olist fix:" << coffset;
-        }
-        curimg->close();
-        //efile.close();
-    //}
-
- */ 
     /*
      *	if(fileinfo->contains("extinode"))
 	    out << "EXTFS inode|" << fileinfo->value("extinode").toUInt() << "|EXTFS inode value to locate file in the filesystem" << Qt::endl;
