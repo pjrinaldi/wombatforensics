@@ -6965,7 +6965,7 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
                 nodedata.clear();
 		if(fileattr & 0x10 && logicalsize > 0) // Sub Directory
 		{
-		    ParseExfatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt - 1, QString(filepath + filename + "/"), layout, orphanoffsets);
+		    inodecnt = ParseExfatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt - 1, QString(filepath + filename + "/"), layout, orphanoffsets);
 		}
 		nodedata.clear();
 	    }
@@ -6979,6 +6979,29 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 
 void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector, qulonglong curinode, QList<qulonglong>* orphanoffsets)
 {
+    uint16_t bytespersector = 0;
+    uint8_t sectorspercluster = 0;
+    //qulonglong clusterareastart = 0;
+    //QString rootdirlayout = "";
+    QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
+    if(!propfile.isOpen())
+	propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(propfile.isOpen())
+    {
+        while(!propfile.atEnd())
+        {
+            QString line = propfile.readLine();
+            if(line.startsWith("Bytes Per Sector|"))
+                bytespersector = line.split("|").at(1).toUInt();
+            else if(line.startsWith("Sectors Per Cluster|"))
+                sectorspercluster = line.split("|").at(1).toUInt();
+            //else if(line.startsWith("Root Directory Layout|"))
+            //    rootdirlayout = line.split("|").at(1);
+            //else if(line.startsWith("Cluster Area Start|"))
+            //    clusterareastart = line.split("|").at(1).toULongLong();
+        }
+        propfile.close();
+    }
     //qDebug() << "orphanoffsets:" << *orphanoffsets;
     qulonglong curoffset = 0;
     while(curoffset < curimg->Size())
@@ -6987,6 +7010,86 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector
 	if(entrytype == 0x05)
 	{
 	    //qDebug() << "coffset:" << curoffset << "possible orphan.";
+	    uint8_t itemtype = 4;
+	    uint8_t secondarycount = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 1, 1));
+	    uint8_t fileattr = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 4, 1));
+	    // out information to property file
+	    if(fileattr & 0x01) // Read Only
+	    {
+	    }
+	    if(fileattr & 0x02) // Hidden File
+	    {
+	    }
+	    if(fileattr & 0x04) // System File
+	    {
+	    }
+	    if(fileattr & 0x10) // Sub Directory
+	    {
+		itemtype = 2;
+	    }
+	    if(fileattr & 0x20) // Archive File
+	    {
+	    }
+	    qint64 createdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 9, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 8, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 11, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 10, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 22, 1)));
+	    qint64 modifydate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 13, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 12, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 15, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 14, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 23, 1)));
+	    qint64 accessdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 17, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 16, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 19, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 18, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 24, 1)));
+	    QString filename = "";
+	    uint8_t namelength = 0;
+	    uint8_t curlength = 0;
+	    uint8_t subentrytype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 32, 1));
+	    if(subentrytype == 0x40)
+	    {
+		namelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 32 + 3, 1));
+		QString flagstr = QString("%1").arg(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 32 + 1, 1)), 8, 2, QChar('0'));
+		int fatchain = flagstr.mid(7, 1).toInt(nullptr, 2);
+		flagstr = "";
+		uint32_t clusternum = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 32 + 20, 4));
+		uint64_t logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 32 + 8, 8));
+		uint64_t physicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 32 + 24, 8));
+		if(namelength > 0)
+		{
+		    for(uint8_t i=0; i < secondarycount - 1; i++)
+		    {
+			uint8_t subsubentry = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 64, 1));
+			if(subsubentry = 0x41)
+			{
+			    curlength += 15;
+			    if(curlength <= namelength)
+			    {
+				for(int k=1; k < 16; k++)
+				    filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(64 + i*32 + k*2, 2))));
+			    }
+			    else
+			    {
+				int remaining = namelength + 16 - curlength;
+				for(int k=1; k < remaining; k++)
+				    filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(64 + i*32 + k*2, 2))));
+			    }
+			}
+		    }
+		    qDebug() << "filename:" << filename;
+		    uint8_t isdeleted = 1;
+		    QString path = "/";
+		    // add "/orphans/" directory and the bool here somewhere
+		    qulonglong parentinode = 0;
+		    qulonglong inode = curinode;
+		    QString layout = "";
+		    if(fatchain == 0 && clusternum > 1)
+		    {
+			QList<uint> clusterlist;
+			clusterlist.clear();
+			//GetNextCluster();
+			//layout = ConvertBlocksToExtents();
+			clusterlist.clear();
+		    }
+		    else if(fatchain == 1)
+		    {
+			int clustercount = (int)ceil((float)physicalsize / (bytespersector * sectorspercluster));
+			//layout = "";
+		    }
+		    // nodedata here...
+		}
+	    }
 	}
 	curoffset += 32;
 	//qDebug() << "curoffset before fix:" << curoffset;
@@ -6998,11 +7101,10 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector
 	//qDebug() << "curoffset after fix:" << curoffset;
     }
 }
+//qDebug() << "create date:" << QDateTime::fromSecsSinceEpoch(fileinfo.value("createdate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
 /*
  *void ParseExFatDirEntry(ForensicImage* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
 {
-	//qDebug() << "create date:" << QDateTime::fromSecsSinceEpoch(fileinfo.value("createdate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
-	//qDebug() << "Entry Type:" << QString("0x" + QString::number(entrytype, 16));
     }
     // EXFAT ORPHAN'S ARE SEARCHING THE WHOLE FILESYSTEM SPACE FOR 0X05 FOLLOWED BY 0X40 AND 0X41'S....
     // SO I WOULD NEED TO LOOP OVER THE PARTITION AND LOOK FOR 0x05's WHICH ARE NOT ALREADY COVERED...
@@ -7010,115 +7112,18 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, uint32_t curstartsector
     // USE FATBUF, AND THEN LOOP OVER THE FILEINFOLIST.COUNT(); THEN I CAN COLLECT ALL THE LAYOUT'S OR CLUSTERSTR'S FOR EACH FILE TO KNOW WHERE I CAN LOOK THAT ISN'T AN EXISTING DIRECTORY
     // THEN I CAN SEARCH THROUGH THE RAW IMAGE FOR ALL 0x05's, WHICH SHOULD SHORTEN WHAT I NEED...., I COULD JUST DO FILEINFO'S WHERE FILEATTR == 0x10
     //qDebug() << "Start Initial Orphan Run";
-    QString olayout = fsinfo->value("rootdirlayout").toString();
-    for(int i=0; i < fileinfolist->count(); i++)
-    {
-        if(fileinfolist->at(i).value("fileattr").toUInt() & 0x10) // is a directory
-        {
-            olayout += fileinfolist->at(i).value("layout").toString();
-            //qDebug() << "dir:" << i << fileinfolist->at(i).value("clusterlist").toString() << fileinfolist->at(i).value("layout").toString();
-        }
-    }
-    //qDebug() << "olayout:" << olayout;
-    QStringList olist = olayout.split(";", Qt::SkipEmptyParts);
-    //if(!efile.isOpen())
-    //    efile.open(QIODevice::ReadOnly);
-    //if(efile.isOpen())
     //{
         int coffset = 0;
-        //while(!efile.atEnd())
-        curimg->open(QIODevice::ReadOnly);
-        //while(!curimg->atEnd())
         while(coffset <= curimg->size())
         {
-            QHash<QString, QVariant> orphaninfo;
-            orphaninfo.clear();
-            //efile.seek(coffset);
-            curimg->seek(coffset);
-            QByteArray tmparray = curimg->read(32);
-            //QByteArray tmparray = efile.read(32);
             if(tmparray.at(0) == 0x05 && (tmparray.at(1) >= 0 && tmparray.at(1) < 256))
             {
-                uint itemtype = 4;
-                //qDebug() << "secondary count:" << QString::number(tmparray.at(1));
-                QString attrstr = "";
-                if(tmparray.at(4) & 0x01)
-                    attrstr += "Read Only,";
-                else if(tmparray.at(4) & 0x02)
-                    attrstr += "Hidden File,";
-                else if(tmparray.at(4) & 0x04)
-                    attrstr += "System File,";
-                else if(tmparray.at(4) & 0x10)
-                {
-                    attrstr += "Sub Directory,";
-                    itemtype = 2;
-                }
-                else if(tmparray.at(4) & 0x20)
-                    attrstr += "Archive File,";
-                orphaninfo.insert("secondarycount", QVariant(tmparray.at(1)));
-                orphaninfo.insert("attribute", QVariant(attrstr));
-                orphaninfo.insert("fileattr", QVariant(tmparray.at(4)));
-                orphaninfo.insert("itemtype", QVariant(itemtype));
-                orphaninfo.insert("createdate", QVariant(ConvertExfatTimeToUnixTime(tmparray.at(9), tmparray.at(8), tmparray.at(11), tmparray.at(10), tmparray.at(22))));
-                orphaninfo.insert("modifydate", QVariant(ConvertExfatTimeToUnixTime(tmparray.at(13), tmparray.at(12), tmparray.at(15), tmparray.at(14), tmparray.at(23))));
-                orphaninfo.insert("accessdate", QVariant(ConvertExfatTimeToUnixTime(tmparray.at(17), tmparray.at(16), tmparray.at(19), tmparray.at(18), tmparray.at(24))));
-                //qDebug() << "Create Date:" << ConvertExfatTimeToUnixTime(tmparray.at(9), tmparray.at(8), tmparray.at(11), tmparray.at(10), tmparray.at(22));
-                //qDebug() << "Modify Date:" << ConvertExfatTimeToUnixTime(tmparray.at(13), tmparray.at(12), tmparray.at(15), tmparray.at(14), tmparray.at(23));
-                //qDebug() << "Access Date:" << ConvertExfatTimeToUnixTime(tmparray.at(17), tmparray.at(16), tmparray.at(19), tmparray.at(18), tmparray.at(24));
-	        //qDebug() << "create date:" << QDateTime::fromSecsSinceEpoch(fileinfo.value("createdate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
-                QString filename = "";
-                uint8_t namelength = 0;
-                uint8_t curlength = 0;
-                curimg->seek(coffset + 32);
-                QByteArray tmp40array = curimg->read(32);
-                //efile.seek(coffset + 32);
-                //QByteArray tmp40array = efile.read(32);
                 if(tmp40array.at(0) == 0x40)
                 {
-                    namelength = tmp40array.at(3);
-                    QString flagstr = QString("%1").arg(tmp40array.at(1), 8, 2, QChar('0'));
                     //int allocpossible = flagstr.right(1).toInt(nullptr, 2);
-                    int fatchain = flagstr.mid(7, 1).toInt(nullptr, 2);
                     //qDebug() << "allocpossible:" << allocpossible;
-                    //qDebug() << "fatchain:" << fatchain;
-                    orphaninfo.insert("clusternum", QVariant(qFromLittleEndian<uint32_t>(tmp40array.mid(20, 4))));
-                    orphaninfo.insert("logicalsize", QVariant(qFromLittleEndian<qulonglong>(tmp40array.mid(8, 8))));
-                    orphaninfo.insert("physicalsize", QVariant(qFromLittleEndian<qulonglong>(tmp40array.mid(24, 8))));
-                    //qDebug() << "1st cluster:" << qFromLittleEndian<uint32_t>(tmp40array.mid(20, 4)) << "cluster count:" << fsinfo->value("clustercount").toUInt();
-                    //qDebug() << "logical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(8, 8));
-                    //qDebug() << "physical size:" << qFromLittleEndian<qulonglong>(tmp40array.mid(24, 8));
                     if(namelength > 0)
                     {
-                        curimg->seek(coffset + 64);
-                        QByteArray tmp41array = curimg->read((tmparray.at(1)-1) * 32);
-                        //efile.seek(coffset + 64);
-                        //QByteArray tmp41array = efile.read((tmparray.at(1)-1) * 32);
-                        for(int j=0; j < tmparray.at(1) - 1; j++)
-                        {
-                            if(tmp41array.at(j*32) == 0x41)
-                            {
-                                curlength += 15;
-                                if(curlength <= namelength)
-                                {
-                                    for(int k=1; k < 16; k++)
-                                        filename += QString(QChar(qFromLittleEndian<uint16_t>(tmp41array.mid(j*32 + k*2, 2))));
-                                }
-                                else
-                                {
-                                    int remaining = namelength + 16 - curlength;
-                                    for(int k=1; k < remaining; k++)
-                                        filename += QString(QChar(qFromLittleEndian<uint16_t>(tmp41array.mid(j*32 + k*2, 2))));
-                                }
-                            }
-                        }
-                        orphaninfo.insert("filename", QVariant(filename));
-                        orphaninfo.insert("isdeleted", QVariant(1));
-                        //orphaninfo.insert("path", QVariant("/"));
-                        //orphaninfo.insert("parentinode", QVariant(-1));
-                        //orphaninfo.insert("inode", QVariant(inodecnt));
-                        QList<uint> clusterlist;
-                        QString layout = "";
-                        clusterlist.clear();
                         if(fatchain == 0 && orphaninfo.value("clusternum").toUInt() > 1)
                         {
                             GetNextCluster(orphaninfo.value("clusternum").toUInt(), fsinfo->value("type").toUInt(), &fatbuf, &clusterlist);
