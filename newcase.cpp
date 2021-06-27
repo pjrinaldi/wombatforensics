@@ -7018,22 +7018,20 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 	    uint8_t secondarycount = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 1, 1));
 	    uint8_t fileattr = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 4, 1));
 	    // out information to property file
+	    QString attrstr = "";
 	    if(fileattr & 0x01) // Read Only
-	    {
-	    }
+		attrstr += "Read Only,";
 	    if(fileattr & 0x02) // Hidden File
-	    {
-	    }
+		attrstr += "Hidden File,";
 	    if(fileattr & 0x04) // System File
-	    {
-	    }
+		attrstr += "System File,";
 	    if(fileattr & 0x10) // Sub Directory
 	    {
+		attrstr += "Sub Directory,";
 		itemtype = 2;
 	    }
 	    if(fileattr & 0x20) // Archive File
-	    {
-	    }
+		attrstr += "Archive File,";
 	    qint64 createdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 9, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 8, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 11, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 10, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 22, 1)));
 	    qint64 modifydate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 13, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 12, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 15, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 14, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 23, 1)));
 	    qint64 accessdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 17, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 16, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 19, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 18, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 24, 1)));
@@ -7043,6 +7041,13 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 	    uint8_t subentrytype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 32, 1));
 	    if(subentrytype == 0x40)
 	    {
+		QTextStream out;
+		QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(curinode) + ".prop");
+		if(!fileprop.isOpen())
+		    fileprop.open(QIODevice::Append | QIODevice::Text);
+		out.setDevice(&fileprop);
+		out << "File Attributes|" << attrstr << "|Attributes for the file." << Qt::endl;
+
 		namelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 32 + 3, 1));
 		QString flagstr = QString("%1").arg(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 32 + 1, 1)), 8, 2, QChar('0'));
 		int fatchain = flagstr.mid(7, 1).toInt(nullptr, 2);
@@ -7088,6 +7093,8 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 			int clustercount = (int)ceil((float)physicalsize / (bytespersector * sectorspercluster));
 			layout = QString::number(clusterareastart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + QString::number(clustercount * bytespersector * sectorspercluster) + ";";
 		    }
+		    out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
+		    out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
 		    QList<QVariant> nodedata;
 		    if(orphandirexists == 0) // orphans dir doesn't exist yet, so create it
 		    {
@@ -7118,6 +7125,8 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 		    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"), itemtype, 1);
 		    mutex.unlock();
 		    nodedata.clear();
+		    out.flush();
+		    fileprop.close();
 		    curinode++;
 		}
 	    }
