@@ -19,9 +19,9 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 qulonglong AddVirtualFileSystemFiles(ForImg* curimg, uint8_t ptreecnt, uint8_t fatcount, qulonglong fatsize, qulonglong curinode);
 qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout, QList<qulonglong>* orphanoffsets);
 void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QList<qulonglong>* orphanoffsets);
-quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout);
+quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curextinode, quint64 parinode, QString parfilename, QString dirlayout);
 
-
+/*
 void ProcessVolume(ForImg* tmpimage);
 //void ProcessVolume(ForensicImage* tmpimage);
 //void ProcessVolume(QString evidstring);
@@ -64,5 +64,5 @@ void PopulateFiles(ForImg* tmpimage, QString curpartpath, QHash<QString, QVarian
 //void PopulateFiles(ForensicImage* tmpimage, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int eid, int pid);
 //void PopulateFiles(QString emntstring, QString curpartpath, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist, int eid, int pid);
 void WriteFileProperties(QHash<QString, QVariant>*fileinfo, QString pathstring);
-
+*/
 #endif // newcase.h
