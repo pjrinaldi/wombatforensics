@@ -5353,6 +5353,10 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             partitionname += " [EXT2]";
         }
         out << "|File system type string." << Qt::endl;
+        out << "File System Inode Count|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1024, 4))) << "|Number of inodes within the file system." << Qt::endl;
+        out << "File System Block Count|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1028, 4))) << "|Number of blocks within the file system." << Qt::endl;
+        out << "Block Group 0 Start Block|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1044, 4))) << "|Starting block number for block group 0." << Qt::endl;
+        out << "Block Size|" << QString::number(1024 * pow(2, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1048, 4)))) << "|Block size in bytes." << Qt::endl;
 	// NEED TO IMPLEMENT THESE FS PROPERTIES SO I CAN USE THEM WHEN I PARSE THE EXT2/3/4 FS
 	/*
         fsinfo.insert("partoffset", QVariant((qulonglong)(512 * partoffset)));
