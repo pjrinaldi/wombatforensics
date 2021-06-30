@@ -5353,60 +5353,58 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             partitionname += " [EXT2]";
         }
         out << "|File system type string." << Qt::endl;
+	uint32_t fsblockcnt = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1028, 4));
+	uint32_t blkgrpblkcnt = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1056, 4));
+	uint32_t blocksize = 1024 * pow(2, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1048, 4)));
         out << "File System Inode Count|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1024, 4))) << "|Number of inodes within the file system." << Qt::endl;
-        out << "File System Block Count|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1028, 4))) << "|Number of blocks within the file system." << Qt::endl;
+        out << "File System Block Count|" << QString::number(fsblockcnt) << "|Number of blocks within the file system." << Qt::endl;
         out << "Block Group 0 Start Block|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1044, 4))) << "|Starting block number for block group 0." << Qt::endl;
-        out << "Block Size|" << QString::number(1024 * pow(2, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1048, 4)))) << "|Block size in bytes." << Qt::endl;
+        out << "Block Size|" << QString::number(blocksize) << "|Block size in bytes." << Qt::endl;
+	out << "Fragment Size|" << QString::number(1024 * pow(2, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1052, 4)))) << "|Fragment size in bytes." << Qt::endl;
+	out << "Block Group Block Count|" << QString::number(blkgrpblkcnt) << "|Number of blocks within a block group." << Qt::endl;
+	out << "Block Group Fragment Count|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1060, 4))) << "|Number of fragments within a block group." << Qt::endl;
+	uint32_t blkgrpinodecnt = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1064, 4));
+	out << "Block Group Inode Count|" << QString::number(blkgrpinodecnt) << "|Number of inodes within a block group." << Qt::endl;
+	uint32_t creatoros = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1096, 4));
+	out << "Creator OS|";
+	if(creatoros == 0x00)
+	    out << "Linux";
+	else if(creatoros == 0x03)
+	    out << "FreeBSD";
+	out << "|Operating System used to create the file system.";
+	out << "Inode Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + 1112, 2))) << "|Size of an inode in bytes." << Qt::endl;
+	out << "Last Mounted Path|" << QString::fromStdString(curimg->ReadContent(curstartsector * 512 + 1160, 64).toStdString()) << "|Path where file system was last mounted." << Qt::endl;
+	uint32_t blockgroupcount = fsblockcnt / blkgrpblkcnt;
+	uint blkgrpcntrem = fsblockcnt % blkgrpblkcnt;
+	if(blkgrpcntrem > 0)
+	    blockgroupcount++;
+	if(blockgroupcount == 0)
+	    blockgroupcount = 1;
+	QString inodeaddresstable = "";
+	for(uint i=0; i < blockgroupcount; i++)
+	{
+	    if(blocksize == 1024)
+		inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 2 * blocksize + i * 32 + 8, 4))) + ",";
+	    else
+		inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + blocksize + i*32 + 8, 4))) + ",";
+	}
+	qDebug() << "inodeaddresstable:" << inodeaddresstable;
+	out << "Inode Address Table|" << inodeaddresstable << "|Table of the Inode addresses for a block group." << Qt::endl;
+	out << "Root Inode Table Address|";
+	if(blkgrpinodecnt > 2)
+	    out << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 2056, 4)));
+	else
+	    out << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 2088, 4)));
+	out << "|Starting address for the Root Directory Inode Table." << Qt::endl;
 	// NEED TO IMPLEMENT THESE FS PROPERTIES SO I CAN USE THEM WHEN I PARSE THE EXT2/3/4 FS
 	/*
         fsinfo.insert("partoffset", QVariant((qulonglong)(512 * partoffset)));
-        fsinfo.insert("fsinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1024, 4))));
-        fsinfo.insert("fsblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1028, 4))));
-        fsinfo.insert("blockgroup0startblk", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1044, 4))));
-        fsinfo.insert("blocksize", QVariant(1024 * pow(2, qFromLittleEndian<uint32_t>(partbuf.mid(1048, 4)))));
-        //qDebug() << "block size:" << fsinfo.value("blocksize").toUInt();
-        fsinfo.insert("fragsize", QVariant(1024 * pow(2, qFromLittleEndian<uint32_t>(partbuf.mid(1052, 4)))));
-        fsinfo.insert("blockgroupblockcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1056, 4))));
-        fsinfo.insert("blockgroupfragcnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1060, 4))));
-        //qDebug() << "fs blockcount:" << fsinfo.value("fsblockcnt").toUInt();
-        //qDebug() << "block group block count:" << fsinfo.value("blockgroupblockcnt").toUInt();
-        fsinfo.insert("blockgroupinodecnt", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(1064, 4))));
-	uint32_t creatoros = qFromLittleEndian<uint32_t>(partbuf.mid(1096, 4));
-	if(creatoros == 0x00)
-	    fsinfo.insert("creator", QVariant("Linux"));
-	else if(creatoros == 0x03)
-	    fsinfo.insert("creator", QVariant("FreeBSD"));
-        //qDebug() << "block group inode count:" << fsinfo.value("blockgroupinodecnt").toUInt();
-        fsinfo.insert("inodesize", QVariant(qFromLittleEndian<uint16_t>(partbuf.mid(1112, 2))));
-        fsinfo.insert("vollabel", QString::fromStdString(partbuf.mid(1144, 16).toStdString()));
-	fsinfo.insert("lastmountedpath", QString::fromStdString(partbuf.mid(1160, 64).toStdString()));
         //qDebug() << "INODE SIZE ACCORDING TO SUPERBLOCK:" << fsinfo.value("inodesize").toUInt();
         //qDebug() << "compatflags:" << fsinfo.value("compatflags").toUInt() << "incompatflags:" << fsinfo.value("incompatflags").toUInt() << "readonlyflags:" << fsinfo.value("readonlyflags").toUInt();
         //if(fsinfo.value("incompatflags").toUInt() & 0x40)
         //    qDebug() << "fs uses extents.";
-        uint32_t blockgroupcount = fsinfo.value("fsblockcnt").toUInt() / fsinfo.value("blockgroupblockcnt").toUInt();
-        int blockgroupcntrem = fsinfo.value("fsblockcnt").toUInt() % fsinfo.value("blockgroupblockcnt").toUInt();
-        if(blockgroupcntrem > 0)
-            blockgroupcount++;
-        qDebug() << "block group count:" << blockgroupcount;
-        if(blockgroupcount == 0)
-            blockgroupcount = 1;
-        QString inodeaddresstable = "";
-        for(uint i=0; i < blockgroupcount; i++)
-        {
-            //qDebug() << "inode address table offset:" << fsinfo.value("blocksize").toUInt() + i*32 + 8;
-            if(fsinfo.value("blocksize").toUInt() == 1024)
-                inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(partbuf.mid(2*fsinfo.value("blocksize").toUInt() + i*32 + 8, 4))) + ",";
-            else
-                inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(partbuf.mid(fsinfo.value("blocksize").toUInt() + i*32 + 8, 4))) + ",";
-        }
-        //qDebug() << "inodeaddresstable:" << inodeaddresstable;
-        fsinfo.insert("inodeaddresstable", QVariant(inodeaddresstable));
-        //qDebug() << "blocks for group descriptor table:" << (32 * (fsinfo.value("fsblockcnt").toUInt() / fsinfo.value("blockgroupblockcnt").toUInt())) / fsinfo.value("blocksize").toUInt();
-        //if(fsinfo.value("blockgroupinodecnt").toUInt() > 2)
-        //    fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2056, 4))));
-        //else
-        //    fsinfo.insert("rootinodetablestartingaddress", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(2088, 4))));
+        
+	//qDebug() << "blocks for group descriptor table:" << (32 * (fsinfo.value("fsblockcnt").toUInt() / fsinfo.value("blockgroupblockcnt").toUInt())) / fsinfo.value("blocksize").toUInt();
 	 */ 
     }
     else if(apfsig == "NXSB") // APFS Container
