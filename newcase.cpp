@@ -6546,6 +6546,16 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 
 quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curextinode, quint64 parinode, QString parfilename, QString dirlayout)
 {
+    uint32_t blocksize = 0;
+    uint16_t inodesize = 0;
+    uint32_t blkgrpinodecnt = 0;
+    uint32_t rootinodetableaddress = 0;
+    QString incompatflags = "";
+    QString readonlyflags = "";
+    QString inodeaddresstable = "";
+    QString fstype = "";
+    QString layout = "";
+
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
 	propfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -6554,28 +6564,47 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
         while(!propfile.atEnd())
         {
             QString line = propfile.readLine();
-	    /*
-            if(line.startsWith("Bytes Per Sector|"))
-                bytespersector = line.split("|").at(1).toUInt();
-            else if(line.startsWith("Sectors Per Cluster|"))
-                sectorspercluster = line.split("|").at(1).toUInt();
-            else if(line.startsWith("FAT Offset|"))
-                fatoffset = line.split("|").at(1).toULongLong();
-            //else if(line.startsWith("Root Directory Layout|"))
-            //    rootdirlayout = line.split("|").at(1);
-            else if(line.startsWith("Cluster Area Start|"))
-                clusterareastart = line.split("|").at(1).toULongLong();
-	    */
+	    if(line.startsWith("Block Size|"))
+		blocksize = line.split("|").at(1).toUInt();
+	    else if(line.startsWith("Inode Address Table|"))
+		inodeaddresstable = line.split("|").at(1);
+	    else if(line.startsWith("Inode Size|"))
+		inodesize = line.split("|").at(1).toUInt();
+	    else if(line.startsWith("Block Group  Inode Count|"))
+		blkgrpinodecnt = line.split("|").at(1).toUInt();
+	    else if(line.startsWith("File System Type|"))
+		fstype = line.split("|").at(1);
+	    else if(line.startsWith("Read Only Compatible Features|"))
+		readonlyflags = line.split("|").at(1);
+	    else if(line.startsWith("Incompatible Features|"))
+		incompatflags = line.split("|").at(1);
+	    else if(line.startsWith("Layout|"))
+		layout = line.split("|").at(1);
+	    if(curextinode == 2)
+	    {
+		if(line.startsWith("Root Inode Table Address|"))
+		    rootinodetableaddress = line.split("|").at(1).toUInt();
+	    }
+
         }
         propfile.close();
     }
     quint64 inodecnt = 0;
-    /*
-	if(parinode == 0)
-	    inodecnt = 0;
-	else
-	    inodecnt = parinode + 1;
-    */
+    uint8_t bgnumber = 0;
+    quint64 inodestartingblock = 0;
+    if(parinode > 0)
+	inodecnt = parinode + 1;
+    for(int i=1; i <= inodeaddresstable.split(",", Qt::SkipEmptyParts).count(); i++)
+    {
+	if(curextinode < i*blkgrpinodecnt)
+	{
+	    inodestartingblock = inodeaddresstable.split(",", Qt::SkipEmptyParts).at(i-1).toULongLong();
+	    bgnumber = i - 1;
+	    break;
+	}
+    }
+    qDebug() << "block groups:" << inodeaddresstable;
+    qDebug() << "inode table starting block:" << inodestartingblock;
 }
 
 
