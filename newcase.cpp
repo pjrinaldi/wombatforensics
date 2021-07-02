@@ -6632,7 +6632,7 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
     {
         quint64 relcurinode = curextinode - 1 - (bgnumber * blkgrpinodecnt);
         //qDebug() << "inode flags:" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + inodestartingblock * blocksize + inodesize * relcurinode + 32, 4).toStdString());
-        uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 32, 4));
+        //uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 32, 4));
         //qDebug() << "relcurinode:" << relcurinode << "inodeflags:" << QString::number(inodeflags, 16);
 	//if(incompatflags & 0x80)
 	//    out << "FS size over 2^32 blocks,";
@@ -6640,19 +6640,30 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 	//    out << "Files use Extents,";
         
         // NEED TO FUNCTIONALIZE THE FOLLOWING EXTENTS AND BLOCK METHODOLOGY TO JUST RETURN THE BLOCKS OR THE LAYOUT....
-        GetContentBlocks(curimg, curstartsector, inodestartingblock, blocksize, inodesize, relcurinode, inodeflags, incompatflags, &blocklist);
+        quint64 curoffset = curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode;
+        GetContentBlocks(curimg, curoffset, &incompatflags, &blocklist);
         /*
-        if(incompatflags.contains("File use Extents,") && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
+        if(incompatflags.contains("Files use Extents,") && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
         {
             uint16_t extententries = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 42, 2));
             uint16_t extentdepth = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode + 46, 2));
+            qDebug() << "long item:" << "extententries:" << extententries << "extentdepth:" << extentdepth;
         }
         */
     }
 }
 
-void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, quint64 inodestartingblock, uint32_t blocksize, uint16_t inodesize, quint64 relcurinode, uint32_t inodeflags, QString incompatflags, QList<quint64>* blocklist)
+void GetContentBlocks(ForImg* curimg, quint64 curoffset, QString* incompatflags, QList<quint64>* blocklist)
 {
+    uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 32, 4));
+    //uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 32, 4));
+    if(incompatflags->contains("Files use Extents,") && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
+    {
+        //uint curoffset = curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode;
+        uint16_t extententries = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 42, 2));
+        uint16_t extentdepth = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 46, 2));
+        qDebug() << "extententries:" << extententries << "extentdepth:" << extentdepth;
+    }
 }
 
 /*
