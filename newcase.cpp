@@ -6631,83 +6631,53 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
     else // NEED TO PARSE THE INODE TABLE FOR THE CURRENT BLOCK GROUP
     {
         quint64 relcurinode = curextinode - 1 - (bgnumber * blkgrpinodecnt);
-        //qDebug() << "inode flags:" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + inodestartingblock * blocksize + inodesize * relcurinode + 32, 4).toStdString());
-        //uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 32, 4));
-        //qDebug() << "relcurinode:" << relcurinode << "inodeflags:" << QString::number(inodeflags, 16);
 	//if(incompatflags & 0x80)
 	//    out << "FS size over 2^32 blocks,";
 	//if(incompatflags & 0x40)
 	//    out << "Files use Extents,";
         
-        // NEED TO FUNCTIONALIZE THE FOLLOWING EXTENTS AND BLOCK METHODOLOGY TO JUST RETURN THE BLOCKS OR THE LAYOUT....
         quint64 curoffset = curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode;
         GetContentBlocks(curimg, curoffset, &incompatflags, &blocklist);
-        /*
-        if(incompatflags.contains("Files use Extents,") && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
-        {
-            uint16_t extententries = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 42, 2));
-            uint16_t extentdepth = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode + 46, 2));
-            qDebug() << "long item:" << "extententries:" << extententries << "extentdepth:" << extentdepth;
-        }
-        */
+        
+        //qDebug() << "blocklist:" << blocklist;
     }
 }
 
 void GetContentBlocks(ForImg* curimg, quint64 curoffset, QString* incompatflags, QList<quint64>* blocklist)
 {
     uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 32, 4));
-    //uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 32, 4));
     if(incompatflags->contains("Files use Extents,") && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
     {
-        //uint curoffset = curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode;
         uint16_t extententries = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 42, 2));
         uint16_t extentdepth = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 46, 2));
-        qDebug() << "extententries:" << extententries << "extentdepth:" << extentdepth;
+        //qDebug() << "extententries:" << extententries << "extentdepth:" << extentdepth;
+        if(extentdepth == 0) // use ext4_extent
+        {
+            for(uint16_t i=0; i < extententries; i++)
+            {
+                uint16_t blocklength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 56 + i*12, 2));
+                uint16_t starthi = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 58 + i*12, 2));
+                uint32_t startlo = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 60 + i*12, 4));
+                quint64 startblock = (((uint64_t)starthi >> 32) + startlo); // block #, not bytes
+                blocklist->append(startblock);
+            }
+        }
+        else // use ext4_extent_idx
+        {
+        }
     }
 }
 
 /*
- *    //qDebug() << "current inode:" << curinode;
-    // DETERMINE WHICH BLOCK GROUP THE CUR INODE IS A PART OF.
 
-    //QFile efile(estring);
-    QByteArray direntrybuf;
-    uint32_t inodeflags = 0;
     else
     {
-        QByteArray inodetablebuf;
-        inodetablebuf.clear();
-        curimg->open(QIODevice::ReadOnly);
-        curimg->seek(fsinfo->value("partoffset").toUInt() + (inodetablestartingblock * fsinfo->value("blocksize").toUInt()));
-        inodetablebuf = curimg->read(fsinfo->value("inodesize").toUInt() * fsinfo->value("blockgroupinodecnt").toUInt());
-        curimg->close();
-        // NOW I HAVE THE INODE TABLE FOR THE CURRENT BLOCK GROUP. I CAN GO THE CURINODE's OFFSET and parse it's inode table entry to get the content for the directory entry...
         QStringList blkstrlist;
         blkstrlist.clear();
         //QList<uint32_t> blocklist;
         //blocklist.clear();
-        qulonglong relcurinode = curinode - 1 - (bgnumber * fsinfo->value("blockgroupinodecnt").toUInt());
-        inodeflags = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 32, 4));
 	if((fsinfo->value("incompatflags").toUInt() & 0x40) && (inodeflags & 0x80000)) // FS USES EXTENTS && INODE USES EXTENTS
 	{
-            uint16_t extententries = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 42, 2));
-            uint16_t extentdepth = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 46, 2));
-            if(extentdepth == 0) // use ext4_extent
-            {
-                for(int i=0; i < extententries; i++)
-                {
-                    //qDebug() << "ee_block:" << qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 52 + i*12, 4));
-                    //qDebug() << "ee_length:" << qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 56 + i*12, 2));
-                    //qDebug() << "ee_start_hi:" << qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 58 + i*12, 2));
-                    //qDebug() << "ee_start_lo:" << qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 60 + i*12, 4));
-                    uint16_t blocklength = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 56 + i*12, 2));
-                    uint16_t starthi = qFromLittleEndian<uint16_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 58 + i*12, 2));
-                    uint32_t startlo = qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 60 + i*12, 4));
-                    uint64_t startblock = (((uint64_t)starthi >> 32) + startlo) * fsinfo->value("blocksize").toUInt();
-                    //qDebug() << "startblock:" << startblock;
-                    blkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength * fsinfo->value("blocksize").toUInt()));
-                }
-            }
             else // use ext4_extent_idx
             {
 		QList<uint32_t> leafnodes;
