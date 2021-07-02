@@ -5353,12 +5353,20 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             partitionname += " [EXT2]";
         }
         out << "|File system type string." << Qt::endl;
+        uint16_t grpdescsize = 16;
+	if(incompatflags & 0x80)
+        {
+            grpdescsize = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + 1278, 2));
+        }
+        //qDebug() << "grpdescsize:" << grpdescsize;
+        out << "Block Group Descriptor Size|" << QString::number(grpdescsize) << "|Size in bytes of the block group descriptor table entry." << Qt::endl;
 	uint32_t fsblockcnt = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1028, 4));
 	uint32_t blkgrpblkcnt = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1056, 4));
 	uint32_t blocksize = 1024 * pow(2, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1048, 4)));
+        uint32_t blkgrp0startblk = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1044, 4));
         out << "File System Inode Count|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1024, 4))) << "|Number of inodes within the file system." << Qt::endl;
         out << "File System Block Count|" << QString::number(fsblockcnt) << "|Number of blocks within the file system." << Qt::endl;
-        out << "Block Group 0 Start Block|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1044, 4))) << "|Starting block number for block group 0." << Qt::endl;
+        out << "Block Group 0 Start Block|" << QString::number(blkgrp0startblk) << "|Starting block number for block group 0." << Qt::endl;
         out << "Block Size|" << QString::number(blocksize) << "|Block size in bytes." << Qt::endl;
 	out << "Fragment Size|" << QString::number(1024 * pow(2, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1052, 4)))) << "|Fragment size in bytes." << Qt::endl;
 	out << "Block Group Block Count|" << QString::number(blkgrpblkcnt) << "|Number of blocks within a block group." << Qt::endl;
@@ -5371,7 +5379,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    out << "Linux";
 	else if(creatoros == 0x03)
 	    out << "FreeBSD";
-	out << "|Operating System used to create the file system.";
+	out << "|Operating System used to create the file system." << Qt::endl;
 	out << "Inode Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + 1112, 2))) << "|Size of an inode in bytes." << Qt::endl;
 	out << "Last Mounted Path|" << QString::fromStdString(curimg->ReadContent(curstartsector * 512 + 1160, 64).toStdString()) << "|Path where file system was last mounted." << Qt::endl;
 	uint32_t blockgroupcount = fsblockcnt / blkgrpblkcnt;
@@ -5380,15 +5388,19 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    blockgroupcount++;
 	if(blockgroupcount == 0)
 	    blockgroupcount = 1;
+        //qDebug() << "curstartsector:" << curstartsector;
+        //qDebug() << "blkgrp0startblock:" << blkgrp0startblk;
 	QString inodeaddresstable = "";
+        //qDebug() << "blockgroupcount:" << blockgroupcount;
+        //qDebug() << "blocksize:" << blocksize;
 	for(uint i=0; i < blockgroupcount; i++)
 	{
 	    if(blocksize == 1024)
-		inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 2 * blocksize + i * 32 + 8, 4))) + ",";
+		inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 2 * blocksize + i * grpdescsize + 8, 4))) + ",";
 	    else
-		inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + blocksize + i*32 + 8, 4))) + ",";
+		inodeaddresstable += QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + blocksize + i * grpdescsize + 8, 4))) + ",";
 	}
-	qDebug() << "inodeaddresstable:" << inodeaddresstable;
+	//qDebug() << "inodeaddresstable:" << inodeaddresstable;
 	out << "Inode Address Table|" << inodeaddresstable << "|Table of the Inode addresses for a block group." << Qt::endl;
 	out << "Root Inode Table Address|";
 	if(blkgrpinodecnt > 2)
@@ -6570,7 +6582,7 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 		inodeaddresstable = line.split("|").at(1);
 	    else if(line.startsWith("Inode Size|"))
 		inodesize = line.split("|").at(1).toUInt();
-	    else if(line.startsWith("Block Group  Inode Count|"))
+	    else if(line.startsWith("Block Group Inode Count|"))
 		blkgrpinodecnt = line.split("|").at(1).toUInt();
 	    else if(line.startsWith("File System Type|"))
 		fstype = line.split("|").at(1);
@@ -6585,10 +6597,10 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 		if(line.startsWith("Root Inode Table Address|"))
 		    rootinodetableaddress = line.split("|").at(1).toUInt();
 	    }
-
         }
         propfile.close();
     }
+    //qDebug() << "block size:" << blocksize << "inode size:" << inodesize << "block group inode count:" << blkgrpinodecnt;
     quint64 inodecnt = 0;
     uint8_t bgnumber = 0;
     quint64 inodestartingblock = 0;
@@ -6603,52 +6615,53 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 	    break;
 	}
     }
-    qDebug() << "block groups:" << inodeaddresstable;
-    qDebug() << "inode table starting block:" << inodestartingblock;
+    //qDebug() << "block groups:" << inodeaddresstable;
+    //qDebug() << "inode table starting block:" << inodestartingblock << "bgnumber:" << bgnumber;
+    //qDebug() << "root inode table address:" << rootinodetableaddress;
+    //qDebug() << "layout:" << layout;
+    //qDebug() << "incompatflags:" << incompatflags;
+    // NEED TO GET THE BLOCK LIST FOR THE CURRENT INODE SO I CAN GET IT'S CONTENTS AND PARSE THE DIRECTORY ENTRY
+    // ON SUB DIRECTORIES SINCE I HAVE THE INODE'S LAYOUT, I CAN JUST READ THE LAYOUT CONTENT DIRECTLY
+    QList<quint64> blocklist;
+    blocklist.clear();
+    if(parinode > 0)
+    {
+        // loop over layout variable to parse the content....
+    }
+    else // NEED TO PARSE THE INODE TABLE FOR THE CURRENT BLOCK GROUP
+    {
+        quint64 relcurinode = curextinode - 1 - (bgnumber * blkgrpinodecnt);
+        //qDebug() << "inode flags:" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + inodestartingblock * blocksize + inodesize * relcurinode + 32, 4).toStdString());
+        uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 32, 4));
+        //qDebug() << "relcurinode:" << relcurinode << "inodeflags:" << QString::number(inodeflags, 16);
+	//if(incompatflags & 0x80)
+	//    out << "FS size over 2^32 blocks,";
+	//if(incompatflags & 0x40)
+	//    out << "Files use Extents,";
+        
+        // NEED TO FUNCTIONALIZE THE FOLLOWING EXTENTS AND BLOCK METHODOLOGY TO JUST RETURN THE BLOCKS OR THE LAYOUT....
+        GetContentBlocks(curimg, curstartsector, inodestartingblock, blocksize, inodesize, relcurinode, inodeflags, incompatflags, &blocklist);
+        /*
+        if(incompatflags.contains("File use Extents,") && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
+        {
+            uint16_t extententries = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + (inodestartingblock * blocksize) + (inodesize * relcurinode) + 42, 2));
+            uint16_t extentdepth = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode + 46, 2));
+        }
+        */
+    }
 }
 
+void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, quint64 inodestartingblock, uint32_t blocksize, uint16_t inodesize, quint64 relcurinode, uint32_t inodeflags, QString incompatflags, QList<quint64>* blocklist)
+{
+}
 
 /*
  *    //qDebug() << "current inode:" << curinode;
     // DETERMINE WHICH BLOCK GROUP THE CUR INODE IS A PART OF.
-    //qDebug() << "inode address table:" << fsinfo->value("inodeaddresstable").toString();
-    QStringList blockgroups = fsinfo->value("inodeaddresstable").toString().split(",", Qt::SkipEmptyParts);
-    qulonglong inodetablestartingblock = 0;
-    int bgnumber = 0;
-    qulonglong inodecnt = curicnt;
-
-    for(int i=1; i <= blockgroups.count(); i++)
-    {
-        if(curinode < i*fsinfo->value("blockgroupinodecnt").toUInt())
-        {
-            inodetablestartingblock = blockgroups.at(i-1).toULongLong();
-            bgnumber = i - 1;
-            break;
-        }
-    }
-    //qDebug() << "blockgroups:" << blockgroups;
-    //qDebug() << "inode table starting block:" << inodetablestartingblock;
-
-    QHash<QString, QVariant> fileinfo;
-    fileinfo.clear();
 
     //QFile efile(estring);
     QByteArray direntrybuf;
     uint32_t inodeflags = 0;
-    // I NEED TO DO THIS TO GET THE BLOCK LIST FOR THE CURRENT INODE SO I CAN GET IT'S CONTENT AND READ TEH DIRECTORY ENTRY, BUT THIS IS A GIVEN
-    // ON SUB DIRECTORIES SINCE I WILL HAVE THE INODE'S LAYOUT AND CURBLOCKLIST, SO I CAN SKIP THIS PART WHEN THESE VALUES ARE KNOWN...
-    if(parfileinfo != NULL)
-    {
-        direntrybuf.clear();
-        curimg->open(QIODevice::ReadOnly);
-        QStringList layoutlist = parfileinfo->value("layout").toString().split(";", Qt::SkipEmptyParts);
-        for(int i=0; i < layoutlist.count(); i++)
-        {
-            curimg->seek(layoutlist.at(i).split(",").at(0).toUInt());
-            direntrybuf.append(curimg->read(layoutlist.at(i).split(",").at(1).toUInt()));
-        }
-        curimg->close();
-    }
     else
     {
         QByteArray inodetablebuf;
