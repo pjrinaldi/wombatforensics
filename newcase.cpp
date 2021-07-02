@@ -6637,13 +6637,13 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 	//    out << "Files use Extents,";
         
         quint64 curoffset = curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode;
-        GetContentBlocks(curimg, curoffset, &incompatflags, &blocklist);
+        GetContentBlocks(curimg, curstartsector, blocksize, curoffset, &incompatflags, &blocklist);
         
         //qDebug() << "blocklist:" << blocklist;
     }
 }
 
-void GetContentBlocks(ForImg* curimg, quint64 curoffset, QString* incompatflags, QList<quint64>* blocklist)
+void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, quint64 curoffset, QString* incompatflags, QList<quint64>* blocklist)
 {
     uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 32, 4));
     if(incompatflags->contains("Files use Extents,") && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
@@ -6664,7 +6664,57 @@ void GetContentBlocks(ForImg* curimg, quint64 curoffset, QString* incompatflags,
         }
         else // use ext4_extent_idx
         {
+	    QList<uint32_t> leafnodes;
+	    leafnodes.clear();
+	    for(uint16_t i=0; i < extententries; i++)
+		leafnodes.append(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 56 + i*12, 4)));
+	    for(int i=0; i < leafnodes.count(); i++)
+	    {
+		uint16_t lextententries = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 2, 2));
+		uint16_t lextentdepth = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 6, 2));
+		if(extentdepth == 0) // use ext4_extent
+		{
+		    for(uint16_t j=0; j < lextententries; j++)
+		    {
+			uint16_t blocklength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 16 + j*12, 2));
+			uint16_t starthi = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 18 + j*12, 2));
+			uint32_t startlo = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 20 + j*12, 4));
+			quint64 startblock = (((uint64_t)starthi >> 32) + startlo); // block #, not bytes
+			blocklist->append(startblock);
+		    }
+		}
+		else // use ext4_extent_idx
+		{
+		    qDebug() << "repeat leafnode exercise here...";
+		}
+		//qDebug() << "leaf header:" << QString::number(qFromLittleEndian<uint16_t>(leafnode.mid(0, 2)), 16);
+		//qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
+		//qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(4, 2));
+		//qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
+	    }
+	    //qDebug() << "extent header:" << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(40, 2)), 16);
+	    //qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(42, 2));
+	    //qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(44, 2));
+	    //qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(46, 2));
+	    
+	    //qDebug() << "ei_block:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(52, 4));
+	    //qDebug() << "ei_leaf_lo:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56, 4));
+	    //qDebug() << "ei_leaf_hi:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(60, 2));
+	    //qDebug() << "use extent idx";
         }
+    }
+    else // direct and indirect blocks
+    {
+	for(int i=0; i < 12; i++)
+	{
+	    uint32_t curdirectblock = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 40 + i*4, 4));
+	    if(curdirectblock > 0)
+		blocklist->append(curdirectblock);
+	}
+	qDebug() << "blocklist before indirects:" << *blocklist;
+	uint32_t singleindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 88, 4));
+	uint32_t doubleindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 92, 4));
+	uint32_t tripleindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 96, 4));
     }
 }
 
@@ -6676,58 +6726,6 @@ void GetContentBlocks(ForImg* curimg, quint64 curoffset, QString* incompatflags,
         blkstrlist.clear();
         //QList<uint32_t> blocklist;
         //blocklist.clear();
-	if((fsinfo->value("incompatflags").toUInt() & 0x40) && (inodeflags & 0x80000)) // FS USES EXTENTS && INODE USES EXTENTS
-	{
-            else // use ext4_extent_idx
-            {
-		QList<uint32_t> leafnodes;
-		leafnodes.clear();
-		for(int i=0; i < extententries; i++)
-		{
-		    leafnodes.append(qFromLittleEndian<uint32_t>(inodetablebuf.mid(fsinfo->value("inodesize").toUInt() * relcurinode + 56 + i*12, 4)));
-		}
-		for(int i=0; i < leafnodes.count(); i++)
-		{
-		    QByteArray leafnode;
-		    leafnode.clear();
-                    curimg->open(QIODevice::ReadOnly);
-                    curimg->seek(fsinfo->value("partoffset").toUInt() + (leafnodes.at(i) * fsinfo->value("blocksize").toUInt()));
-                    leafnode = curimg->read(fsinfo->value("blockszie").toUInt());
-                    curimg->close();
-			uint16_t extententries = qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
-			uint16_t extentdepth = qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
-			if(extentdepth == 0) // use ext4_extent
-			{
-			    for(int j=0; j < extententries; j++)
-			    {
-				uint16_t blocklength = qFromLittleEndian<uint16_t>(leafnode.mid(16 + j*12, 2));
-				uint16_t starthi = qFromLittleEndian<uint16_t>(leafnode.mid(18 + j*12, 2));
-				uint32_t startlo = qFromLittleEndian<uint32_t>(leafnode.mid(20 + j*12, 4));
-				uint64_t startblock = (((uint64_t)starthi >> 32) + startlo) * fsinfo->value("blocksize").toUInt();
-				blkstrlist.append(QString::number(startblock) + "," + QString::number(blocklength * fsinfo->value("blocksize").toUInt()));
-			    }
-			}
-			else // use ext4_extent_idx
-			{
-			    qDebug() << "repeat leafnode exercise here...";
-			}
-			//qDebug() << "leaf header:" << QString::number(qFromLittleEndian<uint16_t>(leafnode.mid(0, 2)), 16);
-			//qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
-			//qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(4, 2));
-			//qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
-		    //}
-		}
-		//qDebug() << "extent header:" << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(40, 2)), 16);
-		//qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(42, 2));
-		//qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(44, 2));
-		//qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(46, 2));
-		
-		//qDebug() << "ei_block:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(52, 4));
-		//qDebug() << "ei_leaf_lo:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56, 4));
-		//qDebug() << "ei_leaf_hi:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(60, 2));
-		//qDebug() << "use extent idx";
-            }
-	}
         else
         {
 	    for(int i=0; i < 12; i++)
