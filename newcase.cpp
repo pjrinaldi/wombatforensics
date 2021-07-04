@@ -5408,6 +5408,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	else
 	    out << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 2088, 4)));
 	out << "|Starting address for the Root Directory Inode Table." << Qt::endl;
+	out << "Revision Level|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + 1100, 4))) + "." + QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + 1086, 2))) << "|File system revision level." << Qt::endl;
 	// NEED TO IMPLEMENT THESE FS PROPERTIES SO I CAN USE THEM WHEN I PARSE THE EXT2/3/4 FS
 	/*
         fsinfo.insert("partoffset", QVariant((qulonglong)(512 * partoffset)));
@@ -6568,6 +6569,7 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
     QString inodeaddresstable = "";
     QString fstype = "";
     QString layout = "";
+    float revision = 0.0;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -6593,6 +6595,8 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 		incompatflags = line.split("|").at(1);
 	    else if(line.startsWith("Layout|"))
 		layout = line.split("|").at(1);
+	    else if(line.startsWith("Revision Level|"))
+		revision = line.split("|").at(1).toFloat();
 	    if(curextinode == 2)
 	    {
 		if(line.startsWith("Root Inode Table Address|"))
@@ -6691,10 +6695,10 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
                     filepath = parfilename;
                     //parentinode = parinode;
                 }
-                int namelength = 0;
+                uint16_t namelength = 0;
                 int filetype =  -1;
                 entrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(coffset + 4, 2));
-                if(incompatflags.contains("Directory Entries record file type,"))
+                if(incompatflags.contains("Directory Entries record file type,") || revision > 0.4)
                 {
                     namelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(coffset + 6, 1));
                     filetype = qFromLittleEndian<uint8_t>(curimg->ReadContent(coffset + 7, 1));
@@ -6704,9 +6708,9 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
                     namelength = qFromLittleEndian<uint16_t>(curimg->ReadContent(coffset + 6, 2));
                 }
 		//qDebug() << "namelength:" << namelength;
-		qDebug() << "newlength:" << newlength << "entrylength:" << entrylength << "namelength:" << namelength;
+		//qDebug() << "newlength:" << newlength << "entrylength:" << entrylength << "namelength:" << QString::number(namelength, 16);
                 QString filename = QString::fromStdString(curimg->ReadContent(coffset + 8, namelength).toStdString()).toLatin1();
-                qDebug() << "filename:" << filename;
+                //qDebug() << "filename:" << filename;
                 uint8_t isdeleted = 0;
                 if(nextisdeleted)
                     isdeleted = 1;
