@@ -7114,6 +7114,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     QString mftlayout = "";
     uint16_t mftentrybytes = 0;
     uint32_t bytespercluster = 0;
+    quint64 maxmftentries = 0;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -7129,6 +7130,8 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 		mftentrybytes = line.split("|").at(1).toUInt();
 	    else if(line.startsWith("Bytes Per Cluster|"))
 		bytespercluster = line.split("|").at(1).toUInt();
+            else if(line.startsWith("Max MFT Entries|"))
+                maxmftentries = line.split("|").at(1).toULongLong();
 	}
 	propfile.close();
     }
@@ -7155,10 +7158,12 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     uint32_t attrlength = 0;
     curoffset = mftentryoffset + firstattroffset;
     //qDebug() << "first attr offset:" << firstattroffset << "attrcount:" << attrcount;
-    uint16_t indxrootoffset = 0;
+    quint64 indxrootoffset = 0;
     uint32_t indxrootlength = 0;
-    uint16_t indxallocoffset =  0;
-    uint16_t indxalloclength = 0;
+    QList<uint16_t> indxallocoffset;
+    QList<uint16_t> indxalloclength;
+    indxallocoffset.clear();
+    indxalloclength.clear();
     for(uint16_t i=0; i < attrcount; i++)
     {
 	//qDebug() << "curoffset:" << curoffset;
@@ -7179,12 +7184,15 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	else if(attrtype == 0xa0) // $INDEX_ALLOCATION - ALWAYS NON_RESIDENT
 	{
 	    uint16_t runlistoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 32, 2));
+            //qDebug() << "runlistoff:" << runlistoff;
 	    int j=0;
 	    QStringList runlist;
 	    runlist.clear();
 	    uint currunoff = curoffset + runlistoff;
-	    while(currunoff < mftentrybytes)
+            //qDebug() << "currunoff:" << currunoff;
+	    while(currunoff < curoffset + mftentrybytes)
 	    {
+                //qDebug() << "runstr:" << qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, 1));
 		if(qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, 1)) > 0)
 		{
 		    QString runstr = QString("%1").arg(qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, 1)), 8, 2, QChar('0'));
@@ -7209,6 +7217,8 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    runoffset = runoffset - 0xffff - 1;
 			runoffset = runoffset + runlist.at(j-1).split(",").at(0).toUInt();
 		    }
+                    indxallocoffset.append(runoffset);
+                    indxalloclength.append(runlength);
 		    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
 		    j++;
 		    currunoff += runlengthbytes + runlengthoffset;
@@ -7216,7 +7226,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 		else
 		    break;
 	    }
-	    qDebug() << "runlist:" << runlist;
+	    //qDebug() << "runlist:" << runlist;
 	}
 	else if(attrtype == 0xffffffff)
 	    break;
@@ -7224,66 +7234,231 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
     qDebug() << "indxrootoffset:" << indxrootoffset << "indxrootlength:" << indxrootlength;
     qDebug() << "indxallocoffset:" << indxallocoffset << "indxalloclength:" << indxalloclength;
+
+    uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 8, 4)); // INDEX RECORD SIZE (bytes)
+    qDebug() << "indxrecordsize:" << indxrecordsize;
+    if(indxallocoffset.count() > 0) // INDX ALLOC EXISTS
+    {
+    }
+    else // NO INDX_ALLOCATION
+    {
+        uint32_t startoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 16, 4));
+        uint32_t endoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 20, 4));
+        uint32_t allocoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 24, 4));
+        uint curpos = indxrootoffset + 16 + startoffset;
+        while(curpos < indxrootoffset + 16 + startoffset + allocoffset)
+        {
+            qDebug() << "in while loop...";
+            uint16_t indxentrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2));
+            uint16_t filenamelength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2));
+            uint64_t ntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
+            qDebug() << "ntinode:" << ntinode;
+            if(indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0)
+            {
+                curpos = curpos + 16;
+                uint8_t fnametype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 65, 1));
+                if(fnametype != 0x02)
+                {
+                    uint8_t fnamelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 64, 1));
+                    QString filename = "";
+                    for(uint8_t i=0; i < fnamelength; i++)
+                        filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 66 + i*2, 2))));
+                    if(filename != ".")
+                    {
+                        qDebug() << "Filename:" << filename;
+                    }
+                }
+                curpos = curpos + indxentrylength;
+            }
+            else
+                curpos = curpos + 4;
+        }
+    }
 }
 
 /*
     out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of bytes per sector, usually 512." << Qt::endl;
     out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of sectors per cluster." << Qt::endl;
     out << "Max MFT Entries|" << QString::number((mftsize * bytespercluster)/1024) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
-    for(int i=0; i < attrcount; i++)
-    {
-        else if(attrtype == 0xa0) // $INDEX_ALLOCATION - ALWAYS NON-RESIDENT
-        {
-	    uint16_t runlistoff = qFromLittleEndian<uint16_t>(curmftentrybuf.mid(curoffset + 32, 2));
-            int j=0;
-            QStringList runlist;
-            runlist.clear();
-	    uint currunoff = curoffset + runlistoff;
-            while(currunoff < fsinfo->value("mftentrybytes").toUInt())
-            {
-                if((uint8_t)curmftentrybuf.at(currunoff) > 0)
-                {
-                    QString runstr = QString("%1").arg(curmftentrybuf.at(currunoff), 8, 2, QChar('0'));
-                    uint runlengthbytes = runstr.right(4).toInt(nullptr, 2);
-                    uint runlengthoffset = runstr.left(4).toInt(nullptr, 2);
-                    if(runlengthbytes == 0 && runlengthoffset == 0)
-                        break;
-                    currunoff++;
-                    uint runlength = 0;
-                    int runoffset = 0;
-		    // I EITHER NEED TO CAST THE VALUES WITH EXTENSIVE IF'S SO I CAN GET THE NEGATIVE WHERE NEEDED
-		    // OR HAVE A RANGE OF VARIABLES AND THEN USE THE IF'S TO PICK WHICH ONE...
-                    if(runlengthbytes == 1)
-                        runlength = qFromLittleEndian<uint8_t>(curmftentrybuf.mid(currunoff, runlengthbytes));
-                    else
-                        runlength = qFromLittleEndian<uint>(curmftentrybuf.mid(currunoff, runlengthbytes));
-                    if(runlengthoffset == 1)
-                        runoffset = qFromLittleEndian<int8_t>(curmftentrybuf.mid(currunoff + runlengthbytes, runlengthoffset));
-                    else
-                        runoffset = qFromLittleEndian<int>(curmftentrybuf.mid(currunoff + runlengthbytes, runlengthoffset));
-                    if(j > 0)
-                    {
-                        if(j > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
-                            runoffset = runoffset - 0xffff - 1;
-                        runoffset = runoffset + runlist.at(j-1).split(",").at(0).toUInt();
-                    }
-                    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
-                    j++;
-                    currunoff += runlengthbytes + runlengthoffset;
-                }
-                else
-                    break;
-            }
-            //qDebug() << "runlist:" << runlist;
-            for(j=0; j < runlist.count(); j++)
-                indxalloc.append(curimg->ReadContent(((fsinfo->value("partoffset").toLongLong()*512) + (runlist.at(j).split(",").at(0).toLongLong()*fsinfo->value("bytespercluster").toLongLong())), (runlist.at(j).split(",").at(1).toLongLong() * fsinfo->value("bytespercluster").toLongLong())));
-        }
-        else if(attrtype == 0xffffffff)
-            break;
-        curoffset += attrlength;
-    }
     
-    uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(indxroot.mid(8, 4)); // INDEX RECORD SIZE (Bytes)
+    else // 0x00 NO INDEX_ALLOC
+    {
+        uint32_t startoffset = qFromLittleEndian<uint32_t>(indxroot.mid(16, 4));
+        uint32_t endoffset = qFromLittleEndian<uint32_t>(indxroot.mid(20, 4));
+        uint32_t allocoffset = qFromLittleEndian<uint32_t>(indxroot.mid(24, 4));
+        uint curpos = 16 + startoffset;
+        while(curpos < allocoffset)
+        {
+            uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxroot.mid(curpos + 8, 2));
+            uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxroot.mid(curpos + 10, 2));
+            uint64_t ntinode = qFromLittleEndian<uint64_t>(indxroot.mid(curpos, 6)); 
+	    if(indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0)
+            {
+                QByteArray filenamebuf = indxroot.mid(curpos + 16, filenamelength);
+                uint8_t fnametype = filenamebuf.at(65);
+                if(fnametype != 0x02)
+                {
+                    uint8_t fnamelength = filenamebuf.at(64);
+                    QString filename = "";
+                    for(int j=0; j < fnamelength; j++)
+                        filename += QString(QChar(qFromLittleEndian<uint16_t>(filenamebuf.mid(66 + j*2, 2))));
+                    if(filename != ".")
+                    {
+	                fileinfo.insert("i30sequenceid", QVariant(qFromLittleEndian<uint16_t>(indxroot.mid(curpos + 6, 2)))); // sequence number for entry
+                        uint64_t parntinode = qFromLittleEndian<uint64_t>(filenamebuf.mid(0, 6)); // parent nt inode for the entry
+                        fileinfo.insert("i30parentsequenceid", QVariant(qFromLittleEndian<uint16_t>(filenamebuf.mid(6, 2)))); // parent sequence number for entry
+                        fileinfo.insert("ntinode", QVariant((qulonglong)ntinode)); // current nt inode
+                        fileinfo.insert("parntinode", QVariant((qulonglong)parntinode)); // current parent nt inode
+                        fileinfo.insert("i30create", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(8, 8)))));
+                        fileinfo.insert("i30modify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8)))));
+                        fileinfo.insert("i30change", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8)))));
+                        fileinfo.insert("i30access", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8)))));
+                        QList<QHash<QString, QVariant>> adsinfolist;
+                        adsinfolist.clear();
+                        fileinfo.insert("filename", QVariant(filename));
+                        fileinfo.insert("inode", QVariant(curinode));
+                        GetMftEntryContent(curimg, ntinode, &fileinfo, fsinfo, &adsinfolist);
+                        //GetMftEntryContent(estring, ntinode, &fileinfo, fsinfo, &adsinfolist);
+                        uint16_t attrflags = fileinfo.value("attrflags").toUInt();
+                        uint32_t accessflags = fileinfo.value("accessflags").toUInt();
+                        if(curpos > endoffset)
+                        {
+                            if(attrflags == 0x00) // unalloc file
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    fileinfo.insert("itemtype", QVariant(13));
+                                else
+                                    fileinfo.insert("itemtype", QVariant(4));
+                                fileinfo.insert("isdeleted", QVariant(1));
+                            }
+                            else if(attrflags == 0x02) // unalloc dir
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    fileinfo.insert("itemtype", QVariant(13));
+                                else
+                                    fileinfo.insert("itemtype", QVariant(2));
+                                fileinfo.insert("isdeleted", QVariant(1));
+                            }
+                            else
+                            {
+                                fileinfo.insert("itemtype", QVariant(4));
+                                fileinfo.insert("isdeleted", QVariant(1));
+                            }
+                        }
+                        else if(parfileinfo != NULL)
+                        {
+                            if(parfileinfo->value("ntinode").toUInt() != parntinode)
+                            {
+                                if(attrflags == 0x00) // unalloc file
+                                {
+                                    if(accessflags & 0x4000) // encrypted
+                                        fileinfo.insert("itemtype", QVariant(13));
+                                    else
+                                        fileinfo.insert("itemtype", QVariant(4));
+                                    fileinfo.insert("isdeleted", QVariant(1));
+                                }
+                                else if(attrflags == 0x02) // unalloc dir
+                                {
+                                    if(accessflags & 0x4000) // encrypted
+                                        fileinfo.insert("itemtype", QVariant(13));
+                                    else
+                                        fileinfo.insert("itemtype", QVariant(2));
+                                    fileinfo.insert("isdeleted", QVariant(1));
+                                }
+                                else
+                                {
+                                    fileinfo.insert("itemtype", QVariant(4));
+                                    fileinfo.insert("isdeleted", QVariant(1));
+                                }
+                            }
+                            else
+                            {
+                                if(attrflags == 0x01) //alloc file
+                                {
+                                    if(accessflags & 0x4000) // encrypted
+                                        fileinfo.insert("itemtype", QVariant(13));
+                                    else
+                                        fileinfo.insert("itemtype", QVariant(5));
+                                    fileinfo.insert("isdeleted", QVariant(0));
+                                }
+                                else if(attrflags == 0x03) // alloc dir
+                                {
+                                    if(accessflags & 0x4000) // encrypted
+                                        fileinfo.insert("itemtype", QVariant(13));
+                                    else
+                                        fileinfo.insert("itemtype", QVariant(3));
+                                    fileinfo.insert("isdeleted", QVariant(0));
+                                }
+                                else
+                                {
+                                    fileinfo.insert("itemtype", QVariant(5));
+                                    fileinfo.insert("isdeleted", QVariant(0));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if(attrflags == 0x01) // alloc file
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    fileinfo.insert("itemtype", QVariant(13));
+                                else
+                                    fileinfo.insert("itemtype", QVariant(5));
+                                fileinfo.insert("isdeleted", QVariant(0));
+                            }
+                            else if(attrflags == 0x03) // alloc dir
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    fileinfo.insert("itemtype", QVariant(13));
+                                else
+                                    fileinfo.insert("itemtype", QVariant(3));
+                                fileinfo.insert("isdeleted", QVariant(0));
+                            }
+                            else
+                            {
+                                fileinfo.insert("itemtype", QVariant(5));
+                                fileinfo.insert("isdeleted", QVariant(0));
+                            }
+                        }
+                        if(parfileinfo == NULL)
+                        {
+                            fileinfo.insert("path", QVariant("/"));
+                            fileinfo.insert("parentinode", QVariant(-1));
+                        }
+                        else
+                        {
+                            fileinfo.insert("path", QVariant(QString(parfileinfo->value("path").toString() + parfileinfo->value("filename").toString() + "/")));
+                            fileinfo.insert("parentinode", QVariant(parfileinfo->value("inode").toULongLong()));
+                        }
+                        fileinfolist->append(fileinfo);
+                        curinode++;
+                        if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
+                        {
+                            ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+                            //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+                            curinode = fileinfolist->count();
+                        }
+                        fileinfo.clear();
+                        if(adsinfolist.count() > 0)
+                        {
+                            for(int j=0; j < adsinfolist.count(); j++)
+                            {
+                                QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
+                                curadsinfo.insert("inode", QVariant(curinode));
+                                fileinfolist->append(curadsinfo);
+                                curinode++;
+                            }
+                            adsinfolist.clear();
+                        }
+                    }
+                }
+                curpos = curpos + indxentrylength;
+            }
+            else
+                curpos = curpos + 4;
+        }
+        indxroot.clear();
+    }
     if(indxalloc.count() > 0)
     {
         // ALSO NEED TO ADD THE INDXROOT ENTRIES HERE FIRST....
@@ -7478,185 +7653,6 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         }
         indxalloc.clear();
     }
-    else // 0x00 NO INDEX_ALLOC
-    {
-        uint32_t startoffset = qFromLittleEndian<uint32_t>(indxroot.mid(16, 4));
-        uint32_t endoffset = qFromLittleEndian<uint32_t>(indxroot.mid(20, 4));
-        uint32_t allocoffset = qFromLittleEndian<uint32_t>(indxroot.mid(24, 4));
-        uint curpos = 16 + startoffset;
-        while(curpos < allocoffset)
-        {
-            uint16_t indxentrylength = qFromLittleEndian<uint16_t>(indxroot.mid(curpos + 8, 2));
-            uint16_t filenamelength = qFromLittleEndian<uint16_t>(indxroot.mid(curpos + 10, 2));
-            uint64_t ntinode = qFromLittleEndian<uint64_t>(indxroot.mid(curpos, 6)); 
-	    if(indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0)
-            {
-                QByteArray filenamebuf = indxroot.mid(curpos + 16, filenamelength);
-                uint8_t fnametype = filenamebuf.at(65);
-                if(fnametype != 0x02)
-                {
-                    uint8_t fnamelength = filenamebuf.at(64);
-                    QString filename = "";
-                    for(int j=0; j < fnamelength; j++)
-                        filename += QString(QChar(qFromLittleEndian<uint16_t>(filenamebuf.mid(66 + j*2, 2))));
-                    if(filename != ".")
-                    {
-	                fileinfo.insert("i30sequenceid", QVariant(qFromLittleEndian<uint16_t>(indxroot.mid(curpos + 6, 2)))); // sequence number for entry
-                        uint64_t parntinode = qFromLittleEndian<uint64_t>(filenamebuf.mid(0, 6)); // parent nt inode for the entry
-                        fileinfo.insert("i30parentsequenceid", QVariant(qFromLittleEndian<uint16_t>(filenamebuf.mid(6, 2)))); // parent sequence number for entry
-                        fileinfo.insert("ntinode", QVariant((qulonglong)ntinode)); // current nt inode
-                        fileinfo.insert("parntinode", QVariant((qulonglong)parntinode)); // current parent nt inode
-                        fileinfo.insert("i30create", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(8, 8)))));
-                        fileinfo.insert("i30modify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8)))));
-                        fileinfo.insert("i30change", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8)))));
-                        fileinfo.insert("i30access", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8)))));
-                        QList<QHash<QString, QVariant>> adsinfolist;
-                        adsinfolist.clear();
-                        fileinfo.insert("filename", QVariant(filename));
-                        fileinfo.insert("inode", QVariant(curinode));
-                        GetMftEntryContent(curimg, ntinode, &fileinfo, fsinfo, &adsinfolist);
-                        //GetMftEntryContent(estring, ntinode, &fileinfo, fsinfo, &adsinfolist);
-                        uint16_t attrflags = fileinfo.value("attrflags").toUInt();
-                        uint32_t accessflags = fileinfo.value("accessflags").toUInt();
-                        if(curpos > endoffset)
-                        {
-                            if(attrflags == 0x00) // unalloc file
-                            {
-                                if(accessflags & 0x4000) // encrypted
-                                    fileinfo.insert("itemtype", QVariant(13));
-                                else
-                                    fileinfo.insert("itemtype", QVariant(4));
-                                fileinfo.insert("isdeleted", QVariant(1));
-                            }
-                            else if(attrflags == 0x02) // unalloc dir
-                            {
-                                if(accessflags & 0x4000) // encrypted
-                                    fileinfo.insert("itemtype", QVariant(13));
-                                else
-                                    fileinfo.insert("itemtype", QVariant(2));
-                                fileinfo.insert("isdeleted", QVariant(1));
-                            }
-                            else
-                            {
-                                fileinfo.insert("itemtype", QVariant(4));
-                                fileinfo.insert("isdeleted", QVariant(1));
-                            }
-                        }
-                        else if(parfileinfo != NULL)
-                        {
-                            if(parfileinfo->value("ntinode").toUInt() != parntinode)
-                            {
-                                if(attrflags == 0x00) // unalloc file
-                                {
-                                    if(accessflags & 0x4000) // encrypted
-                                        fileinfo.insert("itemtype", QVariant(13));
-                                    else
-                                        fileinfo.insert("itemtype", QVariant(4));
-                                    fileinfo.insert("isdeleted", QVariant(1));
-                                }
-                                else if(attrflags == 0x02) // unalloc dir
-                                {
-                                    if(accessflags & 0x4000) // encrypted
-                                        fileinfo.insert("itemtype", QVariant(13));
-                                    else
-                                        fileinfo.insert("itemtype", QVariant(2));
-                                    fileinfo.insert("isdeleted", QVariant(1));
-                                }
-                                else
-                                {
-                                    fileinfo.insert("itemtype", QVariant(4));
-                                    fileinfo.insert("isdeleted", QVariant(1));
-                                }
-                            }
-                            else
-                            {
-                                if(attrflags == 0x01) //alloc file
-                                {
-                                    if(accessflags & 0x4000) // encrypted
-                                        fileinfo.insert("itemtype", QVariant(13));
-                                    else
-                                        fileinfo.insert("itemtype", QVariant(5));
-                                    fileinfo.insert("isdeleted", QVariant(0));
-                                }
-                                else if(attrflags == 0x03) // alloc dir
-                                {
-                                    if(accessflags & 0x4000) // encrypted
-                                        fileinfo.insert("itemtype", QVariant(13));
-                                    else
-                                        fileinfo.insert("itemtype", QVariant(3));
-                                    fileinfo.insert("isdeleted", QVariant(0));
-                                }
-                                else
-                                {
-                                    fileinfo.insert("itemtype", QVariant(5));
-                                    fileinfo.insert("isdeleted", QVariant(0));
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if(attrflags == 0x01) // alloc file
-                            {
-                                if(accessflags & 0x4000) // encrypted
-                                    fileinfo.insert("itemtype", QVariant(13));
-                                else
-                                    fileinfo.insert("itemtype", QVariant(5));
-                                fileinfo.insert("isdeleted", QVariant(0));
-                            }
-                            else if(attrflags == 0x03) // alloc dir
-                            {
-                                if(accessflags & 0x4000) // encrypted
-                                    fileinfo.insert("itemtype", QVariant(13));
-                                else
-                                    fileinfo.insert("itemtype", QVariant(3));
-                                fileinfo.insert("isdeleted", QVariant(0));
-                            }
-                            else
-                            {
-                                fileinfo.insert("itemtype", QVariant(5));
-                                fileinfo.insert("isdeleted", QVariant(0));
-                            }
-                        }
-                        if(parfileinfo == NULL)
-                        {
-                            fileinfo.insert("path", QVariant("/"));
-                            fileinfo.insert("parentinode", QVariant(-1));
-                        }
-                        else
-                        {
-                            fileinfo.insert("path", QVariant(QString(parfileinfo->value("path").toString() + parfileinfo->value("filename").toString() + "/")));
-                            fileinfo.insert("parentinode", QVariant(parfileinfo->value("inode").toULongLong()));
-                        }
-                        fileinfolist->append(fileinfo);
-                        curinode++;
-                        if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
-                        {
-                            ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
-                            //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
-                            curinode = fileinfolist->count();
-                        }
-                        fileinfo.clear();
-                        if(adsinfolist.count() > 0)
-                        {
-                            for(int j=0; j < adsinfolist.count(); j++)
-                            {
-                                QHash<QString, QVariant> curadsinfo = adsinfolist.at(j);
-                                curadsinfo.insert("inode", QVariant(curinode));
-                                fileinfolist->append(curadsinfo);
-                                curinode++;
-                            }
-                            adsinfolist.clear();
-                        }
-                    }
-                }
-                curpos = curpos + indxentrylength;
-            }
-            else
-                curpos = curpos + 4;
-        }
-        indxroot.clear();
-    }
-
  */ 
 
 //qDebug() << "create date:" << QDateTime::fromSecsSinceEpoch(fileinfo.value("createdate").toInt(), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP");
