@@ -7685,37 +7685,67 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 
 quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt)
 {
+    quint64 mftoffset = 0;
+    for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
+    {
+	if(ntinode * mftentrybytes < mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong())
+	{
+	    mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
+	    break;
+	}
+    }
+    quint64 curoffset = mftoffset + ntinode * mftentrybytes;
+    //qDebug() << "ntinode:" << ntinode << "entry signature:" << QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString());
+    if(QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString()) == "FILE") // proper mft entry
+    {
+        QString mftentrylayout = QString(QString::number(curoffset) + "," + QString::number(mftentrybytes) + ";");
+        // add the entry layout to file properties fileprop.
+        uint16_t mftsequenceid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 16, 2)); // sequence number for entry
+        uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2)); // offset to first attribute
+        uint16_t attrflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 22, 2)); // attribute flags
+        uint16_t attrcount = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 40, 2)); // next attribute id
+        if(attrcount > 0)
+        {
+            uint32_t attrlength = 0;
+            uint16_t curpos = firstattroffset;
+            curoffset = curoffset + curpos;
+            for(uint16_t i=0; i < attrcount; i++)
+            {
+                if(curpos + 22 > mftentrybytes)
+                    break;
+                uint32_t attrtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset, 4)); // attribute type
+                attrlength = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 4, 4)); // attribute length
+                if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
+                {
+                }
+                else if(attrtype == 0x30) // $FILE_NAME - always resident
+                {
+                }
+                else if(attrtype == 0x80) // $DATA - resident or non-resident
+                {
+                }
+                else if(attrtype == 0x90) // $INDEX_ROOT - always resident
+                {
+                }
+                else if(attrtype == 0xa0) // INDEX_ALLOCATION - always non-resident
+                {
+                }
+                else if(attrtype == 0xffffffff)
+                    break;
+                curoffset += attrlength;
+            }
+        }
+    }
+    else if(QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString()) == "BAAD") // probably orphan
+    {
+        qDebug() << "BAAD ENTRY... Do something with it.";
+    }
     return inodecnt;
 }
 
 /*
 void GetMftEntryContent(ForImg* curimg, qulonglong ntinode, QHash<QString, QVariant>* fileinfo, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* adsinfolist)
 {
-    QByteArray mftarray;
-    mftarray.clear();
-    QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
-    for(int i=0; i < mftlist.count(); i++)
-        mftarray.append(curimg->ReadContent(mftlist.at(i).split(",").at(0).toLongLong(), mftlist.at(i).split(",").at(1).toLongLong()));
-
-    // GET THE MFT ENTRY BYTE OFFSET RELATIVE TO THE FILE SYSTEM SO I CAN HIGHLIGHT IN HEX
-    qulonglong curmftentryoffset = 0;
-    qulonglong mftrelativeoffset = ntinode * fsinfo->value("mftentrybytes").toUInt();
-    //QStringList mftlist = fsinfo->value("mftlayout").toString().split(";", Qt::SkipEmptyParts);
-    qulonglong entriespersize = 0;
-    for(int j=0; j < mftlist.count(); j++)
-    {
-        entriespersize += mftlist.at(j).split(",").at(1).toULongLong() / fsinfo->value("mftentrybytes").toUInt();
-        if(ntinode < entriespersize)
-        {
-            curmftentryoffset = mftlist.at(j).split(",").at(0).toULongLong() + mftrelativeoffset;
-            break;
-        }
-    }
-
-    //int mftentrycount = mftarray.count() / fsinfo->value("mftentrybytes").toUInt();
-    QByteArray curmftentry = mftarray.mid(ntinode*fsinfo->value("mftentrybytes").toUInt(), fsinfo->value("mftentrybytes").toUInt());
-    mftarray.clear();
-    fileinfo->insert("mftrecordlayout", QString(QString::number(curmftentryoffset) + "," + QString::number(fsinfo->value("mftentrybytes").toUInt()) + ";"));
     // NOW I'VE GOT THE CURMFTENTRY FROM NTINODE AND I NEED TO PARSE THE ATTRIBUTE TO GET REST OF THE FILEINFO...
     if(QString::fromStdString(curmftentry.left(4).toStdString()) == "FILE") // a proper mft entry
     {
