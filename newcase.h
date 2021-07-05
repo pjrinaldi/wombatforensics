@@ -23,6 +23,7 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, quint64 curoffset, QString* incompatflags, QList<uint32_t>* blocklist);
 quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parinode, QString parfilename, QString parlayout);
 quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt);
+void GetRunListLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bytespercluster, uint16_t mftentrybytes, quint64 curoffset, QString* layout);
 
 /*
 void ProcessVolume(ForImg* tmpimage);

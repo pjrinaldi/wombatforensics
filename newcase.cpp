@@ -7718,6 +7718,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 		uint8_t resflags = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 8, 1)); // resident/non-resident flag 0/1
 		uint8_t namelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 9, 1)); // attribute name length
 		uint16_t nameoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 10, 2)); // offset to the attr name
+                QString attrname = "";
                 if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
                 {
 		    uint64_t createdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 24, 8)));
@@ -7789,7 +7790,64 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			}
 			else if(resflags == 0x01) // non-resident
 			{
+			    logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
+			    QString layout = "";
+			    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
+			    qDebug() << "layout:" << layout;
+			    //void GetRunListLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bytespercluster, quint64 curoffset, QString* layout)
+			    /*
+			    uint16_t runlistoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 32, 2));
+			    uint currunoff = curoffset + runlistoff;
+			    int k = 0;
+			    QStringList runlist;
+			    runlist.clear();
+			    while(currunoff < curoffset + mftentrybytes)
+			    {
+				if(qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, 1)) > 0)
+				{
+				    QString runstr = QString("%1").arg(qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, 1)), 8, 2, QChar('0'));
+				    uint runlengthbytes = runstr.right(4).toInt(nullptr, 2);
+				    uint runlengthoffset = runstr.left(4).toInt(nullptr, 2);
+				    if(runlengthbytes == 0 && runlengthoffset == 0)
+					break;
+				    currunoff++;
+				    uint runlength = 0;
+				    int runoffset = 0;
+				    if(runlengthbytes == 1)
+					runlength = qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, runlengthbytes));
+				    else
+					runlength = qFromLittleEndian<uint>(curimg->ReadContent(currunoff, runlengthbytes));
+				    if(runlengthoffset == 1)
+					runoffset = qFromLittleEndian<int8_t>(curimg->ReadContent(currunoff + runlengthbytes, runlengthoffset));
+				    else
+					runoffset = qFromLittleEndian<int>(curimg->ReadContent(currunoff + runlengthbytes, runlengthoffset));
+				    if(k > 0)
+				    {
+					if(k > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
+					    runoffset = runoffset - 0xffff - 1;
+					runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
+				    }
+				    physicalsize += runlength;
+				    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
+				    k++;
+				    currunoff += runlengthbytes + runlengthoffset;
+				}
+				else
+				    break;
+				physicalsize = physicalsize * bytespercluster;
+				QString layout = "";
+				for(int k=0; k < runlist.count(); k++)
+				    layout += QString(QString::number(curstartsector * 512 + (runlist.at(k).split(",").at(0).toUInt() * bytespercluster)) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * bytespercluster) + ";");
+			    }
+			    */
 			}
+		    }
+		    else // alternate data stream
+		    {
+			attrname = "";
+			for(int k=0; k < namelength; k++)
+			    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + k*2, 2))));
+			//qDebug() << "ads:" << QString("$DATA:" + attrname);
 		    }
                 }
                 else if(attrtype == 0x90) // $INDEX_ROOT - always resident
@@ -7811,6 +7869,53 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     return inodecnt;
 }
 
+void GetRunListLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bytespercluster, uint16_t mftentrybytes, quint64 curoffset, QString* layout)
+{
+    uint16_t runlistoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 32, 2));
+    uint currunoff = curoffset + runlistoff;
+    int i = 0;
+    QStringList runlist;
+    runlist.clear();
+    while(currunoff < curoffset + mftentrybytes)
+    {
+	if(qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, 1)) > 0)
+	{
+	    QString runstr = QString("%1").arg(qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, 1)), 8, 2, QChar('0'));
+	    uint runlengthbytes = runstr.right(4).toInt(nullptr, 2);
+	    uint runlengthoffset = runstr.left(4).toInt(nullptr, 2);
+	    if(runlengthbytes == 0 && runlengthoffset == 0)
+		break;
+	    currunoff++;
+	    uint runlength = 0;
+	    int runoffset = 0;
+	    if(runlengthbytes == 1)
+		runlength = qFromLittleEndian<uint8_t>(curimg->ReadContent(currunoff, runlengthbytes));
+	    else
+		runlength = qFromLittleEndian<uint>(curimg->ReadContent(currunoff, runlengthbytes));
+	    if(runlengthoffset == 1)
+		runoffset = qFromLittleEndian<int8_t>(curimg->ReadContent(currunoff + runlengthbytes, runlengthoffset));
+	    else
+		runoffset = qFromLittleEndian<int>(curimg->ReadContent(currunoff + runlengthbytes, runlengthoffset));
+	    if(i > 0)
+	    {
+		if(i > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
+		    runoffset = runoffset - 0xffff - 1;
+		runoffset = runoffset + runlist.at(i-1).split(",").at(0).toUInt();
+	    }
+	    //physicalsize += runlength;
+	    runlist.append(QString(QString::number(runoffset) + "," + QString::number(runlength)));
+	    i++;
+	    currunoff += runlengthbytes + runlengthoffset;
+	}
+	else
+	    break;
+	//physicalsize = physicalsize * bytespercluster;
+    }
+    for(int k=0; k < runlist.count(); k++)
+	layout->append(QString(QString::number(curstartsector * 512 + (runlist.at(k).split(",").at(0).toUInt() * bytespercluster)) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * bytespercluster) + ";"));
+    runlist.clear();
+}
+
 /*
 void GetMftEntryContent(ForImg* curimg, qulonglong ntinode, QHash<QString, QVariant>* fileinfo, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* adsinfolist)
 {
@@ -7819,69 +7924,6 @@ void GetMftEntryContent(ForImg* curimg, qulonglong ntinode, QHash<QString, QVari
     {
                 else if(attrtype == 0x80) // $DATA - resident or non-resident
                 {
-		    if(namelength == 0) // main file content - not alternate data stream
-		    {
-			qulonglong logicalsize = 0;
-			qulonglong physicalsize = 0;
-			if(resflag == 0x00) // resident
-			{
-			    uint32_t contentsize = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 16, 4));
-			    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2));
-			    logicalsize = contentsize;
-			    physicalsize = contentsize;
-			    fileinfo->insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentsize) + ";")));
-			}
-			else if(resflag == 0x01) // non-resident 
-			{
-			    logicalsize = qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8));
-			    uint16_t runlistoff = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 32, 2));
-			    uint currunoff = curoffset + runlistoff;
-			    int k = 0;
-			    QStringList runlist;
-			    runlist.clear();
-			    while(currunoff < fsinfo->value("mftentrybytes").toUInt())
-			    {
-				if(curmftentry.at(currunoff) > 0)
-				{
-				    QString runstr = QString("%1").arg(curmftentry.at(currunoff), 8, 2, QChar('0'));
-				    uint runlengthbytes = runstr.right(4).toInt(nullptr, 2);
-				    uint runlengthoffset = runstr.left(4).toInt(nullptr, 2);
-				    if(runlengthbytes == 0 && runlengthoffset == 0)
-					break;
-				    currunoff++;
-				    uint runlength = 0;
-				    int runoffset = 0;
-				    if(runlengthbytes == 1)
-					runlength = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff, runlengthbytes));
-				    else
-					runlength = qFromLittleEndian<uint>(curmftentry.mid(currunoff, runlengthbytes));
-				    if(runlengthoffset == 1)
-					runoffset = qFromLittleEndian<int8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
-				    else
-					runoffset = qFromLittleEndian<int>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
-				    if(k > 0)
-                                    {
-                                        if(k > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
-                                            runoffset = runoffset - 0xffff - 1;
-					runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
-                                    }
-				    physicalsize += runlength;
-				    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
-				    k++;
-				    currunoff += runlengthbytes + runlengthoffset;
-				}
-				else
-				    break;
-			    }
-			    physicalsize = physicalsize * fsinfo->value("bytespercluster").toUInt();
-			    QString layout = "";
-			    for(int k=0; k < runlist.count(); k++)
-				layout += QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(k).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()) + ";";
-			    fileinfo->insert("layout", QVariant(layout));
-			}
-			fileinfo->insert("logicalsize", QVariant(logicalsize));
-			fileinfo->insert("physicalsize", QVariant(physicalsize));
-		    }
 		    else // alternate data stream
 		    {
 			QHash<QString, QVariant> adsinfo;
