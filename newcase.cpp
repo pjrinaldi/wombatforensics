@@ -7687,7 +7687,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
  */ 
 
-// should be able to get rid ptreecnt 
+// should be able to pass mftentryoffset, inodecnt, filename, parntinode, i30seqid, i30create, i30modify, i30status, i30access to this function so i can populate what i need to populate through here, which is the properties file and the nodedata treenode data, as well as ads sub-files and then return the newest inodecnt value.
 quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt)
 {
     quint64 mftoffset = 0;
@@ -7929,6 +7929,9 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     {
         qDebug() << "BAAD ENTRY... Do something with it.";
     }
+    // TAKE THE STORED NODEDATA AND ADS DATA TO WRITE TO THE RESPECTIVE PROPERTIES FILE AND CONTENT...
+    // NEED TO FIGURE OUT THE BEST WAY TO STORE THAT AND ACCESS IT, SOME KIND OF LIST OR NESTED LIST...
+    // FOR NODEDATA, CLEARLY IT WILL BE THE NODEDATA. FOR THE ADS, IT WILL HAVE TO BE A LIST, OR MAYBE A LIST OF NODELISTS TO LOOP OVER AS WELL AS A LIST OF LISTS OF PROPERTIES FOR EACH TO WRITE AS WELL...
     return inodecnt;
 }
 
