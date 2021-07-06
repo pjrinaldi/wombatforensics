@@ -7148,6 +7148,18 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     //qDebug() << "mft layout:" << mftlayout << "mft entry bytes:" << mftentrybytes << "bytes per cluster:" << bytespercluster;
     //qDebug() << "mft entry offset:" << ntinode * mftentrybytes;
 
+    /*
+     * THE USE OF PARLAYOUT WILL DEPEND ON HOW I STORE THE DIRECTORY LAYOUT AND WHETHER I STORE BOTH THE INDX_ROOT AND THE INDX_ALLOCATION...
+     * IF NOT, THEN I DON'T NEED THE PARLAYOUT VARIABLE
+     *
+     * IF THE PARLAYOUT IS THE MFTENTRYLAYOUT, THEN I DON'T NEED THE BELOW MFTLAYOUT LOOP, I CAN JUST USE THE MFTENTRYLAYOUT TO GET THE MFTENTRYOFFSET
+    if(parinode > 0)
+    {
+        dirlayout = parlayout;
+        // loop over layout variable to parse the content....
+    }
+    */
+
     quint64 mftoffset = 0;
     // THIS MATH IS PROBABLY OFF, WILL HAVE TO TEST WITH A LARGER MFT TEST IMAGE LATER
     for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
@@ -7226,6 +7238,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                 while(curpos < (indxallocoffset.at(i) + indxalloclength.at(i)) * bytespercluster)
                 {
                     uint64_t ntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6)); // nt inode for index entry
+                    ntinode = ntinode & 0x00ffffffffffffff;
                     uint16_t i30seqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2)); // seq number of index entry
                     uint16_t entrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2)); // entry length
                     uint16_t fnattrlength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2)); // $FILE_NAME attr length
@@ -7236,19 +7249,43 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                         {
                             uint8_t filenamelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 16 + 64, 1));
                             QString filename = "";
+                            qDebug() << "filenamelength:" << filenamelength;
                             for(uint8_t k=0; k < filenamelength; k++)
                                 filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 16 + 66 + k*2, 2))));
                             if(filename != ".")
                             {
+                                /*
+                                QTextStream out;
+                                QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+                                if(!fileprop.isOpen())
+                                    fileprop.open(QIODevice::Append | QIODevice::Text);
+                                out.setDevice(&fileprop);
+                                */
                                 //qDebug() << "curpos:" << curpos + 16;
                                 uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 6)); // parent nt inode for entry
+                                parntinode = parntinode & 0x00ffffffffffffff;
                                 uint16_t i30parentsequenceid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 16 + 6, 2)); // parent seq number for entry
                                 uint64_t i30create = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 8, 8)));
                                 uint64_t i30modify = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 8)));
                                 uint64_t i30change = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 24, 8)));
                                 uint64_t i30access = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8)));
-                                qDebug() << inodecnt << "Filename:" << filename << "parntinode:" << parntinode;
+                                qDebug() << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode, 16);
+                                // NODEDATA STARTS HERE, PASS POINTER TO NODEDATA TO GETMFTENTRYCONTENT FUNCTION.
+                                // ALSO PASS STRING POINTER FOR THE PROPERTIES FILE WHICH SHOULD START HERE...
+                                // FINALLY PASS A POINTER TO A STRINGLIST, WHICH CONTAINS THE ADS INFORMATION (WILL HAVE TO COME UP WITH SOME FORMAT I CAN PARSE)
+                                // 
+                                // WHAT IF I PASS THE PROPERTIES/NODEDATA TO THE GETMFTENTRYCONTNT FUNCTION AND THEN POPULATE ALL OF IT FROM WITHIN THERE...
                                 inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt);
+                                /*
+                                 * FILE PATH WILL MATTER AND I'LL FIGURE OUT WHEN I GET THERE...
+                                QString filepath = "/";
+                                //quint64 parentinode = 0;
+                                if(!parfilename.isEmpty())
+                                {
+                                    filepath = parfilename;
+                                    //parentinode = parinode;
+                                }
+                                */
                             }
                         }
                         curpos = curpos + entrylength;
@@ -7444,6 +7481,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
             uint16_t indxentrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2));
             uint16_t filenamelength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2));
             uint64_t ntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
+            ntinode = ntinode & 0x00ffffffffffffff;
             qDebug() << "ntinode:" << ntinode;
             if(indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0)
             {
@@ -7649,6 +7687,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
  */ 
 
+// should be able to get rid ptreecnt 
 quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt)
 {
     quint64 mftoffset = 0;
@@ -7666,6 +7705,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     {
         QString mftentrylayout = QString(QString::number(curoffset) + "," + QString::number(mftentrybytes) + ";");
         // add the entry layout to file properties fileprop.
+        // RETURN THE MFTENTRYOFFSET FOR PROPERTY FILE TO BE USED IN THE MFTENTRYLAYOUT
         uint16_t mftsequenceid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 16, 2)); // sequence number for entry
         uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2)); // offset to first attribute
         uint16_t attrflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 22, 2)); // attribute flags
@@ -7731,6 +7771,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			attrstr += "Not Indexed,";
 		    if(accessflags & 0x4000) // Encrypted
 			attrstr += "Encrypted,";
+                    // ADD ATTRSTR TO RETURN FOR THE PROPERTIES FILE
                 }
                 else if(attrtype == 0x30) // $FILE_NAME - always resident
                 {
@@ -7741,6 +7782,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			uint64_t filemodify = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8)));
 			uint64_t filestatus = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8)));
 			uint64_t fileaccess = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 56, 8)));
+                        // ADD 4 DATES TO RETURN FOR THE PROPERTIES FILE (FC, DATE), (FM, DATE)
 		    }
                 }
                 else if(attrtype == 0x80) // $DATA - resident or non-resident
@@ -7757,6 +7799,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    logicalsize = contentsize;
 			    physicalsize = contentsize;
 			    layout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentsize) + ";");
+                            // RETURN LOGICALSIZE FOR NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
 			}
 			else if(resflags == 0x01) // non-resident
 			{
@@ -7767,6 +7810,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    {
 				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
 			    }
+                            // RETURN LOGICALSIZE FOR THE NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
 			}
 		    }
 		    else // alternate data stream
@@ -7793,6 +7837,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
 				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
 			}
+                        // RETURN ATTRNAME, LOGICALSIZE FOR ADS NODE DATA AND PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
 			// NEED TO DO SOMETHING WITH THE ADS PROPERTIES AS WELL AS THE FILE PROPERTIES...
 		    }
                 }
@@ -7813,10 +7858,12 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 				logicalsize = contentlength;
 				physicalsize = contentlength;
 				layout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
+                                // RETURN APPROPRIATE LOGICALSIZE,PHYSICALSIZE,LAYOUT FOR THE NODEDATA AND PROPERTIES FILE
 			    }
 			    else // alternate stream
 			    {
 				qDebug() << "ads:" << QString("$INDEX_ROOT:" + attrname);
+                                // RETURN THE APPROPRIATE DATA FOR THE ALTERNATE DATA STREAM MAYBE CALCULATE THE 3 VALUES OUTSIDE IF/ELSE AND JUST STORE IT IN THE APPROPRIATE VARIABLES BASED ON THE IF/ELSE
 				/*
 				QHash<QString, QVariant> adsinfo;
 				adsinfo.clear();
@@ -7867,6 +7914,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    adsinfo.insert("path", QVariant(QString(fileinfo->value("path").toString() + fileinfo->value("filename").toString() + "/")));
 			    adsinfolist->append(adsinfo);
 			     */ 
+
+                            // RETURN THE VALUES FOR THE ADS APPROPRIATELY...
 			}
 		    }
                 }
