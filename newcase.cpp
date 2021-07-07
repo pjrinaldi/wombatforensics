@@ -7947,6 +7947,17 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
 				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
 			}
+                        QList<QVariant> tmpnode;
+                        tmpnode.clear();
+                        QList<QString> tmpprop;
+                        tmpprop.clear();
+                        tmpnode << QString("$DATA:" + attrname) << logicalsize;
+                        tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
+                        tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
+                        adsnodelist.append(tmpnode);
+                        adsproplist.append(tmpprop);
+                        tmpnode.clear();
+                        tmpprop.clear();
                         // RETURN ATTRNAME, LOGICALSIZE FOR ADS NODE DATA AND PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
 			// NEED TO DO SOMETHING WITH THE ADS PROPERTIES AS WELL AS THE FILE PROPERTIES...
 		    }
@@ -7974,6 +7985,17 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    else // alternate stream
 			    {
 				qDebug() << "ads:" << QString("$INDEX_ROOT:" + attrname);
+                                QList<QVariant> tmpnode;
+                                QList<QString> tmpprop;
+                                tmpnode.clear();
+                                tmpprop.clear();
+                                tmpnode << QString("$INDEX_ROOT:" + attrname) << contentlength;
+                                tmpprop.append(QString("Physical Size|" + QString::number(contentlength) + "|Physical size for the file in bytes."));
+                                tmpprop.append(QString("Layout|" + QString(QString::number(curoffset + contentoffset) + ",") + QString::number(contentlength) + ";" + "|File layout in bytes as offset,size;."));
+                                adsnodelist.append(tmpnode);
+                                adsproplist.append(tmpprop);
+                                tmpnode.clear();
+                                tmpprop.clear();
                                 // RETURN THE APPROPRIATE DATA FOR THE ALTERNATE DATA STREAM MAYBE CALCULATE THE 3 VALUES OUTSIDE IF/ELSE AND JUST STORE IT IN THE APPROPRIATE VARIABLES BASED ON THE IF/ELSE
 				/*
 				QHash<QString, QVariant> adsinfo;
@@ -7985,7 +8007,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 				adsinfo.insert("ntinode", QVariant(fileinfo->value("ntinode").toUInt()));
 				adsinfo.insert("parentinode", QVariant(fileinfo->value("inode").toUInt()));
 				adsinfo.insert("parntinode", QVariant(fileinfo->value("ntinode").toUInt()));
-				adsinfo.insert("isdeletd", QVariant(fileinfo->value("isdeleted").toUInt()));
+				adsinfo.insert("isdeleted", QVariant(fileinfo->value("isdeleted").toUInt()));
 				adsinfo.insert("itemtype", QVariant(10));
 				adsinfo.insert("path", QVariant(QString(fileinfo->value("path").toString() + fileinfo->value("filename").toString() + "/")));
 				// adsinfo.insert("path", "parntinode", "parentinode", "inode", "ntinode")
@@ -8012,6 +8034,17 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
 				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
 			    qDebug() << "ads:" << QString("$INDEX_ALLOCATION" + attrname);
+                            QList<QVariant> tmpnode;
+                            QList<QString> tmpprop;
+                            tmpnode.clear();
+                            tmpprop.clear();
+                            tmpnode << QString("$INDEX_ALLOCATION:" + attrname) << logicalsize;
+                            tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
+                            tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
+                            adsnodelist.append(tmpnode);
+                            adsproplist.append(tmpprop);
+                            tmpnode.clear();
+                            tmpprop.clear();
 			    /*
 			    adsinfo.insert("filename", QVariant(QString("$INDEX_ALLOCATION:" + attrname)));
 			    adsinfo.insert("layout", QVariant(layout));
@@ -8064,6 +8097,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
     else
         nodedata << "Empty" << "Zero File";
+    quint64 adsparentinode = inodecnt; // adsparentinode = curfile inode
+    QString adsparentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)); // adsparentstr = curfile id
     nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
     QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
     if(parinode > 0)
@@ -8078,6 +8113,14 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         isignals->ProgUpd();
     }
     inodecnt++;
+    nodedata.clear();
+    for(int i=0; i < adsnodelist.count(); i++)
+    {
+        // do catsig here and adsfilepath here as well... filepath + filename + "/"
+        QList<QVariant> adsnode;
+        adsnode.clear();
+
+    }
     /*
     curinode++;
     if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
