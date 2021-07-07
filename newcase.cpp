@@ -7258,10 +7258,10 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 6)); // parent nt inode for entry
                                 parntinode = parntinode & 0x00ffffffffffffff;
                                 uint16_t i30parentsequenceid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 16 + 6, 2)); // parent seq number for entry
-                                uint64_t i30create = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 8, 8)));
-                                uint64_t i30modify = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 8)));
-                                uint64_t i30change = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 24, 8)));
-                                uint64_t i30access = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8)));
+                                uint64_t i30create = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 8, 8)));
+                                uint64_t i30modify = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 16, 8)));
+                                uint64_t i30change = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 24, 8)));
+                                uint64_t i30access = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 32, 8)));
                                 //qDebug() << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode, 16);
                                 // NODEDATA STARTS HERE, PASS POINTER TO NODEDATA TO GETMFTENTRYCONTENT FUNCTION.
                                 // ALSO PASS STRING POINTER FOR THE PROPERTIES FILE WHICH SHOULD START HERE...
@@ -7720,6 +7720,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     {
 
         QString mftentrylayout = QString(QString::number(curoffset) + "," + QString::number(mftentrybytes) + ";");
+	out << "NT Inode|" << QString::number(ntinode) << "|NTFS file inode value." << Qt::endl;
+	out << "Parent NT Inode|" << QString::number(parntinode) << "|File's parent NTFS inode value." << Qt::endl;
         out << "MFT Entry Layout|" << mftentrylayout << "|Offset and size to the MFT entry record for the file." << Qt::endl;
         // add the entry layout to file properties fileprop.
         uint16_t mftsequenceid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 16, 2)); // sequence number for entry
