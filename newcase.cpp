@@ -7275,7 +7275,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 // FINALLY PASS A POINTER TO A STRINGLIST, WHICH CONTAINS THE ADS INFORMATION (WILL HAVE TO COME UP WITH SOME FORMAT I CAN PARSE)
                                 // 
                                 // WHAT IF I PASS THE PROPERTIES/NODEDATA TO THE GETMFTENTRYCONTNT FUNCTION AND THEN POPULATE ALL OF IT FROM WITHIN THERE...
-                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt);
+                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30parentsequenceid, i30create, i30modify, i30change, i30access);
                                 /*
                                  * FILE PATH WILL MATTER AND I'LL FIGURE OUT WHEN I GET THERE...
                                 QString filepath = "/";
@@ -7688,7 +7688,8 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
  */ 
 
 // should be able to pass mftentryoffset, inodecnt, filename, parntinode, i30seqid, i30create, i30modify, i30status, i30access to this function so i can populate what i need to populate through here, which is the properties file and the nodedata treenode data, as well as ads sub-files and then return the newest inodecnt value.
-quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt)
+//quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt)
+quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access)
 {
     quint64 mftoffset = 0;
     for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
