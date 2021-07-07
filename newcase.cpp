@@ -7687,6 +7687,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     QString layout = "";
     uint8_t itemtype = 0;
     uint8_t isdeleted = 0;
+
     QTextStream out;
     QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
     if(!fileprop.isOpen())
@@ -8114,11 +8115,35 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
     inodecnt++;
     nodedata.clear();
+    out.flush();
+    fileprop.close();
     for(int i=0; i < adsnodelist.count(); i++)
     {
         // do catsig here and adsfilepath here as well... filepath + filename + "/"
         QList<QVariant> adsnode;
         adsnode.clear();
+	adsnode << QByteArray(adsnodelist.at(i).at(0).toString().toUtf8()).toBase64() << QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64() << adsnodelist.at(i).at(1) << "0" << "0" << "0" << "0" << "0";
+	if(adsnodelist.at(i).at(1).toULongLong() > 0)
+	{
+	    QString catsig = GenerateCategorySignature(curimg, filename, adsproplist.at(i).at(1).split(";").at(0).split(",").at(0).toULongLong());
+	    adsnode << catsig.split("/").first() << catsig.split("/").last();
+	}
+	else
+	    adsnode << "Empty" << "Zero File";
+	adsnode << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+	mutex.lock();
+	treenodemodel->AddNode(adsnode, adsparentstr, 10, 0);
+	mutex.unlock();
+	// WRITE ADS PROPERTIES
+	QTextStream adsout;
+	QFile adsprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+	if(!adsprop.isOpen())
+	    adsprop.open(QIODevice::Append | QIODevice::Text);
+	adsout.setDevice(&fileprop);
+	adsout << adsproplist.at(i).at(0) << Qt::endl;
+	adsout << adsproplist.at(i).at(1) << Qt::endl;
+	adsout.flush();
+	adsprop.close();
 
     }
     /*
@@ -8131,9 +8156,6 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         curinode = fileinfolist->count();
     }
      */ 
-    nodedata.clear();
-    out.flush();
-    fileprop.close();
 
     // NEED TO TAKE CARE OF ADS'S HERE...
     return inodecnt;
