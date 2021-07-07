@@ -7931,14 +7931,14 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
 			    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &dirlayout);
 			    //qDebug() << "layout:" << layout;
-			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
+			    for(int j=0; j < dirlayout.split(";", Qt::SkipEmptyParts).count(); j++)
 			    {
-				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+				physicalsize += dirlayout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
 			    }
                             // RETURN LOGICALSIZE FOR THE NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
 			}
                         out << "Physical Size|" << QString::number(physicalsize) << "|Physical size in bytes for the file." << Qt::endl;
-                        out << "Layout|" << layout << "|File layout in bytes and formatted as offset,size; entries." << Qt::endl;
+                        out << "Layout|" << dirlayout << "|File layout in bytes and formatted as offset,size; entries." << Qt::endl;
 		    }
 		    else // alternate data stream
 		    {
