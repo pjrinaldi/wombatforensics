@@ -7109,7 +7109,7 @@ void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksiz
     }
 }
 
-quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parinode, QString parfilename, QString parlayout)
+quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout)
 {
     QString mftlayout = "";
     uint16_t mftentrybytes = 0;
@@ -7146,7 +7146,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	propfile.close();
     }
     //qDebug() << "mft layout:" << mftlayout << "mft entry bytes:" << mftentrybytes << "bytes per cluster:" << bytespercluster;
-    //qDebug() << "mft entry offset:" << ntinode * mftentrybytes;
+    //qDebug() << "mft entry offset:" << parentntinode * mftentrybytes;
 
     /*
      * THE USE OF PARLAYOUT WILL DEPEND ON HOW I STORE THE DIRECTORY LAYOUT AND WHETHER I STORE BOTH THE INDX_ROOT AND THE INDX_ALLOCATION...
@@ -7164,14 +7164,14 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     // THIS MATH IS PROBABLY OFF, WILL HAVE TO TEST WITH A LARGER MFT TEST IMAGE LATER
     for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
-	if(ntinode * mftentrybytes < mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong())
+	if(parentntinode * mftentrybytes < mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong())
 	{
 	    mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
 	    break;
 	}
     }
     //qDebug() << "mftoffset:" << mftoffset;
-    quint64 mftentryoffset = mftoffset + ntinode * mftentrybytes;
+    quint64 mftentryoffset = mftoffset + parentntinode * mftentrybytes;
     //qDebug() << "actual mftentryoffset:" << mftentryoffset;
     // PARSE MFT ENTRY FOR THE DIRECTORY SO I CAN THEN GET IT's CONTENTS AND PARSE THE INDIVIDUAL FILES WITHIN IT...
     quint64 curoffset = 0;
@@ -7254,13 +7254,6 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 16 + 66 + k*2, 2))));
                             if(filename != ".")
                             {
-                                /*
-                                QTextStream out;
-                                QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
-                                if(!fileprop.isOpen())
-                                    fileprop.open(QIODevice::Append | QIODevice::Text);
-                                out.setDevice(&fileprop);
-                                */
                                 //qDebug() << "curpos:" << curpos + 16;
                                 uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 6)); // parent nt inode for entry
                                 parntinode = parntinode & 0x00ffffffffffffff;
@@ -7275,17 +7268,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 // FINALLY PASS A POINTER TO A STRINGLIST, WHICH CONTAINS THE ADS INFORMATION (WILL HAVE TO COME UP WITH SOME FORMAT I CAN PARSE)
                                 // 
                                 // WHAT IF I PASS THE PROPERTIES/NODEDATA TO THE GETMFTENTRYCONTNT FUNCTION AND THEN POPULATE ALL OF IT FROM WITHIN THERE...
-                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30parentsequenceid, i30create, i30modify, i30change, i30access);
-                                /*
-                                 * FILE PATH WILL MATTER AND I'LL FIGURE OUT WHEN I GET THERE...
-                                QString filepath = "/";
-                                //quint64 parentinode = 0;
-                                if(!parfilename.isEmpty())
-                                {
-                                    filepath = parfilename;
-                                    //parentinode = parinode;
-                                }
-                                */
+                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset);
                             }
                         }
                         curpos = curpos + entrylength;
@@ -7689,8 +7672,27 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 
 // should be able to pass mftentryoffset, inodecnt, filename, parntinode, i30seqid, i30create, i30modify, i30status, i30access to this function so i can populate what i need to populate through here, which is the properties file and the nodedata treenode data, as well as ads sub-files and then return the newest inodecnt value.
 //quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt)
-quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access)
+quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset)
 {
+    QList<QList<QVariant>> adsnodelist;
+    QList<QList<QString>> adsproplist;
+    adsnodelist.clear();
+    adsproplist.clear();
+    quint64 logicalsize = 0;
+    quint64 createdate = 0;
+    quint64 modifydate = 0;
+    quint64 statusdate = 0;
+    quint64 accessdate = 0;
+    QString attrstr = "";
+    QString layout = "";
+    uint8_t itemtype = 0;
+    uint8_t isdeleted = 0;
+    QTextStream out;
+    QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+    if(!fileprop.isOpen())
+        fileprop.open(QIODevice::Append | QIODevice::Text);
+    out.setDevice(&fileprop);
+
     quint64 mftoffset = 0;
     for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
@@ -7704,13 +7706,16 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     //qDebug() << "ntinode:" << ntinode << "entry signature:" << QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString());
     if(QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString()) == "FILE") // proper mft entry
     {
+
         QString mftentrylayout = QString(QString::number(curoffset) + "," + QString::number(mftentrybytes) + ";");
+        out << "MFT Entry Layout|" << mftentrylayout << "|Offset and size to the MFT entry record for the file." << Qt::endl;
         // add the entry layout to file properties fileprop.
-        // RETURN THE MFTENTRYOFFSET FOR PROPERTY FILE TO BE USED IN THE MFTENTRYLAYOUT
         uint16_t mftsequenceid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 16, 2)); // sequence number for entry
         uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2)); // offset to first attribute
         uint16_t attrflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 22, 2)); // attribute flags
         uint16_t attrcount = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 40, 2)); // next attribute id
+        out << "MFT Sequence ID|" << QString::number(mftsequenceid) << "Sequence number for the MFT entry." << Qt::endl;
+        out << "$I30 Sequence ID|" << QString::number(i30seqid) << "Sequence number for the file from the $I30 attribute." << Qt::endl;
 	uint32_t accessflags = 0;
         if(attrcount > 0)
         {
@@ -7732,12 +7737,12 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 		uint16_t contentoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2)); // attribute content offset
                 if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
                 {
-		    uint64_t createdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 24, 8)));
-		    uint64_t modifydate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 32, 8)));
-		    uint64_t statusdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8)));
-		    uint64_t accessdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8)));
+		    createdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 24, 8)));
+		    modifydate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 32, 8)));
+		    statusdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8)));
+		    accessdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8)));
 		    accessflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 56, 4));
-		    QString attrstr = "";
+		    attrstr = "";
 		    if(attrflags == 0x00) // unallocated file
 			attrstr += "Not Allocated,";
 		    else if(attrflags == 0x01) // allocated file
@@ -7773,6 +7778,105 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 		    if(accessflags & 0x4000) // Encrypted
 			attrstr += "Encrypted,";
                     // ADD ATTRSTR TO RETURN FOR THE PROPERTIES FILE
+                    if(curpos > endoffset)
+                    {
+                        if(attrflags == 0x00) // unalloc file
+                        {
+                            if(accessflags & 0x4000) // encrypted
+                                itemtype = 13;
+                            else
+                                itemtype = 4;
+                            isdeleted = 1;
+                        }
+                        else if(attrflags == 0x02) // unalloc dir
+                        {
+                            if(accessflags & 0x4000) // encrypted
+                                itemtype = 13;
+                            else
+                                itemtype = 2;
+                            isdeleted = 1;
+                        }
+                        else
+                        {
+                            itemtype = 4;
+                            isdeleted = 1;
+                        }
+                    }
+                    else if(!parfilename.isEmpty())
+                    {
+                        if(parntinode != parentntinode)
+                        {
+                            if(attrflags == 0x00) // unalloc file
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    itemtype = 13;
+                                else
+                                    itemtype = 4;
+                                isdeleted = 1;
+                            }
+                            else if(attrflags == 0x02) // unalloc dir
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    itemtype = 13;
+                                else
+                                    itemtype = 2;
+                                isdeleted = 1;
+                            }
+                            else
+                            {
+                                itemtype = 4;
+                                isdeleted = 1;
+                            }
+                        }
+                        else
+                        {
+                            if(attrflags == 0x01) // alloc file
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    itemtype = 13;
+                                else
+                                    itemtype = 5;
+                                isdeleted = 0;
+                            }
+                            else if(attrflags == 0x03) // alloc dir
+                            {
+                                if(accessflags & 0x4000) // encrypted
+                                    itemtype = 13;
+                                else
+                                    itemtype = 3;
+                                isdeleted = 0;
+                            }
+                            else
+                            {
+                                itemtype = 5;
+                                isdeleted = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(attrflags == 0x01) // alloc file
+                        {
+                            if(accessflags & 0x4000) // encrypted
+                                itemtype = 13;
+                            else
+                                itemtype = 5;
+                            isdeleted = 0;
+                        }
+                        else if(attrflags == 0x03) // alloc dir
+                        {
+                            if(accessflags & 0x4000) // encrypted
+                                itemtype = 13;
+                            else
+                                itemtype = 3;
+                            isdeleted = 0;
+                        }
+                        else
+                        {
+                            itemtype = 5;
+                            isdeleted = 0;
+                        }
+                    }
                 }
                 else if(attrtype == 0x30) // $FILE_NAME - always resident
                 {
@@ -7783,16 +7887,19 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			uint64_t filemodify = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8)));
 			uint64_t filestatus = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8)));
 			uint64_t fileaccess = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 56, 8)));
-                        // ADD 4 DATES TO RETURN FOR THE PROPERTIES FILE (FC, DATE), (FM, DATE)
+                        out << "$FILE_NAME Create|" << ConvertWindowsTimeToUnixTimeUTC(filecreate) << "|File creation time as recorded in the $FILE_NAME attribute." << Qt::endl;
+                        out << "$FILE_NAME Modify|" << ConvertWindowsTimeToUnixTimeUTC(filemodify) << "|File modification time as recorded in the $FILE_NAME attribute." << Qt::endl;
+                        out << "$FILE_NAME Status Changed|" << ConvertWindowsTimeToUnixTimeUTC(filestatus) << "|File status changed time as recorded in the $FILE_NAME attribute." << Qt::endl;
+                        out << "$FILE_NAME Accessed|" << ConvertWindowsTimeToUnixTimeUTC(fileaccess) << "|File accessed time as recorded in the $FILE_NAME attribute." << Qt::endl;
 		    }
                 }
                 else if(attrtype == 0x80) // $DATA - resident or non-resident
                 {
 		    if(namelength == 0) // main file content - not alternate data stream
 		    {
-			quint64 logicalsize = 0;
+			logicalsize = 0;
 			quint64 physicalsize = 0;
-			QString layout = "";
+			layout = "";
 			if(resflags == 0x00) // resident
 			{
 			    uint32_t contentsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 16, 4));
@@ -7813,6 +7920,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    }
                             // RETURN LOGICALSIZE FOR THE NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
 			}
+                        out << "Physical Size|" << QString::number(physicalsize) << "|Physical size in bytes for the file." << Qt::endl;
+                        out << "Layout|" << layout << "|File layout in bytes and formatted as offset,size; entries." << Qt::endl;
 		    }
 		    else // alternate data stream
 		    {
@@ -7822,7 +7931,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			qDebug() << "ads:" << QString("$DATA:" + attrname);
 			quint64 logicalsize = 0;
 			quint64 physicalsize = 0;
-			QString layout = "";
+			layout = "";
 			if(resflags == 0x00) // resident
 			{
 			    uint32_t contentsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 16, 4));
@@ -7847,9 +7956,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 		    if(attrflags == 0x02 || attrflags == 0x03 || (accessflags & 0x02 && accessflags & 0x04))
 		    {
 			attrname = "";
-			quint64 logicalsize = 0;
 			quint64 physicalsize = 0;
-			QString layout = "";
+			layout = "";
 			if(namelength > 0) // get $I30 default dir attribute
 			{
 			    for(int j=0; j < namelength; j++)
@@ -7859,6 +7967,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 				logicalsize = contentlength;
 				physicalsize = contentlength;
 				layout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
+                                out << "Physical Size|" << QString::number(physicalsize) << "|Physical size for the file in bytes." << Qt::endl;
+                                out << "Layout|" << layout << "|File layout in bytes as offset,size;." << Qt::endl;
                                 // RETURN APPROPRIATE LOGICALSIZE,PHYSICALSIZE,LAYOUT FOR THE NODEDATA AND PROPERTIES FILE
 			    }
 			    else // alternate stream
@@ -7897,7 +8007,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			{
 			    quint64 logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
 			    quint64 physicalsize = 0;
-			    QString layout = "";
+			    layout = "";
 			    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
 			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
 				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
@@ -7933,6 +8043,56 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     // TAKE THE STORED NODEDATA AND ADS DATA TO WRITE TO THE RESPECTIVE PROPERTIES FILE AND CONTENT...
     // NEED TO FIGURE OUT THE BEST WAY TO STORE THAT AND ACCESS IT, SOME KIND OF LIST OR NESTED LIST...
     // FOR NODEDATA, CLEARLY IT WILL BE THE NODEDATA. FOR THE ADS, IT WILL HAVE TO BE A LIST, OR MAYBE A LIST OF NODELISTS TO LOOP OVER AS WELL AS A LIST OF LISTS OF PROPERTIES FOR EACH TO WRITE AS WELL...
+
+    QString filepath = "/";
+    if(!parfilename.isEmpty())
+        filepath = parfilename;
+
+    // NEED TO FIGURE OUT ITEMTYPE AND ISDELETED...
+    QList<QVariant> nodedata;
+    nodedata.clear();
+    nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray(filepath.toUtf8()).toBase64() << logicalsize << createdate << accessdate << modifydate << statusdate << 0;
+    if(logicalsize > 0) // Get Category/Signature
+    {
+        if(itemtype == 3 && isdeleted == 0)
+            nodedata << "Directory" << "Directory";
+        else
+        {
+            QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
+            nodedata << catsig.split("/").first() << catsig.split("/").last();
+        }
+    }
+    else
+        nodedata << "Empty" << "Zero File";
+    nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+    QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+    if(parinode > 0)
+        parentstr += QString("-f" + QString::number(parinode));
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, parentstr, itemtype, isdeleted);
+    mutex.unlock();
+    if(nodedata.at(11).toString().split("-").count() == 3)
+    {
+        listeditems.append(nodedata.at(11).toString());
+        filesfound++;
+        isignals->ProgUpd();
+    }
+    inodecnt++;
+    /*
+    curinode++;
+    if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
+    {
+        inodecnt = ParseExtDirectory(curimg, curstartsector, ptreecnt, extinode, inodecnt - 1, QString(filepath + filename + "/"), curlayout);
+        ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+        //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
+        curinode = fileinfolist->count();
+    }
+     */ 
+    nodedata.clear();
+    out.flush();
+    fileprop.close();
+
+    // NEED TO TAKE CARE OF ADS'S HERE...
     return inodecnt;
 }
 
