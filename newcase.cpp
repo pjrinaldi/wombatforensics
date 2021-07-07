@@ -7463,6 +7463,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
             qDebug() << "in while loop...";
             uint16_t indxentrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2));
             uint16_t filenamelength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2));
+            uint16_t i30seqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2)); // seq number of index entry
             uint64_t ntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
             ntinode = ntinode & 0x00ffffffffffffff;
             qDebug() << "ntinode:" << ntinode;
@@ -7479,6 +7480,14 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                     if(filename != ".")
                     {
                         qDebug() << "Filename:" << filename;
+			uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
+			uint16_t i30parseqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2));
+			quint64 i30create = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 8, 8)));
+			quint64 i30modify = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 8)));
+			quint64 i30status = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 24, 8)));
+			quint64 i30access = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8)));
+			parntinode = parntinode & 0x00ffffffffffffff;
+                        inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset);
                     }
                 }
                 curpos = curpos + indxentrylength;
@@ -7487,6 +7496,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                 curpos = curpos + 4;
         }
     }
+    return inodecnt;
 }
 
 /*
@@ -7684,6 +7694,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     quint64 statusdate = 0;
     quint64 accessdate = 0;
     QString attrstr = "";
+    QString dirlayout = "";
     QString layout = "";
     uint8_t itemtype = 0;
     uint8_t isdeleted = 0;
@@ -7907,13 +7918,13 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2));
 			    logicalsize = contentsize;
 			    physicalsize = contentsize;
-			    layout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentsize) + ";");
+			    dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentsize) + ";");
                             // RETURN LOGICALSIZE FOR NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
 			}
 			else if(resflags == 0x01) // non-resident
 			{
 			    logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
-			    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
+			    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &dirlayout);
 			    //qDebug() << "layout:" << layout;
 			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
 			    {
@@ -7970,6 +7981,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			attrname = "";
 			quint64 physicalsize = 0;
 			layout = "";
+			dirlayout = "";
 			if(namelength > 0) // get $I30 default dir attribute
 			{
 			    for(int j=0; j < namelength; j++)
@@ -7978,9 +7990,9 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    {
 				logicalsize = contentlength;
 				physicalsize = contentlength;
-				layout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
+				dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
                                 out << "Physical Size|" << QString::number(physicalsize) << "|Physical size for the file in bytes." << Qt::endl;
-                                out << "Layout|" << layout << "|File layout in bytes as offset,size;." << Qt::endl;
+                                out << "Layout|" << dirlayout << "|File layout in bytes as offset,size;." << Qt::endl;
                                 // RETURN APPROPRIATE LOGICALSIZE,PHYSICALSIZE,LAYOUT FOR THE NODEDATA AND PROPERTIES FILE
 			    }
 			    else // alternate stream
@@ -8092,7 +8104,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
             nodedata << "Directory" << "Directory";
         else
         {
-            QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
+            QString catsig = GenerateCategorySignature(curimg, filename, dirlayout.split(";").at(0).split(",").at(0).toULongLong());
             nodedata << catsig.split("/").first() << catsig.split("/").last();
         }
     }
@@ -8146,6 +8158,14 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	adsprop.close();
 	inodecnt++;
     }
+    if(itemtype == 2 || itemtype == 3) // directory
+    {
+	qDebug() << "adsparentinode:" << adsparentinode;
+	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout);
+	qDebug() << "inodecnt on recursive return:" << inodecnt;
+	//curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "");
+	//quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout)
+    }
     /*
     curinode++;
     if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
@@ -8157,6 +8177,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
      */ 
 
+    qDebug() << "inodecnt before getmft return:" << inodecnt;
     // NEED TO TAKE CARE OF ADS'S HERE...
     return inodecnt;
 }
