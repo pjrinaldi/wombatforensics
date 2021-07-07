@@ -7249,7 +7249,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                         {
                             uint8_t filenamelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 16 + 64, 1));
                             QString filename = "";
-                            qDebug() << "filenamelength:" << filenamelength;
+                            //qDebug() << "filenamelength:" << filenamelength;
                             for(uint8_t k=0; k < filenamelength; k++)
                                 filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 16 + 66 + k*2, 2))));
                             if(filename != ".")
@@ -7262,7 +7262,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 uint64_t i30modify = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 8)));
                                 uint64_t i30change = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 24, 8)));
                                 uint64_t i30access = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8)));
-                                qDebug() << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode, 16);
+                                //qDebug() << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode, 16);
                                 // NODEDATA STARTS HERE, PASS POINTER TO NODEDATA TO GETMFTENTRYCONTENT FUNCTION.
                                 // ALSO PASS STRING POINTER FOR THE PROPERTIES FILE WHICH SHOULD START HERE...
                                 // FINALLY PASS A POINTER TO A STRINGLIST, WHICH CONTAINS THE ADS INFORMATION (WILL HAVE TO COME UP WITH SOME FORMAT I CAN PARSE)
@@ -7929,7 +7929,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			attrname = "";
 			for(int k=0; k < namelength; k++)
 			    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + k*2, 2))));
-			qDebug() << "ads:" << QString("$DATA:" + attrname);
+			//qDebug() << "ads:" << QString("$DATA:" + attrname);
 			quint64 logicalsize = 0;
 			quint64 physicalsize = 0;
 			layout = "";
@@ -7985,7 +7985,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    }
 			    else // alternate stream
 			    {
-				qDebug() << "ads:" << QString("$INDEX_ROOT:" + attrname);
+				//qDebug() << "ads:" << QString("$INDEX_ROOT:" + attrname);
                                 QList<QVariant> tmpnode;
                                 QList<QString> tmpprop;
                                 tmpnode.clear();
@@ -8034,7 +8034,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
 			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
 				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
-			    qDebug() << "ads:" << QString("$INDEX_ALLOCATION" + attrname);
+			    //qDebug() << "ads:" << QString("$INDEX_ALLOCATION" + attrname);
                             QList<QVariant> tmpnode;
                             QList<QString> tmpprop;
                             tmpnode.clear();
@@ -8144,7 +8144,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	adsout << adsproplist.at(i).at(1) << Qt::endl;
 	adsout.flush();
 	adsprop.close();
-
+	inodecnt++;
     }
     /*
     curinode++;
