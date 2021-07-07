@@ -7460,13 +7460,13 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         uint curpos = indxrootoffset + 16 + startoffset;
         while(curpos < indxrootoffset + 16 + startoffset + allocoffset)
         {
-            qDebug() << "in while loop...";
+            //qDebug() << "in while loop...";
             uint16_t indxentrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2));
             uint16_t filenamelength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2));
             uint16_t i30seqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2)); // seq number of index entry
             uint64_t ntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
             ntinode = ntinode & 0x00ffffffffffffff;
-            qDebug() << "ntinode:" << ntinode;
+            //qDebug() << "ntinode:" << ntinode;
             if(indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0)
             {
                 curpos = curpos + 16;
@@ -7479,7 +7479,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                         filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 66 + i*2, 2))));
                     if(filename != ".")
                     {
-                        qDebug() << "Filename:" << filename;
+                        //qDebug() << "Filename:" << filename;
 			uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
 			uint16_t i30parseqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2));
 			quint64 i30create = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 8, 8)));
@@ -7726,8 +7726,12 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         uint16_t firstattroffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2)); // offset to first attribute
         uint16_t attrflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 22, 2)); // attribute flags
         uint16_t attrcount = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 40, 2)); // next attribute id
-        out << "MFT Sequence ID|" << QString::number(mftsequenceid) << "Sequence number for the MFT entry." << Qt::endl;
-        out << "$I30 Sequence ID|" << QString::number(i30seqid) << "Sequence number for the file from the $I30 attribute." << Qt::endl;
+        out << "MFT Sequence ID|" << QString::number(mftsequenceid) << "|Sequence number for the MFT entry." << Qt::endl;
+        out << "$I30 Sequence ID|" << QString::number(i30seqid) << "|Sequence number for the file from the $I30 attribute." << Qt::endl;
+        out << "$I30 Create Date|" << ConvertWindowsTimeToUnixTimeUTC(i30create) << "|File Creation time as recorded in the $I30 entry" << Qt::endl;
+        out << "$I30 Modify Date|" << ConvertWindowsTimeToUnixTimeUTC(i30modify) << "|File Modification time as recorded in the $I30 entry" << Qt::endl;
+        out << "$I30 Status Changed Date|" << ConvertWindowsTimeToUnixTimeUTC(i30change) << "|File Status Changed time as recorded in the $I30 entry" << Qt::endl;
+        out << "$I30 Accessed Date|" << ConvertWindowsTimeToUnixTimeUTC(i30access) << "|File Accessed time as recorded in the $I30 entry" << Qt::endl;
 	uint32_t accessflags = 0;
         if(attrcount > 0)
         {
@@ -7790,6 +7794,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 		    if(accessflags & 0x4000) // Encrypted
 			attrstr += "Encrypted,";
                     // ADD ATTRSTR TO RETURN FOR THE PROPERTIES FILE
+		    out << "File Attributes|" << attrstr << "|Attributes list for the file." << Qt::endl;
                     if(curpos > endoffset)
                     {
                         if(attrflags == 0x00) // unalloc file
@@ -8129,6 +8134,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     nodedata.clear();
     out.flush();
     fileprop.close();
+    //qDebug() << "adsproplist:" << adsproplist;
     for(int i=0; i < adsnodelist.count(); i++)
     {
         // do catsig here and adsfilepath here as well... filepath + filename + "/"
@@ -8151,7 +8157,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	QFile adsprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
 	if(!adsprop.isOpen())
 	    adsprop.open(QIODevice::Append | QIODevice::Text);
-	adsout.setDevice(&fileprop);
+	adsout.setDevice(&adsprop);
 	adsout << adsproplist.at(i).at(0) << Qt::endl;
 	adsout << adsproplist.at(i).at(1) << Qt::endl;
 	adsout.flush();
@@ -8160,9 +8166,9 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
     if(itemtype == 2 || itemtype == 3) // directory
     {
-	qDebug() << "adsparentinode:" << adsparentinode;
+	//qDebug() << "adsparentinode:" << adsparentinode;
 	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout);
-	qDebug() << "inodecnt on recursive return:" << inodecnt;
+	//qDebug() << "inodecnt on recursive return:" << inodecnt;
 	//curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "");
 	//quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout)
     }
@@ -8177,7 +8183,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
      */ 
 
-    qDebug() << "inodecnt before getmft return:" << inodecnt;
+    //qDebug() << "inodecnt before getmft return:" << inodecnt;
     // NEED TO TAKE CARE OF ADS'S HERE...
     return inodecnt;
 }
