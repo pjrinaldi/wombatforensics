@@ -1506,7 +1506,7 @@ void WombatForensics::UpdateProperties()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QString nodeid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
     QStringList evidfiles = eviddir.entryList(QStringList("*-*" + nodeid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-    qDebug() << "evidfiles:" << evidfiles;
+    //qDebug() << "evidfiles:" << evidfiles;
     QString evidencename = evidfiles.at(0).split("-e").first();
     propertylist.clear();
     if(nodeid.split("-").count() == 1) // evidence image
