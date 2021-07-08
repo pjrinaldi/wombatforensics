@@ -7457,10 +7457,14 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         uint32_t startoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 16, 4));
         uint32_t endoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 20, 4));
         uint32_t allocoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 24, 4));
+        qDebug() << "endoffset:" << endoffset;
+        qDebug() << "allocoffset:" << allocoffset;
         uint curpos = indxrootoffset + 16 + startoffset;
+        //qDebug() << "initial curpos:" << curpos << "initial end pos:" << indxrootoffset + 16 + startoffset + allocoffset;
         while(curpos < indxrootoffset + 16 + startoffset + allocoffset)
         {
             //qDebug() << "in while loop...";
+            //qDebug() << "curpos:" << curpos - indxrootoffset - startoffset - 16;
             uint16_t indxentrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2));
             uint16_t filenamelength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2));
             uint16_t i30seqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2)); // seq number of index entry
@@ -7490,7 +7494,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                         inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset);
                     }
                 }
-                curpos = curpos + indxentrylength;
+                curpos = curpos - 16 + indxentrylength;
             }
             else
                 curpos = curpos + 4;

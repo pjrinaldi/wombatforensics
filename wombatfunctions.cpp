@@ -352,16 +352,10 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	mimestr = "System File/Allocation Bitmap";
     else if(filename.startsWith("$UpCase"))
 	mimestr = "Windows System/System File";
-    //QString mimecategory = mimestr.split("/").first();
-    //QString mimesignature = mimestr.split("/").last();
-    /*
-    if(filename.startsWith("$UPCASE_TABLE"))
-        mimestr = "System File/Up-case Table";
-    if(filename.startsWith("$UpCase"))
+    else if(filename.startsWith("$MFT") || filename.startsWith("$MFTMirr") || filename.startsWith("$LogFile") || filename.startsWith("$Volume") || filename.startsWith("$AttrDef") || filename.startsWith("$Bitmap") || filename.startsWith("$Boot") || filename.startsWith("$BadClus") || filename.startsWith("$Secure") || filename.startsWith("$Extend"))
         mimestr = "Windows System/System File";
-        else if(filename.startsWith("$ALLOC_BITMAP"))
-            mimestr = "System File/Allocation Bitmap";
-     */ 
+    //else if(filename.startsWith("$INDEX_ROOT:") || filename.startsWith("$DATA:") || filename.startWith("$INDEX_ALLOCATION:"))
+    
 
     return mimestr;
     //return QString(mimecategory + "/" + mimesignature);
