@@ -7883,6 +7883,10 @@ void GetRunListLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bytesper
     runlist.clear();
 }
 
+void ParseNtfsOrphans(ForImg* curimg, uint8_t ptreecnt, quint64 curinode)
+{
+}
+
 /*
 void ParseMFT(ForImg* curimg, QHash<QString, QVariant>* fsinfo, QList<QHash<QString, QVariant>>* fileinfolist, QList<QHash<QString, QVariant>>* orphanlist)
 {
