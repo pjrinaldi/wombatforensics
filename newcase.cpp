@@ -7884,7 +7884,9 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	}
 	propfile.close();
     }
-    qDebug() << "mftentrybytes:" << mftentrybytes;
+
+    //qDebug() << "mftentrybytes:" << mftentrybytes;
+
     //
     // ** Orphan File
     // * This occurs when the file is deleted and either:
@@ -7914,6 +7916,27 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 		//qDebug() << "attrflags:" << QString::number(attrflags, 16);
 		if(attrflags == 0x00 || attrflags == 0x02) // not allocated file or directory [only looking for deleted or orphaned files]
 		{
+		    QList<QList<QVariant>> adsnodelist;
+		    QList<QList<QString>> adsproplist;
+		    adsnodelist.clear();
+		    adsproplist.clear();
+		    quint64 logicalsize = 0;
+		    quint64 createdate = 0;
+		    quint64 modifydate = 0;
+		    quint64 statusdate = 0;
+		    quint64 accessdate = 0;
+		    QString attrstr = "";
+		    QString dirlayout = "";
+		    QString layout = "";
+		    uint8_t itemtype = 0;
+		    uint8_t isdeleted = 0;
+
+		    QTextStream out;
+		    QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(curinode) + ".prop");
+		    if(!fileprop.isOpen())
+			fileprop.open(QIODevice::Append | QIODevice::Text);
+		    out.setDevice(&fileprop);
+
 		    uint32_t attrlength = 0;
 		    curoffset = curoffset + firstattroffset;
 		    while(curoffset < curoffset + mftentrybytes)
@@ -7933,7 +7956,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
 			{
 			    /*
-			     *createdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 24, 8)));
+			    createdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 24, 8)));
 			    modifydate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 32, 8)));
 			    statusdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8)));
 			    accessdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8)));
@@ -8588,10 +8611,79 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	    {
 		qDebug() << "a BAAD MFT to try to read... maybe an orphan..";
 	    }
+	    /*
+	    QString filepath = "/";
+	    if(!parfilename.isEmpty())
+		filepath = parfilename;
+
+	    // NEED TO FIGURE OUT ITEMTYPE AND ISDELETED...
+	    QList<QVariant> nodedata;
+	    nodedata.clear();
+	    nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray(filepath.toUtf8()).toBase64() << logicalsize << createdate << accessdate << modifydate << statusdate << 0;
+	    if(logicalsize > 0) // Get Category/Signature
+	    {
+		if(itemtype == 3 && isdeleted == 0)
+		    nodedata << "Directory" << "Directory";
+		else
+		{
+		    QString catsig = GenerateCategorySignature(curimg, filename, dirlayout.split(";").at(0).split(",").at(0).toULongLong());
+		    nodedata << catsig.split("/").first() << catsig.split("/").last();
+		}
+	    }
+	    else
+		nodedata << "Empty" << "Zero File";
+	    quint64 adsparentinode = inodecnt; // adsparentinode = curfile inode
+	    QString adsparentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)); // adsparentstr = curfile id
+	    nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+	    QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+	    if(parinode > 0)
+		parentstr += QString("-f" + QString::number(parinode));
+	    mutex.lock();
+	    treenodemodel->AddNode(nodedata, parentstr, itemtype, isdeleted);
+	    mutex.unlock();
+	    if(nodedata.at(11).toString().split("-").count() == 3)
+	    {
+		listeditems.append(nodedata.at(11).toString());
+		filesfound++;
+		isignals->ProgUpd();
+	    }
+	    inodecnt++;
+	    nodedata.clear();
+	    out.flush();
+	    fileprop.close();
+	    //qDebug() << "adsproplist:" << adsproplist;
+	    for(int i=0; i < adsnodelist.count(); i++)
+	    {
+		// do catsig here and adsfilepath here as well... filepath + filename + "/"
+		QList<QVariant> adsnode;
+		adsnode.clear();
+		adsnode << QByteArray(adsnodelist.at(i).at(0).toString().toUtf8()).toBase64() << QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64() << adsnodelist.at(i).at(1) << "0" << "0" << "0" << "0" << "0";
+		if(adsnodelist.at(i).at(1).toULongLong() > 0)
+		{
+		    QString catsig = GenerateCategorySignature(curimg, filename, adsproplist.at(i).at(1).split(";").at(0).split(",").at(0).toULongLong());
+		    adsnode << catsig.split("/").first() << catsig.split("/").last();
+		}
+		else
+		    adsnode << "Empty" << "Zero File";
+		adsnode << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+		mutex.lock();
+		treenodemodel->AddNode(adsnode, adsparentstr, 10, 0);
+		mutex.unlock();
+		// WRITE ADS PROPERTIES
+		QTextStream adsout;
+		QFile adsprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+		if(!adsprop.isOpen())
+		    adsprop.open(QIODevice::Append | QIODevice::Text);
+		adsout.setDevice(&adsprop);
+		adsout << adsproplist.at(i).at(0) << Qt::endl;
+		adsout << adsproplist.at(i).at(1) << Qt::endl;
+		adsout.flush();
+		adsprop.close();
+		inodecnt++;
+	    }
+	     */ 
 	}
-
     }
-
 }
 
 /*
