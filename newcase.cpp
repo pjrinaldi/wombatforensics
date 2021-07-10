@@ -7914,6 +7914,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
             uint64_t parntinode = 0;
             uint16_t parseqid = 0;
             uint16_t accessflags = 0;
+            QString filepath = "";
             //uint8_t isdeleted = 1;
 
 	    quint64 curoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
@@ -8213,6 +8214,17 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                 }
                 else
                 {
+                    for(int k=0; k < ntinodelist->count(); k++)
+                    {
+                        if(parntinode == ntinodelist->at(k))
+                        {
+                            // NEED TO GET THE ID, FILENAME, FILEPATH, ITEMTYPE (is it directory)
+                            // MIGHT HAVE TO MOVE NTINODELIST TO A KEY/VALUE HASH OF NTINODE KEY AND ID VALUE FOR EASE OF ACCESS TO GET THE FILE PROPERTIES WITHOUT HAVING TO OPEN/PARSE EACH FILE
+                            // OR I CAN MAKE THE LIST OF STRINGS WHICH IS THE NTINODE|ID
+                            // IF I HAVE A HASH, I DON'T HAVE TO FOR LOOP, I CAN JUST HASKEY
+                            hasparent = 1;
+                        }
+                    }
                     // IF PARNTINODE == ONE OF THE EXISTING FILES NTINODE (LOOP OVER .PROP FILES??? OR HAVE AN QLIST<QUINT64> WITH EXISTING NTINODE'S TO LOOP THROUGH, THEN DELETED...
                     // ELSE ORPHAN
                 }
