@@ -7852,18 +7852,10 @@ void GetRunListLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bytesper
 
 void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curinode)
 {
-    // mftlayout, mftentrybytes, bytespercluster, curstartsector
     QString mftlayout = "";
     uint16_t mftentrybytes = 0;
     uint32_t bytespercluster = 0;
     quint64 maxmftentries = 0;
-    //quint64 inodecnt = 0;
-
-    /*
-    out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of bytes per sector, usually 512." << Qt::endl;
-    out << "Sectors Per Cluster|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1))) << "|Number of sectors per cluster." << Qt::endl;
-    out << "Max MFT Entries|" << QString::number((mftsize * bytespercluster)/1024) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
-    */
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -7884,9 +7876,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	}
 	propfile.close();
     }
-
-    //qDebug() << "mftentrybytes:" << mftentrybytes;
-
     //
     // ** Orphan File
     // * This occurs when the file is deleted and either:
@@ -7903,6 +7892,25 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	// parse each mft block run for entries...
 	for(quint64 j=0; j < entriespersize; j++)
 	{
+            QList<QList<QVariant>> adsnodelist;
+            QList<QList<QString>> adsproplist;
+            adsnodelist.clear();
+            adsproplist.clear();
+            quint64 logicalsize = 0;
+            quint64 createdate = 0;
+            quint64 modifydate = 0;
+            quint64 statusdate = 0;
+            quint64 accessdate = 0;
+            QString attrstr = "";
+            QString dirlayout = "";
+            QString layout = "";
+            QString filename = "";
+            uint8_t itemtype = 0;
+            uint64_t parntinode = 0;
+            uint16_t parseqid = 0;
+            uint16_t accessflags = 0;
+            //uint8_t isdeleted = 1;
+
 	    quint64 curoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
 	    //qDebug() << "curoffset at start of the mft:" << curoffset;
 	    curoffset = curoffset + j*mftentrybytes;
@@ -7916,20 +7924,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 		//qDebug() << "attrflags:" << QString::number(attrflags, 16);
 		if(attrflags == 0x00 || attrflags == 0x02) // not allocated file or directory [only looking for deleted or orphaned files]
 		{
-		    QList<QList<QVariant>> adsnodelist;
-		    QList<QList<QString>> adsproplist;
-		    adsnodelist.clear();
-		    adsproplist.clear();
-		    quint64 logicalsize = 0;
-		    quint64 createdate = 0;
-		    quint64 modifydate = 0;
-		    quint64 statusdate = 0;
-		    quint64 accessdate = 0;
-		    QString attrstr = "";
-		    QString dirlayout = "";
-		    QString layout = "";
-		    uint8_t itemtype = 0;
-		    uint8_t isdeleted = 0;
 
 		    QTextStream out;
 		    QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(curinode) + ".prop");
@@ -7955,7 +7949,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 			uint16_t contentoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2)); // attribute content offset
 			if(attrtype == 0x10) // $STANDARD_INFORMATION - always resident, treenode timestamps
 			{
-			    /*
 			    createdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 24, 8)));
 			    modifydate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 32, 8)));
 			    statusdate = ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8)));
@@ -7963,13 +7956,15 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 			    accessflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 56, 4));
 			    attrstr = "";
 			    if(attrflags == 0x00) // unallocated file
+                            {
 				attrstr += "Not Allocated,";
-			    else if(attrflags == 0x01) // allocated file
-				attrstr += "Allocated,";
+                                itemtype = 4;
+                            }
 			    else if(attrflags == 0x02) // unallocated directory
+                            {
 				attrstr += "Not Allocated,";
-			    else if(attrflags == 0x03) // allocated directory
-				attrstr += "Allocated,";
+                                itemtype = 2;
+                            }
 			    if(accessflags & 0x01) // READ ONLY
 				attrstr += "Read Only,";
 			    if(accessflags & 0x02) // Hidden
@@ -7998,168 +7993,23 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 				attrstr += "Encrypted,";
 			    // ADD ATTRSTR TO RETURN FOR THE PROPERTIES FILE
 			    out << "File Attributes|" << attrstr << "|Attributes list for the file." << Qt::endl;
-			    if(curpos > endoffset)
-			    {
-				if(attrflags == 0x00) // unalloc file
-				{
-				    if(accessflags & 0x4000) // encrypted
-					itemtype = 13;
-				    else
-					itemtype = 4;
-				    isdeleted = 1;
-				}
-				else if(attrflags == 0x02) // unalloc dir
-				{
-				    if(accessflags & 0x4000) // encrypted
-					itemtype = 13;
-				    else
-					itemtype = 2;
-				    isdeleted = 1;
-				}
-				else
-				{
-				    itemtype = 4;
-				    isdeleted = 1;
-				}
-			    }
-			    else if(!parfilename.isEmpty())
-			    {
-				if(parntinode != parentntinode)
-				{
-				    if(attrflags == 0x00) // unalloc file
-				    {
-					if(accessflags & 0x4000) // encrypted
-					    itemtype = 13;
-					else
-					    itemtype = 4;
-					isdeleted = 1;
-				    }
-				    else if(attrflags == 0x02) // unalloc dir
-				    {
-					if(accessflags & 0x4000) // encrypted
-					    itemtype = 13;
-					else
-					    itemtype = 2;
-					isdeleted = 1;
-				    }
-				    else
-				    {
-					itemtype = 4;
-					isdeleted = 1;
-				    }
-				}
-				else
-				{
-				    if(attrflags == 0x01) // alloc file
-				    {
-					if(accessflags & 0x4000) // encrypted
-					    itemtype = 13;
-					else
-					    itemtype = 5;
-					isdeleted = 0;
-				    }
-				    else if(attrflags == 0x03) // alloc dir
-				    {
-					if(accessflags & 0x4000) // encrypted
-					    itemtype = 13;
-					else
-					    itemtype = 3;
-					isdeleted = 0;
-				    }
-				    else
-				    {
-					itemtype = 5;
-					isdeleted = 0;
-				    }
-				}
-			    }
-			    else
-			    {
-				if(attrflags == 0x01) // alloc file
-				{
-				    if(accessflags & 0x4000) // encrypted
-					itemtype = 13;
-				    else
-					itemtype = 5;
-				    isdeleted = 0;
-				}
-				else if(attrflags == 0x03) // alloc dir
-				{
-				    if(accessflags & 0x4000) // encrypted
-					itemtype = 13;
-				    else
-					itemtype = 3;
-				    isdeleted = 0;
-				}
-				else
-				{
-				    itemtype = 5;
-				    isdeleted = 0;
-				}
-			    }
-
-			     */ 
-			    qDebug() << j << "standard information";
-			    /*
-			     *fileinfo.insert("createdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 8)))));
-			    fileinfo.insert("modifydate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
-			    fileinfo.insert("statusdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
-			    fileinfo.insert("accessdate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
-			    uint32_t accessflags = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 56, 4));
-			    QString attrstr = "";
-			    if(attrflags == 0x00) // deleted file
-			    {
-				attrstr += "Not Allocated,";
-				if(accessflags & 0x4000) // encrypted
-				    fileinfo.insert("itemtype", QVariant(13));
-				else
-				    fileinfo.insert("itemtype", QVariant(4));
-				fileinfo.insert("isdeleted", QVariant(1));
-			    }
-			    else if(attrflags == 0x02) // deleted directory
-			    {
-				attrstr += "Not Allocated,";
-				if(accessflags & 0x4000) // encrypted
-				    fileinfo.insert("itemtype", QVariant(13));
-				else
-				    fileinfo.insert("itemtype", QVariant(2));
-				fileinfo.insert("isdeleted", QVariant(1));
-			    }
-			    if(accessflags & 0x01) // READ ONLY
-				attrstr += "Read Only,";
-			    if(accessflags & 0x02) // Hidden
-				attrstr += "Hidden,";
-			    if(accessflags & 0x04) // System
-				attrstr += "System,";
-			    if(accessflags & 0x20) // Archive
-				attrstr += "Archive,";
-			    if(accessflags & 0x40) // Device
-				attrstr += "Device";
-			    if(accessflags & 0x80) // Normal
-				attrstr += "Normal,";
-			    if(accessflags & 0x100) // Temporary
-				attrstr += "Temporary,";
-			    if(accessflags & 0x200) // Sparse File
-				attrstr += "Sparse File,";
-			    if(accessflags & 0x400) // Reparse Point
-				attrstr += "Reparse Point,";
-			    if(accessflags & 0x800) // Compresssed
-				attrstr += "Compressed,";
-			    if(accessflags & 0x1000) // Offline
-				attrstr += "Offline,";
-			    if(accessflags & 0x2000) // Not Indexed
-				attrstr += "Not Indexed,";
-			    if(accessflags & 0x4000) // Encrypted
-				attrstr += "Encrypted";
-			    fileinfo.insert("attribute", QVariant(attrstr));
-			     */ 
 			}
 			else if(attrtype == 0x30) // $FILE_NAME - always resident
 			{
-			    /*
-			     *uint8_t filenamespace = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 89, 1));
+                            parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 24, 6)); // parent mft entry inode
+                            parseqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 30, 2)); // parent sequence id
+			    parntinode = parntinode & 0x00ffffffffffffff;
+                            //qDebug() << "ntinode:" << j << "parntinode:" << parntinode;
+			    uint8_t filenamespace = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 89, 1));
+                            uint8_t filenamelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 88, 1));
 			    if(filenamespace != 0x02)
 			    {
+                                filename = "";
+                                for(uint8_t k=0; k < filenamelength; k++)
+                                    filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 90 + k*2, 2))));
+                                //qDebug() << "filename:" << filename;
+	                        out << "Parent NT Inode|" << QString::number(parntinode) << "|File's parent NTFS inode value." << Qt::endl;
+                                out << "Parent Sequence ID|" << QString::number(parseqid) << "|File's parent sequence id." << Qt::endl;
 				uint64_t filecreate = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 32, 8));
 				uint64_t filemodify = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8));
 				uint64_t filestatus = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
@@ -8169,334 +8019,136 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 				out << "$FILE_NAME Status Changed|" << ConvertWindowsTimeToUnixTimeUTC(filestatus) << "|File status changed time as recorded in the $FILE_NAME attribute." << Qt::endl;
 				out << "$FILE_NAME Accessed|" << ConvertWindowsTimeToUnixTimeUTC(fileaccess) << "|File accessed time as recorded in the $FILE_NAME attribute." << Qt::endl;
 			    }
-			     */ 
-			    qDebug() << j << "file name";
-			    /*
-			     *uint64_t parmftentry = qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 24, 6)); // parent mft entry
-			    uint16_t parsequence = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 30, 2)); // parent sequence id
-			    uint8_t filenamespace = curmftentry.at(curoffset + 89);
-			    uint8_t filenamelength = curmftentry.at(curoffset + 88);
-			    if(filenamespace != 0x02)
-			    {
-				QString filename = "";
-				for(int k=0; k < filenamelength; k++)
-				    filename += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 90 + k*2, 2))));
-				fileinfo.insert("filename", QVariant(filename));
-				fileinfo.insert("ntinode", QVariant(i));
-				fileinfo.insert("parntinode", QVariant((qulonglong)parmftentry));
-				fileinfo.insert("parsequenceid", QVariant(parsequence));
-				fileinfo.insert("filecreate", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 32, 8)))));
-				fileinfo.insert("filemodify", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 40, 8)))));
-				fileinfo.insert("filestatus", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8)))));
-				fileinfo.insert("fileaccess", QVariant(ConvertNtfsTimeToUnixTime(qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 56, 8)))));
-				//fileinfo.insert("inode", QVariant(curinode));
 				//fileinfo.insert("path", QVariant("/"));
 				//fileinfo.insert("parentinode", QVariant(-1));
 				//qDebug() << "nt mft entry:" << i << "filename:" << filename << "sequence number:" << sequenceid << "parmftentry:" << parmftentry << "parent sequence number;" << parsequence;
-			    }
-			     */ 
 			}
 			else if(attrtype == 0x80) // $DATA - resident or non-resident
 			{
-			    /*
-			     *if(namelength == 0) // main file content - not alternate data stream
-				{
-				    logicalsize = 0;
-				    quint64 physicalsize = 0;
-				    layout = "";
-				    if(resflags == 0x00) // resident
-				    {
-					uint32_t contentsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 16, 4));
-					uint16_t contentoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2));
-					logicalsize = contentsize;
-					physicalsize = contentsize;
-					dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentsize) + ";");
-					// RETURN LOGICALSIZE FOR NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
-				    }
-				    else if(resflags == 0x01) // non-resident
-				    {
-					logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
-					GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &dirlayout);
-					//qDebug() << "layout:" << layout;
-					for(int j=0; j < dirlayout.split(";", Qt::SkipEmptyParts).count(); j++)
-					{
-					    physicalsize += dirlayout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
-					}
-					// RETURN LOGICALSIZE FOR THE NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
-				    }
-				    out << "Physical Size|" << QString::number(physicalsize) << "|Physical size in bytes for the file." << Qt::endl;
-				    out << "Layout|" << dirlayout << "|File layout in bytes and formatted as offset,size; entries." << Qt::endl;
-				}
-				else // alternate data stream
-				{
-				    attrname = "";
-				    for(int k=0; k < namelength; k++)
-					attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + k*2, 2))));
-				    //qDebug() << "ads:" << QString("$DATA:" + attrname);
-				    quint64 logicalsize = 0;
-				    quint64 physicalsize = 0;
-				    layout = "";
-				    if(resflags == 0x00) // resident
-				    {
-					uint32_t contentsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 16, 4));
-					uint16_t contentoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2));
-					logicalsize = contentsize;
-					physicalsize = contentsize;
-					layout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentsize) + ";");
-				    }
-				    else if(resflags == 0x01) // non-resident
-				    {
-					logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
-					GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
-					for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
-					    physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
-				    }
-				    QList<QVariant> tmpnode;
-				    tmpnode.clear();
-				    QList<QString> tmpprop;
-				    tmpprop.clear();
-				    tmpnode << QString("$DATA:" + attrname) << logicalsize;
-				    tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
-				    tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
-				    adsnodelist.append(tmpnode);
-				    adsproplist.append(tmpprop);
-				    tmpnode.clear();
-				    tmpprop.clear();
-				    // RETURN ATTRNAME, LOGICALSIZE FOR ADS NODE DATA AND PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
-				    // NEED TO DO SOMETHING WITH THE ADS PROPERTIES AS WELL AS THE FILE PROPERTIES...
-				}
-			     */ 
-			    qDebug() << j << "data";
-			    /*
-			     // NEED "LAYOUT"
-			    // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
 			    if(namelength == 0) // main file content - not alternate data stream
-			    {
-				qulonglong logicalsize = 0;
-				qulonglong physicalsize = 0;
-				if(resflag == 0x00) // resident
-				{
-				    uint32_t contentsize = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 16, 4));
-				    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2));
-				    logicalsize = contentsize;
-				    physicalsize = contentsize;
-				    fileinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentsize) + ";")));
-				}
-				else if(resflag == 0x01) // non-resident
-				{
-				    logicalsize = qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8));
-				    uint16_t runlistoff = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 32, 2));
-				    uint currunoff = curoffset + runlistoff;
-				    int k = 0;
-				    QStringList runlist;
-				    runlist.clear();
-				    while(currunoff < fsinfo->value("mftentrybytes").toUInt())
-				    {
-					if(curmftentry.at(currunoff) > 0)
-					{
-					    QString runstr = QString("%1").arg(curmftentry.at(currunoff), 8, 2, QChar('0'));
-					    uint runlengthbytes = runstr.right(4).toInt(nullptr, 2);
-					    uint runlengthoffset = runstr.left(4).toInt(nullptr, 2);
-					    if(runlengthbytes == 0 && runlengthoffset == 0)
-						break;
-					    currunoff++;
-					    uint runlength = 0;
-					    int runoffset = 0;
-					    if(runlengthbytes == 1)
-						runlength = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff, runlengthbytes));
-					    else
-						runlength = qFromLittleEndian<uint>(curmftentry.mid(currunoff, runlengthbytes));
-					    if(runlengthoffset == 1)
-						runoffset = qFromLittleEndian<int8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
-					    else
-						runoffset = qFromLittleEndian<int>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
-					    if(k > 0)
-					    {
-						if(k > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
-						    runoffset = runoffset - 0xffff - 1;
-						runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
-					    }
-					    physicalsize += runlength;
-					    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
-					    k++;
-					    currunoff += runlengthbytes + runlengthoffset;
-					}
-					else
-					    break;
-				    }
-				    physicalsize = physicalsize * fsinfo->value("bytespercluster").toUInt();
-				    QString layout = "";
-				    for(int k=0; k < runlist.count(); k++)
-					layout += QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(k).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()) + ";";
-				    fileinfo.insert("layout", QVariant(layout));
-				}
-				fileinfo.insert("logicalsize", QVariant(logicalsize));
-				fileinfo.insert("physicalsize", QVariant(physicalsize));
-			    }
+                            {
+                                logicalsize = 0;
+                                quint64 physicalsize = 0;
+                                layout = "";
+                                if(resflag == 0x00) // resident
+                                {
+                                    uint32_t contentsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 16, 4));
+                                    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2));
+                                    logicalsize = contentsize;
+                                    physicalsize = contentsize;
+                                    dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentsize) + ";");
+                                    // RETURN LOGICALSIZE FOR NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
+                                }
+                                else if(resflag == 0x01) // non-resident
+                                {
+                                    logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
+                                    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &dirlayout);
+                                    //qDebug() << "layout:" << layout;
+                                    for(int j=0; j < dirlayout.split(";", Qt::SkipEmptyParts).count(); j++)
+                                    {
+                                        physicalsize += dirlayout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+                                    }
+                                    // RETURN LOGICALSIZE FOR THE NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
+                                }
+                                out << "Physical Size|" << QString::number(physicalsize) << "|Physical size in bytes for the file." << Qt::endl;
+                                out << "Layout|" << dirlayout << "|File layout in bytes and formatted as offset,size; entries." << Qt::endl;
+                            }
+                            else // alternate data stream
+                            {
+                                attrname = "";
+                                for(int k=0; k < namelength; k++)
+                                    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + k*2, 2))));
+                                //qDebug() << "ads:" << QString("$DATA:" + attrname);
+                                quint64 logicalsize = 0;
+                                quint64 physicalsize = 0;
+                                layout = "";
+                                if(resflag == 0x00) // resident
+                                {
+                                    uint32_t contentsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 16, 4));
+                                    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2));
+                                    logicalsize = contentsize;
+                                    physicalsize = contentsize;
+                                    layout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentsize) + ";");
+                                }
+                                else if(resflag == 0x01) // non-resident
+                                {
+                                    logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
+                                    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
+                                    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
+                                        physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+                                }
+                                QList<QVariant> tmpnode;
+                                tmpnode.clear();
+                                QList<QString> tmpprop;
+                                tmpprop.clear();
+                                tmpnode << QString("$DATA:" + attrname) << logicalsize;
+                                tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
+                                tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
+                                adsnodelist.append(tmpnode);
+                                adsproplist.append(tmpprop);
+                                tmpnode.clear();
+                                tmpprop.clear();
+                            }
+			    /*
 			    else // alternate data stream
 			    {
-				QHash<QString, QVariant> adsinfo;
-				attrname = "";
-				for(int k=0; k < namelength; k++)
-				    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
-				adsinfo.clear();
-				// REPEAT ADS HERE AND ADD TO ADSINFO...
-				adsinfo.insert("filename", QVariant(QString("$DATA:" + attrname)));
-				qulonglong logicalsize = 0;
-				qulonglong physicalsize = 0;
-				if(resflag == 0x00) // resident
-				{
-				    uint32_t contentsize = qFromLittleEndian<uint32_t>(curmftentry.mid(curoffset + 16, 4));
-				    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 20, 2));
-				    logicalsize = contentsize;
-				    physicalsize = contentsize;
-				    adsinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentsize) + ";")));
-				}
-				else if(resflag == 0x01) // non-resident
-				{
-				    logicalsize = qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8));
-				    uint16_t runlistoff = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 32, 2));
-				    uint currunoff = curoffset + runlistoff;
-				    int k = 0;
-				    QStringList runlist;
-				    runlist.clear();
-				    while(currunoff < fsinfo->value("mftentrybytes").toUInt())
-				    {
-					if(curmftentry.at(currunoff) > 0)
-					{
-					    QString runstr = QString("%1").arg(curmftentry.at(currunoff), 8, 2, QChar('0'));
-					    uint runlengthbytes = runstr.right(4).toInt(nullptr, 2);
-					    uint runlengthoffset = runstr.left(4).toInt(nullptr, 2);
-					    if(runlengthbytes == 0 && runlengthoffset == 0)
-						break;
-					    currunoff++;
-					    uint runlength = 0;
-					    int runoffset = 0;
-					    if(runlengthbytes == 1)
-						runlength = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff, runlengthbytes));
-					    else
-						runlength = qFromLittleEndian<uint>(curmftentry.mid(currunoff, runlengthbytes));
-					    if(runlengthoffset == 1)
-						runoffset = qFromLittleEndian<int8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
-					    else
-						runoffset = qFromLittleEndian<int>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
-					    if(k > 0)
-					    {
-						if(k > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
-						    runoffset = runoffset - 0xffff - 1;
-						runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
-					    }
-					    physicalsize += runlength;
-					    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
-					    k++;
-					    currunoff += runlengthbytes + runlengthoffset;
-					}
-					else
-					    break;
-				    }
-				    //qDebug() << "runlist:" << runlist;
-				    physicalsize = physicalsize * fsinfo->value("bytespercluster").toUInt();
-				    QString layout = "";
-				    for(int k=0; k < runlist.count(); k++)
-					layout += QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(k).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()) + ";";
-				    //qDebug() << "layout:" << layout;
-				    adsinfo.insert("layout", QVariant(layout));
-				}
-				adsinfo.insert("logicalsize", QVariant(logicalsize));
-				adsinfo.insert("physicalsize", QVariant(physicalsize));
-				adsinfo.insert("ntinode", QVariant(fileinfo.value("ntinode").toUInt()));
-				adsinfo.insert("parentinode", QVariant(fileinfo.value("inode").toUInt()));
-				adsinfo.insert("parntinode", QVariant(fileinfo.value("ntinode").toUInt()));
 				adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
 				adsinfo.insert("itemtype", QVariant(10));
 				adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
-				adsinfolist.append(adsinfo);
 			    }
 			     */ 
 			}
 			else if(attrtype == 0x90) // $INDEX_ROOT - always resident
 			{
+			    if(attrflags == 0x02 || attrflags == 0x03 || (accessflags & 0x02 && accessflags & 0x04))
+                            {
+                                attrname = "";
+                                quint64 physicalsize = 0;
+                                layout = "";
+                                dirlayout = "";
+                                if(namelength > 0) // get $I30 default dir attribute
+                                {
+                                    for(int j=0; j < namelength; j++)
+                                        attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + j*2, 2))));
+                                    if(attrname.startsWith("$I30"))
+                                    {
+                                        logicalsize = contentlength;
+                                        physicalsize = contentlength;
+                                        dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
+                                        out << "Physical Size|" << QString::number(physicalsize) << "|Physical size for the file in bytes." << Qt::endl;
+                                        out << "Layout|" << dirlayout << "|File layout in bytes as offset,size;." << Qt::endl;
+                                        // RETURN APPROPRIATE LOGICALSIZE,PHYSICALSIZE,LAYOUT FOR THE NODEDATA AND PROPERTIES FILE
+                                    }
+                                    else // alternate stream
+                                    {
+                                        //qDebug() << "ads:" << QString("$INDEX_ROOT:" + attrname);
+                                        QList<QVariant> tmpnode;
+                                        QList<QString> tmpprop;
+                                        tmpnode.clear();
+                                        tmpprop.clear();
+                                        tmpnode << QString("$INDEX_ROOT:" + attrname) << contentlength;
+                                        tmpprop.append(QString("Physical Size|" + QString::number(contentlength) + "|Physical size for the file in bytes."));
+                                        tmpprop.append(QString("Layout|" + QString(QString::number(curoffset + contentoffset) + ",") + QString::number(contentlength) + ";" + "|File layout in bytes as offset,size;."));
+                                        adsnodelist.append(tmpnode);
+                                        adsproplist.append(tmpprop);
+                                        tmpnode.clear();
+                                        tmpprop.clear();
+                                    }
+                                }
+                            }
 			    /*
-			     *if(attrflags == 0x02 || attrflags == 0x03 || (accessflags & 0x02 && accessflags & 0x04))
-				{
-				    attrname = "";
-				    quint64 physicalsize = 0;
-				    layout = "";
-				    dirlayout = "";
-				    if(namelength > 0) // get $I30 default dir attribute
-				    {
-					for(int j=0; j < namelength; j++)
-					    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + j*2, 2))));
-					if(attrname.startsWith("$I30"))
-					{
-					    logicalsize = contentlength;
-					    physicalsize = contentlength;
-					    dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
-					    out << "Physical Size|" << QString::number(physicalsize) << "|Physical size for the file in bytes." << Qt::endl;
-					    out << "Layout|" << dirlayout << "|File layout in bytes as offset,size;." << Qt::endl;
-					    // RETURN APPROPRIATE LOGICALSIZE,PHYSICALSIZE,LAYOUT FOR THE NODEDATA AND PROPERTIES FILE
-					}
-					else // alternate stream
-					{
-					    //qDebug() << "ads:" << QString("$INDEX_ROOT:" + attrname);
-					    QList<QVariant> tmpnode;
-					    QList<QString> tmpprop;
-					    tmpnode.clear();
-					    tmpprop.clear();
-					    tmpnode << QString("$INDEX_ROOT:" + attrname) << contentlength;
-					    tmpprop.append(QString("Physical Size|" + QString::number(contentlength) + "|Physical size for the file in bytes."));
-					    tmpprop.append(QString("Layout|" + QString(QString::number(curoffset + contentoffset) + ",") + QString::number(contentlength) + ";" + "|File layout in bytes as offset,size;."));
-					    adsnodelist.append(tmpnode);
-					    adsproplist.append(tmpprop);
-					    tmpnode.clear();
-					    tmpprop.clear();
-					}
-				    }
-				}
-
-			     */ 
-			    qDebug() << j << "index root";
-			    /*
-			     // NEED "LAYOUT"
-			    // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
-			    if(attrflags == 0x02 || attrflags == 0x03 || (fileinfo.value("attribute").toString().contains("Hidden") && fileinfo.value("attribute").toString().contains("System"))) // directory
-			    {
-				attrname = "";
-				if(namelength > 0) // get $I30 default dir attribute
-				{
-				    for(int k=0; k < namelength; k++)
-					attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
-				}
-				if(attrname.startsWith("$I30"))
-				{
-				    fileinfo.insert("logicalsize", QVariant(contentlength));
-				    fileinfo.insert("physicalsize", QVariant(contentlength));
-				    fileinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentlength) + ";")));
-				}
-				else // alternate stream
-				{
-				    QHash<QString, QVariant> adsinfo;
-				    adsinfo.clear();
-				    adsinfo.insert("filename", QVariant(QString("$INDEX_ROOT:" + attrname)));
-				    adsinfo.insert("logicalsize", QVariant(contentlength));
-				    adsinfo.insert("physicalsize", QVariant(contentlength));
-				    adsinfo.insert("layout", QVariant(QString(QString::number(curmftentryoffset + curoffset + contentoffset) + "," + QString::number(contentlength) + ";")));
 				    adsinfo.insert("ntinode", QVariant(fileinfo.value("ntinode").toUInt()));
 				    adsinfo.insert("parentinode", QVariant(fileinfo.value("inode").toUInt()));
 				    adsinfo.insert("parntinode", QVariant(fileinfo.value("ntinode").toUInt()));
 				    adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
 				    adsinfo.insert("itemtype", QVariant(10));
 				    adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
-				    // adsinfo.insert("path", "parntinode", "parentinode", "inode", "ntinode")
-				    // REPEAT THE ABOVE HERE AND ADD TO THE 
-				    adsinfolist.append(adsinfo);
 				}
 			    }
 			     */ 
 			}
 			else if(attrtype == 0xa0) // $INDEX_ALLOCATION - always non-resident
 			{
-			    /*
 			    attrname = "";
 			    if(namelength > 0)
 			    {
@@ -8525,78 +8177,13 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 				    // RETURN THE VALUES FOR THE ADS APPROPRIATELY...
 				}
 			    }
-
-			     */ 
-			    qDebug() << j << "index allocation";
 			    /*
-			     // NEED "LAYOUT"
-			    // NEED TO ACCOUNT FOR POSSIBLE ALTERNATE STREAMS
-			    attrname = "";
-			    if(namelength > 0)
-			    {
-				for(int k=0; k < namelength; k++)
-				    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + nameoffset + k*2, 2))));
-				if(!attrname.startsWith("$I30")) // alternate data stream
-				{
-				    qulonglong logicalsize = 0;
-				    qulonglong physicalsize = 0;
-				    QHash<QString, QVariant> adsinfo;
-				    adsinfo.clear();
-				    logicalsize = qFromLittleEndian<uint64_t>(curmftentry.mid(curoffset + 48, 8));
-				    uint16_t runlistoff = qFromLittleEndian<uint16_t>(curmftentry.mid(curoffset + 32, 2));
-				    uint currunoff = curoffset + runlistoff;
-				    int k=0;
-				    QStringList runlist;
-				    runlist.clear();
-				    while(currunoff < fsinfo->value("mftentrybytes").toUInt())
-				    {
-					if(curmftentry.at(currunoff) > 0)
-					{
-					    QString runstr = QString("%1").arg(curmftentry.at(currunoff), 8, 2, QChar('0'));
-					    uint runlengthbytes = runstr.right(4).toInt(nullptr, 2);
-					    uint runlengthoffset = runstr.left(4).toInt(nullptr, 2);
-					    if(runlengthbytes == 0 && runlengthoffset == 0)
-						break;
-					    currunoff++;
-					    uint runlength = 0;
-					    int runoffset = 0;
-					    if(runlengthbytes == 1)
-						runlength = qFromLittleEndian<uint8_t>(curmftentry.mid(currunoff, runlengthbytes));
-					    else
-						runlength = qFromLittleEndian<uint>(curmftentry.mid(currunoff, runlengthbytes));
-					    if(runlengthoffset == 1)
-						runoffset = qFromLittleEndian<int8_t>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
-					    else
-						runoffset = qFromLittleEndian<int>(curmftentry.mid(currunoff + runlengthbytes, runlengthoffset));
-					    if(k > 0)
-					    {
-						if(k > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
-						    runoffset = runoffset - 0xffff - 1;
-						runoffset = runoffset + runlist.at(k-1).split(",").at(0).toUInt();
-					    }
-					    physicalsize += runlength;
-					    runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
-					    k++;
-					    currunoff += runlengthbytes + runlengthoffset;
-					}
-					else
-					    break;
-				    }
-				    physicalsize = physicalsize * fsinfo->value("bytespercluster").toUInt();
-				    QString layout = "";
-				    for(int k=0; k < runlist.count(); k++)
-					layout += QString::number((fsinfo->value("partoffset").toUInt() * 512) + (runlist.at(k).split(",").at(0).toUInt() * fsinfo->value("bytespercluster").toUInt())) + "," + QString::number(runlist.at(k).split(",").at(1).toUInt() * fsinfo->value("bytespercluster").toUInt()) + ";";
-				    adsinfo.insert("filename", QVariant(QString("$INDEX_ALLOCATION:" + attrname)));
-				    adsinfo.insert("layout", QVariant(layout));
-				    adsinfo.insert("logicalsize", QVariant(logicalsize));
-				    adsinfo.insert("physicalsize", QVariant(physicalsize));
 				    adsinfo.insert("ntinode", QVariant(fileinfo.value("ntinode").toUInt()));
 				    adsinfo.insert("parentinode", QVariant(fileinfo.value("inode").toUInt()));
 				    adsinfo.insert("parntinode", QVariant(fileinfo.value("ntinode").toUInt()));
 				    adsinfo.insert("isdeletd", QVariant(fileinfo.value("isdeleted").toUInt()));
 				    adsinfo.insert("itemtype", QVariant(10));
 				    adsinfo.insert("path", QVariant(QString(fileinfo.value("path").toString() + fileinfo.value("filename").toString() + "/")));
-				    adsinfolist.append(adsinfo);
 				}
 			    }
 			     */ 
@@ -8611,6 +8198,23 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	    {
 		qDebug() << "a BAAD MFT to try to read... maybe an orphan..";
 	    }
+            if(!filename.isEmpty())
+            {
+                uint8_t hasparent = 0;
+                if(parntinode == 5) // root directory is the parent
+                {
+                    hasparent = 1;
+                }
+                else
+                {
+                    // IF PARNTINODE == ONE OF THE EXISTING FILES NTINODE (LOOP OVER .PROP FILES??? OR HAVE AN QLIST<QUINT64> WITH EXISTING NTINODE'S TO LOOP THROUGH, THEN DELETED...
+                    // ELSE ORPHAN
+                }
+                if(hasparent == 0) // orphan, parent no longer exists
+                {
+                }
+            }
+            // SHOULD I ACCOUNT AN ORPHAN WITHOUT A FILE NAME ?????
 	    /*
 	    QString filepath = "/";
 	    if(!parfilename.isEmpty())
