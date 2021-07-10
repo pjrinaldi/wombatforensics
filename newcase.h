@@ -21,10 +21,10 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QList<qulonglong>* orphanoffsets);
 quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curextinode, quint64 parinode, QString parfilename, QString dirlayout);
 void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, quint64 curoffset, QString* incompatflags, QList<uint32_t>* blocklist);
-quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parinode, QString parfilename, QString parlayout);
-quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset);
+quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parinode, QString parfilename, QString parlayout, QList<quint64>* ntinodelist);
+quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset, QList<quint64>* ntinodelist);
 void GetRunListLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bytespercluster, uint16_t mftentrybytes, quint64 curoffset, QString* layout);
-void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curinode);
+void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curinode, QList<quint64>* ntinodelist);
 
 /*
 void ProcessVolume(ForImg* tmpimage);
