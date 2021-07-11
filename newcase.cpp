@@ -5822,11 +5822,14 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     else if(fstype == 5) // NTFS
     {
 	quint64 curinode = 0;
-        QList<quint64> ntinodelist;
-        ntinodelist.clear();
-	curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "", &ntinodelist);
-        ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &ntinodelist);
-        ntinodelist.clear();
+        //QList<quint64> ntinodelist;
+        QHash<quint64, quint64> ntinodehash;
+        //ntinodelist.clear();
+        ntinodehash.clear();
+	curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "", &ntinodehash);
+        ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &ntinodehash);
+        //ntinodelist.clear();
+        ntinodehash.clear();
     }
     else if(fstype == 6) // EXT2/3/4
     {
@@ -7111,7 +7114,7 @@ void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksiz
     }
 }
 
-quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout, QList<quint64>* ntinodelist)
+quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout, QHash<quint64, quint64>* ntinodehash)
 {
     QString mftlayout = "";
     uint16_t mftentrybytes = 0;
@@ -7270,7 +7273,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 // FINALLY PASS A POINTER TO A STRINGLIST, WHICH CONTAINS THE ADS INFORMATION (WILL HAVE TO COME UP WITH SOME FORMAT I CAN PARSE)
                                 // 
                                 // WHAT IF I PASS THE PROPERTIES/NODEDATA TO THE GETMFTENTRYCONTNT FUNCTION AND THEN POPULATE ALL OF IT FROM WITHIN THERE...
-                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, ntinodelist);
+                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, ntinodehash);
                             }
                         }
                         curpos = curpos + entrylength;
@@ -7320,7 +7323,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			quint64 i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8));
                         //qDebug() << "Filename:" << filename << "i30create:" << i30create;
 			parntinode = parntinode & 0x00ffffffffffffff;
-                        inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, ntinodelist);
+                        inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, ntinodehash);
                     }
                 }
                 curpos = curpos - 16 + indxentrylength;
@@ -7332,7 +7335,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     return inodecnt;
 }
 
-quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset, QList<quint64>* ntinodelist)
+quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset, QHash<quint64, quint64>* ntinodehash)
 {
     QList<QList<QVariant>> adsnodelist;
     QList<QList<QString>> adsproplist;
@@ -7385,7 +7388,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         out << "$I30 Status Changed Date|" << ConvertWindowsTimeToUnixTimeUTC(i30change) << "|File Status Changed time as recorded in the $I30 entry" << Qt::endl;
         out << "$I30 Accessed Date|" << ConvertWindowsTimeToUnixTimeUTC(i30access) << "|File Accessed time as recorded in the $I30 entry" << Qt::endl;
         if(attrflags == 0x02 || attrflags == 0x03)
-            ntinodelist->append(ntinode);
+            ntinodehash->insert(ntinode, inodecnt);
+        //ntinodelist->append(ntinode);
 	uint32_t accessflags = 0;
         if(attrcount > 0)
         {
@@ -7789,7 +7793,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     if(itemtype == 2 || itemtype == 3) // directory
     {
 	//qDebug() << "adsparentinode:" << adsparentinode;
-	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, ntinodelist);
+	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, ntinodehash);
 	//qDebug() << "inodecnt on recursive return:" << inodecnt;
 	//curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "");
 	//quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout)
@@ -7855,7 +7859,7 @@ void GetRunListLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bytesper
     runlist.clear();
 }
 
-void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curinode, QList<quint64>* ntinodelist)
+void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curinode, QHash<quint64, quint64>* ntinodehash)
 {
     QString mftlayout = "";
     uint16_t mftentrybytes = 0;
@@ -8050,9 +8054,9 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                                     logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
                                     GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &dirlayout);
                                     //qDebug() << "layout:" << layout;
-                                    for(int j=0; j < dirlayout.split(";", Qt::SkipEmptyParts).count(); j++)
+                                    for(int k=0; k < dirlayout.split(";", Qt::SkipEmptyParts).count(); k++)
                                     {
-                                        physicalsize += dirlayout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+                                        physicalsize += dirlayout.split(";", Qt::SkipEmptyParts).at(k).split(",").at(1).toULongLong();
                                     }
                                     // RETURN LOGICALSIZE FOR THE NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
                                 }
@@ -8062,7 +8066,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                             else // alternate data stream
                             {
                                 attrname = "";
-                                for(int k=0; k < namelength; k++)
+                                for(uint8_t k=0; k < namelength; k++)
                                     attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + k*2, 2))));
                                 //qDebug() << "ads:" << QString("$DATA:" + attrname);
                                 quint64 logicalsize = 0;
@@ -8080,8 +8084,8 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                                 {
                                     logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
                                     GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
-                                    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
-                                        physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+                                    for(int k=0; k < layout.split(";", Qt::SkipEmptyParts).count(); k++)
+                                        physicalsize += layout.split(";", Qt::SkipEmptyParts).at(k).split(",").at(1).toULongLong();
                                 }
                                 QList<QVariant> tmpnode;
                                 tmpnode.clear();
@@ -8114,8 +8118,8 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                                 dirlayout = "";
                                 if(namelength > 0) // get $I30 default dir attribute
                                 {
-                                    for(int j=0; j < namelength; j++)
-                                        attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + j*2, 2))));
+                                    for(uint8_t k=0; k < namelength; k++)
+                                        attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + k*2, 2))));
                                     if(attrname.startsWith("$I30"))
                                     {
                                         logicalsize = contentlength;
@@ -8158,16 +8162,16 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 			    attrname = "";
 			    if(namelength > 0)
 			    {
-				for(int j=0; j < namelength; j++)
-				    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + j*2, 2))));
+				for(uint8_t k=0; k < namelength; k++)
+				    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + k*2, 2))));
 				if(!attrname.startsWith("$I30")) // alternate data stream
 				{
 				    quint64 logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
 				    quint64 physicalsize = 0;
 				    layout = "";
 				    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
-				    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
-					physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+				    for(int k=0; k < layout.split(";", Qt::SkipEmptyParts).count(); k++)
+					physicalsize += layout.split(";", Qt::SkipEmptyParts).at(k).split(",").at(1).toULongLong();
 				    //qDebug() << "ads:" << QString("$INDEX_ALLOCATION" + attrname);
 				    QList<QVariant> tmpnode;
 				    QList<QString> tmpprop;
@@ -8206,25 +8210,28 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	    }
             if(!filename.isEmpty())
             {
-                qDebug() << "ntinodelist:" << *ntinodelist;
+                //qDebug() << "ntinodehash:" << *ntinodehash;
+                //qDebug() << "parntinode:" << parntinode;
                 uint8_t hasparent = 0;
                 if(parntinode == 5) // root directory is the parent
                 {
                     hasparent = 1;
+                    // loop over prop file to get the itemtype, or maybe acess the treenodemodel to get it's NodeData or indexitem values for the filename, filepath, etc..
+                    // i have the parseqid for the "deleted/orhaned" file, i need the seqid for the potential parent to compare them... using the mft sequence id which is in the properties
                 }
                 else
                 {
-                    for(int k=0; k < ntinodelist->count(); k++)
+                    if(ntinodehash->contains(parntinode))
                     {
-                        if(parntinode == ntinodelist->at(k))
-                        {
+                        hasparent = 1;
+                        //qDebug() << "ntinode/inodecnt:" << parntinode << ntinodehash->value(parntinode);
+                    }
+                    /*
                             // NEED TO GET THE ID, FILENAME, FILEPATH, ITEMTYPE (is it directory)
                             // MIGHT HAVE TO MOVE NTINODELIST TO A KEY/VALUE HASH OF NTINODE KEY AND ID VALUE FOR EASE OF ACCESS TO GET THE FILE PROPERTIES WITHOUT HAVING TO OPEN/PARSE EACH FILE
                             // OR I CAN MAKE THE LIST OF STRINGS WHICH IS THE NTINODE|ID
                             // IF I HAVE A HASH, I DON'T HAVE TO FOR LOOP, I CAN JUST HASKEY
-                            hasparent = 1;
-                        }
-                    }
+                    */
                     // IF PARNTINODE == ONE OF THE EXISTING FILES NTINODE (LOOP OVER .PROP FILES??? OR HAVE AN QLIST<QUINT64> WITH EXISTING NTINODE'S TO LOOP THROUGH, THEN DELETED...
                     // ELSE ORPHAN
                 }
