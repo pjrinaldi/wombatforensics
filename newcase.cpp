@@ -7925,6 +7925,11 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	    //qDebug() << "curoffset at start of the mft:" << curoffset;
 	    curoffset = curoffset + j*mftentrybytes;
 	    //qDebug() << QString("curoffset at start of the " + QString::number(j) + " mft entry record:") << curoffset;
+            QTextStream out;
+            QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(curinode) + ".prop");
+            if(!fileprop.isOpen())
+                fileprop.open(QIODevice::Append | QIODevice::Text);
+            out.setDevice(&fileprop);
 	    if(QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString()) == "FILE") // a proper mft entry
 	    {
 		uint16_t seqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 16, 2)); // sequence number for entry
@@ -7935,11 +7940,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 		if(attrflags == 0x00 || attrflags == 0x02) // not allocated file or directory [only looking for deleted or orphaned files]
 		{
 
-		    QTextStream out;
-		    QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(curinode) + ".prop");
-		    if(!fileprop.isOpen())
-			fileprop.open(QIODevice::Append | QIODevice::Text);
-		    out.setDevice(&fileprop);
 
 		    uint32_t attrlength = 0;
 		    curoffset = curoffset + firstattroffset;
@@ -8216,8 +8216,66 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                 if(parntinode == 5) // root directory is the parent
                 {
                     hasparent = 1;
-                    // loop over prop file to get the itemtype, or maybe acess the treenodemodel to get it's NodeData or indexitem values for the filename, filepath, etc..
-                    // i have the parseqid for the "deleted/orhaned" file, i need the seqid for the potential parent to compare them... using the mft sequence id which is in the properties
+                    QList<QVariant> nodedata;
+                    nodedata.clear();
+                    nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray("/").toBase64() << logicalsize << createdate << accessdate << modifydate << statusdate << 0;
+                    if(logicalsize > 0) // Get Category/Signature
+                    {
+                        if(itemtype == 2)
+                            nodedata << "Directory" << "Directory";
+                        else
+                        {
+                            QString catsig = GenerateCategorySignature(curimg, filename, dirlayout.split(";").at(0).split(",").at(0).toULongLong());
+                            nodedata << catsig.split("/").first() << catsig.split("/").last();
+                        }
+                    }
+                    else
+                        nodedata << "Empty" << "Zero File";
+                    quint64 adsparentinode = curinode; // adsparentinode = curfile inode
+                    QString adsparentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode)); // adsparentstr = curfile id
+                    nodedata << "0" << adsparentstr;
+                    QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                    mutex.lock();
+                    treenodemodel->AddNode(nodedata, parentstr, itemtype, 1);
+                    mutex.unlock();
+                    if(nodedata.at(11).toString().split("-").count() == 3)
+                    {
+                        listeditems.append(nodedata.at(11).toString());
+                        filesfound++;
+                        isignals->ProgUpd();
+                    }
+                    curinode++;
+                    nodedata.clear();
+                    out.flush();
+                    fileprop.close();
+                    for(int k=0; k < adsnodelist.count(); k++)
+                    {
+                        QList<QVariant> adsnode;
+                        adsnode.clear();
+                        adsnode << QByteArray(adsnodelist.at(k).at(0).toString().toUtf8()).toBase64() << QByteArray(QString("/" + filename + "/").toUtf8()).toBase64() << adsnodelist.at(i).at(1) << "0" << "0" << "0" << "0" << "0";
+                        if(adsnodelist.at(i).at(1).toULongLong() > 0)
+                        {
+                            // MAY WANT TO SWITCH FILENAME FOR ADSNODELIST.AT(K).AT(0).TOSTRING().SPLIT(":").LAST()
+                            QString catsig = GenerateCategorySignature(curimg, filename, adsproplist.at(i).at(1).split(";").at(0).split(",").at(0).toULongLong());
+                            adsnode << catsig.split("/").first() << catsig.split("/").last();
+                        }
+                        else
+                            adsnode << "Empty" << "Zero File";
+                        adsnode << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
+                        mutex.lock();
+                        treenodemodel->AddNode(adsnode, adsparentstr, 10, 1);
+                        mutex.unlock();
+                        QTextStream adsout;
+                        QFile adsprop(curimg->MountPath() + "/" + QString::number(ptreecnt) + "/f" + QString::number(curinode) + ".prop");
+                        if(!adsprop.isOpen())
+                            adsprop.open(QIODevice::Append | QIODevice::Text);
+                        adsout.setDevice(&adsprop);
+                        adsout << adsproplist.at(i).at(0) << Qt::endl;
+                        adsout << adsproplist.at(i).at(1) << Qt::endl;
+                        adsout.flush();
+                        adsprop.close();
+                        curinode++;
+                    }
                 }
                 else
                 {
@@ -8227,6 +8285,8 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                         //qDebug() << "ntinode/inodecnt:" << parntinode << ntinodehash->value(parntinode);
                     }
                     /*
+                            // loop over prop file to get the itemtype, or maybe acess the treenodemodel to get it's NodeData or indexitem values for the filename, filepath, etc..
+                            // i have the parseqid for the "deleted/orhaned" file, i need the seqid for the potential parent to compare them... using the mft sequence id which is in the properties
                             // NEED TO GET THE ID, FILENAME, FILEPATH, ITEMTYPE (is it directory)
                             // MIGHT HAVE TO MOVE NTINODELIST TO A KEY/VALUE HASH OF NTINODE KEY AND ID VALUE FOR EASE OF ACCESS TO GET THE FILE PROPERTIES WITHOUT HAVING TO OPEN/PARSE EACH FILE
                             // OR I CAN MAKE THE LIST OF STRINGS WHICH IS THE NTINODE|ID
@@ -8240,76 +8300,10 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                 }
             }
             // SHOULD I ACCOUNT AN ORPHAN WITHOUT A FILE NAME ?????
-	    /*
+            /*
 	    QString filepath = "/";
 	    if(!parfilename.isEmpty())
 		filepath = parfilename;
-
-	    // NEED TO FIGURE OUT ITEMTYPE AND ISDELETED...
-	    QList<QVariant> nodedata;
-	    nodedata.clear();
-	    nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray(filepath.toUtf8()).toBase64() << logicalsize << createdate << accessdate << modifydate << statusdate << 0;
-	    if(logicalsize > 0) // Get Category/Signature
-	    {
-		if(itemtype == 3 && isdeleted == 0)
-		    nodedata << "Directory" << "Directory";
-		else
-		{
-		    QString catsig = GenerateCategorySignature(curimg, filename, dirlayout.split(";").at(0).split(",").at(0).toULongLong());
-		    nodedata << catsig.split("/").first() << catsig.split("/").last();
-		}
-	    }
-	    else
-		nodedata << "Empty" << "Zero File";
-	    quint64 adsparentinode = inodecnt; // adsparentinode = curfile inode
-	    QString adsparentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)); // adsparentstr = curfile id
-	    nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
-	    QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-	    if(parinode > 0)
-		parentstr += QString("-f" + QString::number(parinode));
-	    mutex.lock();
-	    treenodemodel->AddNode(nodedata, parentstr, itemtype, isdeleted);
-	    mutex.unlock();
-	    if(nodedata.at(11).toString().split("-").count() == 3)
-	    {
-		listeditems.append(nodedata.at(11).toString());
-		filesfound++;
-		isignals->ProgUpd();
-	    }
-	    inodecnt++;
-	    nodedata.clear();
-	    out.flush();
-	    fileprop.close();
-	    //qDebug() << "adsproplist:" << adsproplist;
-	    for(int i=0; i < adsnodelist.count(); i++)
-	    {
-		// do catsig here and adsfilepath here as well... filepath + filename + "/"
-		QList<QVariant> adsnode;
-		adsnode.clear();
-		adsnode << QByteArray(adsnodelist.at(i).at(0).toString().toUtf8()).toBase64() << QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64() << adsnodelist.at(i).at(1) << "0" << "0" << "0" << "0" << "0";
-		if(adsnodelist.at(i).at(1).toULongLong() > 0)
-		{
-		    QString catsig = GenerateCategorySignature(curimg, filename, adsproplist.at(i).at(1).split(";").at(0).split(",").at(0).toULongLong());
-		    adsnode << catsig.split("/").first() << catsig.split("/").last();
-		}
-		else
-		    adsnode << "Empty" << "Zero File";
-		adsnode << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
-		mutex.lock();
-		treenodemodel->AddNode(adsnode, adsparentstr, 10, 0);
-		mutex.unlock();
-		// WRITE ADS PROPERTIES
-		QTextStream adsout;
-		QFile adsprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
-		if(!adsprop.isOpen())
-		    adsprop.open(QIODevice::Append | QIODevice::Text);
-		adsout.setDevice(&adsprop);
-		adsout << adsproplist.at(i).at(0) << Qt::endl;
-		adsout << adsproplist.at(i).at(1) << Qt::endl;
-		adsout.flush();
-		adsprop.close();
-		inodecnt++;
-	    }
 	     */ 
 	}
     }
