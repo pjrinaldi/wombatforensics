@@ -7279,7 +7279,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 uint64_t i30modify = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 16, 8));
                                 uint64_t i30change = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 24, 8));
                                 uint64_t i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 32, 8));
-				//if(ntinode <= maxmftentries && parntinode <= maxmftentries)
+				if(ntinode <= maxmftentries && parntinode <= maxmftentries)
 				{
                                 qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
                                 // NODEDATA STARTS HERE, PASS POINTER TO NODEDATA TO GETMFTENTRYCONTENT FUNCTION.
