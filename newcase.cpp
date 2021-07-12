@@ -7259,7 +7259,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                     uint16_t i30seqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2)); // seq number of index entry
                     uint16_t entrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2)); // entry length
                     uint16_t fnattrlength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2)); // $FILE_NAME attr length
-                    if(ntinode <= maxmftentries && entrylength > 0 && entrylength < indxrecordsize && fnattrlength < entrylength && fnattrlength > 66 && entrylength % 4 == 0)
+                    if((ntinode == 0 && parentntinode == 5) || (ntinode > 0 && ntinode <= maxmftentries && entrylength > 0 && entrylength < indxrecordsize && fnattrlength < entrylength && fnattrlength > 66 && entrylength % 4 == 0))
                     {
                         uint8_t fntype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 16 + 65, 1));
                         if(fntype != 0x02)
@@ -7279,13 +7279,16 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 uint64_t i30modify = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 16, 8));
                                 uint64_t i30change = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 24, 8));
                                 uint64_t i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 32, 8));
-                                //qDebug() << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode, 16);
+				//if(ntinode <= maxmftentries && parntinode <= maxmftentries)
+				{
+                                qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
                                 // NODEDATA STARTS HERE, PASS POINTER TO NODEDATA TO GETMFTENTRYCONTENT FUNCTION.
                                 // ALSO PASS STRING POINTER FOR THE PROPERTIES FILE WHICH SHOULD START HERE...
                                 // FINALLY PASS A POINTER TO A STRINGLIST, WHICH CONTAINS THE ADS INFORMATION (WILL HAVE TO COME UP WITH SOME FORMAT I CAN PARSE)
                                 // 
                                 // WHAT IF I PASS THE PROPERTIES/NODEDATA TO THE GETMFTENTRYCONTNT FUNCTION AND THEN POPULATE ALL OF IT FROM WITHIN THERE...
                                 inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, ntinodehash);
+				}
                             }
                         }
                         curpos = curpos + entrylength;
