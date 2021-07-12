@@ -5822,14 +5822,14 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     else if(fstype == 5) // NTFS
     {
 	quint64 curinode = 0;
-        //QList<quint64> ntinodelist;
-        QHash<quint64, quint64> ntinodehash;
-        //ntinodelist.clear();
+        QHash<quint64, quint64> dirntinodehash;
+	QHash<quint64, uint16_t> ntinodehash;
+	dirntinodehash.clear();
         ntinodehash.clear();
-	curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "", &ntinodehash);
-        //ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &ntinodehash);
-        //ntinodelist.clear();
-        ntinodehash.clear();
+	curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "", &dirntinodehash, &ntinodehash);
+        //ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &dirntinodehash, &ntinodehash);
+        dirntinodehash.clear();
+	ntinodehash.clear();
     }
     else if(fstype == 6) // EXT2/3/4
     {
@@ -7126,7 +7126,7 @@ void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksiz
     }
 }
 
-quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout, QHash<quint64, quint64>* ntinodehash)
+quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout, QHash<quint64, quint64>* dirntinodehash, QHash<quint64, uint16_t>* ntinodehash)
 {
     QString mftlayout = "";
     uint16_t mftentrybytes = 0;
@@ -7279,7 +7279,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 uint64_t i30modify = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 16, 8));
                                 uint64_t i30change = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 24, 8));
                                 uint64_t i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 32, 8));
-				if(ntinode <= maxmftentries && parntinode <= maxmftentries)
+				if(ntinode <= maxmftentries && parntinode <= maxmftentries && !ntinodehash->contains(ntinode))
 				{
                                 qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
                                 // NODEDATA STARTS HERE, PASS POINTER TO NODEDATA TO GETMFTENTRYCONTENT FUNCTION.
@@ -7287,7 +7287,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 // FINALLY PASS A POINTER TO A STRINGLIST, WHICH CONTAINS THE ADS INFORMATION (WILL HAVE TO COME UP WITH SOME FORMAT I CAN PARSE)
                                 // 
                                 // WHAT IF I PASS THE PROPERTIES/NODEDATA TO THE GETMFTENTRYCONTNT FUNCTION AND THEN POPULATE ALL OF IT FROM WITHIN THERE...
-                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, ntinodehash);
+                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, dirntinodehash, ntinodehash);
 				}
                             }
                         }
@@ -7338,7 +7338,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			quint64 i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8));
                         //qDebug() << "Filename:" << filename << "i30create:" << i30create;
 			parntinode = parntinode & 0x00ffffffffffffff;
-                        inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, ntinodehash);
+                        inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, dirntinodehash, ntinodehash);
                     }
                 }
                 curpos = curpos - 16 + indxentrylength;
@@ -7350,7 +7350,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     return inodecnt;
 }
 
-quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset, QHash<quint64, quint64>* ntinodehash)
+quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset, QHash<quint64, quint64>* dirntinodehash, QHash<quint64, uint16_t>* ntinodehash)
 {
     QList<QList<QVariant>> adsnodelist;
     QList<QList<QString>> adsproplist;
@@ -7402,9 +7402,12 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         out << "$I30 Modify Date|" << ConvertWindowsTimeToUnixTimeUTC(i30modify) << "|File Modification time as recorded in the $I30 entry" << Qt::endl;
         out << "$I30 Status Changed Date|" << ConvertWindowsTimeToUnixTimeUTC(i30change) << "|File Status Changed time as recorded in the $I30 entry" << Qt::endl;
         out << "$I30 Accessed Date|" << ConvertWindowsTimeToUnixTimeUTC(i30access) << "|File Accessed time as recorded in the $I30 entry" << Qt::endl;
+	// this get's only hte direcotry ntinode's, but i need all of them to not reparse multiple entries when they are in the indx allocation more than once...
+	// the best way to tell is with the mftseqid and the ntinode value both being equal... so i might need another hash to handle this...
+	// ntinodehash and dirntinodehash ntinodehash for duplicate index entries and dirntinodehash for valid parent directories for orphan/deleted.
         if(attrflags == 0x02 || attrflags == 0x03)
-            ntinodehash->insert(ntinode, inodecnt);
-        //ntinodelist->append(ntinode);
+            dirntinodehash->insert(ntinode, inodecnt);
+	ntinodehash->insert(ntinode, mftsequenceid);
 	uint32_t accessflags = 0;
         if(attrcount > 0)
         {
@@ -7814,7 +7817,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     if(itemtype == 2 || itemtype == 3) // directory
     {
 	//qDebug() << "adsparentinode:" << adsparentinode;
-	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, ntinodehash);
+	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, dirntinodehash, ntinodehash);
 	//qDebug() << "inodecnt on recursive return:" << inodecnt;
 	//curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "");
 	//quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout)
@@ -7880,7 +7883,7 @@ void GetRunListLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bytesper
     runlist.clear();
 }
 
-void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curinode, QHash<quint64, quint64>* ntinodehash)
+void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 curinode, QHash<quint64, quint64>* dirntinodehash, QHash<quint64, uint16_t>* ntinodehash)
 {
     QString mftlayout = "";
     uint16_t mftentrybytes = 0;
@@ -8307,10 +8310,10 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                 }
                 else
                 {
-                    if(ntinodehash->contains(parntinode))
+                    if(dirntinodehash->contains(parntinode))
                     {
                         hasparent = 1;
-			QString parentid = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(ntinodehash->value(parntinode));
+			QString parentid = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(dirntinodehash->value(parntinode));
 			/*
 			QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(parentid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
 			if(indxlist.count() == 1)
