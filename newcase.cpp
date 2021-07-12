@@ -7269,7 +7269,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                             //qDebug() << "filenamelength:" << filenamelength;
                             for(uint8_t k=0; k < filenamelength; k++)
                                 filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 16 + 66 + k*2, 2))));
-                            if(filename != ".")
+                            if(filename != "." && filename != "..")
                             {
                                 //qDebug() << "curpos:" << curpos + 16;
                                 uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 6)); // parent nt inode for entry
@@ -7325,7 +7325,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                     QString filename = "";
                     for(uint8_t i=0; i < fnamelength; i++)
                         filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 66 + i*2, 2))));
-                    if(filename != ".")
+                    if(filename != "." && filename != "..")
                     {
 			uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
 			uint16_t i30parseqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2));
