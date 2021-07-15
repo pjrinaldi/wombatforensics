@@ -72,7 +72,7 @@ void AddEvidenceDialog::RemoveEvidence()
 
 void AddEvidenceDialog::Cancel()
 {
-    newevid.clear();
+    //newevid.clear();
     newforimglist.clear();
     newevidence.clear();
     // clear passwordhash
@@ -81,7 +81,7 @@ void AddEvidenceDialog::Cancel()
 
 void AddEvidenceDialog::StartProcess()
 {
-    newevid.clear();
+    //newevid.clear();
     newforimglist.clear();
     newevidence.clear();
     for(int i=0; i < ui->evidencelist->count(); i++)

@@ -5167,55 +5167,19 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                         break;
                     curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + curoffset + 4, 4)); // attribute length
                 }
-                curoffset += qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + curoffset + 32, 2)); // move the current offset to the start of the runlist
-                int runlistinc = 0;
-                QStringList runlist;
-                runlist.clear();
-                uint mftsize = 0;
-                while(curoffset < 1024) // curoffset < mftentrybytes
-                {
-                    if(qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset, 1)) > 0)
-                    {
-                        int runlengthbytes = QString(QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset, 1)), 16).at(1)).toInt();
-                        int runlengthoffset = QString(QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset, 1)), 16).at(0)).toInt();
-                        if(runlengthbytes == 0 && runlengthoffset == 0)
-                            break;
-                        curoffset++;
-                        uint runlength = 0;
-                        int runoffset = 0;
-                        if(runlengthbytes == 1)
-                            runlength = qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset, runlengthbytes));
-                        else
-                            runlength = qFromLittleEndian<uint>(curimg->ReadContent(mftoffset + curoffset, runlengthbytes));
-                        if(runlengthoffset == 1)
-                            runoffset = qFromLittleEndian<int8_t>(curimg->ReadContent(mftoffset + curoffset + runlengthbytes, runlengthoffset));
-                        else
-                        {
-                            QString runstr = "";
-                            for(int i=runlengthoffset-1; i >= 0; i--)
-                                runstr += QString(curimg->ReadContent(mftoffset + curoffset + runlengthbytes + i, 1).toHex());
-                            runoffset = runstr.toInt(nullptr, 16);
-                        }
-                        if(runlistinc > 0)
-                        {
-                            if(runlistinc > 1 && QString::number(runoffset, 16).right(1).toInt() == 1)
-                                runoffset = runoffset - 0xffff - 1;
-                            runoffset = runoffset + runlist.at(runlistinc-1).split(",").at(0).toUInt();
-                        }
-                        runlist.append(QString::number(runoffset) + "," + QString::number(runlength));
-                        mftsize += runlength;
-                        runlistinc++;
-                        curoffset += runlengthbytes + runlengthoffset;
-                    }
-                    else
-                        break;
-                }
                 QString runliststr = "";
-                for(int i=0; i < runlist.count(); i++)
-                    runliststr += QString::number(curstartsector*512 + runlist.at(i).split(",").at(0).toULongLong() * bytespercluster) + "," + QString::number(runlist.at(i).split(",").at(1).toULongLong() * bytespercluster);
+                quint64 mftsize = 0;
+                GetRunListLayout(curimg, curstartsector, bytespercluster, 1024, mftoffset + curoffset, &runliststr);
+                //qDebug() << "runliststr for MFT Layout:" << runliststr;
+		for(int j=0; j < runliststr.split(";", Qt::SkipEmptyParts).count(); j++)
+		{
+		    mftsize += runliststr.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+		}
+                //qDebug() << "runliststr for MFT Layout:" << runliststr << "mft size:" << mftsize;
 	        out << "MFT Layout|" << runliststr << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
                 out << "Max MFT Entries|" << QString::number((mftsize * bytespercluster)/1024) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
                 runliststr = "";
+                mftsize = 0;
             }
             // GET VOLUME LABEL FROM THE $VOLUME_NAME SYSTEM FILE
             if(QString::fromStdString(curimg->ReadContent(mftoffset + 3 * 1024, 4).toStdString()) == "FILE") // a proper MFT entry
@@ -7178,15 +7142,36 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     */
 
     quint64 mftoffset = 0;
-    // THIS MATH IS PROBABLY OFF, WILL HAVE TO TEST WITH A LARGER MFT TEST IMAGE LATER
+    // THIS MATH IS WORKING, BUT MIGHT BE OFF BY 1 DUE TO THE MFT STARTING AT 0, WILL HAVE TO TEST WITH THE ROOT DIR.
+    quint64 curmaxntinode = 0;
+    quint64 oldmaxntinode = 0;
+    quint64 relativeparntinode = parentntinode;
     for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
+        //qDebug() << "mftoffset:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong() << "mftlayout length:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
+        //qDebug() << "parentntinode:" << parentntinode << "i:" << i << "mft entries:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() / mftentrybytes;
+        curmaxntinode = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() / mftentrybytes;
+        //qDebug() << "curmaxntinode:" << curmaxntinode;
+        if(relativeparntinode < curmaxntinode)
+        {
+            mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
+            break;
+        }
+        else
+            relativeparntinode = relativeparntinode - curmaxntinode;
+        /*
 	if(parentntinode * mftentrybytes < mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong())
 	{
 	    mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
 	    break;
 	}
+        */
     }
+    qDebug() << "final mftoffset:" << mftoffset;
+    qDebug() << "relative parent nt inode:" << relativeparntinode;
+    /*
+
+
     //qDebug() << "mftoffset:" << mftoffset;
     quint64 mftentryoffset = mftoffset + parentntinode * mftentrybytes;
     //qDebug() << "actual mftentryoffset:" << mftentryoffset;
@@ -7349,6 +7334,9 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         }
     }
     return inodecnt;
+
+
+    */
 }
 
 quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset, QHash<quint64, quint64>* dirntinodehash, QHash<quint64, uint16_t>* ntinodehash)
@@ -7818,10 +7806,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     if(itemtype == 2 || itemtype == 3) // directory
     {
 	//qDebug() << "adsparentinode:" << adsparentinode;
-	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, dirntinodehash, ntinodehash);
+	//inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, dirntinodehash, ntinodehash);
 	//qDebug() << "inodecnt on recursive return:" << inodecnt;
-	//curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "");
-	//quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 parentntinode, quint64 parinode, QString parfilename, QString parlayout)
     }
     /*
     curinode++;

@@ -67,8 +67,8 @@ extern QHash<QString, QString> mftblockhash; // list of mft blockstrings for eac
 extern QHash<QString, QString> passwordhash; // list of passwords for encrypted pool volume's/fs's
 extern QMutex mutex; // mutex so my code will work when multithreaded (mainly for adding treeview nodes)
 //extern EwfImage* testimage;
-extern QList<ForensicImage*> newevid;
-extern QList<ForensicImage*> existingevid;
+//extern QList<ForensicImage*> newevid;
+//extern QList<ForensicImage*> existingevid;
 extern QList<ForImg*> newforimglist;
 extern QList<ForImg*> existingforimglist;
 

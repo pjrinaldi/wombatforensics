@@ -1375,12 +1375,14 @@ void WombatForensics::UpdateStatus()
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
     //UpdateEvidenceList();
+    /*
     for(int i=0; i < newevid.count(); i++)
     {
 	existingevid.append(newevid.at(i));
 	existingevidence.append(newevidence.at(i));
     }
     newevid.clear();
+    */
     newevidence.clear();
     //PrepareEvidenceImage();
     //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
@@ -1422,7 +1424,7 @@ void WombatForensics::AddEvidence()
 QList<ForImg*> newforimglist;
 QList<ForImg*> existingforimglist;
      */ 
-    newevid.clear();
+    //newevid.clear();
     newforimglist.clear();
     newevidence.clear();
     addevidencedialog = new AddEvidenceDialog(this);
@@ -1728,12 +1730,14 @@ void WombatForensics::PopulateHexContents()
         tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
     evidfile.close();
     //qDebug() << "tmpstr:" << tmpstr;
+    /*
     for(int i=0; i < existingevid.count(); i++)
     {
 	if(tmpstr.split(",", Qt::SkipEmptyParts).at(1) == existingevid.at(i)->ImgPath())
 	    ui->hexview->setData(*existingevid.at(i));
 	//qDebug() << QString("newevid " + QString::number(i) + ":") << newevid.at(i)->ImgPath();
     }
+    */
     // EwfImage need to get the imgpath from the correct img from the vector of qiodevices
     //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     ui->hexview->BypassColor(false);
@@ -2623,8 +2627,8 @@ void WombatForensics::CloseCurrentCase()
     partitionlist.clear();
     existingevidence.clear();
     newevidence.clear();
-    newevid.clear();
-    existingevid.clear();
+    //newevid.clear();
+    //existingevid.clear();
     // BEGIN TAR METHOD
     QString tmptar = casepath + "/" + wombatvariable.casename + ".wfc";
     QString oldtmptar = tmptar + ".old";

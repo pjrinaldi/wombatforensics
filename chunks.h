@@ -63,7 +63,7 @@ private:
     int getChunkIndex(qint64 absPos);
 
     QIODevice * _ioDevice;
-    ForensicImage* _ioDevice2;
+    //ForensicImage* _ioDevice2;
     qint64 _pos;
     qint64 _size;
     QList<Chunk> _chunks;

@@ -94,6 +94,6 @@
 #include <tar.h>
 #include <libtar.h>
 #include <libewf.h>
-#include "forimg.h"
+//#include "forimg.h"
 
 #endif // WOMBATINCLUDE_H

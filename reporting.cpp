@@ -31,7 +31,7 @@ void UpdateEvidenceList()
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::Dirs | QDir::NoSymLinks);
     existingevidence.clear();
-    existingevid.clear();
+    //existingevid.clear();
     //QStringList tmplist;
     for(int i=0; i < evidfiles.count(); i++)
     {
@@ -46,8 +46,8 @@ void UpdateEvidenceList()
         }
         efile.close();
         qDebug() << "tmpstr:" << tmpstr.split(",").at(0);
-        ForensicImage* tmpimage = new ForensicImage(tmpstr.split(",").at(0));
-        existingevid.append(tmpimage);
+        //ForensicImage* tmpimage = new ForensicImage(tmpstr.split(",").at(0));
+        //existingevid.append(tmpimage);
         //ForensicImage* tmpimage = new ForensicImage(evidfiles.at(i).split("-e" + QString::number(i)).first());
         //existingevid.append(tmpimage);
         existingevidence.append(evidfiles.at(i).split("-e" + QString::number(i)).first());
