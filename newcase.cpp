@@ -5177,7 +5177,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 		}
                 //qDebug() << "runliststr for MFT Layout:" << runliststr << "mft size:" << mftsize;
 	        out << "MFT Layout|" << runliststr << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
-                out << "Max MFT Entries|" << QString::number((mftsize * bytespercluster)/1024) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
+                out << "Max MFT Entries|" << QString::number((mftsize)/1024) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
                 runliststr = "";
                 mftsize = 0;
             }
@@ -5791,6 +5791,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 	dirntinodehash.clear();
         ntinodehash.clear();
 	curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "", &dirntinodehash, &ntinodehash);
+	qDebug() << "ntinodehash:" << ntinodehash;
         //ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &dirntinodehash, &ntinodehash);
         dirntinodehash.clear();
 	ntinodehash.clear();
@@ -5996,7 +5997,6 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 		else
 		    filepath = parfilename;
 		nodedata << QByteArray(filepath.toUtf8()).toBase64() << logicalsize << createdate << accessdate << modifydate << 0 << 0;
-		/*
 		if(logicalsize > 0) // Get Category/Signature
 		{
 		    if(itemtype == 3 && isdeleted == 0)
@@ -6010,8 +6010,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 		}
                 else
                     nodedata << "Empty" << "Zero File";
-		*/
-		nodedata << "0" << "0";
+		//nodedata << "0" << "0";
                 nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
                 QString parentstr = "";
                 if(parinode == 0)
@@ -6323,7 +6322,6 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 		QList<QVariant> nodedata;
 		nodedata.clear();
 		nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray(filepath.toUtf8()).toBase64() << (qulonglong)logicalsize << createdate << accessdate << modifydate << 0 << 0;
-		/*
 		if(logicalsize > 0) // Get Category/Signature
 		{
 		    if(itemtype == 3 && isdeleted == 0)
@@ -6336,8 +6334,7 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 		}
 		else
 		    nodedata << "Empty" << "Zero File";
-		*/
-		nodedata << "0" << "0";
+		//nodedata << "0" << "0";
 		nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
 		QString parentstr = "";
 		if(parinode == 0)
@@ -6501,7 +6498,6 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 		    }
 		    nodedata.clear();
 		    nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray("/orphans/").toBase64() << (qulonglong)logicalsize << createdate << modifydate << accessdate << "0" << "0";
-		    /*
 		    if(logicalsize > 0) // Get Category/Signature
 		    {
 			if(itemtype == 2)
@@ -6514,8 +6510,7 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 		    }
 		    else
 			nodedata << "Empty" << "Zero File";
-		    */
-		    nodedata << "0" << "0";
+		    //nodedata << "0" << "0";
 		    nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
 		    mutex.lock();
 		    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"), itemtype, 1);
@@ -6910,7 +6905,6 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 		QList<QVariant> nodedata;
 		nodedata.clear();
 		nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray(filepath.toUtf8()).toBase64() << logicalsize << createdate << accessdate << modifydate << 0 << 0;
-		/*
 		if(logicalsize > 0) // Get Category/Signature
 		{
 		    if(itemtype == 3 && isdeleted == 0)
@@ -6923,8 +6917,7 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
 		}
 		else
 		    nodedata << "Empty" << "Zero File";
-		*/
-		nodedata << "0" << "0";
+		//nodedata << "0" << "0";
 		nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
 		QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
 		if(parinode > 0)
@@ -7167,13 +7160,12 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	}
         */
     }
-    qDebug() << "final mftoffset:" << mftoffset;
-    qDebug() << "relative parent nt inode:" << relativeparntinode;
-    /*
-
+    //qDebug() << "final mftoffset:" << mftoffset;
+    //qDebug() << "relative parent nt inode:" << relativeparntinode;
 
     //qDebug() << "mftoffset:" << mftoffset;
-    quint64 mftentryoffset = mftoffset + parentntinode * mftentrybytes;
+    quint64 mftentryoffset = mftoffset + relativeparntinode * mftentrybytes;
+    //quint64 mftentryoffset = mftoffset + parentntinode * mftentrybytes;
     //qDebug() << "actual mftentryoffset:" << mftentryoffset;
     // PARSE MFT ENTRY FOR THE DIRECTORY SO I CAN THEN GET IT's CONTENTS AND PARSE THE INDIVIDUAL FILES WITHIN IT...
     quint64 curoffset = 0;
@@ -7244,7 +7236,8 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                     uint16_t i30seqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2)); // seq number of index entry
                     uint16_t entrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2)); // entry length
                     uint16_t fnattrlength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2)); // $FILE_NAME attr length
-                    if((ntinode == 0 && parentntinode == 5) || (ntinode > 0 && ntinode <= maxmftentries && entrylength > 0 && entrylength < indxrecordsize && fnattrlength < entrylength && fnattrlength > 66 && entrylength % 4 == 0))
+                    //if((ntinode == 0 && parentntinode == 5) || (ntinode > 0 && ntinode <= maxmftentries && entrylength > 0 && entrylength < indxrecordsize && fnattrlength < entrylength && fnattrlength > 66 && entrylength % 4 == 0))
+                    if((ntinode <= maxmftentries && entrylength > 0 && entrylength < indxrecordsize && fnattrlength < entrylength && fnattrlength > 66 && entrylength % 4 == 0))
                     {
                         uint8_t fntype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 16 + 65, 1));
                         if(fntype != 0x02)
@@ -7264,23 +7257,19 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 uint64_t i30modify = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 16, 8));
                                 uint64_t i30change = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 24, 8));
                                 uint64_t i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16 + 32, 8));
-				// also hangs at times, so i need to comment everything out and break it down and parse simple stuff based on ntinode/filename values
-				if(ntinode <= maxmftentries && parntinode <= maxmftentries && !ntinodehash->contains(ntinode))
-				{
-                                qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
-                                // NODEDATA STARTS HERE, PASS POINTER TO NODEDATA TO GETMFTENTRYCONTENT FUNCTION.
-                                // ALSO PASS STRING POINTER FOR THE PROPERTIES FILE WHICH SHOULD START HERE...
-                                // FINALLY PASS A POINTER TO A STRINGLIST, WHICH CONTAINS THE ADS INFORMATION (WILL HAVE TO COME UP WITH SOME FORMAT I CAN PARSE)
-                                // 
-                                // WHAT IF I PASS THE PROPERTIES/NODEDATA TO THE GETMFTENTRYCONTNT FUNCTION AND THEN POPULATE ALL OF IT FROM WITHIN THERE...
-                                inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, dirntinodehash, ntinodehash);
-				}
+				// may not need this if, have to test...
+				//if(ntinode <= maxmftentries && parntinode <= maxmftentries && !ntinodehash->contains(ntinode))
+				//{
+				    //qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
+				    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, dirntinodehash, ntinodehash);
+				//}
                             }
                         }
                         curpos = curpos + entrylength;
                     }
                     else
                         curpos = curpos + 4;
+		    //qDebug() << "curpos:" << curpos;
                 }
             }
         }
@@ -7304,7 +7293,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
             uint64_t ntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
             ntinode = ntinode & 0x00ffffffffffffff;
             //qDebug() << "ntinode:" << ntinode;
-            if(indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0)
+            if((ntinode == 0 && relativeparntinode == 5) || (indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0))
             {
                 curpos = curpos + 16;
                 uint8_t fnametype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 65, 1));
@@ -7334,9 +7323,6 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         }
     }
     return inodecnt;
-
-
-    */
 }
 
 quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, quint64 ntinode, quint64 parentntinode, uint64_t parntinode, QString mftlayout, uint16_t mftentrybytes, uint32_t bytespercluster, quint64 inodecnt, QString filename, qint64 parinode, QString parfilename, uint16_t i30seqid, uint16_t i30parseqid, uint64_t i30create, uint64_t i30modify, uint64_t i30change, uint64_t i30access, quint64 curpos, quint64 endoffset, QHash<quint64, quint64>* dirntinodehash, QHash<quint64, uint16_t>* ntinodehash)
@@ -7736,7 +7722,6 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     QList<QVariant> nodedata;
     nodedata.clear();
     nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray(filepath.toUtf8()).toBase64() << logicalsize << createdate << accessdate << modifydate << statusdate << 0;
-    /*
     if(logicalsize > 0) // Get Category/Signature
     {
         if(itemtype == 3 && isdeleted == 0)
@@ -7749,8 +7734,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
     else
         nodedata << "Empty" << "Zero File";
-    */
-    nodedata << "0" << "0";
+    //nodedata << "0" << "0";
     quint64 adsparentinode = inodecnt; // adsparentinode = curfile inode
     QString adsparentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)); // adsparentstr = curfile id
     nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
@@ -7777,7 +7761,6 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         QList<QVariant> adsnode;
         adsnode.clear();
 	adsnode << QByteArray(adsnodelist.at(i).at(0).toString().toUtf8()).toBase64() << QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64() << adsnodelist.at(i).at(1) << "0" << "0" << "0" << "0" << "0";
-	/*
 	if(adsnodelist.at(i).at(1).toULongLong() > 0)
 	{
 	    QString catsig = GenerateCategorySignature(curimg, filename, adsproplist.at(i).at(1).split(";").at(0).split(",").at(0).toULongLong());
@@ -7785,8 +7768,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	}
 	else
 	    adsnode << "Empty" << "Zero File";
-	*/
-	adsnode << "0" << "0";
+	//adsnode << "0" << "0";
 	adsnode << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
 	mutex.lock();
 	treenodemodel->AddNode(adsnode, adsparentstr, 10, 0);
@@ -7806,22 +7788,11 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     if(itemtype == 2 || itemtype == 3) // directory
     {
 	//qDebug() << "adsparentinode:" << adsparentinode;
-	//inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, dirntinodehash, ntinodehash);
+	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, dirntinodehash, ntinodehash);
 	//qDebug() << "inodecnt on recursive return:" << inodecnt;
     }
-    /*
-    curinode++;
-    if(fileinfo.value("itemtype").toUInt() == 2 || fileinfo.value("itemtype").toUInt() == 3) // directory
-    {
-        inodecnt = ParseExtDirectory(curimg, curstartsector, ptreecnt, extinode, inodecnt - 1, QString(filepath + filename + "/"), curlayout);
-        ParseNtfsDirectory(curimg, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
-        //ParseNtfsDirectory(estring, fsinfo, fileinfolist, orphanlist, &fileinfo, ntinode, curinode); // should be able to get rid of mftentries...
-        curinode = fileinfolist->count();
-    }
-     */ 
 
     //qDebug() << "inodecnt before getmft return:" << inodecnt;
-    // NEED TO TAKE CARE OF ADS'S HERE...
     return inodecnt;
 }
 
@@ -7876,6 +7847,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
     uint16_t mftentrybytes = 0;
     uint32_t bytespercluster = 0;
     quint64 maxmftentries = 0;
+    quint64 currentntinode = 0;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -7912,6 +7884,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	// parse each mft block run for entries...
 	for(quint64 j=0; j < entriespersize; j++)
 	{
+	    qDebug() << "currentntinode:" << currentntinode << entriespersize;
             QList<QList<QVariant>> adsnodelist;
             QList<QList<QString>> adsproplist;
             adsnodelist.clear();
@@ -8231,7 +8204,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                     QList<QVariant> nodedata;
                     nodedata.clear();
                     nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray("/").toBase64() << logicalsize << createdate << accessdate << modifydate << statusdate << 0;
-		    /*
                     if(logicalsize > 0) // Get Category/Signature
                     {
                         if(itemtype == 2)
@@ -8244,8 +8216,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                     }
                     else
                         nodedata << "Empty" << "Zero File";
-		    */
-		    nodedata << "0" << "0";
+		    //nodedata << "0" << "0";
                     quint64 adsparentinode = curinode; // adsparentinode = curfile inode
                     QString adsparentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode)); // adsparentstr = curfile id
                     nodedata << "0" << adsparentstr;
@@ -8268,7 +8239,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                         QList<QVariant> adsnode;
                         adsnode.clear();
                         adsnode << QByteArray(adsnodelist.at(k).at(0).toString().toUtf8()).toBase64() << QByteArray(QString("/" + filename + "/").toUtf8()).toBase64() << adsnodelist.at(i).at(1) << "0" << "0" << "0" << "0" << "0";
-			/*
                         if(adsnodelist.at(i).at(1).toULongLong() > 0)
                         {
                             // MAY WANT TO SWITCH FILENAME FOR ADSNODELIST.AT(K).AT(0).TOSTRING().SPLIT(":").LAST()
@@ -8277,8 +8247,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                         }
                         else
                             adsnode << "Empty" << "Zero File";
-			*/
-			adsnode << "0" << "0";
+			//adsnode << "0" << "0";
                         adsnode << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
                         mutex.lock();
                         treenodemodel->AddNode(adsnode, adsparentstr, 10, 1);
@@ -8334,6 +8303,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	    if(!parfilename.isEmpty())
 		filepath = parfilename;
 	     */ 
+	    currentntinode++;
 	}
     }
 }
