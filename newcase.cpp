@@ -7261,6 +7261,9 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 				//if(ntinode <= maxmftentries && parntinode <= maxmftentries && !ntinodehash->contains(ntinode))
 				//{
 				    //qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
+				if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+				    qDebug() << "indxalloc: do nothing because ntinode already parsed and sequence is equal.";
+				else
 				    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, dirntinodehash, ntinodehash);
 				//}
                             }
@@ -7293,7 +7296,8 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
             uint64_t ntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
             ntinode = ntinode & 0x00ffffffffffffff;
             //qDebug() << "ntinode:" << ntinode;
-            if((ntinode == 0 && relativeparntinode == 5) || (indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0))
+            //if((ntinode == 0 && relativeparntinode == 5) || (indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0))
+            if((indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0))
             {
                 curpos = curpos + 16;
                 uint8_t fnametype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 65, 1));
@@ -7313,7 +7317,10 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			quint64 i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8));
                         //qDebug() << "Filename:" << filename << "i30create:" << i30create;
 			parntinode = parntinode & 0x00ffffffffffffff;
-                        inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, dirntinodehash, ntinodehash);
+			if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+			    qDebug() << "indxroot: do nothing because ntinode already parsed and sequence id is equal.";
+			else
+			    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, dirntinodehash, ntinodehash);
                     }
                 }
                 curpos = curpos - 16 + indxentrylength;
@@ -7382,7 +7389,10 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	// ntinodehash and dirntinodehash ntinodehash for duplicate index entries and dirntinodehash for valid parent directories for orphan/deleted.
         if(attrflags == 0x02 || attrflags == 0x03)
             dirntinodehash->insert(ntinode, inodecnt);
-	ntinodehash->insert(ntinode, mftsequenceid);
+	if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == mftsequenceid)
+	    qDebug() << "mft entry: don't add the ntinode/mftseqid, the ntinode and mftsequenceid already exist in ntinodehash";
+	else
+	    ntinodehash->insert(ntinode, mftsequenceid);
 	uint32_t accessflags = 0;
         if(attrcount > 0)
         {
