@@ -7235,7 +7235,63 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 
     uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 8, 4)); // INDEX RECORD SIZE (bytes)
     //qDebug() << "indxrecordsize:" << indxrecordsize;
-    if(indxallocoffset.count() > 0) // INDX ALLOC EXISTS
+
+    // PARE $INDEX_ROOT RECORD
+    uint32_t startoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 16, 4));
+    uint32_t endoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 20, 4));
+    uint32_t allocoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 24, 4));
+    //qDebug() << "endoffset:" << endoffset;
+    //qDebug() << "allocoffset:" << allocoffset;
+    uint curpos = indxrootoffset + 16 + startoffset;
+    //qDebug() << "initial curpos:" << curpos << "initial end pos:" << indxrootoffset + 16 + startoffset + allocoffset;
+    while(curpos < indxrootoffset + 16 + startoffset + allocoffset)
+    {
+	//qDebug() << "in while loop...";
+	//qDebug() << "curpos:" << curpos - indxrootoffset - startoffset - 16;
+	uint16_t indxentrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 8, 2));
+	uint16_t filenamelength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 10, 2));
+	uint16_t i30seqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2)); // seq number of index entry
+	uint64_t ntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
+	ntinode = ntinode & 0x00ffffffffffffff;
+	//qDebug() << "ntinode:" << ntinode;
+	//if((ntinode == 0 && relativeparntinode == 5) || (indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0))
+	if((indxentrylength > 0 && filenamelength > 0 && ntinode <= maxmftentries && indxentrylength < indxrecordsize && filenamelength < indxentrylength && filenamelength > 66 && indxentrylength % 4 == 0))
+	{
+	    curpos = curpos + 16;
+	    uint8_t fnametype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 65, 1));
+	    if(fnametype != 0x02)
+	    {
+		uint8_t fnamelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(curpos + 64, 1));
+		QString filename = "";
+		for(uint8_t i=0; i < fnamelength; i++)
+		    filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 66 + i*2, 2))));
+		if(filename != "." && filename != ".." && !filename.isEmpty())
+		{
+		    uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
+		    uint16_t i30parseqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2));
+		    quint64 i30create = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 8, 8));
+		    quint64 i30modify = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 8));
+		    quint64 i30status = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 24, 8));
+		    quint64 i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8));
+		    //qDebug() << "Filename:" << filename;
+		    parntinode = parntinode & 0x00ffffffffffffff;
+		    if(parntinode <= maxmftentries)
+		    {
+			if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+			{
+			    //qDebug() << "indxroot: do nothing because ntinode already parsed and sequence id is equal.";
+			}
+			else
+			    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, dirntinodehash, ntinodehash);
+		    }
+		}
+	    }
+	    curpos = curpos - 16 + indxentrylength;
+	}
+	else
+	    curpos = curpos + 4;
+    }
+    if(indxallocoffset.count() > 0) // INDX ALLOC EXISTS, SO LETS PARSE IT
     {
         for(int i=0; i < indxallocoffset.count(); i++)
         {
@@ -7303,6 +7359,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
             }
         }
     }
+    /*
     else // NO INDEX_ALLOCATION
     {
 	// THIS DOESN'T PROCESS THE INDEX_ROOT WHEN AN INDEX_ALLOCATION EXISTS. NEED TO POSSIBLY TAKE THIS OUT OF THE ELSE AND ALWAYS PARSE INDEX_ROOT FIRST AND THEN IF INDEX_ALLOCATION EXISTS, PARSE IT AS WELL....
@@ -7361,6 +7418,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                 curpos = curpos + 4;
         }
     }
+    */
     return inodecnt;
 }
 
