@@ -7171,12 +7171,12 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
     else // use existing parent layout which is the offset and 1024 for the current dir
     {
-	if(parentntinode == 7797)
-	    qDebug() << "parntinode:" << parentntinode << "inode:" << parinode << "parlayout:" << parlayout;
+	//if(parentntinode == 7797)
+	    //qDebug() << "parntinode:" << parentntinode << "inode:" << parinode << "parlayout:" << parlayout;
 	mftentryoffset = parlayout.split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toULongLong();
     }
-    if(parentntinode == 7797)
-	qDebug() << "mftentryoffset:" << mftentryoffset;
+    //if(parentntinode == 7797)
+	//qDebug() << "mftentryoffset:" << mftentryoffset;
     //quint64 mftentryoffset = mftoffset + parentntinode * mftentrybytes;
     //qDebug() << "actual mftentryoffset:" << mftentryoffset;
     // PARSE MFT ENTRY FOR THE DIRECTORY SO I CAN THEN GET IT's CONTENTS AND PARSE THE INDIVIDUAL FILES WITHIN IT...
@@ -7188,8 +7188,8 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     //qDebug() << "first attr offset:" << firstattroffset << "attrcount:" << attrcount;
     quint64 indxrootoffset = 0;
     uint32_t indxrootlength = 0;
-    QList<uint16_t> indxallocoffset;
-    QList<uint16_t> indxalloclength;
+    QList<quint64> indxallocoffset;
+    QList<quint64> indxalloclength;
     indxallocoffset.clear();
     indxalloclength.clear();
     for(uint16_t i=0; i < attrcount; i++)
@@ -7213,21 +7213,25 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	{
 	    QString layout = "";
 	    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
-	    for(int i=0; i < layout.split(";", Qt::SkipEmptyParts).count(); i++)
+	    //if(parentntinode == 7797)
+		//qDebug() << "curoffset:" << curoffset << "layout:" << layout;
+	    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
 	    {
-		indxallocoffset.append(layout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong() / bytespercluster);
-		indxalloclength.append(layout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() / bytespercluster);
+		indxallocoffset.append(layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(0).toULongLong() / bytespercluster);
+		indxalloclength.append(layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong() / bytespercluster);
 	    }
 	}
 	else if(attrtype == 0xffffffff)
 	    break;
 	curoffset += attrlength;
     }
+    /*
     if(parentntinode == 7797)
     {
     qDebug() << "indxrootoffset:" << indxrootoffset << "indxrootlength:" << indxrootlength;
     qDebug() << "indxallocoffset:" << indxallocoffset << "indxalloclength:" << indxalloclength;
     }
+    */
 
     uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 8, 4)); // INDEX RECORD SIZE (bytes)
     //qDebug() << "indxrecordsize:" << indxrecordsize;
@@ -7262,7 +7266,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                             //qDebug() << "filenamelength:" << filenamelength;
                             for(uint8_t k=0; k < filenamelength; k++)
                                 filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 16 + 66 + k*2, 2))));
-                            if(filename != "." && filename != "..")
+                            if(filename != "." && filename != ".." && !filename.isEmpty())
                             {
                                 //qDebug() << "curpos:" << curpos + 16;
                                 uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 16, 6)); // parent nt inode for entry
@@ -7275,16 +7279,19 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 				// may not need this if, have to test...
 				//if(ntinode <= maxmftentries && parntinode <= maxmftentries && !ntinodehash->contains(ntinode))
 				//{
-				if(parentntinode == 7797)
-				    qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
-				if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+				//if(parentntinode == 7797)
+				    //qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
+				if(parntinode <= maxmftentries)
 				{
-				    if(parentntinode == 7797)
-					qDebug() << "indxalloc: do nothing because ntinode already parsed and sequence is equal.";
-				}
-				else
-				    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, dirntinodehash, ntinodehash);
+				    if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+				    {
+					//if(parentntinode == 7797)
+					    //qDebug() << "indxalloc: do nothing because ntinode already parsed and sequence is equal.";
+				    }
+				    else
+					inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, dirntinodehash, ntinodehash);
 				//}
+				}
                             }
                         }
                         curpos = curpos + entrylength;
@@ -7298,6 +7305,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
     else // NO INDEX_ALLOCATION
     {
+	// THIS DOESN'T PROCESS THE INDEX_ROOT WHEN AN INDEX_ALLOCATION EXISTS. NEED TO POSSIBLY TAKE THIS OUT OF THE ELSE AND ALWAYS PARSE INDEX_ROOT FIRST AND THEN IF INDEX_ALLOCATION EXISTS, PARSE IT AS WELL....
         uint32_t startoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 16, 4));
         uint32_t endoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 20, 4));
         uint32_t allocoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 24, 4));
@@ -7326,7 +7334,7 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                     QString filename = "";
                     for(uint8_t i=0; i < fnamelength; i++)
                         filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 66 + i*2, 2))));
-                    if(filename != "." && filename != "..")
+                    if(filename != "." && filename != ".." && !filename.isEmpty())
                     {
 			uint64_t parntinode = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos, 6));
 			uint16_t i30parseqid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curpos + 6, 2));
@@ -7336,12 +7344,15 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			quint64 i30access = qFromLittleEndian<uint64_t>(curimg->ReadContent(curpos + 32, 8));
                         //qDebug() << "Filename:" << filename;
 			parntinode = parntinode & 0x00ffffffffffffff;
-			if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+			if(parntinode <= maxmftentries)
 			{
-			    //qDebug() << "indxroot: do nothing because ntinode already parsed and sequence id is equal.";
+			    if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+			    {
+				//qDebug() << "indxroot: do nothing because ntinode already parsed and sequence id is equal.";
+			    }
+			    else
+				inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, dirntinodehash, ntinodehash);
 			}
-			else
-			    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, dirntinodehash, ntinodehash);
                     }
                 }
                 curpos = curpos - 16 + indxentrylength;
