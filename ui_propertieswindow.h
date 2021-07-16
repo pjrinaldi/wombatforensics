@@ -36,7 +36,7 @@ public:
         if (PropertiesWindow->objectName().isEmpty())
             PropertiesWindow->setObjectName(QString::fromUtf8("PropertiesWindow"));
         PropertiesWindow->setWindowModality(Qt::ApplicationModal);
-        PropertiesWindow->resize(240, 310);
+        PropertiesWindow->resize(414, 511);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -90,7 +90,7 @@ public:
         tableView->horizontalHeader()->setHighlightSections(false);
         tableView->horizontalHeader()->setStretchLastSection(true);
         tableView->verticalHeader()->setVisible(false);
-        tableView->verticalHeader()->setDefaultSectionSize(14);
+        tableView->verticalHeader()->setDefaultSectionSize(16);
         tableView->verticalHeader()->setHighlightSections(false);
         groupBox = new QGroupBox(splitter);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));

@@ -5791,7 +5791,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 	dirntinodehash.clear();
         ntinodehash.clear();
 	curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "", &dirntinodehash, &ntinodehash);
-	qDebug() << "ntinodehash:" << ntinodehash;
+	//qDebug() << "ntinodehash:" << ntinodehash;
         //ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &dirntinodehash, &ntinodehash);
         dirntinodehash.clear();
 	ntinodehash.clear();
@@ -7135,36 +7135,48 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     */
 
     quint64 mftoffset = 0;
-    // THIS MATH IS WORKING, BUT MIGHT BE OFF BY 1 DUE TO THE MFT STARTING AT 0, WILL HAVE TO TEST WITH THE ROOT DIR.
-    quint64 curmaxntinode = 0;
-    quint64 oldmaxntinode = 0;
-    quint64 relativeparntinode = parentntinode;
-    for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
+    quint64 mftentryoffset = 0;
+    if(parlayout.isEmpty())
     {
-        //qDebug() << "mftoffset:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong() << "mftlayout length:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
-        //qDebug() << "parentntinode:" << parentntinode << "i:" << i << "mft entries:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() / mftentrybytes;
-        curmaxntinode = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() / mftentrybytes;
-        //qDebug() << "curmaxntinode:" << curmaxntinode;
-        if(relativeparntinode < curmaxntinode)
-        {
-            mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
-            break;
-        }
-        else
-            relativeparntinode = relativeparntinode - curmaxntinode;
-        /*
-	if(parentntinode * mftentrybytes < mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong())
+	// THIS MATH IS WORKING, BUT MIGHT BE OFF BY 1 DUE TO THE MFT STARTING AT 0, WILL HAVE TO TEST WITH THE ROOT DIR.
+	quint64 curmaxntinode = 0;
+	quint64 oldmaxntinode = 0;
+	quint64 relativeparntinode = parentntinode;
+	for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
 	{
-	    mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
-	    break;
+	    //qDebug() << "mftoffset:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong() << "mftlayout length:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
+	    //qDebug() << "parentntinode:" << parentntinode << "i:" << i << "mft entries:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() / mftentrybytes;
+	    curmaxntinode = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() / mftentrybytes;
+	    //qDebug() << "curmaxntinode:" << curmaxntinode;
+	    if(relativeparntinode < curmaxntinode)
+	    {
+		mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
+		break;
+	    }
+	    else
+		relativeparntinode = relativeparntinode - curmaxntinode;
+	    /*
+	    if(parentntinode * mftentrybytes < mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong())
+	    {
+		mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
+		break;
+	    }
+	    */
 	}
-        */
-    }
-    //qDebug() << "final mftoffset:" << mftoffset;
-    //qDebug() << "relative parent nt inode:" << relativeparntinode;
+	//qDebug() << "final mftoffset:" << mftoffset;
+	//qDebug() << "relative parent nt inode:" << relativeparntinode;
 
-    //qDebug() << "mftoffset:" << mftoffset;
-    quint64 mftentryoffset = mftoffset + relativeparntinode * mftentrybytes;
+	//qDebug() << "mftoffset:" << mftoffset;
+	mftentryoffset = mftoffset + relativeparntinode * mftentrybytes;
+    }
+    else // use existing parent layout which is the offset and 1024 for the current dir
+    {
+	if(parentntinode == 7797)
+	    qDebug() << "parntinode:" << parentntinode << "inode:" << parinode << "parlayout:" << parlayout;
+	mftentryoffset = parlayout.split(";", Qt::SkipEmptyParts).at(0).split(",").at(0).toULongLong();
+    }
+    if(parentntinode == 7797)
+	qDebug() << "mftentryoffset:" << mftentryoffset;
     //quint64 mftentryoffset = mftoffset + parentntinode * mftentrybytes;
     //qDebug() << "actual mftentryoffset:" << mftentryoffset;
     // PARSE MFT ENTRY FOR THE DIRECTORY SO I CAN THEN GET IT's CONTENTS AND PARSE THE INDIVIDUAL FILES WITHIN IT...
@@ -7211,8 +7223,11 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	    break;
 	curoffset += attrlength;
     }
-    //qDebug() << "indxrootoffset:" << indxrootoffset << "indxrootlength:" << indxrootlength;
-    //qDebug() << "indxallocoffset:" << indxallocoffset << "indxalloclength:" << indxalloclength;
+    if(parentntinode == 7797)
+    {
+    qDebug() << "indxrootoffset:" << indxrootoffset << "indxrootlength:" << indxrootlength;
+    qDebug() << "indxallocoffset:" << indxallocoffset << "indxalloclength:" << indxalloclength;
+    }
 
     uint32_t indxrecordsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(indxrootoffset + 8, 4)); // INDEX RECORD SIZE (bytes)
     //qDebug() << "indxrecordsize:" << indxrecordsize;
@@ -7260,10 +7275,12 @@ quint64 ParseNtfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 				// may not need this if, have to test...
 				//if(ntinode <= maxmftentries && parntinode <= maxmftentries && !ntinodehash->contains(ntinode))
 				//{
-				    //qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
+				if(parentntinode == 7797)
+				    qDebug() << "ntinode:" << ntinode << inodecnt << "Filename:" << filename << "parntinode:" << QString::number(parntinode) << "maxmftentries:" << maxmftentries;
 				if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
 				{
-				    //qDebug() << "indxalloc: do nothing because ntinode already parsed and sequence is equal.";
+				    if(parentntinode == 7797)
+					qDebug() << "indxalloc: do nothing because ntinode already parsed and sequence is equal.";
 				}
 				else
 				    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, dirntinodehash, ntinodehash);
@@ -7358,7 +7375,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     if(!fileprop.isOpen())
         fileprop.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&fileprop);
-
+    /*
     quint64 mftoffset = 0;
     for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
@@ -7369,11 +7386,29 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	}
     }
     quint64 curoffset = mftoffset + ntinode * mftentrybytes;
+    */
+    quint64 mftoffset = 0;
+    quint64 curmaxntinode = 0;
+    quint64 oldmaxntinode = 0;
+    quint64 relativentinode = ntinode;
+    for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
+    {
+	curmaxntinode = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() / mftentrybytes;
+	if(relativentinode < curmaxntinode)
+	{
+	    mftoffset = mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
+	    break;
+	}
+	else
+	    relativentinode = relativentinode - curmaxntinode;
+    }
+    quint64 curoffset = mftoffset + relativentinode * mftentrybytes;
     //qDebug() << "ntinode:" << ntinode << "entry signature:" << QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString());
+    QString mftentrylayout = "";
     if(QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString()) == "FILE") // proper mft entry
     {
 
-        QString mftentrylayout = QString(QString::number(curoffset) + "," + QString::number(mftentrybytes) + ";");
+        mftentrylayout = QString(QString::number(curoffset) + "," + QString::number(mftentrybytes) + ";");
 	out << "NT Inode|" << QString::number(ntinode) << "|NTFS file inode value." << Qt::endl;
 	out << "Parent NT Inode|" << QString::number(parntinode) << "|File's parent NTFS inode value." << Qt::endl;
         out << "MFT Entry Layout|" << mftentrylayout << "|Offset and size to the MFT entry record for the file." << Qt::endl;
@@ -7399,7 +7434,6 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	}
 	else
 	{
-	    //qDebug() << "mft entry: added ntinode and mftsequenceid to hash list";
 	    ntinodehash->insert(ntinode, mftsequenceid);
 	}
 	uint32_t accessflags = 0;
@@ -7807,7 +7841,8 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     if(itemtype == 2 || itemtype == 3) // directory
     {
 	//qDebug() << "adsparentinode:" << adsparentinode;
-	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, dirntinodehash, ntinodehash);
+	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), mftentrylayout, dirntinodehash, ntinodehash);
+	//inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, dirntinodehash, ntinodehash);
 	//qDebug() << "inodecnt on recursive return:" << inodecnt;
     }
 
