@@ -331,21 +331,7 @@ QString GenerateCategorySignature(QByteArray sigbuf, QString filename)
 
 QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong fileoffset)
 {
-    // NON-QT WAY USING LIBMAGIC
-    QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
-    magic_t magical;
-    const char* catsig;
-    magical = magic_open(MAGIC_MIME_TYPE);
-    magic_load(magical, NULL);
-    catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
-    std::string catsigstr(catsig);
-    QString mimestr = QString::fromStdString(catsigstr);
-    magic_close(magical);
-    for(int i=0; i < mimestr.count(); i++)
-    {
-	if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
-	    mimestr[i] = mimestr[i].toUpper();
-    }
+    QString mimestr = "";
     if(filename.startsWith("$UPCASE_TABLE"))
 	mimestr = "System File/Up-case Table";
     else if(filename.startsWith("$ALLOC_BITMAP"))
@@ -354,6 +340,24 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	mimestr = "Windows System/System File";
     else if(filename.startsWith("$MFT") || filename.startsWith("$MFTMirr") || filename.startsWith("$LogFile") || filename.startsWith("$Volume") || filename.startsWith("$AttrDef") || filename.startsWith("$Bitmap") || filename.startsWith("$Boot") || filename.startsWith("$BadClus") || filename.startsWith("$Secure") || filename.startsWith("$Extend"))
         mimestr = "Windows System/System File";
+    else
+    {
+	// NON-QT WAY USING LIBMAGIC
+	QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
+	magic_t magical;
+	const char* catsig;
+	magical = magic_open(MAGIC_MIME_TYPE);
+	magic_load(magical, NULL);
+	catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
+	std::string catsigstr(catsig);
+	mimestr = QString::fromStdString(catsigstr);
+	magic_close(magical);
+	for(int i=0; i < mimestr.count(); i++)
+	{
+	    if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
+		mimestr[i] = mimestr[i].toUpper();
+	}
+    }
     //else if(filename.startsWith("$INDEX_ROOT:") || filename.startsWith("$DATA:") || filename.startWith("$INDEX_ALLOCATION:"))
     
 
