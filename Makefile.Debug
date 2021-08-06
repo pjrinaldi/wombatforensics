@@ -39,7 +39,7 @@ DISTNAME      = wombatforensics1.0.0
 DISTDIR = /home/pasquale/Projects/wombatforensics/debug/wombatforensics1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath-link,/usr/lib
-LIBS          = $(SUBLIBS) -lewf -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -lmagic -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -lz -lsmraw `pkg-config fuse3 --cflags --libs` /home/pasquale/Projects/wombatforensics/staticlinked/libzmg.a /usr/lib/libQt5MultimediaWidgets.so /usr/lib/libQt5WebEngineWidgets.so /usr/lib/libQt5PrintSupport.so /usr/lib/libQt5OpenGL.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Multimedia.so /usr/lib/libQt5WebEngineCore.so /usr/lib/libQt5Quick.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Concurrent.so /usr/lib/libQt5Sql.so /usr/lib/libQt5QmlModels.so /usr/lib/libQt5WebChannel.so /usr/lib/libQt5Qml.so /usr/lib/libQt5Network.so /usr/lib/libQt5Positioning.so /usr/lib/libQt5Core.so -lGL -lpthread -lXext -lX11 -lm  
+LIBS          = $(SUBLIBS) -lewf -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -lmagic -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -lz -lsmraw -lblake3 `pkg-config fuse3 --cflags --libs` /home/pasquale/Projects/wombatforensics/staticlinked/libzmg.a /usr/lib/libQt5MultimediaWidgets.so /usr/lib/libQt5WebEngineWidgets.so /usr/lib/libQt5PrintSupport.so /usr/lib/libQt5OpenGL.so /usr/lib/libQt5Widgets.so /usr/lib/libQt5Multimedia.so /usr/lib/libQt5WebEngineCore.so /usr/lib/libQt5Quick.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Concurrent.so /usr/lib/libQt5Sql.so /usr/lib/libQt5QmlModels.so /usr/lib/libQt5WebChannel.so /usr/lib/libQt5Qml.so /usr/lib/libQt5Network.so /usr/lib/libQt5Positioning.so /usr/lib/libQt5Core.so -lGL -lpthread -lXext -lX11 -lm  
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -466,7 +466,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		tagging.h \
 		verevidencedialog.h \
 		zmgfs.c \
-		makezmg.h main.cpp \
+		makezmg.h \
+		blake3.h main.cpp \
 		wombatforensics.cpp \
 		wombatfunctions.cpp \
 		exportdialog.cpp \
@@ -535,7 +536,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents wombatforensics.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h digging.h reporting.h artifactparser.h exporting.h newcase.h opencase.h registryviewer.h newforimg.h imagefunctions.h tagging.h verevidencedialog.h zmgfs.c makezmg.h $(DISTDIR)/
+	$(COPY_FILE) --parents wombatforensics.h wombatvariable.h wombatfunctions.h exportdialog.h globals.h wombatinclude.h propertieswindow.h fileviewer.h filterviews.h imageviewer.h videoviewer.h viewermanager.h textviewer.h htmlviewer.h messageviewer.h byteconverter.h digdeeperdialog.h aboutbox.h qhexedit.h chunks.h commands.h settingsdialog.h addevidencedialog.h remevidencedialog.h tagmanager.h searchdialog.h carvedialog.h filecarvingdialog.h carvingfiletypesdialog.h pdfviewer.h carving.h digging.h reporting.h artifactparser.h exporting.h newcase.h opencase.h registryviewer.h newforimg.h imagefunctions.h tagging.h verevidencedialog.h zmgfs.c makezmg.h blake3.h $(DISTDIR)/
 	$(COPY_FILE) --parents main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp globals.cpp propertieswindow.cpp fileviewer.cpp filterviews.cpp imageviewer.cpp videoviewer.cpp viewermanager.cpp textviewer.cpp htmlviewer.cpp messageviewer.cpp byteconverter.cpp digdeeperdialog.cpp aboutbox.cpp qhexedit.cpp chunks.cpp commands.cpp settingsdialog.cpp addevidencedialog.cpp remevidencedialog.cpp tagmanager.cpp searchdialog.cpp carvedialog.cpp filecarvingdialog.cpp carvingfiletypesdialog.cpp pdfviewer.cpp carving.cpp digging.cpp reporting.cpp artifactparser.cpp exporting.cpp newcase.cpp opencase.cpp registryviewer.cpp newforimg.cpp imagefunctions.cpp tagging.cpp verevidencedialog.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents aboutbox.ui accesseddatefilter.ui analysistypefilter.ui byteconverter.ui changeddatefilter.ui createddatefilter.ui digdeeperdialog.ui exportdialog.ui filecategoryfilter.ui filetypefilter.ui fileviewer.ui hashcategoryfilter.ui htmlviewer.ui idfilter.ui imageviewer.ui imagewindow.ui jumpto.ui messageviewer.ui modifieddatefilter.ui namefilter.ui pathfilter.ui propertieswindow.ui settingsdialog.ui sizefilter.ui textviewer.ui videoviewer.ui viewermanager.ui wombatforensics.ui jumphex.ui addevidencedialog.ui remevidencedialog.ui tagfilter.ui tagmanager.ui searchdialog.ui carvedialog.ui filecarvingdialog.ui carvingfiletypesdialog.ui pdfviewer.ui registryviewer.ui newforimg.ui verifyevidencedialog.ui $(DISTDIR)/
 
