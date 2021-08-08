@@ -100,7 +100,7 @@
      <x>0</x>
      <y>0</y>
      <width>1641</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -174,6 +174,30 @@
    <property name="sizeGripEnabled">
     <bool>true</bool>
    </property>
+  </widget>
+  <widget class="QToolBar" name="pathToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextOnly</enum>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="separator"/>
   </widget>
   <action name="actionNew_Case">
    <property name="icon">

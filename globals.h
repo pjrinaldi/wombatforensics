@@ -301,7 +301,7 @@ public:
         int itemtype = 0;
         QByteArray ba;
         nodetype = itemnode->Data(11).toString().split("-").count();
-        itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
+        itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 2=del-dir, 4=del-file, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
         if(role == Qt::CheckStateRole && index.column() == 11)
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
         else if(role == Qt::ForegroundRole)

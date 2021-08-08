@@ -14,7 +14,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
 {
     ui->setupUi(this);
     this->menuBar()->hide();
+    pathtreeview = new PathTreeView();
+    ui->splitter->addWidget(pathtreeview);
     this->statusBar()->setSizeGripEnabled(true);
+    //ui->dirTreeView->setVisible(false);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
     selectedhex = new QLabel(this);
@@ -1230,11 +1233,74 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        TreeNode* curnode = static_cast<TreeNode*>(selectedindex.internalPointer());
+        //uint8_t actionexists = 0;
+        if(curnode->itemtype == -1 || curnode->itemtype == 3 || curnode->itemtype == 2 || curnode->itemtype == 1)
+        {
+            ui->pathToolBar->clear();
+            uint8_t hasparent = 1;
+            QList<QAction*> actionlist;
+            actionlist.clear();
+            QModelIndex curindex = selectedindex;
+            while(hasparent == 1)
+            {
+                QAction* tmpaction = new QAction(curindex.sibling(curindex.row(), 0).data().toString(), this);
+                tmpaction->setData(curindex.sibling(curindex.row(), 11).data());
+                connect(tmpaction, SIGNAL(triggered()), this, SLOT(TestData()));
+                actionlist.prepend(tmpaction);
+                QModelIndex curparent = curindex.parent();
+                if(curparent == QModelIndex())
+                    hasparent = 0;
+                else
+                    curindex = curparent;
+            }
+            ui->pathToolBar->addActions(actionlist);
+            /*
+            for(int i=0; i < ui->pathToolBar->actions().count(); i++)
+            {
+                if(ui->pathToolBar->actions().at(i)->data().toString() == selectedindex.sibling(selectedindex.row(), 11).data().toString())
+                    actionexists = 1;
+            }
+            // ALSO NEED TO ACCOUNT FOR ITEMTYPE OR SPLIT AND ADD ACCORDINGLY... MAYBE GO THROUGH THE PARENTS, ETC...
+            // OR EASIER MIGHT BE TO CLEAR THE TOOLBAR EACH TIME AND RE-ADD ALL THE ACTIONS FROM THE CURRENT CHILD TO ALL PARENTS USING addActions(QList<QAction*>), and add to the list using actionlist.prepend(QAction*) starting with child and working to root..
+            if(actionexists == 1)
+            {
+                // action already exists, don't add a duplicate...
+                qDebug() << "action already exists...";
+            }
+            else
+            {
+                QAction* tmpaction = new QAction(selectedindex.sibling(selectedindex.row(), 0).data().toString(), this);
+                tmpaction->setData(QVariant(selectedindex.sibling(selectedindex.row(), 11).data().toString()));
+                connect(tmpaction, SIGNAL(triggered()), this, SLOT(TestData()));
+                ui->pathToolBar->addAction(tmpaction);
+            }
+            */
+        }
         //PopulateHexContents();
         //LoadHexContents();
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
     }
+}
+
+void WombatForensics::TestData()
+{
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    //QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
+    QString text = tagaction->text();
+    QString data = tagaction->data().toString();
+    qDebug() << "text:" << text << "data:" << data;
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    if(indexlist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    /*
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    if(indexlist.count() > 0)
+        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    QApplication::restoreOverrideCursor();
+     */ 
 }
 
 void WombatForensics::TreeContextMenu(const QPoint &pt)
@@ -3129,6 +3195,17 @@ void WombatForensics::mouseDoubleClickEvent(QMouseEvent* event)
     {
     }
 }
+
+/*
+void WombatForensics::mousePressEvent(QMouseEvent* event)
+{
+    if(event)
+    {
+        //Qt::QMouseButton button = event->button();
+        qDebug() << "button event:" << event->button();
+    }
+}
+*/
 
 void WombatForensics::closeEvent(QCloseEvent* event)
 {

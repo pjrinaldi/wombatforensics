@@ -70,6 +70,7 @@ public:
     QMenuBar *mainMenubar;
     QToolBar *analysisToolBar;
     QStatusBar *mainStatusBar;
+    QToolBar *pathToolBar;
 
     void setupUi(QMainWindow *WombatForensics)
     {
@@ -295,7 +296,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QString::fromUtf8("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 1641, 23));
+        mainMenubar->setGeometry(QRect(0, 0, 1641, 20));
         mainMenubar->setAcceptDrops(true);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
@@ -312,6 +313,14 @@ public:
         mainStatusBar->setStyleSheet(QString::fromUtf8(""));
         mainStatusBar->setSizeGripEnabled(true);
         WombatForensics->setStatusBar(mainStatusBar);
+        pathToolBar = new QToolBar(WombatForensics);
+        pathToolBar->setObjectName(QString::fromUtf8("pathToolBar"));
+        pathToolBar->setMovable(false);
+        pathToolBar->setAllowedAreas(Qt::TopToolBarArea);
+        pathToolBar->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        pathToolBar->setFloatable(false);
+        WombatForensics->addToolBar(Qt::TopToolBarArea, pathToolBar);
+        WombatForensics->insertToolBarBreak(pathToolBar);
 
         analysisToolBar->addAction(actionNew_Case);
         analysisToolBar->addAction(actionOpen_Case);
@@ -341,6 +350,7 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionCreateForensicImage);
         analysisToolBar->addAction(actionVerifyForensicImage);
+        pathToolBar->addSeparator();
 
         retranslateUi(WombatForensics);
         QObject::connect(actionRemove_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(RemEvidence()));
@@ -472,6 +482,7 @@ public:
         hexview->setWhatsThis(QCoreApplication::translate("WombatForensics", "QHexEdit widget allow to edit the data in hex view.", nullptr));
 #endif // QT_CONFIG(whatsthis)
         analysisToolBar->setWindowTitle(QCoreApplication::translate("WombatForensics", "toolBar", nullptr));
+        pathToolBar->setWindowTitle(QCoreApplication::translate("WombatForensics", "toolBar", nullptr));
     } // retranslateUi
 
 };

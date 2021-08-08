@@ -62,6 +62,24 @@ class StatusLabel : public QLabel
         void clicked();
 };
 
+class PathTreeView : public QTreeView
+{
+    Q_OBJECT
+
+    public:
+
+    protected:
+        void mousePressEvent(QMouseEvent* e)
+        {
+            qDebug() << "single click:" << e->button();
+        }
+        void mouseDoubleClickEvent(QMouseEvent* e)
+        {
+            qDebug() << "double click:" << e->button();
+        }
+    signals:
+};
+
 namespace Ui {
 class WombatForensics;
 }
@@ -236,9 +254,12 @@ private slots:
     void FinishWombatCaseFile(void);
     void FinishVerify(void);
 
+    void TestData(void);
+
 protected:
     void closeEvent(QCloseEvent* event);
     void mouseDoubleClickEvent(QMouseEvent* event);
+    //void mousePressEvent(QMouseEvent* event);
 private:
     Ui::WombatForensics *ui;
 
@@ -302,6 +323,7 @@ private:
     QLabel* digcountlabel;
     QLabel* carvestatuslabel;
     StatusLabel* statuslabel;
+    PathTreeView* pathtreeview;
     QFrame* vline1;
     QFrame* vline2;
     QFrame* vline3;
