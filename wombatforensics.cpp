@@ -1256,7 +1256,6 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
         ui->actionsearchhex->setEnabled(true);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         TreeNode* curnode = static_cast<TreeNode*>(selectedindex.internalPointer());
-        //uint8_t actionexists = 0;
         /*
         if(treenodemodel->rowCount(selectedindex) > 0)
             qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString() << "has children";
@@ -1284,27 +1283,6 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
                     curindex = curparent;
             }
             ui->pathToolBar->addActions(actionlist);
-            /*
-            for(int i=0; i < ui->pathToolBar->actions().count(); i++)
-            {
-                if(ui->pathToolBar->actions().at(i)->data().toString() == selectedindex.sibling(selectedindex.row(), 11).data().toString())
-                    actionexists = 1;
-            }
-            // ALSO NEED TO ACCOUNT FOR ITEMTYPE OR SPLIT AND ADD ACCORDINGLY... MAYBE GO THROUGH THE PARENTS, ETC...
-            // OR EASIER MIGHT BE TO CLEAR THE TOOLBAR EACH TIME AND RE-ADD ALL THE ACTIONS FROM THE CURRENT CHILD TO ALL PARENTS USING addActions(QList<QAction*>), and add to the list using actionlist.prepend(QAction*) starting with child and working to root..
-            if(actionexists == 1)
-            {
-                // action already exists, don't add a duplicate...
-                qDebug() << "action already exists...";
-            }
-            else
-            {
-                QAction* tmpaction = new QAction(selectedindex.sibling(selectedindex.row(), 0).data().toString(), this);
-                tmpaction->setData(QVariant(selectedindex.sibling(selectedindex.row(), 11).data().toString()));
-                connect(tmpaction, SIGNAL(triggered()), this, SLOT(TestData()));
-                ui->pathToolBar->addAction(tmpaction);
-            }
-            */
         }
         //PopulateHexContents();
         //LoadHexContents();
