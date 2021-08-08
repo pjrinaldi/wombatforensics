@@ -15,9 +15,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->setupUi(this);
     this->menuBar()->hide();
     pathtreeview = new PathTreeView();
-    ui->splitter->addWidget(pathtreeview);
+    ui->splitter->insertWidget(0, pathtreeview);
     this->statusBar()->setSizeGripEnabled(true);
-    //ui->dirTreeView->setVisible(false);
+    ui->dirTreeView->setVisible(false);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
     selectedhex = new QLabel(this);
@@ -202,6 +202,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     pathtreeview->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(pathtreeview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(pathtreeview->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
+    connect(pathtreeview, SIGNAL(LaunchFile(const QMOdelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
 
     connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -1244,7 +1245,12 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         TreeNode* curnode = static_cast<TreeNode*>(selectedindex.internalPointer());
         //uint8_t actionexists = 0;
-        if(curnode->itemtype == -1 || curnode->itemtype == 3 || curnode->itemtype == 2 || curnode->itemtype == 1)
+        if(treenodemodel->rowCount(selectedindex) > 0)
+            qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString() << "has children";
+        else
+            qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString() << "doesn't have children";
+        //if(curnode->itemtype == -1 || curnode->itemtype == 3 || curnode->itemtype == 2 || curnode->itemtype == 1)
+        if(treenodemodel->rowCount(selectedindex) > 0)
         {
             ui->pathToolBar->clear();
             uint8_t hasparent = 1;
@@ -1321,6 +1327,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        /*
         ui->pathToolBar->clear();
         uint8_t hasparent = 1;
         QList<QAction*> actionlist;
@@ -1343,6 +1350,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
                 curindex = curparent;
         }
         ui->pathToolBar->addActions(actionlist);
+        */
         //PopulateHexContents();
         //LoadHexContents();
         GenerateHexFile(selectedindex);

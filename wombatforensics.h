@@ -75,9 +75,13 @@ class PathTreeView : public QTreeView
             if(e->button() == Qt::LeftButton)
             {
                 qDebug() << "left clicked";
+                QModelIndex index = this->indexAt(e->pos());
+                this->setCurrentIndex(index);
             }
             else if(e->button() == Qt::MiddleButton)
             {
+                const QModelIndex index = this->indexAt(e->pos());
+                emit this->LaunchFile(index);
                 //ShowFile();
                 qDebug() << "call show file here ... middle button clicked";
             }
@@ -93,7 +97,10 @@ class PathTreeView : public QTreeView
             if(e->button() == Qt::LeftButton)
             {
                 QModelIndex index = this->indexAt(e->pos());
-                this->setRootIndex(index);
+                if(treenodemodel->rowCount(index) > 0)
+                    this->setRootIndex(index);
+                //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+                //ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
                 //emit ChangeRoot(e->pos());
                 //QModelIndex index = pathtreeview->indexAt(e->pos());
                 //if(index.isValid())
@@ -104,6 +111,7 @@ class PathTreeView : public QTreeView
             }
             else if(e->button() == Qt::MiddleButton)
             {
+                //ShowFile();
                 qDebug() << "middle button clicked";
             }
             else if(e->button() == Qt::RightButton)
@@ -113,6 +121,7 @@ class PathTreeView : public QTreeView
             e->ignore();
         }
     signals:
+        void LaunchFile(const QModelIndex &index);
         //void ChangeRoot(QPoint pt);
 };
 
