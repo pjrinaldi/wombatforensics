@@ -194,6 +194,15 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
     connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
+    
+    pathtreeview->setSortingEnabled(true);
+    pathtreeview->setUniformRowHeights(true);
+    pathtreeview->header()->setSortIndicatorShown(false);
+    pathtreeview->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    pathtreeview->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(pathtreeview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
+    connect(pathtreeview->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
+
     connect(imagewindow, SIGNAL(SendObjectToTreeView(QString)), this, SLOT(SetSelectedFromImageViewer(QString)));
     connect(idfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(namefilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
@@ -1206,7 +1215,7 @@ void WombatForensics::ThashFinish(void)
 	StatusUpdate("Digging Deeper...");
 }
 
-void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
+void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
     if(previtem.indexes().count() > 0)
         oldselectedindex = previtem.indexes().at(0);
@@ -1284,6 +1293,63 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     }
 }
 
+
+void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
+{
+    if(previtem.indexes().count() > 0)
+        oldselectedindex = previtem.indexes().at(0);
+    if(curitem.indexes().count() > 0)
+    {
+        selectedindex = curitem.indexes().at(0);
+        bool boolok;
+	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
+        qint64 sizeval = clocale.toLongLong(selectedindex.sibling(selectedindex.row(), 2).data().toString(), &boolok);
+        //qDebug() << "sizevalue:" << sizeval;
+        //qDebug() << "size locale to longlong:" << QLocale(selectedindex.sibling(selectedindex.row(), 2).data().toString())::toLongLong();
+        //if(selectedindex.sibling(selectedindex.row(), 2).data().toLongLong() > 0) // file size
+        if(sizeval > 0)
+            ui->actionView_File->setEnabled(true);
+        else
+            ui->actionView_File->setEnabled(false);
+        //ui->actionView_Properties->setEnabled(true);
+        //ui->actionView_File->setEnabled(true);
+        ui->actionView_Image_Gallery->setEnabled(true);
+        ui->actionTextViewer->setEnabled(true);
+        ui->actionExport_Evidence->setEnabled(true);
+        ui->actionExportForensicImage->setEnabled(true);
+        ui->actionByteConverter->setEnabled(true);
+        ui->actionJumpToHex->setEnabled(true);
+        ui->actionsearchhex->setEnabled(true);
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        ui->pathToolBar->clear();
+        uint8_t hasparent = 1;
+        QList<QAction*> actionlist;
+        actionlist.clear();
+        QModelIndex curindex = selectedindex;
+        while(hasparent == 1)
+        {
+            TreeNode* curnode = static_cast<TreeNode*>(curindex.internalPointer());
+            if(curnode->itemtype == -1 || curnode->itemtype == 3 || curnode->itemtype == 2 || curnode->itemtype == 1)
+            {
+                QAction* tmpaction = new QAction(curindex.sibling(curindex.row(), 0).data().toString(), this);
+                tmpaction->setData(curindex.sibling(curindex.row(), 11).data());
+                connect(tmpaction, SIGNAL(triggered()), this, SLOT(TestData()));
+                actionlist.prepend(tmpaction);
+            }
+            QModelIndex curparent = curindex.parent();
+            if(curparent == QModelIndex())
+                hasparent = 0;
+            else
+                curindex = curparent;
+        }
+        ui->pathToolBar->addActions(actionlist);
+        //PopulateHexContents();
+        //LoadHexContents();
+        GenerateHexFile(selectedindex);
+        QApplication::restoreOverrideCursor();
+    }
+}
+
 void WombatForensics::TestData()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
@@ -1293,7 +1359,10 @@ void WombatForensics::TestData()
     qDebug() << "text:" << text << "data:" << data;
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
-        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    {
+        pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), 0));
+        //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+    }
     /*
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -1305,7 +1374,8 @@ void WombatForensics::TestData()
 
 void WombatForensics::TreeContextMenu(const QPoint &pt)
 {
-    QModelIndex index = ui->dirTreeView->indexAt(pt);
+    QModelIndex index = pathtreeview->indexAt(pt);
+    QModelIndex index2 = ui->dirTreeView->indexAt(pt);
     if(index.isValid())
     {
         actionitem = static_cast<TreeNode*>(index.internalPointer());
@@ -1319,7 +1389,8 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
             ui->actionCheck->setText("UnCheck Selected");
             ui->actionCheck->setIcon(QIcon(":/remcheck"));
         }
-        treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
+        treemenu->exec(pathtreeview->mapToGlobal(pt));
+        //treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
 
@@ -1459,10 +1530,12 @@ void WombatForensics::UpdateStatus()
     }
     //LogMessage("Building Initial Evidence Tree...");
     ui->dirTreeView->setModel(treenodemodel);
+    pathtreeview->setModel(treenodemodel);
     ReadBookmarks();
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
+    connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(PathSelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     UpdateCheckCount();
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
@@ -3145,7 +3218,10 @@ void WombatForensics::DisplayError(QString errorNumber, QString errorType, QStri
 void WombatForensics::ResizeColumns(void)
 {
     for(int i=0; i < treenodemodel->columnCount(QModelIndex()); i++)
+    {
+        pathtreeview->resizeColumnToContents(i);
         ui->dirTreeView->resizeColumnToContents(i);
+    }
 }
 
 void WombatForensics::SetupHexPage(void)

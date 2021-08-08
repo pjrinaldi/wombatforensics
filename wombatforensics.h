@@ -72,12 +72,48 @@ class PathTreeView : public QTreeView
         void mousePressEvent(QMouseEvent* e)
         {
             qDebug() << "single click:" << e->button();
+            if(e->button() == Qt::LeftButton)
+            {
+                qDebug() << "left clicked";
+            }
+            else if(e->button() == Qt::MiddleButton)
+            {
+                //ShowFile();
+                qDebug() << "call show file here ... middle button clicked";
+            }
+            else if(e->button() == Qt::RightButton)
+            {
+                qDebug() << "right button clicked";
+            }
+            e->ignore();
         }
         void mouseDoubleClickEvent(QMouseEvent* e)
         {
             qDebug() << "double click:" << e->button();
+            if(e->button() == Qt::LeftButton)
+            {
+                QModelIndex index = this->indexAt(e->pos());
+                this->setRootIndex(index);
+                //emit ChangeRoot(e->pos());
+                //QModelIndex index = pathtreeview->indexAt(e->pos());
+                //if(index.isValid())
+                //{
+                //    pathtreeview->setRootIndex(index);
+                //}
+                qDebug() << "left clicked";
+            }
+            else if(e->button() == Qt::MiddleButton)
+            {
+                qDebug() << "middle button clicked";
+            }
+            else if(e->button() == Qt::RightButton)
+            {
+                qDebug() << "right button clicked";
+            }
+            e->ignore();
         }
     signals:
+        //void ChangeRoot(QPoint pt);
 };
 
 namespace Ui {
@@ -177,6 +213,7 @@ private slots:
     void OpenUpdate(void);
     void UpdateCheckCount(void);
     void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
+    void PathSelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(void);
     void HideTagManager(void);
