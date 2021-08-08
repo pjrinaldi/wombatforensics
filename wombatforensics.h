@@ -89,7 +89,7 @@ class PathTreeView : public QTreeView
             {
                 //qDebug() << "right button clicked";
             }
-            //e->ignore();
+            e->accept();
         }
         void mouseDoubleClickEvent(QMouseEvent* e)
         {
@@ -97,8 +97,8 @@ class PathTreeView : public QTreeView
             if(e->button() == Qt::LeftButton)
             {
                 QModelIndex index = this->indexAt(e->pos());
-                if(treenodemodel->rowCount(index) > 0)
-                    this->setRootIndex(index);
+                if(treenodemodel->rowCount(index.sibling(index.row(), 0)) > 0)
+                    this->setRootIndex(index.sibling(index.row(), 0));
                 //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
                 //ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
                 //emit ChangeRoot(e->pos());
@@ -270,7 +270,8 @@ private slots:
     void FilterApplied()
     {
         UpdateFilterCount();
-        emit ui->dirTreeView->header()->geometriesChanged();
+        emit pathtreeview->header()->geometriesChanged();
+        //emit ui->dirTreeView->header()->geometriesChanged();
         emit treenodemodel->layoutChanged(); // this messes with the row height and cuts off icons...
     };
     void NextItem();

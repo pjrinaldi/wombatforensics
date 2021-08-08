@@ -7911,7 +7911,6 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	adsprop.close();
 	inodecnt++;
     }
-    //adsparentinode = inodecnt;
     /*
     if(itemtype == 2 || itemtype == 3) // directory
     {
