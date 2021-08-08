@@ -1257,10 +1257,12 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         TreeNode* curnode = static_cast<TreeNode*>(selectedindex.internalPointer());
         //uint8_t actionexists = 0;
+        /*
         if(treenodemodel->rowCount(selectedindex) > 0)
             qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString() << "has children";
         else
             qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString() << "doesn't have children";
+        */
         //if(curnode->itemtype == -1 || curnode->itemtype == 3 || curnode->itemtype == 2 || curnode->itemtype == 1)
         if(treenodemodel->rowCount(selectedindex) > 0)
         {
@@ -1376,7 +1378,7 @@ void WombatForensics::TestData()
     //QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString text = tagaction->text();
     QString data = tagaction->data().toString();
-    qDebug() << "text:" << text << "data:" << data;
+    //qDebug() << "text:" << text << "data:" << data;
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
     {
