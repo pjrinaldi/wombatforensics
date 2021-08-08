@@ -111,6 +111,21 @@ class PathTreeView : public QTreeView
             }
             else if(e->button() == Qt::MiddleButton)
             {
+                TreeNode* itemcheck = static_cast<TreeNode*>(this->indexAt(e->pos()).internalPointer());
+                if(!itemcheck->IsChecked())
+                    itemcheck->SetChecked(true);
+                else
+                    itemcheck->SetChecked(false);
+                emit treenodemodel->CheckedNodesChanged();
+                /*
+                TreeNode* itemcheck = static_cast<TreeNode*>(this->indexAt(e->pos()).internalPointer());
+                if(!itemcheck->IsChecked())
+                    itemcheck->SetChecked(true);
+                else
+                    itemcheck->SetChecked(false);
+                emit treenodemodel->CheckedNodesChanged();
+                */
+
                 //ShowFile();
                 //qDebug() << "middle button clicked";
             }

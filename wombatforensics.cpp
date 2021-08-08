@@ -705,7 +705,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
             ui->actionCheck->setText("UnCheck Selected");
             ui->actionCheck->setIcon(QIcon(":/remcheck"));
         }
-        treemenu->exec(QCursor::pos()); // might want to add the enable/disable depending on whether its a file/dir or not. (4-)
+        //treemenu->exec(QCursor::pos()); // might want to add the enable/disable depending on whether its a file/dir or not. (4-)
     }
     QApplication::restoreOverrideCursor();
 }
