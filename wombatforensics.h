@@ -71,10 +71,10 @@ class PathTreeView : public QTreeView
     protected:
         void mousePressEvent(QMouseEvent* e)
         {
-            qDebug() << "single click:" << e->button();
+            //qDebug() << "single click:" << e->button();
             if(e->button() == Qt::LeftButton)
             {
-                qDebug() << "left clicked";
+                //qDebug() << "left clicked";
                 QModelIndex index = this->indexAt(e->pos());
                 this->setCurrentIndex(index);
             }
@@ -83,17 +83,17 @@ class PathTreeView : public QTreeView
                 const QModelIndex index = this->indexAt(e->pos());
                 emit this->LaunchFile(index);
                 //ShowFile();
-                qDebug() << "call show file here ... middle button clicked";
+                //qDebug() << "call show file here ... middle button clicked";
             }
             else if(e->button() == Qt::RightButton)
             {
-                qDebug() << "right button clicked";
+                //qDebug() << "right button clicked";
             }
-            e->ignore();
+            //e->ignore();
         }
         void mouseDoubleClickEvent(QMouseEvent* e)
         {
-            qDebug() << "double click:" << e->button();
+            //qDebug() << "double click:" << e->button();
             if(e->button() == Qt::LeftButton)
             {
                 QModelIndex index = this->indexAt(e->pos());
@@ -107,19 +107,20 @@ class PathTreeView : public QTreeView
                 //{
                 //    pathtreeview->setRootIndex(index);
                 //}
-                qDebug() << "left clicked";
+                //qDebug() << "left clicked";
             }
             else if(e->button() == Qt::MiddleButton)
             {
                 //ShowFile();
-                qDebug() << "middle button clicked";
+                //qDebug() << "middle button clicked";
             }
             else if(e->button() == Qt::RightButton)
             {
-                qDebug() << "right button clicked";
+                //qDebug() << "right button clicked";
             }
-            e->ignore();
+            //e->ignore();
         }
+
     signals:
         void LaunchFile(const QModelIndex &index);
         //void ChangeRoot(QPoint pt);
