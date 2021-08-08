@@ -80,8 +80,12 @@ class PathTreeView : public QTreeView
             }
             else if(e->button() == Qt::MiddleButton)
             {
-                const QModelIndex index = this->indexAt(e->pos());
-                emit this->LaunchFile(index);
+                TreeNode* itemcheck = static_cast<TreeNode*>(this->indexAt(e->pos()).internalPointer());
+                if(!itemcheck->IsChecked())
+                    itemcheck->SetChecked(true);
+                else
+                    itemcheck->SetChecked(false);
+                emit treenodemodel->CheckedNodesChanged();
                 //ShowFile();
                 //qDebug() << "call show file here ... middle button clicked";
             }
@@ -111,12 +115,8 @@ class PathTreeView : public QTreeView
             }
             else if(e->button() == Qt::MiddleButton)
             {
-                TreeNode* itemcheck = static_cast<TreeNode*>(this->indexAt(e->pos()).internalPointer());
-                if(!itemcheck->IsChecked())
-                    itemcheck->SetChecked(true);
-                else
-                    itemcheck->SetChecked(false);
-                emit treenodemodel->CheckedNodesChanged();
+                const QModelIndex index = this->indexAt(e->pos());
+                emit this->LaunchFile(index);
                 /*
                 TreeNode* itemcheck = static_cast<TreeNode*>(this->indexAt(e->pos()).internalPointer());
                 if(!itemcheck->IsChecked())

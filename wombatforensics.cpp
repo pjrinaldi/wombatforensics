@@ -1282,6 +1282,11 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
                 else
                     curindex = curparent;
             }
+            QAction* voidaction = new QAction("HOME", this);
+            voidaction->setData(QVariant("INDEXVOID"));
+            connect(voidaction, SIGNAL(triggered()), this, SLOT(TestData()));
+            actionlist.prepend(voidaction);
+
             ui->pathToolBar->addActions(actionlist);
         }
         //PopulateHexContents();
@@ -1357,11 +1362,18 @@ void WombatForensics::TestData()
     QString text = tagaction->text();
     QString data = tagaction->data().toString();
     //qDebug() << "text:" << text << "data:" << data;
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    if(indexlist.count() > 0)
+    if(data == "INDEXVOID")
     {
-        pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), 0));
-        //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+        pathtreeview->setRootIndex(QModelIndex());
+    }
+    else
+    {
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        if(indexlist.count() > 0)
+        {
+            pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), 0));
+            //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
+        }
     }
     /*
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
