@@ -7877,6 +7877,10 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     out.flush();
     fileprop.close();
     //qDebug() << "adsproplist:" << adsproplist;
+    if(itemtype == 2 || itemtype == 3) // directory
+    {
+	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), mftentrylayout, dirntinodehash, ntinodehash);
+    }
     for(int i=0; i < adsnodelist.count(); i++)
     {
         // do catsig here and adsfilepath here as well... filepath + filename + "/"
@@ -7907,13 +7911,17 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	adsprop.close();
 	inodecnt++;
     }
+    //adsparentinode = inodecnt;
+    /*
     if(itemtype == 2 || itemtype == 3) // directory
     {
 	//qDebug() << "adsparentinode:" << adsparentinode;
 	inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), mftentrylayout, dirntinodehash, ntinodehash);
+	//inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), mftentrylayout, dirntinodehash, ntinodehash);
 	//inodecnt = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, ntinode, adsparentinode, QString(filepath + filename + "/"), dirlayout, dirntinodehash, ntinodehash);
 	//qDebug() << "inodecnt on recursive return:" << inodecnt;
     }
+    */
 
     //qDebug() << "inodecnt before getmft return:" << inodecnt;
     return inodecnt;
