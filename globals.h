@@ -302,7 +302,7 @@ public:
         QByteArray ba;
         nodetype = itemnode->Data(11).toString().split("-").count();
         itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 2=del-dir, 4=del-file, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
-        if(role == Qt::CheckStateRole && index.column() == 11)
+        if(role == Qt::CheckStateRole && index.column() == 0)
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
         else if(role == Qt::ForegroundRole)
         {
@@ -627,7 +627,7 @@ public:
         if(index == QModelIndex())
             return Qt::NoItemFlags;
         //if(index.column() == 11 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4) // used to be 0
-        if(index.column() == 11 && itemnode->Data(index.column()).toString().split("-").count() == 3) // used to be 0
+        if(index.column() == 0 && itemnode->Data(index.column()).toString().split("-").count() == 3) // used to be 0
             flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
         
         return flags;

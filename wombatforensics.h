@@ -115,8 +115,9 @@ class PathTreeView : public QTreeView
             }
             else if(e->button() == Qt::MiddleButton)
             {
-                const QModelIndex index = this->indexAt(e->pos());
-                emit this->LaunchFile(index);
+		// MIDDLE BUTTON DO NOTHING... WILL SET A KEYBOARD SHORTCUT TO SHOWFILE
+                //const QModelIndex index = this->indexAt(e->pos());
+                //emit this->LaunchFile(index);
                 /*
                 TreeNode* itemcheck = static_cast<TreeNode*>(this->indexAt(e->pos()).internalPointer());
                 if(!itemcheck->IsChecked())
