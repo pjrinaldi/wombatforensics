@@ -71,20 +71,21 @@ class PathTreeView : public QTreeView
     protected:
         void mousePressEvent(QMouseEvent* e)
         {
+            QModelIndex index = this->indexAt(e->pos());
             //qDebug() << "single click:" << e->button();
             if(e->button() == Qt::LeftButton)
             {
                 //qDebug() << "left clicked";
-                QModelIndex index = this->indexAt(e->pos());
                 this->setCurrentIndex(index);
             }
             else if(e->button() == Qt::MiddleButton)
             {
-                TreeNode* itemcheck = static_cast<TreeNode*>(this->indexAt(e->pos()).internalPointer());
+                TreeNode* itemcheck = static_cast<TreeNode*>(index.internalPointer());
                 if(!itemcheck->IsChecked())
                     itemcheck->SetChecked(true);
                 else
                     itemcheck->SetChecked(false);
+		emit dataChanged(index, index);
                 emit treenodemodel->CheckedNodesChanged();
                 //ShowFile();
                 //qDebug() << "call show file here ... middle button clicked";

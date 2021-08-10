@@ -284,11 +284,16 @@ public:
         splitter->addWidget(dirTreeView);
         hexview = new QHexEdit(splitter);
         hexview->setObjectName(QString::fromUtf8("hexview"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(1);
+        sizePolicy1.setHeightForWidth(hexview->sizePolicy().hasHeightForWidth());
+        hexview->setSizePolicy(sizePolicy1);
         hexview->setToolTipDuration(0);
-        hexview->setBytesPerLine(49);
-        hexview->setHexCaps(true);
-        hexview->setDynamicBytesPerLine(true);
-        hexview->setReadOnly(true);
+        hexview->setProperty("bytesPerLine", QVariant(49));
+        hexview->setProperty("hexCaps", QVariant(true));
+        hexview->setProperty("dynamicBytesPerLine", QVariant(true));
+        hexview->setProperty("readOnly", QVariant(true));
         splitter->addWidget(hexview);
 
         horizontalLayout->addWidget(splitter);
@@ -296,7 +301,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QString::fromUtf8("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 1641, 20));
+        mainMenubar->setGeometry(QRect(0, 0, 1641, 22));
         mainMenubar->setAcceptDrops(true);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
