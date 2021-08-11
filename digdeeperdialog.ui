@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>365</width>
+    <width>469</width>
     <height>314</height>
    </rect>
   </property>
@@ -139,6 +139,13 @@
            <widget class="QRadioButton" name="sha256radiobutton">
             <property name="text">
              <string>SHA256</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="blake3radiobutton">
+            <property name="text">
+             <string>BLAKE3</string>
             </property>
            </widget>
           </item>

@@ -96,4 +96,5 @@
 #include <libewf.h>
 //#include "forimg.h"
 
+#include <blake3.h>
 #endif // WOMBATINCLUDE_H

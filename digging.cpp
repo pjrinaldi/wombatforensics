@@ -381,7 +381,7 @@ void GenerateHash(QString objectid)
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         QString objectname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
 	int curhashcount = indxlist.first().sibling(indxlist.first().row(), 7).data().toString().count();
-	if((hashsum == 1 && curhashcount != 32) || (hashsum == 2 && curhashcount != 40) || (hashsum == 3 && curhashcount != 64))
+	if((hashsum == 1 && curhashcount != 32) || (hashsum == 2 && curhashcount != 40) || (hashsum == 4 && curhashcount != 64) || (hashsum == 11 && curhashcount != 64))
 	{
 	    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
 	    qint64 filesize = curitem->Data(2).toLongLong();
@@ -393,8 +393,27 @@ void GenerateHash(QString objectid)
 		QByteArray filebytes;
 		filebytes.clear();
 		filebytes = ReturnFileContent(objectid);
-		QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
-		hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+                if(hashsum == 11)
+                {
+                    /*
+                    */
+                    blake3_hasher filehash;
+                    blake3_hasher_init(&filehash);
+                    blake3_hasher_update(&filehash, filebytes.data(), filebytes.count());
+                    uint8_t blake3hash[BLAKE3_OUT_LEN];
+                    blake3_hasher_finalize(&filehash, blake3hash, BLAKE3_OUT_LEN);
+                    std::stringstream b3str;
+                    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+                        b3str << std::hex << (int)blake3hash[i];
+                    std::string b3hash = "";
+                    hashstr = QString::fromStdString(b3str.str());
+                    qDebug() << "blake3 hash:" << hashstr;
+                }
+                else
+                {
+		    QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+		    hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+                }
 		filebytes.clear();
 	    }
 	    else
@@ -405,6 +424,8 @@ void GenerateHash(QString objectid)
 		    hashstr = QString("da39a3ee5e6b4b0d3255bfef95601890afd80709").toUpper(); // SHA1 zero file
 		else if(hashsum == 4)
 		    hashstr = QString("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").toUpper(); // SHA256 zero file
+                else if(hashsum == 11)
+                    hashstr = QString("af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262").toUpper(); // BLAKE3 zero file
 	    }
 	    if(!isclosing)
 	    {
@@ -421,6 +442,8 @@ void GenerateHash(QString objectid)
 		hashtype = 2;
 	    else if(hashsum == 4) // SHA256
 		hashtype = 3;
+            else if(hashsum == 11) // BLAKE3
+                hashtype = 4;
 	    if(!isclosing)
 		isignals->DigUpd(hashtype, dighashcount);
 	}

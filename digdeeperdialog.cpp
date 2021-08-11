@@ -29,6 +29,7 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
     ui->md5radiobutton->setEnabled(false);
     ui->sha1radiobutton->setEnabled(false);
     ui->sha256radiobutton->setEnabled(false);
+    ui->blake3radiobutton->setEnabled(false);
     connect(ui->thumbnailcheckBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->videocheckBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->hashcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
@@ -49,6 +50,7 @@ void DigDeeperDialog::EnableProcess(bool checked)
         ui->md5radiobutton->setEnabled(true);
         ui->sha1radiobutton->setEnabled(true);
         ui->sha256radiobutton->setEnabled(true);
+        ui->blake3radiobutton->setEnabled(true);
     }
     if(ui->hashcheckbox->isChecked() || ui->thumbnailcheckBox->isChecked() || ui->videocheckBox->isChecked() || ui->expandarchivescheckbox->isChecked())
         ui->processButton->setEnabled(true);
@@ -76,6 +78,8 @@ void DigDeeperDialog::DigDeeperFiles()
             digoptions.append(2);
         else if(ui->sha256radiobutton->isChecked())
             digoptions.append(3);
+        else if(ui->blake3radiobutton->isChecked())
+            digoptions.append(7);
     }
     if(ui->expandarchivescheckbox->isChecked())
         digoptions.append(6);

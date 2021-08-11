@@ -505,6 +505,8 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
                 filestr += "SHA1";
             else if(hashsum == 4)
                 filestr += "SHA256";
+            else if(hashsum == 11)
+                filestr += "BLAKE3";
             filestr += " Hash:</td><td class='property'>" + curindex.sibling(curindex.row(), 7).data().toString() + "</td></tr>";
         }
         filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), 8).data().toString() + "</td></tr>";
@@ -1125,6 +1127,8 @@ void WombatForensics::OpenUpdate()
         hashstr = "SHA1 Hash";
     else if(hashsum == 4)
         hashstr = "SHA256 Hash";
+    else if(hashsum == 11)
+        hashstr = "BLAKE3 Hash";
     treenodemodel->UpdateHeaderNode(7, hashstr);
     thumbdir.mkpath(wombatvariable.tmpmntpath + "carved/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "archives/");
@@ -3140,7 +3144,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 }
             }
         }
-        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 || digoptions.at(i) == 3) // 1 - MD5 || 2- SHA1 || 3- SHA256
+        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 || digoptions.at(i) == 3 || digoptions.at(i) == 7) // 1 - MD5 || 2 - SHA1 || 3 - SHA256 || 7 - BLAKE3
         {
             if(digoptions.at(i) == 2)
                 hashsum = 2;
@@ -3148,6 +3152,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 hashsum = 4;
             else if(digoptions.at(i) == 1)
                 hashsum = 1;
+            else if(digoptions.at(i) == 7)
+                hashsum = 11;
             dighashtotal = digfilelist.count();
 	    dighashcountstring = "Hashed: 0 of " + QString::number(dighashtotal);
             if(dighashtotal > 0)
@@ -3534,6 +3540,8 @@ void WombatForensics::FinishDigging()
             treenodemodel->UpdateHeaderNode(7, "SHA1 Hash");
         else if(hashsum == 4)
             treenodemodel->UpdateHeaderNode(7, "SHA256 Hash");
+        else if(hashsum == 11)
+            treenodemodel->UpdateHeaderNode(7, "BLAKE3 Hash");
         //QtConcurrent::run(SaveHashList); // save ids/hashed values to hashlist file for re-opening a case.
         hashash = false;
     }
@@ -3753,6 +3761,7 @@ void WombatForensics::SetFilter(int headercolumn)
 
 void WombatForensics::NextItem()
 {
+    /*
     QModelIndex curindex = ui->dirTreeView->currentIndex();
     QModelIndexList tmplist = treenodemodel->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(tmplist.isEmpty() == false)
@@ -3771,10 +3780,12 @@ void WombatForensics::NextItem()
             }
         }
     }
+    */
 }
 
 void WombatForensics::PreviousItem()
 {
+    /*
     QModelIndex curindex = ui->dirTreeView->currentIndex();
     QModelIndexList tmplist = treenodemodel->match(ui->dirTreeView->model()->index(0, 0), Qt::ForegroundRole, QVariant(), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchWrap | Qt::MatchRecursive));
     if(tmplist.isEmpty() == false)
@@ -3788,6 +3799,7 @@ void WombatForensics::PreviousItem()
             }
         }
     }
+    */
 }
 
 void WombatForensics::ShowItem()
@@ -3832,8 +3844,15 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     //QString mimestr = GenerateCategorySignature(mimetype, ""); // category/signature
     QString mimestr = GenerateCategorySignature(tmparray, ""); // category/signature
     QString layoutstr = QString::number(coffset) + "," + QString::number(clength) + ";"; // Layout property
-    QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
-    QString curhash = QString(tmphash.hash(tmparray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper(); // HASH for carved content
+    QString curhash = "";
+    if(hashsum == 11)
+    {
+    }
+    else
+    {
+        QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+        curhash = QString(tmphash.hash(tmparray, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper(); // HASH for carved content
+    }
     // Add carved prop file
     QFile cfile(wombatvariable.tmpmntpath + "carved/" + enumber + "-c" + QString::number(carvedcount) + ".prop");
     if(!cfile.isOpen())
