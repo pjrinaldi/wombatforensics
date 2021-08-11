@@ -104,6 +104,8 @@ class PathTreeView : public QTreeView
                 QModelIndex index = this->indexAt(e->pos());
                 if(treenodemodel->rowCount(index.sibling(index.row(), 0)) > 0)
                     this->setRootIndex(index.sibling(index.row(), 0));
+                else
+                    emit LaunchFile(index);
                 //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
                 //ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
                 //emit ChangeRoot(e->pos());

@@ -18,6 +18,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     ui->splitter->insertWidget(0, pathtreeview);
     this->statusBar()->setSizeGripEnabled(true);
     ui->dirTreeView->setVisible(false);
+    ui->dirTreeView->setEnabled(false);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
     selectedhex = new QLabel(this);
@@ -201,7 +202,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     pathtreeview->setSortingEnabled(true);
     pathtreeview->setUniformRowHeights(true);
     pathtreeview->header()->setSortIndicatorShown(false);
-    pathtreeview->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    pathtreeview->header()->setSectionResizeMode(QHeaderView::Interactive);
+    //pathtreeview->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     pathtreeview->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(pathtreeview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
     connect(pathtreeview->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
@@ -705,7 +707,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
             ui->actionCheck->setText("UnCheck Selected");
             ui->actionCheck->setIcon(QIcon(":/remcheck"));
         }
-        //treemenu->exec(QCursor::pos()); // might want to add the enable/disable depending on whether its a file/dir or not. (4-)
+        treemenu->exec(QCursor::pos()); // might want to add the enable/disable depending on whether its a file/dir or not. (4-)
     }
     QApplication::restoreOverrideCursor();
 }
