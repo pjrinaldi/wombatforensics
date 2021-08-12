@@ -93,7 +93,7 @@
 #include <fcntl.h>
 #include <tar.h>
 #include <libtar.h>
-#include <libewf.h>
+//#include <libewf.h>
 //#include "forimg.h"
 
 #include <blake3.h>

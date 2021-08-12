@@ -337,10 +337,14 @@ ForImg::ForImg(QString imgfile)
         imgtype = 0; // EWF
     else if(imgfile.split("/").last().toLower().endsWith(".aff"))
         imgtype = 1; // AFF
-    else if(imgfile.split("/").last().toLower().endsWith(".001") || imgfile.split("/").last().toLower().endsWith(".000") || imgfile.split("/").last().toLower().endsWith(".dd") || imgfile.split("/").last().toLower().endsWith(".raw") || imgfile.split("/").last().toLower().endsWith("aaa"))
-        imgtype = 2; // split raw or raw
+    else if(imgfile.split("/").last().toLower().endsWith(".dd") || imgfile.split("/").last().toLower().endsWith(".raw"))
+        imgtype = 2; // RAW
+    else if(imgfile.split("/").last().toLower().endsWith(".001") || imgfile.split("/").last().toLower().endsWith(".000") || imgfile.split("/").last().toLower().endsWith("aaa"))
+	imgtype = 3; // SMRAW
     else if(imgfile.split("/").last().toLower().endsWith(".zmg"))
-        imgtype = 3; // ZMG
+        imgtype = 4; // ZMG
+    else if(imgfile.split("/").last().toLower().endsWith(".sfs"))
+	imgtype = 5; // SFS
     imgpath = imgfile;
     qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
@@ -395,7 +399,20 @@ ForImg::ForImg(QString imgfile)
         QFileInfo efileinfo(imgpath);
         imgsize = efileinfo.size();
     }
-
+    else if(imgtype == 3) // SMRAW
+    {
+	libsmraw_handle_t* smhandle = NULL;
+	libsmraw_error_t* smerror = NULL;
+	char** globfiles = NULL;
+	int globfilecnt = 0;
+	QString efilepath = imgfile.split(imgfile.split("/").last()).first();
+	QString fileprefix = "";
+	qDebug() << "efilepath:" << efilepath;
+	QDir edir = QDir(efilepath);
+	//QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split("
+	libsmraw_handle_free(&smhandle, &smerror);
+	libsmraw_error_free(&smerror);
+    }
 }
 
 ForImg::~ForImg()
@@ -461,7 +478,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         tmparray = QByteArray::fromRawData((const char*)data, size);
         af_close(afimage);
     }
-    else if(imgtype == 2) // SMRAW
+    else if(imgtype == 2) // RAW
     {
 	QFile tmpfile(imgpath);
 	if(!tmpfile.isOpen())

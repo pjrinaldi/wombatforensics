@@ -16,6 +16,7 @@
 #include <fstream>
 #include <libewf.h>
 #include <afflib/afflib.h>
+#include <libsmraw.h>
 #include <QString>
 #include <QDebug>
 #include <QDir>
