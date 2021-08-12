@@ -519,6 +519,8 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     {
 	libsmraw_handle_t* smhandle = NULL;
 	libsmraw_error_t* smerror = NULL;
+        char** globfiles = NULL;
+        int globfilecnt = 0;
 	QString efilepath = imgpath.split(imgpath.split("/").last()).first();
 	QString fileprefix = "";
 	if(imgpath.toLower().endsWith(".000"))
@@ -534,9 +536,12 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	{
 	    filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
 	}
-	//globfilecnt = efiles.count();
+	globfilecnt = efiles.count();
 	int retopen = 0;
 
+	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
+	if(retopen == -1)
+	    printf(smerror, stdout);
 	retopen = libsmraw_handle_initialize(&smhandle, &smerror);
 	if(retopen == -1)
 	    libsmraw_error_fprint(smerror, stdout);
