@@ -649,6 +649,7 @@ compiler_moc_header_clean:
 	-$(DEL_FILE) debug/moc_wombatforensics.cpp debug/moc_exportdialog.cpp debug/moc_globals.cpp debug/moc_propertieswindow.cpp debug/moc_fileviewer.cpp debug/moc_filterviews.cpp debug/moc_imageviewer.cpp debug/moc_videoviewer.cpp debug/moc_viewermanager.cpp debug/moc_textviewer.cpp debug/moc_htmlviewer.cpp debug/moc_messageviewer.cpp debug/moc_byteconverter.cpp debug/moc_digdeeperdialog.cpp debug/moc_aboutbox.cpp debug/moc_qhexedit.cpp debug/moc_chunks.cpp debug/moc_commands.cpp debug/moc_settingsdialog.cpp debug/moc_addevidencedialog.cpp debug/moc_remevidencedialog.cpp debug/moc_tagmanager.cpp debug/moc_searchdialog.cpp debug/moc_carvedialog.cpp debug/moc_filecarvingdialog.cpp debug/moc_carvingfiletypesdialog.cpp debug/moc_pdfviewer.cpp debug/moc_registryviewer.cpp debug/moc_newforimg.cpp debug/moc_verevidencedialog.cpp
 debug/moc_wombatforensics.cpp: wombatforensics.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
@@ -732,6 +733,7 @@ debug/moc_wombatforensics.cpp: wombatforensics.h \
 
 debug/moc_exportdialog.cpp: exportdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -739,6 +741,7 @@ debug/moc_exportdialog.cpp: exportdialog.h \
 
 debug/moc_globals.cpp: globals.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		imagefunctions.h \
 		debug/moc_predefs.h \
@@ -747,6 +750,7 @@ debug/moc_globals.cpp: globals.h \
 
 debug/moc_propertieswindow.cpp: propertieswindow.h \
 		wombatinclude.h \
+		blake3.h \
 		ui_propertieswindow.h \
 		globals.h \
 		wombatvariable.h \
@@ -757,6 +761,7 @@ debug/moc_propertieswindow.cpp: propertieswindow.h \
 
 debug/moc_fileviewer.cpp: fileviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		ui_fileviewer.h \
 		qhexedit.h \
 		chunks.h \
@@ -771,6 +776,7 @@ debug/moc_fileviewer.cpp: fileviewer.h \
 
 debug/moc_filterviews.cpp: filterviews.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -795,6 +801,7 @@ debug/moc_filterviews.cpp: filterviews.h \
 
 debug/moc_imageviewer.cpp: imageviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -809,6 +816,7 @@ debug/moc_imageviewer.cpp: imageviewer.h \
 
 debug/moc_videoviewer.cpp: videoviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -819,6 +827,7 @@ debug/moc_videoviewer.cpp: videoviewer.h \
 
 debug/moc_viewermanager.cpp: viewermanager.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -829,6 +838,7 @@ debug/moc_viewermanager.cpp: viewermanager.h \
 
 debug/moc_textviewer.cpp: textviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -840,6 +850,7 @@ debug/moc_textviewer.cpp: textviewer.h \
 
 debug/moc_htmlviewer.cpp: htmlviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -852,6 +863,7 @@ debug/moc_htmlviewer.cpp: htmlviewer.h \
 
 debug/moc_messageviewer.cpp: messageviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -863,6 +875,7 @@ debug/moc_messageviewer.cpp: messageviewer.h \
 
 debug/moc_byteconverter.cpp: byteconverter.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -873,6 +886,7 @@ debug/moc_byteconverter.cpp: byteconverter.h \
 
 debug/moc_digdeeperdialog.cpp: digdeeperdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -880,6 +894,7 @@ debug/moc_digdeeperdialog.cpp: digdeeperdialog.h \
 
 debug/moc_aboutbox.cpp: aboutbox.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -892,6 +907,7 @@ debug/moc_aboutbox.cpp: aboutbox.h \
 debug/moc_qhexedit.cpp: qhexedit.h \
 		chunks.h \
 		wombatinclude.h \
+		blake3.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
@@ -902,6 +918,7 @@ debug/moc_qhexedit.cpp: qhexedit.h \
 
 debug/moc_chunks.cpp: chunks.h \
 		wombatinclude.h \
+		blake3.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/local/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include chunks.h -o debug/moc_chunks.cpp
@@ -909,12 +926,14 @@ debug/moc_chunks.cpp: chunks.h \
 debug/moc_commands.cpp: commands.h \
 		chunks.h \
 		wombatinclude.h \
+		blake3.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
 	/usr/bin/moc $(DEFINES) --include /home/pasquale/Projects/wombatforensics/debug/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/pasquale/Projects/wombatforensics -I/usr/include/libffmpegthumbnailer -I/usr/include/ImageMagick-7 -I/usr/local/lib -I/usr/include/poppler/qt5 -I/usr/local/include -I/usr/include/qt -I/usr/include/qt/QtMultimediaWidgets -I/usr/include/qt/QtWebEngineWidgets -I/usr/include/qt/QtPrintSupport -I/usr/include/qt/QtAVWidgets -I/usr/include/qt/QtOpenGL -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtMultimedia -I/usr/include/qt/QtWebEngineCore -I/usr/include/qt/QtQuick -I/usr/include/qt/QtAV -I/usr/include/qt/QtGui -I/usr/include/qt/QtConcurrent -I/usr/include/qt/QtSql -I/usr/include/qt/QtQmlModels -I/usr/include/qt/QtWebChannel -I/usr/include/qt/QtQml -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtPositioning -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include commands.h -o debug/moc_commands.cpp
 
 debug/moc_settingsdialog.cpp: settingsdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -928,6 +947,7 @@ debug/moc_settingsdialog.cpp: settingsdialog.h \
 
 debug/moc_addevidencedialog.cpp: addevidencedialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -939,6 +959,7 @@ debug/moc_addevidencedialog.cpp: addevidencedialog.h \
 
 debug/moc_remevidencedialog.cpp: remevidencedialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -950,6 +971,7 @@ debug/moc_remevidencedialog.cpp: remevidencedialog.h \
 
 debug/moc_tagmanager.cpp: tagmanager.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -964,6 +986,7 @@ debug/moc_searchdialog.cpp: searchdialog.h \
 		qhexedit.h \
 		chunks.h \
 		wombatinclude.h \
+		blake3.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
@@ -974,6 +997,7 @@ debug/moc_searchdialog.cpp: searchdialog.h \
 
 debug/moc_carvedialog.cpp: carvedialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -985,6 +1009,7 @@ debug/moc_carvedialog.cpp: carvedialog.h \
 
 debug/moc_filecarvingdialog.cpp: filecarvingdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		debug/moc_predefs.h \
 		/usr/bin/moc
@@ -992,6 +1017,7 @@ debug/moc_filecarvingdialog.cpp: filecarvingdialog.h \
 
 debug/moc_carvingfiletypesdialog.cpp: carvingfiletypesdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1003,6 +1029,7 @@ debug/moc_carvingfiletypesdialog.cpp: carvingfiletypesdialog.h \
 
 debug/moc_pdfviewer.cpp: pdfviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1016,6 +1043,7 @@ debug/moc_pdfviewer.cpp: pdfviewer.h \
 
 debug/moc_registryviewer.cpp: registryviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1029,6 +1057,7 @@ debug/moc_registryviewer.cpp: registryviewer.h \
 
 debug/moc_newforimg.cpp: newforimg.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1040,6 +1069,7 @@ debug/moc_newforimg.cpp: newforimg.h \
 
 debug/moc_verevidencedialog.cpp: verevidencedialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1101,6 +1131,7 @@ ui_fileviewer.h: fileviewer.ui \
 		qhexedit.h \
 		chunks.h \
 		wombatinclude.h \
+		blake3.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
@@ -1177,6 +1208,7 @@ ui_wombatforensics.h: wombatforensics.ui \
 		qhexedit.h \
 		chunks.h \
 		wombatinclude.h \
+		blake3.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
@@ -1246,6 +1278,7 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 ####### Compile
 
 debug/main.o: main.cpp wombatinclude.h \
+		blake3.h \
 		wombatforensics.h \
 		wombatvariable.h \
 		wombatfunctions.h \
@@ -1328,6 +1361,7 @@ debug/main.o: main.cpp wombatinclude.h \
 
 debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		wombatfunctions.h \
 		globals.h \
@@ -1409,6 +1443,7 @@ debug/wombatforensics.o: wombatforensics.cpp wombatforensics.h \
 
 debug/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h
@@ -1416,18 +1451,21 @@ debug/wombatfunctions.o: wombatfunctions.cpp wombatfunctions.h \
 
 debug/exportdialog.o: exportdialog.cpp exportdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		ui_exportdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/exportdialog.o exportdialog.cpp
 
 debug/globals.o: globals.cpp globals.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		imagefunctions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/globals.o globals.cpp
 
 debug/propertieswindow.o: propertieswindow.cpp propertieswindow.h \
 		wombatinclude.h \
+		blake3.h \
 		ui_propertieswindow.h \
 		globals.h \
 		wombatvariable.h \
@@ -1436,6 +1474,7 @@ debug/propertieswindow.o: propertieswindow.cpp propertieswindow.h \
 
 debug/fileviewer.o: fileviewer.cpp fileviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		ui_fileviewer.h \
 		qhexedit.h \
 		chunks.h \
@@ -1448,6 +1487,7 @@ debug/fileviewer.o: fileviewer.cpp fileviewer.h \
 
 debug/filterviews.o: filterviews.cpp filterviews.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1470,6 +1510,7 @@ debug/filterviews.o: filterviews.cpp filterviews.h \
 
 debug/imageviewer.o: imageviewer.cpp imageviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1482,6 +1523,7 @@ debug/imageviewer.o: imageviewer.cpp imageviewer.h \
 
 debug/videoviewer.o: videoviewer.cpp videoviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1490,6 +1532,7 @@ debug/videoviewer.o: videoviewer.cpp videoviewer.h \
 
 debug/viewermanager.o: viewermanager.cpp viewermanager.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1498,6 +1541,7 @@ debug/viewermanager.o: viewermanager.cpp viewermanager.h \
 
 debug/textviewer.o: textviewer.cpp textviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1507,6 +1551,7 @@ debug/textviewer.o: textviewer.cpp textviewer.h \
 
 debug/htmlviewer.o: htmlviewer.cpp htmlviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1517,6 +1562,7 @@ debug/htmlviewer.o: htmlviewer.cpp htmlviewer.h \
 
 debug/messageviewer.o: messageviewer.cpp messageviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1526,6 +1572,7 @@ debug/messageviewer.o: messageviewer.cpp messageviewer.h \
 
 debug/byteconverter.o: byteconverter.cpp byteconverter.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1534,12 +1581,14 @@ debug/byteconverter.o: byteconverter.cpp byteconverter.h \
 
 debug/digdeeperdialog.o: digdeeperdialog.cpp digdeeperdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		ui_digdeeperdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/digdeeperdialog.o digdeeperdialog.cpp
 
 debug/aboutbox.o: aboutbox.cpp aboutbox.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1550,6 +1599,7 @@ debug/aboutbox.o: aboutbox.cpp aboutbox.h \
 debug/qhexedit.o: qhexedit.cpp qhexedit.h \
 		chunks.h \
 		wombatinclude.h \
+		blake3.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
@@ -1557,16 +1607,19 @@ debug/qhexedit.o: qhexedit.cpp qhexedit.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/qhexedit.o qhexedit.cpp
 
 debug/chunks.o: chunks.cpp chunks.h \
-		wombatinclude.h
+		wombatinclude.h \
+		blake3.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/chunks.o chunks.cpp
 
 debug/commands.o: commands.cpp commands.h \
 		chunks.h \
-		wombatinclude.h
+		wombatinclude.h \
+		blake3.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/commands.o commands.cpp
 
 debug/settingsdialog.o: settingsdialog.cpp settingsdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1578,6 +1631,7 @@ debug/settingsdialog.o: settingsdialog.cpp settingsdialog.h \
 
 debug/addevidencedialog.o: addevidencedialog.cpp addevidencedialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1587,6 +1641,7 @@ debug/addevidencedialog.o: addevidencedialog.cpp addevidencedialog.h \
 
 debug/remevidencedialog.o: remevidencedialog.cpp remevidencedialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1596,6 +1651,7 @@ debug/remevidencedialog.o: remevidencedialog.cpp remevidencedialog.h \
 
 debug/tagmanager.o: tagmanager.cpp tagmanager.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1608,6 +1664,7 @@ debug/searchdialog.o: searchdialog.cpp searchdialog.h \
 		qhexedit.h \
 		chunks.h \
 		wombatinclude.h \
+		blake3.h \
 		commands.h \
 		globals.h \
 		wombatvariable.h \
@@ -1617,6 +1674,7 @@ debug/searchdialog.o: searchdialog.cpp searchdialog.h \
 
 debug/carvedialog.o: carvedialog.cpp carvedialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1626,12 +1684,14 @@ debug/carvedialog.o: carvedialog.cpp carvedialog.h \
 
 debug/filecarvingdialog.o: filecarvingdialog.cpp filecarvingdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		ui_filecarvingdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug/filecarvingdialog.o filecarvingdialog.cpp
 
 debug/carvingfiletypesdialog.o: carvingfiletypesdialog.cpp carvingfiletypesdialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1641,6 +1701,7 @@ debug/carvingfiletypesdialog.o: carvingfiletypesdialog.cpp carvingfiletypesdialo
 
 debug/pdfviewer.o: pdfviewer.cpp pdfviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1653,6 +1714,7 @@ debug/pdfviewer.o: pdfviewer.cpp pdfviewer.h \
 debug/carving.o: carving.cpp carving.h \
 		globals.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatvariable.h \
 		imagefunctions.h \
 		videoviewer.h \
@@ -1661,6 +1723,7 @@ debug/carving.o: carving.cpp carving.h \
 
 debug/digging.o: digging.cpp digging.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatfunctions.h \
 		globals.h \
 		wombatvariable.h \
@@ -1669,6 +1732,7 @@ debug/digging.o: digging.cpp digging.h \
 
 debug/reporting.o: reporting.cpp reporting.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h
@@ -1676,6 +1740,7 @@ debug/reporting.o: reporting.cpp reporting.h \
 
 debug/artifactparser.o: artifactparser.cpp artifactparser.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatfunctions.h \
 		globals.h \
 		wombatvariable.h \
@@ -1684,6 +1749,7 @@ debug/artifactparser.o: artifactparser.cpp artifactparser.h \
 
 debug/exporting.o: exporting.cpp exporting.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatfunctions.h \
 		globals.h \
 		wombatvariable.h \
@@ -1692,6 +1758,7 @@ debug/exporting.o: exporting.cpp exporting.h \
 
 debug/newcase.o: newcase.cpp newcase.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1700,6 +1767,7 @@ debug/newcase.o: newcase.cpp newcase.h \
 
 debug/opencase.o: opencase.cpp opencase.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1708,6 +1776,7 @@ debug/opencase.o: opencase.cpp opencase.h \
 
 debug/registryviewer.o: registryviewer.cpp registryviewer.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1719,6 +1788,7 @@ debug/registryviewer.o: registryviewer.cpp registryviewer.h \
 
 debug/newforimg.o: newforimg.cpp newforimg.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
@@ -1736,6 +1806,7 @@ debug/imagefunctions.o: imagefunctions.cpp imagefunctions.h \
 
 debug/tagging.o: tagging.cpp tagging.h \
 		wombatinclude.h \
+		blake3.h \
 		wombatfunctions.h \
 		globals.h \
 		wombatvariable.h \
@@ -1744,6 +1815,7 @@ debug/tagging.o: tagging.cpp tagging.h \
 
 debug/verevidencedialog.o: verevidencedialog.cpp verevidencedialog.h \
 		wombatinclude.h \
+		blake3.h \
 		globals.h \
 		wombatvariable.h \
 		imagefunctions.h \
