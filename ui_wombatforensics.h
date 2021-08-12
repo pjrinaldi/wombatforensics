@@ -322,7 +322,7 @@ public:
         pathToolBar->setObjectName(QString::fromUtf8("pathToolBar"));
         pathToolBar->setMovable(false);
         pathToolBar->setAllowedAreas(Qt::TopToolBarArea);
-        pathToolBar->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        pathToolBar->setToolButtonStyle(Qt::ToolButtonFollowStyle);
         pathToolBar->setFloatable(false);
         WombatForensics->addToolBar(Qt::TopToolBarArea, pathToolBar);
         WombatForensics->insertToolBarBreak(pathToolBar);

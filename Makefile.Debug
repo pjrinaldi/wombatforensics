@@ -633,6 +633,7 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/go-next.png \
 		Resources/go-previous.png \
 		Resources/list-add.svg \
+		Resources/burrow.png \
 		Resources/window-new.png \
 		Resources/exportfilestoimage.png.svg \
 		Resources/carvetypes

@@ -192,7 +192,7 @@
     <set>Qt::TopToolBarArea</set>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextOnly</enum>
+    <enum>Qt::ToolButtonFollowStyle</enum>
    </property>
    <property name="floatable">
     <bool>false</bool>

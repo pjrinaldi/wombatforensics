@@ -1288,7 +1288,7 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
                 else
                     curindex = curparent;
             }
-            QAction* voidaction = new QAction("BURROW", this);
+            QAction* voidaction = new QAction(QIcon(":/bar/burrow"), "BURROW", this);
             voidaction->setData(QVariant("INDEXVOID"));
             connect(voidaction, SIGNAL(triggered()), this, SLOT(TestData()));
             actionlist.prepend(voidaction);
