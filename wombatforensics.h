@@ -166,6 +166,7 @@ public:
     QMenu* selectionmenu;
     QMenu* bookmarkmenu;
     QMenu* tagcheckedmenu;
+    QMenu* headermenu;
     QAction* remtagaction; // remove selected tag
     QAction* remtagaction1; // remove checked tag
     QAction* remcheckedaction; // remove all checked tags
@@ -284,6 +285,7 @@ private slots:
         statuslabel->setText(tmptext);
     };
     void TreeContextMenu(const QPoint &point);
+    void HeaderContextMenu(const QPoint &point);
     void ImgHexMenu(const QPoint &point);
     void SetFilter(int headercolumn);
     void FilterApplied()
@@ -320,6 +322,7 @@ private slots:
     void UpdateTimeZone(QString newtz);
     void FinishWombatCaseFile(void);
     void FinishVerify(void);
+    void ShowHideColumn(void);
 
     void TestData(void);
 

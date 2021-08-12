@@ -167,7 +167,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     }
 
     treemenu = new QMenu(pathtreeview);
-    //treemenu = new QMenu(ui->dirTreeView);
     
     treemenu->addAction(ui->actionView_File);
     treemenu->addAction(ui->actionView_Properties);
@@ -589,6 +588,15 @@ void WombatForensics::ShowExternalViewer()
     QStringList arguments;
     arguments << tmpstring;
     process->startDetached(((QAction*)QObject::sender())->text(), arguments);
+}
+
+void WombatForensics::ShowHideColumn()
+{
+    int headerindex = ((QAction*)QObject::sender())->data().toInt();
+    if(pathtreeview->header()->isSectionHidden(headerindex))
+	pathtreeview->header()->showSection(headerindex);
+    else
+	pathtreeview->header()->hideSection(headerindex);
 }
 
 void WombatForensics::SetSelectedFromImageViewer(QString objectid)
@@ -1412,6 +1420,28 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
     }
 }
 
+void WombatForensics::HeaderContextMenu(const QPoint &pt)
+{
+    headermenu->clear();
+    for(int i=0; i < pathtreeview->header()->count(); i++)
+    {
+	QString tmpstring = "";
+	if(pathtreeview->header()->isSectionHidden(i))
+	    tmpstring += "Show ";
+	else
+	    tmpstring += "Hide ";
+	tmpstring += treenodemodel->headerData(i, Qt::Horizontal).toString();
+	QAction* tmpaction = new QAction(tmpstring, this);
+	tmpaction->setData(i);
+	connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowHideColumn()));
+        //connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
+	headermenu->addAction(tmpaction);
+    }
+    int headerindex = pathtreeview->header()->logicalIndexAt(pt);
+    //QModelIndex index = pathtreeview->indexAt(pt);
+    headermenu->exec(pathtreeview->header()->mapToGlobal(pt));
+}
+
 void WombatForensics::ImgHexMenu(const QPoint &pt)
 {
     if(ui->hexview->selectionToReadableString().size() > 0)
@@ -1549,6 +1579,26 @@ void WombatForensics::UpdateStatus()
     //LogMessage("Building Initial Evidence Tree...");
     //ui->dirTreeView->setModel(treenodemodel);
     pathtreeview->setModel(treenodemodel);
+
+    headermenu = new QMenu();
+    headermenu->clear();
+    for(int i=0; i < pathtreeview->header()->count(); i++)
+    {
+	QString tmpstring = "";
+	if(pathtreeview->header()->isSectionHidden(i))
+	    tmpstring += "Show ";
+	else
+	    tmpstring += "Hide ";
+	tmpstring += treenodemodel->headerData(i, Qt::Horizontal).toString();
+	QAction* tmpaction = new QAction(tmpstring, this);
+	tmpaction->setData(i);
+	connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowHideColumn()));
+        //connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
+	headermenu->addAction(tmpaction);
+    }
+    pathtreeview->header()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(pathtreeview->header(), SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(HeaderContextMenu(const QPoint &)));
+
     ReadBookmarks();
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
