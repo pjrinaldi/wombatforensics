@@ -13,13 +13,11 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
-#include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidget>
 #include "qhexedit.h"
 
@@ -65,7 +63,6 @@ public:
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
-    QTreeView *dirTreeView;
     QHexEdit *hexview;
     QMenuBar *mainMenubar;
     QToolBar *analysisToolBar;
@@ -272,16 +269,6 @@ public:
         splitter->setSizePolicy(sizePolicy);
         splitter->setOrientation(Qt::Vertical);
         splitter->setChildrenCollapsible(false);
-        dirTreeView = new QTreeView(splitter);
-        dirTreeView->setObjectName(QString::fromUtf8("dirTreeView"));
-        dirTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        dirTreeView->setProperty("showDropIndicator", QVariant(false));
-        dirTreeView->setAlternatingRowColors(true);
-        dirTreeView->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
-        dirTreeView->setUniformRowHeights(true);
-        dirTreeView->setAllColumnsShowFocus(true);
-        dirTreeView->setExpandsOnDoubleClick(false);
-        splitter->addWidget(dirTreeView);
         hexview = new QHexEdit(splitter);
         hexview->setObjectName(QString::fromUtf8("hexview"));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -355,7 +342,6 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionCreateForensicImage);
         analysisToolBar->addAction(actionVerifyForensicImage);
-        pathToolBar->addSeparator();
 
         retranslateUi(WombatForensics);
         QObject::connect(actionRemove_Evidence, SIGNAL(triggered()), WombatForensics, SLOT(RemEvidence()));

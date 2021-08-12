@@ -17,8 +17,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     pathtreeview = new PathTreeView();
     ui->splitter->insertWidget(0, pathtreeview);
     this->statusBar()->setSizeGripEnabled(true);
-    ui->dirTreeView->setVisible(false);
-    ui->dirTreeView->setEnabled(false);
     selectedoffset = new QLabel(this);
     selectedoffset->setText("Offset: 00");
     selectedhex = new QLabel(this);
@@ -185,19 +183,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addAction(ui->actionExport);
     treemenu->addAction(ui->actionExportForensicImage);
 
-    /*
-    ui->dirTreeView->setSortingEnabled(true); // enables the sorting arrow, but doesn't sort anything.
-    ui->dirTreeView->setUniformRowHeights(true);
-    ui->dirTreeView->header()->setSortIndicatorShown(false);
-    ui->dirTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->dirTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->dirTreeView, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-    connect(ui->dirTreeView, SIGNAL(expanded(const QModelIndex &)), this, SLOT(ResizeViewColumns(const QModelIndex &)));
-    connect(ui->dirTreeView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TreeContextMenu(const QPoint &)));
-    connect(ui->dirTreeView->header(), SIGNAL(sectionClicked(int)), this, SLOT(SetFilter(int)));
-    connect(ui->dirTreeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(ShowFile(const QModelIndex &)));
-    */
-    
     pathtreeview->setSortingEnabled(true);
     pathtreeview->setUniformRowHeights(true);
     pathtreeview->header()->setSortIndicatorShown(false);
@@ -605,7 +590,6 @@ void WombatForensics::SetSelectedFromImageViewer(QString objectid)
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         pathtreeview->setCurrentIndex(indexlist.at(0));
-        //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     QApplication::restoreOverrideCursor();
 }
 
@@ -1183,10 +1167,8 @@ void WombatForensics::OpenUpdate()
     //InitializeTaggedList();
     //PrepareEvidenceImage();
     pathtreeview->setModel(treenodemodel);
-    //ui->dirTreeView->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
-    //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     QString curid = InitializeSelectedState();
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(curid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
@@ -1194,13 +1176,9 @@ void WombatForensics::OpenUpdate()
     {
         pathtreeview->setCurrentIndex(indexlist.at(0));
         pathtreeview->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
-        //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
-        //ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
     }
     else
         pathtreeview->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
-        //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
-    //if(ui->dirTreeView->model() != NULL)
     if(pathtreeview->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);
@@ -1288,7 +1266,7 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
             {
                 QAction* tmpaction = new QAction(curindex.sibling(curindex.row(), 0).data().toString(), this);
                 tmpaction->setData(curindex.sibling(curindex.row(), 11).data());
-                connect(tmpaction, SIGNAL(triggered()), this, SLOT(TestData()));
+                connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetRootIndex()));
                 actionlist.prepend(tmpaction);
                 QModelIndex curparent = curindex.parent();
                 if(curparent == QModelIndex())
@@ -1298,7 +1276,7 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
             }
             QAction* voidaction = new QAction(QIcon(":/bar/burrow"), "BURROW", this);
             voidaction->setData(QVariant("INDEXVOID"));
-            connect(voidaction, SIGNAL(triggered()), this, SLOT(TestData()));
+            connect(voidaction, SIGNAL(triggered()), this, SLOT(SetRootIndex()));
             actionlist.prepend(voidaction);
 
             ui->pathToolBar->addActions(actionlist);
@@ -1369,7 +1347,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
     }
 }
 
-void WombatForensics::TestData()
+void WombatForensics::SetRootIndex()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
     //QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
@@ -1382,26 +1360,19 @@ void WombatForensics::TestData()
     }
     else
     {
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         if(indexlist.count() > 0)
         {
             pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), 0));
-            //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
         }
+	QApplication::restoreOverrideCursor();
     }
-    /*
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    if(indexlist.count() > 0)
-        ui->dirTreeView->setCurrentIndex(indexlist.at(0));
-    QApplication::restoreOverrideCursor();
-     */ 
 }
 
 void WombatForensics::TreeContextMenu(const QPoint &pt)
 {
     QModelIndex index = pathtreeview->indexAt(pt);
-    //QModelIndex index2 = ui->dirTreeView->indexAt(pt);
     if(index.isValid())
     {
         actionitem = static_cast<TreeNode*>(index.internalPointer());
@@ -1416,7 +1387,6 @@ void WombatForensics::TreeContextMenu(const QPoint &pt)
             ui->actionCheck->setIcon(QIcon(":/remcheck"));
         }
         treemenu->exec(pathtreeview->mapToGlobal(pt));
-        //treemenu->exec(ui->dirTreeView->mapToGlobal(pt));
     }
 }
 
@@ -1434,11 +1404,9 @@ void WombatForensics::HeaderContextMenu(const QPoint &pt)
 	QAction* tmpaction = new QAction(tmpstring, this);
 	tmpaction->setData(i);
 	connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowHideColumn()));
-        //connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
 	headermenu->addAction(tmpaction);
     }
     int headerindex = pathtreeview->header()->logicalIndexAt(pt);
-    //QModelIndex index = pathtreeview->indexAt(pt);
     headermenu->exec(pathtreeview->header()->mapToGlobal(pt));
 }
 
@@ -1577,7 +1545,6 @@ void WombatForensics::UpdateStatus()
         AddEvidItem(evidrepdatalist.at(i).evidcontent);
     }
     //LogMessage("Building Initial Evidence Tree...");
-    //ui->dirTreeView->setModel(treenodemodel);
     pathtreeview->setModel(treenodemodel);
 
     headermenu = new QMenu();
@@ -1593,7 +1560,6 @@ void WombatForensics::UpdateStatus()
 	QAction* tmpaction = new QAction(tmpstring, this);
 	tmpaction->setData(i);
 	connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowHideColumn()));
-        //connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowExternalViewer()));
 	headermenu->addAction(tmpaction);
     }
     pathtreeview->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -1602,18 +1568,15 @@ void WombatForensics::UpdateStatus()
     ReadBookmarks();
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    //connect(ui->dirTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(PathSelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     UpdateCheckCount();
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
     {
         pathtreeview->setCurrentIndex(indexlist.at(0));
-        //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
     }
     else
         pathtreeview->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
-        //ui->dirTreeView->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
     ui->actionRemove_Evidence->setEnabled(true);
     ui->actionSaveState->setEnabled(true);
     ui->actionDigDeeper->setEnabled(true);
@@ -2685,35 +2648,9 @@ void WombatForensics::CloseCurrentCase()
         SaveTreeModel();
         qInfo() << "Tree Model Saved";
         pathtreeview->clearSelection();
-        //ui->dirTreeView->clearSelection();
         delete treenodemodel;
         autosavetimer->stop();
     }
-    /*
-    if(ui->dirTreeView->model() != NULL)
-    {
-        UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
-        qInfo() << "Selected Item Saved";
-        UpdateCheckState();
-        qInfo() << "Check State Saved";
-        /*
-         * THIS SHOULD BE COVERED BY THE TREE MODEL SAVE
-        SaveTaggedList();
-        qInfo() << "Tagged Items Saved";
-        SaveHashList();
-        qInfo() << "Hashed Items Saved";
-        */
-        /*SavePasswordList();
-        qInfo() << "Password Items Saved";
-        SaveImagesHash();
-        qInfo() << "Thumbnailed Videos and Images Saved";
-        SaveTreeModel();
-        qInfo() << "Tree Model Saved";
-        ui->dirTreeView->clearSelection();
-        delete treenodemodel;
-        autosavetimer->stop();
-    }
-    */
     if(ui->hexview->data().size() > 0)
     {
         // maybe i want to run this but also load a small empty image maybe...
@@ -3311,7 +3248,6 @@ void WombatForensics::ResizeColumns(void)
     for(int i=0; i < treenodemodel->columnCount(QModelIndex()); i++)
     {
         pathtreeview->resizeColumnToContents(i);
-        //ui->dirTreeView->resizeColumnToContents(i);
     }
 }
 
@@ -3855,7 +3791,6 @@ void WombatForensics::PreviousItem()
 void WombatForensics::ShowItem()
 {
     QModelIndex curindex = pathtreeview->currentIndex();
-    //QModelIndex curindex = ui->dirTreeView->currentIndex();
     if(curindex.isValid())
         ShowFile(curindex);
 }

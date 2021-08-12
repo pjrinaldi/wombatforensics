@@ -87,7 +87,6 @@ class PathTreeView : public QTreeView
                     itemcheck->SetChecked(false);
 		emit dataChanged(index, index);
                 emit treenodemodel->CheckedNodesChanged();
-                //ShowFile();
                 //qDebug() << "call show file here ... middle button clicked";
             }
             else if(e->button() == Qt::RightButton)
@@ -106,43 +105,19 @@ class PathTreeView : public QTreeView
                     this->setRootIndex(index.sibling(index.row(), 0));
                 else
                     emit LaunchFile(index);
-                //ui->dirTreeView->setCurrentIndex(indexlist.at(0));
-                //ui->dirTreeView->selectionModel()->select(indexlist.at(0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows | QItemSelectionModel::Select);
-                //emit ChangeRoot(e->pos());
-                //QModelIndex index = pathtreeview->indexAt(e->pos());
-                //if(index.isValid())
-                //{
-                //    pathtreeview->setRootIndex(index);
-                //}
                 //qDebug() << "left clicked";
             }
             else if(e->button() == Qt::MiddleButton)
             {
-		// MIDDLE BUTTON DO NOTHING... WILL SET A KEYBOARD SHORTCUT TO SHOWFILE
-                //const QModelIndex index = this->indexAt(e->pos());
-                //emit this->LaunchFile(index);
-                /*
-                TreeNode* itemcheck = static_cast<TreeNode*>(this->indexAt(e->pos()).internalPointer());
-                if(!itemcheck->IsChecked())
-                    itemcheck->SetChecked(true);
-                else
-                    itemcheck->SetChecked(false);
-                emit treenodemodel->CheckedNodesChanged();
-                */
-
-                //ShowFile();
-                //qDebug() << "middle button clicked";
             }
             else if(e->button() == Qt::RightButton)
             {
-                //qDebug() << "right button clicked";
             }
             //e->ignore();
         }
 
     signals:
         void LaunchFile(const QModelIndex &index);
-        //void ChangeRoot(QPoint pt);
 };
 
 namespace Ui {
@@ -292,7 +267,6 @@ private slots:
     {
         UpdateFilterCount();
         emit pathtreeview->header()->geometriesChanged();
-        //emit ui->dirTreeView->header()->geometriesChanged();
         emit treenodemodel->layoutChanged(); // this messes with the row height and cuts off icons...
     };
     void NextItem();
@@ -324,7 +298,7 @@ private slots:
     void FinishVerify(void);
     void ShowHideColumn(void);
 
-    void TestData(void);
+    void SetRootIndex(void);
 
 protected:
     void closeEvent(QCloseEvent* event);
