@@ -340,7 +340,7 @@ ForImg::ForImg(QString imgfile)
     else if(imgfile.split("/").last().toLower().endsWith(".dd") || imgfile.split("/").last().toLower().endsWith(".raw"))
         imgtype = 2; // RAW
     else if(imgfile.split("/").last().toLower().endsWith(".001") || imgfile.split("/").last().toLower().endsWith(".000") || imgfile.split("/").last().toLower().endsWith("aaa"))
-	imgtype = 3; // SMRAW
+	imgtype = 3; // SPLIT RAW
     else if(imgfile.split("/").last().toLower().endsWith(".zmg"))
         imgtype = 4; // ZMG
     else if(imgfile.split("/").last().toLower().endsWith(".sfs"))
@@ -399,8 +399,32 @@ ForImg::ForImg(QString imgfile)
         QFileInfo efileinfo(imgpath);
         imgsize = efileinfo.size();
     }
-    else if(imgtype == 3) // SMRAW
+    else if(imgtype == 3) // SPLIT RAW
     {
+	QString efilepath = imgfile.split(imgfile.split("/").last()).first();
+	QString fileprefix = "";
+	if(imgfile.toLower().endsWith(".000"))
+	    fileprefix = imgfile.split("/").last().split(".000").first();
+	else if(imgfile.toLower().endsWith(".001"))
+	    fileprefix = imgfile.split("/").last().split(".001").first();
+	else if(imgfile.toLower().endsWith(".aaa"))
+	    fileprefix = imgfile.split("/").last().split(".aaa", Qt::SkipEmptyParts, Qt::CaseInsensitive).first();
+	//qDebug() << "fileprefix:" << fileprefix;
+	//qDebug() << "efilepath:" << efilepath;
+	QDir edir = QDir(efilepath);
+	QStringList efiles = edir.entryList(QStringList() << QString(fileprefix + ".???"), QDir::NoSymLinks | QDir::Files);
+	//qDebug() << "efiles count:" << efiles.count();
+        //qDebug() << "efiles:" << efiles;
+        // SMRAW isn't working, so i'm gonna try to implement it myself...
+        for(int i=0; i < efiles.count(); i++)
+        {
+            QFileInfo segmentfile(efilepath + efiles.at(i));
+            imgsize += segmentfile.size();
+            //qDebug() << "segment size:" << segmentfile.size();
+        }
+        //qDebug() << "final imagesize:" << imgsize;
+
+        /*
 	libsmraw_handle_t* smhandle = NULL;
 	libsmraw_error_t* smerror = NULL;
 	//char** globfiles = NULL;
@@ -437,6 +461,7 @@ ForImg::ForImg(QString imgfile)
 	libsmraw_handle_close(smhandle, &smerror);
 	libsmraw_handle_free(&smhandle, &smerror);
 	libsmraw_error_free(&smerror);
+        */
     }
 }
 
@@ -515,8 +540,20 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    tmpfile.close();
 	}
     }
-    else if(imgtype == 3)
+    else if(imgtype == 3) // SPLIT RAW
     {
+	QString efilepath = imgpath.split(imgpath.split("/").last()).first();
+	QString fileprefix = "";
+	if(imgpath.toLower().endsWith(".000"))
+	    fileprefix = imgpath.split("/").last().split(".000").first();
+	else if(imgpath.toLower().endsWith(".001"))
+	    fileprefix = imgpath.split("/").last().split(".001").first();
+	else if(imgpath.toLower().endsWith(".aaa"))
+	    fileprefix = imgpath.split("/").last().split(".aaa", Qt::SkipEmptyParts, Qt::CaseInsensitive).first();
+	QDir edir = QDir(efilepath);
+	QStringList efiles = edir.entryList(QStringList() << QString(fileprefix + ".???"), QDir::NoSymLinks | QDir::Files);
+
+        /*
 	libsmraw_handle_t* smhandle = NULL;
 	libsmraw_error_t* smerror = NULL;
         char** globfiles = NULL;
@@ -566,6 +603,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	libsmraw_handle_close(smhandle, &smerror);
 	libsmraw_handle_free(&smhandle, &smerror);
 	libsmraw_error_free(&smerror);
+        */
     }
 
     return tmparray;
