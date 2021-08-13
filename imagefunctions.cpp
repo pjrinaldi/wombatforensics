@@ -523,25 +523,36 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         int globfilecnt = 0;
 	QString efilepath = imgpath.split(imgpath.split("/").last()).first();
 	QString fileprefix = "";
+        QString suffix = "";
 	if(imgpath.toLower().endsWith(".000"))
+        {
 	    fileprefix = imgpath.split("/").last().split(".000").first();
+            suffix = ".000";
+        }
 	else if(imgpath.toLower().endsWith(".001"))
+        {
 	    fileprefix = imgpath.split("/").last().split(".001").first();
+            suffix = ".001";
+        }
 	else if(imgpath.toLower().endsWith(".aaa"))
+        {
 	    fileprefix = imgpath.split("/").last().split(".aaa", Qt::SkipEmptyParts, Qt::CaseInsensitive).first();
+            suffix = ".AAA";
+        }
 	QDir edir = QDir(efilepath);
 	QStringList efiles = edir.entryList(QStringList() << QString(fileprefix + ".???"), QDir::NoSymLinks | QDir::Files);
 	char* filenames[efiles.count()] = {NULL};
 	for(int i=0; i < efiles.count(); i++)
 	{
 	    filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
+            printf("filenames: %d %s\n", i, filenames[i]);
 	}
 	globfilecnt = efiles.count();
 	int retopen = 0;
-
+        qDebug() << "strlen of filenames[0]:" << strlen(filenames[0]);
 	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
 	if(retopen == -1)
-	    printf(smerror, stdout);
+	    libsmraw_error_fprint(smerror, stdout);
 	retopen = libsmraw_handle_initialize(&smhandle, &smerror);
 	if(retopen == -1)
 	    libsmraw_error_fprint(smerror, stdout);
