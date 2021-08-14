@@ -5792,7 +5792,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
         ntinodehash.clear();
 	curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "", &dirntinodehash, &ntinodehash);
 	//qDebug() << "ntinodehash:" << ntinodehash;
-        //ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &dirntinodehash, &ntinodehash);
+        ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &dirntinodehash, &ntinodehash);
         dirntinodehash.clear();
 	ntinodehash.clear();
     }
@@ -8014,7 +8014,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	// parse each mft block run for entries...
 	for(quint64 j=0; j < entriespersize; j++)
 	{
-	    qDebug() << "currentntinode:" << currentntinode << entriespersize;
+	    //qDebug() << "currentntinode:" << currentntinode << entriespersize;
             QList<QList<QVariant>> adsnodelist;
             QList<QList<QString>> adsproplist;
             adsnodelist.clear();
@@ -8053,8 +8053,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 		//qDebug() << "attrflags:" << QString::number(attrflags, 16);
 		if(attrflags == 0x00 || attrflags == 0x02) // not allocated file or directory [only looking for deleted or orphaned files]
 		{
-
-
 		    uint32_t attrlength = 0;
 		    curoffset = curoffset + firstattroffset;
 		    while(curoffset < curoffset + mftentrybytes)
@@ -8324,7 +8322,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 	    }
             if(!filename.isEmpty())
             {
-		qDebug() << "orphan filename:" << filename;
+		//qDebug() << "orphan filename:" << filename;
                 //qDebug() << "ntinodehash:" << *ntinodehash;
                 //qDebug() << "parntinode:" << parntinode;
                 uint8_t hasparent = 0;
@@ -8400,6 +8398,10 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                     {
                         hasparent = 1;
 			QString parentid = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(dirntinodehash->value(parntinode));
+                        qDebug() << "parentid:" << parentid;
+                        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(parentid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                        if(indxlist.count() == 1)
+                            qDebug() << "parent filename:" << indxlist.at(0).sibling(indxlist.at(0).row(), 0).data().toString();
 			/*
 			QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(parentid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
 			if(indxlist.count() == 1)
@@ -8409,8 +8411,9 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 			//selectedindex.sibling(selectedindex.row(), 11).data().toString()
 			//TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
 			//exportlist.append(itemnode->Data(11).toString());
-
-                        //qDebug() << "ntinode/inodecnt:" << parntinode << ntinodehash->value(parntinode);
+                        TreeNode* itemnode = static_cast<TreeNode*>(indxlist.at(0).internalPointer());
+                        qDebug() << "itemnode itemtype:" << itemnode->itemtype;
+                        qDebug() << "ntinode/inodecnt:" << parntinode << ntinodehash->value(parntinode);
                     }
                     /*
                             // loop over prop file to get the itemtype, or maybe acess the treenodemodel to get it's NodeData or indexitem values for the filename, filepath, etc..
@@ -8425,6 +8428,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                 }
                 if(hasparent == 0) // orphan, parent no longer exists
                 {
+                    // NEED TO CREATE ORPHAN DIRECTORY AND THEN ADD IT TO THAT DIRECTORY
                 }
             }
             // SHOULD I ACCOUNT AN ORPHAN WITHOUT A FILE NAME ?????
