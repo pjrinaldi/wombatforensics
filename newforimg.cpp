@@ -72,6 +72,8 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
     ui->aff4radio->setEnabled(false); // disabled until i get a way to fuse/tsk view/extract aff4 image.
     ui->sfsradio->setVisible(false);
     ui->sfsradio->setEnabled(false); // disabled until i get a way fuse functionality working for sfs image
+    ui->zmgradio->setVisible(false);
+    ui->zmgradio->setEnabled(false); // disabled until i get a way to work with zmg image without fuse
 }
 
 ForImgDialog::~ForImgDialog()
