@@ -348,7 +348,7 @@ ForImg::ForImg(QString imgfile)
     else if(imgfile.split("/").last().toLower().endsWith(".sfs"))
 	imgtype = 5; // SFS
     imgpath = imgfile;
-    qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
+    //qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
     {
         libewf_handle_t* ewfhandle = NULL;
@@ -505,6 +505,9 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     }
     else if(imgtype == 3) // SPLIT RAW
     {
+        //libsmraw_handle_t* smhandle = NULL;
+        //libsmraw_error_t* smerror = NULL;
+
 	QString efilepath = imgpath.split(imgpath.split("/").last()).first();
 	QString fileprefix = "";
 	if(imgpath.toLower().endsWith(".000"))
@@ -515,6 +518,31 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    fileprefix = imgpath.split("/").last().split(".aaa", Qt::SkipEmptyParts, Qt::CaseInsensitive).first();
 	QDir edir = QDir(efilepath);
 	QStringList efiles = edir.entryList(QStringList() << QString(fileprefix + ".???"), QDir::NoSymLinks | QDir::Files);
+
+        /*
+        char* filenames[efiles.count()] = {NULL};
+        for(int i=0; i < efiles.count(); i++)
+            filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
+        int retopen = 0;
+        retopen = libsmraw_handle_initialize(&smhandle, &smerror);
+        if(retopen == -1)
+            libsmraw_error_fprint(smerror, stdout);
+        retopen = libsmraw_handle_open(smhandle, filenames, efiles.count(), LIBSMRAW_OPEN_READ, &smerror);
+        if(retopen == -1)
+            libsmraw_error_fprint(smerror, stdout);
+        qint64 res = 0;
+        imgoffset = libsmraw_handle_seek_offset(smhandle, pos, SEEK_SET, &smerror);
+        if(retopen == -1)
+            libsmraw_error_fprint(smerror, stdout);
+        res = libsmraw_handle_read_buffer(smhandle, data, size, &smerror);
+        if(retopen == -1)
+            libsmraw_error_fprint(smerror, stdout);
+        tmparray = QByteArray::fromRawData((const char*)data, size);
+        libsmraw_handle_close(smhandle, &smerror);
+        libsmraw_handle_free(&smhandle, &smerror);
+        libsmraw_error_free(&smerror);
+        */
+
         QFileInfo segmentfile(efilepath + efiles.at(0));
         off64_t segsize = segmentfile.size();
         uint16_t segstart = pos / segsize;
@@ -562,7 +590,7 @@ void ForImg::SetMountPath(QString mountpath)
 MyIODevice::MyIODevice(QString imgfile)
 {
     imgpath = imgfile;
-    qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
+    //qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
 }
 MyIODevice::~MyIODevice()
 {
