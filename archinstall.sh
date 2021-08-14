@@ -25,7 +25,7 @@ makepkg -si
 cd ../wombatforensics
 
 # install all the other prerequisites (when given the choice of packages, I always select the default=all)
-sudo pacman -S qt5 qtav ffmpegthumbnailer imagemagick libewf libtar gst-libav gst-transcoder vlc mplayer gst-plugins-bad gst-plugins-ugly gdb libzip poppler-qt5 openssl squashfuse
+sudo pacman -S qt5 qtav ffmpegthumbnailer imagemagick libewf libtar gst-libav gst-transcoder vlc mplayer gst-plugins-bad gst-plugins-ugly gdb libzip poppler-qt5 openssl
 
 # optional archive and image formats
 sudo pacman -S zip unzip p7zip libheif
