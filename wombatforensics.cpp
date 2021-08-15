@@ -1528,14 +1528,13 @@ void WombatForensics::UpdateStatus()
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
     //UpdateEvidenceList();
-    /*
-    for(int i=0; i < newevid.count(); i++)
+    for(int i=0; i < newevidence.count(); i++)
     {
-	existingevid.append(newevid.at(i));
+	//existingevid.append(newevid.at(i));
 	existingevidence.append(newevidence.at(i));
     }
-    newevid.clear();
-    */
+    //newevid.clear();
+
     newevidence.clear();
     //PrepareEvidenceImage();
     //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();

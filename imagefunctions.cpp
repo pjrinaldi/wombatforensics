@@ -14,30 +14,34 @@ unsigned long long GetTotalBytes(std::string instr)
  * SHOULD INCORPORATE THE LOG INTO THE RAW DD IMAGE FILE AND CALL IT A NEW FILETYPE EXTENTSION
  * </HEADER>CASENUMBER|EVIDENCENUMBER|EXAMINER|DESCRIPTION|STARTDATE</HEADER>RAWIMAGECONTENT</FOOTER><MD5></MD5><SHA1></SHA1><SHA256></SHA256>ENDDATE</FOOTER>
  */ 
-void StartImaging(std::string instring, std::string outpath, std::string outstr, int radio) 
+void StartImaging(std::string instring, std::string outpath, std::string outstr, std::string footstr, int radio) 
 {
     if(radio == 0) // RAW
     {
-        ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"));
+        ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"), footstr);
         printf("Raw Forensic Image Finished Successfully.\n");
     }
     else if(radio == 1) // AFF4
     {
+        /*
         ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"));
         std::string aff4cmd = std::string(getenv("HOME")) + std::string("/.local/share/wombatforensics/aff4imager");
         aff4cmd += " -i " + outpath + "/" + outstr + ".dd -i " + outpath + "/" + outstr + ".dd.log -o " + outpath + "/" + outstr + ".aff4";
         system(aff4cmd.c_str());
         std::remove(std::string(outpath + "/" + outstr + ".dd").c_str());
         printf("AFF4'd Forensic Image Finished Successfully.\n");
+        */
     }
     else if(radio == 2) // SFS
     {
+        /*
         ReadBytes(instring, std::string(outpath + "/" + outstr + ".dd"));
         std::string sqshcmd = "mksquashfs " + outpath + "/" + outstr + ".dd " + outpath + "/" + outstr + ".dd.log " + outpath + "/" + outstr + ".sfs";
         system(sqshcmd.c_str());
         std::remove(std::string(outpath + "/" + outstr + ".dd").c_str());
         std::remove(std::string(outpath + "/" + outstr + ".dd.log").c_str());
         printf("Squashfs'd Forensic Image Finished Successfully.\n");
+        */
     }
     else if(radio == 3) // ZMG
     {
@@ -56,7 +60,7 @@ void StartImaging(std::string instring, std::string outpath, std::string outstr,
 }
 
 
-void ReadBytes(std::string instring, std::string outstr)
+void ReadBytes(std::string instring, std::string outstr, std::string footstr)
 {
     std::ofstream logfile;
     std::size_t lpar = instring.find("(");
@@ -67,9 +71,12 @@ void ReadBytes(std::string instring, std::string outstr)
     std::string serialnumber = instring.substr(lpar+6, rpar-lpar-6);
     lpar = instring.find("[");
     std::string deviceinfo = instring.substr(0, lpar-1);
+    std::size_t dotfnd = outstr.rfind(".");
+    std::string logoutstr = outstr.substr(0, dotfnd) + ".log";
+    printf("logoutstr: %s\n", logoutstr.c_str());
 
     time_t starttime = time(NULL);
-    logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
+    logfile.open(logoutstr, std::ofstream::out | std::ofstream::app);
     char buff[35];
     logfile << "Wombat Forensics v0.3 Forensic Image started at: " << GetDateTime(buff) << "\n";
     unsigned long long totalbytes = 0;
@@ -185,6 +192,7 @@ void ReadBytes(std::string instring, std::string outstr)
     logfile << "Forensic Image finished at: " << GetDateTime(buff) << "\n";
     logfile << "Forensic Image created in: " << difftime(endtime, starttime) << " seconds\n\n";
     printf("\nForensic Image Creation Finished!\n");
+    std::stringstream srcstr;
     /*
     std::stringstream srcstr;
     std::stringstream imgstr;
@@ -219,8 +227,10 @@ void ReadBytes(std::string instring, std::string outstr)
     */
     for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
     {
-        logfile << std::hex << sourcehash[i];
-        //fprintf(filelog, "%02x", sourcehash[i]);
+        srcstr << std::hex << (int)sourcehash[i];
+        logfile << std::hex << (int)sourcehash[i];
+        //srcstr << std::hex << sourcehash[i];
+        //fprintf((logfile, "%02x", sourcehash[i]);
         printf("%02x", sourcehash[i]);
     }
     logfile << " - BLAKE3 Source Device\n";
@@ -228,10 +238,13 @@ void ReadBytes(std::string instring, std::string outstr)
     printf(" - BLAKE3 Source Device\n");
     for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
     {
-        logfile << std::hex << forimghash[i];
-        //fprintf(filelog, "%02x", forimghash[i]);
+        logfile << std::hex << (int)forimghash[i];
+        //fprintf(logfile, "%02x", forimghash[i]);
         printf("%02x", forimghash[i]);
     }
+    footstr += "<size>" + QString::number(totalbytes).toStdString() + "</size><blake3>" + srcstr.str() + "</blake3></imglog>";
+    
+    write(outfile, footstr.c_str(), sizeof(char)*footstr.size());
     logfile << " - BLAKE3 Forensic Image\n";
     //fprintf(filelog, " - BLAKE3 Forensic Image\n");
     printf(" - BLAKE3 Forensic Image\n");
@@ -256,7 +269,84 @@ void ReadBytes(std::string instring, std::string outstr)
 
 std::string Verify(QString outstr)
 {
+    qint64 imagesize = 0;
+    uint8_t hashtype = 0;
+    unsigned long long totalbytes = 0;
+    quint64 curpos = 0;
+    unsigned int sectorsize = 512;
+    QString blake3str = "";
+
+    /*
+        QFile efile(imgpath);
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(efile.isOpen())
+        {
+            qint64 imagesize = efile.size();
+            efile.seek(efile.size() - 9);
+            if(QString(efile.read(9)) == "</imglog>")
+            {
+                hashtype = 1; // BLAKE3
+                efile.seek(efile.size() - 1024);
+                QByteArray getlog = efile.read(1024);
+                //QString getlog  QString(efile.read(1024));
+                //qDebug() << "getlog:" << getlog;
+                int sizestart = getlog.indexOf("<size>");
+                int sizeend = getlog.indexOf("</size>");
+                imgsize = getlog.mid(sizestart + 6, sizeend - sizestart - 6).toInt();
+                //qDebug() << getlog.mid(sizestart + 6, sizeend - sizestart- 6);
+                int b3start = getlog.indexOf("<blake3>");
+                int b3end = getlog.indexOf("</blake3>");
+                QString blake3str = getlog.mid(b3start + 8, b3end - b3start - 8);
+                qDebug() << "blake3str:" << blake3str;
+                //blake3hash = blake3str.toInt(nullptr, 16);
+                //qDebug() << "blake3hash:" << blake3hash;
+                //qDebug() << "logstart:" << logstart;
+                //imgsize = efile.size() - logstart;
+                //qDebug() << "imglog size:" << 1024 - logstart;
+                //qDebug() << "imgsize:" << imgsize << "efile size:" << efile.size();
+                //qDebug() << "imglog found!";
+            }
+            else
+            {
+                hashtype = 0; // MD5
+                QFileInfo efileinfo(imgpath);
+                imgsize = efileinfo.size();
+                //qDebug() << "imglog not found!";
+            }
+            efile.close();
+        }
+
+     */ 
+    QFile efile(outstr);
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(efile.isOpen())
+    {
+        imagesize = efile.size();
+        efile.seek(efile.size() - 9);
+        if(QString(efile.read(9)) == "</imglog>")
+        {
+            hashtype = 1; // BLAKE3
+            efile.seek(efile.size() - 1024);
+            QByteArray getlog = efile.read(1024);
+            int sizestart = getlog.indexOf("<size>");
+            int sizeend = getlog.indexOf("</size>");
+            imagesize = getlog.mid(sizestart + 6, sizeend - sizestart - 6).toInt();
+            int b3start = getlog.indexOf("<blake3>");
+            int b3end = getlog.indexOf("</blake3>");
+            blake3str = getlog.mid(b3start + 8, b3end - b3start - 8);
+            qDebug() << "blake3str:" << blake3str;
+        }
+        else
+        {
+            hashtype = 0;
+        }
+        efile.close();
+        qDebug() << "imagesize:" << imagesize;
+    }
     // NEED TO UPDATE THIS TO TAKE INTO ACCOUNT E01, RAW, SPLIT RAW, AND AFF PROPERLY.
+    /*
     std::string mntoutstr = "";
     if(outstr.toLower().endsWith(".zmg"))
         mntoutstr = "/tmp/wombatforensics/datamnt/" + outstr.split("/").last().toLower().split(".zmg").first().toStdString() + ".dd";
@@ -266,20 +356,35 @@ std::string Verify(QString outstr)
         mntoutstr = "/tmp/wombatforensics/datamnt/" + outstr.split("/").last().toStdString() + ".raw";
     else if(outstr.toLower().endsWith(".sfs"))
         mntoutstr = "/tmp/wombatforensics/datamnt/" + outstr.split("/").last().toLower().split(".sfs").first().toStdString() + ".dd";
+    */
     printf("outstr: %s\n", outstr.toStdString().c_str());
-    printf("mntoutstr: %s\n", mntoutstr.c_str());
+    //printf("mntoutstr: %s\n", mntoutstr.c_str());
     
     std::size_t rfound = outstr.toStdString().rfind("/");
     std::string imgname = outstr.toStdString().substr(rfound+1);
-    std::ifstream infile(mntoutstr + ".log");
+    //printf("imgname: %s\n", imgname.c_str());
+    //std::ifstream infile(mntoutstr + ".log");
     std::string md5hash = "";
     std::string curstr = "";
+    if(hashtype == 0) // MD5
+    {
+    std::size_t dotfnd = imgname.rfind(".");
+    std::string instr = imgname.substr(0, dotfnd);
+    std::ifstream infile(instr + ".log");
     while(std::getline(infile, curstr))
     {
         std::size_t found = curstr.find(" - MD5 Forensic Image");
         if(found != std::string::npos)
             md5hash = curstr.substr(0, found);
     }
+    infile.close();
+    }
+    /*
+    else if(hashtype == 1) // BLAKE3
+    {
+        // get imgsize and blake3 hash
+    }
+    */
     if(md5hash.empty())
     {
         if(outstr.toLower().endsWith(".e01"))
@@ -319,69 +424,118 @@ std::string Verify(QString outstr)
         }
     }
     //printf("original md5: %s\n", md5hash.c_str());
-    infile.close();
-    unsigned long long totalbytes = 0;
-    int ofile = open(mntoutstr.c_str(), O_RDONLY);
+    int ofile = open(outstr.toStdString().c_str(), O_RDONLY);
     ioctl(ofile, BLKGETSIZE64, &totalbytes);
+    if(hashtype == 1) // BLAKE3
+    {
+        totalbytes = imagesize;
+        //totalbytes = imgsize;
+    }
+    qDebug() << "totalbytes:" << totalbytes;
+    //qDebug() << "imgsize:" << imgsize << "totalbytes:" << totalbytes;
     close(ofile);
     //std::ofstream logfile;
     time_t starttime = time(NULL);
     char buff[35];
     //logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
     //logfile << "\nStarting Image Verification at " << GetDateTime(buff) << "\n";
-    unsigned int sectorsize = 512;
-    unsigned char o[MD5_DIGEST_LENGTH];
-    int i;
-    FILE* outfile = fopen(mntoutstr.c_str(), "rb");
-    MD5_CTX outcontext;
-    int obytes;
-    unsigned char odata[sectorsize];
-    MD5_Init(&outcontext);
-    unsigned long long curpos = 0;
-    while((obytes = fread(odata, 1, sectorsize, outfile)) != 0)
+    if(hashtype == 0)
     {
-        curpos = curpos + sectorsize;
-        MD5_Update(&outcontext, odata, obytes);
-        printf("Bytes Read: %lld/%lld\r", curpos, totalbytes);
-        fflush(stdout);
+        unsigned char o[MD5_DIGEST_LENGTH];
+        int i;
+        FILE* outfile = fopen(outstr.toStdString().c_str(), "rb");
+        MD5_CTX outcontext;
+        int obytes;
+        unsigned char odata[sectorsize];
+        MD5_Init(&outcontext);
+        unsigned long long curpos = 0;
+        while((obytes = fread(odata, 1, sectorsize, outfile)) != 0)
+        {
+            curpos = curpos + sectorsize;
+            MD5_Update(&outcontext, odata, obytes);
+            printf("Bytes Read: %lld/%lld\r", curpos, totalbytes);
+            fflush(stdout);
+        }
+        //logfile << "Bytes Read: " << curpos << "/" << totalbytes << "\n\n";
+        MD5_Final(o, &outcontext);
+        std::stringstream imgstr;
+        for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+        {
+            imgstr << std::hex << (int)o[i];
+            printf("%02x", o[i]);
+        }
+        printf(" - MD5 Forensic Image\n");
+        std::string imgmd5 = "";
+        imgmd5 = imgstr.str();
+        //logfile << imgmd5 << " - MD5 Forensic Image\n\n";
+        
+        imgname += " Verification ";
+        if(md5hash.compare(imgmd5) == 0)
+        {
+            printf("Verification Successful\n");
+            //logfile << "Verification Successful\n";
+            imgname += "Successful";
+        }
+        else if(md5hash.empty())
+        {
+            printf("Manual MD5 Hash Verification Comparison Required\n");
+            //logfile << "Verification Comparison Required\n";
+            imgname += "Requires Manual Comparison";
+        }
+        else
+        {
+            printf("Verification Failed\n");
+            //logfile << "Verification Failed\n";
+            imgname += "Failed";
+        }
+        fclose(outfile);
     }
-    //logfile << "Bytes Read: " << curpos << "/" << totalbytes << "\n\n";
-    MD5_Final(o, &outcontext);
-    std::stringstream imgstr;
-    for(i = 0; i < MD5_DIGEST_LENGTH; i++)
+    else if(hashtype == 1)
     {
-        imgstr << std::hex << (int)o[i];
-	printf("%02x", o[i]);
-    }
-    printf(" - MD5 Forensic Image\n");
-    std::string imgmd5 = "";
-    imgmd5 = imgstr.str();
-    //logfile << imgmd5 << " - MD5 Forensic Image\n\n";
-    
-    imgname += " Verification ";
-    if(md5hash.compare(imgmd5) == 0)
-    {
-	printf("Verification Successful\n");
-        //logfile << "Verification Successful\n";
-        imgname += "Successful";
-    }
-    else if(md5hash.empty())
-    {
-        printf("Manual MD5 Hash Verification Comparison Required\n");
-        //logfile << "Verification Comparison Required\n";
-        imgname += "Requires Manual Comparison";
-    }
-    else
-    {
-	printf("Verification Failed\n");
-        //logfile << "Verification Failed\n";
-        imgname += "Failed";
+        int obytes = 0;
+        std::stringstream srcstr;
+        int infile = open(outstr.toStdString().c_str(), O_RDONLY);
+        lseek(infile, 0, SEEK_SET);
+        uint8_t imghash[BLAKE3_OUT_LEN];
+        int i;
+        blake3_hasher imghasher;
+        blake3_hasher_init(&imghasher);
+        while(curpos < totalbytes)
+        {
+            char bytebuf[sectorsize];
+            memset(bytebuf, 0, sizeof(bytebuf));
+            ssize_t bytesread = read(infile, bytebuf, sectorsize);
+            blake3_hasher_update(&imghasher, bytebuf, bytesread);
+            curpos = curpos + sectorsize;
+            printf("Bytes Read: %lld/%lld\r", curpos, totalbytes);
+            fflush(stdout);
+        }
+        blake3_hasher_finalize(&imghasher, imghash, BLAKE3_OUT_LEN);
+        for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+        {
+            srcstr << std::hex << (int)imghash[i];
+            printf("%02x", imghash[i]);
+        }
+        printf(" - BLAKE3 Forensic Image\n");
+        std::string imgb3 = "";
+        imgb3 = srcstr.str();
+        imgname += " Verification ";
+        if(blake3str.toStdString().compare(imgb3) == 0)
+        {
+            printf("Verification Successful\n");
+            imgname += "Successful";
+        }
+        else
+        {
+            printf("Verification Failed\n");
+            imgname += "Failed";
+        }
+        close(infile);
     }
     time_t endtime = time(NULL);
     //logfile << "\nFinished Forensic Image Verification at " << GetDateTime(buff) << "\n";
     //logfile << "Finished Forensic Image Verification in: " << difftime(endtime, starttime) << " seconds\n";
     //logfile.close();
-    fclose(outfile);
 
     return imgname;
 }
@@ -496,8 +650,45 @@ ForImg::ForImg(QString imgfile)
     }
     else if(imgtype == 2) // RAW
     {
-        QFileInfo efileinfo(imgpath);
-        imgsize = efileinfo.size();
+        QFile efile(imgpath);
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(efile.isOpen())
+        {
+            qint64 imagesize = efile.size();
+            efile.seek(efile.size() - 9);
+            if(QString(efile.read(9)) == "</imglog>")
+            {
+                hashtype = 1; // BLAKE3
+                efile.seek(efile.size() - 1024);
+                QByteArray getlog = efile.read(1024);
+                //QString getlog  QString(efile.read(1024));
+                //qDebug() << "getlog:" << getlog;
+                int sizestart = getlog.indexOf("<size>");
+                int sizeend = getlog.indexOf("</size>");
+                imgsize = getlog.mid(sizestart + 6, sizeend - sizestart - 6).toInt();
+                //qDebug() << getlog.mid(sizestart + 6, sizeend - sizestart- 6);
+                int b3start = getlog.indexOf("<blake3>");
+                int b3end = getlog.indexOf("</blake3>");
+                QString blake3str = getlog.mid(b3start + 8, b3end - b3start - 8);
+                qDebug() << "blake3str:" << blake3str;
+                //blake3hash = blake3str.toInt(nullptr, 16);
+                //qDebug() << "blake3hash:" << blake3hash;
+                //qDebug() << "logstart:" << logstart;
+                //imgsize = efile.size() - logstart;
+                //qDebug() << "imglog size:" << 1024 - logstart;
+                //qDebug() << "imgsize:" << imgsize << "efile size:" << efile.size();
+                //qDebug() << "imglog found!";
+            }
+            else
+            {
+                hashtype = 0; // MD5
+                QFileInfo efileinfo(imgpath);
+                imgsize = efileinfo.size();
+                //qDebug() << "imglog not found!";
+            }
+            efile.close();
+        }
     }
     else if(imgtype == 3) // SPLIT RAW
     {

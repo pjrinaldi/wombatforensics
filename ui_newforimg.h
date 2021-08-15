@@ -20,6 +20,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 
 QT_BEGIN_NAMESPACE
@@ -47,6 +48,21 @@ public:
     QLabel *label_4;
     QLineEdit *pathedit;
     QPushButton *browsebutton;
+    QHBoxLayout *horizontalLayout_6;
+    QLabel *label_5;
+    QLineEdit *caseedit;
+    QSpacerItem *horizontalSpacer_4;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *label_6;
+    QLineEdit *examineredit;
+    QSpacerItem *horizontalSpacer_6;
+    QHBoxLayout *horizontalLayout_8;
+    QLabel *label_7;
+    QLineEdit *evidnumedit;
+    QSpacerItem *horizontalSpacer_7;
+    QHBoxLayout *horizontalLayout_9;
+    QLabel *label_8;
+    QTextEdit *descriptionedit;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout_5;
     QSpacerItem *horizontalSpacer_5;
@@ -58,7 +74,7 @@ public:
         if (ForImgDialog->objectName().isEmpty())
             ForImgDialog->setObjectName(QString::fromUtf8("ForImgDialog"));
         ForImgDialog->setWindowModality(Qt::ApplicationModal);
-        ForImgDialog->resize(570, 260);
+        ForImgDialog->resize(570, 426);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/bar/newforimg"), QSize(), QIcon::Normal, QIcon::Off);
         ForImgDialog->setWindowIcon(icon);
@@ -157,6 +173,84 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_4);
 
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        horizontalLayout_6->setContentsMargins(-1, 0, -1, 0);
+        label_5 = new QLabel(ForImgDialog);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+
+        horizontalLayout_6->addWidget(label_5);
+
+        caseedit = new QLineEdit(ForImgDialog);
+        caseedit->setObjectName(QString::fromUtf8("caseedit"));
+
+        horizontalLayout_6->addWidget(caseedit);
+
+        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_6->addItem(horizontalSpacer_4);
+
+
+        verticalLayout->addLayout(horizontalLayout_6);
+
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        horizontalLayout_7->setContentsMargins(-1, 0, -1, 0);
+        label_6 = new QLabel(ForImgDialog);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+
+        horizontalLayout_7->addWidget(label_6);
+
+        examineredit = new QLineEdit(ForImgDialog);
+        examineredit->setObjectName(QString::fromUtf8("examineredit"));
+
+        horizontalLayout_7->addWidget(examineredit);
+
+        horizontalSpacer_6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_7->addItem(horizontalSpacer_6);
+
+
+        verticalLayout->addLayout(horizontalLayout_7);
+
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
+        horizontalLayout_8->setContentsMargins(-1, 0, -1, 0);
+        label_7 = new QLabel(ForImgDialog);
+        label_7->setObjectName(QString::fromUtf8("label_7"));
+
+        horizontalLayout_8->addWidget(label_7);
+
+        evidnumedit = new QLineEdit(ForImgDialog);
+        evidnumedit->setObjectName(QString::fromUtf8("evidnumedit"));
+
+        horizontalLayout_8->addWidget(evidnumedit);
+
+        horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_8->addItem(horizontalSpacer_7);
+
+
+        verticalLayout->addLayout(horizontalLayout_8);
+
+        horizontalLayout_9 = new QHBoxLayout();
+        horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
+        horizontalLayout_9->setContentsMargins(-1, 0, -1, 0);
+        label_8 = new QLabel(ForImgDialog);
+        label_8->setObjectName(QString::fromUtf8("label_8"));
+        label_8->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+
+        horizontalLayout_9->addWidget(label_8);
+
+        descriptionedit = new QTextEdit(ForImgDialog);
+        descriptionedit->setObjectName(QString::fromUtf8("descriptionedit"));
+
+        horizontalLayout_9->addWidget(descriptionedit);
+
+
+        verticalLayout->addLayout(horizontalLayout_9);
+
         verticalSpacer = new QSpacerItem(20, 30, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout->addItem(verticalSpacer);
@@ -191,7 +285,7 @@ public:
     {
         ForImgDialog->setWindowTitle(QCoreApplication::translate("ForImgDialog", "Create Forensic Image", nullptr));
         label->setText(QCoreApplication::translate("ForImgDialog", "Select Source Device:", nullptr));
-        sourcecombo->setCurrentText(QCoreApplication::translate("ForImgDialog", "Select Source Device", nullptr));
+        sourcecombo->setCurrentText(QString());
         sourcecombo->setPlaceholderText(QCoreApplication::translate("ForImgDialog", "Select Source Device", nullptr));
         label_2->setText(QCoreApplication::translate("ForImgDialog", "Forensic Image Type:", nullptr));
         rawradio->setText(QCoreApplication::translate("ForImgDialog", "Raw", nullptr));
@@ -202,6 +296,13 @@ public:
         nameedit->setPlaceholderText(QCoreApplication::translate("ForImgDialog", "Name w/o Extension", nullptr));
         label_4->setText(QCoreApplication::translate("ForImgDialog", "Destination Folder:", nullptr));
         browsebutton->setText(QCoreApplication::translate("ForImgDialog", "Browse", nullptr));
+        label_5->setText(QCoreApplication::translate("ForImgDialog", "Case Number:", nullptr));
+        caseedit->setInputMask(QString());
+        caseedit->setPlaceholderText(QString());
+        label_6->setText(QCoreApplication::translate("ForImgDialog", "Examiner:", nullptr));
+        examineredit->setPlaceholderText(QString());
+        label_7->setText(QCoreApplication::translate("ForImgDialog", "Evidence Number:", nullptr));
+        label_8->setText(QCoreApplication::translate("ForImgDialog", "Description:", nullptr));
         cancelbutton->setText(QCoreApplication::translate("ForImgDialog", "Cancel", nullptr));
         createbutton->setText(QCoreApplication::translate("ForImgDialog", "Create Forensic Image", nullptr));
     } // retranslateUi

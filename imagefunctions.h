@@ -34,9 +34,9 @@ static char* GetDateTime(char *buff)
 };
 
 unsigned long long GetTotalBytes(std::string infile);
-void ReadBytes(std::string infile, std::string outfile);
+void ReadBytes(std::string infile, std::string outfile, std::string footstr);
 std::string Verify(QString outstr);
-void StartImaging(std::string instr, std::string outpath, std::string outstr, int radio); 
+void StartImaging(std::string instr, std::string outpath, std::string outstr, std::string footstr, int radio); 
 
 class ForImg
 {
@@ -56,6 +56,8 @@ class ForImg
         QString imgpath = "";
         QString mntpath = "";
         int imgtype = -1;
+        uint8_t hashtype = 0;
+        int blake3hash = 0;
 };
 
 class MyIODevice : public QIODevice

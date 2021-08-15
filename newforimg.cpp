@@ -100,6 +100,7 @@ void ForImgDialog::CreateImage()
     }
     else
     {
+        QString footstring = "<imglog><casenumber>" + ui->caseedit->text() + "</casenumber><examiner>" + ui->examineredit->text() + "</examiner><evidencenumber>" + ui->evidnumedit->text() + "</evidencenumber><description>" + ui->descriptionedit->toPlainText() + "</description>";
         int radio = 0;
         if(ui->rawradio->isChecked())
             radio = 0;
@@ -109,7 +110,7 @@ void ForImgDialog::CreateImage()
             radio = 2;
         else if(ui->zmgradio->isChecked())
             radio = 3;
-        QFuture<void> tmpfuture = QtConcurrent::run(StartImaging, ui->sourcecombo->currentText().toStdString(), ui->pathedit->text().toStdString(), ui->nameedit->text().toStdString(), radio);
+        QFuture<void> tmpfuture = QtConcurrent::run(StartImaging, ui->sourcecombo->currentText().toStdString(), ui->pathedit->text().toStdString(), ui->nameedit->text().toStdString(), footstring.toStdString(), radio);
         imgwatcher.setFuture(tmpfuture);
         this->close();
     }
