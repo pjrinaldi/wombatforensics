@@ -4590,7 +4590,7 @@ void WriteFileSystemProperties(QHash<QString, QVariant>* fsinfo, QString pathstr
 void ProcessForensicImage(ForImg* curimg)
 {
     qInfo() << "Parsing Forensic Image:" << curimg->ImgPath();
-    isignals->StatUp("Parsing Forensic Image");
+    isignals->StatUp("Parsing Forensic Image...");
     //qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
     //qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
     //qDebug() << "imgsize:" << curimg->Size();
@@ -5792,7 +5792,11 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
         ntinodehash.clear();
 	curinode = ParseNtfsDirectory(curimg, curstartsector, ptreecnt, 5, 0, "", "", &dirntinodehash, &ntinodehash);
 	//qDebug() << "ntinodehash:" << ntinodehash;
+        qDebug() << "begin parsing ntfs orphans...";
+        qDebug() << "curinode prior to beginning ntfs orphans:" << curinode;
+        //isignals->StatUp("Parsing Forensic Image...");
         ParseNtfsOrphans(curimg, curstartsector, ptreecnt, curinode, &dirntinodehash, &ntinodehash);
+        qDebug() << "end parsing ntfs orphans...";
         dirntinodehash.clear();
 	ntinodehash.clear();
     }
@@ -8005,7 +8009,9 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
     // * - The sequence number of the parent is no longer correct
     // NOW PARSE THE MFT TO LOOK FOR NON-ALLOCATED ENTRIES
 
+    uint8_t orphandirexists = 0;
     quint64 entriespersize = 0;
+    qDebug() << "mftlayout count:" << mftlayout.split(";", Qt::SkipEmptyParts).count();
     for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
 	//qDebug() << i << "mftoffset:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong() << "mftlength:" << mftlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
@@ -8325,11 +8331,11 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 		//qDebug() << "orphan filename:" << filename;
                 //qDebug() << "ntinodehash:" << *ntinodehash;
                 //qDebug() << "parntinode:" << parntinode;
+                QList<QVariant> nodedata;
                 uint8_t hasparent = 0;
                 if(parntinode == 5) // root directory is the parent
                 {
                     hasparent = 1;
-                    QList<QVariant> nodedata;
                     nodedata.clear();
                     nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray("/").toBase64() << logicalsize << createdate << accessdate << modifydate << statusdate << 0;
                     if(logicalsize > 0) // Get Category/Signature
@@ -8392,16 +8398,18 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                         curinode++;
                     }
                 }
-                else
+                else // POSSIBLY HAS A PARENT WHICH STILL EXISTS
                 {
                     if(dirntinodehash->contains(parntinode))
                     {
                         hasparent = 1;
 			QString parentid = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(dirntinodehash->value(parntinode));
-                        qDebug() << "parentid:" << parentid;
+                        //qDebug() << "parentid:" << parentid;
                         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(parentid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
                         if(indxlist.count() == 1)
-                            qDebug() << "parent filename:" << indxlist.at(0).sibling(indxlist.at(0).row(), 0).data().toString();
+                        {
+                            //qDebug() << "parent filename:" << indxlist.at(0).sibling(indxlist.at(0).row(), 0).data().toString();
+                        }
 			/*
 			QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(parentid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
 			if(indxlist.count() == 1)
@@ -8412,8 +8420,8 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 			//TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
 			//exportlist.append(itemnode->Data(11).toString());
                         TreeNode* itemnode = static_cast<TreeNode*>(indxlist.at(0).internalPointer());
-                        qDebug() << "itemnode itemtype:" << itemnode->itemtype;
-                        qDebug() << "ntinode/inodecnt:" << parntinode << ntinodehash->value(parntinode);
+                        //qDebug() << "itemnode itemtype:" << itemnode->itemtype;
+                        //qDebug() << "ntinode/inodecnt:" << parntinode << ntinodehash->value(parntinode);
                     }
                     /*
                             // loop over prop file to get the itemtype, or maybe acess the treenodemodel to get it's NodeData or indexitem values for the filename, filepath, etc..
@@ -8428,6 +8436,16 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                 }
                 if(hasparent == 0) // orphan, parent no longer exists
                 {
+		    if(orphandirexists == 0) // orphans dir doesn't exist yet, so create it
+		    {
+			nodedata.clear();
+			nodedata << QByteArray("orphans").toBase64() << QByteArray("/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o");
+			mutex.lock();
+			treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
+			mutex.unlock();
+			nodedata.clear();
+			orphandirexists = 1;
+		    }
                     // NEED TO CREATE ORPHAN DIRECTORY AND THEN ADD IT TO THAT DIRECTORY
                 }
             }
