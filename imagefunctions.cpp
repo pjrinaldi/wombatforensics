@@ -75,6 +75,7 @@ void ReadBytes(std::string instring, std::string outstr)
     unsigned long long totalbytes = 0;
     unsigned int sectorsize = 512;
     unsigned long long curpos = 0;
+    uint64_t errorcount = 0;
     int infile = open(instr.c_str(), O_RDONLY);
     int outfile = open(outstr.c_str(), O_RDWR | O_CREAT | O_TRUNC | O_APPEND, S_IRWXU);
     ioctl(infile, BLKGETSIZE64, &totalbytes);
@@ -86,8 +87,53 @@ void ReadBytes(std::string instring, std::string outstr)
     logfile << "Serial Number: " << serialnumber << "\n";
     logfile << "Size: " << totalbytes << " bytes\n";
     logfile << "Block Size: " << sectorsize << " bytes\n";
+    /*
+    time_t endtime = time(NULL);
+    fprintf(filelog, "Wrote %llu out of %llu bytes\n", curpos, totalbytes);
+    fprintf(filelog, "Forensic Image: %s\n", outputstr+3);
+    fprintf(filelog, "Forensic Image finished at: %s\n", GetDateTime(buff));
+    fprintf(filelog, "Forensic Image created in: %f seconds\n\n", difftime(endtime, starttime));
+    printf("\nForensic Image Creation Finished\n");
+    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+    {
+        fprintf(filelog, "%02x", sourcehash[i]);
+        printf("%02x", sourcehash[i]);
+    }
+    fprintf(filelog, " - BLAKE3 Source Device\n");
+    printf(" - BLAKE3 Source Device\n");
+    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+    {
+        fprintf(filelog, "%02x", forimghash[i]);
+        printf("%02x", forimghash[i]);
+    }
+    fprintf(filelog, " - BLAKE3 Forensic Image\n");
+    printf(" - BLAKE3 Forensic Image\n");
+    if(memcmp(sourcehash, forimghash, BLAKE3_OUT_LEN) == 0)
+    {
+        printf("\nVerification Successful\n");
+        fprintf(filelog, "\nVerification Successful\n");
+    }
+    else
+    {
+        printf("\nVerification Failed\n");
+        fprintf(filelog, "\nVerification Failed\n");
+    }
+    fprintf(filelog, "\nFinished Forensic Image Verification at: %s\n", GetDateTime(buff));
+    fprintf(filelog, "Finished Forensic Image Verification in: %f seconds\n", difftime(time(NULL), starttime));
+    fclose(filelog);
+    close(infile);
+    close(outfile);
+     */ 
     lseek(infile, 0, SEEK_SET);
     lseek(outfile, 0, SEEK_SET);
+    uint8_t sourcehash[BLAKE3_OUT_LEN];
+    uint8_t forimghash[BLAKE3_OUT_LEN];
+    int i;
+    blake3_hasher srchash;
+    blake3_hasher imghash;
+    blake3_hasher_init(&srchash);
+    blake3_hasher_init(&imghash);
+    /*
     unsigned char c[MD5_DIGEST_LENGTH];
     unsigned char o[MD5_DIGEST_LENGTH];
     int i;
@@ -95,31 +141,51 @@ void ReadBytes(std::string instring, std::string outstr)
     MD5_CTX outcontext;
     MD5_Init(&mdcontext);
     MD5_Init(&outcontext);
+    */
     while (curpos < totalbytes)
     {
         char bytebuf[sectorsize];
+        memset(bytebuf, 0, sizeof(bytebuf));
         char imgbuf[sectorsize];
+        memset(imgbuf, 0, sizeof(imgbuf));
 	ssize_t bytesread = read(infile, bytebuf, sectorsize);
+        if(bytesread == -1)
+        {
+            memset(bytebuf, 0, sizeof(bytebuf));
+            errorcount++;
+            perror("Read Error, Writing zeros instead.");
+        }
 	ssize_t byteswrite = write(outfile, bytebuf, sectorsize);
+        if(byteswrite == -1)
+            perror("Write error, I haven't accounted for this yet so you probably want to use dc3dd instead.");
+        /*
         if(bytesread == -1)
             perror("Read Error:");
 	if(byteswrite == -1)
 	    perror("Write Error:");
-        MD5_Update(&mdcontext, bytebuf, bytesread);
+        */
+        //MD5_Update(&mdcontext, bytebuf, bytesread);
+        blake3_hasher_update(&srchash, bytebuf, bytesread);
         ssize_t byteswrote = pread(outfile, imgbuf, sectorsize, curpos);
-        MD5_Update(&outcontext, imgbuf, byteswrote);
+        blake3_hasher_update(&imghash, imgbuf, byteswrote);
+        //MD5_Update(&outcontext, imgbuf, byteswrote);
 	curpos = curpos + sectorsize;
-	printf("Wrote %lld out of %lld bytes\r", curpos, totalbytes);
+	printf("Wrote %lld of %lld bytes\r", curpos, totalbytes);
 	fflush(stdout);
     }
-    MD5_Final(c, &mdcontext);
-    MD5_Final(o, &outcontext);
+    blake3_hasher_finalize(&srchash, sourcehash, BLAKE3_OUT_LEN);
+    blake3_hasher_finalize(&imghash, forimghash, BLAKE3_OUT_LEN);
+    //MD5_Final(c, &mdcontext);
+    //MD5_Final(o, &outcontext);
     time_t endtime = time(NULL);
-    logfile << "Wrote " << curpos << " out of " << totalbytes << " bytes\n";
+    logfile << "Wrote " << curpos << " of " << totalbytes << " bytes\n";
     logfile << "Forensic Image: " << outstr << "\n";
+    logfile << errorcount << " blocks replaced with zero's\n";
+    //fprintf(filelog, "%llu blocks replaced with zeros\n", errorcount);
     logfile << "Forensic Image finished at: " << GetDateTime(buff) << "\n";
     logfile << "Forensic Image created in: " << difftime(endtime, starttime) << " seconds\n\n";
     printf("\nForensic Image Creation Finished!\n");
+    /*
     std::stringstream srcstr;
     std::stringstream imgstr;
     for(i = 0; i < MD5_DIGEST_LENGTH; i++)
@@ -150,6 +216,37 @@ void ReadBytes(std::string instring, std::string outstr)
 	printf("Verification Failed\n");
         logfile << "Verification Failed\n";
     }
+    */
+    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+    {
+        logfile << std::hex << sourcehash[i];
+        //fprintf(filelog, "%02x", sourcehash[i]);
+        printf("%02x", sourcehash[i]);
+    }
+    logfile << " - BLAKE3 Source Device\n";
+    //fprintf(filelog, " - BLAKE3 Source Device\n");
+    printf(" - BLAKE3 Source Device\n");
+    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+    {
+        logfile << std::hex << forimghash[i];
+        //fprintf(filelog, "%02x", forimghash[i]);
+        printf("%02x", forimghash[i]);
+    }
+    logfile << " - BLAKE3 Forensic Image\n";
+    //fprintf(filelog, " - BLAKE3 Forensic Image\n");
+    printf(" - BLAKE3 Forensic Image\n");
+    if(memcmp(sourcehash, forimghash, BLAKE3_OUT_LEN) == 0)
+    {
+        printf("\nVerification Successful\n");
+        logfile << "\nVerification Successful\n";
+        //fprintf(filelog, "\nVerification Successful\n");
+    }
+    else
+    {
+        printf("\nVerification Failed\n");
+        logfile << "\nVerification Failed\n";
+        //fprintf(filelog, "\nVerification Failed\n");
+    }
     logfile << "\nFinished Forensic Image Verification at " << GetDateTime(buff) << "\n";
     logfile << "Finished Forensic Image Verification in: " << difftime(endtime, starttime) << " seconds\n";
     logfile.close();
@@ -159,6 +256,7 @@ void ReadBytes(std::string instring, std::string outstr)
 
 std::string Verify(QString outstr)
 {
+    // NEED TO UPDATE THIS TO TAKE INTO ACCOUNT E01, RAW, SPLIT RAW, AND AFF PROPERLY.
     std::string mntoutstr = "";
     if(outstr.toLower().endsWith(".zmg"))
         mntoutstr = "/tmp/wombatforensics/datamnt/" + outstr.split("/").last().toLower().split(".zmg").first().toStdString() + ".dd";

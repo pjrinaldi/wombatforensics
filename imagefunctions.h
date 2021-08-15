@@ -21,6 +21,8 @@
 #include <QDebug>
 #include <QDir>
 
+#include <blake3.h>
+
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
 
