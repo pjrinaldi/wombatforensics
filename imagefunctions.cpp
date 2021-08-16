@@ -75,6 +75,8 @@ void ReadBytes(std::string instring, std::string outstr, std::string footstr)
     std::string logoutstr = outstr.substr(0, dotfnd) + ".log";
     printf("logoutstr: %s\n", logoutstr.c_str());
 
+    //std::string zstdstr = outstr.substr(0, dotfnd) + ".wbi";
+
     time_t starttime = time(NULL);
     logfile.open(logoutstr, std::ofstream::out | std::ofstream::app);
     char buff[35];
@@ -85,6 +87,20 @@ void ReadBytes(std::string instring, std::string outstr, std::string footstr)
     uint64_t errorcount = 0;
     int infile = open(instr.c_str(), O_RDONLY);
     int outfile = open(outstr.c_str(), O_RDWR | O_CREAT | O_TRUNC | O_APPEND, S_IRWXU);
+
+    /*
+    FILE* const fout = fopen(zstdstr.c_str(), "wb");
+    size_t const buffinsize = ZSTD_CStreamInSize();
+    void* const buffin = malloc(buffinsize);
+    size_t const buffoutsize = ZSTD_CStreamOutSize();
+    void* const buffout = malloc(buffoutsize);
+    ZSTD_CCtx* const cctx = ZSTD_createCCtx();
+    ZSTD_CCtx_setParameter(cctx, ZSTD_c_compressionLevel, 1);
+    ZSTD_CCtx_setParameter(cctx, ZSTD_c_checksumFlag, 1);
+    ZSTD_CCtx_setParameter(cctx, ZSTD_c_nbWorkers, 4);
+    */
+
+
     ioctl(infile, BLKGETSIZE64, &totalbytes);
     ioctl(infile, BLKSSZGET, &sectorsize);
     logfile << "\nSource Device\n";

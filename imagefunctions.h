@@ -22,6 +22,7 @@
 #include <QDir>
 
 #include <blake3.h>
+#include <zstd.h>
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
