@@ -615,6 +615,8 @@ ForImg::ForImg(QString imgfile)
         imgtype = 4; // ZMG
     else if(imgfile.split("/").last().toLower().endsWith(".sfs"))
 	imgtype = 5; // SFS
+    else if(imgfile.split("/").last().toLower().endsWith(".aff4"))
+        imgtype = 6; // AFF4
     imgpath = imgfile;
     //qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
@@ -730,6 +732,15 @@ ForImg::ForImg(QString imgfile)
             //qDebug() << "segment size:" << segmentfile.size();
         }
         //qDebug() << "final imagesize:" << imgsize;
+    }
+    else if(imgtype == 6) // AFF4
+    {
+        /*
+        AFF4_init();
+        int aff4handle = AFF4_open(imgfile.split(imgfile.split("/").last()).first().toStdString().c_str());
+        qint64 imgsize = AFF4_object_size(aff4handle);
+        AFF4_close(aff4handle);
+        */
     }
 }
 
@@ -867,6 +878,20 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
             tmparray = tmpfile.read(size);
             tmpfile.close();
         }
+    }
+    else if(imgtype == 6) // AFF4
+    {
+        /*
+        char* data = new char[size];
+        QByteArray tmparray;
+        tmparray.clear();
+
+        AFF4_init();
+        int aff4handle = AFF4_open(imgpath.split(imgpath.split("/").last()).first().toStdString().c_str());
+        int bytesread = AFF4_read(aff4handle, pos, data, size);
+        tmparray = QByteArray::fromRawData((const char*)data, size);
+        AFF4_close(aff4handle);
+        */
     }
 
     return tmparray;
