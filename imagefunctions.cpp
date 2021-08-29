@@ -617,6 +617,8 @@ ForImg::ForImg(QString imgfile)
 	imgtype = 5; // SFS
     else if(imgfile.split("/").last().toLower().endsWith(".aff4"))
         imgtype = 6; // AFF4
+    else if(imgfile.split("/").last().toLower().endsWith(".wfi"))
+        imgtype = 7; // WFI
     imgpath = imgfile;
     //qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
@@ -741,6 +743,24 @@ ForImg::ForImg(QString imgfile)
         qint64 imgsize = AFF4_object_size(aff4handle);
         AFF4_close(aff4handle);
         */
+    }
+    else if(imgtype == 7) // WFI
+    {
+        QFile wfile(imgpath);
+        if(!wfile.isOpen())
+            wfile.open(QIODevice::ReadOnly);
+        QDataStream in(&wfile);
+        if(in.version() != QDataStream::Qt_5_15)
+        {
+            qDebug() << "Wrong Qt Data Stream version:" << in.version();
+        }
+        quint64 header;
+        uint8_t version;
+        quint16 sectorsize;
+        quint64 totalbytes;
+        in >> header >> version >> sectorsize >> totalbytes;
+        imgsize = totalbytes;
+        wfile.close();
     }
 }
 
@@ -892,6 +912,186 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         tmparray = QByteArray::fromRawData((const char*)data, size);
         AFF4_close(aff4handle);
         */
+    }
+    else if(imgtype == 7) // WFI
+    {
+        QFile wfi(imgpath);
+        QFile ndx(imgpath.split(".").first() + ".ndx");
+        if(!wfi.isOpen())
+            wfi.open(QIODevice::ReadOnly);
+        QDataStream in(&wfi);
+        if(in.version() != QDataStream::Qt_5_15)
+        {
+            qDebug() << "Wrong Qt Data Stream version:" << in.version();
+            //return 1;
+        }
+        if(!ndx.isOpen())
+            ndx.open(QIODevice::ReadOnly);
+        quint64 header;
+        uint8_t version;
+        quint16 sectorsize;
+        quint64 totalbytes;
+        QString casenumber;
+        QString evidnumber;
+        QString examiner;
+        QString description;
+        in >> header >> version >> sectorsize >> totalbytes >> casenumber >> evidnumber >> examiner >> description;
+
+        if(header != 0x776f6d6261746669)
+        {
+            qDebug() << "Wrong file type, not a wombat forensic image.";
+            //return 1;
+        }
+        if(version != 1)
+        {
+            qDebug() << "Not the correct wombat forensic image format.";
+            //return 1;
+        }
+        LZ4F_dctx* lz4dctx;
+        LZ4F_errorCode_t errcode;
+        errcode = LZ4F_createDecompressionContext(&lz4dctx, LZ4F_getVersion());
+        char* cmpbuf = new char[2*sectorsize];
+        QByteArray framearray;
+        framearray.clear();
+        quint64 frameoffset = 0;
+        quint64 nextoffset = 0;
+        quint64 framesize = 0;
+        size_t ret = 1;
+        size_t bread = 0;
+
+        off_t curindex = pos / sectorsize;
+        qDebug() << "curindex:" << curindex;
+        ndx.seek(curindex*8);
+        frameoffset = qFromBigEndian<quint64>(ndx.read(8));
+        if(curindex == ((totalbytes / sectorsize) - 1))
+            framesize = totalbytes - frameoffset;
+        else
+        {
+            framesize = qFromBigEndian<quint64>(ndx.peek(8))- frameoffset;
+        }
+        qDebug() << "frame offset:" << frameoffset << "frame size:" << framesize;
+        int bytesread = in.readRawData(cmpbuf, framesize);
+        bread = bytesread;
+        size_t rawbufsize = sectorsize;
+        char* rawbuf = new char[rawbufsize];
+        size_t dstsize = rawbufsize;
+        ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
+        if(dstsize >= size) // got enough data, return tmparray
+        {
+            qDebug() << "got the data, set it and forget it.";
+        }
+        else // get another frame.... turn this into a while loop...
+        {
+            qDebug() << "don't have enough data... try again...";
+        }
+        QByteArray tmparray(rawbuf, dstsize);
+
+        // POSITION TO JUMP TO IS pos AND SIZE TO READ IS size
+
+        /*
+            char* fbuf = new char[8];
+            char* nbuf = new char[8];
+            //fseek(infile, offset, SEEK_SET);
+            //int bytesread = fread(cmpbuf, 1, size, infile);
+            uint64_t frameoffset = 0;
+            uint64_t nextoffset = 0;
+            uint64_t framesize = 0;
+            size_t ret = 1;
+            size_t bread = 0;
+            off_t curindex = offset / 512;
+            fseek(ndxfile, curindex*8, SEEK_SET);
+            fread(fbuf, 1, 8, ndxfile);
+            frameoffset = strtoull(fbuf, NULL, 0);
+            if(curindex == framecnt - 1)
+                framesize = rawsize - frameoffset;
+            else
+            {
+                fread(nbuf, 1, 8, ndxfile);
+                nextoffset = strtoull(nbuf, NULL, 0);
+                framesize = nextoffset - frameoffset;
+            }
+            char* cmpbuf = new char[framesize];
+            fseek(infile, frameoffset, SEEK_SET);
+            int bytesread = fread(cmpbuf, 1, framesize, infile);
+            char* rawbuf = new char[512];
+            size_t dstsize = 512;
+            bread = bytesread;
+            //LZ4F_frameInfo_t lz4frameinfo;
+            LZ4F_dctx* lz4dctx;
+            LZ4F_errorCode_t errcode;
+            errcode = LZ4F_createDecompressionContext(&lz4dctx, LZ4F_getVersion());
+            ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
+            if(bread >= size)
+                memcpy(buf, rawbuf, size);
+            else
+            {
+                size = bread;
+                memcpy(buf, rawbuf, size);
+            }
+         */ 
+        /*
+        for(int i=0; i < (totalbytes / sectorsize); i++)
+        {
+            //ndx.seek(i*8);
+            frameoffset = qFromBigEndian<quint64>(ndx.read(8));
+            //nin >> frameoffset;
+            if(i == ((totalbytes / sectorsize) - 1))
+                framesize = totalbytes - frameoffset;
+            else
+            {
+                framesize = qFromBigEndian<quint64>(ndx.peek(8))- frameoffset;
+            }
+            //int bytesread = cin.readRawData(frameoffset, 2*sectorsize);
+            //qDebug() << "frame offset:" << frameoffset << "frame size:" << framesize;
+            int bytesread = in.readRawData(cmpbuf, framesize);
+            bread = bytesread;
+            size_t rawbufsize = sectorsize;
+            char* rawbuf = new char[rawbufsize];
+            size_t dstsize = rawbufsize;
+            ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
+            if(LZ4F_isError(ret))
+                printf("decompress error %s\n", LZ4F_getErrorName(ret));
+            blake3_hasher_update(&imghasher, rawbuf, dstsize);
+            printf("Verifying %ld of %llu bytes\r", dstsize, totalbytes);
+            fflush(stdout);
+            //size_t framesize = LZ4F_getFrameInfo(lz4dctx, &lz4frameInfo, cmpbuf, &consumedsize);
+            //if(LZ4F_isError(framesize))
+            //    printf("frameinfo error: %s\n", LZ4F_getErrorName(framesize));
+            //char* rawbuf = new char[sectorsize];
+            //nin >> rawbufsize;
+        }
+        blake3_hasher_finalize(&imghasher, imghash, BLAKE3_OUT_LEN);
+        QString calchash = "";
+        for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+        {
+            printf("%02x", imghash[i]);
+            calchash.append(QString("%1").arg(imghash[i], 2, 16, QChar('0')));
+            //logout << QString("%1").arg(forimghash[i], 2, 16, QChar('0'));
+        }
+        printf(" - Forensic Image Hash\n");
+        //logout << " - Forensic Image Hash" << Qt::endl;
+        ndx.close();
+
+        //HOW TO GET HASH OUT OF THE IMAGE FOR THE WOMBATVERIFY FUNCTION...
+        wfi.seek(wfi.size() - 128);
+        QString readhash;
+        QByteArray tmparray = wfi.read(128);
+        for(int i=1; i < 128; i++)
+        {
+            if(i % 2 != 0)
+                readhash.append(tmparray.at(i));
+        }
+        //qDebug() << "readhash:" << readhash;
+        wfi.close();
+        //rawdd.close();
+        delete[] cmpbuf;
+
+         */ 
+        errcode = LZ4F_freeDecompressionContext(lz4dctx);
+        delete[] cmpbuf;
+        delete[] rawbuf;
+        ndx.close();
+        wfi.close();
     }
 
     return tmparray;
