@@ -965,8 +965,8 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 
         off_t curindex = pos / sectorsize;
         qDebug() << "curindex:" << curindex;
-        while(cursize < size - 5)
-        {
+        //while(cursize < size - 5)
+        //{
             ndx.seek(curindex*8);
             frameoffset = qFromBigEndian<quint64>(ndx.read(8));
             if(curindex == ((totalbytes / sectorsize) - 1))
@@ -981,8 +981,8 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
             ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
             cursize += dstsize;
             qDebug() << "cursize:" << cursize;
-            curindex++;
-        }
+            //curindex++;
+        //}
         qDebug() << "out of loop:" << cursize;
         /*
         if(dstsize >= size) // got enough data, return tmparray
@@ -1110,7 +1110,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         wfi.close();
     }
 
-    return tmparray;
+    return tmparray.mid(pos, size);
 }
 
 qint64 ForImg::Size()
