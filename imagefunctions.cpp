@@ -984,6 +984,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         {
             qDebug() << "don't have enough data... try again...";
         }
+	qDebug() << "size requested:" << size << "size read:" << dstsize;
         QByteArray tmparray(rawbuf, dstsize);
         qDebug() << "dstsize:" << dstsize;
         qDebug() << "tmparray:" << tmparray.toHex();
