@@ -958,24 +958,33 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         quint64 framesize = 0;
         size_t ret = 1;
         size_t bread = 0;
+        size_t rawbufsize = sectorsize;
+        size_t dstsize = rawbufsize;
+        int cursize = 0;
+        char* rawbuf = new char[rawbufsize];
 
         off_t curindex = pos / sectorsize;
         qDebug() << "curindex:" << curindex;
-        ndx.seek(curindex*8);
-        frameoffset = qFromBigEndian<quint64>(ndx.read(8));
-        if(curindex == ((totalbytes / sectorsize) - 1))
-            framesize = totalbytes - frameoffset;
-        else
+        while(cursize < size - 5)
         {
-            framesize = qFromBigEndian<quint64>(ndx.peek(8))- frameoffset;
+            ndx.seek(curindex*8);
+            frameoffset = qFromBigEndian<quint64>(ndx.read(8));
+            if(curindex == ((totalbytes / sectorsize) - 1))
+                framesize = totalbytes - frameoffset;
+            else
+            {
+                framesize = qFromBigEndian<quint64>(ndx.peek(8))- frameoffset;
+            }
+            qDebug() << "frame offset:" << frameoffset << "frame size:" << framesize;
+            int bytesread = in.readRawData(cmpbuf, framesize);
+            bread = bytesread;
+            ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
+            cursize += dstsize;
+            qDebug() << "cursize:" << cursize;
+            curindex++;
         }
-        qDebug() << "frame offset:" << frameoffset << "frame size:" << framesize;
-        int bytesread = in.readRawData(cmpbuf, framesize);
-        bread = bytesread;
-        size_t rawbufsize = sectorsize;
-        char* rawbuf = new char[rawbufsize];
-        size_t dstsize = rawbufsize;
-        ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
+        qDebug() << "out of loop:" << cursize;
+        /*
         if(dstsize >= size) // got enough data, return tmparray
         {
             qDebug() << "got the data, set it and forget it.";
@@ -984,10 +993,14 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         {
             qDebug() << "don't have enough data... try again...";
         }
+        while(dstsize < size)
+        {
+        }
+        */
 	qDebug() << "size requested:" << size << "size read:" << dstsize;
         QByteArray tmparray(rawbuf, dstsize);
-        qDebug() << "dstsize:" << dstsize;
-        qDebug() << "tmparray:" << tmparray.toHex();
+        //qDebug() << "dstsize:" << dstsize;
+        qDebug() << "tmparray:" << tmparray.mid(pos, size).toHex();
 
         // POSITION TO JUMP TO IS pos AND SIZE TO READ IS size
 
