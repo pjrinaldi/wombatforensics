@@ -966,11 +966,15 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 
 	qint64 indxstart = pos / sectorsize;
 	qint8 posodd = pos % sectorsize;
-	qint64 relpos = pos - (indxstart * 8);
+	qint64 relpos = pos - (indxstart * sectorsize);
 	qint64 indxcnt = size / sectorsize;
+	if(indxcnt == 0)
+	    indxcnt = 1;
 	if(posodd != 0)
 	    indxcnt++;
-	for(int i=indxstart; i < indxcnt; i++)
+	qDebug() << "requested pos:" << pos << "relpos:" << relpos << "requested size:" << size;
+	qDebug() << "indxstart:" << indxstart << "posodd:" << posodd << "indxcnt:" << indxcnt;
+	for(int i=indxstart; i < indxstart + indxcnt; i++)
 	{
 	    ndx.seek(i*8);
 	    frameoffset = qFromBigEndian<quint64>(ndx.read(8));
@@ -985,38 +989,12 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    QByteArray blockarray(rawbuf, dstsize);
 	    framearray.append(blockarray);
 	}
+	qDebug() << "framearray size:" << framearray.size();
+	if(posodd == 0)
+	    qDebug() << "framearray:" << framearray.mid(0, size).toHex();
+	else
+	    qDebug() << "framearray:" << framearray.mid(relpos, size).toHex();
 
-	/*
-            ndx.seek(curindex*8);
-            frameoffset = qFromBigEndian<quint64>(ndx.read(8));
-            if(curindex == ((totalbytes / sectorsize) - 1))
-                framesize = totalbytes - frameoffset;
-            else
-            {
-                framesize = qFromBigEndian<quint64>(ndx.peek(8))- frameoffset;
-            }
-            qDebug() << "frame offset:" << frameoffset << "frame size:" << framesize;
-            int bytesread = in.readRawData(cmpbuf, framesize);
-            bread = bytesread;
-            ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
-            cursize += dstsize;
-            qDebug() << "cursize:" << cursize;
-            //curindex++;
-        //}
-	//*/
-        /*
-        if(dstsize >= size) // got enough data, return tmparray
-        {
-            qDebug() << "got the data, set it and forget it.";
-        }
-        else // get another frame.... turn this into a while loop...
-        {
-            qDebug() << "don't have enough data... try again...";
-        }
-        while(dstsize < size)
-        {
-        }
-        */
 	//qDebug() << "size requested:" << size << "size read:" << dstsize;
         //QByteArray tmparray(rawbuf, dstsize);
         //qDebug() << "dstsize:" << dstsize;
