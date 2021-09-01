@@ -972,8 +972,8 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    indxcnt = 1;
 	if(posodd != 0)
 	    indxcnt++;
-	qDebug() << "requested pos:" << pos << "relpos:" << relpos << "requested size:" << size;
-	qDebug() << "indxstart:" << indxstart << "posodd:" << posodd << "indxcnt:" << indxcnt;
+	//qDebug() << "requested pos:" << pos << "relpos:" << relpos << "requested size:" << size;
+	//qDebug() << "indxstart:" << indxstart << "posodd:" << posodd << "indxcnt:" << indxcnt;
 	for(int i=indxstart; i < indxstart + indxcnt; i++)
 	{
 	    ndx.seek(i*8);
@@ -989,131 +989,33 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    QByteArray blockarray(rawbuf, dstsize);
 	    framearray.append(blockarray);
 	}
-	qDebug() << "framearray size:" << framearray.size();
+	//qDebug() << "framearray size:" << framearray.size();
+        /*
 	if(posodd == 0)
 	    qDebug() << "framearray:" << framearray.mid(0, size).toHex();
 	else
 	    qDebug() << "framearray:" << framearray.mid(relpos, size).toHex();
+        */
 
 	//qDebug() << "size requested:" << size << "size read:" << dstsize;
-        //QByteArray tmparray(rawbuf, dstsize);
-        //qDebug() << "dstsize:" << dstsize;
-        //qDebug() << "tmparray:" << tmparray.mid(pos, size).toHex();
-
-        // POSITION TO JUMP TO IS pos AND SIZE TO READ IS size
-
-        /*
-            char* fbuf = new char[8];
-            char* nbuf = new char[8];
-            //fseek(infile, offset, SEEK_SET);
-            //int bytesread = fread(cmpbuf, 1, size, infile);
-            uint64_t frameoffset = 0;
-            uint64_t nextoffset = 0;
-            uint64_t framesize = 0;
-            size_t ret = 1;
-            size_t bread = 0;
-            off_t curindex = offset / 512;
-            fseek(ndxfile, curindex*8, SEEK_SET);
-            fread(fbuf, 1, 8, ndxfile);
-            frameoffset = strtoull(fbuf, NULL, 0);
-            if(curindex == framecnt - 1)
-                framesize = rawsize - frameoffset;
-            else
-            {
-                fread(nbuf, 1, 8, ndxfile);
-                nextoffset = strtoull(nbuf, NULL, 0);
-                framesize = nextoffset - frameoffset;
-            }
-            char* cmpbuf = new char[framesize];
-            fseek(infile, frameoffset, SEEK_SET);
-            int bytesread = fread(cmpbuf, 1, framesize, infile);
-            char* rawbuf = new char[512];
-            size_t dstsize = 512;
-            bread = bytesread;
-            //LZ4F_frameInfo_t lz4frameinfo;
-            LZ4F_dctx* lz4dctx;
-            LZ4F_errorCode_t errcode;
-            errcode = LZ4F_createDecompressionContext(&lz4dctx, LZ4F_getVersion());
-            ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
-            if(bread >= size)
-                memcpy(buf, rawbuf, size);
-            else
-            {
-                size = bread;
-                memcpy(buf, rawbuf, size);
-            }
-         */ 
-        /*
-        for(int i=0; i < (totalbytes / sectorsize); i++)
-        {
-            //ndx.seek(i*8);
-            frameoffset = qFromBigEndian<quint64>(ndx.read(8));
-            //nin >> frameoffset;
-            if(i == ((totalbytes / sectorsize) - 1))
-                framesize = totalbytes - frameoffset;
-            else
-            {
-                framesize = qFromBigEndian<quint64>(ndx.peek(8))- frameoffset;
-            }
-            //int bytesread = cin.readRawData(frameoffset, 2*sectorsize);
-            //qDebug() << "frame offset:" << frameoffset << "frame size:" << framesize;
-            int bytesread = in.readRawData(cmpbuf, framesize);
-            bread = bytesread;
-            size_t rawbufsize = sectorsize;
-            char* rawbuf = new char[rawbufsize];
-            size_t dstsize = rawbufsize;
-            ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
-            if(LZ4F_isError(ret))
-                printf("decompress error %s\n", LZ4F_getErrorName(ret));
-            blake3_hasher_update(&imghasher, rawbuf, dstsize);
-            printf("Verifying %ld of %llu bytes\r", dstsize, totalbytes);
-            fflush(stdout);
-            //size_t framesize = LZ4F_getFrameInfo(lz4dctx, &lz4frameInfo, cmpbuf, &consumedsize);
-            //if(LZ4F_isError(framesize))
-            //    printf("frameinfo error: %s\n", LZ4F_getErrorName(framesize));
-            //char* rawbuf = new char[sectorsize];
-            //nin >> rawbufsize;
-        }
-        blake3_hasher_finalize(&imghasher, imghash, BLAKE3_OUT_LEN);
-        QString calchash = "";
-        for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
-        {
-            printf("%02x", imghash[i]);
-            calchash.append(QString("%1").arg(imghash[i], 2, 16, QChar('0')));
-            //logout << QString("%1").arg(forimghash[i], 2, 16, QChar('0'));
-        }
-        printf(" - Forensic Image Hash\n");
-        //logout << " - Forensic Image Hash" << Qt::endl;
-        ndx.close();
-
-        //HOW TO GET HASH OUT OF THE IMAGE FOR THE WOMBATVERIFY FUNCTION...
-        wfi.seek(wfi.size() - 128);
-        QString readhash;
-        QByteArray tmparray = wfi.read(128);
-        for(int i=1; i < 128; i++)
-        {
-            if(i % 2 != 0)
-                readhash.append(tmparray.at(i));
-        }
-        //qDebug() << "readhash:" << readhash;
-        wfi.close();
-        //rawdd.close();
-        delete[] cmpbuf;
-
-         */ 
         errcode = LZ4F_freeDecompressionContext(lz4dctx);
         delete[] cmpbuf;
         delete[] rawbuf;
         ndx.close();
         wfi.close();
 	if(posodd == 0)
-	    return framearray.mid(0, size);
+        {
+            tmparray = framearray.mid(0, size);
+            framearray.clear();
+        }
 	else
-	    return framearray.mid(relpos, size);
+        {
+            tmparray = framearray.mid(relpos, size);
+            framearray.clear();
+        }
     }
 
     return tmparray;
-    //return tmparray.mid(pos, size);
 }
 
 qint64 ForImg::Size()
