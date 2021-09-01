@@ -1002,13 +1002,11 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    QByteArray blockarray(rawbuf, dstsize);
 	    framearray.append(blockarray);
 	}
-	//qDebug() << "framearray size:" << framearray.size();
-        /*
+	qDebug() << "framearray size:" << framearray.size();
 	if(posodd == 0)
 	    qDebug() << "framearray:" << framearray.mid(0, size).toHex();
 	else
 	    qDebug() << "framearray:" << framearray.mid(relpos, size).toHex();
-        */
 
 	//qDebug() << "size requested:" << size << "size read:" << dstsize;
         errcode = LZ4F_freeDecompressionContext(lz4dctx);
