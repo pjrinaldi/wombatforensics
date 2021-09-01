@@ -919,6 +919,10 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         QFile ndx(imgpath.split(".").first() + ".ndx");
         if(!wfi.isOpen())
             wfi.open(QIODevice::ReadOnly);
+        else
+        {
+            qDebug() << "wfi file failed to open";
+        }
         QDataStream in(&wfi);
         if(in.version() != QDataStream::Qt_5_15)
         {
@@ -927,6 +931,10 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         }
         if(!ndx.isOpen())
             ndx.open(QIODevice::ReadOnly);
+        else
+            qDebug() << "ndx file failed to open";
+        //qDebug() << "ndx size:" << ndx.size();
+        //qDebug() << "ndx count:" << ndx.size() / 8;
         quint64 header;
         uint8_t version;
         quint16 sectorsize;
@@ -972,8 +980,13 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    indxcnt = 1;
 	if(posodd != 0)
 	    indxcnt++;
-	//qDebug() << "requested pos:" << pos << "relpos:" << relpos << "requested size:" << size;
-	//qDebug() << "indxstart:" << indxstart << "posodd:" << posodd << "indxcnt:" << indxcnt;
+        qint64 indxend = indxstart + indxcnt;
+        if(indxend > totalbytes / sectorsize)
+        {
+            qDebug() << "indxend is larger than totalbytes / sectorsize";
+        }
+	qDebug() << "requested pos:" << pos << "relpos:" << relpos << "requested size:" << size;
+	qDebug() << "indxstart:" << indxstart << "posodd:" << posodd << "indxcnt:" << indxcnt;
 	for(int i=indxstart; i < indxstart + indxcnt; i++)
 	{
 	    ndx.seek(i*8);
