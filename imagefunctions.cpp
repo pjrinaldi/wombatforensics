@@ -978,7 +978,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	qint64 indxcnt = size / sectorsize;
 	if(indxcnt == 0)
 	    indxcnt = 1;
-	if(posodd != 0)
+	if(posodd != 0 && (relpos + size) > sectorsize)
 	    indxcnt++;
         qint64 indxend = indxstart + indxcnt;
         if(indxend > totalbytes / sectorsize)
@@ -1004,9 +1004,9 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	}
 	qDebug() << "framearray size:" << framearray.size();
 	if(posodd == 0)
-	    qDebug() << "framearray:" << framearray.mid(0, size).toHex();
+	    qDebug() << "framearray zero:" << framearray.mid(0, size).toHex();
 	else
-	    qDebug() << "framearray:" << framearray.mid(relpos, size).toHex();
+	    qDebug() << "framearray rel:" << framearray.mid(relpos, size).toHex();
 
 	//qDebug() << "size requested:" << size << "size read:" << dstsize;
         errcode = LZ4F_freeDecompressionContext(lz4dctx);
@@ -1014,16 +1014,16 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         delete[] rawbuf;
         ndx.close();
         wfi.close();
+	tmparray.clear();
 	if(posodd == 0)
         {
             tmparray = framearray.mid(0, size);
-            framearray.clear();
         }
 	else
         {
             tmparray = framearray.mid(relpos, size);
-            framearray.clear();
         }
+	qDebug() << "tmparray:" << tmparray.toHex();
     }
 
     return tmparray;
