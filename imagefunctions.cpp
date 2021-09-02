@@ -981,7 +981,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	if(posodd != 0 && (relpos + size) > sectorsize)
 	    indxcnt++;
         qint64 indxend = indxstart + indxcnt;
-        if(indxend > totalbytes / sectorsize)
+        if(indxend > totalbytes / sectorsize) // this if clause causes fuse to fail, so maybe check here and see...
         {
             qDebug() << "indxend is larger than totalbytes / sectorsize";
         }
