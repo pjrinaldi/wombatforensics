@@ -757,8 +757,9 @@ ForImg::ForImg(QString imgfile)
         quint64 header;
         uint8_t version;
         quint16 sectorsize;
+        quint32 blocksize;
         quint64 totalbytes;
-        in >> header >> version >> sectorsize >> totalbytes;
+        in >> header >> version >> sectorsize >> blocksize >> totalbytes;
         imgsize = totalbytes;
         wfile.close();
     }
@@ -916,7 +917,6 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     else if(imgtype == 7) // WFI
     {
         QFile wfi(imgpath);
-        QFile ndx(imgpath.split(".").first() + ".ndx");
         if(!wfi.isOpen())
             wfi.open(QIODevice::ReadOnly);
         else
@@ -927,40 +927,45 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         if(in.version() != QDataStream::Qt_5_15)
         {
             qDebug() << "Wrong Qt Data Stream version:" << in.version();
-            //return 1;
         }
-        if(!ndx.isOpen())
-            ndx.open(QIODevice::ReadOnly);
-        else
-            qDebug() << "ndx file failed to open";
-        //qDebug() << "ndx size:" << ndx.size();
-        //qDebug() << "ndx count:" << ndx.size() / 8;
+        // METHOD TO GET THE SKIPPABLE FRAME INDX CONTENT !!!!!
+        wfi.seek(wfi.size() - 128 - 10000);
+        QByteArray skiparray = wfi.read(10000);
+        int isskiphead = skiparray.lastIndexOf("_*M");
+        //qDebug() << "isskiphead:" << isskiphead << skiparray.mid(isskiphead, 4).toHex();
+        QString getindx = "";
+        if(qFromBigEndian<quint32>(skiparray.mid(isskiphead, 4)) == 0x5f2a4d18)
+        {
+            //qDebug() << "skippable frame containing the index...";
+            wfi.seek(wfi.size() - 128 - 10000 + isskiphead + 8);
+            in >> getindx;
+        }
+        wfi.seek(0);
         quint64 header;
         uint8_t version;
         quint16 sectorsize;
+        quint32 blocksize;
         quint64 totalbytes;
         QString casenumber;
         QString evidnumber;
         QString examiner;
         QString description;
-        in >> header >> version >> sectorsize >> totalbytes >> casenumber >> evidnumber >> examiner >> description;
+        in >> header >> version >> sectorsize >> blocksize >> totalbytes >> casenumber >> evidnumber >> examiner >> description;
 	
 	qint64 lz4start = wfi.pos();
 
         if(header != 0x776f6d6261746669)
         {
             qDebug() << "Wrong file type, not a wombat forensic image.";
-            //return 1;
         }
         if(version != 1)
         {
             qDebug() << "Not the correct wombat forensic image format.";
-            //return 1;
         }
         LZ4F_dctx* lz4dctx;
         LZ4F_errorCode_t errcode;
         errcode = LZ4F_createDecompressionContext(&lz4dctx, LZ4F_getVersion());
-        char* cmpbuf = new char[2*sectorsize];
+        char* cmpbuf = new char[2*blocksize];
         QByteArray framearray;
         framearray.clear();
         quint64 frameoffset = 0;
@@ -968,33 +973,33 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         quint64 framesize = 0;
         size_t ret = 1;
         size_t bread = 0;
-        size_t rawbufsize = sectorsize;
+        size_t rawbufsize = blocksize;
         size_t dstsize = rawbufsize;
         char* rawbuf = new char[rawbufsize];
 
-	qint64 indxstart = pos / sectorsize;
-	qint8 posodd = pos % sectorsize;
-	qint64 relpos = pos - (indxstart * sectorsize);
-	qint64 indxcnt = size / sectorsize;
+	qint64 indxstart = pos / blocksize;
+	qint8 posodd = pos % blocksize;
+	qint64 relpos = pos - (indxstart * blocksize);
+	qint64 indxcnt = size / blocksize;
 	if(indxcnt == 0)
 	    indxcnt = 1;
-	if(posodd != 0 && (relpos + size) > sectorsize)
+	if(posodd != 0 && (relpos + size) > blocksize)
 	    indxcnt++;
         qint64 indxend = indxstart + indxcnt;
-        if(indxend > totalbytes / sectorsize) // this if clause causes fuse to fail, so maybe check here and see...
+        if(indxend > totalbytes / blocksize) // this if clause causes fuse to fail, so maybe check here and see...
         {
             qDebug() << "indxend is larger than totalbytes / sectorsize";
         }
-	qDebug() << "requested pos:" << pos << "relpos:" << relpos << "requested size:" << size;
-	qDebug() << "indxstart:" << indxstart << "posodd:" << posodd << "indxcnt:" << indxcnt;
+	//qDebug() << "requested pos:" << pos << "relpos:" << relpos << "requested size:" << size;
+	//qDebug() << "indxstart:" << indxstart << "posodd:" << posodd << "indxcnt:" << indxcnt;
+        QStringList indxlist = getindx.split(",", Qt::SkipEmptyParts);
 	for(int i=indxstart; i < indxstart + indxcnt; i++)
 	{
-	    ndx.seek(i*8);
-	    frameoffset = qFromBigEndian<quint64>(ndx.read(8));
+            frameoffset = indxlist.at(i).toULongLong();
 	    if(i == ((totalbytes / sectorsize) - 1))
 		framesize = totalbytes - frameoffset;
 	    else
-		framesize = qFromBigEndian<quint64>(ndx.peek(8)) - frameoffset;
+                framesize = indxlist.at(i+1).toULongLong() - frameoffset;
 	    wfi.seek(lz4start + frameoffset);
 	    int bytesread = in.readRawData(cmpbuf, framesize);
 	    bread = bytesread;
@@ -1002,28 +1007,25 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    QByteArray blockarray(rawbuf, dstsize);
 	    framearray.append(blockarray);
 	}
+        /*
 	qDebug() << "framearray size:" << framearray.size();
 	if(posodd == 0)
 	    qDebug() << "framearray zero:" << framearray.mid(0, size).toHex();
 	else
 	    qDebug() << "framearray rel:" << framearray.mid(relpos, size).toHex();
+        */
 
 	//qDebug() << "size requested:" << size << "size read:" << dstsize;
         errcode = LZ4F_freeDecompressionContext(lz4dctx);
         delete[] cmpbuf;
         delete[] rawbuf;
-        ndx.close();
         wfi.close();
 	tmparray.clear();
 	if(posodd == 0)
-        {
             tmparray = framearray.mid(0, size);
-        }
 	else
-        {
             tmparray = framearray.mid(relpos, size);
-        }
-	qDebug() << "tmparray:" << tmparray.toHex();
+	//qDebug() << "tmparray:" << tmparray.toHex();
     }
 
     return tmparray;
