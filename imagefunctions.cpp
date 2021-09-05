@@ -969,7 +969,6 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         QByteArray framearray;
         framearray.clear();
         quint64 frameoffset = 0;
-        quint64 nextoffset = 0;
         quint64 framesize = 0;
         size_t ret = 1;
         size_t bread = 0;
@@ -996,7 +995,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	for(int i=indxstart; i < indxstart + indxcnt; i++)
 	{
             frameoffset = indxlist.at(i).toULongLong();
-	    if(i == ((totalbytes / sectorsize) - 1))
+	    if(i == ((totalbytes / blocksize) - 1))
 		framesize = totalbytes - frameoffset;
 	    else
                 framesize = indxlist.at(i+1).toULongLong() - frameoffset;
@@ -1007,6 +1006,9 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    QByteArray blockarray(rawbuf, dstsize);
 	    framearray.append(blockarray);
 	}
+        //qDebug() << "framecnt:" << totalbytes / sectorsize;
+        //if(ret > 0)
+        //    qDebug() << "ret value:" << ret;
         /*
 	qDebug() << "framearray size:" << framearray.size();
 	if(posodd == 0)
