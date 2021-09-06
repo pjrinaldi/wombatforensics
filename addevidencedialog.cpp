@@ -36,13 +36,13 @@ void AddEvidenceDialog::SelectEvidence()
     }
     if(alreadyadded == false)
     {
-        if(evidfilename.toLower().endsWith(".dd") || evidfilename.toLower().endsWith(".raw") || evidfilename.toLower().endsWith(".e01") || evidfilename.toLower().endsWith(".000") || evidfilename.toLower().endsWith(".001") || evidfilename.toLower().endsWith(".aff") || evidfilename.toLower().endsWith(".image") || evidfilename.toLower().endsWith(".dmg") || evidfilename.toLower().endsWith(".sfs") || evidfilename.toLower().endsWith(".zmg") || evidfilename.toLower().endsWith(".wfi"))// || evidfilename.toLower().endsWith("aff4"))
+        if(evidfilename.toLower().endsWith(".dd") || evidfilename.toLower().endsWith(".raw") || evidfilename.toLower().endsWith(".e01") || evidfilename.toLower().endsWith(".000") || evidfilename.toLower().endsWith(".001") || evidfilename.toLower().endsWith(".aff") || evidfilename.toLower().endsWith(".image") || evidfilename.toLower().endsWith(".dmg") || evidfilename.toLower().endsWith(".sfs") || evidfilename.toLower().endsWith(".zmg") || evidfilename.toLower().endsWith(".wfi") || evidfilename.toLower().endsWith(".wli"))// || evidfilename.toLower().endsWith("aff4"))
         {
             // it's an evidence image so process...
             ui->evidencelist->addItem(evidfilename);
             ui->startbutton->setEnabled(true);
         }
-        else if(evidfilename.isNull())
+        else if(evidfilename.isNull() || evidfilename.isEmpty())
         {
             qDebug() << "cancelled by the user.";
         }

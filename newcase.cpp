@@ -4636,6 +4636,8 @@ void ProcessForensicImage(ForImg* curimg)
     ParseVolume(curimg, imgsize, &pofflist, &psizelist, &fsinfolist);
     */
     qInfo() << "Reading Partition Table...";
+    qint64 wlisig = qFromBigEndian<qint64>(curimg->ReadContent(0, 8));
+    //qDebug() << "wlisig:" << QString::number(wlisig, 16);
     uint16_t mbrsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(510, 2));
     uint16_t applesig = qFromLittleEndian<uint16_t>(curimg->ReadContent(0, 2)); // should be in 2nd sector, powerpc mac's not intel mac's
     uint32_t bsdsig = qFromLittleEndian<uint32_t>(curimg->ReadContent(0, 4)); // can be at start of partition entry of a dos mbr
@@ -4842,12 +4844,142 @@ void ProcessForensicImage(ForImg* curimg)
             }
         }
     }
+    else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
+    {
+        ParseLogicalImage(curimg);
+    }
     else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
     {
 	ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
         //qDebug() << "partition signature not found correctly";
     }
     //FindPartitions(curimg, &pofflist, &psizelist);
+}
+
+void ParseLogicalImage(ForImg* curimg)
+{
+    //qDebug() << "parse logical image here...";
+    //qDebug() << "img path:" << curimg->ImgPath();
+    QFile wli(curimg->ImgPath());
+    if(!wli.isOpen())
+        wli.open(QIODevice::ReadOnly);
+    QDataStream in(&wli);
+    quint64 header;
+    quint8 version;
+    QString casenumber;
+    QString examiner;
+    QString description;
+    in >> header >> version >> casenumber >> examiner >> description;
+    //qDebug() << "cur pos:" << wli.pos();
+    //qDebug() << QString::number(header, 16) << version;
+    qint64 curoffset = wli.pos();
+    //qDebug() << curoffset;
+    QList<qint64> fileindxlist;
+    while(!in.atEnd())
+    {
+        QByteArray skiparray = wli.read(1000);
+        int isindx = skiparray.indexOf("wliindex");
+        if(isindx >= 0)
+            fileindxlist.append(curoffset + isindx);
+        curoffset += 1000;
+    }
+    qDebug() << "fileindxlist:" << fileindxlist;
+    qDebug() << "fileindxlist count:" << fileindxlist.count();
+    for(int i=0; i < fileindxlist.count(); i++)
+    {
+        qint64 fileoffset = fileindxlist.at(i);
+        qint64 lzfilesize = 0;
+        if(i == fileindxlist.count() - 1)
+            lzfilesize = wli.size() - fileindxlist.at(i);
+        else
+            lzfilesize = fileindxlist.at(i+1) - fileoffset;
+        //qDebug() << "index:" << i << "fileoffset:" << fileoffset + 8 << "filesize:" << filesize;
+        wli.seek(fileoffset);
+        wli.read(8);
+        //qDebug() << "wlistart:" << QString(wli.read(8));
+        //qDebug() << "wli start:" << wli.read(8).toHex()
+        QString filename;
+        QString filepath;
+        qint64 filesize;
+        qint64 filecreate;
+        qint64 filemodify;
+        qint64 fileaccess;
+        qint64 filestatus;
+        QString srchash;
+        QString catsig;
+        in >> filename >> filepath >> filesize >> filecreate >> fileaccess >> filemodify >> filestatus >> srchash >> catsig;
+        //qDebug() << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig;
+        QList<QVariant> nodedata;
+        nodedata.clear();
+        nodedata << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig.split("/").first() << catsig.split("/").last() << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-f" + QString::number(i));
+        mutex.lock();
+        treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), 5, 0);
+        mutex.unlock();
+
+        //qDebug() << "cur pos before frame:" << wli.pos();
+        //qDebug() << "filename:" << filename << "filesize:" << filesize;
+        //qDebug() << "new restorepath:" << restoredir.absolutePath() + filepath + "/" + filename;
+        /*
+        QDir tmpdir;
+        if(tmpdir.mkpath(restoredir.absolutePath() + filepath) == false)
+            qDebug() << "Failed to create restored directory for current file.";
+        QFile restorefile(restoredir.absolutePath() + filepath + "/" + filename);
+        if(!restorefile.isOpen())
+            restorefile.open(QIODevice::WriteOnly | QIODevice::Append);
+        QDataStream out(&restorefile);
+        // Decompress and Write Contents to the restored file
+        char* cmpbuf = new char[200];
+        LZ4F_dctx* lz4dctx;
+        LZ4F_errorCode_t errcode;
+        errcode = LZ4F_createDecompressionContext(&lz4dctx, LZ4F_getVersion());
+        if(LZ4F_isError(errcode))
+            qDebug() << "Create Error:" << LZ4F_getErrorName(errcode);
+        size_t consumedsize = 0;
+        size_t rawbufsize = 1000;
+        char* rawbuf = new char[rawbufsize];
+        size_t filled = 0;
+        int firstchunk = 1;
+        size_t ret = 1;
+        while(ret != 0)
+        {
+            size_t readsize = firstchunk ? filled : in.readRawData(cmpbuf, 100);
+            firstchunk = 0;
+            const void* srcptr = (const char*)cmpbuf + consumedsize;
+            consumedsize = 0;
+            const void* const srcend = (const char*)srcptr + readsize;
+            while(srcptr < srcend && ret != 0)
+            {
+                size_t dstsize = rawbufsize;
+                size_t srcsize = (const char*)srcend - (const char*)srcptr;
+                ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, srcptr, &srcsize, NULL);
+                //qDebug() << "dstsize:" << dstsize;
+                if(LZ4F_isError(ret))
+                    qDebug() << "Decompress Error:" << LZ4F_getErrorName(ret);
+                if(dstsize > 0)
+                {
+                    int byteswrote = out.writeRawData(rawbuf, dstsize);
+                    //qDebug() << "byteswrote:" << byteswrote;
+                }
+                srcptr = (const char*)srcptr + srcsize;
+            }
+            //qDebug() << "ret:" << ret;
+        }
+        restorefile.close();
+        */
+        //qDebug() << "restorefile size:" << restorefile.size();
+        /*
+        if(!restorefile.isOpen())
+            restorefile.open(QIODevice::ReadOnly);
+        restorefile.setFileTime(QDateTime::fromSecsSinceEpoch(filecreate, Qt::UTC), QFileDevice::FileBirthTime);
+        restorefile.setFileTime(QDateTime::fromSecsSinceEpoch(fileaccess, Qt::UTC), QFileDevice::FileAccessTime);
+        restorefile.setFileTime(QDateTime::fromSecsSinceEpoch(filemodify, Qt::UTC), QFileDevice::FileModificationTime);
+        restorefile.setFileTime(QDateTime::fromSecsSinceEpoch(filestatus, Qt::UTC), QFileDevice::FileMetadataChangeTime);
+        restorefile.close();
+        qDebug() << "Exported" << QString(filepath + "/" + filename) << "to" << restoredir.absolutePath();
+        */
+    }
+    //qDebug() << Qt::endl << "wombatexport finished at" << QDateTime::currentDateTime().toString("MM/dd/yyyy hh:mm:ss ap") << Qt::endl;
+    wli.close();
 }
 
 void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursectorsize, uint8_t ptreecnt, uint8_t allocstatus)
