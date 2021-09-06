@@ -4883,8 +4883,8 @@ void ParseLogicalImage(ForImg* curimg)
             fileindxlist.append(curoffset + isindx);
         curoffset += 1000;
     }
-    qDebug() << "fileindxlist:" << fileindxlist;
-    qDebug() << "fileindxlist count:" << fileindxlist.count();
+    //qDebug() << "fileindxlist:" << fileindxlist;
+    //qDebug() << "fileindxlist count:" << fileindxlist.count();
     for(int i=0; i < fileindxlist.count(); i++)
     {
         qint64 fileoffset = fileindxlist.at(i);
@@ -4907,15 +4907,15 @@ void ParseLogicalImage(ForImg* curimg)
         qint64 filestatus;
         QString srchash;
         QString catsig;
-        //quint8 itemtype;
-        //quint8 deleted;
-        in >> filename >> filepath >> filesize >> filecreate >> fileaccess >> filemodify >> filestatus >> srchash >> catsig;
-        //qDebug() << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig;
+        quint8 itemtype;
+        quint8 deleted;
+        in >> filename >> filepath >> filesize >> filecreate >> fileaccess >> filemodify >> filestatus >> srchash >> catsig >> itemtype >> deleted;
+        //qDebug() << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig << itemtype << deleted;
         QList<QVariant> nodedata;
         nodedata.clear();
-        nodedata << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig.split("/").first() << catsig.split("/").last() << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-f" + QString::number(i));
+        nodedata << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig.split("/").first() << catsig.split("/").last() << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-f" + QString::number(fileindxlist.at(i)));
         mutex.lock();
-        treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), 5, 0);
+        treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), itemtype, deleted);
         mutex.unlock();
 
         //qDebug() << "cur pos before frame:" << wli.pos();
