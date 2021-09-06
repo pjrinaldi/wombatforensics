@@ -4907,6 +4907,8 @@ void ParseLogicalImage(ForImg* curimg)
         qint64 filestatus;
         QString srchash;
         QString catsig;
+        //quint8 itemtype;
+        //quint8 deleted;
         in >> filename >> filepath >> filesize >> filecreate >> fileaccess >> filemodify >> filestatus >> srchash >> catsig;
         //qDebug() << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig;
         QList<QVariant> nodedata;
