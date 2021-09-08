@@ -787,6 +787,12 @@ ForImg::ForImg(QString imgfile)
         quint64 totalbytes;
         in >> header >> version >> sectorsize >> blocksize >> totalbytes;
         imgsize = totalbytes;
+        wfile.seek(0);
+        // HOW TO GET FRAME INDEX LIST OUT OF THE WFI FILE 
+        
+        //QList<qint64> frameindxlist;
+        framelist.clear();
+        FindNextFrame(0, &framelist, &wfile);
         wfile.close();
     }
     else if(imgtype == 8) // WLI
@@ -976,10 +982,6 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
             qDebug() << "Wrong Qt Data Stream version:" << in.version();
         }
 
-        // HOW TO GET FRAME INDEX LIST OUT OF THE WFI FILE 
-        QList<qint64> frameindxlist;
-        frameindxlist.clear();
-        FindNextFrame(0, &frameindxlist, &wfi);
 
         /*
         // METHOD TO GET THE SKIPPABLE FRAME INDX CONTENT !!!!!
@@ -1050,12 +1052,12 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         //QStringList indxlist = getindx.split(",", Qt::SkipEmptyParts);
 	for(int i=indxstart; i < indxstart + indxcnt; i++)
 	{
-            frameoffset = frameindxlist.at(i);
+            frameoffset = framelist.at(i);
             //frameoffset = indxlist.at(i).toULongLong();
 	    if(i == ((totalbytes / blocksize) - 1))
 		framesize = totalbytes - frameoffset;
 	    else
-                framesize = frameindxlist.at(i+1) - frameoffset;
+                framesize = framelist.at(i+1) - frameoffset;
                 //framesize = indxlist.at(i+1).toULongLong() - frameoffset;
 	    wfi.seek(frameoffset);
 	    //wfi.seek(lz4start + frameoffset);

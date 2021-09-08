@@ -65,6 +65,7 @@ class ForImg
         int imgtype = -1;
         uint8_t hashtype = 0;
         int blake3hash = 0;
+        QList<qint64> framelist;
 };
 
 class MyIODevice : public QIODevice
