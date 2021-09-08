@@ -25,7 +25,7 @@
 #include <QtEndian>
 
 #include <blake3.h>
-#include <zstd.h>
+//#include <zstd.h>
 #include <lz4.h>
 #include <lz4frame.h>
 
@@ -39,6 +39,7 @@ static char* GetDateTime(char *buff)
     return buff;
 };
 
+void FindNextFrame(qint64 initialindex, QList<qint64>* framelist, QFile* wfi);
 unsigned long long GetTotalBytes(std::string infile);
 void ReadBytes(std::string infile, std::string outfile, std::string footstr);
 std::string Verify(QString outstr);

@@ -1,6 +1,30 @@
 #include "imagefunctions.h"
 //#include "makezmg.h"
 
+void FindNextFrame(qint64 initialindex, QList<qint64>* framelist, QFile* wfi)
+{
+    //qDebug() << "initial index:" << initialindex;
+    if(!wfi->isOpen())
+        wfi->open(QIODevice::ReadOnly);
+    wfi->seek(initialindex);
+    QByteArray srcharray = wfi->peek(131072);
+    int srchindx = srcharray.toHex().indexOf("04224d18");
+    if(srchindx == -1)
+    {
+        //qDebug() << "this should occur after the last frame near the end of the file";
+    }
+    //int srchindx = srcharray.toHex().indexOf("04224d18", initialindex*2);
+    wfi->seek(initialindex + srchindx/2);
+    if(qFromBigEndian<qint32>(wfi->peek(4)) == 0x04224d18)
+    {
+        //qDebug() << "frame found:" << srchindx/2;
+        framelist->append(initialindex + srchindx/2);
+        FindNextFrame(initialindex + srchindx/2 + 1, framelist, wfi);
+    }
+    //else
+    //    qDebug() << "frame error:" << srchindx/2;
+}
+
 unsigned long long GetTotalBytes(std::string instr)
 {
     unsigned long long totbyt = 0;
@@ -951,6 +975,13 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         {
             qDebug() << "Wrong Qt Data Stream version:" << in.version();
         }
+
+        // HOW TO GET FRAME INDEX LIST OUT OF THE WFI FILE 
+        QList<qint64> frameindxlist;
+        frameindxlist.clear();
+        FindNextFrame(0, &frameindxlist, &wfi);
+
+        /*
         // METHOD TO GET THE SKIPPABLE FRAME INDX CONTENT !!!!!
         wfi.seek(wfi.size() - 128 - 10000);
         QByteArray skiparray = wfi.read(10000);
@@ -963,6 +994,8 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
             wfi.seek(wfi.size() - 128 - 10000 + isskiphead + 8);
             in >> getindx;
         }
+        */
+
         wfi.seek(0);
         quint64 header;
         uint8_t version;
@@ -1014,15 +1047,18 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         }
 	//qDebug() << "requested pos:" << pos << "relpos:" << relpos << "requested size:" << size;
 	//qDebug() << "indxstart:" << indxstart << "posodd:" << posodd << "indxcnt:" << indxcnt;
-        QStringList indxlist = getindx.split(",", Qt::SkipEmptyParts);
+        //QStringList indxlist = getindx.split(",", Qt::SkipEmptyParts);
 	for(int i=indxstart; i < indxstart + indxcnt; i++)
 	{
-            frameoffset = indxlist.at(i).toULongLong();
+            frameoffset = frameindxlist.at(i);
+            //frameoffset = indxlist.at(i).toULongLong();
 	    if(i == ((totalbytes / blocksize) - 1))
 		framesize = totalbytes - frameoffset;
 	    else
-                framesize = indxlist.at(i+1).toULongLong() - frameoffset;
-	    wfi.seek(lz4start + frameoffset);
+                framesize = frameindxlist.at(i+1) - frameoffset;
+                //framesize = indxlist.at(i+1).toULongLong() - frameoffset;
+	    wfi.seek(frameoffset);
+	    //wfi.seek(lz4start + frameoffset);
 	    int bytesread = in.readRawData(cmpbuf, framesize);
 	    bread = bytesread;
 	    ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
