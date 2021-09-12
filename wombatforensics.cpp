@@ -109,6 +109,13 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     tagcheckedmenu = new QMenu();
     tagcheckedmenu->setTitle("Tag Checked As");
     tagcheckedmenu->setIcon(QIcon(":/bar/addtotag"));
+    hashlistmenu = new QMenu();
+    hashlistmenu->setTitle("Add Selected To");
+    hashlistmenu->setIcon(QIcon(":/bar/hashlist"));
+    hashcheckedmenu = new QMenu();
+    hashcheckedmenu->setTitle("Add Checked To");
+    hashcheckedmenu->setIcon(QIcon(":/bar/hashlist"));
+
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->analysisToolBar->addWidget(spacer);
     ui->analysisToolBar->addAction(ui->actionchomp);
@@ -175,9 +182,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     treemenu->addSeparator();
     treemenu->addMenu(bookmarkmenu);
     treemenu->addAction(remtagaction);
+    treemenu->addMenu(hashlistmenu);
     treemenu->addSeparator();
     treemenu->addMenu(tagcheckedmenu);
     treemenu->addAction(remtagaction1);
+    treemenu->addMenu(hashcheckedmenu);
     treemenu->addSeparator();
     treemenu->addAction(ui->actionDigDeeper);
     treemenu->addAction(ui->actionExport);
@@ -251,6 +260,17 @@ void WombatForensics::UnCheckChecked()
         }
     }
     emit treenodemodel->CheckedNodesChanged();
+}
+
+void WombatForensics::ReadHashLists()
+{
+    /*
+    ui->hashlistwidget->clear();
+    QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
+    QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
+    for(int i=0; i < whllist.count(); i++)
+        ui->hashlistwidget->addItem(whllist.at(i).fileName());
+    */
 }
 
 void WombatForensics::ReadBookmarks()
@@ -3278,6 +3298,8 @@ WombatForensics::~WombatForensics()
     //delete hashlistmanager;
     delete bookmarkmenu;
     delete tagcheckedmenu;
+    delete hashlistmenu;
+    delete hashcheckedmenu;
     delete selectionmenu;
     delete msgviewer;
     delete idfilterview;

@@ -142,6 +142,8 @@ public:
     QMenu* selectionmenu;
     QMenu* bookmarkmenu;
     QMenu* tagcheckedmenu;
+    QMenu* hashlistmenu;
+    QMenu* hashcheckedmenu;
     QMenu* headermenu;
     QAction* remtagaction; // remove selected tag
     QAction* remtagaction1; // remove checked tag
@@ -294,6 +296,7 @@ private slots:
     void UnCheckChecked(void);
     void ReadSettings(void);
     void ReadBookmarks(void);
+    void ReadHashLists(void);
     void ShowSearchDialog(void);
     void TagSection(QString ctitle, QString ctag);
     void LaunchChomp(void);
