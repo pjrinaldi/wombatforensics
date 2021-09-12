@@ -5026,6 +5026,11 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     mutex.unlock();
     // FILE CARVING DIRECTORIES
     nodedata.clear();
+    nodedata << QByteArray("orphans").toBase64() << QByteArray("/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o");
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
+    mutex.unlock();
+    nodedata.clear();
     if(allocstatus == 1)
         ParseDirectoryStructure(curimg, cursectoroffset, ptreecnt);
     nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
@@ -5903,7 +5908,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     if(fstype > 0 and fstype < 4) // FAT12 || FAT16 || FAT32
     {
 	qulonglong curinode = 0;
-	curinode = ParseFatDirectory(curimg, curstartsector, ptreecnt, 0, 0, "", "");
+	curinode = ParseFatDirectory(curimg, curstartsector, ptreecnt, 0, "", "");
 	curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
     }
     else if(fstype == 4) // EXFAT
@@ -5942,7 +5947,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }
 
-qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint8_t orphandirexists, qulonglong parinode, QString parfilename, QString dirlayout)
+qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout)
 {
     qulonglong inodecnt = 0;
     //uint32_t fatsize = 0;
@@ -6020,6 +6025,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
             if(firstchar == 0x00) // entry is free and all remaining are free
                 break;
             uint8_t fileattr = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 11, 1));
+            //qDebug() << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
             if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub component
             {
                 if(!longnamestring.isEmpty())
@@ -6172,7 +6178,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 if(fileattr & 0x10 && logicalsize > 0) // sub directory
                 {
                     if(firstchar != 0xe5 && firstchar != 0x05) // not deleted
-			inodecnt = ParseFatDirectory(curimg, curstartsector, ptreecnt, orphandirexists, inodecnt-1, QString(filepath + filename + "/"), layout);
+			inodecnt = ParseFatDirectory(curimg, curstartsector, ptreecnt, inodecnt-1, QString(filepath + filename + "/"), layout);
                 }
             }
             else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
@@ -6182,16 +6188,6 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                     if(!longnamestring.isEmpty()) // orphan long entry
                     {
 			QList<QVariant> nodedata;
-			if(orphandirexists == 0) // orphans dir doesn't exists, so create it
-			{
-			    nodedata.clear();
-			    nodedata << QByteArray("orphans").toBase64() << QByteArray("/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o");
-			    mutex.lock();
-			    treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-			    mutex.unlock();
-			    nodedata.clear();
-			    orphandirexists = 1;
-			}
 			nodedata.clear();
 			nodedata << QByteArray(longnamestring.toUtf8()).toBase64() << QByteArray("/orphans/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Empty" << "Empty File" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
 			mutex.lock();
@@ -6507,7 +6503,6 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QList<qulonglong>* orphanoffsets)
 {
     //qDebug() << "start orphan processing with curinode:" << curinode;
-    uint8_t orphandirexists = 0;
     uint16_t bytespersector = 0;
     uint8_t sectorspercluster = 0;
     qulonglong fatoffset = 0;
@@ -6624,16 +6619,6 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 		    out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
 		    out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
 		    QList<QVariant> nodedata;
-		    if(orphandirexists == 0) // orphans dir doesn't exist yet, so create it
-		    {
-			nodedata.clear();
-			nodedata << QByteArray("orphans").toBase64() << QByteArray("/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o");
-			mutex.lock();
-			treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-			mutex.unlock();
-			nodedata.clear();
-			orphandirexists = 1;
-		    }
 		    nodedata.clear();
 		    nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray("/orphans/").toBase64() << (qulonglong)logicalsize << createdate << modifydate << accessdate << "0" << "0";
 		    if(logicalsize > 0) // Get Category/Signature
@@ -8143,7 +8128,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
     // * - The sequence number of the parent is no longer correct
     // NOW PARSE THE MFT TO LOOK FOR NON-ALLOCATED ENTRIES
 
-    uint8_t orphandirexists = 0;
     quint64 entriespersize = 0;
     qDebug() << "mftlayout count:" << mftlayout.split(";", Qt::SkipEmptyParts).count();
     for(int i=0; i < mftlayout.split(";", Qt::SkipEmptyParts).count(); i++)
@@ -8570,16 +8554,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                 }
                 if(hasparent == 0) // orphan, parent no longer exists
                 {
-		    if(orphandirexists == 0) // orphans dir doesn't exist yet, so create it
-		    {
-			nodedata.clear();
-			nodedata << QByteArray("orphans").toBase64() << QByteArray("/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o");
-			mutex.lock();
-			treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
-			mutex.unlock();
-			nodedata.clear();
-			orphandirexists = 1;
-		    }
                     // NEED TO CREATE ORPHAN DIRECTORY AND THEN ADD IT TO THAT DIRECTORY
                 }
             }
