@@ -44,6 +44,7 @@
 #include "registryviewer.h"
 #include "newforimg.h"
 #include "verevidencedialog.h"
+#include "hashlistmanager.h"
 
 class StatusLabel : public QLabel
 {
@@ -178,6 +179,7 @@ public:
     RegistryDialog* regviewer;
     ForImgDialog* forimgdialog;
     VerEvidenceDialog* verevidencedialog;
+    HashListManager* hashlistmanager;
 
 signals:
     void CancelCurrentThread();
