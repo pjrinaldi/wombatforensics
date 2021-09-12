@@ -44,6 +44,7 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
+    <file alias="hashlist">Resources/hashlist.png</file>
     <file alias="burrow">Resources/burrow.png</file>
     <file alias="reverify">Resources/reverifyforimg.png.svg</file>
     <file alias="exportforimg">Resources/exportfilestoimage.png.svg</file>

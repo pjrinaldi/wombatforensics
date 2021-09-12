@@ -60,6 +60,7 @@ public:
     QAction *actionCreateForensicImage;
     QAction *actionExportForensicImage;
     QAction *actionVerifyForensicImage;
+    QAction *actionHashListManager;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -254,6 +255,11 @@ public:
         QIcon icon30;
         icon30.addFile(QString::fromUtf8(":/bar/reverify"), QSize(), QIcon::Normal, QIcon::Off);
         actionVerifyForensicImage->setIcon(icon30);
+        actionHashListManager = new QAction(WombatForensics);
+        actionHashListManager->setObjectName(QString::fromUtf8("actionHashListManager"));
+        QIcon icon31;
+        icon31.addFile(QString::fromUtf8(":/bar/hashlist"), QSize(), QIcon::Normal, QIcon::Off);
+        actionHashListManager->setIcon(icon31);
         centralwidget = new QWidget(WombatForensics);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -277,10 +283,10 @@ public:
         sizePolicy1.setHeightForWidth(hexview->sizePolicy().hasHeightForWidth());
         hexview->setSizePolicy(sizePolicy1);
         hexview->setToolTipDuration(0);
-        hexview->setProperty("bytesPerLine", QVariant(49));
-        hexview->setProperty("hexCaps", QVariant(true));
-        hexview->setProperty("dynamicBytesPerLine", QVariant(true));
-        hexview->setProperty("readOnly", QVariant(true));
+        hexview->setBytesPerLine(49);
+        hexview->setHexCaps(true);
+        hexview->setDynamicBytesPerLine(true);
+        hexview->setReadOnly(true);
         splitter->addWidget(hexview);
 
         horizontalLayout->addWidget(splitter);
@@ -288,7 +294,7 @@ public:
         WombatForensics->setCentralWidget(centralwidget);
         mainMenubar = new QMenuBar(WombatForensics);
         mainMenubar->setObjectName(QString::fromUtf8("mainMenubar"));
-        mainMenubar->setGeometry(QRect(0, 0, 1641, 22));
+        mainMenubar->setGeometry(QRect(0, 0, 1641, 20));
         mainMenubar->setAcceptDrops(true);
         WombatForensics->setMenuBar(mainMenubar);
         analysisToolBar = new QToolBar(WombatForensics);
@@ -327,6 +333,7 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionSettings);
         analysisToolBar->addAction(actionViewerManager);
+        analysisToolBar->addAction(actionHashListManager);
         analysisToolBar->addAction(actionViewMessageLog);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Image_Gallery);
@@ -465,6 +472,10 @@ public:
         actionVerifyForensicImage->setText(QCoreApplication::translate("WombatForensics", "Verify Forensic Image", nullptr));
 #if QT_CONFIG(tooltip)
         actionVerifyForensicImage->setToolTip(QCoreApplication::translate("WombatForensics", "Verify Forensic Image", nullptr));
+#endif // QT_CONFIG(tooltip)
+        actionHashListManager->setText(QCoreApplication::translate("WombatForensics", "HashListManager", nullptr));
+#if QT_CONFIG(tooltip)
+        actionHashListManager->setToolTip(QCoreApplication::translate("WombatForensics", "Manage Hash Lists", nullptr));
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
         hexview->setToolTip(QString());

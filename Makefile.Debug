@@ -562,6 +562,7 @@ debug/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/list-remove.svg \
 		Resources/text-x-hex.png \
 		Resources/folder-open.svg \
+		Resources/hashlist.png \
 		Resources/text-x-install.svg \
 		Resources/reverifyforimg.png.svg \
 		Resources/document-new.svg \

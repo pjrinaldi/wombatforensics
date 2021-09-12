@@ -60,16 +60,16 @@
        <property name="whatsThis">
         <string>QHexEdit widget allow to edit the data in hex view.</string>
        </property>
-       <property name="bytesPerLine" stdset="0">
+       <property name="bytesPerLine">
         <number>49</number>
        </property>
-       <property name="hexCaps" stdset="0">
+       <property name="hexCaps">
         <bool>true</bool>
        </property>
-       <property name="dynamicBytesPerLine" stdset="0">
+       <property name="dynamicBytesPerLine">
         <bool>true</bool>
        </property>
-       <property name="readOnly" stdset="0">
+       <property name="readOnly">
         <bool>true</bool>
        </property>
       </widget>
@@ -83,7 +83,7 @@
      <x>0</x>
      <y>0</y>
      <width>1641</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -134,6 +134,7 @@
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="actionViewerManager"/>
+   <addaction name="actionHashListManager"/>
    <addaction name="actionViewMessageLog"/>
    <addaction name="separator"/>
    <addaction name="actionView_Image_Gallery"/>
@@ -610,6 +611,18 @@
    </property>
    <property name="toolTip">
     <string>Verify Forensic Image</string>
+   </property>
+  </action>
+  <action name="actionHashListManager">
+   <property name="icon">
+    <iconset resource="wombatforensics.qrc">
+     <normaloff>:/bar/hashlist</normaloff>:/bar/hashlist</iconset>
+   </property>
+   <property name="text">
+    <string>HashListManager</string>
+   </property>
+   <property name="toolTip">
+    <string>Manage Hash Lists</string>
    </property>
   </action>
  </widget>
