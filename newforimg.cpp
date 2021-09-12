@@ -68,6 +68,8 @@ ForImgDialog::ForImgDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ForImg
     connect(ui->createbutton, SIGNAL(clicked()), this, SLOT(CreateImage()), Qt::DirectConnection);
     connect(ui->browsebutton, SIGNAL(clicked()), this, SLOT(GetFolder()), Qt::DirectConnection);
     connect(&imgwatcher, SIGNAL(finished()), this, SLOT(FinishImaging()), Qt::QueuedConnection);
+    ui->rawradio->setVisible(false);
+    ui->rawradio->setEnabled(false); // disabled until i decide if i want raw at all.
     ui->aff4radio->setVisible(false);
     ui->aff4radio->setEnabled(false); // disabled until i get a way to fuse/tsk view/extract aff4 image.
     ui->sfsradio->setVisible(false);

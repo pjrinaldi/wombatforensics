@@ -35,6 +35,9 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
     connect(ui->hashcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->expandarchivescheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->processButton, SIGNAL(clicked()), this, SLOT(DigDeeperFiles()));
+    ui->md5radiobutton->setVisible(false);
+    ui->sha1radiobutton->setVisible(false);
+    ui->sha256radiobutton->setVisible(false);
 }
 
 DigDeeperDialog::~DigDeeperDialog()

@@ -39,6 +39,7 @@ public:
     QRadioButton *aff4radio;
     QRadioButton *sfsradio;
     QRadioButton *zmgradio;
+    QRadioButton *wfiradio;
     QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label_3;
@@ -74,7 +75,7 @@ public:
         if (ForImgDialog->objectName().isEmpty())
             ForImgDialog->setObjectName(QString::fromUtf8("ForImgDialog"));
         ForImgDialog->setWindowModality(Qt::ApplicationModal);
-        ForImgDialog->resize(570, 426);
+        ForImgDialog->resize(587, 426);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/bar/newforimg"), QSize(), QIcon::Normal, QIcon::Off);
         ForImgDialog->setWindowIcon(icon);
@@ -126,6 +127,11 @@ public:
         zmgradio->setObjectName(QString::fromUtf8("zmgradio"));
 
         horizontalLayout_2->addWidget(zmgradio);
+
+        wfiradio = new QRadioButton(ForImgDialog);
+        wfiradio->setObjectName(QString::fromUtf8("wfiradio"));
+
+        horizontalLayout_2->addWidget(wfiradio);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -292,6 +298,7 @@ public:
         aff4radio->setText(QCoreApplication::translate("ForImgDialog", "AFF4", nullptr));
         sfsradio->setText(QCoreApplication::translate("ForImgDialog", "Squash FS'd Raw", nullptr));
         zmgradio->setText(QCoreApplication::translate("ForImgDialog", "ZMG FS'd Raw", nullptr));
+        wfiradio->setText(QCoreApplication::translate("ForImgDialog", "WFI", nullptr));
         label_3->setText(QCoreApplication::translate("ForImgDialog", "Forensic Image Name:", nullptr));
         nameedit->setPlaceholderText(QCoreApplication::translate("ForImgDialog", "Name w/o Extension", nullptr));
         label_4->setText(QCoreApplication::translate("ForImgDialog", "Destination Folder:", nullptr));

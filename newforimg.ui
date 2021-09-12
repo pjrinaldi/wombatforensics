@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>570</width>
+    <width>587</width>
     <height>426</height>
    </rect>
   </property>
@@ -92,6 +92,13 @@
       <widget class="QRadioButton" name="zmgradio">
        <property name="text">
         <string>ZMG FS'd Raw</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="wfiradio">
+       <property name="text">
+        <string>WFI</string>
        </property>
       </widget>
      </item>
