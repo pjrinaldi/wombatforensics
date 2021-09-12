@@ -65,7 +65,7 @@
        <item>
         <widget class="QPushButton" name="createbutton">
          <property name="text">
-          <string>Create Hash List</string>
+          <string>Create Empty List</string>
          </property>
         </widget>
        </item>

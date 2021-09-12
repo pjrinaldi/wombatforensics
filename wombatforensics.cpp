@@ -711,6 +711,10 @@ void WombatForensics::HideImageWindow(bool checkstate)
     ui->actionView_Image_Gallery->setChecked(checkstate);
 }
 
+void WombatForensics::HideHashListManager()
+{
+}
+
 void WombatForensics::HideViewerManager()
 {
     treemenu->clear();
@@ -882,9 +886,12 @@ void WombatForensics::InitializeAppStructure()
     settingsdialog = new SettingsDialog(this);
     viewmanage->setWindowIcon(QIcon(":/bar/viewermanager"));
     settingsdialog->setWindowIcon(QIcon(":/bar/settings"));
+    //hashlistmanager = new HashListManager(this);
+    //hashlistmanager->setWindowIcon(QIcon(":/bar/hashlist"));
     connect(viewmanage, SIGNAL(HideManagerWindow()), this, SLOT(HideViewerManager()), Qt::DirectConnection);
     connect(settingsdialog, SIGNAL(HideSettingsWindow()), this, SLOT(HideSettingsWindow()), Qt::DirectConnection);
     connect(settingsdialog, SIGNAL(UpdateTZ(QString)), this, SLOT(UpdateTimeZone(QString)), Qt::DirectConnection);
+    //connect(hashlistmanager, SIGNAL(HideHashListManager()), this, SLOT(HideHashListManager()), Qt::DirectConnection);
     ui->actionSaveState->setEnabled(false);
     ui->actionAdd_Evidence->setEnabled(false);
     ui->actionRemove_Evidence->setEnabled(false);
@@ -900,6 +907,7 @@ void WombatForensics::InitializeAppStructure()
     ui->actionpublishresults->setEnabled(false);
     ui->actionCarve->setEnabled(false);
     ui->actionExportForensicImage->setEnabled(false);
+    ui->actionHashListManager->setEnabled(false);
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
@@ -951,6 +959,7 @@ void WombatForensics::InitializeCaseStructure()
         ui->actionpreviewreport->setEnabled(true);
         ui->actionBookmark_Manager->setEnabled(true);
         ui->actionpublishresults->setEnabled(true);
+        ui->actionHashListManager->setEnabled(true);
         qInfo() << "Case was Created";
         //LogMessage("Case was Created");
         QApplication::restoreOverrideCursor();
@@ -1188,6 +1197,7 @@ void WombatForensics::OpenUpdate()
         ui->actionCarve->setEnabled(true);
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
+        ui->actionHashListManager->setEnabled(true);
         //ui->actionExpandAll->setEnabled(true);
         //ui->actionCollapseAll->setEnabled(true);
     }
@@ -3265,6 +3275,7 @@ void WombatForensics::SetupHexPage(void)
 WombatForensics::~WombatForensics()
 {
     delete viewmanage;
+    //delete hashlistmanager;
     delete bookmarkmenu;
     delete tagcheckedmenu;
     delete selectionmenu;
@@ -3333,6 +3344,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     
     imagewindow->close();
     viewmanage->close();
+    //hashlistmanager->close();
     byteviewer->close();
     previewreport->close();
     aboutbox->close();
@@ -3568,6 +3580,14 @@ void WombatForensics::FinishDigging()
 void WombatForensics::on_actionViewerManager_triggered()
 {
     viewmanage->show();
+}
+
+void WombatForensics::on_actionHashListManager_triggered()
+{
+    hashlistmanager = new HashListManager(this);
+    hashlistmanager->setWindowIcon(QIcon(":/bar/hashlist"));
+    connect(hashlistmanager, SIGNAL(HideHashListManager()), this, SLOT(HideHashListManager()), Qt::DirectConnection);
+    hashlistmanager->show();
 }
 
 void WombatForensics::on_actionBookmark_Manager_triggered()

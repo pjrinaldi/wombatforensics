@@ -22,23 +22,20 @@ public:
     ~HashListManager();
 
 private slots:
-    /*
     void HideClicked();
-    void ShowBrowser();
-    void AddViewer();
-    void RemoveSelected();
-    void UpdateList();
+    void ImportHashList();
+    void CreateHashList();
+    void DeleteSelectedList();
     void SelectionChanged();
-    */
+    void UpdateList();
+
 signals:
-    //void HideManagerWindow();
+    void HideHashListManager();
 
 protected:
     void closeEvent(QCloseEvent* event);
 private:
     Ui::HashListManager* ui;
-    //QString fileviewerpath;
-    //QModelIndex selectedindex;
 };
 
 Q_DECLARE_METATYPE(HashListManager*);

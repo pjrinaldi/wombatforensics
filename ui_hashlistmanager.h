@@ -112,7 +112,7 @@ public:
         HashListManager->setWindowTitle(QCoreApplication::translate("HashListManager", "Hash List Manager", nullptr));
         label->setText(QCoreApplication::translate("HashListManager", "<u>Hash Lists</u>", nullptr));
         importbutton->setText(QCoreApplication::translate("HashListManager", "Import Hash List", nullptr));
-        createbutton->setText(QCoreApplication::translate("HashListManager", "Create Hash List", nullptr));
+        createbutton->setText(QCoreApplication::translate("HashListManager", "Create Empty List", nullptr));
         deletebutton->setText(QCoreApplication::translate("HashListManager", "Delete Selected", nullptr));
         closebutton->setText(QCoreApplication::translate("HashListManager", "Close", nullptr));
     } // retranslateUi

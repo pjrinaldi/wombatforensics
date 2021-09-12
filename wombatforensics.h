@@ -213,6 +213,7 @@ private slots:
     void on_actionAbout_triggered();
     void on_actionSettings_triggered();
     void on_actionJumpToHex_triggered();
+    void on_actionHashListManager_triggered();
     void UpdateProgress(qint64 count);
     void UpdateExport(void);
     void UpdateDig(int digstateid, int digcount);
@@ -223,6 +224,7 @@ private slots:
     void PathSelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(void);
+    void HideHashListManager(void);
     void HideTagManager(void);
     void HideSettingsWindow(void);
     void HideMessageViewer(bool checkstate);
