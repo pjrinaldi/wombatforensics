@@ -25,7 +25,6 @@
 #include <QtEndian>
 
 #include <blake3.h>
-//#include <zstd.h>
 #include <lz4.h>
 #include <lz4frame.h>
 

@@ -452,9 +452,10 @@ std::string Verify(QString outstr)
         }
     }
     //printf("original md5: %s\n", md5hash.c_str());
+    /*
     int ofile = open(outstr.toStdString().c_str(), O_RDONLY);
     ioctl(ofile, BLKGETSIZE64, &totalbytes);
-    if(hashtype == 1) // BLAKE3
+    if(hashtype == 1) // WFI
     {
         totalbytes = imagesize;
         //totalbytes = imgsize;
@@ -462,9 +463,10 @@ std::string Verify(QString outstr)
     qDebug() << "totalbytes:" << totalbytes;
     //qDebug() << "imgsize:" << imgsize << "totalbytes:" << totalbytes;
     close(ofile);
+    */
     //std::ofstream logfile;
-    time_t starttime = time(NULL);
-    char buff[35];
+    //time_t starttime = time(NULL);
+    //char buff[35];
     //logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
     //logfile << "\nStarting Image Verification at " << GetDateTime(buff) << "\n";
     if(hashtype == 0)
@@ -520,6 +522,119 @@ std::string Verify(QString outstr)
     }
     else if(hashtype == 1) // WFI
     {
+        QFile wfi(outstr);
+        if(!wfi.isOpen())
+            wfi.open(QIODevice::ReadOnly);
+        QDataStream in(&wfi);
+        if(in.version() != QDataStream::Qt_5_15)
+        {
+            qDebug() << "Wrong Qt Data Stream version:" << in.version();
+            //return 1;
+        }
+        quint64 header;
+        in >> header;
+        if(header == 0x776f6d6261746669) // wombat forensic image
+        {
+            // HOW TO GET FRAME INDEX LIST OUT OF THE WFI FILE 
+            QList<qint64> frameindxlist;
+            frameindxlist.clear();
+            FindNextFrame(0, &frameindxlist, &wfi);
+
+            wfi.seek(0);
+
+            uint8_t version;
+            quint16 sectorsize;
+            quint32 blocksize;
+            quint64 totalbytes;
+            QString casenumber;
+            QString evidnumber;
+            QString examiner;
+            QString description;
+            in >> header >> version >> sectorsize >> blocksize >> totalbytes >> casenumber >> evidnumber >> examiner >> description;
+            if(header != 0x776f6d6261746669)
+            {
+                qDebug() << "Wrong file type, not a wombat forensic image.";
+                //return 1;
+            }
+            if(version != 1)
+            {
+                qDebug() << "Not the correct wombat forensic image format.";
+                //return 1;
+            }
+            
+            //printf("wombatverify v0.1 started at: %s\n", QDateTime::currentDateTime().toString("MM/dd/yyyy hh:mm:ss ap").toStdString().c_str());
+            uint8_t imghash[BLAKE3_OUT_LEN];
+            blake3_hasher imghasher;
+            blake3_hasher_init(&imghasher);
+            LZ4F_dctx* lz4dctx;
+            LZ4F_errorCode_t errcode;
+            errcode = LZ4F_createDecompressionContext(&lz4dctx, LZ4F_getVersion());
+            //if(LZ4F_isError(errcode))
+                //printf("%s\n", LZ4F_getErrorName(errcode));
+            char* cmpbuf = new char[2*blocksize];
+            quint64 frameoffset = 0;
+            quint64 framesize = 0;
+            quint64 curpos = 0;
+
+            size_t ret = 1;
+            size_t bread = 0;
+            for(int i=0; i < (totalbytes / blocksize); i++)
+            {
+                frameoffset = frameindxlist.at(i);
+                //frameoffset = indxlist.at(i).toULongLong();
+                if(i == ((totalbytes / blocksize) - 1))
+                    framesize = totalbytes - frameoffset;
+                else
+                {
+                    framesize = frameindxlist.at(i+1) - frameoffset;
+                    //framesize = indxlist.at(i+1).toULongLong() - frameoffset;
+                }
+                int bytesread = in.readRawData(cmpbuf, framesize);
+                bread = bytesread;
+                size_t rawbufsize = blocksize;
+                char* rawbuf = new char[rawbufsize];
+                size_t dstsize = rawbufsize;
+                ret = LZ4F_decompress(lz4dctx, rawbuf, &dstsize, cmpbuf, &bread, NULL);
+                //if(LZ4F_isError(ret))
+                //    printf("decompress error %s\n", LZ4F_getErrorName(ret));
+                blake3_hasher_update(&imghasher, rawbuf, dstsize);
+                curpos += dstsize;
+                //printf("Verifying %llu of %llu bytes\r", curpos, totalbytes);
+                fflush(stdout);
+            }
+            blake3_hasher_finalize(&imghasher, imghash, BLAKE3_OUT_LEN);
+            QString calchash = "";
+            for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+            {
+                //printf("%02x", imghash[i]);
+                calchash.append(QString("%1").arg(imghash[i], 2, 16, QChar('0')));
+            }
+            //printf(" - Forensic Image Hash\n");
+
+            //HOW TO GET HASH OUT OF THE IMAGE FOR THE WOMBATVERIFY FUNCTION...
+            wfi.seek(wfi.size() - 132);
+            QString readhash = "";
+            in >> readhash;
+            wfi.close();
+            delete[] cmpbuf;
+
+            errcode = LZ4F_freeDecompressionContext(lz4dctx);
+
+            imgname += " Verification ";
+            // VERIFY HASHES HERE...
+            if(calchash == readhash)
+            {
+                imgname += "Successful";
+                //printf("\nVerification Successful\n");
+            }
+            else
+            {
+                imgname += "Failed";
+                //printf("\nVerification Failed\n");
+            }
+            //printf("Finished Forensic Image Verification at %s\n", QDateTime::currentDateTime().toString("MM/dd/yyyy hh:mm:ss ap").toStdString().c_str());
+        }
+
         /*
         int obytes = 0;
         std::stringstream srcstr;
@@ -564,8 +679,58 @@ std::string Verify(QString outstr)
     }
     else if(hashtype == 2) // WLI
     {
+        QFile wfi(outstr);
+        if(!wfi.isOpen())
+            wfi.open(QIODevice::ReadOnly);
+        QDataStream in(&wfi);
+        if(in.version() != QDataStream::Qt_5_15)
+        {
+            qDebug() << "Wrong Qt Data Stream version:" << in.version();
+            //return 1;
+        }
+        quint64 header;
+        in >> header;
+        if(header == 0x776f6d6261746c69) // wombat logical image
+        {
+            //printf("wombatverify v0.1 started at: %s\n", QDateTime::currentDateTime().toString("MM/dd/yyyy hh:mm:ss ap").toStdString().c_str());
+            wfi.seek(0);
+            qint64 imgsize = wfi.size() - 132;
+            blake3_hasher logicalhasher;
+            blake3_hasher_init(&logicalhasher);
+            qint64 curpos = 0;
+            while(!wfi.atEnd())
+            {
+                QByteArray tmparray = wfi.read(65536);
+                curpos += tmparray.count();
+                if(curpos > imgsize)
+                    tmparray.chop(132);
+                blake3_hasher_update(&logicalhasher, tmparray.data(), tmparray.count());
+                //printf("Verifying %llu of %llu bytes\r", curpos, imgsize);
+                //fflush(stdout);
+            }
+            // read existing hash
+            wfi.seek(imgsize);
+            QString readhash;
+            in >> readhash;
+            wfi.close();
+            uint8_t output[BLAKE3_OUT_LEN];
+            blake3_hasher_finalize(&logicalhasher, output, BLAKE3_OUT_LEN);
+            QString calchash = "";
+            for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+                calchash.append(QString("%1").arg(output[i], 2, 16, QChar('0')));
+
+            imgname += " Verification ";
+            //printf("%s - Logical Image Hash\n", calchash.toStdString().c_str());
+            if(calchash == readhash)
+                imgname += "Successful";
+                //printf("\nVerification Successful\n");
+            else
+                imgname += "Failed";
+                //printf("\nVerification Failed\n");
+            //printf("Finished Logical Image Verification at %s\n", QDateTime::currentDateTime().toString("MM/dd/yyyy hh:mm:ss ap").toStdString().c_str());
+        }
     }
-    time_t endtime = time(NULL);
+    //time_t endtime = time(NULL);
     //logfile << "\nFinished Forensic Image Verification at " << GetDateTime(buff) << "\n";
     //logfile << "Finished Forensic Image Verification in: " << difftime(endtime, starttime) << " seconds\n";
     //logfile.close();
