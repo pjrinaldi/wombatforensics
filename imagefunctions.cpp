@@ -316,48 +316,34 @@ std::string Verify(QString outstr)
     unsigned int sectorsize = 512;
     QString blake3str = "";
 
-    /*
-        QFile efile(imgpath);
-        if(!efile.isOpen())
-            efile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(efile.isOpen())
+    QFile efile(outstr);
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        QDataStream in(&efile);
+        efile.seek(0);
+        if(in.version() != QDataStream::Qt_5_15)
         {
-            qint64 imagesize = efile.size();
-            efile.seek(efile.size() - 9);
-            if(QString(efile.read(9)) == "</imglog>")
-            {
-                hashtype = 1; // BLAKE3
-                efile.seek(efile.size() - 1024);
-                QByteArray getlog = efile.read(1024);
-                //QString getlog  QString(efile.read(1024));
-                //qDebug() << "getlog:" << getlog;
-                int sizestart = getlog.indexOf("<size>");
-                int sizeend = getlog.indexOf("</size>");
-                imgsize = getlog.mid(sizestart + 6, sizeend - sizestart - 6).toInt();
-                //qDebug() << getlog.mid(sizestart + 6, sizeend - sizestart- 6);
-                int b3start = getlog.indexOf("<blake3>");
-                int b3end = getlog.indexOf("</blake3>");
-                QString blake3str = getlog.mid(b3start + 8, b3end - b3start - 8);
-                qDebug() << "blake3str:" << blake3str;
-                //blake3hash = blake3str.toInt(nullptr, 16);
-                //qDebug() << "blake3hash:" << blake3hash;
-                //qDebug() << "logstart:" << logstart;
-                //imgsize = efile.size() - logstart;
-                //qDebug() << "imglog size:" << 1024 - logstart;
-                //qDebug() << "imgsize:" << imgsize << "efile size:" << efile.size();
-                //qDebug() << "imglog found!";
-            }
-            else
-            {
-                hashtype = 0; // MD5
-                QFileInfo efileinfo(imgpath);
-                imgsize = efileinfo.size();
-                //qDebug() << "imglog not found!";
-            }
-            efile.close();
+            //qDebug() << "Wrong Qt Data Stream version:" << in.version();
+            //return 1;
         }
+        quint64 header;
+        in >> header;
+        if(header == 0x776f6d6261746669) // wombat forensic image
+        {
+            hashtype = 1; // WFI IMAGE
+        }
+        else if(header == 0x776f6d6261746c69) // wombat logical image
+        {
+            hashtype = 2; // WLI IMAGE
+        }
+        else
+            hashtype = 0; // MD5
+        efile.close();
+    }
 
-     */ 
+    /*
     QFile efile(outstr);
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -385,6 +371,8 @@ std::string Verify(QString outstr)
         efile.close();
         qDebug() << "imagesize:" << imagesize;
     }
+    */
+
     // NEED TO UPDATE THIS TO TAKE INTO ACCOUNT E01, RAW, SPLIT RAW, AND AFF PROPERLY.
     /*
     std::string mntoutstr = "";
@@ -408,16 +396,16 @@ std::string Verify(QString outstr)
     std::string curstr = "";
     if(hashtype == 0) // MD5
     {
-    std::size_t dotfnd = imgname.rfind(".");
-    std::string instr = imgname.substr(0, dotfnd);
-    std::ifstream infile(instr + ".log");
-    while(std::getline(infile, curstr))
-    {
-        std::size_t found = curstr.find(" - MD5 Forensic Image");
-        if(found != std::string::npos)
-            md5hash = curstr.substr(0, found);
-    }
-    infile.close();
+        std::size_t dotfnd = imgname.rfind(".");
+        std::string instr = imgname.substr(0, dotfnd);
+        std::ifstream infile(instr + ".log");
+        while(std::getline(infile, curstr))
+        {
+            std::size_t found = curstr.find(" - MD5 Forensic Image");
+            if(found != std::string::npos)
+                md5hash = curstr.substr(0, found);
+        }
+        infile.close();
     }
     /*
     else if(hashtype == 1) // BLAKE3
@@ -530,8 +518,9 @@ std::string Verify(QString outstr)
         }
         fclose(outfile);
     }
-    else if(hashtype == 1)
+    else if(hashtype == 1) // WFI
     {
+        /*
         int obytes = 0;
         std::stringstream srcstr;
         int infile = open(outstr.toStdString().c_str(), O_RDONLY);
@@ -571,6 +560,10 @@ std::string Verify(QString outstr)
             imgname += "Failed";
         }
         close(infile);
+        */
+    }
+    else if(hashtype == 2) // WLI
+    {
     }
     time_t endtime = time(NULL);
     //logfile << "\nFinished Forensic Image Verification at " << GetDateTime(buff) << "\n";
@@ -982,22 +975,6 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
             qDebug() << "Wrong Qt Data Stream version:" << in.version();
         }
 
-
-        /*
-        // METHOD TO GET THE SKIPPABLE FRAME INDX CONTENT !!!!!
-        wfi.seek(wfi.size() - 128 - 10000);
-        QByteArray skiparray = wfi.read(10000);
-        int isskiphead = skiparray.lastIndexOf("_*M");
-        //qDebug() << "isskiphead:" << isskiphead << skiparray.mid(isskiphead, 4).toHex();
-        QString getindx = "";
-        if(qFromBigEndian<quint32>(skiparray.mid(isskiphead, 4)) == 0x5f2a4d18)
-        {
-            //qDebug() << "skippable frame containing the index...";
-            wfi.seek(wfi.size() - 128 - 10000 + isskiphead + 8);
-            in >> getindx;
-        }
-        */
-
         wfi.seek(0);
         quint64 header;
         uint8_t version;
@@ -1011,6 +988,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         in >> header >> version >> sectorsize >> blocksize >> totalbytes >> casenumber >> evidnumber >> examiner >> description;
 	
 	qint64 lz4start = wfi.pos();
+        qint64 lz4size = wfi.size() - wfi.pos() - 132; // wfi file size - position aat start of 1st frame - blake3 hash at the end
 
         if(header != 0x776f6d6261746669)
         {
@@ -1055,7 +1033,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
             frameoffset = framelist.at(i);
             //frameoffset = indxlist.at(i).toULongLong();
 	    if(i == ((totalbytes / blocksize) - 1))
-		framesize = totalbytes - frameoffset;
+		framesize = lz4size - frameoffset;
 	    else
                 framesize = framelist.at(i+1) - frameoffset;
                 //framesize = indxlist.at(i+1).toULongLong() - frameoffset;
