@@ -4919,6 +4919,7 @@ void ParseLogicalImage(ForImg* curimg)
             parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last();
             if(j > 0)
                 parentstr += "-d" + QString::number(j-1);
+            // NEED TO IMPLEMENT THE DIRECTORY CHECK CODE HERE.
             nodedata.clear();
             //qDebug() << "filename:" << filepathlist.at(j) << "filepath:" << curdirstr << 0 << 0 << 0 << 0 << 0 << 0 << 0 << "Directory/Directory" << 5 << 0;
             nodedata << filepathlist.at(j) << curdirstr << 0 << 0 << 0 << 0 << 0 << 0 << "Directory" << "Directory" << 0 << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-d" + QString::number(j));
@@ -4927,7 +4928,7 @@ void ParseLogicalImage(ForImg* curimg)
             mutex.unlock();
             curdirstr += filepathlist.at(j) + "/";
         }
-        qDebug() << "parentstr:" << parentstr;
+        //qDebug() << "parentstr:" << parentstr;
         parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-d" + QString::number(filepathlist.count() - 1);
         //qDebug() << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig << itemtype << deleted;
         nodedata.clear();
