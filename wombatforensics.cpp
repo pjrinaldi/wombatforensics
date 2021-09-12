@@ -929,6 +929,7 @@ void WombatForensics::InitializeCaseStructure()
         dir.mkpath(wombatvariable.tmpmntpath);
         dir.mkpath(wombatvariable.tmpmntpath + "carved/");
         dir.mkpath(wombatvariable.tmpmntpath + "archives/");
+        dir.mkpath(wombatvariable.tmpmntpath + "hashlists/");
         wombatvariable.iscaseopen = true;
         InitializePreviewReport();
         bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
