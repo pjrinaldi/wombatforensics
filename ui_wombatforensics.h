@@ -333,7 +333,6 @@ public:
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionSettings);
         analysisToolBar->addAction(actionViewerManager);
-        analysisToolBar->addAction(actionHashListManager);
         analysisToolBar->addAction(actionViewMessageLog);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionView_Image_Gallery);
@@ -344,6 +343,7 @@ public:
         analysisToolBar->addAction(actionExportForensicImage);
         analysisToolBar->addSeparator();
         analysisToolBar->addAction(actionBookmark_Manager);
+        analysisToolBar->addAction(actionHashListManager);
         analysisToolBar->addAction(actionpreviewreport);
         analysisToolBar->addAction(actionpublishresults);
         analysisToolBar->addSeparator();

@@ -264,13 +264,33 @@ void WombatForensics::UnCheckChecked()
 
 void WombatForensics::ReadHashLists()
 {
-    /*
-    ui->hashlistwidget->clear();
-    QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
+    hashlistmenu->clear();
+    hashcheckedmenu->clear();
+    QDir hshdir(wombatvariable.tmpmntpath + "hashlists/");
     QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
+    QAction* newhashlistaction = new QAction("New Empty List", hashlistmenu);
+    newhashlistaction->setIcon(QIcon(":/bar/newhash"));
+    connect(newhashlistaction, SIGNAL(triggered()), this, SLOT(CreateEmptyHashList()));
+    hashlistmenu->addAction(newhashlistaction);
+    QAction* newhashlistaction1 = new QAction("New Empty List", hashcheckedmenu);
+    newhashlistaction1->setIcon(QIcon(":/bar/newhash"));
+    connect(newhashlistaction1, SIGNAL(triggered()), this, SLOT(CreateEmptyHashList()));
+    hashcheckedmenu->addAction(newhashlistaction1);
+    hashlistmenu->addSeparator();
+    hashcheckedmenu->addSeparator();
     for(int i=0; i < whllist.count(); i++)
-        ui->hashlistwidget->addItem(whllist.at(i).fileName());
-    */
+    {
+        QAction* tmpaction = new QAction(whllist.at(i).fileName(), hashlistmenu);
+        tmpaction->setIcon(QIcon(":/bar/addtohash"));
+        tmpaction->setData(QVariant("h" + QString::number(i)));
+        connect(tmpaction, SIGNAL(triggered()), this, SLOT(AddExistingHashList()));
+        QAction* tmpaction1 = new QAction(whllist.at(i).fileName(), hashcheckedmenu);
+        tmpaction1->setIcon(QIcon(":/bar/addtohash"));
+        tmpaction1->setData(QVariant("h" + QString::number(i)));
+        connect(tmpaction1, SIGNAL(triggered()), this, SLOT(AddExistingHashList()));
+        hashlistmenu->addAction(tmpaction);
+        hashcheckedmenu->AddAction(tmpaction1);
+    }
 }
 
 void WombatForensics::ReadBookmarks()
@@ -288,7 +308,7 @@ void WombatForensics::ReadBookmarks()
     connect(newtagaction, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     bookmarkmenu->addAction(newtagaction);
     QAction* newtagaction1 = new QAction("New Tag", tagcheckedmenu);
-    newtagaction->setIcon(QIcon(":/bar/newtag"));
+    newtagaction1->setIcon(QIcon(":/bar/newtag"));
     connect(newtagaction1, SIGNAL(triggered()), this, SLOT(CreateNewTag()));
     tagcheckedmenu->addAction(newtagaction1);
     bookmarkmenu->addSeparator();

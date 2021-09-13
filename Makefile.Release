@@ -547,14 +547,15 @@ release/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/dig.png \
 		Resources/bookmark-new.png \
 		Resources/PossibleGraphics/pie_chart_003.png \
-		Resources/icons8-spade-40.png \
 		Resources/PossibleGraphics/publish/paperairplane2.png \
+		Resources/icons8-spade-40.png \
 		Resources/accessories-calculator.svg \
 		Resources/thumbmissing.png \
 		Resources/bookmark-rem.svg \
 		Resources/xchomp.png \
 		Resources/searchhex.png \
 		Resources/extension.svg \
+		Resources/existinghash.png \
 		Resources/applications-system.png \
 		Resources/checkbox.png \
 		Resources/bookmark.png \
@@ -574,6 +575,7 @@ release/qrc_wombatforensics.cpp: wombatforensics.qrc \
 		Resources/list-add.svg \
 		Resources/burrow.png \
 		Resources/window-new.png \
+		Resources/newhash.png \
 		Resources/exportfilestoimage.png.svg \
 		Resources/carvetypes
 	/usr/bin/rcc -name wombatforensics wombatforensics.qrc -o release/qrc_wombatforensics.cpp

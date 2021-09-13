@@ -134,7 +134,6 @@
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="actionViewerManager"/>
-   <addaction name="actionHashListManager"/>
    <addaction name="actionViewMessageLog"/>
    <addaction name="separator"/>
    <addaction name="actionView_Image_Gallery"/>
@@ -145,6 +144,7 @@
    <addaction name="actionExportForensicImage"/>
    <addaction name="separator"/>
    <addaction name="actionBookmark_Manager"/>
+   <addaction name="actionHashListManager"/>
    <addaction name="actionpreviewreport"/>
    <addaction name="actionpublishresults"/>
    <addaction name="separator"/>

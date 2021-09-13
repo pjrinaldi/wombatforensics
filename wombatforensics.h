@@ -291,6 +291,7 @@ private slots:
     void PrepareEvidenceImage(void);
     void SetHexOffset(void);
     void CreateNewTag(void);
+    void CreateEmptyHashList(void);
     void SetBookmark(void);
     void RemoveTag(void);
     void UnCheckChecked(void);
