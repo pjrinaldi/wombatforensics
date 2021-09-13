@@ -266,7 +266,7 @@ void WombatForensics::ReadHashLists()
 {
     hashlistmenu->clear();
     hashcheckedmenu->clear();
-    QDir hshdir(wombatvariable.tmpmntpath + "hashlists/");
+    QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
     QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
     QAction* newhashlistaction = new QAction("New Empty List", hashlistmenu);
     newhashlistaction->setIcon(QIcon(":/bar/newhash"));
@@ -289,7 +289,7 @@ void WombatForensics::ReadHashLists()
         tmpaction1->setData(QVariant("h" + QString::number(i)));
         connect(tmpaction1, SIGNAL(triggered()), this, SLOT(AddExistingHashList()));
         hashlistmenu->addAction(tmpaction);
-        hashcheckedmenu->AddAction(tmpaction1);
+        hashcheckedmenu->addAction(tmpaction1);
     }
 }
 
@@ -455,6 +455,10 @@ void WombatForensics::RemoveTag()
     }
 }
 
+void WombatForensics::CreateEmptyHashList(void)
+{
+}
+
 void WombatForensics::CreateNewTag()
 {
     QAction* tagaction = qobject_cast<QAction*>(sender());
@@ -498,6 +502,10 @@ void WombatForensics::CreateNewTag()
         else
             QMessageBox::information(this, "Tag Exists", "Tag Not Added. Tag Name Already Exists.", QMessageBox::Ok);
     }
+}
+
+void WombatForensics::AddExistingHashList(void)
+{
 }
 
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
@@ -988,6 +996,7 @@ void WombatForensics::InitializeCaseStructure()
         }
         qInfo() << "Bookmarks File Created";
         ReadBookmarks();
+        ReadHashLists();
         logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
         logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         msglog->clear();
@@ -1089,6 +1098,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
         InitializePreviewReport();
     //qInfo() << "Bookmarks File Created";
     ReadBookmarks();
+    ReadHashLists();
     logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
     logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
     msglog->clear();
@@ -1616,6 +1626,7 @@ void WombatForensics::UpdateStatus()
     connect(pathtreeview->header(), SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(HeaderContextMenu(const QPoint &)));
 
     ReadBookmarks();
+    ReadHashLists();
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(PathSelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
@@ -3629,6 +3640,7 @@ void WombatForensics::on_actionHashListManager_triggered()
     hashlistmanager = new HashListManager(this);
     hashlistmanager->setWindowIcon(QIcon(":/bar/hashlist"));
     connect(hashlistmanager, SIGNAL(HideHashListManager()), this, SLOT(HideHashListManager()), Qt::DirectConnection);
+    connect(hashlistmanager, SIGNAL(ReadHashLists()), this, SLOT(ReadHashLists()), Qt::DirectConnection);
     hashlistmanager->show();
 }
 

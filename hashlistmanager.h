@@ -31,6 +31,7 @@ private slots:
 
 signals:
     void HideHashListManager();
+    void ReadHashLists();
 
 protected:
     void closeEvent(QCloseEvent* event);

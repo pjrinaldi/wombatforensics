@@ -44,6 +44,7 @@ void HashListManager::ImportHashList()
         tmpfile.copy(wombatvariable.tmpmntpath + "hashlists/" + files.at(i).split("/").last());
     }
     UpdateList();
+    emit ReadHashLists();
 }
 
 void HashListManager::CreateHashList()
@@ -68,6 +69,7 @@ void HashListManager::CreateHashList()
         tmpfile.close();
         ui->hashlistwidget->addItem(emptyfilename);
     }
+    emit ReadHashLists();
 }
 
 void HashListManager::DeleteSelectedList()
@@ -76,6 +78,7 @@ void HashListManager::DeleteSelectedList()
     QFile tmphashlistfile(wombatvariable.tmpmntpath + "hashlists/" + curitem->text());
     tmphashlistfile.remove();
     delete curitem;
+    emit ReadHashLists();
 }
 
 /*

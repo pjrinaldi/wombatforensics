@@ -292,6 +292,7 @@ private slots:
     void SetHexOffset(void);
     void CreateNewTag(void);
     void CreateEmptyHashList(void);
+    void AddExistingHashList(void);
     void SetBookmark(void);
     void RemoveTag(void);
     void UnCheckChecked(void);
