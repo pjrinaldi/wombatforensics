@@ -646,3 +646,98 @@ QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
 
     return extentstring;
 }
+
+QString HashFiles(QString itemid)
+{
+    QString hashstr = "";
+
+    return hashstr;
+}
+/*
+QString HashFiles(QString itemid)
+{
+    QString selectedid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList("*-" + selectedid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    QString evidencename = evidfiles.at(0).split("-e").first();
+    QString tmpstr = "";
+    QFile estatfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
+    if(!estatfile.isOpen())
+        estatfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(estatfile.isOpen())
+    {
+        tmpstr = estatfile.readLine();
+        estatfile.close();
+    }
+    QByteArray filecontent;
+    filecontent.clear();
+    QString layout = "";
+    QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + selectedid.split("-").at(1) + "/" + selectedid.split("-").at(2) + ".prop");
+    if(!fpropfile.isOpen())
+        fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(fpropfile.isOpen())
+    {
+        QString line = "";
+        while(!fpropfile.atEnd())
+        {
+            line = fpropfile.readLine();
+            if(line.startsWith("Layout"))
+            {
+                layout = line.split("|").at(1);
+                break;
+            }
+        }
+        fpropfile.close();
+    }
+    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+    QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+    if(!efile.isOpen())
+        efile.open(QIODevice::ReadOnly);
+    if(efile.isOpen())
+    {
+        for(int i=0; i < layoutlist.count(); i++)
+        {
+            efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+            filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+        }
+        efile.close();
+    }
+    QDir dir;
+    dir.mkpath(wombatvariable.tmpfilepath);
+    hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
+    QFile tmpfile(hexstring);
+    if(!tmpfile.isOpen())
+        tmpfile.open(QIODevice::WriteOnly);
+    if(tmpfile.isOpen())
+    {
+        tmpfile.write(filecontent);
+        tmpfile.close();
+    }
+
+    QFile bfile(filename);
+    if(!bfile.isOpen())
+        bfile.open(QIODevice::ReadOnly);
+    bfile.seek(0);
+    blake3_hasher hasher;
+    blake3_hasher_init(&hasher);
+    while(!bfile.atEnd())
+    {
+        QByteArray tmparray = bfile.read(65536);
+        blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
+    }
+    uint8_t output[BLAKE3_OUT_LEN];
+    blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
+    QString srchash = "";
+    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+    {
+        srchash.append(QString("%1").arg(output[i], 2, 16, QChar('0')));
+    }
+    srchash += "," + filename;
+
+    return srchash;
+}
+
+void WriteHash(QString hashstring)
+{
+}
+ */ 

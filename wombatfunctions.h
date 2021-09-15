@@ -41,4 +41,6 @@ QString ConvertUnixTimeToString(uint32_t input);
 uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate);
 QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize);
 
+QString HashFiles(QString itemid);
+
 #endif // wombatfunctions.h

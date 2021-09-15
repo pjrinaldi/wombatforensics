@@ -457,8 +457,11 @@ void WombatForensics::RemoveTag()
 
 void WombatForensics::CreateEmptyHashList(void)
 {
-    /*
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    QString parentmenu = qobject_cast<QMenu*>(tagaction->parentWidget())->title();
     QString emptyfilename = "";
+    QStringList filestohash;
+    filestohash.clear();
     QInputDialog* newdialog = new QInputDialog(this);
     newdialog->setCancelButtonText("Cancel");
     newdialog->setInputMode(QInputDialog::TextInput);
@@ -474,12 +477,47 @@ void WombatForensics::CreateEmptyHashList(void)
         if(!emptyfilename.endsWith(".whl"))
             emptyfilename = emptyfilename + ".whl";
         QFile tmpfile(wombatvariable.tmpmntpath + "hashlists/" + emptyfilename);
-        tmpfile.open(QIODevice::WriteOnly | QIODevice::Text);
-        tmpfile.close();
-        ui->hashlistwidget->addItem(emptyfilename);
+        if(!tmpfile.exists())
+        {
+            tmpfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            tmpfile.close();
+            ReadHashLists();
+            if(parentmenu.contains("Selected")) // single file
+            {
+                filestohash.append(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+            }
+            else if(parentmenu.contains("Checked")) // checked files
+            {
+                QStringList checkeditems = GetFileLists(1);
+                filestohash.append(checkeditems);
+                /*
+                for(int i=0; i < checkeditems.count(); i++)
+                {
+                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                    if(indexlist.count() > 0)
+                    {
+                        QModelIndex curindex = ((QModelIndex)indexlist.first());
+                        filestohash.append(curindex.id);
+                        //TagFile(curindex, tagname);
+                    }
+                }
+                */
+            }
+            qDebug() << "filestoshash:" << filestohash;
+            QStringList fileshashes = QtConcurrent::blockingMapped(filestohash, HashFiles);
+            // for each hash, write it to the file
+            // tmpfile.open();
+            // for i < filehashes.count(); i++)
+            //hashfile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+            //QTextStream out;
+            //out.setDevice(&hashfile);
+            //out << hashstring << Qt::endl;
+            //hashfile.close();
+            // out << fileshashes.at(i)
+        }
+        else
+            QMessageBox::information(this, "Hash List Exists", "Hash List not created, already exists.", QMessageBox::Ok);
     }
-    emit ReadHashLists();
-     */ 
 }
 
 void WombatForensics::CreateNewTag()
@@ -525,10 +563,6 @@ void WombatForensics::CreateNewTag()
         else
             QMessageBox::information(this, "Tag Exists", "Tag Not Added. Tag Name Already Exists.", QMessageBox::Ok);
     }
-}
-
-void WombatForensics::AddExistingHashList(void)
-{
 }
 
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
@@ -587,6 +621,15 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
     */
     else
         qInfo() << "Can only tag files and directories, not evidence images, volumes or partitions.";
+}
+
+void WombatForensics::AddExistingHashList(void)
+{
+    QAction* hashaction = qobject_cast<QAction*>(sender());
+    QString parentmenu = qobject_cast<QMenu*>(hashaction->parentWidget())->title();
+    QString hashlistfilename = hashaction->text();
+    // get selected file or checked files, run hashfiles function
+    // open this file, adn loop over returned hash+files and add to the resepective file.
 }
 
 void WombatForensics::SetBookmark()
