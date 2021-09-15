@@ -457,6 +457,29 @@ void WombatForensics::RemoveTag()
 
 void WombatForensics::CreateEmptyHashList(void)
 {
+    /*
+    QString emptyfilename = "";
+    QInputDialog* newdialog = new QInputDialog(this);
+    newdialog->setCancelButtonText("Cancel");
+    newdialog->setInputMode(QInputDialog::TextInput);
+    newdialog->setLabelText("Enter Hash List Name");
+    newdialog->setOkButtonText("Create Empty List");
+    newdialog->setTextEchoMode(QLineEdit::Normal);
+    newdialog->setWindowTitle("Create Empty Wombat Hash List");
+    if(newdialog->exec())
+        emptyfilename = newdialog->textValue();
+    if(!emptyfilename.isEmpty())
+    {
+        //qDebug() << "Create Empty Hash List.";
+        if(!emptyfilename.endsWith(".whl"))
+            emptyfilename = emptyfilename + ".whl";
+        QFile tmpfile(wombatvariable.tmpmntpath + "hashlists/" + emptyfilename);
+        tmpfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        tmpfile.close();
+        ui->hashlistwidget->addItem(emptyfilename);
+    }
+    emit ReadHashLists();
+     */ 
 }
 
 void WombatForensics::CreateNewTag()
