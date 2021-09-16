@@ -503,6 +503,9 @@ void WombatForensics::CreateEmptyHashList(void)
                 }
                 */
             }
+	    //qDebug() << "existing evidence:" << existingevidence;
+	    // SHOULD SWITCH FROM NEWEVIDENCE/EXISTINGEVIDENCE TO NEWFORIMGLIST/EXISTINGFORIMGLIST
+	    qDebug() << "existingforimglist:" << existingforimglist.first()->ImgPath() << existingforimglist.first()->MountPath();
             qDebug() << "filestoshash:" << filestohash;
             QStringList fileshashes = QtConcurrent::blockingMapped(filestohash, HashFiles);
             // for each hash, write it to the file
@@ -1661,8 +1664,11 @@ void WombatForensics::UpdateStatus()
 	existingevidence.append(newevidence.at(i));
     }
     //newevid.clear();
+    //for(int i=0; i < newforimglist.count(); i++)
+    existingforimglist.append(newforimglist);
 
     newevidence.clear();
+    newforimglist.clear();
     //PrepareEvidenceImage();
     //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
     for(int i=0; i < evidrepdatalist.count(); i++)
@@ -3050,6 +3056,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             edir.removeRecursively();
             // 4. Delete from existingevidence.
             existingevidence.removeOne(remevidlist.at(i));
+	    // 4.5 Delete from existingforimglist.
             // 5. Remove TreeNode.
             QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())
