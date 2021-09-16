@@ -29,11 +29,18 @@ void AddEvidenceDialog::SelectEvidence()
     bool alreadyadded = false;
     if(addeviddialog.exec())
         evidfilename = addeviddialog.selectedFiles().first();
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+	if(existingforimglist.at(i)->ImgPath().contains(evidfilename))
+	    alreadyadded = true;
+    }
+    /*
     for(int i=0; i < existingevidence.count();i++)
     {
         if(existingevidence.at(i).contains(evidfilename))
             alreadyadded = true;
     }
+    */
     if(alreadyadded == false)
     {
         if(evidfilename.toLower().endsWith(".dd") || evidfilename.toLower().endsWith(".raw") || evidfilename.toLower().endsWith(".e01") || evidfilename.toLower().endsWith(".000") || evidfilename.toLower().endsWith(".001") || evidfilename.toLower().endsWith(".aff") || evidfilename.toLower().endsWith(".image") || evidfilename.toLower().endsWith(".dmg") || evidfilename.toLower().endsWith(".sfs") || evidfilename.toLower().endsWith(".zmg") || evidfilename.toLower().endsWith(".wfi") || evidfilename.toLower().endsWith(".wli"))// || evidfilename.toLower().endsWith("aff4"))
@@ -107,11 +114,18 @@ void AddEvidenceDialog::dropEvent(QDropEvent* e)
     bool alreadyadded = false;
     foreach(const QUrl &url, e->mimeData()->urls())
     {
+	for(int i=0; i < existingforimglist.count(); i++)
+	{
+	    if(existingforimglist.at(i)->ImgPath().contains(url.toLocalFile().split("/").last()))
+		alreadyadded = true;
+	}
+	/*
         for(int i=0; i < existingevidence.count(); i++)
         {
             if(existingevidence.at(i).contains(url.toLocalFile().split("/").last()))
                 alreadyadded = true;
         }
+	*/
         if(alreadyadded == false)
         {
             ui->evidencelist->addItem(url.toLocalFile());

@@ -229,7 +229,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     */
     checkhash.clear();
     listeditems.clear();
-    existingevidence.clear();
+    //existingevidence.clear();
     partitionlist.clear();
     carvecounthash.clear();
     treenodemodel = new TreeNodeModel();
@@ -1179,7 +1179,8 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     ui->actionpublishresults->setEnabled(true);
     autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
     UpdateEvidenceList();
-    if(existingevidence.count() > 0)
+    //if(existingevidence.count() > 0)
+    if(existingforimglist.count() > 0)
     {
         /*
         for(int i=0; i < existingevidence.count(); i++)
@@ -1658,11 +1659,13 @@ void WombatForensics::UpdateStatus()
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
     //UpdateEvidenceList();
+    /*
     for(int i=0; i < newevidence.count(); i++)
     {
 	//existingevid.append(newevid.at(i));
 	existingevidence.append(newevidence.at(i));
     }
+    */
     //newevid.clear();
     //for(int i=0; i < newforimglist.count(); i++)
     existingforimglist.append(newforimglist);
@@ -2923,7 +2926,7 @@ void WombatForensics::CloseCurrentCase()
     */
     carvecounthash.clear();
     partitionlist.clear();
-    existingevidence.clear();
+    //existingevidence.clear();
     newevidence.clear();
     //newevid.clear();
     //existingevid.clear();
@@ -3054,9 +3057,14 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
             // 3. Delete evid directory.
             QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
             edir.removeRecursively();
-            // 4. Delete from existingevidence.
-            existingevidence.removeOne(remevidlist.at(i));
-	    // 4.5 Delete from existingforimglist.
+            // 4.5 Delete from existingevidence.
+            //existingevidence.removeOne(remevidlist.at(i));
+	    // 4. Delete from existingforimglist.
+	    for(int j=0; j < existingforimglist.count(); j++)
+	    {
+		if(existingforimglist.at(j)->ImgPath().contains(remevidlist.at(i)))
+		    existingforimglist.removeAt(j);
+	    }
             // 5. Remove TreeNode.
             QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())
@@ -4376,11 +4384,15 @@ void WombatForensics::SaveTreeModel(void)
     if(treefile.isOpen())
     {
         QTextStream stream(&treefile);
+	for(int i=0; i < existingforimglist.count(); i++)
+	    PrintTree(0, treenodemodel->index(i, 0), stream);
+	/*
         for(int i=0; i < existingevidence.count(); i++)
         {
             //qDebug() << "existingevidence:" << existingevidence.at(i);
             PrintTree(0, treenodemodel->index(i, 0), stream);
         }
+	*/
         //PrintTree(0, treenodemodel->index(0, 0), stream);
         stream.flush();
         treefile.close();
