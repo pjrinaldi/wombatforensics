@@ -650,94 +650,47 @@ QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
 QString HashFiles(QString itemid)
 {
     QString hashstr = "";
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+	if(existingforimglist.at(i)->MountPath().endsWith(itemid.split("-").at(0)))
+	{
+	    //qDebug() << "match evid:" << existingforimglist.at(i)->MountPath();
+	    QString layout = "";
+	    QFile fpropfile(existingforimglist.at(i)->MountPath() + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2) + ".prop");
+	    if(!fpropfile.isOpen())
+		fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+	    if(fpropfile.isOpen())
+	    {
+		QString line = "";
+		while(!fpropfile.atEnd())
+		{
+		    line = fpropfile.readLine();
+		    if(line.startsWith("Layout"))
+		    {
+			layout = line.split("|").at(1);
+			break;
+		    }
+		}
+		fpropfile.close();
+	    }
+	    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+	    blake3_hasher hasher;
+	    blake3_hasher_init(&hasher);
+	    for(int j=0; j < layoutlist.count(); j++)
+	    {
+		QByteArray tmparray = existingforimglist.at(i)->ReadContent(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong(), layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong());
+		blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
+	    }
+	    uint8_t output[BLAKE3_OUT_LEN];
+	    blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
+	    for(size_t j=0; j < BLAKE3_OUT_LEN; j++)
+		hashstr.append(QString("%1").arg(output[j], 2, 16, QChar('0')));
+	    // NOT SURE HOW TO GET FILENAME OR BEST WAY TO DO THAT, WHETHER IT SHOULD BE THE ID OR THE PATH+FILENAME OR JUST FILENAME
+	    // ID WILL ENABLE IT TO BE TIED BACK TO A PIECE OF EVIDENCE AND AVOID CONFUSION AS TO WHICH FILE IN WHICH EVIDENCE IMAGE IS IT SUCH AS IMAGE_100.JPG
+	    // FOR NOW I WILL PUT itemid IN PLACE OF THE PATH+FILENAME
+	    hashstr += "," + itemid;
+	}
+    }
 
     return hashstr;
 }
-/*
-QString HashFiles(QString itemid)
-{
-    QString selectedid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList("*-" + selectedid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
-    QString evidencename = evidfiles.at(0).split("-e").first();
-    QString tmpstr = "";
-    QFile estatfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
-    if(!estatfile.isOpen())
-        estatfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(estatfile.isOpen())
-    {
-        tmpstr = estatfile.readLine();
-        estatfile.close();
-    }
-    QByteArray filecontent;
-    filecontent.clear();
-    QString layout = "";
-    QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + selectedid.split("-").at(1) + "/" + selectedid.split("-").at(2) + ".prop");
-    if(!fpropfile.isOpen())
-        fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(fpropfile.isOpen())
-    {
-        QString line = "";
-        while(!fpropfile.atEnd())
-        {
-            line = fpropfile.readLine();
-            if(line.startsWith("Layout"))
-            {
-                layout = line.split("|").at(1);
-                break;
-            }
-        }
-        fpropfile.close();
-    }
-    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
-    QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
-    if(!efile.isOpen())
-        efile.open(QIODevice::ReadOnly);
-    if(efile.isOpen())
-    {
-        for(int i=0; i < layoutlist.count(); i++)
-        {
-            efile.seek(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-            filecontent.append(efile.read(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-        }
-        efile.close();
-    }
-    QDir dir;
-    dir.mkpath(wombatvariable.tmpfilepath);
-    hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
-    QFile tmpfile(hexstring);
-    if(!tmpfile.isOpen())
-        tmpfile.open(QIODevice::WriteOnly);
-    if(tmpfile.isOpen())
-    {
-        tmpfile.write(filecontent);
-        tmpfile.close();
-    }
-
-    QFile bfile(filename);
-    if(!bfile.isOpen())
-        bfile.open(QIODevice::ReadOnly);
-    bfile.seek(0);
-    blake3_hasher hasher;
-    blake3_hasher_init(&hasher);
-    while(!bfile.atEnd())
-    {
-        QByteArray tmparray = bfile.read(65536);
-        blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
-    }
-    uint8_t output[BLAKE3_OUT_LEN];
-    blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
-    QString srchash = "";
-    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
-    {
-        srchash.append(QString("%1").arg(output[i], 2, 16, QChar('0')));
-    }
-    srchash += "," + filename;
-
-    return srchash;
-}
-
-void WriteHash(QString hashstring)
-{
-}
- */ 

@@ -505,9 +505,10 @@ void WombatForensics::CreateEmptyHashList(void)
             }
 	    //qDebug() << "existing evidence:" << existingevidence;
 	    // SHOULD SWITCH FROM NEWEVIDENCE/EXISTINGEVIDENCE TO NEWFORIMGLIST/EXISTINGFORIMGLIST
-	    qDebug() << "existingforimglist:" << existingforimglist.first()->ImgPath() << existingforimglist.first()->MountPath();
+	    //qDebug() << "existingforimglist:" << existingforimglist.first()->ImgPath() << existingforimglist.first()->MountPath();
             qDebug() << "filestoshash:" << filestohash;
             QStringList fileshashes = QtConcurrent::blockingMapped(filestohash, HashFiles);
+	    qDebug() << "filehashes:" << fileshashes;
             // for each hash, write it to the file
             // tmpfile.open();
             // for i < filehashes.count(); i++)
