@@ -490,18 +490,6 @@ void WombatForensics::CreateEmptyHashList(void)
             {
                 QStringList checkeditems = GetFileLists(1);
                 filestohash.append(checkeditems);
-                /*
-                for(int i=0; i < checkeditems.count(); i++)
-                {
-                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-                    if(indexlist.count() > 0)
-                    {
-                        QModelIndex curindex = ((QModelIndex)indexlist.first());
-                        filestohash.append(curindex.id);
-                        //TagFile(curindex, tagname);
-                    }
-                }
-                */
             }
 	    //qDebug() << "existing evidence:" << existingevidence;
 	    // SHOULD SWITCH FROM NEWEVIDENCE/EXISTINGEVIDENCE TO NEWFORIMGLIST/EXISTINGFORIMGLIST
