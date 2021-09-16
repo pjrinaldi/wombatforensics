@@ -1670,7 +1670,7 @@ void WombatForensics::UpdateStatus()
     //for(int i=0; i < newforimglist.count(); i++)
     existingforimglist.append(newforimglist);
 
-    newevidence.clear();
+    //newevidence.clear();
     newforimglist.clear();
     //PrepareEvidenceImage();
     //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
@@ -1734,15 +1734,17 @@ QList<ForImg*> existingforimglist;
      */ 
     //newevid.clear();
     newforimglist.clear();
-    newevidence.clear();
+    //newevidence.clear();
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
-    for(int i=0; i < newevidence.count(); i++)
+    //for(int i=0; i < newevidence.count(); i++)
+    for(int i=0; i < newforimglist.count(); i++)
     {
-        QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + "-e" + QString::number(ecount) + "/";
+        //QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + "-e" + QString::number(ecount) + "/";
+        QString evidencepath = wombatvariable.tmpmntpath + newforimglist.at(i)->ImgPath().split("/").last() + "-e" + QString::number(ecount) + "/";
 	QString emntpath = "";
         QDir dir;
         dir.mkpath(evidencepath);
@@ -1789,7 +1791,8 @@ QList<ForImg*> existingforimglist;
             fuserlist.push_back(EwfFuser(emntpath, newevidence.at(i)));
         */
     }
-    if(newevidence.count() > 0)
+    //if(newevidence.count() > 0)
+    if(newforimglist.count() > 0)
     {
         evidrepdatalist.clear();
         /*
@@ -2927,7 +2930,9 @@ void WombatForensics::CloseCurrentCase()
     carvecounthash.clear();
     partitionlist.clear();
     //existingevidence.clear();
-    newevidence.clear();
+    newforimglist.clear();
+    existingforimglist.clear();
+    //newevidence.clear();
     //newevid.clear();
     //existingevid.clear();
     // BEGIN TAR METHOD

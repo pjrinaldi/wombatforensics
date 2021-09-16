@@ -44,8 +44,8 @@ extern QStringList exportlist; // contains list of files to be exported
 extern QStringList digfilelist; // contains list of files to dig
 extern QStringList listeditems; // contains checked or all list of files for a case
 
-extern QStringList existingevidence; // contains the list of existing evidence
-extern QStringList newevidence; // contains the list of new evidence items
+//extern QStringList existingevidence; // contains the list of existing evidence
+//extern QStringList newevidence; // contains the list of new evidence items
 
 extern QStringList partitionlist; // contains the list of partitions for file carving
 //extern QStringList carvedtypeslist; // contains the user selected list of file carving types

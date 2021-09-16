@@ -30,12 +30,13 @@ void UpdateEvidenceList()
 {
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::Dirs | QDir::NoSymLinks);
-    existingevidence.clear();
+    existingforimglist.clear();
+    //existingevidence.clear();
     //existingevid.clear();
     //QStringList tmplist;
     for(int i=0; i < evidfiles.count(); i++)
     {
-        qDebug() << "evid:" << evidfiles.at(i);
+        //qDebug() << "evid:" << evidfiles.at(i);
         QString tmpstr = "";
         QFile efile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");
         if(!efile.isOpen())
@@ -45,12 +46,16 @@ void UpdateEvidenceList()
             tmpstr = efile.readLine();
         }
         efile.close();
-        qDebug() << "tmpstr:" << tmpstr.split(",").at(0);
+        //qDebug() << "tmpstr:" << tmpstr.split(",").at(0);
+	ForImg* tmpimg = new ForImg(tmpstr.split(",").at(0));
+	tmpimg->SetMountPath(wombatvariable.tmpmntpath + evidfiles.at(i) + "/");
+	//qDebug() << "MountPath():" << tmpimg->MountPath();
+	existingforimglist.append(tmpimg);
         //ForensicImage* tmpimage = new ForensicImage(tmpstr.split(",").at(0));
         //existingevid.append(tmpimage);
         //ForensicImage* tmpimage = new ForensicImage(evidfiles.at(i).split("-e" + QString::number(i)).first());
         //existingevid.append(tmpimage);
-        existingevidence.append(evidfiles.at(i).split("-e" + QString::number(i)).first());
+        //existingevidence.append(evidfiles.at(i).split("-e" + QString::number(i)).first());
         //tmplist.clear();
         /*
         QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");

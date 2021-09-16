@@ -40,8 +40,8 @@ QStringList propertylist;
 QStringList exportlist;
 QStringList digfilelist;
 QStringList listeditems;
-QStringList existingevidence;
-QStringList newevidence;
+//QStringList existingevidence;
+//QStringList newevidence;
 QStringList partitionlist;
 //QStringList carvedtypeslist;
 QString casepath = QDir::homePath(); // case path settings variable

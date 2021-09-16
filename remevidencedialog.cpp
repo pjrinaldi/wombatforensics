@@ -11,8 +11,12 @@ RemEvidenceDialog::RemEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
 
     // POPULATE EVIDENCE LIST
     //qDebug() << "existing evidence:" << existingevidence;
+    for(int i=0; i < existingforimglist.count(); i++)
+	ui->evidencelist->addItem(existingforimglist.at(i)->ImgPath());
+    /*
     for(int i=0; i < existingevidence.count(); i++)
         ui->evidencelist->addItem(existingevidence.at(i));
+    */
 }
 
 RemEvidenceDialog::~RemEvidenceDialog()
