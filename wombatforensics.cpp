@@ -479,7 +479,7 @@ void WombatForensics::CreateEmptyHashList(void)
         QFile tmpfile(wombatvariable.tmpmntpath + "hashlists/" + emptyfilename);
         if(!tmpfile.exists())
         {
-            tmpfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            tmpfile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
             tmpfile.close();
             ReadHashLists();
             if(parentmenu.contains("Selected")) // single file
@@ -509,15 +509,13 @@ void WombatForensics::CreateEmptyHashList(void)
             qDebug() << "filestoshash:" << filestohash;
             QStringList fileshashes = QtConcurrent::blockingMapped(filestohash, HashFiles);
 	    qDebug() << "filehashes:" << fileshashes;
-            // for each hash, write it to the file
-            // tmpfile.open();
-            // for i < filehashes.count(); i++)
-            //hashfile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
-            //QTextStream out;
-            //out.setDevice(&hashfile);
-            //out << hashstring << Qt::endl;
-            //hashfile.close();
-            // out << fileshashes.at(i)
+            if(!tmpfile.isOpen())
+                tmpfile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+            QTextStream out;
+            out.setDevice(&tmpfile);
+            for(int i=0; i < fileshashes.count(); i++)
+                out << fileshashes.at(i) << Qt::endl;
+            tmpfile.close();
         }
         else
             QMessageBox::information(this, "Hash List Exists", "Hash List not created, already exists.", QMessageBox::Ok);
