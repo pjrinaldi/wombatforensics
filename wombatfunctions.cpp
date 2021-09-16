@@ -681,6 +681,17 @@ QString HashFiles(QString itemid)
 		QByteArray tmparray = existingforimglist.at(i)->ReadContent(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong(), layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong());
 		blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
 	    }
+            /*
+            for(uint i=1; i <= (uint)layoutlist.count(); i++)
+            {
+                efile.seek(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
+                if(i * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong() <= filesize)
+                    filecontent.append(efile.read(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+                else
+                    filecontent.append(efile.read(filesize - ((i-1) * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong())));
+            }
+            efile.close();
+             */
 	    uint8_t output[BLAKE3_OUT_LEN];
 	    blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
 	    for(size_t j=0; j < BLAKE3_OUT_LEN; j++)
