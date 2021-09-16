@@ -83,10 +83,17 @@ class PathTreeView : public QTreeView
             {
                 TreeNode* itemcheck = static_cast<TreeNode*>(index.internalPointer());
                 if(!itemcheck->IsChecked())
+                {
                     itemcheck->SetChecked(true);
+                    checkhash.insert(itemcheck->Data(11).toString(), true); // used to be 0
+                }
                 else
+                {
                     itemcheck->SetChecked(false);
-		emit dataChanged(index, index);
+                    checkhash.insert(itemcheck->Data(11).toString(), false); // used to be 0
+                }
+                //treenodemodel->setData(index, 
+		emit treenodemodel->dataChanged(index, index);
                 emit treenodemodel->CheckedNodesChanged();
                 //qDebug() << "call show file here ... middle button clicked";
             }

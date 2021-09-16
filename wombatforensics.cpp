@@ -506,9 +506,9 @@ void WombatForensics::CreateEmptyHashList(void)
 	    //qDebug() << "existing evidence:" << existingevidence;
 	    // SHOULD SWITCH FROM NEWEVIDENCE/EXISTINGEVIDENCE TO NEWFORIMGLIST/EXISTINGFORIMGLIST
 	    //qDebug() << "existingforimglist:" << existingforimglist.first()->ImgPath() << existingforimglist.first()->MountPath();
-            qDebug() << "filestoshash:" << filestohash;
+            //qDebug() << "filestoshash:" << filestohash;
             QStringList fileshashes = QtConcurrent::blockingMapped(filestohash, HashFiles);
-	    qDebug() << "filehashes:" << fileshashes;
+	    //qDebug() << "filehashes:" << fileshashes;
             if(!tmpfile.isOpen())
                 tmpfile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
             QTextStream out;
@@ -630,8 +630,28 @@ void WombatForensics::AddExistingHashList(void)
     QAction* hashaction = qobject_cast<QAction*>(sender());
     QString parentmenu = qobject_cast<QMenu*>(hashaction->parentWidget())->title();
     QString hashlistfilename = hashaction->text();
+    QStringList filestohash;
+    filestohash.clear();
     // get selected file or checked files, run hashfiles function
     // open this file, adn loop over returned hash+files and add to the resepective file.
+    if(parentmenu.contains("Selected")) // single file
+    {
+        filestohash.append(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+    }
+    else if(parentmenu.contains("Checked")) // checked files
+    {
+        QStringList checkeditems = GetFileLists(1);
+        filestohash.append(checkeditems);
+    }
+    QStringList fileshashes = QtConcurrent::blockingMapped(filestohash, HashFiles);
+    QFile tmpfile(wombatvariable.tmpmntpath + "hashlists/" + hashlistfilename);
+    if(!tmpfile.isOpen())
+        tmpfile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+    QTextStream out;
+    out.setDevice(&tmpfile);
+    for(int i=0; i < fileshashes.count(); i++)
+        out << fileshashes.at(i) << Qt::endl;
+    tmpfile.close();
 }
 
 void WombatForensics::SetBookmark()

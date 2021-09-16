@@ -578,7 +578,7 @@ public:
                 itemnode->SetChecked(true);
                 checkhash.insert(itemnode->Data(11).toString(), true); // used to be 0
             }
-            //qDebug() << "checkhash:" << checkhash;
+            qDebug() << "checkhash:" << checkhash;
             emit dataChanged(index, index);
             emit CheckedNodesChanged();
             return true;
