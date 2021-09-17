@@ -657,6 +657,7 @@ QString HashFiles(QString itemid)
 	{
 	    //qDebug() << "match evid:" << existingforimglist.at(i)->MountPath();
 	    QString layout = "";
+	    quint64 logicalsize = 0;
 	    QFile fpropfile(curimg->MountPath() + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2) + ".prop");
 	    if(!fpropfile.isOpen())
 		fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -669,7 +670,11 @@ QString HashFiles(QString itemid)
 		    if(line.startsWith("Layout"))
 		    {
 			layout = line.split("|").at(1);
-			break;
+			//break;
+		    }
+		    else if(line.startsWith("Logical Size|"))
+		    {
+			logicalsize = line.split("|").at(1).toULongLong();
 		    }
 		}
 		fpropfile.close();
@@ -677,22 +682,18 @@ QString HashFiles(QString itemid)
 	    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
 	    blake3_hasher hasher;
 	    blake3_hasher_init(&hasher);
-	    for(int j=0; j < layoutlist.count(); j++)
+	    for(int j=1; j <= layoutlist.count(); j++)
 	    {
-		QByteArray tmparray = curimg->ReadContent(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong(), layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong());
+		QByteArray tmparray;
+		tmparray.clear();
+		quint64 curoffset = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
+		quint64 cursize = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
+		if(j * cursize <= logicalsize)
+		    tmparray.append(curimg->ReadContent(curoffset, cursize));
+		else
+		    tmparray.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
 		blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
 	    }
-            /*
-            for(uint i=1; i <= (uint)layoutlist.count(); i++)
-            {
-                efile.seek(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong());
-                if(i * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong() <= filesize)
-                    filecontent.append(efile.read(layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
-                else
-                    filecontent.append(efile.read(filesize - ((i-1) * layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong())));
-            }
-            efile.close();
-             */
 	    uint8_t output[BLAKE3_OUT_LEN];
 	    blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
 	    for(size_t j=0; j < BLAKE3_OUT_LEN; j++)
