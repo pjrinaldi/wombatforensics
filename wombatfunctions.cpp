@@ -652,11 +652,12 @@ QString HashFiles(QString itemid)
     QString hashstr = "";
     for(int i=0; i < existingforimglist.count(); i++)
     {
-	if(existingforimglist.at(i)->MountPath().endsWith(itemid.split("-").at(0)))
+	ForImg* curimg = existingforimglist.at(i);
+	if(curimg->MountPath().endsWith(itemid.split("-").at(0)))
 	{
 	    //qDebug() << "match evid:" << existingforimglist.at(i)->MountPath();
 	    QString layout = "";
-	    QFile fpropfile(existingforimglist.at(i)->MountPath() + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2) + ".prop");
+	    QFile fpropfile(curimg->MountPath() + "/" + itemid.split("-").at(1) + "/" + itemid.split("-").at(2) + ".prop");
 	    if(!fpropfile.isOpen())
 		fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
 	    if(fpropfile.isOpen())
@@ -678,7 +679,7 @@ QString HashFiles(QString itemid)
 	    blake3_hasher_init(&hasher);
 	    for(int j=0; j < layoutlist.count(); j++)
 	    {
-		QByteArray tmparray = existingforimglist.at(i)->ReadContent(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong(), layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong());
+		QByteArray tmparray = curimg->ReadContent(layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(0).toULongLong(), layoutlist.at(j).split(",", Qt::SkipEmptyParts).at(1).toULongLong());
 		blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
 	    }
             /*

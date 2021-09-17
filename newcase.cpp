@@ -6144,6 +6144,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 			itemtype = 5;
 		    logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(rootdiroffset + j*32 + 28, 4));
 		}
+		out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
 		//qDebug() << "logicalsize:" << logicalsize;
 		// ADD FILE INFO TO THE NODE TREE...
 		QString filepath = "";
@@ -6470,6 +6471,7 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 		}
 		out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
 		out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
+		out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
 		if(!parfilename.isEmpty())
 		    filepath = parfilename;
 		QList<QVariant> nodedata;
@@ -6637,6 +6639,7 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 		    }
 		    out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
 		    out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
+		    out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
 		    QList<QVariant> nodedata;
 		    nodedata.clear();
 		    nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray("/orphans/").toBase64() << (qulonglong)logicalsize << createdate << modifydate << accessdate << "0" << "0";
@@ -7041,6 +7044,7 @@ quint64 ParseExtDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptree
                 if(phyremcnt > 0)
                     physicalsize += blocksize;
 		out << "Physical Size|" << QString::number(physicalsize) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
+		out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
 
 		//qDebug() << "curlayout:" << curlayout;
                 curblklist.clear();
@@ -7853,6 +7857,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                             // RETURN LOGICALSIZE FOR THE NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
 			}
                         out << "Physical Size|" << QString::number(physicalsize) << "|Physical size in bytes for the file." << Qt::endl;
+			out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
                         out << "Layout|" << dirlayout << "|File layout in bytes and formatted as offset,size; entries." << Qt::endl;
 		    }
 		    else // alternate data stream
@@ -7885,6 +7890,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                         tmpprop.clear();
                         tmpnode << QString("$DATA:" + attrname) << logicalsize;
                         tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
+			tmpprop.append(QString("Logical Size|" + QString::number(logicalsize) + "|Logical size for the file in bytes."));
                         tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
                         adsnodelist.append(tmpnode);
                         adsproplist.append(tmpprop);
@@ -7912,6 +7918,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 				physicalsize = contentlength;
 				dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
                                 out << "Physical Size|" << QString::number(physicalsize) << "|Physical size for the file in bytes." << Qt::endl;
+				out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
                                 out << "Layout|" << dirlayout << "|File layout in bytes as offset,size;." << Qt::endl;
                                 // RETURN APPROPRIATE LOGICALSIZE,PHYSICALSIZE,LAYOUT FOR THE NODEDATA AND PROPERTIES FILE
 			    }
@@ -7924,6 +7931,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                                 tmpprop.clear();
                                 tmpnode << QString("$INDEX_ROOT:" + attrname) << contentlength;
                                 tmpprop.append(QString("Physical Size|" + QString::number(contentlength) + "|Physical size for the file in bytes."));
+				tmpprop.append(QString("Logical Size|" + QString::number(contentlength) + "|Logical size for the file in bytes."));
                                 tmpprop.append(QString("Layout|" + QString(QString::number(curoffset + contentoffset) + ",") + QString::number(contentlength) + ";" + "|File layout in bytes as offset,size;."));
                                 adsnodelist.append(tmpnode);
                                 adsproplist.append(tmpprop);
@@ -7955,6 +7963,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
                             tmpprop.clear();
                             tmpnode << QString("$INDEX_ALLOCATION:" + attrname) << logicalsize;
                             tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
+			    tmpprop.append(QString("Logical Size|" + QString::number(logicalsize) + "|Logical size for the file in bytes."));
                             tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
                             adsnodelist.append(tmpnode);
                             adsproplist.append(tmpprop);
@@ -8316,6 +8325,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                                     // RETURN LOGICALSIZE FOR THE NODE DATA, PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
                                 }
                                 out << "Physical Size|" << QString::number(physicalsize) << "|Physical size in bytes for the file." << Qt::endl;
+				out << "Logical Size|" << QString::number(logicalsize) << "|Logical size in bytes for the file." << Qt::endl;
                                 out << "Layout|" << dirlayout << "|File layout in bytes and formatted as offset,size; entries." << Qt::endl;
                             }
                             else // alternate data stream
@@ -8348,6 +8358,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                                 tmpprop.clear();
                                 tmpnode << QString("$DATA:" + attrname) << logicalsize;
                                 tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
+				tmpprop.append(QString("Logical Size|" + QString::number(logicalsize) + "|Logical size for the file in bytes."));
                                 tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
                                 adsnodelist.append(tmpnode);
                                 adsproplist.append(tmpprop);
@@ -8381,6 +8392,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                                         physicalsize = contentlength;
                                         dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
                                         out << "Physical Size|" << QString::number(physicalsize) << "|Physical size for the file in bytes." << Qt::endl;
+					out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
                                         out << "Layout|" << dirlayout << "|File layout in bytes as offset,size;." << Qt::endl;
                                         // RETURN APPROPRIATE LOGICALSIZE,PHYSICALSIZE,LAYOUT FOR THE NODEDATA AND PROPERTIES FILE
                                     }
@@ -8393,6 +8405,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                                         tmpprop.clear();
                                         tmpnode << QString("$INDEX_ROOT:" + attrname) << contentlength;
                                         tmpprop.append(QString("Physical Size|" + QString::number(contentlength) + "|Physical size for the file in bytes."));
+					tmpprop.append(QString("Logical Size|" + QString::number(contentlength) + "|Logical size for the file in bytes."));
                                         tmpprop.append(QString("Layout|" + QString(QString::number(curoffset + contentoffset) + ",") + QString::number(contentlength) + ";" + "|File layout in bytes as offset,size;."));
                                         adsnodelist.append(tmpnode);
                                         adsproplist.append(tmpprop);
@@ -8434,6 +8447,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 				    tmpprop.clear();
 				    tmpnode << QString("$INDEX_ALLOCATION:" + attrname) << logicalsize;
 				    tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
+				    tmpprop.append(QString("Logical Size|" + QString::number(logicalsize) + "|Logical size for the file in bytes."));
 				    tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
 				    adsnodelist.append(tmpnode);
 				    adsproplist.append(tmpprop);
