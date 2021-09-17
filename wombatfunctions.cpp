@@ -682,13 +682,15 @@ QString HashFiles(QString itemid)
 	    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
 	    blake3_hasher hasher;
 	    blake3_hasher_init(&hasher);
+	    quint64 curlogsize = 0;
 	    for(int j=1; j <= layoutlist.count(); j++)
 	    {
 		QByteArray tmparray;
 		tmparray.clear();
 		quint64 curoffset = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
 		quint64 cursize = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
-		if(j * cursize <= logicalsize)
+		curlogsize += cursize;
+		if(curlogsize <= logicalsize)
 		    tmparray.append(curimg->ReadContent(curoffset, cursize));
 		else
 		    tmparray.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
