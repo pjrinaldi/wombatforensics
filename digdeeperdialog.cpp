@@ -17,7 +17,7 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
     ui->checkedFileRadioButton->setText(checktext);
     ui->listedFileRadioButton->setText(listtext);
     ui->processButton->setEnabled(false);
-    ui->hashlistbutton->setEnabled(false);
+    ui->hashlistwidget->setEnabled(false);
     ui->selectedFileRadioButton->setChecked(true);
     if(checkcount <= 0)
         ui->checkedFileRadioButton->setEnabled(false);
@@ -37,11 +37,16 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
     connect(ui->expandarchivescheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->hashlistcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->processButton, SIGNAL(clicked()), this, SLOT(DigDeeperFiles()));
-    connect(ui->hashlistbutton, SIGNAL(clicked()), this, SLOT(ShowHashListDialog()));
     ui->md5radiobutton->setVisible(false);
     ui->sha1radiobutton->setVisible(false);
     ui->sha256radiobutton->setVisible(false);
     ui->blake3radiobutton->setVisible(false);
+    // Get Hash Lists populated
+    ui->hashlistwidget->clear();
+    QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
+    QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
+    for(int i=0; i < whllist.count(); i++)
+	new QListWidgetItem(whllist.at(i).fileName(), ui->hashlistwidget);
 }
 
 DigDeeperDialog::~DigDeeperDialog()
@@ -60,36 +65,15 @@ void DigDeeperDialog::EnableProcess(bool checked)
         ui->blake3radiobutton->setEnabled(true);
     }
     if(ui->hashlistcheckbox->isChecked())
-	ui->hashlistbutton->setEnabled(true);
-    if(ui->hashcheckbox->isChecked() || ui->thumbnailcheckBox->isChecked() || ui->videocheckBox->isChecked() || ui->expandarchivescheckbox->isChecked())
+    {
+	ui->hashlistwidget->setEnabled(true);
+    }
+    else
+	ui->hashlistwidget->setEnabled(false);
+    if(ui->hashcheckbox->isChecked() || ui->thumbnailcheckBox->isChecked() || ui->videocheckBox->isChecked() || ui->expandarchivescheckbox->isChecked() || ui->hashlistcheckbox->isChecked())
         ui->processButton->setEnabled(true);
 }
 
-void DigDeeperDialog::ShowHashListDialog()
-{
-    QInputDialog* listdialog = new QInputDialog(this);
-    listdialog->setCancelButtonText("Cancel");
-    listdialog->setOption(QInputDialog::UseListViewForComboBoxItems);
-    listdialog->setLabelText("Select Hash Lists to Compare");
-    listdialog->setOkButtonText("Select Hash Lists");
-    listdialog->setWindowTitle("Comparison Hash Lists");
-    listdialog->setComboBoxEditable(false);
-    listdialog->setComboBoxItems(QStringList() << "item 1" << "item 2");
-    if(listdialog->exec())
-	qDebug() << listdialog->textValue();
-    //listdialog->setInputMode(
-    /*
-    QInputDialog* newdialog = new QInputDialog(this);
-    newdialog->setCancelButtonText("Cancel");
-    newdialog->setInputMode(QInputDialog::TextInput);
-    newdialog->setLabelText("Enter Hash List Name");
-    newdialog->setOkButtonText("Create Empty List");
-    newdialog->setTextEchoMode(QLineEdit::Normal);
-    newdialog->setWindowTitle("Create Empty Wombat Hash List");
-    if(newdialog->exec())
-        emptyfilename = newdialog->textValue();
-     */ 
-}
 void DigDeeperDialog::DigDeeperFiles()
 {
     if(ui->selectedFileRadioButton->isChecked())
@@ -117,6 +101,11 @@ void DigDeeperDialog::DigDeeperFiles()
         else if(ui->blake3radiobutton->isChecked())
             digoptions.append(7);
 	*/
+    }
+    if(ui->hashlistcheckbox->isChecked())
+    {
+	// ALSO NEED A WAY TO TRACK THE WHL FILES SELECTED
+	digoptions.append(8);
     }
     if(ui->expandarchivescheckbox->isChecked())
         digoptions.append(6);

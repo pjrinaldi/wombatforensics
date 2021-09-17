@@ -6,6 +6,7 @@
 
 #include "wombatinclude.h"
 #include "wombatvariable.h"
+#include "globals.h"
 
 namespace Ui {
 class DigDeeperDialog;
@@ -25,7 +26,6 @@ signals:
 private slots:
     void EnableProcess(bool checked);
     void DigDeeperFiles(void);
-    void ShowHashListDialog(void);
 
 private:
     Ui::DigDeeperDialog *ui;

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>511</width>
-    <height>323</height>
+    <width>516</width>
+    <height>368</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -165,20 +165,38 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
+          <item alignment="Qt::AlignTop">
            <widget class="QCheckBox" name="hashlistcheckbox">
             <property name="text">
-             <string>Compare Files to Selected Hash Lists</string>
+             <string>Compare Files to Selected Hash Lists:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="hashlistbutton">
-            <property name="enabled">
+           <widget class="QListWidget" name="hashlistwidget">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>70</height>
+             </size>
+            </property>
+            <property name="showDropIndicator" stdset="0">
+             <bool>false</bool>
+            </property>
+            <property name="alternatingRowColors">
              <bool>true</bool>
             </property>
-            <property name="text">
-             <string>Select Hash Lists</string>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
+            <property name="uniformItemSizes">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

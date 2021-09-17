@@ -16,6 +16,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSpacerItem>
@@ -46,7 +47,7 @@ public:
     QRadioButton *blake3radiobutton;
     QHBoxLayout *horizontalLayout_5;
     QCheckBox *hashlistcheckbox;
-    QPushButton *hashlistbutton;
+    QListWidget *hashlistwidget;
     QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_4;
     QCheckBox *expandarchivescheckbox;
@@ -62,7 +63,7 @@ public:
         if (DigDeeperDialog->objectName().isEmpty())
             DigDeeperDialog->setObjectName(QString::fromUtf8("DigDeeperDialog"));
         DigDeeperDialog->setWindowModality(Qt::ApplicationModal);
-        DigDeeperDialog->resize(511, 323);
+        DigDeeperDialog->resize(516, 368);
         DigDeeperDialog->setModal(true);
         verticalLayout_2 = new QVBoxLayout(DigDeeperDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
@@ -153,13 +154,22 @@ public:
         hashlistcheckbox = new QCheckBox(groupBox);
         hashlistcheckbox->setObjectName(QString::fromUtf8("hashlistcheckbox"));
 
-        horizontalLayout_5->addWidget(hashlistcheckbox);
+        horizontalLayout_5->addWidget(hashlistcheckbox, 0, Qt::AlignTop);
 
-        hashlistbutton = new QPushButton(groupBox);
-        hashlistbutton->setObjectName(QString::fromUtf8("hashlistbutton"));
-        hashlistbutton->setEnabled(true);
+        hashlistwidget = new QListWidget(groupBox);
+        hashlistwidget->setObjectName(QString::fromUtf8("hashlistwidget"));
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(hashlistwidget->sizePolicy().hasHeightForWidth());
+        hashlistwidget->setSizePolicy(sizePolicy);
+        hashlistwidget->setMaximumSize(QSize(16777215, 70));
+        hashlistwidget->setProperty("showDropIndicator", QVariant(false));
+        hashlistwidget->setAlternatingRowColors(true);
+        hashlistwidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        hashlistwidget->setUniformItemSizes(true);
 
-        horizontalLayout_5->addWidget(hashlistbutton);
+        horizontalLayout_5->addWidget(hashlistwidget);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -230,8 +240,7 @@ public:
         sha1radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA1", nullptr));
         sha256radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA256", nullptr));
         blake3radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "BLAKE3", nullptr));
-        hashlistcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Compare Files to Selected Hash Lists", nullptr));
-        hashlistbutton->setText(QCoreApplication::translate("DigDeeperDialog", "Select Hash Lists", nullptr));
+        hashlistcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Compare Files to Selected Hash Lists:", nullptr));
         expandarchivescheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Expand Archives (zip)", nullptr));
         cancelButton->setText(QCoreApplication::translate("DigDeeperDialog", "Cancel", nullptr));
         processButton->setText(QCoreApplication::translate("DigDeeperDialog", "Process", nullptr));
