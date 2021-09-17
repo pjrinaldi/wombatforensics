@@ -90,6 +90,7 @@ void DigDeeperDialog::DigDeeperFiles()
         digoptions.append(5);
     if(ui->hashcheckbox->isChecked())
     {
+        //QList<QListWidgetItem*> 
 	digoptions.append(7);
 	/*
         if(ui->md5radiobutton->isChecked())
@@ -105,10 +106,14 @@ void DigDeeperDialog::DigDeeperFiles()
     if(ui->hashlistcheckbox->isChecked())
     {
 	// ALSO NEED A WAY TO TRACK THE WHL FILES SELECTED
+        hashlists.clear();
 	digoptions.append(8);
+        for(int i=0; i < ui->hashlistwidget->selectedItems().count(); i++)
+            hashlists.append(ui->hashlistwidget->selectedItems().at(i)->text());
     }
     if(ui->expandarchivescheckbox->isChecked())
         digoptions.append(6);
+    emit HashComparison(hashlists);
     emit StartDig(digtype, digoptions);
     this->close();
 }

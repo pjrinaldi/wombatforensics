@@ -3196,8 +3196,15 @@ void WombatForensics::StartCarving(QStringList plist, QStringList flist)
     carvewatcher.setFuture(tmpfuture);
 }
 
+void WombatForensics::GetHashComparisons(QStringList whlfiles)
+{
+    whlcomparisonlist.append(whlfiles);
+}
+
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 {
+    // provides access to the whlcomparisonlist to give access to the files...
+    //qDebug() << "whlfiles:" << whlcomparisonlist;
     digimgthumbtotal = 0;
     digvidthumbtotal = 0;
     dighashtotal = 0;
@@ -3596,6 +3603,7 @@ void WombatForensics::on_actionDigDeeper_triggered()
     digvidthumbcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
     connect(digdeeperdialog, SIGNAL(StartDig(int, QVector<int>)), this, SLOT(DigFiles(int, QVector<int>)), Qt::DirectConnection);
+    connect(digdeeperdialog, SIGNAL(HashComparison(QStringList)), this, SLOT(GetHashComparisons(QStringList)), Qt::DirectConnection);
     digdeeperdialog->show();
 }
 

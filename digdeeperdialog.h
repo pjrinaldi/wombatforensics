@@ -22,6 +22,7 @@ public:
 
 signals:
     void StartDig(int digtype, QVector<int> digoptions);
+    void HashComparison(QStringList comparisonhashlists);
 
 private slots:
     void EnableProcess(bool checked);
@@ -34,6 +35,7 @@ private:
     int digtype = 0;
     QVector<int> digoptions;
     QWidget* parentwidget;
+    QStringList hashlists;
 };
 
 #endif // DIGDEEPERDIALOG_H

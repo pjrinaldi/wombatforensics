@@ -253,6 +253,7 @@ private slots:
     void ExportForensicImage(void);
     //void VerifyForensicImage(void);
     void DigFiles(int digtype, QVector<int> digoptions);
+    void GetHashComparisons(QStringList whlfiles);
     void StartCarving(QStringList plist, QStringList flist);
     void SetOffsetLabel(qint64 pos);
     void HexSelectionChanged(void);
@@ -415,6 +416,7 @@ private:
     QString digtotalcountstring = "";
     QString currentreportpath = "";
     QHash<QString, int>carvecounthash;
+    QStringList whlcomparisonlist;
     //std::vector<struct fuse_session*> fuserlist;
     //std::vector<ForensicImage*> evidimglist;
     //std::vector<struct fuse*> fuserlist;
