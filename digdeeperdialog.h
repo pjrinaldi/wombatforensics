@@ -25,6 +25,7 @@ signals:
 private slots:
     void EnableProcess(bool checked);
     void DigDeeperFiles(void);
+    void ShowHashListDialog(void);
 
 private:
     Ui::DigDeeperDialog *ui;

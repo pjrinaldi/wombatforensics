@@ -44,6 +44,10 @@ public:
     QRadioButton *sha1radiobutton;
     QRadioButton *sha256radiobutton;
     QRadioButton *blake3radiobutton;
+    QHBoxLayout *horizontalLayout_5;
+    QCheckBox *hashlistcheckbox;
+    QPushButton *hashlistbutton;
+    QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_4;
     QCheckBox *expandarchivescheckbox;
     QSpacerItem *verticalSpacer;
@@ -58,7 +62,7 @@ public:
         if (DigDeeperDialog->objectName().isEmpty())
             DigDeeperDialog->setObjectName(QString::fromUtf8("DigDeeperDialog"));
         DigDeeperDialog->setWindowModality(Qt::ApplicationModal);
-        DigDeeperDialog->resize(469, 314);
+        DigDeeperDialog->resize(511, 323);
         DigDeeperDialog->setModal(true);
         verticalLayout_2 = new QVBoxLayout(DigDeeperDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
@@ -143,6 +147,27 @@ public:
 
         verticalLayout_4->addLayout(horizontalLayout_3);
 
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
+        hashlistcheckbox = new QCheckBox(groupBox);
+        hashlistcheckbox->setObjectName(QString::fromUtf8("hashlistcheckbox"));
+
+        horizontalLayout_5->addWidget(hashlistcheckbox);
+
+        hashlistbutton = new QPushButton(groupBox);
+        hashlistbutton->setObjectName(QString::fromUtf8("hashlistbutton"));
+        hashlistbutton->setEnabled(true);
+
+        horizontalLayout_5->addWidget(hashlistbutton);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_5->addItem(horizontalSpacer_2);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_5);
+
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         expandarchivescheckbox = new QCheckBox(groupBox);
@@ -198,13 +223,15 @@ public:
         checkedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "Checked (#)", nullptr));
         listedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "All (#)", nullptr));
         groupBox->setTitle(QCoreApplication::translate("DigDeeperDialog", "For the Following Options", nullptr));
-        thumbnailcheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Image Files", nullptr));
-        videocheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for All Video Files", nullptr));
-        hashcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Calcuate Hash:", nullptr));
+        thumbnailcheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for Image Files", nullptr));
+        videocheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for Video Files", nullptr));
+        hashcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Calcuate BLAKE3 Hash", nullptr));
         md5radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "MD5", nullptr));
         sha1radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA1", nullptr));
         sha256radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA256", nullptr));
         blake3radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "BLAKE3", nullptr));
+        hashlistcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Compare Files to Selected Hash Lists", nullptr));
+        hashlistbutton->setText(QCoreApplication::translate("DigDeeperDialog", "Select Hash Lists", nullptr));
         expandarchivescheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Expand Archives (zip)", nullptr));
         cancelButton->setText(QCoreApplication::translate("DigDeeperDialog", "Cancel", nullptr));
         processButton->setText(QCoreApplication::translate("DigDeeperDialog", "Process", nullptr));
