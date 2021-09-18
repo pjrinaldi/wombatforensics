@@ -385,7 +385,7 @@ void WombatForensics::RemoveTag()
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
         */
-        treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), 10, "0");
+        treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), "tag", "0");
     }
     else if(QString(tagaction->iconText()).contains("Checked")) // single file
     {
@@ -449,7 +449,7 @@ void WombatForensics::RemoveTag()
                     filefile.write(tmpstr.toStdString().c_str());
                 filefile.close();
                 */
-                treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, "0");
+                treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), "tag", "0");
             }
         }
     }
@@ -562,7 +562,7 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
     {
         QTimeZone tmpzone = QTimeZone(reporttimezone);
         //taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
-        treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), 10, tagname);
+        treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), "tag", tagname);
         QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
         filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
         filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
@@ -1260,7 +1260,7 @@ void WombatForensics::OpenUpdate()
     else if(hashsum == 11)
         hashstr = "BLAKE3 Hash";
         */
-    treenodemodel->UpdateHeaderNode(7, "BLAKE3 Hash");
+    //treenodemodel->UpdateHeaderNode(7, "BLAKE3 Hash");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "carved/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "archives/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/"); // won't do anything if it already exists
@@ -2033,11 +2033,11 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 void WombatForensics::PopulateHexContents()
 {
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
-    QString nodeid = selectednode->Data(11).toString();
+    QString nodeid = selectednode->Data("id").toString();
     if(nodeid.contains("z")) // since we can't navigate to file contents which are part of a zip due to compression, navigate to the parent.zip file instead.
     {
         selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
-        nodeid = selectednode->Data(11).toString();
+        nodeid = selectednode->Data("id").toString();
     }
     QString evidid = nodeid.split("-").first();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
@@ -2067,7 +2067,7 @@ void WombatForensics::PopulateHexContents()
     if(nodeid.split("-").count() == 1) // image file
     {
         ui->hexview->setCursorPosition(0);
-        ui->hexview->SetColor(QString("0," + QString::number(selectednode->Data(2).toLongLong()) + ";"), selectednode->Data(2).toLongLong());
+        ui->hexview->SetColor(QString("0," + QString::number(selectednode->Data("size").toLongLong()) + ";"), selectednode->Data("size").toLongLong());
     }
     else if(nodeid.split("-").count() == 2) // unallocated, file system, or partition, possibly carved, zip, etc...
     {
@@ -2084,7 +2084,7 @@ void WombatForensics::PopulateHexContents()
             //qDebug() << "offset 2:" << QString::number(tmpstr.split(",").at(0).toLongLong(), 16);
             ui->hexview->BypassColor(true);
             ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toULongLong()*2);
-            ui->hexview->SetColor(tmpstr, selectednode->Data(2).toLongLong());
+            ui->hexview->SetColor(tmpstr, selectednode->Data("size").toLongLong());
         }
         else
         {
@@ -2155,7 +2155,7 @@ void WombatForensics::PopulateHexContents()
                 fpropfile.close();
             }
             ui->hexview->setCursorPosition(layout.split(",").at(0).toUInt() * 2);
-            ui->hexview->SetColor(layout, selectednode->Data(2).toLongLong());
+            ui->hexview->SetColor(layout, selectednode->Data("size").toLongLong());
         }
     }
     else if(nodeid.split("-").count() == 4) // zip file
@@ -3173,7 +3173,7 @@ void WombatForensics::ExportFiles(int etype, bool opath, QString epath)
     if(etype == 0) // selected
     {
         TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
-        exportlist.append(itemnode->Data(11).toString());
+        exportlist.append(itemnode->Data("id").toString());
     }
     else
         exportlist = GetFileLists(etype);
@@ -3230,7 +3230,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         if(dtype == 0) // selected
         {
             TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
-            digfilelist.append(itemnode->Data(11).toString());
+            digfilelist.append(itemnode->Data("id").toString());
         }
         else
             digfilelist = GetFileLists(dtype);
@@ -3688,6 +3688,7 @@ void WombatForensics::FinishDigging()
 {
     if(hashash)
     {
+        /*
         if(hashsum == 1)
             treenodemodel->UpdateHeaderNode(7, "MD5 Hash");
         else if(hashsum == 2)
@@ -3696,6 +3697,7 @@ void WombatForensics::FinishDigging()
             treenodemodel->UpdateHeaderNode(7, "SHA256 Hash");
         else if(hashsum == 11)
             treenodemodel->UpdateHeaderNode(7, "BLAKE3 Hash");
+        */
         //QtConcurrent::run(SaveHashList); // save ids/hashed values to hashlist file for re-opening a case.
         hashash = false;
     }
@@ -4025,9 +4027,24 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
         cfile.close();
     }
 
+    QHash<QString, QVariant> nodedata;
+    nodedata.insert("name", QByteArray(ctitle.toUtf8()).toBase64());
+    nodedata.insert("path", QByteArray(offstr.toUtf8()).toBase64());
+    nodedata.insert("size", clength);
+    nodedata.insert("create", "0");
+    nodedata.insert("access", "0");
+    nodedata.insert("modify", "0");
+    nodedata.insert("status", "0");
+    nodedata.insert("hash", curhash);
+    nodedata.insert("cat", mimestr.split("/").at(0));
+    nodedata.insert("sig", mimestr.split("/").at(1));
+    nodedata.insert("tag", ctag);
+    nodedata.insert("id", QString(enumber + "-c" + QString::number(carvedcount)));
+    /*
     QList<QVariant> nodedata;
     nodedata.clear();
     nodedata << QByteArray(ctitle.toUtf8()).toBase64() << QByteArray(offstr.toUtf8()).toBase64() << clength << "0" << "0" << "0" << "0" << curhash << mimestr.split("/").at(0) << mimestr.split("/").at(1) << ctag << QString(enumber + "-c" + QString::number(carvedcount));
+    */
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString(enumber + "-cm"), 15, 0);
     mutex.unlock();
@@ -4425,17 +4442,20 @@ void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream
 {
     //selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     TreeNode* curnode = static_cast<TreeNode*>(index.internalPointer());
+    TreeNode* curparnode = static_cast<TreeNode*>(index.parent().internalPointer());
     if(index.isValid())
     {
         //stream << QString("(" + QString::number(level) + "," + QString::number(index.row()) + ")") << ","; // parent, child
-        for(int c=0; c < 12; c++)
+        //for(int c=0; c < 12; c++)
+        for(int c=0; c < curnode->ColumnCount(); c++)
         {
-            stream << curnode->Data(c).toString() << ","; // column values for id
-            //stream << index.sibling(index.row(), c).data().toString() << ",";
+            //stream << curnode->Data(columnorder.at(c)).toString() << ","; // column values for id
+            stream << index.sibling(index.row(), c).data().toString() << ",";
         }
         stream << QString::number(curnode->itemtype) << ","; // item type
         stream << QString::number(curnode->IsDeleted()) << ","; // is deleted
-        stream << index.parent().sibling(index.parent().row(), 11).data().toString(); // parent str
+        stream << curparnode->Data("id").toString();
+        //stream << index.parent().sibling(index.parent().row(), 11).data().toString(); // parent str
         stream << Qt::endl;
         //qDebug() << "parent id:" << index.parent().sibling(index.parent().row(), 11).data().toString();
         // WILL PROBABLY NEED TO BASE64 1, 2, AND DO SOMETHING WITH THE DATES, AND PROBABLY SAVE THE ISDELETED STATE, ETC... TO POPULATE PROPERLY...

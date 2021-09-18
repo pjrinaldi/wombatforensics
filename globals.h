@@ -293,6 +293,7 @@ public:
         zerodata.insert("path", "Full Path");
         zerodata.insert("size", "Size (bytes)");
         zerodata.insert("create", "Created (UTC)");
+        zerodata.insert("access", "Accessed (UTC)");
         zerodata.insert("modify", "Modified (UTC)");
         zerodata.insert("status", "Status Changed (UTC)");
         zerodata.insert("hash", "BLAKE3 Hash");
@@ -302,6 +303,7 @@ public:
         zerodata.insert("id", "ID");
         zerodata.insert("match", "Hash Match");
         zeronode = new TreeNode(zerodata);
+        columnorder << "id" << "name" << "path" << "size" << "create" << "access" << "modify" << "status" << "cat" << "sig" << "tag" << "hash" << "match";
         /*
         QList<QVariant> zerodata;
         zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "BLAKE3 Hash" << "File Category" << "File Signature" << "Tagged" << "ID" << "Hash Match"; // NAME IN FIRST COLUMN
@@ -456,70 +458,76 @@ public:
         }
         else if(role == Qt::DisplayRole)
         {
-            //if(index.column
-            /*
-            if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
+            if(columnorder.at(index.column()) == "name" || columnorder.at(index.column()) == "path") // used to be 1 || 2
             {
                 if(nodetype == 3 || nodetype == 4 || (nodetype == 2 && itemnode->Data("id").toString().contains("-c"))) // used to be 5
                 {
                     ba.clear();
-                    //ba.append(itemnode->Data(index.column()).toString().toUtf8());
+                    ba.append(itemnode->Data(columnorder.at(index.column())).toString().toUtf8());
                     return QByteArray::fromBase64(ba);
                 }
                 else
                 {
-                    if(itemnode->Data(index.column()).toString().compare("0") == 0)
+                    if(itemnode->Data(columnorder.at(index.column())).toString().compare("0") == 0)
                         return "";
                     else
-                        return itemnode->Data(index.column());
+                        return itemnode->Data(columnorder.at(index.column()));
                 }
             }
-            else if(index.column() == 2) // used to be 3
+            else if(columnorder.at(index.column()) == "size") // used to be 3
 	    {
 		QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
-		return QString("%L1").arg(itemnode->Data(index.column()).toLongLong());
+		return QString("%L1").arg(itemnode->Data(columnorder.at(index.column())).toLongLong());
                 //return itemnode->Data(index.column());
 	    }
-            else if(index.column() >= 3 && index.column() <= 6) // used to be >= 4 <= 7
+            //else if(index.column() >= 3 && index.column() <= 6) // used to be >= 4 <= 7
+            else if(columnorder.at(index.column()) == "create" || columnorder.at(index.column()) == "access" || columnorder.at(index.column()) == "modify" || columnorder.at(index.column()) == "status") // used to be >= 4 <= 7
             {
-                if(itemnode->Data(index.column()).toString().compare("0") == 0)
+                if(itemnode->Data(columnorder.at(index.column())).toString().compare("0") == 0)
                     return "";
                 else // surely i can qt this up....
                 {
-                    QDateTime tmpdt = QDateTime::fromSecsSinceEpoch(itemnode->Data(index.column()).toInt(), QTimeZone::utc());
+                    QDateTime tmpdt = QDateTime::fromSecsSinceEpoch(itemnode->Data(columnorder.at(index.column())).toInt(), QTimeZone::utc());
                     QString tmpstr = tmpdt.toString("MM/dd/yyyy hh:mm:ss AP");
                     return tmpstr;
                 }
             }
-            else if(index.column() >= 7 && index.column() <= 10) // used to be >= 8 <= 10 // now includes tagged column
+            //else if(index.column() >= 7 && index.column() <= 10) // used to be >= 8 <= 10 // now includes tagged column
+            /*
             {
-                if(itemnode->Data(index.column()).toString().compare("0") != 0)
-                    return itemnode->Data(index.column());
+                if(itemnode->Data(columnorder.at(index.column())).toString().compare("0") != 0)
+                    return itemnode->Data(columnorder.at(index.column()));
                 else
                     return "";
             }
-            else
             */
-                //return itemnode->Data(index.column());
+            else
+            {
+                if(itemnode->Data(columnorder.at(index.column())).toString().compare("0") != 0)
+                    return itemnode->Data(columnorder.at(index.column()));
+                else
+                    return "";
+            }
         }
         else if(role == Qt::DecorationRole)
         {
             //ba.clear();
             //ba.append(itemnode->Data(0).toString().toUtf8()); // used to be 1
             //QString nodename = QByteArray::fromBase64(ba);
+            //if(columnorder.at(index.column()) == "id")
             if(index.column() == 0)
             {
                 if(nodetype == 1)
                     return QIcon(":/basic/treeimg");
                 else if(nodetype == 2)
                 {
-                    if(itemnode->Data(11).toString().endsWith("-cm"))
+                    if(itemnode->Data("id").toString().endsWith("-cm"))
                         return QIcon(":/basic/virtualfolder");
-                    else if(itemnode->Data(11).toString().contains("-c"))
+                    else if(itemnode->Data("id").toString().contains("-c"))
                         return QIcon(":/basic/carveicon");
-                    else if(itemnode->Data(11).toString().contains("-d"))
+                    else if(itemnode->Data("id").toString().contains("-d"))
                         return QIcon(":/basic/treefolder");
-                    else if(itemnode->Data(11).toString().contains("-f"))
+                    else if(itemnode->Data("id").toString().contains("-f"))
                         return QIcon(":/basic/treefile");
                     else
                         return QIcon(":/basic/treevol");
@@ -595,14 +603,14 @@ public:
             if(itemnode->IsChecked())
             {
                 itemnode->SetChecked(false);
-                checkhash.insert(itemnode->Data(11).toString(), false); // used to be 0
+                checkhash.insert(itemnode->Data("id").toString(), false); // used to be 0
             }
             else
             {
                 itemnode->SetChecked(true);
-                checkhash.insert(itemnode->Data(11).toString(), true); // used to be 0
+                checkhash.insert(itemnode->Data("id").toString(), true); // used to be 0
             }
-            qDebug() << "checkhash:" << checkhash;
+            //qDebug() << "checkhash:" << checkhash;
             emit dataChanged(index, index);
             emit CheckedNodesChanged();
             return true;
@@ -630,7 +638,7 @@ public:
         if(role == Qt::EditRole)
         {
             //qDebug() << "edit role for header...";
-            bool result = zeronode->SetData(section, value);
+            bool result = zeronode->SetData(columnorder.at(section), value);
             if(result)
                 emit headerDataChanged(orientation, section, section);
             return result;
@@ -660,7 +668,7 @@ public:
         if(index == QModelIndex())
             return Qt::NoItemFlags;
         //if(index.column() == 11 && itemnode->Data(index.column()).toString().split("-a").first().split("-").count() == 4) // used to be 0
-        if(index.column() == 0 && itemnode->Data(index.column()).toString().split("-").count() == 3) // used to be 0
+        if(index.column() == 0 && itemnode->Data(columnorder.at(index.column())).toString().split("-").count() == 3) // used to be 0
             flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
         
         return flags;
@@ -671,35 +679,35 @@ public:
         if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
         {
             if(section >= 0)
-                return zeronode->Data(section);
+                return zeronode->Data(columnorder.at(section));
         }
         if(role == Qt::DecorationRole)
         {
-            if(section == 11 && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
+            if(columnorder.at(section) == "id" && (!filtervalues.idfilter.isEmpty() && !filtervalues.idfilter.isNull()))
                 return QIcon(":/basic/filterimg");
-            if(section == 0 && filtervalues.namebool)
+            if(columnorder.at(section) == "name" && filtervalues.namebool)
                 return QIcon(":/basic/filterimg");
-            if(section == 1 && filtervalues.pathbool)
+            if(columnorder.at(section) == "path" && filtervalues.pathbool)
                 return QIcon(":/basic/filterimg");
-            if(section == 2 && filtervalues.maxsizebool)
+            if(columnorder.at(section) == "size" && filtervalues.maxsizebool)
                 return QIcon(":/basic/filterimg");
-            if(section == 2 && filtervalues.minsizebool)
+            if(columnorder.at(section) == "size" && filtervalues.minsizebool)
                 return QIcon(":/basic/filterimg");
-            if(section == 3 && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
+            if(columnorder.at(section) == "create" && (filtervalues.maxcreatebool || filtervalues.mincreatebool))
                 return QIcon(":/basic/filterimg");
-            if(section == 4 && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
+            if(columnorder.at(section) == "access" && (filtervalues.maxaccessbool || filtervalues.minaccessbool))
                 return QIcon(":/basic/filterimg");
-            if(section == 5 && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
+            if(columnorder.at(section) == "modify" && (filtervalues.maxmodifybool || filtervalues.minmodifybool))
                 return QIcon(":/basic/filterimg");
-            if(section == 6 && (filtervalues.maxchangebool || filtervalues.minchangebool))
+            if(columnorder.at(section) == "status" && (filtervalues.maxchangebool || filtervalues.minchangebool))
                 return QIcon(":/basic/filterimg");
-            if(section == 7 && (filtervalues.hashbool || filtervalues.hashbool2))
+            if(columnorder.at(section) == "hash" && (filtervalues.hashbool || filtervalues.hashbool2))
                 return QIcon(":/basic/filterimg");
-            if(section == 8 && filtervalues.filegroupbool)
+            if(columnorder.at(section) == "cat" && filtervalues.filegroupbool)
                 return QIcon(":/basic/filterimg");
-            if(section == 9 && filtervalues.filetypebool)
+            if(columnorder.at(section) == "sig" && filtervalues.filetypebool)
                 return QIcon(":/basic/filterimg");
-            if(section == 10 && filtervalues.tagbool)
+            if(columnorder.at(section) == "tag" && filtervalues.tagbool)
                 return QIcon(":/basic/filterimg");
         }
         return QVariant();
@@ -764,12 +772,12 @@ signals:
 //private:
 
 public:
-    void AddNode(QList<QVariant> data, QString parid, int type, int deleted)
+    void AddNode(QHash<QString, QVariant> data, QString parid, int type, int deleted)
     {
         if(parid.toInt() == -1) // evid
         {
             zeronode->AppendChild(new TreeNode(data, zeronode));
-            parents[data.at(11).toString()] = zeronode->child(zeronode->ChildCount() - 1); // USED TO BE 0
+            parents[data.value("id").toString()] = zeronode->child(zeronode->ChildCount() - 1); // USED TO BE 0
         }
         else // everything else 
         {
@@ -780,16 +788,17 @@ public:
                 //qDebug() << "parid:" << parid;
                 parents.value(parid)->AppendChild(new TreeNode(data, parents.value(parid), type));
             }
-            parents[data.at(11).toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
-            if(checkhash.contains(data.at(11).toString())) // USED TO BE 0
+            parents[data.value("id").toString()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
+            //parents[data.at("id").toString().split("-a").first()] = parents.value(parid)->child(parents.value(parid)->ChildCount() - 1); // USED TO BE 0
+            if(checkhash.contains(data.value("id").toString())) // USED TO BE 0
             {
-                parents.value(data.at(11).toString())->SetChecked(true);
+                parents.value(data.value("id").toString())->SetChecked(true);
                 //parents.value(data.at(11).toString().split("-a").first())->SetChecked(true); // USED TO BE 0
             }
             if(deleted == 1)
             {
                 //parents.value(data.at(11).toString().split("-a").first())->SetDeleted(true); // USED TO BE 0
-                parents.value(data.at(11).toString())->SetDeleted(true); // USED TO BE 0
+                parents.value(data.value("id").toString())->SetDeleted(true); // USED TO BE 0
             }
         }
     };
@@ -801,17 +810,21 @@ public:
         return false;
     };
 
-    void UpdateNode(QString itemid, int column, QString hash)
+    //void UpdateNode(QString itemid, int column, QString hash)
+    void UpdateNode(QString itemid, QString column, QString hash)
     {
         const QVariant tmpvar(hash);
-        parents.value(itemid.split("-a").first())->SetData(column, tmpvar);
+        //parents.value(itemid.split("-a").first())->SetData(column, tmpvar);
+        parents.value(itemid)->SetData(column, tmpvar);
     };
     
+    /*
     void UpdateHeaderNode(int column, QString hash)
     {
         //qDebug() << "updatehadernode value:" << zeronode->Data(9).toString();
         zeronode->SetData(column, hash);
     };
+    */
 
     void RemEvidence()
     {
@@ -827,6 +840,7 @@ public:
     };
 private:
     TreeNode* zeronode; //rootitem
+    QStringList columnorder;
     QHash<QString, TreeNode*> parents;
 };
 

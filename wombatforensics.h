@@ -85,12 +85,12 @@ class PathTreeView : public QTreeView
                 if(!itemcheck->IsChecked())
                 {
                     itemcheck->SetChecked(true);
-                    checkhash.insert(itemcheck->Data(11).toString(), true); // used to be 0
+                    checkhash.insert(itemcheck->Data("id").toString(), true); // used to be 0
                 }
                 else
                 {
                     itemcheck->SetChecked(false);
-                    checkhash.insert(itemcheck->Data(11).toString(), false); // used to be 0
+                    checkhash.insert(itemcheck->Data("id").toString(), false); // used to be 0
                 }
                 //treenodemodel->setData(index, 
 		emit treenodemodel->dataChanged(index, index);
