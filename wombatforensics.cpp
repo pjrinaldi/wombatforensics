@@ -570,19 +570,20 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         treenodemodel->UpdateNode(curindex.sibling(curindex.row(), colindex).data().toString(), "tag", tagname);
         QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), colindex).data().toString() + "'>";
         filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString() + "</th></tr>";
-        filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
-        if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 3).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
-        if(!curindex.sibling(curindex.row(), 4).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Accessed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 4).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
-        if(!curindex.sibling(curindex.row(), 5).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 5).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
-        if(!curindex.sibling(curindex.row(), 6).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Changed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), 6).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
-        if(!curindex.sibling(curindex.row(), 7).data().toString().isEmpty())
+        filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("path")).data().toString() + "</span></td></tr>";
+        filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("size")).data().toString() + " bytes</td></tr>";
+        if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("create")).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("create")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("access")).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Accessed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("access"))).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("modify")).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("modify")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("status")).data().toString().isEmpty())
+            filestr += "<tr class='odd'><td class='pvalue'>Changed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("status")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+        if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("hash")).data().toString().isEmpty())
         {
             filestr += "<tr class='odd'><td class='pvalue'>";
+            /*
             if(hashsum == 1)
                 filestr += "MD5";
             else if(hashsum == 2)
@@ -591,18 +592,19 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
                 filestr += "SHA256";
             else if(hashsum == 11)
                 filestr += "BLAKE3";
-            filestr += " Hash:</td><td class='property'>" + curindex.sibling(curindex.row(), 7).data().toString() + "</td></tr>";
+            */
+            filestr += "BLAKE3 Hash:</td><td class='property'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("hash")).data().toString() + "</td></tr>";
         }
-        filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), 8).data().toString() + "</td></tr>";
-        filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), 9).data().toString() + "</td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), 11).data().toString() + "</td></tr>";
+        filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString() + "</td></tr>";
+        filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("sig")).data().toString() + "</td></tr>";
+        filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), colindex).data().toString() + "</td></tr>";
 	// IF HTMLVIEWER WON'T OPEN FILE WITHOUT .HTML EXTENSION, THEN I WILL NEED TO ADD THE SHORTCUT AND OTHER HTML PARSED ARTIFACTS TO THIS IF/ELSE STATEMENT...
-        if(curindex.sibling(curindex.row(), 8).data().toString().contains("Image") || curindex.sibling(curindex.row(), 8).data().toString().contains("Video"))
-            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'><img src='./thumbs/" + curindex.sibling(curindex.row(), 11).data().toString() + ".png'/></a></td></tr>";
+        if(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Image") || curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Video"))
+            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "\")'><img src='./thumbs/" + curindex.sibling(curindex.row(), colindex).data().toString() + ".png'/></a></td></tr>";
         else
-            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), 11).data().toString() + "\")'>Link</a></td></tr>";
+            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "\")'>Link</a></td></tr>";
         filestr += "</table></td>";
-        RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
+        RemoveFileItem(curindex.sibling(curindex.row(), colindex).data().toString());
         AddFileItem(tagname, filestr);
         emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     }
@@ -629,7 +631,7 @@ void WombatForensics::AddExistingHashList(void)
     // open this file, adn loop over returned hash+files and add to the resepective file.
     if(parentmenu.contains("Selected")) // single file
     {
-        filestohash.append(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        filestohash.append(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString());
     }
     else if(parentmenu.contains("Checked")) // checked files
     {
@@ -697,7 +699,7 @@ void WombatForensics::VerEvidence()
 
 void WombatForensics::ShowExternalViewer()
 {
-    QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), 11).data().toString() + "-fhex";
+    QString tmpstring = wombatvariable.tmpfilepath + selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString() + "-fhex";
     QProcess* process = new QProcess(this);
     QStringList arguments;
     arguments << tmpstring;
@@ -716,7 +718,7 @@ void WombatForensics::ShowHideColumn()
 void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
         pathtreeview->setCurrentIndex(indexlist.at(0));
     QApplication::restoreOverrideCursor();
@@ -724,97 +726,98 @@ void WombatForensics::SetSelectedFromImageViewer(QString objectid)
 
 void WombatForensics::ShowFile(const QModelIndex &index)
 {
+    int colindex = treenodemodel->GetColumnIndex("id");
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    if(index.sibling(index.row(), 8).data().toString().contains("Image"))
+    if(index.sibling(index.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Image"))
     {
         imageviewer = new ImageWindow();
         imageviewer->setWindowIcon(QIcon(":/img"));
-        imageviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Image Viewer");
+        imageviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " Image Viewer");
         imageviewer->setAttribute(Qt::WA_DeleteOnClose);
-        imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        imageviewer->GetImage(selectedindex.sibling(selectedindex.row(), colindex).data().toString());
         imageviewer->show();
     }
-    else if(index.sibling(index.row(), 8).data().toString().contains("Video"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Video"))
     {
         videowindow = new VideoViewer();
         videowindow->setAttribute(Qt::WA_DeleteOnClose);
         videowindow->setWindowIcon(QIcon(":/vid"));
-        videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Video Viewer");
+        videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " Video Viewer");
         videowindow->ShowVideo(index);
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("HTML"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("HTML"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowIcon(QIcon(":/web"));
-        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " HTML Viewer");
+        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " HTML Viewer");
         htmlviewer->ShowHtml(index);
     }
-    else if(index.sibling(index.row(), 8).data().toString().contains("Text"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Text"))
     {
         // toggle the button...
         textviewer = new TextViewer();
         textviewer->setWindowIcon(QIcon(":/textencode"));
-        textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Text Viewer");
+        textviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " Text Viewer");
         textviewer->setAttribute(Qt::WA_DeleteOnClose);
         // THIS FAILS ON ADS
         textviewer->ShowText(index);
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("Shortcut"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Shortcut"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " LNK Viewer");
+        htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " LNK Viewer");
 	htmlviewer->ShowArtifact(0, index); // LNK
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("Directory"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Directory"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowTitle("$I30 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->setWindowTitle("$I30 Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(1, index); // I30
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("Recycler"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Recycler"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowTitle("INFO2 Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->setWindowTitle("INFO2 Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(2, index); // INFO2
     }
-    else if(index.sibling(index.row(), 9).data().toString().startsWith("Recycle.Bin"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Recycle.Bin"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(3, index); // $I
     }
-    else if(index.sibling(index.row(), 9).data().toString().contains("Prefetch"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Prefetch"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowTitle("Prefetch Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->setWindowTitle("Prefetch Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(4, index); // Prefetch
     }
-    else if(index.sibling(index.row(), 9).data().toString().startsWith("Zip"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Zip"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
-        htmlviewer->setWindowTitle("Archive Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        htmlviewer->setWindowTitle("Archive Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
         htmlviewer->ShowArtifact(5, index); // Archive
     }
-    else if(index.sibling(index.row(), 9).data().toString().startsWith("PDF"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("PDF"))
     {
 	pdfviewer = new PdfViewer();
 	pdfviewer->setAttribute(Qt::WA_DeleteOnClose);
-	pdfviewer->setWindowTitle("PDF Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
+	pdfviewer->setWindowTitle("PDF Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	pdfviewer->ShowPdf(index.sibling(index.row(), 11).data().toString());
     }
-    else if(index.sibling(index.row(), 9).data().toString().startsWith("Registry"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Registry"))
     {
         regviewer = new RegistryDialog();
         regviewer->setAttribute(Qt::WA_DeleteOnClose);
-        regviewer->setWindowTitle("Registry Viewer " + selectedindex.sibling(selectedindex.row(), 11).data().toString());
-        regviewer->LoadRegistryFile(selectedindex.sibling(selectedindex.row(), 11).data().toString(), selectedindex.sibling(selectedindex.row(), 0).data().toString());
+        regviewer->setWindowTitle("Registry Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
+        regviewer->LoadRegistryFile(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
     }
     else
     {
@@ -998,12 +1001,14 @@ void WombatForensics::InitializeAppStructure()
         QFile chompfile(homepath + "xchomp");
         chompfile.setPermissions(QFileDevice::ExeOwner);
     }
+    /*
     if(!FileExists(QString(homepath + "aff4imager").toStdString()))
     {
         QFile::copy(":/aff4imager", homepath + "aff4imager");
         QFile aff4file(homepath + "aff4imager");
         aff4file.setPermissions(QFileDevice::ExeOwner);
     }
+    */
     QFile ctypes(homepath + "carvetypes");
     if(!FileExists(QString(homepath + "carvetypes").toStdString()))
     {
@@ -1314,7 +1319,7 @@ void WombatForensics::OpenUpdate()
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     QString curid = InitializeSelectedState();
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(curid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(curid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
     if(indexlist.count() > 0)
     {
@@ -1374,7 +1379,7 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
         selectedindex = curitem.indexes().at(0);
         bool boolok;
 	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
-        qint64 sizeval = clocale.toLongLong(selectedindex.sibling(selectedindex.row(), 2).data().toString(), &boolok);
+        qint64 sizeval = clocale.toLongLong(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("size")).data().toString(), &boolok);
         //qDebug() << "sizevalue:" << sizeval;
         //qDebug() << "size locale to longlong:" << QLocale(selectedindex.sibling(selectedindex.row(), 2).data().toString())::toLongLong();
         //if(selectedindex.sibling(selectedindex.row(), 2).data().toLongLong() > 0) // file size
@@ -1409,8 +1414,8 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
             QModelIndex curindex = selectedindex;
             while(hasparent == 1)
             {
-                QAction* tmpaction = new QAction(curindex.sibling(curindex.row(), 0).data().toString(), this);
-                tmpaction->setData(curindex.sibling(curindex.row(), 11).data());
+                QAction* tmpaction = new QAction(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString(), this);
+                tmpaction->setData(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("id")).data());
                 connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetRootIndex()));
                 actionlist.prepend(tmpaction);
                 QModelIndex curparent = curindex.parent();
@@ -1443,7 +1448,7 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         selectedindex = curitem.indexes().at(0);
         bool boolok;
 	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
-        qint64 sizeval = clocale.toLongLong(selectedindex.sibling(selectedindex.row(), 2).data().toString(), &boolok);
+        qint64 sizeval = clocale.toLongLong(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("size")).data().toString(), &boolok);
         //qDebug() << "sizevalue:" << sizeval;
         //qDebug() << "size locale to longlong:" << QLocale(selectedindex.sibling(selectedindex.row(), 2).data().toString())::toLongLong();
         //if(selectedindex.sibling(selectedindex.row(), 2).data().toLongLong() > 0) // file size
@@ -1506,10 +1511,10 @@ void WombatForensics::SetRootIndex()
     else
     {
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         if(indexlist.count() > 0)
         {
-            pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), 0));
+            pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), treenodemodel->GetColumnIndex("name")));
         }
 	QApplication::restoreOverrideCursor();
     }
@@ -1720,7 +1725,7 @@ void WombatForensics::UpdateStatus()
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(PathSelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     UpdateCheckCount();
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     if(indexlist.count() > 0)
     {
         pathtreeview->setCurrentIndex(indexlist.at(0));
@@ -1831,7 +1836,7 @@ void WombatForensics::UpdateProperties()
 {
     QFile propfile;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QString nodeid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
+    QString nodeid = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString();
     QStringList evidfiles = eviddir.entryList(QStringList("*-*" + nodeid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     //qDebug() << "evidfiles:" << evidfiles;
     QString evidencename = evidfiles.at(0).split("-e").first();
@@ -1934,7 +1939,7 @@ void WombatForensics::UpdateProperties()
 
 void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 {
-    QString curid = curindex.sibling(curindex.row(), 11).data().toString();
+    QString curid = curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("id")).data().toString();
     if(curid.contains("-z")) // zip file
     {
         int err = 0;
@@ -1994,7 +1999,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
     {
         bool boolok;
 	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
-        qint64 sizeval = clocale.toLongLong(curindex.sibling(curindex.row(), 2).data().toString(), &boolok);
+        qint64 sizeval = clocale.toLongLong(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("size")).data().toString(), &boolok);
         if(sizeval > 0)
             RewriteSelectedIdContent(curindex);
     }
@@ -2110,12 +2115,12 @@ void WombatForensics::PopulateHexContents()
             tmpstr = partfile.readLine(); // part name, offset, size, part type, id
         partfile.close();
         //qDebug() << "selectedindex name:" << selectedindex.sibling(selectedindex.row(), 0).data().toString();
-        if(selectedindex.sibling(selectedindex.row(), 0).data().toString() == "$MBR")
+        if(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString() == "$MBR")
         {
             ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toULongLong()*2);
             ui->hexview->SetColor(QString("0,512;"), 512);
         }
-        else if(selectedindex.sibling(selectedindex.row(), 0).data().toString().startsWith("$FAT"))
+        else if(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString().startsWith("$FAT"))
         {
 	    uint fatoffset = 0;
 	    uint fatsize = 0;
@@ -2136,7 +2141,7 @@ void WombatForensics::PopulateHexContents()
 		}
 		ppropfile.close();
 	    }
-	    uint fatnum = selectedindex.sibling(selectedindex.row(), 0).data().toString().right(1).toUInt();
+	    uint fatnum = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString().right(1).toUInt();
 	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
             ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
         }
@@ -2790,7 +2795,7 @@ void WombatForensics::CloseCurrentCase()
     }
     if(pathtreeview->model() != NULL)
     {
-        UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        UpdateSelectedState(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString());
         qInfo() << "Selected Item Saved";
         UpdateCheckState();
         qInfo() << "Check State Saved";
@@ -3085,7 +3090,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
 		    existingforimglist.removeAt(j);
 	    }
             // 5. Remove TreeNode.
-            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant("e" + evidfiles.first().split(".e").last()), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(!indexlist.isEmpty())
             {
                 treenodemodel->removeRow(indexlist.first().row(), indexlist.first());
@@ -3117,31 +3122,31 @@ QStringList WombatForensics::GetFileLists(int filelisttype)
         return listeditems;
     else if(filelisttype == 3) // Generate list for Publish Report
     {
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 10, QModelIndex()), Qt::DisplayRole, QVariant(tr("*[A-Za-z0-9]*")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchWildcard));
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("tag"), QModelIndex()), Qt::DisplayRole, QVariant(tr("*[A-Za-z0-9]*")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchWildcard));
         foreach(QModelIndex index, indexlist)
-            tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
+            tmplist.append(QString(index.sibling(index.row(), treenodemodel->GetColumnIndex("id")).data().toString()));
         return tmplist;
     }
     else if(filelisttype == 4) // Generate list for Image category
     {
-	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant(tr("Image")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
+	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("cat"), QModelIndex()), Qt::DisplayRole, QVariant(tr("Image")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
 	foreach(QModelIndex index, indexlist)
-	    tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
+	    tmplist.append(QString(index.sibling(index.row(), treenodemodel->GetColumnIndex("id")).data().toString()));
 	return tmplist;
     }
     else if(filelisttype == 5) // Generate list for Video category
     {
-	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant(tr("Video")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
+	QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("cat"), QModelIndex()), Qt::DisplayRole, QVariant(tr("Video")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
 	foreach(QModelIndex index, indexlist)
-	    tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
+	    tmplist.append(QString(index.sibling(index.row(), treenodemodel->GetColumnIndex("id")).data().toString()));
 	return tmplist;
     }
     else if(filelisttype == 6) // Generate list for Archive category
     {
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant(("Archive")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("cat"), QModelIndex()), Qt::DisplayRole, QVariant(("Archive")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchExactly));
         //qDebug() << "archives found: indexlist count:" << indexlist.count();
         foreach(QModelIndex index, indexlist)
-            tmplist.append(QString(index.sibling(index.row(), 11).data().toString()));
+            tmplist.append(QString(index.sibling(index.row(), treenodemodel->GetColumnIndex("id")).data().toString()));
         //qDebug() << "archive tmplist value:" << tmplist.count();
         return tmplist;
     }
@@ -3624,7 +3629,7 @@ void WombatForensics::on_actionView_Properties_triggered(bool checked)
     if(checked){}
     propertywindow = new PropertiesWindow(this);
     propertywindow->setWindowIcon(QIcon(":/info"));
-    propertywindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Properties");
+    propertywindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString() + " Properties");
     propertywindow->setAttribute(Qt::WA_DeleteOnClose);
     propertywindow->setModal(false);
     UpdateProperties();
@@ -3635,7 +3640,7 @@ void WombatForensics::on_actionView_File_triggered(bool checked)
     if(checked){}
     fileviewer = new FileViewer();
     fileviewer->setWindowIcon(QIcon(":/ehex"));
-    fileviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), 11).data().toString() + " Hex");
+    fileviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString() + " Hex");
     fileviewer->setAttribute(Qt::WA_DeleteOnClose);
     fileviewer->UpdateHexView();
 }
@@ -3766,7 +3771,7 @@ void WombatForensics::on_actionBookmark_Manager_triggered()
 void WombatForensics::on_actionTextViewer_triggered(bool checked)
 {
     if(checked){}
-    if(selectedindex.sibling(selectedindex.row(), 8).data().toString().contains("text/"))
+    if(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("text/"))
     {
         textviewer->ShowText(selectedindex);
         textviewer->show();
@@ -3986,7 +3991,7 @@ void WombatForensics::UpdateFilterCount()
     for(int i=0; i < tmplist.count(); i++)
     {
         //if(tmplist.at(i).sibling(tmplist.at(i).row(), 11).data().toString().split("-").count() == 5)
-        if(tmplist.at(i).sibling(tmplist.at(i).row(), 11).data().toString().split("-").count() == 3)
+        if(tmplist.at(i).sibling(tmplist.at(i).row(), treenodemodel->GetColumnIndex("id")).data().toString().split("-").count() == 3)
             filtercount++;
     }
     if(filtercount == filesfound)
@@ -4005,7 +4010,7 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
 {
     qint64 coffset = ui->hexview->GetOffset(); // current offset
     qint64 clength = ui->hexview->GetSelectionLength(); // current selection length (carved size)
-    QString enumber = selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").first(); // current evidence item
+    QString enumber = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString().split("-").first(); // current evidence item
     QString offstr = "0x" + QString::number(coffset, 16); // offset string 0xabc
     QByteArray tmparray = ui->hexview->selectionToByteArray(); // current carved content
     //QMimeDatabase mimedb;
@@ -4065,13 +4070,15 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     if(!curhash.isEmpty())
     {
         filestr += "<tr class='odd'><td class='pvalue'>";
+        /*
         if(hashsum == 1)
             filestr += "MD5";
         else if(hashsum == 2)
             filestr += "SHA1";
         else if(hashsum == 4)
             filestr += "SHA256";
-        filestr += " Hash:</td><td class='property'>" + curhash + "</td></tr>";
+        */
+        filestr += "BLAKE3 Hash:</td><td class='property'>" + curhash + "</td></tr>";
     }
     filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + mimestr.split("/").first() + "</td></tr>";
     filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + mimestr.split("/").last() + "</td></tr>";
@@ -4140,9 +4147,9 @@ void WombatForensics::SaveState()
 {
     RemoveTmpFiles();
     UpdateCheckState();
-    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+    UpdateSelectedState(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString());
     //if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 5)
-    if(selectedindex.sibling(selectedindex.row(), 11).data().toString().split("-").count() == 3)
+    if(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString().split("-").count() == 3)
         RewriteSelectedIdContent(selectedindex);
     //SaveTaggedList();
     //SaveHashList();
