@@ -1724,7 +1724,6 @@ void WombatForensics::UpdateStatus()
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     pathtreeview->header()->setSectionsMovable(true);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    //connect(treenodemodel, SIGNAL(MoveColumn
     connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(PathSelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     UpdateCheckCount();
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(InitializeSelectedState()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
