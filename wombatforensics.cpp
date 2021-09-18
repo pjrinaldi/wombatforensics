@@ -3907,29 +3907,29 @@ void WombatForensics::SetOffsetLabel(qint64 pos)
 
 void WombatForensics::SetFilter(int headercolumn)
 {
-    if(headercolumn == 11)
+    if(headercolumn == treenodemodel->GetColumnIndex("id"))
         idfilterview->DisplayFilter();
-    if(headercolumn == 0)
+    if(headercolumn == treenodemodel->GetColumnIndex("name"))
         namefilterview->DisplayFilter();
-    if(headercolumn == 1)
+    if(headercolumn == treenodemodel->GetColumnIndex("path"))
         pathfilterview->DisplayFilter();
-    if(headercolumn == 2)
+    if(headercolumn == treenodemodel->GetColumnIndex("size"))
         sizefilterview->DisplayFilter();
-    if(headercolumn == 3)
+    if(headercolumn == treenodemodel->GetColumnIndex("create"))
         createfilterview->DisplayFilter();
-    if(headercolumn == 4)
+    if(headercolumn == treenodemodel->GetColumnIndex("access"))
         accessfilterview->DisplayFilter();
-    if(headercolumn == 5)
+    if(headercolumn == treenodemodel->GetColumnIndex("modify"))
         modifyfilterview->DisplayFilter();
-    if(headercolumn == 6)
+    if(headercolumn == treenodemodel->GetColumnIndex("status"))
         changefilterview->DisplayFilter();
-    if(headercolumn == 7)
+    if(headercolumn == treenodemodel->GetColumnIndex("hash"))
         hashfilterview->DisplayFilter();
-    if(headercolumn == 8)
+    if(headercolumn == treenodemodel->GetColumnIndex("cat"))
         filecategoryfilterview->DisplayFilter();
-    if(headercolumn == 9)
+    if(headercolumn == treenodemodel->GetColumnIndex("sig"))
         filetypefilterview->DisplayFilter();
-    if(headercolumn == 10)
+    if(headercolumn == treenodemodel->GetColumnIndex("tag"))
         tagfilterview->DisplayFilter();
     ResizeColumns();
 }
