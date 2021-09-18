@@ -843,6 +843,7 @@ public:
     {
         for(int i=0; i < columnorder.count(); i++)
         {
+            //qDebug() << "i:" << i << "columnorder:" << columnorder;
             if(columnorder.at(i) == colkey)
                 return i;
         }

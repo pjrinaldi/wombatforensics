@@ -1514,7 +1514,7 @@ void WombatForensics::SetRootIndex()
         QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(data), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         if(indexlist.count() > 0)
         {
-            pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), treenodemodel->GetColumnIndex("name")));
+            pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), 0));
         }
 	QApplication::restoreOverrideCursor();
     }
@@ -4454,7 +4454,7 @@ void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream
 {
     //selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     TreeNode* curnode = static_cast<TreeNode*>(index.internalPointer());
-    TreeNode* curparnode = static_cast<TreeNode*>(index.parent().internalPointer());
+    //TreeNode* curparnode = static_cast<TreeNode*>(index.parent().internalPointer());
     if(index.isValid())
     {
         //stream << QString("(" + QString::number(level) + "," + QString::number(index.row()) + ")") << ","; // parent, child
@@ -4466,8 +4466,8 @@ void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream
         }
         stream << QString::number(curnode->itemtype) << ","; // item type
         stream << QString::number(curnode->IsDeleted()) << ","; // is deleted
-        stream << curparnode->Data("id").toString();
-        //stream << index.parent().sibling(index.parent().row(), 11).data().toString(); // parent str
+        //stream << curparnode->Data("id").toString();
+        stream << index.parent().sibling(index.parent().row(), treenodemodel->GetColumnIndex("id")).data().toString(); // parent str
         stream << Qt::endl;
         //qDebug() << "parent id:" << index.parent().sibling(index.parent().row(), 11).data().toString();
         // WILL PROBABLY NEED TO BASE64 1, 2, AND DO SOMETHING WITH THE DATES, AND PROBABLY SAVE THE ISDELETED STATE, ETC... TO POPULATE PROPERLY...

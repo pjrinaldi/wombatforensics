@@ -104,7 +104,7 @@ void GenerateWombatCaseFile(void)
 
 void RewriteSelectedIdContent(QModelIndex selectedindex)
 {
-    QString selectedid = selectedindex.sibling(selectedindex.row(), 11).data().toString();
+    QString selectedid = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*-" + selectedid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split("-e").first();
