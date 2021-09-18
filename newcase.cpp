@@ -4594,9 +4594,20 @@ void ProcessForensicImage(ForImg* curimg)
     //qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
     //qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
     //qDebug() << "imgsize:" << curimg->Size();
-    QList<QVariant> nodedata;
+    QHash<QString, QVariant> nodedata;
     nodedata.clear();
-    nodedata << curimg->ImgPath().split("/").last() << "0" << QString::number(curimg->Size()) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last());
+    nodedata.insert("name", curimg->ImgPath().split("/").last());
+    nodedata.insert("path", "0");
+    nodedata.insert("size", curimg->Size());
+    nodedata.insert("create", "0");
+    nodedata.insert("access", "0");
+    nodedata.insert("modify", "0");
+    nodedata.insert("status", "0");
+    nodedata.insert("hash", "0");
+    nodedata.insert("cat", "0");
+    nodedata.insert("sig", "0");
+    nodedata.insert("tag", "0");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last()));
     /*
      * NEED TO WRITE THIS AS I GO.... AND CLEAR STRING AS I GO
      *
@@ -4910,7 +4921,7 @@ void ParseLogicalImage(ForImg* curimg)
         quint8 itemtype;
         quint8 deleted;
         in >> filename >> filepath >> filesize >> filecreate >> fileaccess >> filemodify >> filestatus >> srchash >> catsig >> itemtype >> deleted;
-        QList<QVariant> nodedata;
+        QHash<QString, QVariant> nodedata;
         QStringList filepathlist = filepath.split("/", Qt::SkipEmptyParts);
         QString curdirstr = "/";
         QString parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last();
@@ -4922,7 +4933,18 @@ void ParseLogicalImage(ForImg* curimg)
             // NEED TO IMPLEMENT THE DIRECTORY CHECK CODE HERE.
             nodedata.clear();
             //qDebug() << "filename:" << filepathlist.at(j) << "filepath:" << curdirstr << 0 << 0 << 0 << 0 << 0 << 0 << 0 << "Directory/Directory" << 5 << 0;
-            nodedata << filepathlist.at(j) << curdirstr << 0 << 0 << 0 << 0 << 0 << 0 << "Directory" << "Directory" << 0 << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-d" + QString::number(j));
+            nodedata.insert("name", filepathlist.at(j));
+            nodedata.insert("path", curdirstr);
+            nodedata.insert("size", 0);
+            nodedata.insert("create", 0);
+            nodedata.insert("access", 0);
+            nodedata.insert("modify", 0);
+            nodedata.insert("status", 0);
+            nodedata.insert("hash", 0);
+            nodedata.insert("cat", "Directory");
+            nodedata.insert("sig", "Directory");
+            nodedata.insert("tag", 0);
+            nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-d" + QString::number(j)));
             mutex.lock();
             treenodemodel->AddNode(nodedata, parentstr, 3, 0);
             mutex.unlock();
@@ -4932,7 +4954,18 @@ void ParseLogicalImage(ForImg* curimg)
         parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-d" + QString::number(filepathlist.count() - 1);
         //qDebug() << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig << itemtype << deleted;
         nodedata.clear();
-        nodedata << filename << filepath << filesize << filecreate << fileaccess << filemodify << filestatus << srchash << catsig.split("/").first() << catsig.split("/").last() << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-f" + QString::number(fileindxlist.at(i)));
+        nodedata.insert("name", filename);
+        nodedata.insert("path", filepath);
+        nodedata.insert("size", filesize);
+        nodedata.insert("create", filecreate);
+        nodedata.insert("access", fileaccess);
+        nodedata.insert("modify", filemodify);
+        nodedata.insert("status", filestatus);
+        nodedata.insert("hash", srchash);
+        nodedata.insert("cat", catsig.split("/").first());
+        nodedata.insert("sig", catsig.split("/").last());
+        nodedata.insert("tag", "0");
+        nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-f" + QString::number(fileindxlist.at(i))));
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, itemtype, deleted);
         mutex.unlock();
@@ -5011,7 +5044,7 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     QString pname = "";
     QTextStream out;
     dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
-    QList<QVariant> nodedata;
+    QHash<QString, QVariant> nodedata;
     pstatfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
     if(!pstatfile.isOpen())
 	pstatfile.open(QIODevice::Append | QIODevice::Text);
@@ -5036,28 +5069,71 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     //partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
     nodedata.clear();
     if(allocstatus == 0)
-	nodedata << "UNALLOCATED";
+	nodedata.insert("name", "UNALLOCATED");
     else if(allocstatus == 1)
-	nodedata << pname;
-    nodedata << "0" << QString::number((qint64)cursectorsize*512) << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+	nodedata.insert("name", pname);
+    nodedata.insert("path", "0");
+    nodedata.insert("size", QString::number((qint64)cursectorsize*512));
+    nodedata.insert("create", "0");
+    nodedata.insert("access", "0");
+    nodedata.insert("modify", "0");
+    nodedata.insert("status", "0");
+    nodedata.insert("hash", "0");
+    nodedata.insert("cat", "0");
+    nodedata.insert("sig", "0");
+    nodedata.insert("tag", "0");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)));
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last()), -1, 0);
     mutex.unlock();
     // FILE CARVING DIRECTORIES
     nodedata.clear();
-    nodedata << QByteArray("orphans").toBase64() << QByteArray("/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o");
+    nodedata.insert("name", QByteArray("orphans").toBase64());
+    nodedata.insert("path", QByteArray("/").toBase64());
+    nodedata.insert("size", "0");
+    nodedata.insert("create", "0");
+    nodedata.insert("access", "0");
+    nodedata.insert("modify", "0");
+    nodedata.insert("status", "0");
+    nodedata.insert("hash", "0");
+    nodedata.insert("cat", "Directory");
+    nodedata.insert("sig", "Virtual Directory");
+    nodedata.insert("tag", "0");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"));
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
     mutex.unlock();
     nodedata.clear();
     if(allocstatus == 1)
         ParseDirectoryStructure(curimg, cursectoroffset, ptreecnt);
-    nodedata << QByteArray("carved validated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv");
+    nodedata.insert("name", QByteArray("carved validated").toBase64());
+    nodedata.insert("path",  "0");
+    nodedata.insert("size", "0");
+    nodedata.insert("create", "0");
+    nodedata.insert("access", "0");
+    nodedata.insert("modify", "0");
+    nodedata.insert("status", "0");
+    nodedata.insert("hash", "0");
+    nodedata.insert("cat", "Directory");
+    nodedata.insert("sig", "Virtual Directory");
+    nodedata.insert("tag", "0");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cv"));
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
     mutex.unlock();
     nodedata.clear();
-    nodedata << QByteArray("carved unvalidated").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "0" << "Directory" << "Virtual Directory" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cu");
+    nodedata.insert("name", QByteArray("carved unvalidated").toBase64());
+    nodedata.insert("path",  "0");
+    nodedata.insert("size", "0");
+    nodedata.insert("create", "0");
+    nodedata.insert("access", "0");
+    nodedata.insert("modify", "0");
+    nodedata.insert("status", "0");
+    nodedata.insert("hash", "0");
+    nodedata.insert("cat", "Directory");
+    nodedata.insert("sig", "Virtual Directory");
+    nodedata.insert("tag", "0");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-cu"));
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);
     mutex.unlock();
@@ -5873,9 +5949,20 @@ QString ConvertBlocksToExtents(QList<uint> blocklist, uint blocksize, qulonglong
 
 qulonglong AddVirtualFileSystemFiles(ForImg* curimg, uint8_t ptreecnt, uint8_t fatcount, qulonglong fatsize, qulonglong curinode)
 {
-    QList<QVariant> nodedata;
+    QHash<QString, QVariant> nodedata;
     nodedata.clear();
-    nodedata << QByteArray("$MBR").toBase64() << QByteArray("/").toBase64() << "512" << "0" << "0" << "0" << "0" << "0" << "System File" << "Master Boot Record" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
+    nodedata.insert("name", QByteArray("$MBR").toBase64());
+    nodedata.insert("path", QByteArray("/").toBase64());
+    nodedata.insert("size", 512);
+    nodedata.insert("create", "0");
+    nodedata.insert("access", "0");
+    nodedata.insert("modify", "0");
+    nodedata.insert("status", "0");
+    nodedata.insert("hash", "0");
+    nodedata.insert("cat", "System File");
+    nodedata.insert("sig", "Master Boot Record");
+    nodedata.insert("tag", "0");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode)));
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 10, 0);
     mutex.unlock();
@@ -5884,7 +5971,18 @@ qulonglong AddVirtualFileSystemFiles(ForImg* curimg, uint8_t ptreecnt, uint8_t f
     for(int i=0; i < fatcount; i++)
     {
 	nodedata.clear();
-	nodedata << QByteArray(QString("$FAT" + QString::number(i+1)).toUtf8()).toBase64() << QByteArray("/").toBase64() << fatsize << "0" << "0" << "0" << "0" << "0" << "System File" << "File Allocation Table" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
+	nodedata.insert("name", QByteArray(QString("$FAT" + QString::number(i+1)).toUtf8()).toBase64());
+        nodedata.insert("path", QByteArray("/").toBase64());
+        nodedata.insert("size", fatsize);
+        nodedata.insert("create", "0");
+        nodedata.insert("access", "0");
+        nodedata.insert("modify", "0");
+        nodedata.insert("status", "0");
+        nodedata.insert("hash", "0");
+        nodedata.insert("cat", "System File");
+        nodedata.insert("sig", "File Allocation Table");
+        nodedata.insert("tag", "0");
+        nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode)));
 	mutex.lock();
 	treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 10, 0);
 	mutex.unlock();
@@ -6153,29 +6251,42 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 		    filename = aliasname;
 		else
 		    filename = longname;
-		QList<QVariant> nodedata;
+		QHash<QString, QVariant> nodedata;
 		nodedata.clear();
-		nodedata << QByteArray(filename.toStdString().c_str()).toBase64();
+		nodedata.insert("name", QByteArray(filename.toStdString().c_str()).toBase64());
 		if(parfilename.isEmpty())
 		    filepath = "/";
 		else
 		    filepath = parfilename;
-		nodedata << QByteArray(filepath.toUtf8()).toBase64() << logicalsize << createdate << accessdate << modifydate << 0 << 0;
+		nodedata.insert("path", QByteArray(filepath.toUtf8()).toBase64());
+                nodedata.insert("size", logicalsize);
+                nodedata.insert("create", createdate);
+                nodedata.insert("access", accessdate);
+                nodedata.insert("modify", modifydate);
+                nodedata.insert("status", "0");
+                nodedata.insert("hash", "0");
 		if(logicalsize > 0) // Get Category/Signature
 		{
 		    if(itemtype == 3 && isdeleted == 0)
-			nodedata << "Directory" << "Directory"; // category << signature
+                    {
+			nodedata.insert("cat", "Directory");
+                        nodedata.insert("sig", "Directory"); // category << signature
+                    }
 		    else
 		    {
 			QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
 			//qDebug() << filename.left(20) << catsig;
-                        nodedata << catsig.split("/").first() << catsig.split("/").last();
+                        nodedata.insert("cat", catsig.split("/").first());
+                        nodedata.insert("sig", catsig.split("/").last());
 		    }
 		}
                 else
-                    nodedata << "Empty" << "Zero File";
-		//nodedata << "0" << "0";
-                nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+                {
+                    nodedata.insert("cat", "Empty");
+                    nodedata.insert("sig", "Zero File");
+                }
+                nodedata.insert("tag", "0");
+                nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
                 QString parentstr = "";
                 if(parinode == 0)
                     parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
@@ -6184,9 +6295,9 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, parentstr, itemtype, isdeleted);
                 mutex.unlock();
-                if(nodedata.at(11).toString().split("-").count() == 3)
+                if(nodedata.value("id").toString().split("-").count() == 3)
                 {
-                    listeditems.append(nodedata.at(11).toString());
+                    listeditems.append(nodedata.value("id").toString());
                     filesfound++;
                     isignals->ProgUpd();
                 }
@@ -6207,9 +6318,20 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 {
                     if(!longnamestring.isEmpty()) // orphan long entry
                     {
-			QList<QVariant> nodedata;
+			QHash<QString, QVariant> nodedata;
 			nodedata.clear();
-			nodedata << QByteArray(longnamestring.toUtf8()).toBase64() << QByteArray("/orphans/").toBase64() << "0" << "0" << "0" << "0" << "0" << "0" << "Empty" << "Empty File" << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+			nodedata.insert("name", QByteArray(longnamestring.toUtf8()).toBase64());
+                        nodedata.insert("path", QByteArray("/orphans/").toBase64());
+                        nodedata.insert("size", 0);
+                        nodedata.insert("create", "0");
+                        nodedata.insert("access", "0");
+                        nodedata.insert("modify", "0");
+                        nodedata.insert("status", "0");
+                        nodedata.insert("hash", "0");
+                        nodedata.insert("cat", "Empty");
+                        nodedata.insert("sig", "Empty File");
+                        nodedata.insert("tag", "0");
+                        nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
 			mutex.lock();
 			treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"), 4, 1);
 			mutex.unlock();
@@ -6474,23 +6596,37 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 		out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
 		if(!parfilename.isEmpty())
 		    filepath = parfilename;
-		QList<QVariant> nodedata;
+		QHash<QString, QVariant> nodedata;
 		nodedata.clear();
-		nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray(filepath.toUtf8()).toBase64() << (qulonglong)logicalsize << createdate << accessdate << modifydate << 0 << 0;
+		nodedata.insert("name", QByteArray(filename.toUtf8()).toBase64());
+                nodedata.insert("path", QByteArray(filepath.toUtf8()).toBase64());
+                nodedata.insert("size", (qulonglong)logicalsize);
+                nodedata.insert("create", createdate);
+                nodedata.insert("access", accessdate);
+                nodedata.insert("modify", modifydate);
+                nodedata.insert("status", "0");
+                nodedata.insert("hash", "0");
 		if(logicalsize > 0) // Get Category/Signature
 		{
 		    if(itemtype == 3 && isdeleted == 0)
-			nodedata << "Directory" << "Directory";
+                    {
+			nodedata.insert("cat", "Directory");
+                        nodedata.insert("sig", "Directory");
+                    }
 		    else
 		    {
 			QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
-			nodedata << catsig.split("/").first() << catsig.split("/").last();
+			nodedata.insert("cat", catsig.split("/").first());
+                        nodedata.insert("sig", catsig.split("/").last());
 		    }
 		}
 		else
-		    nodedata << "Empty" << "Zero File";
-		//nodedata << "0" << "0";
-		nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt));
+                {
+		    nodedata.insert("cat", "Empty");
+                    nodedata.insert("sig", "Zero File");
+                }
+		nodedata.insert("tag", "0");
+                nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
 		QString parentstr = "";
 		if(parinode == 0)
 		    parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
@@ -6499,9 +6635,9 @@ qulonglong ParseExfatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t 
 		mutex.lock();
 		treenodemodel->AddNode(nodedata, parentstr, itemtype, isdeleted);
 		mutex.unlock();
-		if(nodedata.at(11).toString().split("-").count() == 3)
+		if(nodedata.value("id").toString().split("-").count() == 3)
 		{
-		    listeditems.append(nodedata.at(11).toString());
+		    listeditems.append(nodedata.value("id").toString());
 		    filesfound++;
 		    isignals->ProgUpd();
 		}
@@ -6640,13 +6776,22 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 		    out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
 		    out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
 		    out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
-		    QList<QVariant> nodedata;
+		    QHash<QString, QVariant> nodedata;
 		    nodedata.clear();
-		    nodedata << QByteArray(filename.toUtf8()).toBase64() << QByteArray("/orphans/").toBase64() << (qulonglong)logicalsize << createdate << modifydate << accessdate << "0" << "0";
+		    nodedata.insert("name", QByteArray(filename.toUtf8()).toBase64());
+                    nodedata.insert("path", QByteArray("/orphans/").toBase64());
+                    nodedata.insert("size", (qulonglong)logicalsize);
+                    nodedata.insert("create", createdate);
+                    nodedata.insert("modify", modifydate);
+                    nodedata.insert("access", accessdate);
+                    nodedata.insert("status", "0");
+                    nodedata.insert("hash", "0");
 		    if(logicalsize > 0) // Get Category/Signature
 		    {
 			if(itemtype == 2)
+                        {
 			    nodedata << "Directory" << "Directory";
+                        }
 			else
 			{
 			    QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
@@ -6654,7 +6799,9 @@ void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QL
 			}
 		    }
 		    else
+                    {
 			nodedata << "Empty" << "Zero File";
+                    }
 		    //nodedata << "0" << "0";
 		    nodedata << "0" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode));
 		    mutex.lock();
