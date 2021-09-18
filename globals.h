@@ -176,7 +176,8 @@ extern InterfaceSignals* isignals;
 class TreeNode
 {
 public:
-    explicit TreeNode(const QList<QVariant> &data, TreeNode* parent = 0, int itype = -1)
+    //explicit TreeNode(const QList<QVariant> &data, TreeNode* parent = 0, int itype = -1)
+    explicit TreeNode(const QHash<QString, QVariant> &data, TreeNode* parent = 0, int itype = -1)
     {
         parentitem = parent;
         itemdata = data;
@@ -208,7 +209,8 @@ public:
         return itemdata.count();
     };
 
-    QVariant Data(int column) const
+    //QVariant Data(int column) const
+    QVariant Data(QString column) const
     {
         return itemdata.value(column);
     };
@@ -246,11 +248,13 @@ public:
         deleted = set;
     };
 
-    bool SetData(int column, const QVariant &value)
+    //bool SetData(int column, const QVariant &value)
+    bool SetData(QString column, const QVariant &value)
     {
-        if(column < 0 || column >= 12)
-            return false;
-        itemdata[column] = value;
+        //if(column < 0 || column >= 12)
+        //    return false;
+        itemdata.insert(column, value);
+        //itemdata[column] = value;
         return true;
     }
 
@@ -270,7 +274,8 @@ public:
 
 private:
     QList<TreeNode*> childitems;
-    QList<QVariant> itemdata;
+    QHash<QString, QVariant> itemdata;
+    //QList<QVariant> itemdata;
     TreeNode* parentitem;
 };
 
@@ -283,9 +288,25 @@ class TreeNodeModel : public QAbstractItemModel
 public:
     explicit TreeNodeModel(QObject* parent = 0) : QAbstractItemModel(parent)
     {
+        QHash<QString, QVariant> zerodata;
+        zerodata.insert("name", "Name");
+        zerodata.insert("path", "Full Path");
+        zerodata.insert("size", "Size (bytes)");
+        zerodata.insert("create", "Created (UTC)");
+        zerodata.insert("modify", "Modified (UTC)");
+        zerodata.insert("status", "Status Changed (UTC)");
+        zerodata.insert("hash", "BLAKE3 Hash");
+        zerodata.insert("cat", "Category");
+        zerodata.insert("sig", "Signature");
+        zerodata.insert("tag", "Tagged");
+        zerodata.insert("id", "ID");
+        zerodata.insert("match", "Hash Match");
+        zeronode = new TreeNode(zerodata);
+        /*
         QList<QVariant> zerodata;
         zerodata << "Name" << "Full Path" << "Size (bytes)" << "Created (UTC)" << "Accessed (UTC)" << "Modified (UTC)" << "Status Changed (UTC)" << "BLAKE3 Hash" << "File Category" << "File Signature" << "Tagged" << "ID" << "Hash Match"; // NAME IN FIRST COLUMN
         zeronode = new TreeNode(zerodata);
+        */
     };
 
     ~TreeNodeModel()
@@ -302,131 +323,131 @@ public:
         int nodetype = 0;
         int itemtype = 0;
         QByteArray ba;
-        nodetype = itemnode->Data(11).toString().split("-").count();
+        nodetype = itemnode->Data("id").toString().split("-").count();
         itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 2=del-dir, 4=del-file, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
         if(role == Qt::CheckStateRole && index.column() == 0)
             return static_cast<int>(itemnode->IsChecked() ? Qt::Checked : Qt::Unchecked);
         else if(role == Qt::ForegroundRole)
         {
-            if(nodetype == 3 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c")) || (nodetype == 2 && itemnode->Data(11).toString().contains("-mc"))) // used to be 5
+            if(nodetype == 3 || (nodetype == 2 && itemnode->Data("id").toString().contains("-c")) || (nodetype == 2 && itemnode->Data("id").toString().contains("-mc"))) // used to be 5
             {
-                if(itemnode->Data(11).toString().contains(filtervalues.idfilter) == false)
+                if(itemnode->Data("id").toString().contains(filtervalues.idfilter) == false)
                     return QColor(Qt::lightGray);
                 if(filtervalues.namebool)
                 {
                     ba.clear();
-                    ba.append(itemnode->Data(0).toString().toUtf8());
+                    ba.append(itemnode->Data("name").toString().toUtf8());
                     if(QString(QByteArray::fromBase64(ba)).contains(filtervalues.namefilter) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.pathbool)
                 {
                     ba.clear();
-                    ba.append(itemnode->Data(1).toString().toUtf8());
+                    ba.append(itemnode->Data("path").toString().toUtf8());
                     if(QString(QByteArray::fromBase64(ba)).contains(filtervalues.pathfilter) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxsizebool && filtervalues.minsizebool == false)
                 {
-                    if(itemnode->Data(2).toLongLong() <= filtervalues.maxsize)
+                    if(itemnode->Data("size").toLongLong() <= filtervalues.maxsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.minsizebool && filtervalues.maxsizebool == false)
                 {
-                    if(itemnode->Data(2).toLongLong() >= filtervalues.minsize)
+                    if(itemnode->Data("size").toLongLong() >= filtervalues.minsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxsizebool && filtervalues.minsizebool)
                 {
-                    if(itemnode->Data(2).toLongLong() >= filtervalues.minsize || itemnode->Data(2).toLongLong() <= filtervalues.maxsize)
+                    if(itemnode->Data("size").toLongLong() >= filtervalues.minsize || itemnode->Data("size").toLongLong() <= filtervalues.maxsize)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool == false)
                 {
-                    if(itemnode->Data(3).toInt() <= filtervalues.maxcreate)
+                    if(itemnode->Data("create").toInt() <= filtervalues.maxcreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool == false && filtervalues.mincreatebool)
                 {
-                    if(itemnode->Data(3).toInt() >= filtervalues.mincreate)
+                    if(itemnode->Data("create").toInt() >= filtervalues.mincreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxcreatebool && filtervalues.mincreatebool)
                 {
-                    if(itemnode->Data(3).toInt() >= filtervalues.mincreate || itemnode->Data(3).toInt() <= filtervalues.maxcreate)
+                    if(itemnode->Data("create").toInt() >= filtervalues.mincreate || itemnode->Data("create").toInt() <= filtervalues.maxcreate)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool && filtervalues.minaccessbool == false)
                 {
-                    if(itemnode->Data(4).toInt() <= filtervalues.maxaccess)
+                    if(itemnode->Data("access").toInt() <= filtervalues.maxaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool == false && filtervalues.minaccessbool)
                 {
-                    if(itemnode->Data(4).toInt() >= filtervalues.minaccess)
+                    if(itemnode->Data("access").toInt() >= filtervalues.minaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxaccessbool && filtervalues.minaccessbool)
                 {
-                    if(itemnode->Data(4).toInt() >= filtervalues.minaccess || itemnode->Data(4).toInt() <= filtervalues.maxaccess)
+                    if(itemnode->Data("access").toInt() >= filtervalues.minaccess || itemnode->Data("access").toInt() <= filtervalues.maxaccess)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool && filtervalues.minmodifybool == false)
                 {
-                    if(itemnode->Data(5).toInt() <= filtervalues.maxmodify)
+                    if(itemnode->Data("modify").toInt() <= filtervalues.maxmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool == false && filtervalues.minmodifybool)
                 {
-                    if(itemnode->Data(5).toInt() >= filtervalues.minmodify)
+                    if(itemnode->Data("modify").toInt() >= filtervalues.minmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxmodifybool && filtervalues.minmodifybool)
                 {
-                    if(itemnode->Data(5).toInt() >= filtervalues.minmodify || itemnode->Data(5).toInt() <= filtervalues.maxmodify)
+                    if(itemnode->Data("modify").toInt() >= filtervalues.minmodify || itemnode->Data("modify").toInt() <= filtervalues.maxmodify)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool && filtervalues.minchangebool == false)
                 {
-                    if(itemnode->Data(6).toInt() <= filtervalues.maxchange)
+                    if(itemnode->Data("status").toInt() <= filtervalues.maxchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool == false && filtervalues.minchangebool)
                 {
-                    if(itemnode->Data(6).toInt() >= filtervalues.minchange)
+                    if(itemnode->Data("status").toInt() >= filtervalues.minchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.maxchangebool && filtervalues.minchangebool)
                 {
-                    if(itemnode->Data(6).toInt() >= filtervalues.minchange || itemnode->Data(6).toInt() <= filtervalues.maxchange)
+                    if(itemnode->Data("status").toInt() >= filtervalues.minchange || itemnode->Data("status").toInt() <= filtervalues.maxchange)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.hashbool)
                 {
                     for(int i = 0; i < filtervalues.hashlist.count(); i++)
                     {
-                        if(itemnode->Data(7).toString().compare(filtervalues.hashlist.at(i)) == 0)
+                        if(itemnode->Data("hash").toString().compare(filtervalues.hashlist.at(i)) == 0)
                             return QColor(Qt::lightGray);
                     }
                 }
                 if(filtervalues.hashbool2)
                 {
-                    if(itemnode->Data(7).toString().contains(filtervalues.hashfilter, Qt::CaseInsensitive) == false)
+                    if(itemnode->Data("hash").toString().contains(filtervalues.hashfilter, Qt::CaseInsensitive) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.filegroupbool)
                 {
-                    if(itemnode->Data(8).toString().contains(filtervalues.filegroup) == false)
+                    if(itemnode->Data("cat").toString().contains(filtervalues.filegroup) == false)
                         return QColor(Qt::lightGray);
                 }
                 if(filtervalues.filetypebool)
                 {
-                    if(itemnode->Data(9).toString().contains(filtervalues.filetype) == false)
+                    if(itemnode->Data("sig").toString().contains(filtervalues.filetype) == false)
                             return QColor(Qt::lightGray);
                 }
                 if(filtervalues.tagbool)
                 {
-                    if(itemnode->Data(10).toString().compare(filtervalues.tag) != 0)
+                    if(itemnode->Data("tag").toString().compare(filtervalues.tag) != 0)
                         return QColor(Qt::lightGray);
                 }
             }
@@ -435,12 +456,14 @@ public:
         }
         else if(role == Qt::DisplayRole)
         {
+            //if(index.column
+            /*
             if(index.column() == 0 || index.column() == 1) // used to be 1 || 2
             {
-                if(nodetype == 3 || nodetype == 4 || (nodetype == 2 && itemnode->Data(11).toString().contains("-c"))) // used to be 5
+                if(nodetype == 3 || nodetype == 4 || (nodetype == 2 && itemnode->Data("id").toString().contains("-c"))) // used to be 5
                 {
                     ba.clear();
-                    ba.append(itemnode->Data(index.column()).toString().toUtf8());
+                    //ba.append(itemnode->Data(index.column()).toString().toUtf8());
                     return QByteArray::fromBase64(ba);
                 }
                 else
@@ -476,7 +499,8 @@ public:
                     return "";
             }
             else
-                return itemnode->Data(index.column());
+            */
+                //return itemnode->Data(index.column());
         }
         else if(role == Qt::DecorationRole)
         {
@@ -588,10 +612,13 @@ public:
             return false;
         if(role == Qt::EditRole)
         {
+            /*
             bool result = itemnode->SetData(index.column(), value);
             if(result)
                 emit dataChanged(index, index, {role});
             return result;
+            */
+            return false;
         }
         return false;
     };

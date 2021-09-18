@@ -1250,6 +1250,7 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
 
 void WombatForensics::OpenUpdate()
 {
+    /*
     QString hashstr = "MD5 Hash";
     // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
     if(hashsum == 2)
@@ -1258,7 +1259,8 @@ void WombatForensics::OpenUpdate()
         hashstr = "SHA256 Hash";
     else if(hashsum == 11)
         hashstr = "BLAKE3 Hash";
-    treenodemodel->UpdateHeaderNode(7, hashstr);
+        */
+    treenodemodel->UpdateHeaderNode(7, "BLAKE3 Hash");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "carved/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "archives/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/"); // won't do anything if it already exists
