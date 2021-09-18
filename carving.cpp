@@ -5,7 +5,7 @@
 
 void PopulateCarvedFiles(QString cfilestr)
 {
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(cfilestr.split(".").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(cfilestr.split(".").first()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap));
     if(indexlist.count() == 0)
     {
 	cfilestr = wombatvariable.tmpmntpath + "carved/" + cfilestr;
@@ -17,20 +17,20 @@ void PopulateCarvedFiles(QString cfilestr)
 	    tmpstr = cfile.readLine();
 	cfile.close();
 	QStringList slist = tmpstr.split(",");
-	QList<QVariant> nodedata;
+	QHash<QString, QVariant> nodedata;
 	nodedata.clear();
-	nodedata << slist.at(0); // name
-	nodedata << slist.at(3); // path
-	nodedata << slist.at(8); // size
-	nodedata << slist.at(6); // crtime
-	nodedata << slist.at(4); // atime
-	nodedata << slist.at(7); // mtime
-	nodedata << slist.at(5); // ctime
-	nodedata << slist.at(13); // hash
-	nodedata << QString(slist.at(10)).split("/").first(); // category
-	nodedata << QString(slist.at(10)).split("/").last(); // signature
-	nodedata << slist.at(15); // tag
-	nodedata << slist.at(12); // id
+	nodedata.insert("name", slist.at(0)); // name
+	nodedata.insert("path", slist.at(3)); // path
+	nodedata.insert("size", slist.at(8)); // size
+	nodedata.insert("create", slist.at(6)); // crtime
+	nodedata.insert("access", slist.at(4)); // atime
+	nodedata.insert("modify", slist.at(7)); // mtime
+	nodedata.insert("status", slist.at(5)); // ctime
+	nodedata.insert("hash", slist.at(13)); // hash
+	nodedata.insert("cat", QString(slist.at(10)).split("/").first()); // category
+	nodedata.insert("sig", QString(slist.at(10)).split("/").last()); // signature
+	nodedata.insert("tag", slist.at(15)); // tag
+	nodedata.insert("id", slist.at(12)); // id
 	mutex.lock();
 	if(slist.at(12).split("-").count() == 2)
 	    treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-").first() + "-mc"), 15, 0);
@@ -387,9 +387,20 @@ void WriteCarvedFile(QString& curplist, qint64& carvedstringsize, qint64& blocks
         cfile.write(QString(QString::number(curblock*blocksize) + "," + QString::number(carvedstringsize) + ";").toStdString().c_str());
         cfile.close();
     }
-    QList<QVariant> nodedata;
+    QHash<QString, QVariant> nodedata;
     nodedata.clear();
-    nodedata << QByteArray(QString("Carved" + QString::number(curblock) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64() << QByteArray(QString("0x" + QString::number(curblock*blocksize, 16)).toStdString().c_str()).toBase64() << QString::number(carvedstringsize) << "0" << "0" << "0" << "0" << "0" << curtypestr.split(",").at(0) << curtypestr.split(",").at(1) << "" << curplist + "-c" + QString::number(carvedcount);
+    nodedata.insert("name", QByteArray(QString("Carved" + QString::number(curblock) + "." + curtypestr.split(",").at(4).toLower()).toStdString().c_str()).toBase64());
+    nodedata.insert("path", QByteArray(QString("0x" + QString::number(curblock*blocksize, 16)).toStdString().c_str()).toBase64());
+    nodedata.insert("size", QString::number(carvedstringsize));
+    nodedata.insert("create", "0");
+    nodedata.insert("access", "0");
+    nodedata.insert("modify", "0");
+    nodedata.insert("status", "0");
+    nodedata.insert("hash", "0");
+    nodedata.insert("cat", curtypestr.split(",").at(0));
+    nodedata.insert("sig", curtypestr.split(",").at(1));
+    nodedata.insert("tag", "");
+    nodedata.insert("id", curplist + "-c" + QString::number(carvedcount));
     mutex.lock();
     treenodemodel->AddNode(nodedata, parstr, 15, 0);
     //treenodemodel->AddNode(nodedata, QString(slist.at(12).split("-c").first() + "-" + slist.at(17)), 15, 0);

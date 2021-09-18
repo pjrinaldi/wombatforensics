@@ -495,7 +495,7 @@ void InitializeTaggedList(void)
     while(i.hasNext())
     {
         i.next();
-        treenodemodel->UpdateNode(i.key(), 10, i.value());
+        treenodemodel->UpdateNode(i.key(), "hash", i.value());
     }
 }
 // should be able to remove

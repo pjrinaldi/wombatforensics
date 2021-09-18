@@ -829,9 +829,9 @@ void TransferThumbnails(QString thumbid, QString reppath)
 
 void TransferFiles(QString thumbid, QString reppath)
 {
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt:: MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt:: MatchRecursive));
     TreeNode* curnode = static_cast<TreeNode*>(indexlist.at(0).internalPointer());
-    qulonglong filesize = curnode->Data(2).toULongLong();
+    qulonglong filesize = curnode->Data("size").toULongLong();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*-" + thumbid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split("-e").first();
@@ -921,7 +921,7 @@ void TransferFiles(QString thumbid, QString reppath)
         }
     }
     QString tmppath = reppath + "files/";
-    if(curnode->Data(8).toString() == "Directory")
+    if(curnode->Data("cat").toString() == "Directory")
     {
         // NEED TO DETERMINE IF THE FS IS NTFS, THEN I CAN WRITE $I30 AS WELL...
         // CURRENTLY USING THE FIRST 2 OF ID DON'T WORK FOR CARVED, SINCE IT DOESN'T HAVE PARTITION...
@@ -940,22 +940,22 @@ void TransferFiles(QString thumbid, QString reppath)
                 tmpfile.open(QIODevice::WriteOnly);
             if(tmpfile.isOpen())
             {
-                if(curnode->Data(9).toString().contains("Shortcut"))
+                if(curnode->Data("sig").toString().contains("Shortcut"))
                 {
                     QString lnkstr = ParseLnkArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
                     tmpfile.write(lnkstr.toStdString().c_str());
                 }
-                else if(curnode->Data(9).toString().contains("Recycler"))
+                else if(curnode->Data("sig").toString().contains("Recycler"))
                 {
                     QString info2str = ParseInfo2Artifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
                     tmpfile.write(info2str.toStdString().c_str());
                 }
-                else if(curnode->Data(9).toString().contains("Recycle.Bin"))
+                else if(curnode->Data("sig").toString().contains("Recycle.Bin"))
                 {
                     QString idollarstr = ParseIDollarArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
                     tmpfile.write(idollarstr.toStdString().c_str());
                 }
-                else if(curnode->Data(9).toString().contains("Prefetch"))
+                else if(curnode->Data("sig").toString().contains("Prefetch"))
                 {
                     QString pfstr = ParsePrefetchArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
                     tmpfile.write(pfstr.toStdString().c_str());

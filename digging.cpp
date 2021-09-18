@@ -201,9 +201,20 @@ void GenerateArchiveExpansion(QString objectid)
 		for(int i=0; i < 12; i++)
 		    nodedata << treeout.at(i);
                 */
-                QList<QVariant> nodedata;
+                QHash<QString, QVariant> nodedata;
                 nodedata.clear();
-                nodedata << QByteArray(QString::fromStdString(std::string(zipstat.name)).toUtf8()).toBase64() << QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64() << QString::number(zipstat.size) << "0" << "0" << QString::number(zipstat.mtime) << "0" << "0" << mimestr.split("/").at(0) << mimestr.split("/").at(1) << "0" << QString(objectid + "-z" + QString::number(i));
+                nodedata.insert("name", QByteArray(QString::fromStdString(std::string(zipstat.name)).toUtf8()).toBase64());
+                nodedata.insert("path", QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64());
+                nodedata.insert("size", (quint64)zipstat.size);
+                nodedata.insert("create", "0");
+                nodedata.insert("access", "0");
+                nodedata.insert("modify", QString::number(zipstat.mtime));
+                nodedata.insert("status", "0");
+                nodedata.insert("hash", "0");
+                nodedata.insert("cat", mimestr.split("/").at(0));
+                nodedata.insert("sig", mimestr.split("/").at(1));
+                nodedata.insert("tag", "");
+                nodedata.insert("id", QString(objectid + "-z" + QString::number(i)));
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, objectid, 1, 0);
                 mutex.unlock();
@@ -378,13 +389,14 @@ void GenerateHash(QString objectid)
     //if((objectid.split("-").count() == 5 || objectid.contains("-c")) && !isclosing)
     if((objectid.split("-").count() == 3 || objectid.contains("-c")) && !isclosing)
     {
-        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        QString objectname = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
-	int curhashcount = indxlist.first().sibling(indxlist.first().row(), 7).data().toString().count();
+        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        QString objectname = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("name")).data().toString();
+	int curhashcount = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("hash")).data().toString().count();
+        // CAN REMOVE HASH IF
 	if((hashsum == 1 && curhashcount != 32) || (hashsum == 2 && curhashcount != 40) || (hashsum == 4 && curhashcount != 64) || (hashsum == 11 && curhashcount != 64))
 	{
 	    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-	    qint64 filesize = curitem->Data(2).toLongLong();
+	    qint64 filesize = curitem->Data("size").toLongLong();
 	    //if(objectid.contains("z"))
             //  qDebug() << objectid << filesize;
 	    QString hashstr = "";
@@ -431,7 +443,7 @@ void GenerateHash(QString objectid)
 	    {
 		hashlist.insert(objectid, hashstr);
 		mutex.lock();
-		treenodemodel->UpdateNode(objectid, 7, hashstr);
+		treenodemodel->UpdateNode(objectid, "hash", hashstr);
 		mutex.unlock();
 		dighashcount++;
 	    }
@@ -454,7 +466,7 @@ void GenerateHash(QString objectid)
 
 void GenerateVidThumbnails(QString thumbid)
 {
-    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();
     bool imgbool = testimage->load(thumbtestpath);
@@ -465,7 +477,7 @@ void GenerateVidThumbnails(QString thumbid)
     else
     {
 	TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-	qint64 filesize = curitem->Data(2).toLongLong();
+	qint64 filesize = curitem->Data("size").toLongLong();
 	if(filesize > 0 && !isclosing)
 	{
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
@@ -484,7 +496,7 @@ void GenerateVidThumbnails(QString thumbid)
 	    else
 		qDebug() << "Item:" << thumbid << "couldn't open file for writing contents.";
 	    QByteArray ba;
-	    QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
+	    QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
 	    ba.clear();
 	    ba.append(fullpath.toUtf8());
 	    if(!isclosing)
@@ -657,9 +669,9 @@ void GeneratePreDigging(QString thumbid)
     QString category = "";
     if(!isclosing)
     {
-        indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        category = curitem->Data(8).toString();
+        category = curitem->Data("cat").toString();
     }
     bool isarchive = false;
     isarchive = category.contains("Archive");
@@ -674,9 +686,9 @@ void GenerateDigging(QString thumbid)
     QString category = "";
     if(!isclosing)
     {
-        indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        category = curitem->Data(8).toString();
+        category = curitem->Data("cat").toString();
     }
     bool isvid = false;
     bool isimg = false;
@@ -694,7 +706,7 @@ void GenerateDigging(QString thumbid)
 
 void GenerateThumbnails(QString thumbid)
 {
-    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();
     bool imgbool = testimage->load(thumbtestpath);
@@ -705,7 +717,7 @@ void GenerateThumbnails(QString thumbid)
     else
     {
 	TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-	qint64 filesize = curitem->Data(2).toLongLong();
+	qint64 filesize = curitem->Data("size").toLongLong();
 	Magick::Geometry thumbgeometry(thumbsize, thumbsize);
 	if(filesize > 0 && !isclosing)
 	{
@@ -715,7 +727,7 @@ void GenerateThumbnails(QString thumbid)
 	    filebytes = ReturnFileContent(thumbid);
 	    QByteArray ba;
 	    ba.clear();
-	    QString fullpath = curitem->Data(1).toString() + curitem->Data(0).toString();
+	    QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
 	    ba.append(fullpath.toUtf8());
 	    imageshash.insert(thumbid, QString(ba.toBase64()));
 	    try
@@ -792,9 +804,9 @@ void GenerateThumbnails(QString thumbid)
 QByteArray ReturnFileContent(QString objectid)
 {
     // STILL NEED TO HANDLE ZIP AND CARVED
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
-    qulonglong filesize = curnode->Data(2).toULongLong();
+    qulonglong filesize = curnode->Data("size").toULongLong();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*-" + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split("-e").first();
@@ -925,7 +937,7 @@ void InitializeHashList(void)
     while(i.hasNext())
     {
         i.next();
-        treenodemodel->UpdateNode(i.key(), 7, i.value());
+        treenodemodel->UpdateNode(i.key(), "hash", i.value());
     }
 }
 
@@ -940,20 +952,20 @@ void PopulateArchiveFiles(QString afilestr)
         tmpstr = afile.readLine();
     afile.close();
     QStringList slist = tmpstr.split(",");
-    QList<QVariant> nodedata;
+    QHash<QString, QVariant> nodedata;
     nodedata.clear();
-    nodedata << slist.at(0); // name
-    nodedata << slist.at(3); // path
-    nodedata << slist.at(8); // size
-    nodedata << slist.at(6); // crtime
-    nodedata << slist.at(4); // atime
-    nodedata << slist.at(7); // mtime
-    nodedata << slist.at(5); // ctime
-    nodedata << slist.at(13); // hash
-    nodedata << QString(slist.at(10)).split("/").first(); // category
-    nodedata << QString(slist.at(10)).split("/").last(); // signature
-    nodedata << slist.at(15); // tag
-    nodedata << slist.at(12); // id
+    nodedata.insert("name", slist.at(0)); // name
+    nodedata.insert("path", slist.at(3)); // path
+    nodedata.insert("size", slist.at(8)); // size
+    nodedata.insert("create", slist.at(6)); // crtime
+    nodedata.insert("access", slist.at(4)); // atime
+    nodedata.insert("modify", slist.at(7)); // mtime
+    nodedata.insert("status", slist.at(5)); // ctime
+    nodedata.insert("hash", slist.at(13)); // hash
+    nodedata.insert("cat", QString(slist.at(10)).split("/").first()); // category
+    nodedata.insert("sig", QString(slist.at(10)).split("/").last()); // signature
+    nodedata.insert("tag", slist.at(15)); // tag
+    nodedata.insert("id", slist.at(12)); // id
     QString parentstr = afilestr.split("/").last().split("-fz").first() + "-f" + afilestr.split("/").last().split("-a").last().split(".stat").first();
     mutex.lock();
     treenodemodel->AddNode(nodedata, parentstr, 1, 0);
