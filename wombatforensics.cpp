@@ -368,7 +368,8 @@ void WombatForensics::RemoveTag()
             tmpstr = filefile.readLine();
         filefile.close();
         */
-        RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+        int colindex = treenodemodel->GetColumnIndex("id");
+        RemoveFileItem(selectedindex.sibling(selectedindex.row(), colindex).data().toString());
         /*
         if(tmpstr.split(",").count() > 15)
             tmplist = tmpstr.split(",", Qt::SkipEmptyParts);
@@ -385,14 +386,15 @@ void WombatForensics::RemoveTag()
             filefile.write(tmpstr.toStdString().c_str());
         filefile.close();
         */
-        treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), 11).data().toString(), "tag", "0");
+        treenodemodel->UpdateNode(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), "tag", "0");
     }
     else if(QString(tagaction->iconText()).contains("Checked")) // single file
     {
         QStringList checkeditems = GetFileLists(1);
         for(int i=0; i < checkeditems.count(); i++)
         {
-            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            int colindex = treenodemodel->GetColumnIndex("id");
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(indexlist.count() > 0)
             {
                 QModelIndex curindex = ((QModelIndex)indexlist.first());
@@ -432,7 +434,7 @@ void WombatForensics::RemoveTag()
                     tmpstr = filefile.readLine();
                 filefile.close();
                 */
-                RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
+                RemoveFileItem(curindex.sibling(curindex.row(), colindex).data().toString());
                 /*
                 if(tmpstr.split(",").count() > 15)
                     tmplist = tmpstr.split(",", Qt::SkipEmptyParts);
@@ -449,7 +451,7 @@ void WombatForensics::RemoveTag()
                     filefile.write(tmpstr.toStdString().c_str());
                 filefile.close();
                 */
-                treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), "tag", "0");
+                treenodemodel->UpdateNode(curindex.sibling(curindex.row(), colindex).data().toString(), "tag", "0");
             }
         }
     }
@@ -484,7 +486,8 @@ void WombatForensics::CreateEmptyHashList(void)
             ReadHashLists();
             if(parentmenu.contains("Selected")) // single file
             {
-                filestohash.append(selectedindex.sibling(selectedindex.row(), 11).data().toString());
+                int colindex = treenodemodel->GetColumnIndex("id");
+                filestohash.append(selectedindex.sibling(selectedindex.row(), colindex).data().toString());
             }
             else if(parentmenu.contains("Checked")) // checked files
             {
@@ -541,7 +544,8 @@ void WombatForensics::CreateNewTag()
                 QStringList checkeditems = GetFileLists(1);
                 for(int i=0; i < checkeditems.count(); i++)
                 {
-                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                    int colindex = treenodemodel->GetColumnIndex("id");
+                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
                     if(indexlist.count() > 0)
                     {
                         QModelIndex curindex = ((QModelIndex)indexlist.first());
@@ -557,14 +561,15 @@ void WombatForensics::CreateNewTag()
 
 void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
 {
+    int colindex = treenodemodel->GetColumnIndex("id");
     //if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c"))
-    if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 3 || curindex.sibling(curindex.row(), 11).data().toString().contains("-c") || curindex.sibling(curindex.row(), 11).data().toString().contains("-z"))
+    if(curindex.sibling(curindex.row(), colindex).data().toString().split("-").count() == 3 || curindex.sibling(curindex.row(), colindex).data().toString().contains("-c") || curindex.sibling(curindex.row(), colindex).data().toString().contains("-z"))
     {
         QTimeZone tmpzone = QTimeZone(reporttimezone);
         //taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
-        treenodemodel->UpdateNode(curindex.sibling(curindex.row(), 11).data().toString(), "tag", tagname);
-        QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), 11).data().toString() + "'>";
-        filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), 0).data().toString() + "</th></tr>";
+        treenodemodel->UpdateNode(curindex.sibling(curindex.row(), colindex).data().toString(), "tag", tagname);
+        QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), colindex).data().toString() + "'>";
+        filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString() + "</th></tr>";
         filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), 1).data().toString() + "</span></td></tr>";
         filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), 2).data().toString() + " bytes</td></tr>";
         if(!curindex.sibling(curindex.row(), 3).data().toString().isEmpty())

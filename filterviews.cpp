@@ -415,12 +415,15 @@ void FileTypeFilter::DisplayFilter()
     QStringList tmptype;
     tmptype.clear();
     ui->typecomboBox->clear();
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 9, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
+    // NEED TO FIGURE OUT HOW TO GET THE CORRECT ROW SO I AM PULLING ALL THE MATCHING SIGNATURE ENTRIES
+    // MAYBE CALLING int treenodemodel->GetColumnIndex(QString "sig") which returns the index... this would apply for all the selectedindex as well...
+    int colindex = treenodemodel->GetColumnIndex("sig");
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
     for(int i=0; i < indexlist.count(); i++)
     {
         TreeNode* tmpnode = static_cast<TreeNode*>(indexlist.at(i).internalPointer());
-        if(tmpnode->Data(9).toString() != "0")
-            tmptype.append(tmpnode->Data(9).toString());
+        if(tmpnode->Data("sig").toString() != "0")
+            tmptype.append(tmpnode->Data("sig").toString());
     }
     tmptype.removeDuplicates();
     for(int i=0; i < tmptype.count(); i++)
@@ -503,12 +506,13 @@ void FileCategoryFilter::DisplayFilter()
     QStringList tmpcategory;
     tmpcategory.clear();
     ui->categorycomboBox->clear();
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 8, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
+    int colindex = treenodemodel->GetColumnIndex("cat");
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
     for(int i=0; i < indexlist.count(); i++)
     {
         TreeNode* tmpnode = static_cast<TreeNode*>(indexlist.at(i).internalPointer());
-        if(tmpnode->Data(8).toString() != "0")
-            tmpcategory.append(tmpnode->Data(8).toString());
+        if(tmpnode->Data("cat").toString() != "0")
+            tmpcategory.append(tmpnode->Data("cat").toString());
     }
     tmpcategory.removeDuplicates();
     for(int i=0; i < tmpcategory.count(); i++)
@@ -555,12 +559,13 @@ void HashFilter::HideClicked()
 {
     filtervalues.hashbool = ui->checkBox->isChecked();
     filtervalues.hashbool2 = ui->checkBox_2->isChecked();
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 7, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
+    int colindex = treenodemodel->GetColumnIndex("hash");
+    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant("*"), -1, Qt::MatchFlags(Qt::MatchWildcard | Qt::MatchRecursive));
     for(int i=0; i < indexlist.count(); i++)
     {
         TreeNode* tmpnode = static_cast<TreeNode*>(indexlist.at(i).internalPointer());
-        if(tmpnode->Data(7).toString() == "0")
-            filtervalues.hashlist.append(tmpnode->Data(7).toString());
+        if(tmpnode->Data("hash").toString() == "0")
+            filtervalues.hashlist.append(tmpnode->Data("hash").toString());
     }
     if(filtervalues.hashbool)
     {

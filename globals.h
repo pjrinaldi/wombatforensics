@@ -838,6 +838,16 @@ public:
         parents.clear();
         endResetModel();
     };
+
+    int GetColumnIndex(QString colkey)
+    {
+        for(int i=0; i < columnorder.count(); i++)
+        {
+            if(columnorder.at(i) == colkey)
+                return i;
+        }
+    };
+
 private:
     TreeNode* zeronode; //rootitem
     QStringList columnorder;
