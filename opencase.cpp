@@ -3,6 +3,7 @@
 // Copyright 2013-2021 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
+// NEED TO FIX THIS TO ACCOUNT FOR THE MOVEABLE COLUMNS
 void LoadTreeModel(void)
 {
     QStringList treelist;
@@ -26,9 +27,20 @@ void LoadTreeModel(void)
         QString parentstr = "";
         QStringList nodelist = treelist.at(i).split(",");
         //qDebug() << nodelist.at(11);
-        QList<QVariant> nodedata;
+        QHash<QString, QVariant> nodedata;
         nodedata.clear();
-        nodedata << nodelist.at(0) << nodelist.at(1) << nodelist.at(2).toLongLong() << nodelist.at(3).toInt() << nodelist.at(4).toInt() << nodelist.at(5).toInt() << nodelist.at(6).toInt() << nodelist.at(7) << nodelist.at(8) << nodelist.at(9) << nodelist.at(10) << nodelist.at(11);
+        nodedata.insert("name", nodelist.at(0));
+        nodedata.insert("path", nodelist.at(1));
+        nodedata.insert("size", nodelist.at(2).toLongLong());
+        nodedata.insert("create", nodelist.at(3).toInt());
+        nodedata.insert("access", nodelist.at(4).toInt());
+        nodedata.insert("modify", nodelist.at(5).toInt());
+        nodedata.insert("status", nodelist.at(6).toInt());
+        nodedata.insert("hash", nodelist.at(7));
+        nodedata.insert("cat", nodelist.at(8));
+        nodedata.insert("sig", nodelist.at(9));
+        nodedata.insert("tag", nodelist.at(10));
+        nodedata.insert("id", nodelist.at(11));
         if(nodelist.at(14).isEmpty())
             parentstr = "-1";
         else
