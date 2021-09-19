@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>hashcategoryfilter</class>
- <widget class="QWidget" name="hashcategoryfilter">
+ <widget class="QDialog" name="hashcategoryfilter">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -9,22 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
-    <height>42</height>
+    <width>382</width>
+    <height>41</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>8</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
-   <string>Filter</string>
+   <string>Hash Category Filter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="horizontalSpacing">
-    <number>0</number>
-   </property>
    <item row="0" column="0">
     <widget class="QCheckBox" name="checkBox">
      <property name="text">
@@ -45,22 +37,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>checkBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>comboBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>115</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>297</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

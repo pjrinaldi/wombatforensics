@@ -38,7 +38,7 @@ namespace Ui {
     class JumpHex;
 }
 
-class IdFilter : public QFrame
+class IdFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -51,6 +51,7 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
     void BuildId(QString curstring);
     void Rebuild();
 
@@ -80,7 +81,7 @@ private:
     Ui::JumpHex* ui;
 };
 
-class NameFilter : public QWidget
+class NameFilter : public QDialog
 {
     Q_OBJECT
 
@@ -94,12 +95,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
 
 private:
     Ui::NameFilter* ui;
 };
 
-class PathFilter : public QWidget
+class PathFilter : public QDialog
 {
     Q_OBJECT
 
@@ -113,12 +115,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
 
 private:
     Ui::PathFilter* ui;
 };
 
-class SizeFilter : public QWidget
+class SizeFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -131,12 +134,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
 
 private:
     Ui::SizeFilter* ui;
 };
 
-class CreatedDateFilter : public QWidget
+class CreatedDateFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -149,12 +153,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
 
 private:
     Ui::CreatedDateFilter* ui;
 };
 
-class AccessedDateFilter : public QWidget
+class AccessedDateFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -167,11 +172,12 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
 private:
     Ui::AccessedDateFilter* ui;
 };
 
-class ModifiedDateFilter : public QWidget
+class ModifiedDateFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -184,11 +190,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
+
 private:
     Ui::ModifiedDateFilter* ui;
 };
 
-class ChangedDateFilter : public QWidget
+class ChangedDateFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -201,11 +209,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
+
 private:
     Ui::ChangedDateFilter* ui;
 };
 
-class FileTypeFilter : public QWidget
+class FileTypeFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -218,11 +228,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
+
 private:
     Ui::FileTypeFilter* ui;
 };
 
-class FileCategoryFilter : public QWidget
+class FileCategoryFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -235,11 +247,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
+
 private:
     Ui::FileCategoryFilter* ui;
 };
 
-class TagFilter : public QWidget
+class TagFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -252,11 +266,13 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
+
 private:
     Ui::TagFilter* ui;
 };
 
-class HashFilter : public QWidget
+class HashFilter : public QDialog
 {
     Q_OBJECT
 public:
@@ -269,6 +285,8 @@ signals:
 
 private slots:
     void HideClicked();
+    void CancelClicked();
+
 private:
     Ui::HashFilter* ui;
 };

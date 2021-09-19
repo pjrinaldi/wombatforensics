@@ -1,34 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>IdFilter</class>
- <widget class="QFrame" name="IdFilter">
-  <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
-  </property>
+ <widget class="QDialog" name="IdFilter">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>148</width>
-    <height>208</height>
+    <width>146</width>
+    <height>243</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Frame</string>
-  </property>
-  <property name="autoFillBackground">
-   <bool>true</bool>
-  </property>
-  <property name="frameShape">
-   <enum>QFrame::StyledPanel</enum>
-  </property>
-  <property name="frameShadow">
-   <enum>QFrame::Raised</enum>
+   <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="sizeConstraint">
-    <enum>QLayout::SetFixedSize</enum>
-   </property>
    <item row="2" column="0">
     <widget class="QCheckBox" name="echeckBox">
      <property name="font">
@@ -38,6 +23,48 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="idlabel">
+     <property name="font">
+      <font>
+       <family>Ubuntu</family>
+       <pointsize>8</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">padding-top: 5px; padding-bottom: 5px;</string>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QSpinBox" name="fspinBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="prefix">
+      <string>f</string>
+     </property>
+     <property name="maximum">
+      <number>1000000000</number>
      </property>
     </widget>
    </item>
@@ -66,6 +93,13 @@
     </widget>
    </item>
    <item row="5" column="0">
+    <widget class="QCheckBox" name="fcheckBox">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
     <widget class="QCheckBox" name="vcheckBox">
      <property name="font">
       <font>
@@ -77,32 +111,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="QSpinBox" name="vspinBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="prefix">
-      <string>v</string>
-     </property>
-     <property name="maximum">
-      <number>1000000000</number>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QCheckBox" name="pcheckBox">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
+   <item row="4" column="1">
     <widget class="QSpinBox" name="pspinBox">
      <property name="enabled">
       <bool>false</bool>
@@ -114,31 +123,6 @@
      </property>
      <property name="prefix">
       <string>p</string>
-     </property>
-     <property name="maximum">
-      <number>1000000000</number>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QCheckBox" name="fcheckBox">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QSpinBox" name="fspinBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="prefix">
-      <string>f</string>
      </property>
      <property name="maximum">
       <number>1000000000</number>
@@ -166,7 +150,32 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+   <item row="4" column="0">
+    <widget class="QCheckBox" name="pcheckBox">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QSpinBox" name="vspinBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="prefix">
+      <string>v</string>
+     </property>
+     <property name="maximum">
+      <number>1000000000</number>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
     <widget class="QPushButton" name="pushButton">
      <property name="font">
       <font>
@@ -191,97 +200,21 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QLabel" name="idlabel">
-     <property name="font">
-      <font>
-       <family>Ubuntu</family>
-       <pointsize>8</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
+   <item row="7" column="1">
+    <widget class="QPushButton" name="pushButton_2">
      <property name="styleSheet">
-      <string notr="true">padding-top: 5px; padding-bottom: 5px;</string>
+      <string notr="true">border: 1px solid black; padding: 5px 5px 5px 5px;</string>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>Cancel</string>
      </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+     <property name="flat">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>echeckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>espinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>27</x>
-     <y>40</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>91</x>
-     <y>40</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>vcheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>vspinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>71</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>68</x>
-     <y>71</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pcheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pspinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>14</x>
-     <y>98</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>61</x>
-     <y>106</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fcheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>fspinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>29</x>
-     <y>126</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>55</x>
-     <y>126</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

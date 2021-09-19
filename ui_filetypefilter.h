@@ -13,9 +13,9 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -23,30 +23,19 @@ class Ui_FileTypeFilter
 {
 public:
     QGridLayout *gridLayout;
-    QPushButton *pushButton;
     QCheckBox *typecheckBox;
     QComboBox *typecomboBox;
+    QPushButton *pushButton;
+    QPushButton *pushButton_2;
 
-    void setupUi(QWidget *FileTypeFilter)
+    void setupUi(QDialog *FileTypeFilter)
     {
         if (FileTypeFilter->objectName().isEmpty())
             FileTypeFilter->setObjectName(QString::fromUtf8("FileTypeFilter"));
         FileTypeFilter->setWindowModality(Qt::ApplicationModal);
-        FileTypeFilter->resize(429, 80);
-        QFont font;
-        font.setPointSize(8);
-        FileTypeFilter->setFont(font);
-        FileTypeFilter->setAutoFillBackground(true);
+        FileTypeFilter->resize(406, 74);
         gridLayout = new QGridLayout(FileTypeFilter);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setHorizontalSpacing(0);
-        pushButton = new QPushButton(FileTypeFilter);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 10px 5px 10px;"));
-        pushButton->setFlat(true);
-
-        gridLayout->addWidget(pushButton, 1, 1, 1, 1);
-
         typecheckBox = new QCheckBox(FileTypeFilter);
         typecheckBox->setObjectName(QString::fromUtf8("typecheckBox"));
 
@@ -59,9 +48,20 @@ public:
 
         gridLayout->addWidget(typecomboBox, 0, 1, 1, 1);
 
+        pushButton = new QPushButton(FileTypeFilter);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setStyleSheet(QString::fromUtf8(""));
+        pushButton->setFlat(false);
+
+        gridLayout->addWidget(pushButton, 1, 1, 1, 1);
+
+        pushButton_2 = new QPushButton(FileTypeFilter);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+
+        gridLayout->addWidget(pushButton_2, 1, 0, 1, 1);
+
 
         retranslateUi(FileTypeFilter);
-        QObject::connect(typecheckBox, SIGNAL(toggled(bool)), typecomboBox, SLOT(setEnabled(bool)));
 
         pushButton->setDefault(true);
 
@@ -69,11 +69,12 @@ public:
         QMetaObject::connectSlotsByName(FileTypeFilter);
     } // setupUi
 
-    void retranslateUi(QWidget *FileTypeFilter)
+    void retranslateUi(QDialog *FileTypeFilter)
     {
-        FileTypeFilter->setWindowTitle(QCoreApplication::translate("FileTypeFilter", "Filter", nullptr));
-        pushButton->setText(QCoreApplication::translate("FileTypeFilter", "Apply", nullptr));
+        FileTypeFilter->setWindowTitle(QCoreApplication::translate("FileTypeFilter", "File Type Filter", nullptr));
         typecheckBox->setText(QCoreApplication::translate("FileTypeFilter", "Show Items where type matches", nullptr));
+        pushButton->setText(QCoreApplication::translate("FileTypeFilter", "Apply", nullptr));
+        pushButton_2->setText(QCoreApplication::translate("FileTypeFilter", "Cancel", nullptr));
     } // retranslateUi
 
 };

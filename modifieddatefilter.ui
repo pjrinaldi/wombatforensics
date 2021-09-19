@@ -1,44 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ModifiedDateFilter</class>
- <widget class="QWidget" name="ModifiedDateFilter">
-  <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
-  </property>
+ <widget class="QDialog" name="ModifiedDateFilter">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
+    <width>348</width>
     <height>105</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>8</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
-   <string>Filter</string>
-  </property>
-  <property name="autoFillBackground">
-   <bool>true</bool>
+   <string>Modified Date Filter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="horizontalSpacing">
-    <number>0</number>
-   </property>
    <item row="0" column="0">
     <widget class="QCheckBox" name="morecheckBox">
      <property name="text">
       <string>Show Items with date &gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QCheckBox" name="lesscheckBox">
-     <property name="text">
-      <string>Show Items with date &lt;</string>
      </property>
     </widget>
    </item>
@@ -58,7 +37,14 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="1" column="0">
+    <widget class="QCheckBox" name="lesscheckBox">
+     <property name="text">
+      <string>Show Items with date &lt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
     <widget class="QDateTimeEdit" name="lessdateTimeEdit">
      <property name="enabled">
       <bool>false</bool>
@@ -74,10 +60,10 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="2" column="1">
     <widget class="QPushButton" name="pushButton">
      <property name="styleSheet">
-      <string notr="true">border: 1px solid black; padding: 5px 10px 5px 10px;</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>Apply</string>
@@ -86,45 +72,19 @@
       <bool>true</bool>
      </property>
      <property name="flat">
-      <bool>true</bool>
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="text">
+      <string>Cancel</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>lesscheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lessdateTimeEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>162</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>238</x>
-     <y>162</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>morecheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>moredateTimeEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>238</x>
-     <y>76</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

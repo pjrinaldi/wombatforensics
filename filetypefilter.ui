@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>FileTypeFilter</class>
- <widget class="QWidget" name="FileTypeFilter">
+ <widget class="QDialog" name="FileTypeFilter">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -9,41 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>429</width>
-    <height>80</height>
+    <width>406</width>
+    <height>74</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>8</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
-   <string>Filter</string>
-  </property>
-  <property name="autoFillBackground">
-   <bool>true</bool>
+   <string>File Type Filter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="horizontalSpacing">
-    <number>0</number>
-   </property>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="pushButton">
-     <property name="styleSheet">
-      <string notr="true">border: 1px solid black; padding: 5px 10px 5px 10px;</string>
-     </property>
-     <property name="text">
-      <string>Apply</string>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
     <widget class="QCheckBox" name="typecheckBox">
      <property name="text">
@@ -61,25 +34,31 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="pushButton">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string>Apply</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>typecheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>typecomboBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>120</x>
-     <y>55</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>248</x>
-     <y>49</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

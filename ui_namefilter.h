@@ -12,10 +12,10 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -26,20 +26,15 @@ public:
     QCheckBox *checkBox;
     QLineEdit *lineEdit;
     QPushButton *pushButton;
+    QPushButton *pushButton_2;
 
-    void setupUi(QWidget *NameFilter)
+    void setupUi(QDialog *NameFilter)
     {
         if (NameFilter->objectName().isEmpty())
             NameFilter->setObjectName(QString::fromUtf8("NameFilter"));
-        NameFilter->setWindowModality(Qt::ApplicationModal);
-        NameFilter->resize(346, 75);
-        QFont font;
-        font.setPointSize(8);
-        NameFilter->setFont(font);
-        NameFilter->setAutoFillBackground(true);
+        NameFilter->resize(377, 70);
         gridLayout = new QGridLayout(NameFilter);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setHorizontalSpacing(0);
         checkBox = new QCheckBox(NameFilter);
         checkBox->setObjectName(QString::fromUtf8("checkBox"));
 
@@ -53,14 +48,18 @@ public:
 
         pushButton = new QPushButton(NameFilter);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 10px 5px 10px;"));
-        pushButton->setFlat(true);
+        pushButton->setStyleSheet(QString::fromUtf8(""));
+        pushButton->setFlat(false);
 
         gridLayout->addWidget(pushButton, 1, 1, 1, 1);
 
+        pushButton_2 = new QPushButton(NameFilter);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+
+        gridLayout->addWidget(pushButton_2, 1, 0, 1, 1);
+
 
         retranslateUi(NameFilter);
-        QObject::connect(checkBox, SIGNAL(toggled(bool)), lineEdit, SLOT(setEnabled(bool)));
 
         pushButton->setDefault(true);
 
@@ -68,12 +67,13 @@ public:
         QMetaObject::connectSlotsByName(NameFilter);
     } // setupUi
 
-    void retranslateUi(QWidget *NameFilter)
+    void retranslateUi(QDialog *NameFilter)
     {
-        NameFilter->setWindowTitle(QCoreApplication::translate("NameFilter", "Filter", nullptr));
+        NameFilter->setWindowTitle(QCoreApplication::translate("NameFilter", "Name Filter", nullptr));
         checkBox->setText(QCoreApplication::translate("NameFilter", "Show Items where name contains", nullptr));
         lineEdit->setPlaceholderText(QString());
         pushButton->setText(QCoreApplication::translate("NameFilter", "Apply", nullptr));
+        pushButton_2->setText(QCoreApplication::translate("NameFilter", "Cancel", nullptr));
     } // retranslateUi
 
 };

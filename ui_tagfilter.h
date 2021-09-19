@@ -13,9 +13,9 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -23,30 +23,19 @@ class Ui_TagFilter
 {
 public:
     QGridLayout *gridLayout;
-    QPushButton *pushButton;
     QCheckBox *tagcheckBox;
     QComboBox *tagcomboBox;
+    QPushButton *pushButton;
+    QPushButton *pushButton_2;
 
-    void setupUi(QWidget *TagFilter)
+    void setupUi(QDialog *TagFilter)
     {
         if (TagFilter->objectName().isEmpty())
             TagFilter->setObjectName(QString::fromUtf8("TagFilter"));
         TagFilter->setWindowModality(Qt::ApplicationModal);
-        TagFilter->resize(429, 80);
-        QFont font;
-        font.setPointSize(8);
-        TagFilter->setFont(font);
-        TagFilter->setAutoFillBackground(true);
+        TagFilter->resize(395, 74);
         gridLayout = new QGridLayout(TagFilter);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setHorizontalSpacing(0);
-        pushButton = new QPushButton(TagFilter);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 10px 5px 10px;"));
-        pushButton->setFlat(true);
-
-        gridLayout->addWidget(pushButton, 1, 1, 1, 1);
-
         tagcheckBox = new QCheckBox(TagFilter);
         tagcheckBox->setObjectName(QString::fromUtf8("tagcheckBox"));
 
@@ -59,9 +48,20 @@ public:
 
         gridLayout->addWidget(tagcomboBox, 0, 1, 1, 1);
 
+        pushButton = new QPushButton(TagFilter);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setStyleSheet(QString::fromUtf8(""));
+        pushButton->setFlat(false);
+
+        gridLayout->addWidget(pushButton, 1, 1, 1, 1);
+
+        pushButton_2 = new QPushButton(TagFilter);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+
+        gridLayout->addWidget(pushButton_2, 1, 0, 1, 1);
+
 
         retranslateUi(TagFilter);
-        QObject::connect(tagcheckBox, SIGNAL(toggled(bool)), tagcomboBox, SLOT(setEnabled(bool)));
 
         pushButton->setDefault(true);
 
@@ -69,11 +69,12 @@ public:
         QMetaObject::connectSlotsByName(TagFilter);
     } // setupUi
 
-    void retranslateUi(QWidget *TagFilter)
+    void retranslateUi(QDialog *TagFilter)
     {
-        TagFilter->setWindowTitle(QCoreApplication::translate("TagFilter", "Filter", nullptr));
-        pushButton->setText(QCoreApplication::translate("TagFilter", "Apply", nullptr));
+        TagFilter->setWindowTitle(QCoreApplication::translate("TagFilter", "Tag Filter", nullptr));
         tagcheckBox->setText(QCoreApplication::translate("TagFilter", "Show Items Tagged As", nullptr));
+        pushButton->setText(QCoreApplication::translate("TagFilter", "Apply", nullptr));
+        pushButton_2->setText(QCoreApplication::translate("TagFilter", "Cancel", nullptr));
     } // retranslateUi
 
 };

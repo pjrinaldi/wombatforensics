@@ -13,8 +13,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -25,18 +25,14 @@ public:
     QCheckBox *checkBox;
     QComboBox *comboBox;
 
-    void setupUi(QWidget *hashcategoryfilter)
+    void setupUi(QDialog *hashcategoryfilter)
     {
         if (hashcategoryfilter->objectName().isEmpty())
             hashcategoryfilter->setObjectName(QString::fromUtf8("hashcategoryfilter"));
         hashcategoryfilter->setWindowModality(Qt::ApplicationModal);
-        hashcategoryfilter->resize(383, 42);
-        QFont font;
-        font.setPointSize(8);
-        hashcategoryfilter->setFont(font);
+        hashcategoryfilter->resize(382, 41);
         gridLayout = new QGridLayout(hashcategoryfilter);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setHorizontalSpacing(0);
         checkBox = new QCheckBox(hashcategoryfilter);
         checkBox->setObjectName(QString::fromUtf8("checkBox"));
 
@@ -50,14 +46,13 @@ public:
 
 
         retranslateUi(hashcategoryfilter);
-        QObject::connect(checkBox, SIGNAL(toggled(bool)), comboBox, SLOT(setEnabled(bool)));
 
         QMetaObject::connectSlotsByName(hashcategoryfilter);
     } // setupUi
 
-    void retranslateUi(QWidget *hashcategoryfilter)
+    void retranslateUi(QDialog *hashcategoryfilter)
     {
-        hashcategoryfilter->setWindowTitle(QCoreApplication::translate("hashcategoryfilter", "Filter", nullptr));
+        hashcategoryfilter->setWindowTitle(QCoreApplication::translate("hashcategoryfilter", "Hash Category Filter", nullptr));
         checkBox->setText(QCoreApplication::translate("hashcategoryfilter", "Show Items where hash matches", nullptr));
         comboBox->setCurrentText(QString());
     } // retranslateUi

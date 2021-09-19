@@ -12,7 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
-#include <QtWidgets/QFrame>
+#include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
@@ -25,29 +25,25 @@ class Ui_IdFilter
 public:
     QGridLayout *gridLayout;
     QCheckBox *echeckBox;
-    QSpinBox *espinBox;
-    QCheckBox *vcheckBox;
-    QSpinBox *vspinBox;
-    QCheckBox *pcheckBox;
-    QSpinBox *pspinBox;
-    QCheckBox *fcheckBox;
-    QSpinBox *fspinBox;
-    QLabel *label;
-    QPushButton *pushButton;
     QLabel *idlabel;
+    QSpinBox *fspinBox;
+    QSpinBox *espinBox;
+    QCheckBox *fcheckBox;
+    QCheckBox *vcheckBox;
+    QSpinBox *pspinBox;
+    QLabel *label;
+    QCheckBox *pcheckBox;
+    QSpinBox *vspinBox;
+    QPushButton *pushButton;
+    QPushButton *pushButton_2;
 
-    void setupUi(QFrame *IdFilter)
+    void setupUi(QDialog *IdFilter)
     {
         if (IdFilter->objectName().isEmpty())
             IdFilter->setObjectName(QString::fromUtf8("IdFilter"));
-        IdFilter->setWindowModality(Qt::WindowModal);
-        IdFilter->resize(148, 208);
-        IdFilter->setAutoFillBackground(true);
-        IdFilter->setFrameShape(QFrame::StyledPanel);
-        IdFilter->setFrameShadow(QFrame::Raised);
+        IdFilter->resize(146, 243);
         gridLayout = new QGridLayout(IdFilter);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        gridLayout->setSizeConstraint(QLayout::SetFixedSize);
         echeckBox = new QCheckBox(IdFilter);
         echeckBox->setObjectName(QString::fromUtf8("echeckBox"));
         QFont font;
@@ -55,6 +51,28 @@ public:
         echeckBox->setFont(font);
 
         gridLayout->addWidget(echeckBox, 2, 0, 1, 1);
+
+        idlabel = new QLabel(IdFilter);
+        idlabel->setObjectName(QString::fromUtf8("idlabel"));
+        QFont font1;
+        font1.setFamily(QString::fromUtf8("Ubuntu"));
+        font1.setPointSize(8);
+        font1.setBold(true);
+        font1.setWeight(75);
+        idlabel->setFont(font1);
+        idlabel->setStyleSheet(QString::fromUtf8("padding-top: 5px; padding-bottom: 5px;"));
+        idlabel->setTextFormat(Qt::AutoText);
+        idlabel->setAlignment(Qt::AlignCenter);
+
+        gridLayout->addWidget(idlabel, 1, 0, 1, 2);
+
+        fspinBox = new QSpinBox(IdFilter);
+        fspinBox->setObjectName(QString::fromUtf8("fspinBox"));
+        fspinBox->setEnabled(false);
+        fspinBox->setFont(font);
+        fspinBox->setMaximum(1000000000);
+
+        gridLayout->addWidget(fspinBox, 5, 1, 1, 1);
 
         espinBox = new QSpinBox(IdFilter);
         espinBox->setObjectName(QString::fromUtf8("espinBox"));
@@ -65,24 +83,16 @@ public:
 
         gridLayout->addWidget(espinBox, 2, 1, 1, 1);
 
+        fcheckBox = new QCheckBox(IdFilter);
+        fcheckBox->setObjectName(QString::fromUtf8("fcheckBox"));
+
+        gridLayout->addWidget(fcheckBox, 5, 0, 1, 1);
+
         vcheckBox = new QCheckBox(IdFilter);
         vcheckBox->setObjectName(QString::fromUtf8("vcheckBox"));
         vcheckBox->setFont(font);
 
-        gridLayout->addWidget(vcheckBox, 5, 0, 1, 1);
-
-        vspinBox = new QSpinBox(IdFilter);
-        vspinBox->setObjectName(QString::fromUtf8("vspinBox"));
-        vspinBox->setEnabled(false);
-        vspinBox->setFont(font);
-        vspinBox->setMaximum(1000000000);
-
-        gridLayout->addWidget(vspinBox, 5, 1, 1, 1);
-
-        pcheckBox = new QCheckBox(IdFilter);
-        pcheckBox->setObjectName(QString::fromUtf8("pcheckBox"));
-
-        gridLayout->addWidget(pcheckBox, 6, 0, 1, 1);
+        gridLayout->addWidget(vcheckBox, 3, 0, 1, 1);
 
         pspinBox = new QSpinBox(IdFilter);
         pspinBox->setObjectName(QString::fromUtf8("pspinBox"));
@@ -90,20 +100,7 @@ public:
         pspinBox->setFont(font);
         pspinBox->setMaximum(1000000000);
 
-        gridLayout->addWidget(pspinBox, 6, 1, 1, 1);
-
-        fcheckBox = new QCheckBox(IdFilter);
-        fcheckBox->setObjectName(QString::fromUtf8("fcheckBox"));
-
-        gridLayout->addWidget(fcheckBox, 7, 0, 1, 1);
-
-        fspinBox = new QSpinBox(IdFilter);
-        fspinBox->setObjectName(QString::fromUtf8("fspinBox"));
-        fspinBox->setEnabled(false);
-        fspinBox->setFont(font);
-        fspinBox->setMaximum(1000000000);
-
-        gridLayout->addWidget(fspinBox, 7, 1, 1, 1);
+        gridLayout->addWidget(pspinBox, 4, 1, 1, 1);
 
         label = new QLabel(IdFilter);
         label->setObjectName(QString::fromUtf8("label"));
@@ -114,38 +111,40 @@ public:
 
         gridLayout->addWidget(label, 0, 0, 1, 2);
 
+        pcheckBox = new QCheckBox(IdFilter);
+        pcheckBox->setObjectName(QString::fromUtf8("pcheckBox"));
+
+        gridLayout->addWidget(pcheckBox, 4, 0, 1, 1);
+
+        vspinBox = new QSpinBox(IdFilter);
+        vspinBox->setObjectName(QString::fromUtf8("vspinBox"));
+        vspinBox->setEnabled(false);
+        vspinBox->setFont(font);
+        vspinBox->setMaximum(1000000000);
+
+        gridLayout->addWidget(vspinBox, 3, 1, 1, 1);
+
         pushButton = new QPushButton(IdFilter);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        QFont font1;
-        font1.setPointSize(8);
-        font1.setStrikeOut(false);
-        pushButton->setFont(font1);
+        QFont font2;
+        font2.setPointSize(8);
+        font2.setStrikeOut(false);
+        pushButton->setFont(font2);
         pushButton->setCursor(QCursor(Qt::ArrowCursor));
         pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding-top: 5px; padding-bottom: 5px;"));
         pushButton->setFlat(true);
 
-        gridLayout->addWidget(pushButton, 8, 1, 1, 1);
+        gridLayout->addWidget(pushButton, 6, 1, 1, 1);
 
-        idlabel = new QLabel(IdFilter);
-        idlabel->setObjectName(QString::fromUtf8("idlabel"));
-        QFont font2;
-        font2.setFamily(QString::fromUtf8("Ubuntu"));
-        font2.setPointSize(8);
-        font2.setBold(true);
-        font2.setWeight(75);
-        idlabel->setFont(font2);
-        idlabel->setStyleSheet(QString::fromUtf8("padding-top: 5px; padding-bottom: 5px;"));
-        idlabel->setTextFormat(Qt::AutoText);
-        idlabel->setAlignment(Qt::AlignCenter);
+        pushButton_2 = new QPushButton(IdFilter);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        pushButton_2->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 5px 5px 5px;"));
+        pushButton_2->setFlat(true);
 
-        gridLayout->addWidget(idlabel, 1, 0, 1, 2);
+        gridLayout->addWidget(pushButton_2, 7, 1, 1, 1);
 
 
         retranslateUi(IdFilter);
-        QObject::connect(echeckBox, SIGNAL(toggled(bool)), espinBox, SLOT(setEnabled(bool)));
-        QObject::connect(vcheckBox, SIGNAL(toggled(bool)), vspinBox, SLOT(setEnabled(bool)));
-        QObject::connect(pcheckBox, SIGNAL(toggled(bool)), pspinBox, SLOT(setEnabled(bool)));
-        QObject::connect(fcheckBox, SIGNAL(toggled(bool)), fspinBox, SLOT(setEnabled(bool)));
 
         pushButton->setDefault(true);
 
@@ -153,21 +152,22 @@ public:
         QMetaObject::connectSlotsByName(IdFilter);
     } // setupUi
 
-    void retranslateUi(QFrame *IdFilter)
+    void retranslateUi(QDialog *IdFilter)
     {
-        IdFilter->setWindowTitle(QCoreApplication::translate("IdFilter", "Frame", nullptr));
+        IdFilter->setWindowTitle(QCoreApplication::translate("IdFilter", "Dialog", nullptr));
         echeckBox->setText(QString());
+        idlabel->setText(QCoreApplication::translate("IdFilter", "TextLabel", nullptr));
+        fspinBox->setPrefix(QCoreApplication::translate("IdFilter", "f", nullptr));
         espinBox->setSuffix(QString());
         espinBox->setPrefix(QCoreApplication::translate("IdFilter", "e", nullptr));
-        vcheckBox->setText(QString());
-        vspinBox->setPrefix(QCoreApplication::translate("IdFilter", "v", nullptr));
-        pcheckBox->setText(QString());
-        pspinBox->setPrefix(QCoreApplication::translate("IdFilter", "p", nullptr));
         fcheckBox->setText(QString());
-        fspinBox->setPrefix(QCoreApplication::translate("IdFilter", "f", nullptr));
+        vcheckBox->setText(QString());
+        pspinBox->setPrefix(QCoreApplication::translate("IdFilter", "p", nullptr));
         label->setText(QCoreApplication::translate("IdFilter", "Show ID's that contain:", nullptr));
+        pcheckBox->setText(QString());
+        vspinBox->setPrefix(QCoreApplication::translate("IdFilter", "v", nullptr));
         pushButton->setText(QCoreApplication::translate("IdFilter", "Apply", nullptr));
-        idlabel->setText(QCoreApplication::translate("IdFilter", "TextLabel", nullptr));
+        pushButton_2->setText(QCoreApplication::translate("IdFilter", "Cancel", nullptr));
     } // retranslateUi
 
 };

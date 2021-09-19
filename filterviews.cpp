@@ -3,7 +3,8 @@
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-IdFilter::IdFilter(QWidget* parent) : QFrame(parent), ui(new Ui::IdFilter)
+//CarveDialog::CarveDialog(QWidget* parent) : QDialog(parent), ui(new Ui::CarveDialog)
+IdFilter::IdFilter(QWidget* parent) : QDialog(parent), ui(new Ui::IdFilter)
 {
     ui->setupUi(this);
     this->hide();
@@ -11,6 +12,7 @@ IdFilter::IdFilter(QWidget* parent) : QFrame(parent), ui(new Ui::IdFilter)
     ui->vcheckBox->setVisible(false);
     ui->idlabel->setText("");
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
     connect(ui->espinBox, SIGNAL(textChanged(QString)), this, SLOT(BuildId(QString)));
     connect(ui->vspinBox, SIGNAL(textChanged(QString)), this, SLOT(BuildId(QString)));
     connect(ui->pspinBox, SIGNAL(textChanged(QString)), this, SLOT(BuildId(QString)));
@@ -64,7 +66,7 @@ void IdFilter::DisplayFilter()
     }
     QPoint cursorpos = this->mapFromGlobal(QCursor::pos());
     QPoint newpos = QPoint(cursorpos.x() - this->width(), cursorpos.y());
-    if(this->pos().x() == 0)
+    if(this->pos().x() <= 0)
         this->move(newpos);
     this->show();
 }
@@ -74,6 +76,11 @@ void IdFilter::HideClicked()
     filtervalues.idfilter = ui->idlabel->text();
     this->hide();
     emit HeaderChanged();
+}
+
+void IdFilter::CancelClicked()
+{
+    this->hide();
 }
 
 void IdFilter::BuildId(QString curstring)
@@ -156,11 +163,12 @@ void JumpHex::HideClicked()
     emit SetOffset(); 
 }
 
-NameFilter::NameFilter(QWidget* parent) : QWidget(parent), ui(new Ui::NameFilter)
+NameFilter::NameFilter(QWidget* parent) : QDialog(parent), ui(new Ui::NameFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 NameFilter::~NameFilter()
@@ -191,11 +199,17 @@ void NameFilter::HideClicked()
     emit HeaderChanged();
 }
 
-PathFilter::PathFilter(QWidget* parent) : QWidget(parent), ui(new Ui::PathFilter)
+void NameFilter::CancelClicked()
+{
+    this->hide();
+}
+
+PathFilter::PathFilter(QWidget* parent) : QDialog(parent), ui(new Ui::PathFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 PathFilter::~PathFilter()
@@ -226,11 +240,17 @@ void PathFilter::HideClicked()
     emit HeaderChanged();
 }
 
-SizeFilter::SizeFilter(QWidget* parent) : QWidget(parent), ui(new Ui::SizeFilter)
+void PathFilter::CancelClicked()
+{
+    this->hide();
+}
+
+SizeFilter::SizeFilter(QWidget* parent) : QDialog(parent), ui(new Ui::SizeFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 SizeFilter::~SizeFilter()
@@ -262,12 +282,17 @@ void SizeFilter::HideClicked()
     this->hide();
     emit HeaderChanged();
 }
+void SizeFilter::CancelClicked()
+{
+    this->hide();
+}
 
-CreatedDateFilter::CreatedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::CreatedDateFilter)
+CreatedDateFilter::CreatedDateFilter(QWidget* parent) : QDialog(parent), ui(new Ui::CreatedDateFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 CreatedDateFilter::~CreatedDateFilter()
@@ -297,11 +322,17 @@ void CreatedDateFilter::HideClicked()
     emit HeaderChanged();
 }
 
-AccessedDateFilter::AccessedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::AccessedDateFilter)
+void CreatedDateFilter::CancelClicked()
+{
+    this->hide();
+}
+
+AccessedDateFilter::AccessedDateFilter(QWidget* parent) : QDialog(parent), ui(new Ui::AccessedDateFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 AccessedDateFilter::~AccessedDateFilter()
@@ -331,11 +362,17 @@ void AccessedDateFilter::HideClicked()
     emit HeaderChanged();
 }
 
-ModifiedDateFilter::ModifiedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::ModifiedDateFilter)
+void AccessedDateFilter::CancelClicked()
+{
+    this->hide();
+}
+
+ModifiedDateFilter::ModifiedDateFilter(QWidget* parent) : QDialog(parent), ui(new Ui::ModifiedDateFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 ModifiedDateFilter::~ModifiedDateFilter()
@@ -365,11 +402,17 @@ void ModifiedDateFilter::HideClicked()
     emit HeaderChanged();
 }
 
-ChangedDateFilter::ChangedDateFilter(QWidget* parent) : QWidget(parent), ui(new Ui::ChangedDateFilter)
+void ModifiedDateFilter::CancelClicked()
+{
+    this->hide();
+}
+
+ChangedDateFilter::ChangedDateFilter(QWidget* parent) : QDialog(parent), ui(new Ui::ChangedDateFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 ChangedDateFilter::~ChangedDateFilter()
@@ -399,11 +442,17 @@ void ChangedDateFilter::HideClicked()
     emit HeaderChanged();
 }
 
-FileTypeFilter::FileTypeFilter(QWidget* parent) : QWidget(parent), ui(new Ui::FileTypeFilter)
+void ChangedDateFilter::CancelClicked()
+{
+    this->hide();
+}
+
+FileTypeFilter::FileTypeFilter(QWidget* parent) : QDialog(parent), ui(new Ui::FileTypeFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 FileTypeFilter::~FileTypeFilter()
@@ -446,11 +495,17 @@ void FileTypeFilter::HideClicked()
     emit HeaderChanged();
 }
 
-TagFilter::TagFilter(QWidget* parent) : QWidget(parent), ui(new Ui::TagFilter)
+void FileTypeFilter::CancelClicked()
+{
+    this->hide();
+}
+
+TagFilter::TagFilter(QWidget* parent) : QDialog(parent), ui(new Ui::TagFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 TagFilter::~TagFilter()
@@ -490,11 +545,17 @@ void TagFilter::HideClicked()
     emit HeaderChanged();
 }
 
-FileCategoryFilter::FileCategoryFilter(QWidget* parent) : QWidget(parent), ui(new Ui::FileCategoryFilter)
+void TagFilter::CancelClicked()
+{
+    this->hide();
+}
+
+FileCategoryFilter::FileCategoryFilter(QWidget* parent) : QDialog(parent), ui(new Ui::FileCategoryFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 FileCategoryFilter::~FileCategoryFilter()
@@ -535,11 +596,17 @@ void FileCategoryFilter::HideClicked()
     emit HeaderChanged();
 }
 
-HashFilter::HashFilter(QWidget* parent) : QWidget(parent), ui(new Ui::HashFilter)
+void FileCategoryFilter::CancelClicked()
+{
+    this->hide();
+}
+
+HashFilter::HashFilter(QWidget* parent) : QDialog(parent), ui(new Ui::HashFilter)
 {
     ui->setupUi(this);
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
+    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
 }
 
 HashFilter::~HashFilter()
@@ -587,4 +654,9 @@ void HashFilter::HideClicked()
     }
     this->hide();
     emit HeaderChanged();
+}
+
+void HashFilter::CancelClicked()
+{
+    this->hide();
 }
