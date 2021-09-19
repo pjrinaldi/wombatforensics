@@ -849,6 +849,11 @@ public:
         }
     };
 
+    QStringList ReturnColumnOrder()
+    {
+        return columnorder;
+    };
+
 private:
     TreeNode* zeronode; //rootitem
     QStringList columnorder;

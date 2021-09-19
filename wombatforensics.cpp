@@ -4440,6 +4440,11 @@ void WombatForensics::SaveTreeModel(void)
     if(treefile.isOpen())
     {
         QTextStream stream(&treefile);
+        // PRINT HEADER INFO HERE
+        QStringList columnheaders = treenodemodel->ReturnColumnOrder();
+        for(int i=0; i < columnheaders.count(); i++)
+            stream << columnheaders.at(i);
+        stream << Qt::endl;
 	for(int i=0; i < existingforimglist.count(); i++)
 	    PrintTree(0, treenodemodel->index(i, 0), stream);
 	/*

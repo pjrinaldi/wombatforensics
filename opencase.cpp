@@ -26,6 +26,7 @@ void LoadTreeModel(void)
     {
         QString parentstr = "";
         QStringList nodelist = treelist.at(i).split(",");
+        qDebug() << "nodelist:" << nodelist << nodelist.count();
         //qDebug() << nodelist.at(11);
         QHash<QString, QVariant> nodedata;
         nodedata.clear();
