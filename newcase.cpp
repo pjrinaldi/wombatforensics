@@ -8774,6 +8774,7 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
                         if(indxlist.count() == 1)
                         {
                             //qDebug() << "parent filename:" << indxlist.at(0).sibling(indxlist.at(0).row(), 0).data().toString();
+                            TreeNode* itemnode = static_cast<TreeNode*>(indxlist.at(0).internalPointer());
                         }
 			/*
 			QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(parentid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
@@ -8784,7 +8785,6 @@ void ParseNtfsOrphans(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt,
 			//selectedindex.sibling(selectedindex.row(), 11).data().toString()
 			//TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
 			//exportlist.append(itemnode->Data(11).toString());
-                        TreeNode* itemnode = static_cast<TreeNode*>(indxlist.at(0).internalPointer());
                         //qDebug() << "itemnode itemtype:" << itemnode->itemtype;
                         //qDebug() << "ntinode/inodecnt:" << parntinode << ntinodehash->value(parntinode);
                     }

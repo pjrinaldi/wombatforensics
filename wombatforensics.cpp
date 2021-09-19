@@ -3216,6 +3216,8 @@ void WombatForensics::GetHashComparisons(QStringList whlfiles)
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 {
+    // digtype = selected (0) | checked (1) | all (2)
+    // digoptions = thumbimg (0) | thumbvid (4) | thumbimgvid (5) | hash (7) | hashlistcompare (8) | expandarchive zip (6)
     // provides access to the whlcomparisonlist to give access to the files...
     //qDebug() << "whlfiles:" << whlcomparisonlist;
     digimgthumbtotal = 0;
@@ -3236,15 +3238,17 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     qInfo() << "Digging Deeper into Evidence";
     StatusUpdate("Digging Deeper...");
     //LogMessage("Digging Deeper into Evidence");
+
+    if(dtype == 0) // selected
+    {
+        TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
+        digfilelist.append(itemnode->Data("id").toString());
+    }
+    else
+        digfilelist = GetFileLists(dtype);
+
     for(int i = 0; i < digoptions.count(); i++)
     {
-        if(dtype == 0) // selected
-        {
-            TreeNode* itemnode = static_cast<TreeNode*>(selectedindex.internalPointer());
-            digfilelist.append(itemnode->Data("id").toString());
-        }
-        else
-            digfilelist = GetFileLists(dtype);
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {
             genthmbpath = wombatvariable.tmpmntpath;
