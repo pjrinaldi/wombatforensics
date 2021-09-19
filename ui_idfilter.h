@@ -131,15 +131,15 @@ public:
         font2.setStrikeOut(false);
         pushButton->setFont(font2);
         pushButton->setCursor(QCursor(Qt::ArrowCursor));
-        pushButton->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding-top: 5px; padding-bottom: 5px;"));
-        pushButton->setFlat(true);
+        pushButton->setStyleSheet(QString::fromUtf8(""));
+        pushButton->setFlat(false);
 
         gridLayout->addWidget(pushButton, 6, 1, 1, 1);
 
         pushButton_2 = new QPushButton(IdFilter);
         pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
-        pushButton_2->setStyleSheet(QString::fromUtf8("border: 1px solid black; padding: 5px 5px 5px 5px;"));
-        pushButton_2->setFlat(true);
+        pushButton_2->setStyleSheet(QString::fromUtf8(""));
+        pushButton_2->setFlat(false);
 
         gridLayout->addWidget(pushButton_2, 7, 1, 1, 1);
 
@@ -154,7 +154,7 @@ public:
 
     void retranslateUi(QDialog *IdFilter)
     {
-        IdFilter->setWindowTitle(QCoreApplication::translate("IdFilter", "Dialog", nullptr));
+        IdFilter->setWindowTitle(QCoreApplication::translate("IdFilter", "ID Filter", nullptr));
         echeckBox->setText(QString());
         idlabel->setText(QCoreApplication::translate("IdFilter", "TextLabel", nullptr));
         fspinBox->setPrefix(QCoreApplication::translate("IdFilter", "f", nullptr));

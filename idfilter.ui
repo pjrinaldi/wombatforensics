@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>ID Filter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="0">
@@ -187,7 +187,7 @@
       <cursorShape>ArrowCursor</cursorShape>
      </property>
      <property name="styleSheet">
-      <string notr="true">border: 1px solid black; padding-top: 5px; padding-bottom: 5px;</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>Apply</string>
@@ -196,20 +196,20 @@
       <bool>true</bool>
      </property>
      <property name="flat">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>
    <item row="7" column="1">
     <widget class="QPushButton" name="pushButton_2">
      <property name="styleSheet">
-      <string notr="true">border: 1px solid black; padding: 5px 5px 5px 5px;</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>Cancel</string>
      </property>
      <property name="flat">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>
