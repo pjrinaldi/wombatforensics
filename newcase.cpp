@@ -5099,6 +5099,7 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     nodedata.insert("cat", "Directory");
     nodedata.insert("sig", "Virtual Directory");
     nodedata.insert("tag", "0");
+    nodedata.insert("match", "0");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"));
     mutex.lock();
     treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt)), 11, 0);

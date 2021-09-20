@@ -4443,8 +4443,12 @@ void WombatForensics::SaveTreeModel(void)
         // PRINT HEADER INFO HERE
         QStringList columnheaders = treenodemodel->ReturnColumnOrder();
         for(int i=0; i < columnheaders.count(); i++)
+        {
             stream << columnheaders.at(i);
-        stream << Qt::endl;
+            if(i < columnheaders.count() - 1)
+                stream << ",";
+        }
+        stream << ",itemtype,isdeleted,parentid" << Qt::endl;
 	for(int i=0; i < existingforimglist.count(); i++)
 	    PrintTree(0, treenodemodel->index(i, 0), stream);
 	/*

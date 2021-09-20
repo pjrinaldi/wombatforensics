@@ -22,7 +22,9 @@ void LoadTreeModel(void)
         treefile.close();
     }
     //qDebug() << "treelist count:" << treelist.count();
-    for(int i=0; i < treelist.count(); i++)
+    //qDebug() << "nodelist:" << treelist.at(0) << treelist.at(0).split(",").count();
+    QStringList columnorder = treelist.at(0).split(",");
+    for(int i=1; i < treelist.count(); i++)
     {
         QString parentstr = "";
         QStringList nodelist = treelist.at(i).split(",");
@@ -30,6 +32,8 @@ void LoadTreeModel(void)
         //qDebug() << nodelist.at(11);
         QHash<QString, QVariant> nodedata;
         nodedata.clear();
+        //nodedata.insert("name", nodelist.at(
+        /*
         nodedata.insert("name", nodelist.at(0));
         nodedata.insert("path", nodelist.at(1));
         nodedata.insert("size", nodelist.at(2).toLongLong());
@@ -61,6 +65,7 @@ void LoadTreeModel(void)
             filesfound++;
             isignals->ProgUpd();
         }
+        */
         //listeditems.append(treeout.at(11));
     }
 }
