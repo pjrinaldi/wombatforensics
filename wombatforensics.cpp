@@ -3250,7 +3250,50 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 
     for(int i = 0; i < digoptions.count(); i++)
     {
+        if(digoptions.at(i) == 0) // Generate Image Thumbnails
+        {
+            if(dtype == 1) // checked so get all images in a tmp list and then reduce the checked list to just checked images
+            {
+                qDebug() << "all checked files:" << digfilelist;
+                QStringList tmpimglist = GetFileLists(4);
+                for(int j=0; j < digfilelist.count(); j++)
+                {
+                    if(!tmpimglist.contains(digfilelist.at(j)))
+                        digfilelist.removeAt(j);
+                }
+                qDebug() << "checked images only:" << digfilelist;
+            }
+            else if(dtype == 2) // all files, replace all files with just images.
+                digfilelist = GetFileLists(4);
+        }
+        else if(digoptions.at(i) == 1) // Generate Video Thumbnails
+        {
+            if(dtype == 1) // checked, so get all videos in a tmplist and then reduce the checked list to just checked videos
+            {
+                qDebug() << "all checked files:" << digfilelist;
+                QStringList tmpvidlist = GetFileLists(5);
+                for(int j=0; j < digfilelist.count(); j++)
+                {
+                    if(!tmpvidlist.contains(digfilelist.at(j)))
+                        digfilelist.removeAt(j);
+                }
+                qDebug() << "checked videos only:" << digfilelist;
+            }
+            else if(dtype == 2) // all files, replace all files with just videos
+                digfilelist = GetFileLists(5);
+        }
+        else if(digoptions.at(i) == 2) // Generate BlAKE3 Hash
+        {
+        }
+        else if(digoptions.at(i) == 3) // Compare with Selected HashLists
+        {
+            // global variable is whlcomparisonlist
+        }
+        else if(digoptions.at(i) == 4) // Expand Zip Archives
+        {
+        }
         /*
+        // I MAY NOT NEED 4,5,6 IF I DO THE CHECK ON THE LIST PRIOR TO CALCULATION OTHERWISE I WILL HAVE TO REDUCE THE SELECTED OR CHECKED OR ALL LIST HERE...
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {
             genthmbpath = wombatvariable.tmpmntpath;

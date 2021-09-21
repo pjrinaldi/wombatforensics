@@ -41,10 +41,6 @@ public:
     QCheckBox *videocheckBox;
     QHBoxLayout *horizontalLayout_3;
     QCheckBox *hashcheckbox;
-    QRadioButton *md5radiobutton;
-    QRadioButton *sha1radiobutton;
-    QRadioButton *sha256radiobutton;
-    QRadioButton *blake3radiobutton;
     QHBoxLayout *horizontalLayout_5;
     QCheckBox *hashlistcheckbox;
     QListWidget *hashlistwidget;
@@ -124,26 +120,6 @@ public:
         hashcheckbox->setObjectName(QString::fromUtf8("hashcheckbox"));
 
         horizontalLayout_3->addWidget(hashcheckbox);
-
-        md5radiobutton = new QRadioButton(groupBox);
-        md5radiobutton->setObjectName(QString::fromUtf8("md5radiobutton"));
-
-        horizontalLayout_3->addWidget(md5radiobutton);
-
-        sha1radiobutton = new QRadioButton(groupBox);
-        sha1radiobutton->setObjectName(QString::fromUtf8("sha1radiobutton"));
-
-        horizontalLayout_3->addWidget(sha1radiobutton);
-
-        sha256radiobutton = new QRadioButton(groupBox);
-        sha256radiobutton->setObjectName(QString::fromUtf8("sha256radiobutton"));
-
-        horizontalLayout_3->addWidget(sha256radiobutton);
-
-        blake3radiobutton = new QRadioButton(groupBox);
-        blake3radiobutton->setObjectName(QString::fromUtf8("blake3radiobutton"));
-
-        horizontalLayout_3->addWidget(blake3radiobutton);
 
 
         verticalLayout_4->addLayout(horizontalLayout_3);
@@ -236,10 +212,6 @@ public:
         thumbnailcheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for Image Files", nullptr));
         videocheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for Video Files", nullptr));
         hashcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Calcuate BLAKE3 Hash", nullptr));
-        md5radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "MD5", nullptr));
-        sha1radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA1", nullptr));
-        sha256radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "SHA256", nullptr));
-        blake3radiobutton->setText(QCoreApplication::translate("DigDeeperDialog", "BLAKE3", nullptr));
         hashlistcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Compare Files to Selected Hash Lists:", nullptr));
         expandarchivescheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Expand Archives (zip)", nullptr));
         cancelButton->setText(QCoreApplication::translate("DigDeeperDialog", "Cancel", nullptr));
