@@ -121,34 +121,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QRadioButton" name="md5radiobutton">
-            <property name="text">
-             <string>MD5</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="sha1radiobutton">
-            <property name="text">
-             <string>SHA1</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="sha256radiobutton">
-            <property name="text">
-             <string>SHA256</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="blake3radiobutton">
-            <property name="text">
-             <string>BLAKE3</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>

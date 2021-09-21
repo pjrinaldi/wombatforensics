@@ -3106,6 +3106,7 @@ void WombatForensics::RemoveEvidence(QStringList remevidlist)
 
 QStringList WombatForensics::GetFileLists(int filelisttype)
 {
+    // I MAY NOT NEED 4,5,6 IF I DO THE CHECK ON THE LIST PRIOR TO CALCULATION OTHERWISE I WILL HAVE TO REDUCE THE SELECTED OR CHECKED OR ALL LIST HERE...
     QStringList tmplist;
     tmplist.clear();
     if(filelisttype == 1) // checked
@@ -3217,7 +3218,7 @@ void WombatForensics::GetHashComparisons(QStringList whlfiles)
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 {
     // digtype = selected (0) | checked (1) | all (2)
-    // digoptions = thumbimg (0) | thumbvid (4) | thumbimgvid (5) | hash (7) | hashlistcompare (8) | expandarchive zip (6)
+    // digoptions = thumbimg (0) | thumbvid (1) | hash (2) | hashlistcompare (3) | expandarchive zip (4)
     // provides access to the whlcomparisonlist to give access to the files...
     //qDebug() << "whlfiles:" << whlcomparisonlist;
     digimgthumbtotal = 0;
@@ -3249,6 +3250,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 
     for(int i = 0; i < digoptions.count(); i++)
     {
+        /*
         if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
         {
             genthmbpath = wombatvariable.tmpmntpath;
@@ -3352,6 +3354,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             if(digarchivetotal > 0)
                 hasarchive = true;
         }
+        */
     }
     digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
@@ -3662,6 +3665,10 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
         QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
         if(tdir.isEmpty())
         {
+            // NEED TO FIX THIS POPUP ONCE I'VE GOT DIGGING FLESHED OUT BETTER AGAIN!
+            // POSSIBLY JUST MAKE THIS AN INDICATOR WHICH OPENS THE DIG DEEPER DIALOG
+            qDebug() << "fix what to do here in terms of how to generate the thumbnails";
+            /*
             int ret = QMessageBox::question(this, tr("Generate Thumbnails"), tr("Thumbnails have not been generated. Do you want to generate all IMG & VID thumbnails now?\r\n\r\nNote: This can take a while and will show the Thumbnail Gallery window when complete."), QMessageBox::Yes | QMessageBox::No);
             if(ret == QMessageBox::Yes)
             {
@@ -3671,6 +3678,7 @@ void WombatForensics::on_actionView_Image_Gallery_triggered(bool checked)
             }
             else
                 ui->actionView_Image_Gallery->setChecked(false);
+            */
         }
         else
         {

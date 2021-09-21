@@ -27,20 +27,12 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
         ui->listedFileRadioButton->setEnabled(false);
     else
         ui->listedFileRadioButton->setEnabled(true);
-    ui->md5radiobutton->setEnabled(false);
-    ui->sha1radiobutton->setEnabled(false);
-    ui->sha256radiobutton->setEnabled(false);
-    ui->blake3radiobutton->setEnabled(false);
     connect(ui->thumbnailcheckBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->videocheckBox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->hashcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->expandarchivescheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->hashlistcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->processButton, SIGNAL(clicked()), this, SLOT(DigDeeperFiles()));
-    ui->md5radiobutton->setVisible(false);
-    ui->sha1radiobutton->setVisible(false);
-    ui->sha256radiobutton->setVisible(false);
-    ui->blake3radiobutton->setVisible(false);
     // Get Hash Lists populated
     ui->hashlistwidget->clear();
     QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
@@ -57,13 +49,6 @@ DigDeeperDialog::~DigDeeperDialog()
 void DigDeeperDialog::EnableProcess(bool checked)
 {
     ui->processButton->setEnabled(checked);
-    if(ui->hashcheckbox->isChecked())
-    {
-        ui->md5radiobutton->setEnabled(true);
-        ui->sha1radiobutton->setEnabled(true);
-        ui->sha256radiobutton->setEnabled(true);
-        ui->blake3radiobutton->setEnabled(true);
-    }
     if(ui->hashlistcheckbox->isChecked())
     {
 	ui->hashlistwidget->setEnabled(true);
@@ -82,38 +67,25 @@ void DigDeeperDialog::DigDeeperFiles()
         digtype = 1;
     if(ui->listedFileRadioButton->isChecked())
         digtype = 2;
-    if(ui->thumbnailcheckBox->isChecked() && !ui->videocheckBox->isChecked())
+    if(ui->thumbnailcheckBox->isChecked())
         digoptions.append(0);
-    else if(!ui->thumbnailcheckBox->isChecked() && ui->videocheckBox->isChecked())
-        digoptions.append(4);
-    else if(ui->thumbnailcheckBox->isChecked() && ui->videocheckBox->isChecked())
-        digoptions.append(5);
+    if(ui->videocheckBox->isChecked())
+        digoptions.append(1);
     if(ui->hashcheckbox->isChecked())
     {
-        //QList<QListWidgetItem*> 
-	digoptions.append(7);
-	/*
-        if(ui->md5radiobutton->isChecked())
-            digoptions.append(1);
-        else if(ui->sha1radiobutton->isChecked())
-            digoptions.append(2);
-        else if(ui->sha256radiobutton->isChecked())
-            digoptions.append(3);
-        else if(ui->blake3radiobutton->isChecked())
-            digoptions.append(7);
-	*/
+	digoptions.append(2);
     }
     if(ui->hashlistcheckbox->isChecked())
     {
 	// ALSO NEED A WAY TO TRACK THE WHL FILES SELECTED
         hashlists.clear();
-	digoptions.append(8);
+	digoptions.append(3);
         for(int i=0; i < ui->hashlistwidget->selectedItems().count(); i++)
             hashlists.append(ui->hashlistwidget->selectedItems().at(i)->text());
+        emit HashComparison(hashlists);
     }
     if(ui->expandarchivescheckbox->isChecked())
-        digoptions.append(6);
-    emit HashComparison(hashlists);
+        digoptions.append(4);
     emit StartDig(digtype, digoptions);
     this->close();
 }

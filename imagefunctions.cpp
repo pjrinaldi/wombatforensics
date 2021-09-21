@@ -469,6 +469,8 @@ std::string Verify(QString outstr)
     //char buff[35];
     //logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
     //logfile << "\nStarting Image Verification at " << GetDateTime(buff) << "\n";
+    
+    // NEED TO SWITCH THIS TO QCRYPTOGRAPHICHASH HASH(), ADDDATA(), RESULT()
     if(hashtype == 0)
     {
         unsigned char o[MD5_DIGEST_LENGTH];
