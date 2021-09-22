@@ -138,6 +138,9 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
         fpropfile.close();
     }
     QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+    /*
+     * MODIFY TO BE curimg->ReadContent()
+     * ALSO INTEGRATE INTO THE READ/WRITE AS ONE SO I DON'T FILL UP MEMORY FOR A BIG FILE
     QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     if(!efile.isOpen())
         efile.open(QIODevice::ReadOnly);
@@ -150,6 +153,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
         }
         efile.close();
     }
+    */
     QDir dir;
     dir.mkpath(wombatvariable.tmpfilepath);
     hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
@@ -357,6 +361,21 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	    if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
 		mimestr[i] = mimestr[i].toUpper();
 	}
+	if(mimestr.contains("Application/Octet-Stream"))
+	{
+	    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
+		mimestr = "Windows System/Shortcut";
+	    else if(strcmp(filename.toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
+		mimestr = "Windows System/Recycler";
+	    else if(filename.startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
+		mimestr = "Windows System/Recycle.Bin";
+	    else if(filename.endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
+		mimestr = "Windows System/Prefetch";
+	    else if(filename.endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
+		mimestr = "Windows System/Prefetch";
+	    else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
+		mimestr = "Windows System/Registry";
+	}
     }
     //else if(filename.startsWith("$INDEX_ROOT:") || filename.startsWith("$DATA:") || filename.startWith("$INDEX_ALLOCATION:"))
     
@@ -463,30 +482,6 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
         else if(mimesignature.contains("video") || mimesignature.contains("Video"))
             mimecategory = "Video";
     }
-    if(mimesignature.contains("unknown"))
-    {
-        //mimesignature = "Unknown";
-        if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
-            mimestr = "Windows System/Shortcut";
-        else if(strcmp(filename.toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
-            mimestr = "Windows System/Recycler";
-        else if(filename.startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
-            mimestr = "Windows System/Recycle.Bin";
-        else if(filename.endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
-            mimestr = "Windows System/Prefetch";
-        else if(filename.endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
-            mimestr = "Windows System/Prefetch";
-        else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
-            mimestr = "Windows System/Registry";
-        else if(filename.startsWith("$ALLOC_BITMAP"))
-            mimestr = "System File/Allocation Bitmap";
-        else if(filename.startsWith("$MFT") || filename.startsWith("$MFTMirr") || filename.startsWith("$LogFile") || filename.startsWith("$Volume") || filename.startsWith("$AttrDef") || filename.startsWith("$Bitmap") || filename.startsWith("$Boot") || filename.startsWith("$BadClus") || filename.startsWith("$Secure") || filename.startsWith("$Extend"))
-            mimestr = "Windows System/System File";
-    }
-    if(filename.startsWith("$UPCASE_TABLE"))
-        mimestr = "System File/Up-case Table";
-    if(filename.startsWith("$UpCase"))
-        mimestr = "Windows System/System File";
     //if(orphanlist->at(j).value("itemtype").toUInt() == 2)
     //    mimestr = "Directory/Directory";
 		    //else if(sigbuf.left(4) == "FILE")

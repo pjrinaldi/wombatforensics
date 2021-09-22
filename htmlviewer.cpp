@@ -21,33 +21,33 @@ void HtmlViewer::HideClicked()
 
 void HtmlViewer::ShowHtml(const QModelIndex &index)
 {
-    /*
     QString oldfile = wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex";
     QString newfile = oldfile + ".html";
     QFile::copy(oldfile, newfile);
-    ui->webView->setUrl(QUrl::fromLocalFile(newfile));
-    */
+    ui->textbrowser->setSource(QUrl::fromLocalFile(newfile));
+    //ui->webView->setUrl(QUrl::fromLocalFile(newfile));
     this->show();
 }
 
 void HtmlViewer::ShowArtifact(int artifactid, const QModelIndex &index)
 {
-    /*
+    int nameindex = treenodemodel->GetColumnIndex("name");
+    int idindex = treenodemodel->GetColumnIndex("id");
     QString htmlstring = "";
     if(artifactid == 0) // LNK
-	htmlstring = ParseLnkArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+	htmlstring = ParseLnkArtifact(index.sibling(index.row(), nameindex).data().toString(), index.sibling(index.row(), idindex).data().toString());
     else if(artifactid == 1) // I30
-	htmlstring = ParseI30Artifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+	htmlstring = ParseI30Artifact(index.sibling(index.row(), nameindex).data().toString(), index.sibling(index.row(), idindex).data().toString());
     else if(artifactid == 2) // INFO2
-	htmlstring = ParseInfo2Artifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+	htmlstring = ParseInfo2Artifact(index.sibling(index.row(), nameindex).data().toString(), index.sibling(index.row(), idindex).data().toString());
     else if(artifactid == 3) // $I
-	htmlstring = ParseIDollarArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+	htmlstring = ParseIDollarArtifact(index.sibling(index.row(), nameindex).data().toString(), index.sibling(index.row(), idindex).data().toString());
     else if(artifactid == 4) // Prefetch
-	htmlstring = ParsePrefetchArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
+	htmlstring = ParsePrefetchArtifact(index.sibling(index.row(), nameindex).data().toString(), index.sibling(index.row(), idindex).data().toString());
     else if(artifactid == 5) // Archive
-        htmlstring = ParseArchiveArtifact(index.sibling(index.row(), 0).data().toString(), index.sibling(index.row(), 11).data().toString());
-    ui->webView->setHtml(htmlstring);
-    */
+        htmlstring = ParseArchiveArtifact(index.sibling(index.row(), nameindex).data().toString(), index.sibling(index.row(), idindex).data().toString());
+    ui->textbrowser->setHtml(htmlstring);
+    //ui->webView->setHtml(htmlstring);
     this->show();
 }
 
@@ -55,6 +55,7 @@ void HtmlViewer::ShowArtifact(int artifactid, const QModelIndex &index)
 
 void HtmlViewer::LoadHtml(QString filepath)
 {
+    ui->textbrowser->setSource(QUrl::fromLocalFile(filepath));
     /*
     // populate html here
     ui->webView->setUrl(QUrl::fromLocalFile(filepath));
@@ -64,6 +65,7 @@ void HtmlViewer::LoadHtml(QString filepath)
 
 void HtmlViewer::Reload()
 {
+    ui->textbrowser->reload();
     /*
     ui->webView->reload();
     */
@@ -77,6 +79,6 @@ void HtmlViewer::mousePressEvent(QMouseEvent* e)
 
 void HtmlViewer::closeEvent(QCloseEvent* e)
 {
-    //emit HideReportPreviewWindow(false);
+    emit HideReportPreviewWindow(false);
     e->accept();
 }

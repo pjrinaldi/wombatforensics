@@ -22,7 +22,7 @@
 #include "videoviewer.h"
 #include "viewermanager.h"
 #include "textviewer.h"
-//#include "htmlviewer.h"
+#include "htmlviewer.h"
 #include "messageviewer.h"
 #include "byteconverter.h"
 #include "digdeeperdialog.h"
@@ -173,8 +173,8 @@ public:
     VideoViewer* videowindow;
     ViewerManager* viewmanage;
     TextViewer* textviewer;
-    //HtmlViewer* htmlviewer;
-    //HtmlViewer* previewreport;
+    HtmlViewer* htmlviewer;
+    HtmlViewer* previewreport;
     MessageViewer* msgviewer;
     ByteConverter* byteviewer;
     AboutBox* aboutbox;
@@ -229,7 +229,7 @@ private slots:
     void UpdateCarve(QString partid, int carvecount);
     void OpenUpdate(void);
     void UpdateCheckCount(void);
-    void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
+    //void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void PathSelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(void);

@@ -747,13 +747,11 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("HTML"))
     {
-        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowIcon(QIcon(":/web"));
         htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " HTML Viewer");
         htmlviewer->ShowHtml(index);
-        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Text"))
     {
@@ -767,57 +765,45 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Shortcut"))
     {
-        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " LNK Viewer");
 	htmlviewer->ShowArtifact(0, index); // LNK
-        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Directory"))
     {
-        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("$I30 Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(1, index); // I30
-        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Recycler"))
     {
-        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("INFO2 Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(2, index); // INFO2
-        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Recycle.Bin"))
     {
-        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(3, index); // $I
-        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Prefetch"))
     {
-        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("Prefetch Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(4, index); // Prefetch
-        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Zip"))
     {
-        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("Archive Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
         htmlviewer->ShowArtifact(5, index); // Archive
-        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("PDF"))
     {
@@ -1461,6 +1447,7 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
 }
 
 
+/*
 void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
 {
     if(previtem.indexes().count() > 0)
@@ -1514,10 +1501,11 @@ void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QIte
         */
         //PopulateHexContents();
         //LoadHexContents();
-        GenerateHexFile(selectedindex);
+/*        GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
     }
 }
+*/
 
 void WombatForensics::SetRootIndex()
 {
