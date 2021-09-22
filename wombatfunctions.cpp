@@ -108,7 +108,6 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
     //QString sizestr = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("size")).data().toString();
     //this gets the comma'd size, would have to convert to qstring number before i try to use as size
     //qDebug() << "sizestr:" << sizestr;
-    //qDebug() << "selectedid:" << selectedid;
     for(int i=0; i < existingforimglist.count(); i++)
     {
 	ForImg* curimg = existingforimglist.at(i);
