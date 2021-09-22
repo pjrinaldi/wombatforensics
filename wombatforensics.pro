@@ -1,4 +1,5 @@
-QT += widgets core concurrent multimedia multimediawidgets webenginewidgets gui avwidgets
+QT += widgets core concurrent multimedia multimediawidgets gui avwidgets
+#QT += widgets core concurrent multimedia multimediawidgets webenginewidgets gui avwidgets
 #QT -= opengl quick network qml
 linux:CONFIG += debug_and_release debug_and_release_target qt x11 build_all c++14 
 DEFINES += MAGICKCORE_HDRI_ENABLE=0
@@ -22,7 +23,7 @@ SOURCES = main.cpp wombatforensics.cpp wombatfunctions.cpp exportdialog.cpp glob
 RESOURCES += wombatforensics.qrc
 release: DESTDIR = release
 debug:   DESTDIR = debug
-linux:LIBS = -lewf -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -lmagic -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -ludev -lafflib -llzo2 -lz -lblake3 -llz4 -lcrypto #-laff4 #-lzstd #-lsmraw
+linux:LIBS = -lewf -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -lmagic -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -ludev -lafflib -llzo2 -lz -lblake3 -llz4 #-lcrypto #-laff4 #-lzstd #-lsmraw
 #linux:LIBS = -lewf -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -lmagic -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -lz -lblake3 -laff4 -llz4 #-lzstd #-lsmraw
 #linux:LIBS = -lewf -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -lmagic -llnk -lfwnt -lzip -lpoppler-qt5 -lregf -lcrypto -ludev -lafflib -llzo2 -lz -lsmraw -lblake3 `pkg-config fuse3 --cflags --libs`
 #linux:LIBS = -ltar -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lQtAVWidgets -lQtAV -lzip -lpoppler-qt5 -lcrypto -ludev -llzo2 -lz

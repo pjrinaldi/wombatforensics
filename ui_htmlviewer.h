@@ -10,10 +10,10 @@
 #define UI_HTMLVIEWER_H
 
 #include <QtCore/QVariant>
-#include <QtWebEngineWidgets/QWebEngineView>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QTextBrowser>
 
 QT_BEGIN_NAMESPACE
 
@@ -21,7 +21,7 @@ class Ui_HtmlViewer
 {
 public:
     QHBoxLayout *horizontalLayout;
-    QWebEngineView *webView;
+    QTextBrowser *textbrowser;
 
     void setupUi(QDialog *HtmlViewer)
     {
@@ -33,11 +33,10 @@ public:
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        webView = new QWebEngineView(HtmlViewer);
-        webView->setObjectName(QString::fromUtf8("webView"));
-        webView->setUrl(QUrl(QString::fromUtf8("about:blank")));
+        textbrowser = new QTextBrowser(HtmlViewer);
+        textbrowser->setObjectName(QString::fromUtf8("textbrowser"));
 
-        horizontalLayout->addWidget(webView);
+        horizontalLayout->addWidget(textbrowser);
 
 
         retranslateUi(HtmlViewer);

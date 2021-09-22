@@ -72,14 +72,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     imagewindow = new ImageViewer(this);
     msgviewer = new MessageViewer(this);
     byteviewer = new ByteConverter(this);
-    previewreport = new HtmlViewer(this);
+    //previewreport = new HtmlViewer(this);
     aboutbox = new AboutBox(this);
     searchdialog = new SearchDialog(ui->hexview, this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
-    previewreport->setWindowIcon(QIcon(":/bar/reportpreview"));
-    previewreport->setWindowTitle("Report Preview");
+    //previewreport->setWindowIcon(QIcon(":/bar/reportpreview"));
+    //previewreport->setWindowTitle("Report Preview");
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
     imagewindow->hide();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
@@ -95,11 +95,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
-    connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
+    //connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
-    connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
+    //connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     connect(isignals, SIGNAL(CarveUpdate(QString, int)), this, SLOT(UpdateCarve(QString, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(StatUpdate(QString)), this, SLOT(StatusUpdate(QString)), Qt::QueuedConnection);
     InitializeAppStructure();
@@ -747,11 +747,13 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("HTML"))
     {
+        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowIcon(QIcon(":/web"));
         htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " HTML Viewer");
         htmlviewer->ShowHtml(index);
+        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Text"))
     {
@@ -765,45 +767,57 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Shortcut"))
     {
+        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " LNK Viewer");
 	htmlviewer->ShowArtifact(0, index); // LNK
+        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Directory"))
     {
+        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("$I30 Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(1, index); // I30
+        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Recycler"))
     {
+        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("INFO2 Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(2, index); // INFO2
+        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Recycle.Bin"))
     {
+        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("$I Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(3, index); // $I
+        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Prefetch"))
     {
+        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("Prefetch Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
 	htmlviewer->ShowArtifact(4, index); // Prefetch
+        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Zip"))
     {
+        /*
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
         htmlviewer->setWindowTitle("Archive Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
         htmlviewer->ShowArtifact(5, index); // Archive
+        */
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("PDF"))
     {
@@ -3510,7 +3524,7 @@ WombatForensics::~WombatForensics()
     delete hashfilterview;
     delete tagfilterview;
     delete byteviewer;
-    delete previewreport;
+    //delete previewreport;
     delete imagewindow;
     delete aboutbox;
     delete settingsdialog;
@@ -3562,7 +3576,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     viewmanage->close();
     //hashlistmanager->close();
     byteviewer->close();
-    previewreport->close();
+    //previewreport->close();
     aboutbox->close();
     settingsdialog->close();
     /*
@@ -3852,6 +3866,7 @@ void WombatForensics::on_actionByteConverter_triggered(bool checked)
 
 void WombatForensics::on_actionpreviewreport_triggered(bool checked)
 {
+    /*
     if(!checked) // hide viewer
         previewreport->hide();
     else
@@ -3859,6 +3874,7 @@ void WombatForensics::on_actionpreviewreport_triggered(bool checked)
         previewreport->LoadHtml(QString(wombatvariable.tmpmntpath + "previewreport.html"));
         previewreport->show();
     }
+    */
 }
 
 void WombatForensics::on_actionExpandAll_triggered()

@@ -70,7 +70,7 @@
 #include <QPainter>
 #include <QPixmap>
 //#include <QVideoWidget>
-#include <QWebEngineView>
+//#include <QWebEngineView>
 #include <QWidget>
 
 #include <sstream>

@@ -9,8 +9,8 @@
 #include <string>
 #include <errno.h>
 #include <stdio.h>
-#include <openssl/md5.h>
-#include <openssl/evp.h>
+//#include <openssl/md5.h>
+//#include <openssl/evp.h>
 #include <cstring>
 #include <sstream>
 #include <fstream>

@@ -473,6 +473,7 @@ std::string Verify(QString outstr)
     // NEED TO SWITCH THIS TO QCRYPTOGRAPHICHASH HASH(), ADDDATA(), RESULT()
     if(hashtype == 0)
     {
+        /*
         unsigned char o[MD5_DIGEST_LENGTH];
         int i;
         FILE* outfile = fopen(outstr.toStdString().c_str(), "rb");
@@ -520,6 +521,7 @@ std::string Verify(QString outstr)
             //logfile << "Verification Failed\n";
             imgname += "Failed";
         }
+        */
         fclose(outfile);
     }
     else if(hashtype == 1) // WFI
