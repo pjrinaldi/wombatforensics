@@ -180,7 +180,63 @@ public:
     explicit TreeNode(const QHash<QString, QVariant> &data, TreeNode* parent = 0, int itype = -1)
     {
         parentitem = parent;
-        itemdata = data;
+	itemdata.clear();
+	// if i want to make the data work regardless of if the data has columns, i would have to break the below itemdata into a bunch of:
+	// if(data.contains("match")) { itemdata.insert("match", data.value("match")); } else { itemdata.insert("match", "0"); }
+        //columnorder << "id" << "name" << "path" << "size" << "create" << "access" << "modify" << "status" << "cat" << "sig" << "tag" << "hash" << "match";
+	if(data.contains("id"))
+	    itemdata.insert("id", data.value("id"));
+	else
+	    itemdata.insert("id", "0");
+	if(data.contains("name"))
+	    itemdata.insert("name", data.value("name"));
+	else
+	    itemdata.insert("name", "");
+	if(data.contains("path"))
+	    itemdata.insert("path", data.value("path"));
+	else
+	    itemdata.insert("path", "");
+	if(data.contains("size"))
+	    itemdata.insert("size", data.value("size"));
+	else
+	    itemdata.insert("size", 0);
+	if(data.contains("create"))
+	    itemdata.insert("create", data.value("create"));
+	else
+	    itemdata.insert("create", "0");
+	if(data.contains("access"))
+	    itemdata.insert("access", data.value("access"));
+	else
+	    itemdata.insert("access", "0");
+	if(data.contains("modify"))
+	    itemdata.insert("modify", data.value("modify"));
+	else
+	    itemdata.insert("modify", "0");
+	if(data.contains("status"))
+	    itemdata.insert("status", data.value("status"));
+	else
+	    itemdata.insert("status", "0");
+	if(data.contains("cat"))
+	    itemdata.insert("cat", data.value("cat"));
+	else
+	    itemdata.insert("cat", "0");
+	if(data.contains("sig"))
+	    itemdata.insert("sig", data.value("sig"));
+	else
+	    itemdata.insert("sig", "0");
+	if(data.contains("tag"))
+	    itemdata.insert("tag", data.value("tag"));
+	else
+	    itemdata.insert("tag", "");
+	if(data.contains("hash"))
+	    itemdata.insert("hash", data.value("hash"));
+	else
+	    itemdata.insert("hash", "");
+	if(data.contains("match"))
+	    itemdata.insert("match", data.value("match"));
+	else
+	    itemdata.insert("match", "");
+        //itemdata = data;
         itemtype = itype;
     };
 
@@ -212,7 +268,10 @@ public:
     //QVariant Data(int column) const
     QVariant Data(QString column) const
     {
-        return itemdata.value(column);
+	if(itemdata.contains(column))
+	    return itemdata.value(column);
+	else
+	    return QVariant("");
     };
 
     int Row(void) const
