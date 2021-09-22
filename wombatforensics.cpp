@@ -1439,7 +1439,7 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
 
             ui->pathToolBar->addActions(actionlist);
         }
-        //PopulateHexContents();
+        PopulateHexContents();
         //LoadHexContents();
         GenerateHexFile(selectedindex);
         QApplication::restoreOverrideCursor();
@@ -2053,6 +2053,8 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
 // OR I CAN DO IT ALL IN POPULATEHEXCONTENTS, BUT NEED TO SEE IF CURRENT HEXCONTENTS == NEW HEXCONTENTS AND THEN SKIP LOADING HEX, AND JUST GO TO LOCATING NEW OFFSET...
 void WombatForensics::PopulateHexContents()
 {
+    //qDebug() << "populatehexcontents";
+    ForImg* curimg = NULL;
     selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
     QString nodeid = selectednode->Data("id").toString();
     if(nodeid.contains("z")) // since we can't navigate to file contents which are part of a zip due to compression, navigate to the parent.zip file instead.
@@ -2060,6 +2062,17 @@ void WombatForensics::PopulateHexContents()
         selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
         nodeid = selectednode->Data("id").toString();
     }
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+	curimg = existingforimglist.at(i);
+	if(curimg->MountPath().endsWith(nodeid.split("-").at(0)))
+	{
+            break;
+            //qDebug() << curimg->ImgPath() << curimg->MountPath();
+        }
+    }
+    QString tmpstr = "";
+    /*
     QString evidid = nodeid.split("-").first();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
@@ -2070,6 +2083,7 @@ void WombatForensics::PopulateHexContents()
     if(evidfile.isOpen())
         tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
     evidfile.close();
+    */
     //qDebug() << "tmpstr:" << tmpstr;
     /*
     for(int i=0; i < existingevid.count(); i++)
@@ -2081,10 +2095,13 @@ void WombatForensics::PopulateHexContents()
     */
     // EwfImage need to get the imgpath from the correct img from the vector of qiodevices
     //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+    //casedatafile.setFileName(curimg->ImgPath());
     ui->hexview->BypassColor(false);
+    //ui->hexview->setData(casedatafile);
     //ui->hexview->setData(casedatafile);
     //(newevid.at(0))->open(QIODevice::ReadOnly);
     //ui->hexview->setData((*newevid.at(0)));
+    
     if(nodeid.split("-").count() == 1) // image file
     {
         ui->hexview->setCursorPosition(0);
@@ -2109,7 +2126,8 @@ void WombatForensics::PopulateHexContents()
         }
         else
         {
-            QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
+            QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
+            //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
             partfile.open(QIODevice::ReadOnly | QIODevice::Text);
             if(partfile.isOpen())
                 tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
@@ -2120,7 +2138,8 @@ void WombatForensics::PopulateHexContents()
     }
     else if(nodeid.split("-").count() == 3) // file/directory
     {
-        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
+        QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
+        //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
         partfile.open(QIODevice::ReadOnly | QIODevice::Text);
         if(partfile.isOpen())
             tmpstr = partfile.readLine(); // part name, offset, size, part type, id
@@ -2136,7 +2155,8 @@ void WombatForensics::PopulateHexContents()
 	    uint fatoffset = 0;
 	    uint fatsize = 0;
 	    uint bytespersector = 0;
-	    QFile ppropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/prop");
+            QFile ppropfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/prop");
+	    //QFile ppropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/prop");
 	    ppropfile.open(QIODevice::ReadOnly | QIODevice::Text);
 	    if(ppropfile.isOpen())
 	    {
@@ -2159,7 +2179,8 @@ void WombatForensics::PopulateHexContents()
         else
         {
             QString layout = "";
-            QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
+            QFile fpropfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
+            //QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
             fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
             if(fpropfile.isOpen())
             {
@@ -2184,6 +2205,8 @@ void WombatForensics::PopulateHexContents()
         qDebug() << "get zip's parent layout here...";
     }
     ui->hexview->ensureVisible();
+
+
     //(newevid.at(0))->close();
     /*
     QString datastring = wombatvariable.imgdatapath;

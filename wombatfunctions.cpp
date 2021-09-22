@@ -113,7 +113,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
 	ForImg* curimg = existingforimglist.at(i);
 	if(curimg->MountPath().endsWith(selectedid.split("-").at(0)))
 	{
-            qDebug() << curimg->ImgPath() << curimg->MountPath();
+            //qDebug() << curimg->ImgPath() << curimg->MountPath();
             QString layout = "";
             QFile fpropfile(curimg->MountPath() + "/" + selectedid.split("-").at(1) + "/" + selectedid.split("-").at(2) + ".prop");
             if(!fpropfile.isOpen())
