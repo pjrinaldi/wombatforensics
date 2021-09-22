@@ -249,7 +249,7 @@ void WombatForensics::UnCheckChecked()
     //qDebug() << "checekeditems:" << checkeditems;
     for(int i=0; i < checkeditems.count(); i++)
     {
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         if(indexlist.count() > 0)
         {
             actionitem = static_cast<TreeNode*>(indexlist.first().internalPointer());
@@ -664,7 +664,7 @@ void WombatForensics::SetBookmark()
         QStringList checkeditems = GetFileLists(1);
         for(int i=0; i < checkeditems.count(); i++)
         {
-            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(indexlist.count() > 0)
             {
                 QModelIndex curindex = ((QModelIndex)indexlist.first());
@@ -824,7 +824,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
 	pdfviewer = new PdfViewer();
 	pdfviewer->setAttribute(Qt::WA_DeleteOnClose);
 	pdfviewer->setWindowTitle("PDF Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
-	pdfviewer->ShowPdf(index.sibling(index.row(), 11).data().toString());
+	pdfviewer->ShowPdf(index.sibling(index.row(), colindex).data().toString());
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Registry"))
     {
@@ -4543,10 +4543,13 @@ void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream
         for(int c=0; c < curnode->ColumnCount(); c++)
         {
             //stream << curnode->Data(columnorder.at(c)).toString() << ","; // column values for id
-            stream << index.sibling(index.row(), c).data().toString() << ",";
+            stream << index.sibling(index.row(), c).data().toString();
+	    if(c < curnode->ColumnCount() - 1)
+		stream << ",";
         }
-        stream << QString::number(curnode->itemtype) << ","; // item type
-        stream << QString::number(curnode->IsDeleted()) << ","; // is deleted
+	stream << ";";
+        stream << QString::number(curnode->itemtype) << ";"; // item type
+        stream << QString::number(curnode->IsDeleted()) << ";"; // is deleted
         //stream << curparnode->Data("id").toString();
         stream << index.parent().sibling(index.parent().row(), treenodemodel->GetColumnIndex("id")).data().toString(); // parent str
         stream << Qt::endl;

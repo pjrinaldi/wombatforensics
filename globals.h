@@ -854,6 +854,12 @@ public:
         return columnorder;
     };
 
+    void SetColumnOrder(QStringList colorder)
+    {
+	columnorder.clear();
+	columnorder.append(colorder);
+    }
+
 private:
     TreeNode* zeronode; //rootitem
     QStringList columnorder;

@@ -23,29 +23,48 @@ void LoadTreeModel(void)
     }
     //qDebug() << "treelist count:" << treelist.count();
     //qDebug() << "nodelist:" << treelist.at(0) << treelist.at(0).split(",").count();
-    QStringList columnorder = treelist.at(0).split(",");
+    QStringList colorder = treelist.at(0).split(";").first().split(",");
+    qDebug() << "colorder:" << colorder << colorder.count();
+    treenodemodel->SetColumnOrder(colorder);
+    // with columnorder set, i should be able to call nodedata.insert using GetColumnIndex("")
     for(int i=1; i < treelist.count(); i++)
     {
         QString parentstr = "";
-        QStringList nodelist = treelist.at(i).split(",");
+        QStringList nodelist = treelist.at(i).split(";").first().split(",");
         qDebug() << "nodelist:" << nodelist << nodelist.count();
         //qDebug() << nodelist.at(11);
         QHash<QString, QVariant> nodedata;
         nodedata.clear();
-        //nodedata.insert("name", nodelist.at(
-        /*
-        nodedata.insert("name", nodelist.at(0));
-        nodedata.insert("path", nodelist.at(1));
-        nodedata.insert("size", nodelist.at(2).toLongLong());
-        nodedata.insert("create", nodelist.at(3).toInt());
-        nodedata.insert("access", nodelist.at(4).toInt());
-        nodedata.insert("modify", nodelist.at(5).toInt());
-        nodedata.insert("status", nodelist.at(6).toInt());
-        nodedata.insert("hash", nodelist.at(7));
-        nodedata.insert("cat", nodelist.at(8));
-        nodedata.insert("sig", nodelist.at(9));
-        nodedata.insert("tag", nodelist.at(10));
-        nodedata.insert("id", nodelist.at(11));
+        nodedata.insert("name", nodelist.at(treenodemodel->GetColumnIndex("name")));
+        nodedata.insert("path", nodelist.at(treenodemodel->GetColumnIndex("path")));
+        nodedata.insert("size", nodelist.at(treenodemodel->GetColumnIndex("size")).toLongLong());
+        nodedata.insert("create", nodelist.at(treenodemodel->GetColumnIndex("create")).toInt());
+        nodedata.insert("access", nodelist.at(treenodemodel->GetColumnIndex("access")).toInt());
+        nodedata.insert("modify", nodelist.at(treenodemodel->GetColumnIndex("modify")).toInt());
+        nodedata.insert("status", nodelist.at(treenodemodel->GetColumnIndex("status")).toInt());
+        nodedata.insert("hash", nodelist.at(treenodemodel->GetColumnIndex("hash")));
+        nodedata.insert("cat", nodelist.at(treenodemodel->GetColumnIndex("cat")));
+        nodedata.insert("sig", nodelist.at(treenodemodel->GetColumnIndex("sig")));
+        nodedata.insert("tag", nodelist.at(treenodemodel->GetColumnIndex("tag")));
+        nodedata.insert("id", nodelist.at(treenodemodel->GetColumnIndex("id")));
+	nodedata.insert("match", nodelist.at(treenodemodel->GetColumnIndex("match")));
+	if(treelist.at(i).split(";").at(3).isEmpty())
+	    parentstr = "-1";
+	else
+	    parentstr = treelist.at(i).split(";").at(3);
+	qDebug() << "parentstr:" << treelist.at(i).split(";").at(3);
+	mutex.lock();
+	treenodemodel->AddNode(nodedata, parentstr, treelist.at(i).split(";").at(1).toInt(), treelist.at(i).split(";").at(2).toInt());
+	mutex.unlock();
+	if(nodedata.value("id").toString().split("-").count() == 2)
+	    partitionlist.append(nodedata.value("id").toString() + ": " + nodedata.value("name").toString());
+	if(nodedata.value("id").toString().split("-").count() == 3)
+	{
+	    listeditems.append(nodedata.value("id").toString());
+	    filesfound++;
+	    isignals->ProgUpd();
+	}
+	/*
         if(nodelist.at(14).isEmpty())
             parentstr = "-1";
         else
