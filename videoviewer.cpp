@@ -105,9 +105,10 @@ void VideoViewer::ShowVideo(const QModelIndex &index)
 {
     this->show();
     ui->label_2->setVisible(true);
-    this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), 11).data().toString()));
-    curobjaddr = index.sibling(index.row(), 11).data().toString().toLongLong();
-    vplayer->play(QString(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex"));
+    int colindex = treenodemodel->GetColumnIndex("id");
+    this->setWindowTitle(QString("Video Viewer - ") + QString(index.sibling(index.row(), colindex).data().toString()));
+    curobjaddr = index.sibling(index.row(), colindex).data().toString().toLongLong();
+    vplayer->play(QString(wombatvariable.tmpfilepath + index.sibling(index.row(), colindex).data().toString() + "-fhex"));
     ui->label_2->setVisible(false);
     //ui->label3->setText(QTime(0, 0, 0).addMSecs(vplayer->mediaStopPosition()/vunit).toString("HH:mm:ss"));
 }

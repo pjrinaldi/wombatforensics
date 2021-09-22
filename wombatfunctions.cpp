@@ -105,6 +105,49 @@ void GenerateWombatCaseFile(void)
 void RewriteSelectedIdContent(QModelIndex selectedindex)
 {
     QString selectedid = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString();
+    //QString sizestr = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("size")).data().toString();
+    //this gets the comma'd size, would have to convert to qstring number before i try to use as size
+    //qDebug() << "sizestr:" << sizestr;
+    //qDebug() << "selectedid:" << selectedid;
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+	ForImg* curimg = existingforimglist.at(i);
+	if(curimg->MountPath().endsWith(selectedid.split("-").at(0)))
+	{
+            qDebug() << curimg->ImgPath() << curimg->MountPath();
+            QString layout = "";
+            QFile fpropfile(curimg->MountPath() + "/" + selectedid.split("-").at(1) + "/" + selectedid.split("-").at(2) + ".prop");
+            if(!fpropfile.isOpen())
+                fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            while(!fpropfile.atEnd())
+            {
+                QString line = fpropfile.readLine();
+                if(line.startsWith("Layout|"))
+                {
+                    layout = line.split("|").at(1);
+                    break;
+                }
+            }
+            fpropfile.close();
+            QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+            QDir dir;
+            dir.mkpath(wombatvariable.tmpfilepath);
+            hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
+            QFile tmpfile(hexstring);
+            if(!tmpfile.isOpen())
+                tmpfile.open(QIODevice::WriteOnly | QIODevice::Append);
+            if(tmpfile.isOpen())
+            {
+                for(int j=0; j < layoutlist.count(); j++)
+                {
+                    QByteArray filearray = curimg->ReadContent(layoutlist.at(j).split(",").at(0).toULongLong(), layoutlist.at(j).split(",").at(1).toULongLong());
+                    tmpfile.write(filearray);
+                }
+                tmpfile.close();
+            }
+        }
+    }
+    /*
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*-" + selectedid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QString evidencename = evidfiles.at(0).split("-e").first();
@@ -137,7 +180,8 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
         }
         fpropfile.close();
     }
-    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+    */
+    //QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
     /*
      * MODIFY TO BE curimg->ReadContent()
      * ALSO INTEGRATE INTO THE READ/WRITE AS ONE SO I DON'T FILL UP MEMORY FOR A BIG FILE
@@ -154,6 +198,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
         efile.close();
     }
     */
+    /*
     QDir dir;
     dir.mkpath(wombatvariable.tmpfilepath);
     hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
@@ -165,6 +210,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
         tmpfile.write(filecontent);
         tmpfile.close();
     }
+    */
 }
 
 void InitializePasswordList(void)

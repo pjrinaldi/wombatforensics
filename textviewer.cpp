@@ -30,14 +30,15 @@ void TextViewer::ShowText(const QModelIndex &index)
     //curindex = index;
     //curobjaddr = index.sibling(index.row(), 10).data().toString().split("-f").at(1).toLongLong();
     //UpdateEncoding(0);
-    QFile tfile(wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex");
+    int colindex = treenodemodel->GetColumnIndex("id");
+    QFile tfile(wombatvariable.tmpfilepath + index.sibling(index.row(), colindex).data().toString() + "-fhex");
     if(!tfile.isOpen())
         tfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(tfile.isOpen())
         decodedstring = tfile.readAll();
     tfile.close();
     ui->textEdit->setPlainText(decodedstring);
-    this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), 11).data().toString()));
+    this->setWindowTitle(QString("Text Viewer - ") + QString(index.sibling(index.row(), colindex).data().toString()));
     this->show();
 }
 

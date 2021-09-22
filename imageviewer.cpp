@@ -100,14 +100,15 @@ void ImageViewer::OpenImageWindow(QListWidgetItem* item)
     }
     else if(iconimage.width() > thumbsize)
     {
-        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(item->text()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        int colindex = treenodemodel->GetColumnIndex("id");
+        QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant(item->text()), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         if(indexlist.count() > 0)
         {
             videowindow = new VideoViewer();
             videowindow->setAttribute(Qt::WA_DeleteOnClose);
             videowindow->setWindowIcon(QIcon(":/vid"));
             videowindow->setWindowTitle(item->text() + "Video Viewer");
-            videowindow->setWindowTitle(indexlist.first().sibling(indexlist.first().row(), 11).data().toString() + " Video Viewer");
+            videowindow->setWindowTitle(indexlist.first().sibling(indexlist.first().row(), colindex).data().toString() + " Video Viewer");
             videowindow->ShowVideo(indexlist.first());
         }
     }
