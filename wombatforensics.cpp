@@ -3270,6 +3270,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     else
         digfilelist = GetFileLists(dtype);
 
+    // THIS LOOP MIGHT BE JUST TO GET THE COUNTS FOR THE STATUS, NOT NECESSARILY THE FILEIDLISTS FOR RESPECTIVE DIGGING
     for(int i = 0; i < digoptions.count(); i++)
     {
         if(digoptions.at(i) == 0) // Generate Image Thumbnails

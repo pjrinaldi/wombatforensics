@@ -61,6 +61,7 @@ void DigDeeperDialog::EnableProcess(bool checked)
 
 void DigDeeperDialog::DigDeeperFiles()
 {
+    // POSSIBLY SET DIGOPTIONS TO BE BINARY ENUM 1, 2, 4, 8, 10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000, 4000, 8000, ETC.
     if(ui->selectedFileRadioButton->isChecked())
         digtype = 0;
     if(ui->checkedFileRadioButton->isChecked())
