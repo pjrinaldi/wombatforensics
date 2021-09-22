@@ -1331,11 +1331,16 @@ void WombatForensics::OpenUpdate()
     //PrepareEvidenceImage();
     pathtreeview->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
+    pathtreeview->header()->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(pathtreeview->header(), SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(HeaderContextMenu(const QPoint &)));
     //connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(PathSelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
-    QString curid = InitializeSelectedState();
-    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(curid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    pathtreeview->header()->setSectionsMovable(true);
+    
+    //QString curid = InitializeSelectedState();
+    //QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(curid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
+    /*
     if(indexlist.count() > 0)
     {
         pathtreeview->setCurrentIndex(indexlist.at(0));
@@ -1343,6 +1348,8 @@ void WombatForensics::OpenUpdate()
     }
     else
         pathtreeview->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
+    */
+    pathtreeview->setCurrentIndex(treenodemodel->index(0, 0, QModelIndex()));
     if(pathtreeview->model() != NULL)
     {
         ui->actionRemove_Evidence->setEnabled(true);

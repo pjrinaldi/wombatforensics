@@ -56,8 +56,8 @@ void LoadTreeModel(void)
 	mutex.lock();
 	treenodemodel->AddNode(nodedata, parentstr, treelist.at(i).split(";").at(1).toInt(), treelist.at(i).split(";").at(2).toInt());
 	mutex.unlock();
-	if(nodedata.value("id").toString().split("-").count() == 2)
-	    partitionlist.append(nodedata.value("id").toString() + ": " + nodedata.value("name").toString());
+	//if(nodedata.value("id").toString().split("-").count() == 2)
+	//    partitionlist.append(nodedata.value("id").toString() + ": " + nodedata.value("name").toString());
 	if(nodedata.value("id").toString().split("-").count() == 3)
 	{
 	    listeditems.append(nodedata.value("id").toString());
