@@ -1331,7 +1331,8 @@ void WombatForensics::OpenUpdate()
     //PrepareEvidenceImage();
     pathtreeview->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
-    connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
+    //connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(SelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
+    connect(pathtreeview->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(PathSelectionChanged(const QItemSelection &, const QItemSelection &)), Qt::DirectConnection);
     QString curid = InitializeSelectedState();
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(curid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     UpdateCheckCount();
@@ -4543,7 +4544,8 @@ void WombatForensics::PrintTree(int level, const QModelIndex& index, QTextStream
         for(int c=0; c < curnode->ColumnCount(); c++)
         {
             //stream << curnode->Data(columnorder.at(c)).toString() << ","; // column values for id
-            stream << index.sibling(index.row(), c).data().toString();
+	    stream << curnode->Data(treenodemodel->ReturnColumnOrder().at(c)).toString();
+            //stream << index.sibling(index.row(), c).data().toString();
 	    if(c < curnode->ColumnCount() - 1)
 		stream << ",";
         }
