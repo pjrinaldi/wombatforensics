@@ -521,8 +521,8 @@ std::string Verify(QString outstr)
             //logfile << "Verification Failed\n";
             imgname += "Failed";
         }
-        */
         fclose(outfile);
+        */
     }
     else if(hashtype == 1) // WFI
     {
