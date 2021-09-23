@@ -25,8 +25,9 @@ bool Chunks::setIODevice(QIODevice &ioDevice)
 {
     //_ioDevice2 = (ForensicImage*)&ioDevice;
     //_ioDevice = &ioDevice;
-    _ioDevice = (ForImg*)&ioDevice;
-    _size = _ioDevice->size();
+    iodevice = (ForImg*)&ioDevice;
+    _size = iodevice->Size();
+    //_size = _ioDevice->size();
     /*
     bool ok = _ioDevice->open(QIODevice::ReadOnly);
     if (ok)   // Try to open IODevice
@@ -126,6 +127,7 @@ QByteArray Chunks::data(qint64 pos, qint64 maxSize, QByteArray *highlighted)
             maxSize -= byteCount;
             //_ioDevice2->seek(pos + ioDelta);
             //readBuffer = _ioDevice2->read(byteCount);
+            readBuffer = iodevice->ReadContent(pos + ioDelta, byteCount);
             buffer += readBuffer;
             if (highlighted)
                 *highlighted += QByteArray(readBuffer.size(), NORMAL);
@@ -308,6 +310,7 @@ int Chunks::getChunkIndex(qint64 absPos)
         Chunk newChunk;
         qint64 readAbsPos = absPos - ioDelta;
         qint64 readPos = (readAbsPos & READ_CHUNK_MASK);
+        newChunk.data = iodevice->ReadContent(readPos, CHUNK_SIZE);
         //_ioDevice->open(QIODevice::ReadOnly);
         //_ioDevice2->open(QIODevice::ReadOnly);
         //_ioDevice2->seek(readPos);

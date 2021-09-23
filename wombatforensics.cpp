@@ -2097,7 +2097,7 @@ void WombatForensics::PopulateHexContents()
     //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     //casedatafile.setFileName(curimg->ImgPath());
     ui->hexview->BypassColor(false);
-    //ui->hexview->setData(curimg);
+    ui->hexview->setData(*curimg);
 
     //ui->hexview->setData(casedatafile);
     //ui->hexview->setData(casedatafile);

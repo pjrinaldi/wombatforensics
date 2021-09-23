@@ -46,7 +46,6 @@ void StartImaging(std::string instr, std::string outpath, std::string outstr, st
 
 class ForImg : public QIODevice
 {
-    Q_OBJECT
     public:
         ForImg(QString imgfile);
         ~ForImg();

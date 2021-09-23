@@ -63,6 +63,7 @@ private:
     int getChunkIndex(qint64 absPos);
 
     QIODevice * _ioDevice;
+    ForImg* iodevice;
     //ForensicImage* _ioDevice2;
     qint64 _pos;
     qint64 _size;
