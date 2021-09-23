@@ -24,14 +24,14 @@ void LoadTreeModel(void)
     //qDebug() << "treelist count:" << treelist.count();
     //qDebug() << "nodelist:" << treelist.at(0) << treelist.at(0).split(",").count();
     QStringList colorder = treelist.at(0).split(";").first().split(",");
-    qDebug() << "colorder:" << colorder << colorder.count();
+    //qDebug() << "colorder:" << colorder << colorder.count();
     treenodemodel->SetColumnOrder(colorder);
     // with columnorder set, i should be able to call nodedata.insert using GetColumnIndex("")
     for(int i=1; i < treelist.count(); i++)
     {
         QString parentstr = "";
         QStringList nodelist = treelist.at(i).split(";").first().split(",");
-        qDebug() << "nodelist:" << nodelist << nodelist.count();
+        //qDebug() << "nodelist:" << nodelist << nodelist.count();
         //qDebug() << nodelist.at(11);
         QHash<QString, QVariant> nodedata;
         nodedata.clear();
@@ -52,7 +52,7 @@ void LoadTreeModel(void)
 	    parentstr = "-1";
 	else
 	    parentstr = treelist.at(i).split(";").at(3);
-	qDebug() << "parentstr:" << treelist.at(i).split(";").at(3);
+	//qDebug() << "parentstr:" << treelist.at(i).split(";").at(3);
 	mutex.lock();
 	treenodemodel->AddNode(nodedata, parentstr, treelist.at(i).split(";").at(1).toInt(), treelist.at(i).split(";").at(2).toInt());
 	mutex.unlock();

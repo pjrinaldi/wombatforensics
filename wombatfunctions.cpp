@@ -115,19 +115,55 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
 	{
             //qDebug() << curimg->ImgPath() << curimg->MountPath();
             QString layout = "";
-            QFile fpropfile(curimg->MountPath() + "/" + selectedid.split("-").at(1) + "/" + selectedid.split("-").at(2) + ".prop");
-            if(!fpropfile.isOpen())
-                fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-            while(!fpropfile.atEnd())
+            QString filename = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString();
+            if(filename.startsWith("$FAT"))
             {
-                QString line = fpropfile.readLine();
-                if(line.startsWith("Layout|"))
+                uint fatoffset = 0;
+                uint fatsize = 0;
+                uint bytespersector = 0;
+                QFile ppropfile(curimg->MountPath() + "/" + selectedid.split("-").at(1) + "/prop");
+                //QFile ppropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/prop");
+                ppropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(ppropfile.isOpen())
                 {
-                    layout = line.split("|").at(1);
-                    break;
+                    while(!ppropfile.atEnd())
+                    {
+                        QString tmpstr = ppropfile.readLine();
+                        if(tmpstr.startsWith("FAT Offset"))
+                            fatoffset = tmpstr.split("|").at(1).toUInt();
+                        else if(tmpstr.startsWith("Bytes Per Sector"))
+                            bytespersector = tmpstr.split("|").at(1).toUInt();
+                        else if(tmpstr.startsWith("FAT Size"))
+                            fatsize = tmpstr.split("|").at(1).toUInt() * bytespersector;
+                    }
+                    ppropfile.close();
                 }
+                uint fatnum = filename.right(1).toUInt();
+                layout = QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";");
+                //ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
+                //ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
             }
-            fpropfile.close();
+            else if(filename == "$MBR")
+            {
+                layout = "0,512;";
+                //ui->hexview->SetColor(QString("0,512;"), 512);
+            }
+            else
+            {
+                QFile fpropfile(curimg->MountPath() + "/" + selectedid.split("-").at(1) + "/" + selectedid.split("-").at(2) + ".prop");
+                if(!fpropfile.isOpen())
+                    fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                while(!fpropfile.atEnd())
+                {
+                    QString line = fpropfile.readLine();
+                    if(line.startsWith("Layout|"))
+                    {
+                        layout = line.split("|").at(1);
+                        break;
+                    }
+                }
+                fpropfile.close();
+            }
             QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
             QDir dir;
             dir.mkpath(wombatvariable.tmpfilepath);
