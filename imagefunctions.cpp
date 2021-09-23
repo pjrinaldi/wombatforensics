@@ -807,6 +807,8 @@ ForImg::ForImg(QString imgfile)
         imgtype = 7; // WFI
     else if(imgfile.split("/").last().toLower().endsWith(".wli")) // WLI
         imgtype = 8;
+    else // any old file..
+        imgtype = 15;
     imgpath = imgfile;
     //qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
@@ -977,6 +979,20 @@ ForImg::ForImg(QString imgfile)
         QString description;
         in >> header >> version >> casenumber >> examiner >> description;
          */ 
+    }
+    else if(imgtype == 15) // everything else
+    {
+        //QFile efile(imgpath);
+        //if(!efile.isOpen())
+        //    efile.open(QIDevice::ReadOnly);
+        //if(efile.isOpen())
+        //{
+            //hashtype = 0; // MD5
+        QFileInfo efileinfo(imgpath);
+        imgsize = efileinfo.size();
+        //efile.close();
+        //}
+
     }
 }
 
@@ -1245,6 +1261,18 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         wfile.seek(pos);
         tmparray = wfile.read(size);
         wfile.close();
+    }
+    else if(imgtype == 15) // everything else
+    {
+	QFile tmpfile(imgpath);
+	if(!tmpfile.isOpen())
+	    tmpfile.open(QIODevice::ReadOnly);
+	if(tmpfile.isOpen())
+	{
+	    tmpfile.seek(pos);
+	    tmparray = tmpfile.read(size);
+	    tmpfile.close();
+	}
     }
 
     return tmparray;

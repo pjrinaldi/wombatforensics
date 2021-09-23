@@ -77,9 +77,11 @@ void FileViewer::UpdateSelectValue()
 
 void FileViewer::UpdateHexView()
 {
-    hexfile.setFileName(hexstring);
-    ui->filehexview->setData(hexfile);
+    //hexfile.setFileName(hexstring);
+    //ui->filehexview->setData(hexfile);
+    ForImg* tmpimg = new ForImg(hexstring);
     BypassColor(true);
+    ui->filehexview->setData(*tmpimg);
     this->show();
 }
 
