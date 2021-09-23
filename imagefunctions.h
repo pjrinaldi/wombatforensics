@@ -44,7 +44,7 @@ void ReadBytes(std::string infile, std::string outfile, std::string footstr);
 std::string Verify(QString outstr);
 void StartImaging(std::string instr, std::string outpath, std::string outstr, std::string footstr, int radio); 
 
-class ForImg
+class ForImg : public QIODevice
 {
     public:
         ForImg(QString imgfile);
@@ -54,6 +54,15 @@ class ForImg
         QString ImgPath();
         QString MountPath();
         void SetMountPath(QString mountpath);
+    protected:
+	virtual qint64 readData(char* data, qint64 maxsize)
+	{
+	    return maxsize;
+	};
+	virtual qint64 writeData(char* data, qint64 maxsize)
+	{
+	    return maxsize;
+	};
 
     private:
 

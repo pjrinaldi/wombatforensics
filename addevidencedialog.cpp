@@ -94,7 +94,7 @@ void AddEvidenceDialog::StartProcess()
     for(int i=0; i < ui->evidencelist->count(); i++)
     {
         //ForensicImage* tmpimage = new ForensicImage(ui->evidencelist->item(i)->text());
-        ForImg* tmpimage = new ForImg(ui->evidencelist->item(i)->text());
+        ForImg* tmpimage = new ForImg(QString(ui->evidencelist->item(i)->text()));
         newforimglist.append(tmpimage);
         //newevid.append(tmpimage);
         //newevidence.append(ui->evidencelist->item(i)->text());
