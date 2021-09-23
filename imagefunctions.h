@@ -46,6 +46,7 @@ void StartImaging(std::string instr, std::string outpath, std::string outstr, st
 
 class ForImg : public QIODevice
 {
+    Q_OBJECT
     public:
         ForImg(QString imgfile);
         ~ForImg();
@@ -54,12 +55,14 @@ class ForImg : public QIODevice
         QString ImgPath();
         QString MountPath();
         void SetMountPath(QString mountpath);
+
     protected:
-	virtual qint64 readData(char* data, qint64 maxsize)
+
+	qint64 readData(char* data, qint64 maxsize)
 	{
 	    return maxsize;
 	};
-	virtual qint64 writeData(char* data, qint64 maxsize)
+	qint64 writeData(const char* data, qint64 maxsize)
 	{
 	    return maxsize;
 	};
@@ -76,6 +79,7 @@ class ForImg : public QIODevice
         QList<qint64> framelist;
 };
 
+/*
 class MyIODevice : public QIODevice
 {
     public:
@@ -90,5 +94,6 @@ class MyIODevice : public QIODevice
         int imgtype = -1;
         qint64 imgsize = 0;
 };
+*/
 
 #endif // IMAGEFUNCTIONS_H

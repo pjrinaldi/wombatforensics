@@ -8,6 +8,7 @@
 #include "globals.h"
 #include "wombatfunctions.h"
 #include "ui_addevidencedialog.h"
+//#include "imagefunctions.h"
 
 namespace Ui
 {
@@ -27,15 +28,15 @@ private slots:
     void Cancel();
     void StartProcess();
     void UpdateButtons();
-    void ReadXMountOut(void);
-    void ReadXMountErr(void);
+    //void ReadXMountOut(void);
+    //void ReadXMountErr(void);
 private:
     Ui::AddEvidenceDialog* ui;
 protected:
     void dragEnterEvent(QDragEnterEvent* e);
     void dropEvent(QDropEvent* e);
     
-    QProcess* xmntprocess;
+    //QProcess* xmntprocess;
 };
 
 Q_DECLARE_METATYPE(AddEvidenceDialog*)

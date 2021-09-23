@@ -133,6 +133,7 @@ void AddEvidenceDialog::dropEvent(QDropEvent* e)
         }
     }
 }
+/*
 void AddEvidenceDialog::ReadXMountOut()
 {
     qWarning() << xmntprocess->readAllStandardOutput();
@@ -142,3 +143,4 @@ void AddEvidenceDialog::ReadXMountErr()
 {
     qWarning() << xmntprocess->readAllStandardError();
 }
+*/

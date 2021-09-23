@@ -1271,18 +1271,6 @@ void ForImg::SetMountPath(QString mountpath)
 }
 
 /*
-qint64 ForImg::readData(char* data, qint64 maxsize)
-{
-    //ReadContent
-    return maxsize;
-}
-
-qint64 ForImg::writeData(char* data, qint64 maxsize)
-{
-    return maxsize;
-}
-*/
-
 MyIODevice::MyIODevice(QString imgfile)
 {
     imgpath = imgfile;
@@ -1297,3 +1285,4 @@ qint64 MyIODevice::readData(char *data, qint64 maxSize)
 qint64 MyIODevice::writeData(char* data, qint64 maxSize)
 {
 }
+*/

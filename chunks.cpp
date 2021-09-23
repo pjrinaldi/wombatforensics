@@ -24,7 +24,8 @@ Chunks::Chunks(QIODevice &ioDevice, QObject *parent): QObject(parent)
 bool Chunks::setIODevice(QIODevice &ioDevice)
 {
     //_ioDevice2 = (ForensicImage*)&ioDevice;
-    _ioDevice = &ioDevice;
+    //_ioDevice = &ioDevice;
+    _ioDevice = (ForImg*)&ioDevice;
     _size = _ioDevice->size();
     /*
     bool ok = _ioDevice->open(QIODevice::ReadOnly);
