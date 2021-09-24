@@ -4597,16 +4597,30 @@ void ProcessForensicImage(ForImg* curimg)
     QHash<QString, QVariant> nodedata;
     nodedata.clear();
     nodedata.insert("name", curimg->ImgPath().split("/").last());
-    nodedata.insert("path", "0");
+    if(curimg->ImgType() == 15)
+    {
+	QString imgname = "/" + curimg->ImgPath().split("/").last();
+	nodedata.insert("path", curimg->ImgPath().split(imgname).first());
+    }
+    //nodedata.insert("path", "0");
     nodedata.insert("size", curimg->Size());
-    nodedata.insert("create", "0");
-    nodedata.insert("access", "0");
-    nodedata.insert("modify", "0");
-    nodedata.insert("status", "0");
-    nodedata.insert("hash", "0");
-    nodedata.insert("cat", "0");
-    nodedata.insert("sig", "0");
-    nodedata.insert("tag", "0");
+    //nodedata.insert("create", "0");
+    //nodedata.insert("access", "0");
+    //nodedata.insert("modify", "0");
+    //nodedata.insert("status", "0");
+    //nodedata.insert("hash", "0");
+    if(curimg->ImgType() == 15)
+    {
+	QString catsig = GenerateCategorySignature(curimg, curimg->ImgPath().split("/").last(), 0);
+	nodedata.insert("cat", catsig.split("/").first());
+	nodedata.insert("sig", catsig.split("/").last());
+    }
+    //else
+    //{
+	//nodedata.insert("cat", "0");
+	//nodedata.insert("sig", "0");
+    //}
+    //nodedata.insert("tag", "0");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last()));
     //nodedata.insert("match", "0");
     /*
@@ -4643,227 +4657,234 @@ void ProcessForensicImage(ForImg* curimg)
         estatfile.close();
     }
 
-    /*
-    qDebug() << "Starting Parse Volume";
-    ParseVolume(curimg, imgsize, &pofflist, &psizelist, &fsinfolist);
-    */
-    qInfo() << "Reading Partition Table...";
-    qint64 wlisig = qFromBigEndian<qint64>(curimg->ReadContent(0, 8));
-    //qDebug() << "wlisig:" << QString::number(wlisig, 16);
-    uint16_t mbrsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(510, 2));
-    uint16_t applesig = qFromLittleEndian<uint16_t>(curimg->ReadContent(0, 2)); // should be in 2nd sector, powerpc mac's not intel mac's
-    uint32_t bsdsig = qFromLittleEndian<uint32_t>(curimg->ReadContent(0, 4)); // can be at start of partition entry of a dos mbr
-    uint16_t sunsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(508, 2)); // worry about it later, i386 sun can be at 2nd sector of partition entry of a dos mbr
-    uint64_t gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(0, 8));
-    if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
+    if(curimg->ImgType() == 15)
     {
-        if((uint8_t)qFromLittleEndian<uint8_t>(curimg->ReadContent(450, 1)) == 0xee) // GPT DISK
-        {
-            gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(512, 8));
-	    if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
-            {
-                uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
-                uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
-                uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
-                uint8_t ptreecnt = 0; // partition counter to add unallocated in..
-                QDir dir; // current partition directory
-                QFile pstatfile; // current statfile
-                int pcount = 0;
-                for(int i=0; i < partentrycount; i++)
-                {
-                    int cnt = i*partentrysize;
-                    uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
-                    uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-                    if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-                        pcount++;
-                }
-                for(int i=0; i < pcount; i++)
-                {
-                    uint32_t sectorcheck = 0;
-                    int cnt = i*partentrysize;
-                    uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
-                    uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-                    if(i ==0) // INITIAL PARTITION
-                        sectorcheck = 0;
-                    else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
-                        sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
-                    else if(i == pcount - 1)
-                        sectorcheck = curimg->Size()/512;
-                    if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-                    {
-                        if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
-                        {
-			    ParsePartition(curimg, sectorcheck, curstartsector, ptreecnt, 0);
-                            ptreecnt++;
-                        }
-                        // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
-			ParsePartition(curimg, curstartsector, (curendsector - curstartsector + 1), ptreecnt, 1);
-                        ptreecnt++;
-                        if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
-                        {
-                            if(curendsector < curimg->Size())
-				ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
-                        }
-                    }
-                    else // INVALID PARTITION ENTRY
-                    {
-                        // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
-                        // shouldn't need this section so populate later.
-                    }
-                }
-            }
-        }
-        else // MBR DISK
-        {
-            QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
-            QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
-            QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
-	    if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 W/O PARTITION TABLE
-            {
-		ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
-            }
-            else // MBR
-            {
-                uint8_t ptreecnt = 0;
-		uint8_t pcount = 0;
-		for(int i=0; i < 4; i++)
+	qInfo() << "File Loaded";
+    }
+    else
+    {
+	/*
+	qDebug() << "Starting Parse Volume";
+	ParseVolume(curimg, imgsize, &pofflist, &psizelist, &fsinfolist);
+	*/
+	qInfo() << "Reading Partition Table...";
+	qint64 wlisig = qFromBigEndian<qint64>(curimg->ReadContent(0, 8));
+	//qDebug() << "wlisig:" << QString::number(wlisig, 16);
+	uint16_t mbrsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(510, 2));
+	uint16_t applesig = qFromLittleEndian<uint16_t>(curimg->ReadContent(0, 2)); // should be in 2nd sector, powerpc mac's not intel mac's
+	uint32_t bsdsig = qFromLittleEndian<uint32_t>(curimg->ReadContent(0, 4)); // can be at start of partition entry of a dos mbr
+	uint16_t sunsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(508, 2)); // worry about it later, i386 sun can be at 2nd sector of partition entry of a dos mbr
+	uint64_t gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(0, 8));
+	if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
+	{
+	    if((uint8_t)qFromLittleEndian<uint8_t>(curimg->ReadContent(450, 1)) == 0xee) // GPT DISK
+	    {
+		gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(512, 8));
+		if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
 		{
-		    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
-			pcount++;
+		    uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
+		    uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
+		    uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
+		    uint8_t ptreecnt = 0; // partition counter to add unallocated in..
+		    QDir dir; // current partition directory
+		    QFile pstatfile; // current statfile
+		    int pcount = 0;
+		    for(int i=0; i < partentrycount; i++)
+		    {
+			int cnt = i*partentrysize;
+			uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+			uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+			if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+			    pcount++;
+		    }
+		    for(int i=0; i < pcount; i++)
+		    {
+			uint32_t sectorcheck = 0;
+			int cnt = i*partentrysize;
+			uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+			uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+			if(i ==0) // INITIAL PARTITION
+			    sectorcheck = 0;
+			else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
+			    sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
+			else if(i == pcount - 1)
+			    sectorcheck = curimg->Size()/512;
+			if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+			{
+			    if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+			    {
+				ParsePartition(curimg, sectorcheck, curstartsector, ptreecnt, 0);
+				ptreecnt++;
+			    }
+			    // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
+			    ParsePartition(curimg, curstartsector, (curendsector - curstartsector + 1), ptreecnt, 1);
+			    ptreecnt++;
+			    if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
+			    {
+				if(curendsector < curimg->Size())
+				    ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
+			    }
+			}
+			else // INVALID PARTITION ENTRY
+			{
+			    // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
+			    // shouldn't need this section so populate later.
+			}
+		    }
 		}
-                for(uint8_t i=0; i < pcount; i++)
-                {
-                    //int cnt = i*16;
-                    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + (i*16), 1));
-                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i*16), 4));
-                    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i*16), 4));
-                    qint64 sectorcheck = 0;
-                    if(i == 0) // INITIAL PARTITION
-                        sectorcheck = 0;
-                    else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
-                        sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
-                    else if(i == pcount - 1) // LAST PARTITION
-                        sectorcheck = curimg->Size()/512;
-                    if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
-                    {
-                        //qDebug() << "unallocated partition before:" << i;
-			//qDebug() << "unalloc:" << ptreecnt << "curoffset:" << sectorcheck << "curend:" << (curoffset + sectorcheck - 1) << "cursize:" << sectorcheck + curoffset;
-			ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
-                        ptreecnt++;
-                    }
-                    if(curparttype == 0x05) // extended partition
-                    {
-			//qDebug() << "extendedpartition:" << curoffset << cursize;
-                        ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
-                        //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
-                        //ParseExtentedPartition(curimg, curoffset, cursize, j);
-                        //ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
-                    }
-                    else if(curparttype == 0x00)
-                    {
-                        //qDebug() << "do nothing here cause it is an empty partition...";
-                    }
-                    else if(curparttype == 0x82) // Sun i386
-                    {
-                        // parse sun table here passing pofflist and psizelist
-                    }
-                    else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
-                    {
-                        // parse bsd table here passing pofflist nad psizelist
-                    }
-                    else
-                    {
-                        if(cursize > 0)
-                        {
-			    //qDebug() << "ppart:" << ptreecnt << "curoffset:" << curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize;
-                            //qDebug() << "begin parse file system information";
-			    ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
-                            ptreecnt++;
-                        }
-                    }
-                    if(i == pcount - 1 && curoffset + cursize < curimg->Size()/512 - 1) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
-                    {
-                        //qDebug() << "add unallocated partition after last partition" << i;
-			ParsePartition(curimg, curoffset + cursize, curimg->Size()/512 - (curoffset + cursize), ptreecnt, 0);
-			//ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
-                        //ptreecnt++;
-                    }
-                }
-            }
-        }
-    }
-    else if(applesig == 0x504d) // APPLE PARTITION
-    {
-        qDebug() << "apple sig here...";
-    }
-    else if(bsdsig == 0x82564557) // BSD PARTITION
-    {
-        qDebug() << "bsd part here...";
-    }
-    else if(sunsig == 0xDABE) // SUN PARTITION
-    {
-        qDebug() << "determine if sparc or i386 and then process partitions.";
-    }
-    else if(gptsig == 0x5452415020494645) // GPT PARTITION
-    {
-        uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
-        uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
-        uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
-        uint8_t ptreecnt = 0; // partition counter to add unallocated in..
-        QDir dir; // current partition directory
-        QFile pstatfile; // current statfile
-        int pcount = 0;
-        for(int i=0; i < partentrycount; i++)
-        {
-            int cnt = i*partentrysize;
-            uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
-            uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-            if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-                pcount++;
-        }
-        for(int i=0; i < pcount; i++)
-        {
-            uint32_t sectorcheck = 0;
-            int cnt = i*partentrysize;
-            uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
-            uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-            if(i ==0) // INITIAL PARTITION
-                sectorcheck = 0;
-            else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
-                sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
-            else if(i == pcount - 1)
-                sectorcheck = curimg->Size()/512;
-            if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-            {
-                if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
-                {
-                    ParsePartition(curimg, sectorcheck, curstartsector, ptreecnt, 0);
-                    ptreecnt++;
-                }
-                // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
-                ParsePartition(curimg, curstartsector, (curendsector - curstartsector + 1), ptreecnt, 1);
-                ptreecnt++;
-                if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
-                {
-                    if(curendsector < curimg->Size())
-                        ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
-                }
-            }
-            else // INVALID PARTITION ENTRY
-            {
-                // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
-                // shouldn't need this section so populate later.
-            }
-        }
-    }
-    else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
-    {
-        ParseLogicalImage(curimg);
-    }
-    else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
-    {
-	ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
-        //qDebug() << "partition signature not found correctly";
+	    }
+	    else // MBR DISK
+	    {
+		QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
+		QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
+		QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
+		if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 W/O PARTITION TABLE
+		{
+		    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
+		}
+		else // MBR
+		{
+		    uint8_t ptreecnt = 0;
+		    uint8_t pcount = 0;
+		    for(int i=0; i < 4; i++)
+		    {
+			if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
+			    pcount++;
+		    }
+		    for(uint8_t i=0; i < pcount; i++)
+		    {
+			//int cnt = i*16;
+			uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + (i*16), 1));
+			uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i*16), 4));
+			uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i*16), 4));
+			qint64 sectorcheck = 0;
+			if(i == 0) // INITIAL PARTITION
+			    sectorcheck = 0;
+			else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
+			    sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
+			else if(i == pcount - 1) // LAST PARTITION
+			    sectorcheck = curimg->Size()/512;
+			if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
+			{
+			    //qDebug() << "unallocated partition before:" << i;
+			    //qDebug() << "unalloc:" << ptreecnt << "curoffset:" << sectorcheck << "curend:" << (curoffset + sectorcheck - 1) << "cursize:" << sectorcheck + curoffset;
+			    ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
+			    ptreecnt++;
+			}
+			if(curparttype == 0x05) // extended partition
+			{
+			    //qDebug() << "extendedpartition:" << curoffset << cursize;
+			    ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
+			    //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
+			    //ParseExtentedPartition(curimg, curoffset, cursize, j);
+			    //ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+			}
+			else if(curparttype == 0x00)
+			{
+			    //qDebug() << "do nothing here cause it is an empty partition...";
+			}
+			else if(curparttype == 0x82) // Sun i386
+			{
+			    // parse sun table here passing pofflist and psizelist
+			}
+			else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
+			{
+			    // parse bsd table here passing pofflist nad psizelist
+			}
+			else
+			{
+			    if(cursize > 0)
+			    {
+				//qDebug() << "ppart:" << ptreecnt << "curoffset:" << curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize;
+				//qDebug() << "begin parse file system information";
+				ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
+				ptreecnt++;
+			    }
+			}
+			if(i == pcount - 1 && curoffset + cursize < curimg->Size()/512 - 1) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
+			{
+			    //qDebug() << "add unallocated partition after last partition" << i;
+			    ParsePartition(curimg, curoffset + cursize, curimg->Size()/512 - (curoffset + cursize), ptreecnt, 0);
+			    //ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
+			    //ptreecnt++;
+			}
+		    }
+		}
+	    }
+	}
+	else if(applesig == 0x504d) // APPLE PARTITION
+	{
+	    qDebug() << "apple sig here...";
+	}
+	else if(bsdsig == 0x82564557) // BSD PARTITION
+	{
+	    qDebug() << "bsd part here...";
+	}
+	else if(sunsig == 0xDABE) // SUN PARTITION
+	{
+	    qDebug() << "determine if sparc or i386 and then process partitions.";
+	}
+	else if(gptsig == 0x5452415020494645) // GPT PARTITION
+	{
+	    uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
+	    uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
+	    uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
+	    uint8_t ptreecnt = 0; // partition counter to add unallocated in..
+	    QDir dir; // current partition directory
+	    QFile pstatfile; // current statfile
+	    int pcount = 0;
+	    for(int i=0; i < partentrycount; i++)
+	    {
+		int cnt = i*partentrysize;
+		uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+		uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+		if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+		    pcount++;
+	    }
+	    for(int i=0; i < pcount; i++)
+	    {
+		uint32_t sectorcheck = 0;
+		int cnt = i*partentrysize;
+		uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+		uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+		if(i ==0) // INITIAL PARTITION
+		    sectorcheck = 0;
+		else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
+		    sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
+		else if(i == pcount - 1)
+		    sectorcheck = curimg->Size()/512;
+		if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+		{
+		    if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+		    {
+			ParsePartition(curimg, sectorcheck, curstartsector, ptreecnt, 0);
+			ptreecnt++;
+		    }
+		    // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
+		    ParsePartition(curimg, curstartsector, (curendsector - curstartsector + 1), ptreecnt, 1);
+		    ptreecnt++;
+		    if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
+		    {
+			if(curendsector < curimg->Size())
+			    ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
+		    }
+		}
+		else // INVALID PARTITION ENTRY
+		{
+		    // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
+		    // shouldn't need this section so populate later.
+		}
+	    }
+	}
+	else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
+	{
+	    ParseLogicalImage(curimg);
+	}
+	else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
+	{
+	    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
+	    //qDebug() << "partition signature not found correctly";
+	}
     }
     //FindPartitions(curimg, &pofflist, &psizelist);
 }

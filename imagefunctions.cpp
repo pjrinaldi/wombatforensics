@@ -1283,6 +1283,11 @@ qint64 ForImg::Size()
     return imgsize;
 }
 
+int ForImg::ImgType()
+{
+    return imgtype;
+}
+
 QString ForImg::ImgPath()
 {
     return imgpath;
@@ -1292,6 +1297,7 @@ QString ForImg::MountPath()
 {
     return mntpath;
 }
+
 void ForImg::SetMountPath(QString mountpath)
 {
     mntpath = mountpath;

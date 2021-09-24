@@ -805,7 +805,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setWindowTitle("Archive Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
         htmlviewer->ShowArtifact(5, index); // Archive
     }
-    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("PDF"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Pdf"))
     {
 	pdfviewer = new PdfViewer();
 	pdfviewer->setAttribute(Qt::WA_DeleteOnClose);
@@ -1834,9 +1834,9 @@ QList<ForImg*> existingforimglist;
         */
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
         QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessForensicImage);
+        volwatcher.setFuture(tmpfuture);
         //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
         //QFuture<void> tmpfuture = QtConcurrent::map(newevid, ProcessVolume);
-        volwatcher.setFuture(tmpfuture);
         //UpdateStatus();
         //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
         //sqlwatcher.setFuture(tmpfuture);
@@ -2014,6 +2014,15 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
         if(sizeval > 0)
             RewriteSelectedIdContent(curindex);
     }
+    else if(curid.split("-").count() == 1 && curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("sig")).data().toString().isEmpty() == false)
+    {
+	bool boolok;
+	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
+	qint64 sizeval = clocale.toLongLong(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("size")).data().toString(), &boolok);
+	if(sizeval > 0)
+	    RewriteSelectedIdContent(curindex);
+    }
+    // MAY NEED TO FIGURE OUT AN ELSE IF FOR THE ADDING A FILE AS FORENSIC IMAGE...
     /*
     if(curindex.sibling(curindex.row(), 11).data().toString().split("-").count() == 5)
     {

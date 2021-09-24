@@ -55,8 +55,11 @@ void AddEvidenceDialog::SelectEvidence()
         }
         else
         {
-            QMessageBox::warning(this, tr("Unsupported Format"), tr("Unfortunately, this format is not supported YET, it should be supported by v0.5"), QMessageBox::Ok);
-            qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.5.";
+	    QMessageBox::information(this, tr("Adding Regular File"), tr("You are adding a format which is not a supported forensic image, it will be added to the evidence list as a regular file"), QMessageBox::Ok);
+	    ui->evidencelist->addItem(evidfilename);
+	    ui->startbutton->setEnabled(true);
+            //QMessageBox::warning(this, tr("Unsupported Format"), tr("Unfortunately, this format is not supported YET, it should be supported by v0.5"), QMessageBox::Ok);
+            //qDebug() << "Unfortunately this format is not supported YET, it should be supported by v0.5.";
         }
     }
     else

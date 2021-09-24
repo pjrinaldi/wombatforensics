@@ -54,6 +54,7 @@ class ForImg : public QIODevice
         QString ImgPath();
         QString MountPath();
         void SetMountPath(QString mountpath);
+	int ImgType();
 
     protected:
 
