@@ -2138,6 +2138,7 @@ void WombatForensics::PopulateHexContents()
         else
         {
             QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
+	    //qDebug() << "partfile:" << partfile.absoluteFilePath();
             //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
             partfile.open(QIODevice::ReadOnly | QIODevice::Text);
             if(partfile.isOpen())
