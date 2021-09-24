@@ -24,7 +24,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filtercountlabel = new QLabel(this);
     filtercountlabel->setText("Filtered: 0");
     filecountlabel = new QLabel(this);
-    filecountlabel->setText("Found: 0");
+    filecountlabel->setText("Parsed: 0");
     checkedcountlabel = new QLabel(this);
     checkedcountlabel->setText("Checked: 0");
     digcountlabel = new QLabel(this);
@@ -2875,7 +2875,7 @@ void WombatForensics::CloseCurrentCase()
     fileschecked = 0;
     carvedcount = 0;
     filtercountlabel->setText("Filtered: 0");
-    filecountlabel->setText("Found: " + QString::number(filesfound));
+    filecountlabel->setText("Parsed: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
 
     // UNMOUNT ALL FUSE MOUNTED IMAGES
@@ -3499,7 +3499,7 @@ void WombatForensics::UpdateExport()
 
 void WombatForensics::UpdateProgress(qint64 filecount)
 {
-    filecountlabel->setText("Found: " + QString::number(filecount));
+    filecountlabel->setText("Parsed: " + QString::number(filecount));
 }
 
 void WombatForensics::DisplayError(QString errorNumber, QString errorType, QString errorValue)

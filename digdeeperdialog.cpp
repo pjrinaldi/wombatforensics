@@ -18,6 +18,7 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
     ui->listedFileRadioButton->setText(listtext);
     ui->processButton->setEnabled(false);
     ui->hashlistwidget->setEnabled(false);
+    ui->hashlistcheckbox->setEnabled(false);
     ui->selectedFileRadioButton->setChecked(true);
     if(checkcount <= 0)
         ui->checkedFileRadioButton->setEnabled(false);
@@ -39,6 +40,8 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
     QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
     for(int i=0; i < whllist.count(); i++)
 	new QListWidgetItem(whllist.at(i).fileName(), ui->hashlistwidget);
+    if(ui->hashlistwidget->count() > 0)
+	ui->hashlistcheckbox->setEnabled(true);
 }
 
 DigDeeperDialog::~DigDeeperDialog()
