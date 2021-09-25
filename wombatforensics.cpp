@@ -97,10 +97,10 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     //connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
-    connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
+    //connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
-    connect(isignals, SIGNAL(CarveUpdate(QString, int)), this, SLOT(UpdateCarve(QString, int)), Qt::QueuedConnection);
+    //connect(isignals, SIGNAL(CarveUpdate(QString, int)), this, SLOT(UpdateCarve(QString, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(StatUpdate(QString)), this, SLOT(StatusUpdate(QString)), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
@@ -234,11 +234,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     carvecounthash.clear();
     treenodemodel = new TreeNodeModel();
     autosavetimer = new QTimer(this);
-    digrotatetimer = new QTimer(this);
-    carverotatetimer = new QTimer(this);
+    //digrotatetimer = new QTimer(this);
+    //carverotatetimer = new QTimer(this);
     connect(autosavetimer, SIGNAL(timeout()), this, SLOT(AutoSaveState()));
-    connect(digrotatetimer, SIGNAL(timeout()), this, SLOT(RotateDig()));
-    connect(carverotatetimer, SIGNAL(timeout()), this, SLOT(RotateCarve()));
+    //connect(digrotatetimer, SIGNAL(timeout()), this, SLOT(RotateDig()));
+    //connect(carverotatetimer, SIGNAL(timeout()), this, SLOT(RotateCarve()));
 }
 
 void WombatForensics::UnCheckChecked()
@@ -1361,21 +1361,25 @@ void WombatForensics::ThashSaveFinish(void)
 {
     qDebug() << "SaveImageHashes Finished";
     StatusUpdate("Thumbnail Library Saved");
+    /*
     if(!digrotatetimer->isActive())
         StatusUpdate("Ready");
     else
         StatusUpdate("Digging Deeper...");
+    */
 }
 
 void WombatForensics::ThashFinish(void)
 {
     qDebug() << "LoadImageHashes Finished";
     StatusUpdate("Thumbnail Library Ready");
+    /*
     ui->actionView_Image_Gallery->setEnabled(true);
     if(!digrotatetimer->isActive())
     	StatusUpdate("Ready");
     else
 	StatusUpdate("Digging Deeper...");
+        */
 }
 
 void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
@@ -3266,6 +3270,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     // digoptions = thumbimg (0) | thumbvid (1) | hash (2) | hashlistcompare (3) | expandarchive zip (4)
     // provides access to the whlcomparisonlist to give access to the files...
     //qDebug() << "whlfiles:" << whlcomparisonlist;
+    /*
     digimgthumbtotal = 0;
     digvidthumbtotal = 0;
     dighashtotal = 0;
@@ -3278,6 +3283,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digvidcountstring = "";
     dighashcountstring = "";
     digtotalcountstring = "";
+    */
     digtype = dtype;
     digoptions = doptions;
     digfilelist.clear();
@@ -3293,46 +3299,52 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     else
         digfilelist = GetFileLists(dtype);
 
+    /*
     // THIS LOOP MIGHT BE JUST TO GET THE COUNTS FOR THE STATUS, NOT NECESSARILY THE FILEIDLISTS FOR RESPECTIVE DIGGING
+    // GET COUNTS FOR EACH DIGGING CHOICE
     for(int i = 0; i < digoptions.count(); i++)
     {
         if(digoptions.at(i) == 0) // Generate Image Thumbnails
         {
             if(dtype == 1) // checked so get all images in a tmp list and then reduce the checked list to just checked images
             {
-                qDebug() << "all checked files:" << digfilelist;
+                //qDebug() << "all checked files:" << digfilelist;
                 QStringList tmpimglist = GetFileLists(4);
                 for(int j=0; j < digfilelist.count(); j++)
                 {
                     if(!tmpimglist.contains(digfilelist.at(j)))
-                        digfilelist.removeAt(j);
+                        digimgthumbtotal++;
+                        //digfilelist.removeAt(j);
                 }
-                qDebug() << "checked images only:" << digfilelist;
+                //qDebug() << "checked images only:" << digfilelist;
             }
             else if(dtype == 2) // all files, replace all files with just images.
-                digfilelist = GetFileLists(4);
+                digimgthumbtotal = GetFileLists(4).count();
         }
         else if(digoptions.at(i) == 1) // Generate Video Thumbnails
         {
             if(dtype == 1) // checked, so get all videos in a tmplist and then reduce the checked list to just checked videos
             {
-                qDebug() << "all checked files:" << digfilelist;
+                //qDebug() << "all checked files:" << digfilelist;
                 QStringList tmpvidlist = GetFileLists(5);
                 for(int j=0; j < digfilelist.count(); j++)
                 {
                     if(!tmpvidlist.contains(digfilelist.at(j)))
-                        digfilelist.removeAt(j);
+                        digvidthumbtotal++;
+                        //digfilelist.removeAt(j);
                 }
-                qDebug() << "checked videos only:" << digfilelist;
+                //qDebug() << "checked videos only:" << digfilelist;
             }
             else if(dtype == 2) // all files, replace all files with just videos
-                digfilelist = GetFileLists(5);
+                digvidthumbtotal = GetFileLists(5).count();
         }
         else if(digoptions.at(i) == 2) // Generate BlAKE3 Hash
         {
+            dighashtotal = digfilelist.count();
         }
         else if(digoptions.at(i) == 3) // Compare with Selected HashLists
         {
+            digmatchtotal = digfilelist.count();
             // global variable is whlcomparisonlist
         }
         else if(digoptions.at(i) == 4) // Expand Zip Archives
@@ -3444,9 +3456,10 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
                 hasarchive = true;
         }
         */
-    }
+    /*}
     digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
+    */
     // LAUNCH GENERATEPREDIGGING() MAP HERE...
     // IMPLEMENT PREDIGWATCHER
     // ON PREDIGWATCHER RETURN, THEN CALL THE BELOW CODE...
@@ -3456,9 +3469,10 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     predigwatcher.setFuture(predigfuture);
     //digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
     //digwatcher.setFuture(digfuture);
-    digrotatetimer->start(1500);
+    //digrotatetimer->start(1500);
 }
 
+/*
 void WombatForensics::UpdateCarve(QString pid, int carvecnt)
 {
     carvecounthash.insert(pid, carvecnt);
@@ -3468,7 +3482,9 @@ void WombatForensics::UpdateCarve(QString pid, int carvecnt)
     carvestatuslabel->setText("Partition: " + pid + " Carved: " + QString::number(carvecnt));
     // have values for QHash<QString partitionid, int carvecount>carvecounthash;
 }
+*/
 
+/*
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
     if(digid == 0)
@@ -3489,6 +3505,7 @@ void WombatForensics::UpdateDig(int digid, int digcnt)
     }
     digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount + digarchivecount) + " of " + QString::number(digtotalcount);
 }
+*/
 
 void WombatForensics::UpdateExport()
 {
@@ -3841,8 +3858,8 @@ void WombatForensics::FinishDigging()
         isreport = false;
     }
     qInfo() << "Digging Finished";
-    digrotatetimer->stop();
-    digcountlabel->setText(digtotalcountstring);
+    //digrotatetimer->stop();
+    //digcountlabel->setText(digtotalcountstring);
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
     StatusUpdate("Ready");
 }
@@ -4340,6 +4357,7 @@ void WombatForensics::AutoSaveState()
     SaveState(); // send to another thread and then send the finish to spit out the saved log info and update the status..
 }
 
+/*
 void WombatForensics::RotateCarve()
 {
     /*
@@ -4361,8 +4379,10 @@ void WombatForensics::RotateCarve()
     /*
      * while(carvetimercounter < carvecounthash.count();
      */ 
-}
+/*}
+*/
 
+/*
 void WombatForensics::RotateDig()
 {
     if(digtimercounter == 0 && digimgthumbtotal > 0)
@@ -4414,6 +4434,7 @@ void WombatForensics::RotateDig()
     //if(digtotalcount == (digvidthumbcount + digimgthumbcount + dighashcount))
 	//digrotatetimer->stop();
 }
+*/
 
 void WombatForensics::SetHexOffset()
 {
@@ -4525,10 +4546,12 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
 void WombatForensics::FinishWombatCaseFile(void)
 {
     qInfo() << "Current State Saved.";
+    /*
     if(digrotatetimer->isActive())
     	StatusUpdate("Digging Deeper...");
     else
 	StatusUpdate("Ready");
+    */
 }
 
 void WombatForensics::SaveTreeModel(void)

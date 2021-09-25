@@ -225,8 +225,8 @@ private slots:
     void on_actionHashListManager_triggered();
     void UpdateProgress(qint64 count);
     void UpdateExport(void);
-    void UpdateDig(int digstateid, int digcount);
-    void UpdateCarve(QString partid, int carvecount);
+    //void UpdateDig(int digstateid, int digcount);
+    //void UpdateCarve(QString partid, int carvecount);
     void OpenUpdate(void);
     void UpdateCheckCount(void);
     //void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
@@ -293,8 +293,8 @@ private slots:
     void CarveFile(void);
     void PublishResults(void);
     void AutoSaveState(void);
-    void RotateDig(void);
-    void RotateCarve(void);
+    //void RotateDig(void);
+    //void RotateCarve(void);
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
     void PrepareEvidenceImage(void);
     void SetHexOffset(void);
@@ -400,8 +400,8 @@ private:
     QShortcut* jumpbackward;
     QShortcut* showitem;
     QTimer* autosavetimer;
-    QTimer* digrotatetimer; 
-    QTimer* carverotatetimer;
+    //QTimer* digrotatetimer; 
+    //QTimer* carverotatetimer;
     TreeNode* actionitem;
     QWidget* cancelwidget;
     qint64 digimgthumbtotal = 0;
