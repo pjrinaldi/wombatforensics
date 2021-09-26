@@ -15,6 +15,14 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
         htmlstr = initfile.readAll();
     initfile.close();
     htmlstr += "<div id='infotitle'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
+    //htmlstr += "<div id='infotitle'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
+    /*
+            text-transform: uppercase;
+            font-size: 18px;
+            font-family: verdana, sans;
+            font-color: #9b7d4b;
+            font-color: #3a291a;
+     */ 
     htmlstr += "<table width='100%'><tr><th>NAME</th><th>VALUE</th></tr>";
     QString lnkfile = wombatvariable.tmpfilepath + lnkid + "-fhex";
     liblnk_error_t* error = NULL;
