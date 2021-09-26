@@ -806,6 +806,50 @@ void GenerateThumbnails(QString thumbid)
 
 QByteArray ReturnFileContent(QString objectid)
 {
+    ForImg* curimg = NULL;
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+        if(curimg->MountPath().endsWith(objectid.split("-").at(0)))
+        {
+            curimg = existingforimglist.at(i);
+            break;
+        }
+    }
+    QString layout = "";
+    if(curimg->ImgType() == 15)
+        layout = "0," + QString::number(curimg->Size()) + ";";
+    else
+    {
+        QFile fpropfile(curimg->MountPath() + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
+        if(!fpropfile.isOpen())
+            fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        while(!fpropfile.atEnd())
+        {
+            QString line = fpropfile.readLine();
+            if(line.startsWith("Layout|"))
+            {
+                layout = line.split("|").at(1);
+                break;
+            }
+        }
+        fpropfile.close();
+    }
+    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+    QByteArray filecontent;
+    filecontent.clear();
+    quint64 curlogsize = 0;
+    for(int i=0; i < layoutlist.count(); i++)
+    {
+        /*
+        quint64 curoffset = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
+        quint64 cursize = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
+        curlogsize += cursize;
+        if(curlogsize <= logicalsize)
+            tmparray.append(curimg->ReadContent(curoffset, cursize));
+        else
+            tmparray.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
+        */
+    }
     /*
     QString selectedid = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString();
     //QString sizestr = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("size")).data().toString();
@@ -824,39 +868,6 @@ QByteArray ReturnFileContent(QString objectid)
 	    else
 	    {
 		//qDebug() << curimg->ImgPath() << curimg->MountPath();
-		QString filename = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString();
-		if(filename.startsWith("$FAT"))
-		{
-		    uint fatoffset = 0;
-		    uint fatsize = 0;
-		    uint bytespersector = 0;
-		    QFile ppropfile(curimg->MountPath() + "/" + selectedid.split("-").at(1) + "/prop");
-		    //QFile ppropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/prop");
-		    ppropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-		    if(ppropfile.isOpen())
-		    {
-			while(!ppropfile.atEnd())
-			{
-			    QString tmpstr = ppropfile.readLine();
-			    if(tmpstr.startsWith("FAT Offset"))
-				fatoffset = tmpstr.split("|").at(1).toUInt();
-			    else if(tmpstr.startsWith("Bytes Per Sector"))
-				bytespersector = tmpstr.split("|").at(1).toUInt();
-			    else if(tmpstr.startsWith("FAT Size"))
-				fatsize = tmpstr.split("|").at(1).toUInt() * bytespersector;
-			}
-			ppropfile.close();
-		    }
-		    uint fatnum = filename.right(1).toUInt();
-		    layout = QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";");
-		    //ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
-		    //ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
-		}
-		else if(filename == "$MBR")
-		{
-		    layout = "0,512;";
-		    //ui->hexview->SetColor(QString("0,512;"), 512);
-		}
 		else
 		{
 		    QFile fpropfile(curimg->MountPath() + "/" + selectedid.split("-").at(1) + "/" + selectedid.split("-").at(2) + ".prop");
@@ -889,11 +900,30 @@ QByteArray ReturnFileContent(QString objectid)
 		    tmpfile.write(filearray);
 		}
 		tmpfile.close();
+                /*
+                 * 
+                quint64 curlogsize = 0;
+                for(int j=1; j <= layoutlist.count(); j++)
+                {
+                    QByteArray tmparray;
+                    tmparray.clear();
+                    quint64 curoffset = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
+                    quint64 cursize = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
+                    curlogsize += cursize;
+                    if(curlogsize <= logicalsize)
+                        tmparray.append(curimg->ReadContent(curoffset, cursize));
+                    else
+                        tmparray.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
+                    blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
+                }
+                uint8_t output[BLAKE3_OUT_LEN];
 	    }
         }
     }
 
      */ 
+
+    /*
     // STILL NEED TO HANDLE ZIP AND CARVED
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     TreeNode* curnode = static_cast<TreeNode*>(indexlist.first().internalPointer());
@@ -986,6 +1016,7 @@ QByteArray ReturnFileContent(QString objectid)
     }
 
     return filecontent;
+    */
 }
 
 void SaveHashList(void)
