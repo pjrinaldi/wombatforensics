@@ -806,7 +806,6 @@ void GenerateThumbnails(QString thumbid)
 
 QByteArray ReturnFileContent(QString objectid)
 {
-    // NEED TO GET FILESIZE FROM SOMEWHERE, MAYBE SEND IT WITH THE FUNCTION..
     ForImg* curimg = NULL;
     for(int i=0; i < existingforimglist.count(); i++)
     {
@@ -829,14 +828,9 @@ QByteArray ReturnFileContent(QString objectid)
         {
             QString line = fpropfile.readLine();
             if(line.startsWith("Layout|"))
-            {
                 layout = line.split("|").at(1);
-                //break;
-            }
             else if(line.startsWith("Logical Size|"))
-            {
                 logicalsize = line.split("|").at(1).toULongLong();
-            }
         }
         fpropfile.close();
     }
