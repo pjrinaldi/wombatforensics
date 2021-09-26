@@ -2,6 +2,7 @@
 #include <QtEndian>
 
 #include <libfwnt.h>
+#include "cssstrings.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -14,16 +15,11 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
-    htmlstr += "<div id='infotitle'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
+    htmlstr += "<div style='" + bodycss + "'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
     //htmlstr += "<div id='infotitle'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
     /*
-            text-transform: uppercase;
-            font-size: 18px;
-            font-family: verdana, sans;
-            font-color: #9b7d4b;
-            font-color: #3a291a;
      */ 
-    htmlstr += "<table width='100%'><tr><th>NAME</th><th>VALUE</th></tr>";
+    htmlstr += "<table width='100%' style='" + tablecss + "'><tr><th style='" + thcss + "'>NAME</th><th style='" + thcss + "'>Value</th></tr>";
     QString lnkfile = wombatvariable.tmpfilepath + lnkid + "-fhex";
     liblnk_error_t* error = NULL;
     liblnk_file_t* lnkobj = NULL;
@@ -37,18 +33,18 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
 	    uint32_t tmpuint32 = 0;
 	    size_t tmpsize = 0;
             liblnk_file_get_file_creation_time(lnkobj, &gettime, &error);
-	    htmlstr += "<tr class='odd'><td class='aval'>Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
 	    gettime = 0;
 	    liblnk_file_get_file_modification_time(lnkobj, &gettime, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>Modification Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Modification Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
 	    gettime = 0;
 	    liblnk_file_get_file_access_time(lnkobj, &gettime, &error);
-	    htmlstr += "<tr class='odd'><td class='aval'>Access Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Access Time:</td><td>" + ConvertWindowsTimeToUnixTime(gettime) + "</td></tr>";
 	    liblnk_file_get_file_size(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>File Size:</td><td>" + QString::number(tmpuint32) + " bytes</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>File Size:</td><td>" + QString::number(tmpuint32) + " bytes</td></tr>";
 	    tmpuint32 = 0;
 	    liblnk_file_get_file_attribute_flags(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr class='odd'><td class='aval vtop'>File Attributes:</td><td class='vtop'>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "<br/>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalvtopcss + "'>File Attributes:</td><td class='vtop'>0x" + QString("%1").arg(tmpuint32, 8, 16, QChar('0')) + "<br/>";
 	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_READ_ONLY) != 0)
 		htmlstr += "Read Only (FILE_ATTRIBUTE_READ_ONLY)<br/>";
 	    if((tmpuint32 & LIBLNK_FILE_ATTRIBUTE_FLAG_HIDDEN) != 0)
@@ -82,7 +78,7 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
 	    htmlstr += "</td></tr>";
 	    tmpuint32 = 0;
 	    liblnk_file_get_drive_type(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>Drive Type:</td><td>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Drive Type:</td><td>";
 	    switch(tmpuint32)
 	    {
 		case LIBLNK_DRIVE_TYPE_UNKNOWN:
@@ -113,22 +109,22 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
 	    htmlstr += " (" + QString::number(tmpuint32) + ")</td></tr>";
 	    tmpuint32 = 0;
 	    liblnk_file_get_drive_serial_number(lnkobj, &tmpuint32, &error);
-	    htmlstr += "<tr class='odd'><td class='aval'>Drive Serial Number:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Drive Serial Number:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
 	    tmpsize = 0;
 	    liblnk_file_get_utf8_volume_label_size(lnkobj, &tmpsize, &error);
 	    uint8_t volabel[tmpsize];
 	    liblnk_file_get_utf8_volume_label(lnkobj, volabel, tmpsize, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>Volume Label:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Volume Label:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(volabel)) + "</td></tr>";
 	    tmpsize = 0;
 	    liblnk_file_get_utf8_local_path_size(lnkobj, &tmpsize, &error);
 	    uint8_t localpath[tmpsize];
 	    liblnk_file_get_utf8_local_path(lnkobj, localpath, tmpsize, &error);
-	    htmlstr += "<tr class='odd'><td class='aval'>Local Path:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(localpath)) + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Local Path:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(localpath)) + "</td></tr>";
 	    tmpsize = 0;
 	    liblnk_file_get_utf8_working_directory_size(lnkobj, &tmpsize, &error);
 	    uint8_t workdir[tmpsize];
 	    liblnk_file_get_utf8_working_directory(lnkobj, workdir, tmpsize, &error);
-	    htmlstr += "<tr class='even'><td class='aval'>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
         }
     }
     liblnk_file_close(lnkobj, &error);
