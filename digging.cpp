@@ -810,13 +810,14 @@ QByteArray ReturnFileContent(QString objectid)
     ForImg* curimg = NULL;
     for(int i=0; i < existingforimglist.count(); i++)
     {
-        if(curimg->MountPath().endsWith(objectid.split("-").at(0)))
+        if(existingforimglist.at(i)->MountPath().endsWith(objectid.split("-").at(0)))
         {
             curimg = existingforimglist.at(i);
             break;
         }
     }
     QString layout = "";
+    quint64 logicalsize = 0;
     if(curimg->ImgType() == 15)
         layout = "0," + QString::number(curimg->Size()) + ";";
     else
@@ -830,7 +831,11 @@ QByteArray ReturnFileContent(QString objectid)
             if(line.startsWith("Layout|"))
             {
                 layout = line.split("|").at(1);
-                break;
+                //break;
+            }
+            else if(line.startsWith("Logical Size|"))
+            {
+                logicalsize = line.split("|").at(1).toULongLong();
             }
         }
         fpropfile.close();
@@ -847,90 +852,10 @@ QByteArray ReturnFileContent(QString objectid)
         if(curlogsize <= logicalsize)
             filecontent.append(curimg->ReadContent(curoffset, cursize));
         else
-            filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
-        /*
-        quint64 curoffset = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
-        quint64 cursize = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
-        curlogsize += cursize;
-        if(curlogsize <= logicalsize)
-            tmparray.append(curimg->ReadContent(curoffset, cursize));
-        else
-            tmparray.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
-        */
-    }
-    /*
-    QString selectedid = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString();
-    //QString sizestr = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("size")).data().toString();
-    //this gets the comma'd size, would have to convert to qstring number before i try to use as size
-    //qDebug() << "sizestr:" << sizestr;
-    for(int i=0; i < existingforimglist.count(); i++)
-    {
-	ForImg* curimg = existingforimglist.at(i);
-	if(curimg->MountPath().endsWith(selectedid.split("-").at(0)))
-	{
-	    QString layout = "";
-	    if(curimg->ImgType() == 15)
-	    {
-		layout = "0," + QString::number(curimg->Size()) + ";";
-	    }
-	    else
-	    {
-		//qDebug() << curimg->ImgPath() << curimg->MountPath();
-		else
-		{
-		    QFile fpropfile(curimg->MountPath() + "/" + selectedid.split("-").at(1) + "/" + selectedid.split("-").at(2) + ".prop");
-		    if(!fpropfile.isOpen())
-			fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-		    while(!fpropfile.atEnd())
-		    {
-			QString line = fpropfile.readLine();
-			if(line.startsWith("Layout|"))
-			{
-			    layout = line.split("|").at(1);
-			    break;
-			}
-		    }
-		    fpropfile.close();
-		}
-	    }
-	    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
-	    QDir dir;
-	    dir.mkpath(wombatvariable.tmpfilepath);
-	    hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
-	    QFile tmpfile(hexstring);
-	    if(!tmpfile.isOpen())
-		tmpfile.open(QIODevice::WriteOnly | QIODevice::Append);
-	    if(tmpfile.isOpen())
-	    {
-		for(int j=0; j < layoutlist.count(); j++)
-		{
-		    QByteArray filearray = curimg->ReadContent(layoutlist.at(j).split(",").at(0).toULongLong(), layoutlist.at(j).split(",").at(1).toULongLong());
-		    tmpfile.write(filearray);
-		}
-		tmpfile.close();
-                /*
-                 * 
-                quint64 curlogsize = 0;
-                for(int j=1; j <= layoutlist.count(); j++)
-                {
-                    QByteArray tmparray;
-                    tmparray.clear();
-                    quint64 curoffset = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
-                    quint64 cursize = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
-                    curlogsize += cursize;
-                    if(curlogsize <= logicalsize)
-                        tmparray.append(curimg->ReadContent(curoffset, cursize));
-                    else
-                        tmparray.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
-                    blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
-                }
-                uint8_t output[BLAKE3_OUT_LEN];
-	    }
-        }
+            filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((i-1) * cursize))));
     }
 
-     */ 
-
+    return filecontent;
     /*
     // STILL NEED TO HANDLE ZIP AND CARVED
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
