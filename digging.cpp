@@ -806,6 +806,7 @@ void GenerateThumbnails(QString thumbid)
 
 QByteArray ReturnFileContent(QString objectid)
 {
+    // NEED TO GET FILESIZE FROM SOMEWHERE, MAYBE SEND IT WITH THE FUNCTION..
     ForImg* curimg = NULL;
     for(int i=0; i < existingforimglist.count(); i++)
     {
@@ -838,8 +839,15 @@ QByteArray ReturnFileContent(QString objectid)
     QByteArray filecontent;
     filecontent.clear();
     quint64 curlogsize = 0;
-    for(int i=0; i < layoutlist.count(); i++)
+    for(int i=1; i <= layoutlist.count(); i++)
     {
+        quint64 curoffset = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
+        quint64 cursize = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
+        curlogsize += cursize;
+        if(curlogsize <= logicalsize)
+            filecontent.append(curimg->ReadContent(curoffset, cursize));
+        else
+            filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
         /*
         quint64 curoffset = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
         quint64 cursize = layoutlist.at(j-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
