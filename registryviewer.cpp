@@ -1,4 +1,5 @@
 #include "registryviewer.h"
+//#include "cssstrings.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -301,7 +302,7 @@ void RegistryDialog::ValueSelected(void)
 	htmlvalue += "<pre>";
 	htmlvalue += valuedata;
 	htmlvalue += "</pre>";
-	htmlvalue += "</body></html>";
+	htmlvalue += "</table></body></html>";
 
         libregf_value_free(&curval, &regerr);
         libregf_key_free(&curkey, &regerr);

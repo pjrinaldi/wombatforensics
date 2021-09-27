@@ -2,7 +2,7 @@
 #define CSSSTRINGS_H
 
 // Copyright 2013-2021 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2
+// Distributed under the terms of the GNU General Public License version 2
 
 QString bodycss = "font-size: 12px; font-family: verdana, sans; font-color: #3a291a;";
 QString infotitlecss = "text-transform: uppercase; font-size: 18px; font-family: verdana, sans; font-color: #9b7d4b; font-color: #3a291a;";

@@ -53,6 +53,8 @@ private:
     QString htmlvalue;
     //QFile bookmarkfile;
     //QStringList taglist;
+    QString bodycss = "font-size: 12px; font-family: verdana, sans; font-color: #3a291a;";
+    QString infotitlecss = "text-transform: uppercase; font-size: 18px; font-family: verdana, sans; font-color: #9b7d4b; font-color: #3a291a;";
 };
 
 Q_DECLARE_METATYPE(RegistryDialog*);
