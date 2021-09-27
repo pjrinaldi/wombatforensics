@@ -132,9 +132,9 @@ void RegistryDialog::ValueSelected(void)
 	*/
 
 	htmlentry = "";
-	htmlentry += "<td class='fitem' id='" + this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text() + "'>";
-	htmlentry += "<table width='300px'><tr><th colspan='2'>" + ui->tableWidget->selectedItems().first()->text() + "</th></tr>";
-	htmlentry += "<tr class='odd vtop'><td class='pvalue'>Path:</td><td class='property'><span style='word-wrap:break-word;'>" + ui->label->text() + "</span></td></tr>";
+	htmlentry += "<td style='" + tdfitemcss + "' id='" + this->windowTitle().mid(16) + "|" + ui->label->text() + "\\" + ui->tableWidget->selectedItems().first()->text() + "'>";
+	htmlentry += "<table style='" + tablecss + "' width='300px'><tr style='" + trcss + "'><th style='" + thcss + "' colspan='2'>" + ui->tableWidget->selectedItems().first()->text() + "</th></tr>";
+	htmlentry += "<tr style='" + troddvtopcss + "'><td style='" + tdpvaluecss + "'>Path:</td><td style='" + tdpropcss + "'><span style='word-wrap:break-word;'>" + ui->label->text() + "</span></td></tr>";
 	int valueindex = ui->tableWidget->selectedItems().first()->row();
 	QString keypath = ui->label->text();
 	libregf_file_t* regfile = NULL;
@@ -147,9 +147,9 @@ void RegistryDialog::ValueSelected(void)
 	libregf_key_get_value(curkey, valueindex, &curval, &regerr);
         uint64_t lastwritetime = 0;
         libregf_key_get_last_written_time(curkey, &lastwritetime, &regerr);
-	htmlentry += "<tr class='even'><td class='pvalue'>Last Modified:</td><td class=;property'>" + ConvertWindowsTimeToUnixTime(lastwritetime) + "</td></tr>";
-	htmlentry += "<tr class='odd'><td class='pvalue'>ID:</td><td class='property'>" + this->windowTitle().mid(16) + "</td></tr>";
-        htmlentry += "<tr class='even'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./registry/" + this->windowTitle().mid(16) + "." + ui->label->text().replace("\\", "-") + "-" + ui->tableWidget->selectedItems().first()->text() + "\")'>Link</a></td></tr>";
+	htmlentry += "<tr style='" + trevencss + "'><td style='" + tdpvaluecss + "'>Last Modified:</td><td style='" + tdpropcss + "'>" + ConvertWindowsTimeToUnixTime(lastwritetime) + "</td></tr>";
+	htmlentry += "<tr style='" + troddcss + "'><td style='" + tdpvaluecss + "'>ID:</td><td style='" + tdpropcss + "'>" + this->windowTitle().mid(16) + "</td></tr>";
+        htmlentry += "<tr style='" + trevencss + "'><td style='" + tdpvaluecss + "'>&nbsp;</td><td style='" + tdcss + "'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./registry/" + this->windowTitle().mid(16) + "." + ui->label->text().replace("\\", "-") + "-" + ui->tableWidget->selectedItems().first()->text() + "\")'>Link</a></td></tr>";
 	htmlentry += "</table></td>";
         QString valuedata = "Last Written Time:\t" + ConvertWindowsTimeToUnixTimeUTC(lastwritetime) + " UTC\n\n";
 	valuedata += "Name:\t" + ui->tableWidget->selectedItems().first()->text() + "\n\n";
