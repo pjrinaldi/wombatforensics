@@ -289,17 +289,19 @@ void RegistryDialog::ValueSelected(void)
         }
 	ui->plainTextEdit->setPlainText(valuedata);
 
-    	htmlvalue = "";
+    	htmlvalue = "<html><body style='" + bodycss + "'>";
+        /*
 	QFile initfile(":/html/artifactprephtml");
 	initfile.open(QIODevice::ReadOnly);
 	if(initfile.isOpen())
 	    htmlvalue = initfile.readAll();
 	initfile.close();
-	htmlvalue += "<div id='infotitle'>Registry Analysis</div><br/>";
+        */
+	htmlvalue += "<div style='" + infotitlecss + "'>Registry Analysis</div><br/>";
 	htmlvalue += "<pre>";
 	htmlvalue += valuedata;
 	htmlvalue += "</pre>";
-	htmlvalue += "</table></body></html>";
+	htmlvalue += "</body></html>";
 
         libregf_value_free(&curval, &regerr);
         libregf_key_free(&curkey, &regerr);

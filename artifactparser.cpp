@@ -9,13 +9,15 @@
 
 QString ParseLnkArtifact(QString lnkname, QString lnkid)
 {
-    QString htmlstr = "";
+    QString htmlstr = "<html><body style='" + bodycss + "'>";
+    /*
     QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
-    htmlstr += "<div style='" + bodycss + "'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
+    */
+    htmlstr += "<div style='" + infotitlecss + "'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
     htmlstr += "<table width='100%' style='" + tablecss + "'><tr><th style='" + thcss + "'>NAME</th><th style='" + thcss + "'>Value</th></tr>";
     QString lnkfile = wombatvariable.tmpfilepath + lnkid + "-fhex";
     liblnk_error_t* error = NULL;
@@ -134,15 +136,17 @@ QString ParseLnkArtifact(QString lnkname, QString lnkid)
 
 QString ParseI30Artifact(QString i30name, QString i30id)
 {
-    QString htmlstr = "";
+    QString htmlstr = "<html><body style='" + bodycss + "'>";
+    /*
     QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
-    htmlstr += "<div id='infotitle'>$I30 File Analysis for " + i30name + " (" + i30id + ")</div><br/>";
-    htmlstr += "<table><tr><th colspan=8>$I30 Entries</th></tr>";
-    htmlstr += "<tr><td class=subhead>File Name</td><td class=subhead>Created</td><td class=subhead>Modified</td><td class=subhead>Changed</td><td class=subhead>Accessed</td><td class=subhead>Logical Size (bytes)</td><td class=subhead>Physical Size (bytes)</td><td class=subhead>Recovered</td></tr>";
+    */
+    htmlstr += "<div style='" + infotitlecss + "'>$I30 File Analysis for " + i30name + " (" + i30id + ")</div><br/>";
+    htmlstr += "<table style='" + tablecss + "'><tr style='" + trcss + "'><th style='" + thcss + "' colspan=8>$I30 Entries</th></tr>";
+    htmlstr += "<tr style='" + thcss + "'><td style='" + tdsubheadcss + "'>File Name</td><td style='" + tdsubheadcss + "'>Created</td><td style='" + tdsubheadcss + "'>Modified</td><td style='" + tdsubheadcss + "'>Changed</td><td style='" + tdsubheadcss + "'>Accessed</td><td style='" + tdsubheadcss + "'>Logical Size (bytes)</td><td style='" + tdsubheadcss + "'>Physical Size (bytes)</td><td style='" + tdsubheadcss + "'>Recovered</td></tr>";
     // uint8 = 1 byte - uchar
     // uint16 = 2 bytes - ushort
     // uint32 = 4 bytes - uint
@@ -335,20 +339,20 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                                         filename += QString(QChar(qFromLittleEndian<uint16_t>(fnattrbuf.mid(66 + j*2, 2))));
                                     //qDebug() << "filename:" << filename;
                                     if( a % 2 == 0)
-                                        htmlstr += "<tr class=even>";
+                                        htmlstr += "<tr style='" + trevencss + "'>";
                                     else
-                                        htmlstr += "<tr class=odd>";
-                                    htmlstr += "<td>" + filename + "</td>";
-                                    htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fnattrbuf.mid(8, 8))) + "</td>";
-                                    htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fnattrbuf.mid(16, 8))) + "</td>";
-                                    htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fnattrbuf.mid(24, 8))) + "</td>";
-                                    htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fnattrbuf.mid(32, 8))) + "</td>";
-                                    htmlstr += "<td>" + QString::number(qFromLittleEndian<uint64_t>(fnattrbuf.mid(40, 8))) + "</td>";
-                                    htmlstr += "<td>" + QString::number(qFromLittleEndian<uint64_t>(fnattrbuf.mid(48, 8))) + "</td>";
+                                        htmlstr += "<tr style='" + troddcss + "'>";
+                                    htmlstr += "<td style='" + tdcss + "'>" + filename + "</td>";
+                                    htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fnattrbuf.mid(8, 8))) + "</td>";
+                                    htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fnattrbuf.mid(16, 8))) + "</td>";
+                                    htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fnattrbuf.mid(24, 8))) + "</td>";
+                                    htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fnattrbuf.mid(32, 8))) + "</td>";
+                                    htmlstr += "<td style='" + tdcss + "'>" + QString::number(qFromLittleEndian<uint64_t>(fnattrbuf.mid(40, 8))) + "</td>";
+                                    htmlstr += "<td style='" + tdcss + "'>" + QString::number(qFromLittleEndian<uint64_t>(fnattrbuf.mid(48, 8))) + "</td>";
                                     if(curpos > endoffset)
-                                        htmlstr += "<td>YES</td>";
+                                        htmlstr += "<td style='" + tdcss + "'>YES</td>";
                                     else
-                                        htmlstr += "<td>NO</td>";
+                                        htmlstr += "<td style='" + tdcss + "'>NO</td>";
                                     htmlstr += "</tr>";
                                 }
                             }
@@ -383,20 +387,20 @@ QString ParseI30Artifact(QString i30name, QString i30id)
                         for(int j=0; j < fnamelength; j++)
                             filename += QString(QChar(qFromLittleEndian<uint16_t>(filenamebuf.mid(66 + j*2, 2))));
                         if( a % 2 == 0)
-                            htmlstr += "<tr class=even>";
+                            htmlstr += "<tr style='" + trevencss + "'>";
                         else
-                            htmlstr += "<tr class=odd>";
-                        htmlstr += "<td>" + filename + "</td>";
-                        htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(8, 8))) + "</td>";
-                        htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8))) + "</td>";
-                        htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8))) + "</td>";
-                        htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8))) + "</td>";
-                        htmlstr += "<td>" + QString::number(qFromLittleEndian<uint64_t>(filenamebuf.mid(40, 8))) + "</td>";
-                        htmlstr += "<td>" + QString::number(qFromLittleEndian<uint64_t>(filenamebuf.mid(48, 8))) + "</td>";
+                            htmlstr += "<tr style='" + troddcss + "'>";
+                        htmlstr += "<td style='" + tdcss + "'>" + filename + "</td>";
+                        htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(8, 8))) + "</td>";
+                        htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(16, 8))) + "</td>";
+                        htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(24, 8))) + "</td>";
+                        htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(filenamebuf.mid(32, 8))) + "</td>";
+                        htmlstr += "<td style='" + tdcss + "'>" + QString::number(qFromLittleEndian<uint64_t>(filenamebuf.mid(40, 8))) + "</td>";
+                        htmlstr += "<td style='" + tdcss + "'>" + QString::number(qFromLittleEndian<uint64_t>(filenamebuf.mid(48, 8))) + "</td>";
                         if(curpos > endoffset)
-                            htmlstr += "<td>YES</td>";
+                            htmlstr += "<td style='" + tdcss + "'>YES</td>";
                         else
-                            htmlstr += "<td>NO</td>";
+                            htmlstr += "<td style='" + tdcss + "'>NO</td>";
                         htmlstr += "</tr>";
                     }
                     curpos = curpos + indxentrylength;
@@ -431,14 +435,16 @@ QString ParseI30Artifact(QString i30name, QString i30id)
 
 QString ParseInfo2Artifact(QString info2name, QString info2id)
 {
-    QString htmlstr = "";
+    QString htmlstr = "<html><body style='" + bodycss + "'>";
+    /*
     QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
-    htmlstr += "<div id='infotitle'>INFO2 File Analysis for " + info2name + " (" + info2id + ")</div><br/>";
-    htmlstr += "<table width='100%'><tr><th>FILE NAME</th><th>DELETED</th></tr>";
+    */
+    htmlstr += "<div style='" + infotitlecss + "'>INFO2 File Analysis for " + info2name + " (" + info2id + ")</div><br/>";
+    htmlstr += "<table style='" + tablecss + "' width='100%'><tr style='" + trcss + "'><th style='" + thcss + "'>FILE NAME</th><th style='" + thcss + "'>DELETED</th></tr>";
     QString info2file = wombatvariable.tmpfilepath + info2id + "-fhex";
     QByteArray info2content;
     info2content.clear();
@@ -454,13 +460,13 @@ QString ParseInfo2Artifact(QString info2name, QString info2id)
     while(curpos < info2content.count())
     {
         if(a % 2 == 0)
-            htmlstr += "<tr class=even>";
+            htmlstr += "<tr style='" + trevencss + "'>";
         else
-            htmlstr += "<tr class=odd>";
+            htmlstr += "<tr style='" + troddcss + "'>";
 	QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 3, 260).toStdString().c_str(), -1).toStdString());
         uint64_t deleteddate = qFromLittleEndian<uint64_t>(info2content.mid(curpos + 268, 8));
-        htmlstr += "<td>" + filenamestring + "</td>";
-        htmlstr += "<td>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td>";
+        htmlstr += "<td style='" + tdcss + "'>" + filenamestring + "</td>";
+        htmlstr += "<td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td>";
         htmlstr += "</tr>";
         curpos = curpos + fileentrysize;
     }
@@ -472,14 +478,16 @@ QString ParseInfo2Artifact(QString info2name, QString info2id)
 
 QString ParseIDollarArtifact(QString idollarname, QString idollarid)
 {
-    QString htmlstr = "";
+    QString htmlstr = "<html><body style='" + bodycss + "'>";
+    /*
     QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
-    htmlstr += "<div id='infotitle'>$I File Analysis for " + idollarname + " (" + idollarid + ")</div><br/>";
-    htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
+    */
+    htmlstr += "<div style='" + infotitlecss + "'>$I File Analysis for " + idollarname + " (" + idollarid + ")</div><br/>";
+    htmlstr += "<table style='" + tablecss + "' width='100%'><tr style='" + trcss + "'><th style='" + thcss + "'>NAME</th><th style='" + thcss + "'>Value</th></tr>";
     QString idollarfilestr = wombatvariable.tmpfilepath + idollarid + "-fhex";
     QByteArray idollarcontent;
     idollarcontent.clear();
@@ -502,9 +510,9 @@ QString ParseIDollarArtifact(QString idollarname, QString idollarid)
         uint32_t filenamesize = qFromLittleEndian<uint32_t>(idollarcontent.mid(24, 4));
         filenamestring = QString::fromStdString(idollarcontent.mid(24, filenamesize).trimmed().toStdString());
     }
-    htmlstr += "<tr class=odd><td class=aval>File Name:</td><td>" + filenamestring + "</td></tr>";
-    htmlstr += "<tr class=even><td class=aval>Deleted:</td><td>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td></tr>";
-    htmlstr += "<tr class=odd><td class=aval>File Size:</td><td>" + QString::number(filesize) + " bytes</td></tr>";
+    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>File Name:</td><td style='" + tdcss + "'>" + filenamestring + "</td></tr>";
+    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Deleted:</td><td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td></tr>";
+    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>File Size:</td><td style='" + tdcss + "'>" + QString::number(filesize) + " bytes</td></tr>";
 
     htmlstr += "</table></body></html>";
     
@@ -513,14 +521,16 @@ QString ParseIDollarArtifact(QString idollarname, QString idollarid)
 
 QString ParsePrefetchArtifact(QString pfname, QString pfid)
 {
-    QString htmlstr = "";
+    QString htmlstr = "<html><body style='" + bodycss + "'>";
+    /*
     QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
-    htmlstr += "<div id='infotitle'>Prefetch File Analysis for " + pfname + " (" + pfid + ")</div><br/>";
-    htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
+    */
+    htmlstr += "<div style='" + infotitlecss + "'>Prefetch File Analysis for " + pfname + " (" + pfid + ")</div><br/>";
+    htmlstr += "<table style='" + tablecss + "' width='100%'><tr style='" + trcss + "'><th style='" + thcss + "'>NAME</th><th style='" + thcss + "'>Value</th></tr>";
     QString pffilestr = wombatvariable.tmpfilepath + pfid + "-fhex";
     QByteArray pfcontent;
     pfcontent.clear();
@@ -552,7 +562,7 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
     if(pfheader.contains("SCCA"))
     {
 	uint32_t pfversion = qFromLittleEndian<uint32_t>(pfcontent.left(4));
-	htmlstr += "<tr class=odd><td class=aval>Format Version:</td><td>" + QString::number(pfversion) + "</td></tr>";
+	htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Format Version:</td><td style='" + tdcss + "'>" + QString::number(pfversion) + "</td></tr>";
 	QString filenamestring = "";
 	for(int i=16; i < 76; i++)
 	{
@@ -563,9 +573,9 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 		filenamestring.append(pfcontent.at(i));
 	    }
 	}
-	htmlstr += "<tr class=even><td class=aval>Executable File Name:</td><td>" + filenamestring + "</td></tr>";
+	htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Executable File Name:</td><td style='" + tdcss + "'>" + filenamestring + "</td></tr>";
 	tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(76, 4));
-	htmlstr += "<tr class=odd><td class=aval>Prefetch Hash:</td><td>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
+	htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Prefetch Hash:</td><td style='" + tdcss + "'>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
 	tmpuint32 = 0;
 	uint32_t fnamestringsoffset = 0;
 	uint32_t fnamestringssize = 0;
@@ -592,26 +602,26 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 	volinfocount = qFromLittleEndian<uint32_t>(fileinformation.mid(28, 4));
 	volinfosize = qFromLittleEndian<uint32_t>(fileinformation.mid(32, 4));
 	if(pfversion == 17)
-	    htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(60, 4))) + "</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Run Count:</td><td style='" + tdcss + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(60, 4))) + "</td></tr>";
 	else if(pfversion == 23)
-	    htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(68, 4))) + "</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Run Count:</td><td style='" + tdcss + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(68, 4))) + "</td></tr>";
 	else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130))
-	    htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(124, 4))) + "</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Run Count:</td><td style='" + tdcss + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(124, 4))) + "</td></tr>";
 	else if(pfversion == 30 && metricsoffset == 0x128)
-	    htmlstr += "<tr class=even><td class=aval>Run Count:</td><td>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(116, 4))) + "</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>Run Count:</td><td style='" + tdcss + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(116, 4))) + "</td></tr>";
 	if(pfversion == 17)
-	    htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(36, 8))) + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Last Run Time:</td><td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(36, 8))) + "</td></tr>";
 	else if(pfversion == 23)
-	    htmlstr += "<tr class=odd><td class=aval>Last Run Time:</td><td>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(44, 8))) + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Last Run Time:</td><td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(44, 8))) + "</td></tr>";
 	else if(pfversion == 26 || pfversion == 30)
 	{
 	    for(int i=0; i < 8; i++)
 	    {
 		uint64_t lastruntime = qFromLittleEndian<uint64_t>(fileinformation.mid(44+(i*8), 8));
 		if(lastruntime == 0)
-		    htmlstr += "<tr class=odd><td class=aval>Last Run Time" + QString::number(i+1) + "</td><td>Not Set (0)</td></tr>";
+		    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Last Run Time" + QString::number(i+1) + "</td><td style='" + tdcss + "'>Not Set (0)</td></tr>";
 		else
-		    htmlstr += "<tr class=odd><td class=aval>Last Run Time" + QString::number(i+1) + "</td><td>" + ConvertWindowsTimeToUnixTime(lastruntime) + "</td></tr>";
+		    htmlstr += "<tr style='" + troddcss + "'><tdstyle='" + tdavalcss + "'>Last Run Time" + QString::number(i+1) + "</td><td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(lastruntime) + "</td></tr>";
 	    }
 	}
 	filenamestrings.clear();
@@ -633,7 +643,7 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 	    }
 	}
 	for(int i=0; i < tmpstrlist.count(); i++)
-	    htmlstr += "<tr class=even><td class=aval>File Name " + QString::number(i+1) + ":</td><td>" + tmpstrlist.at(i) + "</td></tr>";
+	    htmlstr += "<tr style='" + trevencss + "'><td style='" + tdavalcss + "'>File Name " + QString::number(i+1) + ":</td><td style='" + tdcss + "'>" + tmpstrlist.at(i) + "</td></tr>";
 	volinfocontent.clear();
 	volinfocontent = pfcontent.mid(volinfooffset, volinfosize);
 	int curpos = 0;
@@ -656,9 +666,9 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 	    }
 	    uint64_t tmpuint64 = qFromLittleEndian<uint64_t>(volinfocontent.mid(curpos+8, 8));
 	    uint32_t volserial = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+16, 4));
-	    htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Path:</td><td>" + volpathstr + "</td></tr>";
-	    htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Serial Number:</td><td>0x" + QString::number(volserial, 16) + "</td></tr>";
-	    htmlstr += "<tr class=odd><td class=aval>Volume " + QString::number(i+1) + " Creation Time:</td><td>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Volume " + QString::number(i+1) + " Path:</td><td style='" + tdcss + "'>" + volpathstr + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Volume " + QString::number(i+1) + " Serial Number:</td><td style='" + tdcss + "'>0x" + QString::number(volserial, 16) + "</td></tr>";
+	    htmlstr += "<tr style='" + troddcss + "'><td style='" + tdavalcss + "'>Volume " + QString::number(i+1) + " Creation Time:</td><td style='" + tdcss+ + "'>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
 	}
     }
     htmlstr += "</table></body></html>";
@@ -668,15 +678,17 @@ QString ParsePrefetchArtifact(QString pfname, QString pfid)
 
 QString ParseArchiveArtifact(QString archivename, QString archiveid)
 {
-    QString htmlstr = "";
+    QString htmlstr = "<html><body style='" + bodycss + "'>";
+    /*
     QFile initfile(":/html/artifactprephtml");
     initfile.open(QIODevice::ReadOnly);
     if(initfile.isOpen())
         htmlstr = initfile.readAll();
     initfile.close();
-    htmlstr += "<div id='infotitle'>Archive File Analysis for " + archivename + " (" + archiveid + ")</div><br/>";
+    */
+    htmlstr += "<div style='" + infotitlecss + "'>Archive File Analysis for " + archivename + " (" + archiveid + ")</div><br/>";
     //htmlstr += "<table width='100%'><tr><th>NAME</th><th>Value</th></tr>";
-    htmlstr += "<table width='100%'><tr><th>File Name</th><th>Uncompressed Size</th><th>Compressed Size</th><th>Modified Time</th><th>Compression Method</th><th>Encryption Method</th></tr>";
+    htmlstr += "<table style='" + tablecss + "' width='100%'><tr style='" + trcss + "'><th style='" + thcss + "'>File Name</th><th style='" + thcss + "'>Uncompressed Size</th><th style='" + thcss + "'>Compressed Size</th><th style='" + thcss + "'>Modified Time</th><th style='" + thcss + "'>Compression Method</th><th style='" + thcss + "'>Encryption Method</th></tr>";
     QString archivefilestr = wombatvariable.tmpfilepath + archiveid + "-fhex";
     int err = 0;
     zip* curzip = zip_open(archivefilestr.toStdString().c_str(), ZIP_RDONLY, &err);
@@ -686,16 +698,16 @@ QString ParseArchiveArtifact(QString archivename, QString archiveid)
         struct zip_stat zipstat;
         zip_stat_init(&zipstat);
         zip_stat_index(curzip, i, 0, &zipstat);
-        htmlstr += "<tr class=";
+        htmlstr += "<tr style='";
         if(i % 2 == 0)
-            htmlstr += "odd";
+            htmlstr += troddcss;
         else
-            htmlstr += "even";
+            htmlstr += trevencss;
         time_t modtime = zipstat.mtime;
         uint64_t temp = (uint64_t)modtime;
         temp = temp + EPOCH_DIFFERENCE;
         temp = temp * TICKS_PER_SECOND;
-        htmlstr += "><td>" + QString::fromStdString(std::string(zipstat.name)) + "</td><td>" + QString::number(zipstat.size) + "</td><td>" + QString::number(zipstat.comp_size) + "</td><td>" + ConvertWindowsTimeToUnixTime(temp) + "</td><td>";
+        htmlstr += "'><td style='" + tdcss + "'>" + QString::fromStdString(std::string(zipstat.name)) + "</td><td style='" + tdcss + "'>" + QString::number(zipstat.size) + "</td><td style='" + tdcss + "'>" + QString::number(zipstat.comp_size) + "</td><td style='" + tdcss + "'>" + ConvertWindowsTimeToUnixTime(temp) + "</td><td style='" + tdcss + "'>";
         //if(zipstat.comp_method == )
         switch(zipstat.comp_method)
         {
@@ -760,7 +772,7 @@ QString ParseArchiveArtifact(QString archivename, QString archiveid)
                 htmlstr += "DEFLATE";
                 break;
         }
-        htmlstr += "</td><td>";
+        htmlstr += "</td><td style='" + tdcss + "'>";
         //if(zipstat.encryption_method == )
         switch(zipstat.encryption_method)
         {
