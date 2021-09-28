@@ -1173,6 +1173,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         in >> header >> version >> sectorsize >> blocksize >> totalbytes >> casenumber >> evidnumber >> examiner >> description;
 	
 	qint64 lz4start = wfi.pos();
+        //qDebug() << "lz4start:" << lz4start; // IF IT IS OFF BY 35, THEN THIS IS WHAT IS SCREWING UP THE HEXVIEWER DISPLAY BYTES...
         qint64 lz4size = wfi.size() - wfi.pos() - 132; // wfi file size - position aat start of 1st frame - blake3 hash at the end
 
         if(header != 0x776f6d6261746669)
