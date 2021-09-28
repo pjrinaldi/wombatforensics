@@ -58,5 +58,5 @@ QString ReturnCssString(qint8 cssid)
         case 15:
             return tdvtopcss;
     }
-}
+};
 #endif // CSSSTRINGS_H
