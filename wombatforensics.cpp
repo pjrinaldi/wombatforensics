@@ -568,21 +568,21 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         QTimeZone tmpzone = QTimeZone(reporttimezone);
         //taggedhash.insert(curindex.sibling(curindex.row(), 11).data().toString(), tagname);
         treenodemodel->UpdateNode(curindex.sibling(curindex.row(), colindex).data().toString(), "tag", tagname);
-        QString filestr = "<td class='fitem' id='" + curindex.sibling(curindex.row(), colindex).data().toString() + "'>";
-        filestr += "<table width='300px'><tr><th colspan='2'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString() + "</th></tr>";
-        filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("path")).data().toString() + "</span></td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("size")).data().toString() + " bytes</td></tr>";
+        QString filestr = "<td style='" + ReturnCssString(11) + "' id='" + curindex.sibling(curindex.row(), colindex).data().toString() + "'>";
+        filestr += "<table width='300px'><tr><th style='" + ReturnCssString(6) + "' colspan='2'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString() + "</th></tr>";
+        filestr += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>File Path:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("path")).data().toString() + "</span></td></tr>";
+        filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>File Size:</td><td style='" + ReturnCssString(14) + "'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("size")).data().toString() + " bytes</td></tr>";
         if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("create")).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("create")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>Created:</td><td style='" + ReturnCssString(14) + "'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("create")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
         if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("access")).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Accessed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("access")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>Accessed:</td><td style='" + ReturnCssString(14) + "'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("access")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
         if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("modify")).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("modify")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>Modified:</td><td style='" + ReturnCssString(14) + "'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("modify")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
         if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("status")).data().toString().isEmpty())
-            filestr += "<tr class='odd'><td class='pvalue'>Changed:</td><td class='property'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("status")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>Changed:</td><td style='" + ReturnCssString(14) + "'>" + QDateTime::fromSecsSinceEpoch(QDateTime::fromString(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("status")).data().toString(), "MM/dd/yyyy hh:mm:ss AP").toSecsSinceEpoch(), tmpzone).toString("MM/dd/yyyy hh:mm:ss AP") + "</td></tr>";
         if(!curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("hash")).data().toString().isEmpty())
         {
-            filestr += "<tr class='odd'><td class='pvalue'>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>";
             /*
             if(hashsum == 1)
                 filestr += "MD5";
@@ -593,16 +593,16 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
             else if(hashsum == 11)
                 filestr += "BLAKE3";
             */
-            filestr += "BLAKE3 Hash:</td><td class='property'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("hash")).data().toString() + "</td></tr>";
+            filestr += "BLAKE3 Hash:</td><td style='" + ReturnCssString(14) + "'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("hash")).data().toString() + "</td></tr>";
         }
-        filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString() + "</td></tr>";
-        filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("sig")).data().toString() + "</td></tr>";
-        filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + curindex.sibling(curindex.row(), colindex).data().toString() + "</td></tr>";
+        filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>Category:</td><td style='" + ReturnCssString(14) + "'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString() + "</td></tr>";
+        filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>Signature:</td><td style='" + ReturnCssString(14) + "'>" + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("sig")).data().toString() + "</td></tr>";
+        filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>ID:</td><td style='" + ReturnCssString(14) + "'>" + curindex.sibling(curindex.row(), colindex).data().toString() + "</td></tr>";
 	// IF HTMLVIEWER WON'T OPEN FILE WITHOUT .HTML EXTENSION, THEN I WILL NEED TO ADD THE SHORTCUT AND OTHER HTML PARSED ARTIFACTS TO THIS IF/ELSE STATEMENT...
         if(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Image") || curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Video"))
-            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "\")'><img src='./thumbs/" + curindex.sibling(curindex.row(), colindex).data().toString() + ".png'/></a></td></tr>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "\")'><img src='./thumbs/" + curindex.sibling(curindex.row(), colindex).data().toString() + ".png'/></a></td></tr>";
         else
-            filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "\")'>Link</a></td></tr>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "\")'>Link</a></td></tr>";
         filestr += "</table></td>";
         RemoveFileItem(curindex.sibling(curindex.row(), colindex).data().toString());
         AddFileItem(tagname, filestr);
@@ -4182,17 +4182,17 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
     treenodemodel->AddNode(nodedata, QString(enumber + "-cm"), 15, 0);
     mutex.unlock();
     // ADD TO PREVIEW REPORT
-    QString filestr = "<td class='fitem' id='" + QString(enumber + "-c" + QString::number(carvedcount)) + "'>";
-    filestr += "<table width='300px'><tr><th colspan='2'>" + ctitle + "</th></tr>";
-    filestr += "<tr class='odd vtop'><td class='pvalue'>File Path:</td><td class='property'><span style='word-wrap:break-word;'>" + enumber + "->" + offstr + "</span></td></tr>";
-    filestr += "<tr class='even'><td class='pvalue'>File Size:</td><td class='property'>" + QString::number(clength) + " bytes</td></tr>";
-    filestr += "<tr class='odd'><td class='pvalue'>Created:</td><td class='property'>-</td></tr>";
-    filestr += "<tr class='even'><td class='pvalue'>Accessed:</td><td class='property'>-</td></tr>";
-    filestr += "<tr class='odd'><td class='pvalue'>Modified:</td><td class='property'>-</td></tr>";
-    filestr += "<tr class='even'><td class='pvalue'>Changed:</td><td class='property'>-</td></tr>";
+    QString filestr = "<td style='" + ReturnCssString(11) + "' id='" + QString(enumber + "-c" + QString::number(carvedcount)) + "'>";
+    filestr += "<table width='300px'><tr><th style='" + ReturnCssString(6) + "' colspan='2'>" + ctitle + "</th></tr>";
+    filestr += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>File Path:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + enumber + "->" + offstr + "</span></td></tr>";
+    filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>File Size:</td><td style='" + ReturnCssString(14) + "'>" + QString::number(clength) + " bytes</td></tr>";
+    filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>Created:</td><td style='" + ReturnCssString(14) + "'>-</td></tr>";
+    filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>Accessed:</td><td style='" + ReturnCssString(14) + "'>-</td></tr>";
+    filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>Modified:</td><td style='" + ReturnCssString(14) + "'>-</td></tr>";
+    filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>Changed:</td><td style='" + ReturnCssString(14) + "'>-</td></tr>";
     if(!curhash.isEmpty())
     {
-        filestr += "<tr class='odd'><td class='pvalue'>";
+        filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>";
         /*
         if(hashsum == 1)
             filestr += "MD5";
@@ -4201,12 +4201,12 @@ void WombatForensics::TagSection(QString ctitle, QString ctag)
         else if(hashsum == 4)
             filestr += "SHA256";
         */
-        filestr += "BLAKE3 Hash:</td><td class='property'>" + curhash + "</td></tr>";
+        filestr += "BLAKE3 Hash:</td><td style='" + ReturnCssString(14) + "'>" + curhash + "</td></tr>";
     }
-    filestr += "<tr class='even'><td class='pvalue'>Category:</td><td class='property'>" + mimestr.split("/").first() + "</td></tr>";
-    filestr += "<tr class='odd'><td class='pvalue'>Signature:</td><td class='property'>" + mimestr.split("/").last() + "</td></tr>";
-    filestr += "<tr class='even'><td class='pvalue'>ID:</td><td class='property'>" + QString(enumber + "-c" + QString::number(carvedcount)) + "</td></tr>";
-    filestr += "<tr class='odd'><td class='pvalue'>&nbsp;</td><td class='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
+    filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>Category:</td><td style='" + ReturnCssString(14) + "'>" + mimestr.split("/").first() + "</td></tr>";
+    filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>Signature:</td><td style='" + ReturnCssString(14) + "'>" + mimestr.split("/").last() + "</td></tr>";
+    filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>ID:</td><td style='" + ReturnCssString(14) + "'>" + QString(enumber + "-c" + QString::number(carvedcount)) + "</td></tr>";
+    filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Link</td></tr>";
     filestr += "</table></td>";
     AddFileItem(ctag, filestr);
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
@@ -4482,7 +4482,7 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
         QString posttzsplit = prevstring.split("Report Time Zone&nbsp;").last().split("</h4>").last();
         // REPLACE CREATED DATE TIME VALUES
         int i = 0;
-        while((i = posttzsplit.indexOf("<td class='pvalue'>Accessed:</td><td class='property'>", i)) != -1)
+        while((i = posttzsplit.indexOf("<td style='" + ReturnCssString(13) + "'>Accessed:</td><td style='" + ReturnCssString(14) + "'>", i)) != -1)
         {
             QString curdate = posttzsplit.mid(i+54, 22);
             QDateTime olddatetime;
@@ -4495,7 +4495,7 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
             i++;
         }
         i = 0;
-        while((i = posttzsplit.indexOf("<td class='pvalue'>Modified:</td><td class='property'>", i)) != -1)
+        while((i = posttzsplit.indexOf("<td style='" + ReturnCssString(13) + "'>Modified:</td><td style='" + ReturnCssString(14) + "'>", i)) != -1)
         {
             QString curdate = posttzsplit.mid(i+54, 22);
             QDateTime olddatetime;
@@ -4508,7 +4508,7 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
             i++;
         }
         i = 0;
-        while((i = posttzsplit.indexOf("<td class='pvalue'>Changed:</td><td class='property'>", i)) != -1)
+        while((i = posttzsplit.indexOf("<td style='" + ReturnCssString(13) + "'>Changed:</td><td style='" + ReturnCssString(14) + "'>", i)) != -1)
         {
             QString curdate = posttzsplit.mid(i+53, 22);
             QDateTime olddatetime;
@@ -4521,7 +4521,7 @@ void WombatForensics::UpdateTimeZone(QString newtimezone)
             i++;
         }
         i = 0;
-        while((i = posttzsplit.indexOf("<td class='pvalue'>Created:</td><td class='property'>", i)) != -1)
+        while((i = posttzsplit.indexOf("<td style='" + ReturnCssString(13) + "'>Created:</td><td style='" + ReturnCssString(14) + "'>", i)) != -1)
         {
             QString curdate = posttzsplit.mid(i+53, 22);
             QDateTime olddatetime;
