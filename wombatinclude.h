@@ -94,6 +94,7 @@
 #include <tar.h>
 #include <libtar.h>
 #include "imagefunctions.h"
+#include "cssstrings.h"
 //#include <libewf.h>
 //#include "forimg.h"
 

@@ -53,6 +53,7 @@ private:
     QString htmlvalue;
     //QFile bookmarkfile;
     //QStringList taglist;
+    /*
     QString bodycss = "font-size: 12px; font-family: verdana, sans; font-color: #3a291a;";
     QString infotitlecss = "text-transform: uppercase; font-size: 18px; font-family: verdana, sans; font-color: #9b7d4b; font-color: #3a291a;";
     QString tdfitemcss = "padding-left: 10px; padding-top: 2.5px; padding-right: 10px; padding-bottom: 2.5px; width:150px; vertical-align: top;";
@@ -65,6 +66,7 @@ private:
     QString tdcss = "padding-left: 10px; padding-top: 2.5px; padding-right: 10px; padding-bottom: 2.5px;";
     QString tdpvaluecss = "padding-left: 10px; padding-top: 2.5px; padding-right: 10px; padding-bottom: 2.5px; width:72px";
     QString tdpropcss = "padding-left: 10px; padding-top: 2.5px; padding-right: 10px; padding-bottom: 2.5px; width:188px";
+    */
 };
 
 Q_DECLARE_METATYPE(RegistryDialog*);

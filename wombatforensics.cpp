@@ -1106,19 +1106,21 @@ void WombatForensics::InitializeCaseStructure()
 void WombatForensics::InitializePreviewReport()
 {
     QString initialhtml = "";
+    /*
     previewfile.setFileName(":/html/initialhtml");
     previewfile.open(QIODevice::ReadOnly);
     if(previewfile.isOpen())
         initialhtml = previewfile.readAll();
     previewfile.close();
+    */
     previewfile.setFileName(wombatvariable.tmpmntpath + "previewreport.html");
     previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
     if(previewfile.isOpen())
     {
         QTimeZone itz = QTimeZone(reporttimezone);
-        previewfile.write(initialhtml.toStdString().c_str());
-        QString initialstr = "";
-        initialstr = "<div id='infotitle'><h1>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></h1></div>\n";
+        //previewfile.write(initialhtml.toStdString().c_str());
+        QString initialstr = "<html><body style='" + ReturnCssString(0) + "'>";
+        initialstr = "<div style='" + ReturnCssString(1) + "'><h1>Case Title:&nbsp;<span id='casename'>" + wombatvariable.casename + "</span></h1></div>\n";
         initialstr += "<div id='tz'><h4>Report Time Zone:&nbsp;" + reporttimezone + "</h4><div><br/>\n";
         initialstr += "<div id='toc'><h2>Contents</h2>";
         initialstr += "<div id='elinks'>";
