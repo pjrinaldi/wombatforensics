@@ -97,7 +97,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     //connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
-    //connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(CarveUpdate(QString, int)), this, SLOT(UpdateCarve(QString, int)), Qt::QueuedConnection);
@@ -600,9 +600,9 @@ void WombatForensics::TagFile(QModelIndex curindex, QString tagname)
         filestr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>ID:</td><td style='" + ReturnCssString(14) + "'>" + curindex.sibling(curindex.row(), colindex).data().toString() + "</td></tr>";
 	// IF HTMLVIEWER WON'T OPEN FILE WITHOUT .HTML EXTENSION, THEN I WILL NEED TO ADD THE SHORTCUT AND OTHER HTML PARSED ARTIFACTS TO THIS IF/ELSE STATEMENT...
         if(curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Image") || curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Video"))
-            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "\")'><img src='./thumbs/" + curindex.sibling(curindex.row(), colindex).data().toString() + ".png'/></a></td></tr>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "'><img src='./thumbs/" + curindex.sibling(curindex.row(), colindex).data().toString() + ".png'/></a></td></tr>";
         else
-            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='ShowContent(\"./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "\")'>Link</a></td></tr>";
+            filestr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='lvalue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='./files/" + curindex.sibling(curindex.row(), colindex).data().toString() + "'>Link</a></td></tr>";
         filestr += "</table></td>";
         RemoveFileItem(curindex.sibling(curindex.row(), colindex).data().toString());
         AddFileItem(tagname, filestr);
@@ -3276,7 +3276,9 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digimgthumbtotal = 0;
     digvidthumbtotal = 0;
     dighashtotal = 0;
+    */
     digtotalcount = 0;
+    /*
     digimgthumbcount = 0;
     digvidthumbcount = 0;
     digarchivecount = 0;
@@ -3284,8 +3286,9 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digimgcountstring = "";
     digvidcountstring = "";
     dighashcountstring = "";
-    digtotalcountstring = "";
     */
+    digtotalcountstring = "";
+
     digtype = dtype;
     digoptions = doptions;
     digfilelist.clear();
@@ -3300,6 +3303,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     }
     else
         digfilelist = GetFileLists(dtype);
+    digtotalcount = digfilelist.count();
 
     /*
     // THIS LOOP MIGHT BE JUST TO GET THE COUNTS FOR THE STATUS, NOT NECESSARILY THE FILEIDLISTS FOR RESPECTIVE DIGGING
@@ -3462,6 +3466,9 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
     */
+
+    digtotalcountstring = "Dug: 0 of " + digtotalcount;
+
     // LAUNCH GENERATEPREDIGGING() MAP HERE...
     // IMPLEMENT PREDIGWATCHER
     // ON PREDIGWATCHER RETURN, THEN CALL THE BELOW CODE...
@@ -3486,9 +3493,9 @@ void WombatForensics::UpdateCarve(QString pid, int carvecnt)
 }
 */
 
-/*
 void WombatForensics::UpdateDig(int digid, int digcnt)
 {
+    /*
     if(digid == 0)
     {
 	digimgcountstring = "Thumbnailed: " + QString::number(digcnt) + " of " + QString::number(digimgthumbtotal) + " Images";
@@ -3506,8 +3513,9 @@ void WombatForensics::UpdateDig(int digid, int digcnt)
         digarchivecountstring = "Expanded: " + QString::number(digcnt) + " of " + QString::number(digarchivetotal) + " Archives";
     }
     digtotalcountstring = "Dug: " + QString::number(digvidthumbcount + digimgthumbcount + dighashcount + digarchivecount) + " of " + QString::number(digtotalcount);
+    */
+    digtotalcountstring = "Dug: " + QString::number(digcnt) + " of " + QString::number(digtotalcount);
 }
-*/
 
 void WombatForensics::UpdateExport()
 {

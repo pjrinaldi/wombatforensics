@@ -225,7 +225,7 @@ private slots:
     void on_actionHashListManager_triggered();
     void UpdateProgress(qint64 count);
     void UpdateExport(void);
-    //void UpdateDig(int digstateid, int digcount);
+    void UpdateDig(int digstateid, int digcount);
     //void UpdateCarve(QString partid, int carvecount);
     void OpenUpdate(void);
     void UpdateCheckCount(void);
