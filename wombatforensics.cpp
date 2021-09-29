@@ -72,14 +72,14 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     imagewindow = new ImageViewer(this);
     msgviewer = new MessageViewer(this);
     byteviewer = new ByteConverter(this);
-    //previewreport = new HtmlViewer(this);
+    previewreport = new HtmlViewer(this);
     aboutbox = new AboutBox(this);
     searchdialog = new SearchDialog(ui->hexview, this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
-    //previewreport->setWindowIcon(QIcon(":/bar/reportpreview"));
-    //previewreport->setWindowTitle("Report Preview");
+    previewreport->setWindowIcon(QIcon(":/bar/reportpreview"));
+    previewreport->setWindowTitle("Report Preview");
     aboutbox->setWindowIcon(QIcon(":/bar/about"));
     imagewindow->hide();
     filtervalues.maxcreate = QDateTime::currentDateTimeUtc().toTime_t();
@@ -95,11 +95,11 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(imagewindow, SIGNAL(HideImageWindow(bool)), this, SLOT(HideImageWindow(bool)), Qt::DirectConnection);
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
-    //connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
+    connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
-    //connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
+    connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(CarveUpdate(QString, int)), this, SLOT(UpdateCarve(QString, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(StatUpdate(QString)), this, SLOT(StatusUpdate(QString)), Qt::QueuedConnection);
     InitializeAppStructure();
@@ -3583,7 +3583,7 @@ WombatForensics::~WombatForensics()
     delete hashfilterview;
     delete tagfilterview;
     delete byteviewer;
-    //delete previewreport;
+    delete previewreport;
     delete imagewindow;
     delete aboutbox;
     delete settingsdialog;
@@ -3635,7 +3635,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     viewmanage->close();
     //hashlistmanager->close();
     byteviewer->close();
-    //previewreport->close();
+    previewreport->close();
     aboutbox->close();
     settingsdialog->close();
     /*
@@ -3925,7 +3925,6 @@ void WombatForensics::on_actionByteConverter_triggered(bool checked)
 
 void WombatForensics::on_actionpreviewreport_triggered(bool checked)
 {
-    /*
     if(!checked) // hide viewer
         previewreport->hide();
     else
@@ -3933,7 +3932,6 @@ void WombatForensics::on_actionpreviewreport_triggered(bool checked)
         previewreport->LoadHtml(QString(wombatvariable.tmpmntpath + "previewreport.html"));
         previewreport->show();
     }
-    */
 }
 
 void WombatForensics::on_actionExpandAll_triggered()
