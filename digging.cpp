@@ -206,14 +206,14 @@ void GenerateArchiveExpansion(QString objectid)
                 nodedata.insert("name", QByteArray(QString::fromStdString(std::string(zipstat.name)).toUtf8()).toBase64());
                 nodedata.insert("path", QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64());
                 nodedata.insert("size", (quint64)zipstat.size);
-                nodedata.insert("create", "0");
-                nodedata.insert("access", "0");
+                //nodedata.insert("create", "0");
+                //nodedata.insert("access", "0");
                 nodedata.insert("modify", QString::number(zipstat.mtime));
-                nodedata.insert("status", "0");
-                nodedata.insert("hash", "0");
+                //nodedata.insert("status", "0");
+                //nodedata.insert("hash", "0");
                 nodedata.insert("cat", mimestr.split("/").at(0));
                 nodedata.insert("sig", mimestr.split("/").at(1));
-                nodedata.insert("tag", "");
+                //nodedata.insert("tag", "");
                 nodedata.insert("id", QString(objectid + "-z" + QString::number(i)));
                 mutex.lock();
                 treenodemodel->AddNode(nodedata, objectid, 1, 0);
@@ -806,6 +806,7 @@ void GenerateThumbnails(QString thumbid)
 
 QByteArray ReturnFileContent(QString objectid)
 {
+    // STILL NEED TO HANDLE ZIP AND CARVED
     ForImg* curimg = NULL;
     for(int i=0; i < existingforimglist.count(); i++)
     {
