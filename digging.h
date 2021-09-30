@@ -19,7 +19,9 @@ void GenerateVidThumbnails(QString thumbid);
 void GenerateArchiveExpansion(QString thumbid);
 void GenerateDigging(QString thumbid);
 void GeneratePreDigging(QString thumbid);
-QByteArray ReturnFileContent(QString objectid);
+//QByteArray ReturnFileContent(QString objectid);
+QByteArray ReturnFileContent(ForImg* curimg, QString objectid, QString* layout);
+QString ReturnFileContent(ForImg* curimg, QString objectid);
 
 void LoadImagesHash(void);
 void SaveImagesHash(void);

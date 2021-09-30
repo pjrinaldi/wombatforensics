@@ -58,13 +58,35 @@ void GenerateArchiveExpansion(QString objectid)
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
         QString filepath = indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+
+        ForImg* curimg = NULL;
+        for(int i=0; i < existingforimglist.count(); i++)
+        {
+            if(existingforimglist.at(i)->MountPath().endsWith(objectid.split("-").at(0)))
+            {
+                curimg = existingforimglist.at(i);
+                break;
+            }
+        }
+
         int err = 0;
+        /*
 	QByteArray filebytes;
 	filebytes.clear();
-        filebytes = ReturnFileContent(objectid);
+        //filebytes = ReturnFileContent(objectid);
+        QString layout = "";
+        // PASS THE QFILE as a POINTER, AND WRITE THE CONTENTS TO THE FILE SO THEN THE ZIP CAN USE IT, AND I CAN RETURN THE LAYOUT STRING AND NOT BOTHER WITH THE MEMORY HEAVY QBYTEARRAY
+        filebytes = ReturnFileContent(curimg, objectid, &layout);
+        */
+        QString layout = "";
+        layout = ReturnFileContent(curimg, objectid);
+        qDebug() << "layout:" << layout;
+
         //get parent layout property.
-        QDir eviddir = QDir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList("*-" + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+
+        //QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        //QStringList evidfiles = eviddir.entryList(QStringList("*-" + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+
         //QString evidencename = evidfiles.at(0).split("-e").first();
         //QString tmpstr = "";
         /*
@@ -79,6 +101,9 @@ void GenerateArchiveExpansion(QString objectid)
         QByteArray filecontent;
         filecontent.clear();
         */
+
+        // THIS SEEMS DUPLICATIVE FROM RETURNFILECONTENT()
+        /*
         QString layout = "";
         if(objectid.split("-").count() == 3)
         {
@@ -112,6 +137,8 @@ void GenerateArchiveExpansion(QString objectid)
             }
         }
         QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+        */
+        /*
         QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
         QFile tmpfile(fnamestr);
         if(!tmpfile.isOpen())
@@ -121,7 +148,10 @@ void GenerateArchiveExpansion(QString objectid)
             tmpfile.write(filebytes);
             tmpfile.close();
         }
+        */
+        QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
         zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+        //filebytes.clear();
         qint64 zipentrycount = zip_get_num_entries(curzip, 0);
         for(int i=0; i < zipentrycount; i++)
         {
@@ -161,6 +191,7 @@ void GenerateArchiveExpansion(QString objectid)
 		}
 		mutex.unlock();
 		tmparray = QByteArray::fromRawData(magicbuffer, sigsize);
+                // THIS NEEDS TO BE SWITCHED TO THE NEW GENERATECATEGORY USING CURIMG, SO I NEED CURIMG, AND CAN UPGRADE RETURNFILECONTENT POSSIBLY AS WELL...
 		QString mimestr = GenerateCategorySignature(tmparray, QString::fromStdString(std::string(zipstat.name)));
 		//QString mimestr = GenerateCategorySignature(mimetype, QString::fromStdString(std::string(zipstat.name)));
                 /*
@@ -211,8 +242,8 @@ void GenerateArchiveExpansion(QString objectid)
                 nodedata.insert("modify", QString::number(zipstat.mtime));
                 //nodedata.insert("status", "0");
                 //nodedata.insert("hash", "0");
-                nodedata.insert("cat", mimestr.split("/").at(0));
-                nodedata.insert("sig", mimestr.split("/").at(1));
+                //nodedata.insert("cat", mimestr.split("/").at(0));
+                //nodedata.insert("sig", mimestr.split("/").at(1));
                 //nodedata.insert("tag", "");
                 nodedata.insert("id", QString(objectid + "-z" + QString::number(i)));
                 mutex.lock();
@@ -404,7 +435,7 @@ void GenerateHash(QString objectid)
 	    {
 		QByteArray filebytes;
 		filebytes.clear();
-		filebytes = ReturnFileContent(objectid);
+		//filebytes = ReturnFileContent(objectid);
                 if(hashsum == 11)
                 {
                     /*
@@ -483,7 +514,7 @@ void GenerateVidThumbnails(QString thumbid)
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
 	    QByteArray filebytes;
 	    filebytes.clear();
-	    filebytes = ReturnFileContent(thumbid);
+	    //filebytes = ReturnFileContent(thumbid);
 	    QDir dir;
 	    dir.mkpath(wombatvariable.tmpfilepath);
 	    QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
@@ -727,7 +758,7 @@ void GenerateThumbnails(QString thumbid)
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
 	    QByteArray filebytes;
 	    filebytes.clear();
-	    filebytes = ReturnFileContent(thumbid);
+	    //filebytes = ReturnFileContent(thumbid);
 	    QByteArray ba;
 	    ba.clear();
 	    QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
@@ -804,9 +835,11 @@ void GenerateThumbnails(QString thumbid)
     }
 }
 
-QByteArray ReturnFileContent(QString objectid)
+//QByteArray ReturnFileContent(ForImg* curimg, QString objectid, QString* layout)
+QString ReturnFileContent(ForImg* curimg, QString objectid)
 {
     // STILL NEED TO HANDLE ZIP AND CARVED
+    /*
     ForImg* curimg = NULL;
     for(int i=0; i < existingforimglist.count(); i++)
     {
@@ -816,10 +849,11 @@ QByteArray ReturnFileContent(QString objectid)
             break;
         }
     }
-    QString layout = "";
+    */
+    QString curlayout = "";
     quint64 logicalsize = 0;
     if(curimg->ImgType() == 15)
-        layout = "0," + QString::number(curimg->Size()) + ";";
+        curlayout = "0," + QString::number(curimg->Size()) + ";";
     else
     {
         QFile fpropfile(curimg->MountPath() + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
@@ -829,28 +863,61 @@ QByteArray ReturnFileContent(QString objectid)
         {
             QString line = fpropfile.readLine();
             if(line.startsWith("Layout|"))
-                layout = line.split("|").at(1);
+                curlayout = line.split("|").at(1);
             else if(line.startsWith("Logical Size|"))
                 logicalsize = line.split("|").at(1).toULongLong();
         }
         fpropfile.close();
     }
-    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
-    QByteArray filecontent;
-    filecontent.clear();
+    //layout = &curlayout;
+    QStringList layoutlist = curlayout.split(";", Qt::SkipEmptyParts);
+    //QByteArray filecontent;
+    //filecontent.clear();
     quint64 curlogsize = 0;
-    for(int i=1; i <= layoutlist.count(); i++)
+    QString fnamestr = wombatvariable.tmpmntpath + objectid + "-fhex";
+    QFile tmpfile(fnamestr);
+    if(!tmpfile.isOpen())
+        tmpfile.open(QIODevice::WriteOnly | QIODevice::Append);
+    if(tmpfile.isOpen())
     {
-        quint64 curoffset = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
-        quint64 cursize = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
-        curlogsize += cursize;
-        if(curlogsize <= logicalsize)
-            filecontent.append(curimg->ReadContent(curoffset, cursize));
-        else
-            filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((i-1) * cursize))));
+        for(int i=1; i <= layoutlist.count(); i++)
+        {
+            QByteArray filecontent;
+            filecontent.clear();
+            quint64 curoffset = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
+            quint64 cursize = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
+            curlogsize += cursize;
+            if(curlogsize <= logicalsize)
+                filecontent.append(curimg->ReadContent(curoffset, cursize));
+            else
+                filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((i-1) * cursize))));
+            tmpfile.write(filecontent);
+        }
+        tmpfile.close();
     }
 
-    return filecontent;
+    /*
+        QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
+        QFile tmpfile(fnamestr);
+        if(!tmpfile.isOpen())
+            tmpfile.open(QIODevice::WriteOnly);
+        if(tmpfile.isOpen())
+        {
+            tmpfile.write(filebytes);
+            tmpfile.close();
+        }
+        for(int j=0; j < layoutlist.count(); j++)
+        {
+            QByteArray filearray = curimg->ReadContent(layoutlist.at(j).split(",").at(0).toULongLong(), layoutlist.at(j).split(",").at(1).toULongLong());
+            tmpfile.write(filearray);
+        }
+        tmpfile.close();
+     */ 
+
+    //return filecontent;
+
+    return curlayout;
+
     /*
     // STILL NEED TO HANDLE ZIP AND CARVED
     QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), 1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
