@@ -5081,7 +5081,8 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
 	    pname = "UNALLOCATED,";
 	else if(allocstatus == 1)
             pname = ParseFileSystem(curimg, cursectoroffset, ptreecnt);
-	out << pname << "," << QString::number((qint64)cursectoroffset*512) << "," << QString::number((qint64)cursectorsize*512) << ",0," << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+        // OFFSET, SIZE
+	out << QString::number((qint64)cursectoroffset*512) << "," << QString::number((qint64)cursectorsize*512);
 	out.flush();
 	pstatfile.close();
     }

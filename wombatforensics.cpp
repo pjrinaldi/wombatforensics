@@ -2144,15 +2144,15 @@ void WombatForensics::PopulateHexContents()
         else
         {
             QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
-	    qDebug() << "partfile:" << partfile.fileName();
+	    //qDebug() << "partfile:" << partfile.fileName();
             //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
             partfile.open(QIODevice::ReadOnly | QIODevice::Text);
             if(partfile.isOpen())
                 tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
             partfile.close();
-            qDebug() << "tmpstr:" << tmpstr;
-            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong()*2);
-            ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(1) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(2) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(2).toLongLong());
+            //qDebug() << "tmpstr:" << tmpstr;
+            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toLongLong()*2);
+            ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(0) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(1) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong());
         }
     }
     else if(nodeid.split("-").count() == 3) // file/directory
