@@ -3309,7 +3309,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         digfilelist = GetFileLists(dtype);
     digtotalcount = digfilelist.count();
 
-    qDebug() << "digfilelist:" << digfilelist;
+    //qDebug() << "digfilelist:" << digfilelist;
     /*
     // THIS LOOP MIGHT BE JUST TO GET THE COUNTS FOR THE STATUS, NOT NECESSARILY THE FILEIDLISTS FOR RESPECTIVE DIGGING
     // GET COUNTS FOR EACH DIGGING CHOICE
