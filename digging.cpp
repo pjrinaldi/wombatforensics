@@ -862,6 +862,7 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
         }
         else if(objectid.contains("-z"))
         {
+            // need to determine what the objectid is before i decide how to get the parent.
             qDebug() << "objectid:" << objectid;
             /*
             int err = 0;
