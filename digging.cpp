@@ -14,6 +14,7 @@
 void GenerateArchiveExpansion(QString objectid)
 {
     // NEED TO FIGURE OUT HOW I WANT TO RECORD ZIP FILES.... UNDER THE NEW ID PARADIGM
+    qDebug() << "extract zip for:" << objectid;
 
     // NEED TO DISTINGUISH BETWEEN ZIP AND OTHER ARCHIVE FORMATS AND PROCESS ACCORDINGLY...
     if(!isclosing)

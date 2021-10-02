@@ -2086,144 +2086,147 @@ void WombatForensics::PopulateHexContents()
             //qDebug() << curimg->ImgPath() << curimg->MountPath();
         }
     }
-    QString tmpstr = "";
-    /*
-    QString evidid = nodeid.split("-").first();
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
-    QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
-    QString tmpstr = "";
-    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
-    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(evidfile.isOpen())
-        tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
-    evidfile.close();
-    */
-    //qDebug() << "tmpstr:" << tmpstr;
-    /*
-    for(int i=0; i < existingevid.count(); i++)
+    if(curimg != NULL)
     {
-	if(tmpstr.split(",", Qt::SkipEmptyParts).at(1) == existingevid.at(i)->ImgPath())
-	    ui->hexview->setData(*existingevid.at(i));
-	//qDebug() << QString("newevid " + QString::number(i) + ":") << newevid.at(i)->ImgPath();
-    }
-    */
-    // EwfImage need to get the imgpath from the correct img from the vector of qiodevices
-    //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
-    //casedatafile.setFileName(curimg->ImgPath());
-    ui->hexview->BypassColor(false);
-    ui->hexview->setData(*curimg);
-
-    //ui->hexview->setData(casedatafile);
-    //ui->hexview->setData(casedatafile);
-    //(newevid.at(0))->open(QIODevice::ReadOnly);
-    //ui->hexview->setData((*newevid.at(0)));
-    
-    if(nodeid.split("-").count() == 1) // image file
-    {
-        ui->hexview->setCursorPosition(0);
-        ui->hexview->SetColor(QString("0," + QString::number(selectednode->Data("size").toLongLong()) + ";"), selectednode->Data("size").toLongLong());
-    }
-    else if(nodeid.split("-").count() == 2) // unallocated, file system, or partition, possibly carved, zip, etc...
-    {
-        if(nodeid.contains("-c")) // manually carved file
+        QString tmpstr = "";
+        /*
+        QString evidid = nodeid.split("-").first();
+        QDir eviddir = QDir(wombatvariable.tmpmntpath);
+        QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
+        QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
+        QString tmpstr = "";
+        QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
+        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(evidfile.isOpen())
+            tmpstr = evidfile.readLine(); // original evidence filename, evidence mount string, imgsize, id
+        evidfile.close();
+        */
+        //qDebug() << "tmpstr:" << tmpstr;
+        /*
+        for(int i=0; i < existingevid.count(); i++)
         {
-            QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".prop");
-            if(!cfile.isOpen())
-                cfile.open(QIODevice::ReadOnly | QIODevice::Text);
-            if(cfile.isOpen())
-            {
-                tmpstr = QString(cfile.readLine()).split(";", Qt::SkipEmptyParts).at(0);
-                cfile.close();
-            }
-            //qDebug() << "offset 2:" << QString::number(tmpstr.split(",").at(0).toLongLong(), 16);
-            ui->hexview->BypassColor(true);
-            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toULongLong()*2);
-            ui->hexview->SetColor(tmpstr, selectednode->Data("size").toLongLong());
+            if(tmpstr.split(",", Qt::SkipEmptyParts).at(1) == existingevid.at(i)->ImgPath())
+                ui->hexview->setData(*existingevid.at(i));
+            //qDebug() << QString("newevid " + QString::number(i) + ":") << newevid.at(i)->ImgPath();
         }
-        else
+        */
+        // EwfImage need to get the imgpath from the correct img from the vector of qiodevices
+        //casedatafile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
+        //casedatafile.setFileName(curimg->ImgPath());
+        ui->hexview->BypassColor(false);
+        ui->hexview->setData(*curimg);
+
+        //ui->hexview->setData(casedatafile);
+        //ui->hexview->setData(casedatafile);
+        //(newevid.at(0))->open(QIODevice::ReadOnly);
+        //ui->hexview->setData((*newevid.at(0)));
+        
+        if(nodeid.split("-").count() == 1) // image file
+        {
+            ui->hexview->setCursorPosition(0);
+            ui->hexview->SetColor(QString("0," + QString::number(selectednode->Data("size").toLongLong()) + ";"), selectednode->Data("size").toLongLong());
+        }
+        else if(nodeid.split("-").count() == 2) // unallocated, file system, or partition, possibly carved, zip, etc...
+        {
+            if(nodeid.contains("-c")) // manually carved file
+            {
+                QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".prop");
+                if(!cfile.isOpen())
+                    cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(cfile.isOpen())
+                {
+                    tmpstr = QString(cfile.readLine()).split(";", Qt::SkipEmptyParts).at(0);
+                    cfile.close();
+                }
+                //qDebug() << "offset 2:" << QString::number(tmpstr.split(",").at(0).toLongLong(), 16);
+                ui->hexview->BypassColor(true);
+                ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toULongLong()*2);
+                ui->hexview->SetColor(tmpstr, selectednode->Data("size").toLongLong());
+            }
+            else
+            {
+                QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
+                //qDebug() << "partfile:" << partfile.fileName();
+                //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
+                partfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(partfile.isOpen())
+                    tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
+                partfile.close();
+                //qDebug() << "tmpstr:" << tmpstr;
+                ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toLongLong()*2);
+                ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(0) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(1) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong());
+            }
+        }
+        else if(nodeid.split("-").count() == 3) // file/directory
         {
             QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
-	    //qDebug() << "partfile:" << partfile.fileName();
             //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
             partfile.open(QIODevice::ReadOnly | QIODevice::Text);
             if(partfile.isOpen())
-                tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
+                tmpstr = partfile.readLine(); // part name, offset, size, part type, id
             partfile.close();
-            //qDebug() << "tmpstr:" << tmpstr;
-            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toLongLong()*2);
-            ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(0) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(1) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong());
-        }
-    }
-    else if(nodeid.split("-").count() == 3) // file/directory
-    {
-        QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
-        //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
-        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(partfile.isOpen())
-            tmpstr = partfile.readLine(); // part name, offset, size, part type, id
-        partfile.close();
-        //qDebug() << "selectedindex name:" << selectedindex.sibling(selectedindex.row(), 0).data().toString();
-        if(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString() == "$MBR")
-        {
-            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toULongLong()*2);
-            ui->hexview->SetColor(QString("0,512;"), 512);
-        }
-        else if(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString().startsWith("$FAT"))
-        {
-	    uint fatoffset = 0;
-	    uint fatsize = 0;
-	    uint bytespersector = 0;
-            QFile ppropfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/prop");
-	    //QFile ppropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/prop");
-	    ppropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-	    if(ppropfile.isOpen())
-	    {
-		while(!ppropfile.atEnd())
-		{
-		    tmpstr = ppropfile.readLine();
-		    if(tmpstr.startsWith("FAT Offset"))
-			fatoffset = tmpstr.split("|").at(1).toUInt();
-		    else if(tmpstr.startsWith("Bytes Per Sector"))
-			bytespersector = tmpstr.split("|").at(1).toUInt();
-		    else if(tmpstr.startsWith("FAT Size"))
-			fatsize = tmpstr.split("|").at(1).toUInt() * bytespersector;
-		}
-		ppropfile.close();
-	    }
-	    uint fatnum = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString().right(1).toUInt();
-	    ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
-            ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
-        }
-        else
-        {
-            QString layout = "";
-            QFile fpropfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
-            //QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
-            fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-            if(fpropfile.isOpen())
+            //qDebug() << "selectedindex name:" << selectedindex.sibling(selectedindex.row(), 0).data().toString();
+            if(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString() == "$MBR")
             {
-                QString tmpstr = "";
-                while(!fpropfile.atEnd())
-                {
-                    tmpstr = fpropfile.readLine();
-                    if(tmpstr.startsWith("Layout"))
-                    {
-                        layout = tmpstr.split("|").at(1);
-                        break;
-                    }
-                }
-                fpropfile.close();
+                ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(1).toULongLong()*2);
+                ui->hexview->SetColor(QString("0,512;"), 512);
             }
-            ui->hexview->setCursorPosition(layout.split(",").at(0).toUInt() * 2);
-            ui->hexview->SetColor(layout, selectednode->Data("size").toLongLong());
+            else if(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString().startsWith("$FAT"))
+            {
+                uint fatoffset = 0;
+                uint fatsize = 0;
+                uint bytespersector = 0;
+                QFile ppropfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/prop");
+                //QFile ppropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/prop");
+                ppropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(ppropfile.isOpen())
+                {
+                    while(!ppropfile.atEnd())
+                    {
+                        tmpstr = ppropfile.readLine();
+                        if(tmpstr.startsWith("FAT Offset"))
+                            fatoffset = tmpstr.split("|").at(1).toUInt();
+                        else if(tmpstr.startsWith("Bytes Per Sector"))
+                            bytespersector = tmpstr.split("|").at(1).toUInt();
+                        else if(tmpstr.startsWith("FAT Size"))
+                            fatsize = tmpstr.split("|").at(1).toUInt() * bytespersector;
+                    }
+                    ppropfile.close();
+                }
+                uint fatnum = selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString().right(1).toUInt();
+                ui->hexview->setCursorPosition((fatoffset + fatsize * (fatnum - 1)) * 2);
+                ui->hexview->SetColor(QString(QString::number(fatoffset + fatsize * (fatnum - 1)) + "," + QString::number(fatsize) + ";"), fatsize - 1);
+            }
+            else
+            {
+                QString layout = "";
+                QFile fpropfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
+                //QFile fpropfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + ".prop");
+                fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(fpropfile.isOpen())
+                {
+                    QString tmpstr = "";
+                    while(!fpropfile.atEnd())
+                    {
+                        tmpstr = fpropfile.readLine();
+                        if(tmpstr.startsWith("Layout"))
+                        {
+                            layout = tmpstr.split("|").at(1);
+                            break;
+                        }
+                    }
+                    fpropfile.close();
+                }
+                ui->hexview->setCursorPosition(layout.split(",").at(0).toUInt() * 2);
+                ui->hexview->SetColor(layout, selectednode->Data("size").toLongLong());
+            }
         }
+        else if(nodeid.split("-").count() == 4) // zip file
+        {
+            qDebug() << "get zip's parent layout here...";
+        }
+        ui->hexview->ensureVisible();
     }
-    else if(nodeid.split("-").count() == 4) // zip file
-    {
-        qDebug() << "get zip's parent layout here...";
-    }
-    ui->hexview->ensureVisible();
 
 
     //(newevid.at(0))->close();
@@ -3306,6 +3309,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         digfilelist = GetFileLists(dtype);
     digtotalcount = digfilelist.count();
 
+    qDebug() << "digfilelist:" << digfilelist;
     /*
     // THIS LOOP MIGHT BE JUST TO GET THE COUNTS FOR THE STATUS, NOT NECESSARILY THE FILEIDLISTS FOR RESPECTIVE DIGGING
     // GET COUNTS FOR EACH DIGGING CHOICE
@@ -3467,6 +3471,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
     */
+    hasarchive = true;
 
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
 
@@ -3553,6 +3558,8 @@ void WombatForensics::SetupHexPage(void)
 {
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+    //QByteArray zarray;
+    //ui->hexview->setData(zarray);
     ui->hexview->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->hexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetOffsetLabel(qint64)));
     connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));

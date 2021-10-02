@@ -789,6 +789,8 @@ std::string Verify(QString outstr)
  */ 
 ForImg::ForImg(QString imgfile)
 {
+    if(imgfile.split("/").count() == 0)
+        imgfile = -1;
     if(imgfile.split("/").last().toLower().endsWith(".e01"))
         imgtype = 0; // EWF
     else if(imgfile.split("/").last().toLower().endsWith(".aff"))
@@ -993,6 +995,10 @@ ForImg::ForImg(QString imgfile)
         //efile.close();
         //}
 
+    }
+    else if(imgtype = -1)
+    {
+        imgsize = 0;
     }
 }
 
@@ -1274,6 +1280,10 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 	    tmparray = tmpfile.read(size);
 	    tmpfile.close();
 	}
+    }
+    else if(imgtype == -1) // no file loaded yet
+    {
+        //tmparray.append("zero");
     }
 
     return tmparray;

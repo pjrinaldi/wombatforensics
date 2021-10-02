@@ -99,6 +99,17 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QCheckBox" name="expandarchivescheckbox">
+            <property name="text">
+             <string>Expand Archives (zip)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QCheckBox" name="thumbnailcheckBox">
           <property name="text">
            <string>Generate Thumbnails for Image Files</string>
@@ -184,17 +195,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QCheckBox" name="expandarchivescheckbox">
-            <property name="text">
-             <string>Expand Archives (zip)</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </item>

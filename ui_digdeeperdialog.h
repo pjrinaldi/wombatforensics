@@ -37,6 +37,8 @@ public:
     QRadioButton *listedFileRadioButton;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_4;
+    QHBoxLayout *horizontalLayout_4;
+    QCheckBox *expandarchivescheckbox;
     QCheckBox *thumbnailcheckBox;
     QCheckBox *videocheckBox;
     QHBoxLayout *horizontalLayout_3;
@@ -45,8 +47,6 @@ public:
     QCheckBox *hashlistcheckbox;
     QListWidget *hashlistwidget;
     QSpacerItem *horizontalSpacer_2;
-    QHBoxLayout *horizontalLayout_4;
-    QCheckBox *expandarchivescheckbox;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer;
@@ -104,6 +104,16 @@ public:
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         verticalLayout_4 = new QVBoxLayout(groupBox);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        expandarchivescheckbox = new QCheckBox(groupBox);
+        expandarchivescheckbox->setObjectName(QString::fromUtf8("expandarchivescheckbox"));
+
+        horizontalLayout_4->addWidget(expandarchivescheckbox);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_4);
+
         thumbnailcheckBox = new QCheckBox(groupBox);
         thumbnailcheckBox->setObjectName(QString::fromUtf8("thumbnailcheckBox"));
 
@@ -154,16 +164,6 @@ public:
 
         verticalLayout_4->addLayout(horizontalLayout_5);
 
-        horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        expandarchivescheckbox = new QCheckBox(groupBox);
-        expandarchivescheckbox->setObjectName(QString::fromUtf8("expandarchivescheckbox"));
-
-        horizontalLayout_4->addWidget(expandarchivescheckbox);
-
-
-        verticalLayout_4->addLayout(horizontalLayout_4);
-
 
         verticalLayout->addWidget(groupBox);
 
@@ -209,11 +209,11 @@ public:
         checkedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "Checked (#)", nullptr));
         listedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "All (#)", nullptr));
         groupBox->setTitle(QCoreApplication::translate("DigDeeperDialog", "For the Following Options", nullptr));
+        expandarchivescheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Expand Archives (zip)", nullptr));
         thumbnailcheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for Image Files", nullptr));
         videocheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for Video Files", nullptr));
         hashcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Calcuate BLAKE3 Hash", nullptr));
         hashlistcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Compare Files to Selected Hash Lists:", nullptr));
-        expandarchivescheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Expand Archives (zip)", nullptr));
         cancelButton->setText(QCoreApplication::translate("DigDeeperDialog", "Cancel", nullptr));
         processButton->setText(QCoreApplication::translate("DigDeeperDialog", "Process", nullptr));
     } // retranslateUi
