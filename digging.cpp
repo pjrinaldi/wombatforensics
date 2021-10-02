@@ -862,8 +862,24 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
         }
         else if(objectid.contains("-z"))
         {
-            // need to determine what the objectid is before i decide how to get the parent.
-            qDebug() << "objectid:" << objectid;
+            //qDebug() << "objectid:" << objectid;
+            int err = 0;
+            QString parlayout = "";
+            quint64 parlogsize = 0;
+            // Populate Parent -fhex file here
+            QFile fpropfile(curimg->MountPath() + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
+            if(!fpropfile.isOpen())
+                fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            while(!fpropfile.atEnd())
+            {
+                QString line = fpropfile.readLine();
+                if(line.startsWith("Layout|"))
+                    parlayout = line.split("|").at(1);
+                else if(line.startsWith("Logical Size|"))
+                    parlogsize = line.split("|").at(1).toULongLong();
+            }
+            fpropfile.close();
+            QStringList parlaylist = parlayout.split(";", Qt::SkipEmptyParts);
             /*
             int err = 0;
             RewriteSelectedIdContent(indexlist.at(0).parent()); // writes parent content to use to load zip content
