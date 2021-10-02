@@ -839,40 +839,69 @@ void GenerateThumbnails(QString thumbid)
 QString ReturnFileContent(ForImg* curimg, QString objectid)
 {
     // STILL NEED TO HANDLE ZIP AND CARVED
-    /*
-    ForImg* curimg = NULL;
-    for(int i=0; i < existingforimglist.count(); i++)
-    {
-        if(existingforimglist.at(i)->MountPath().endsWith(objectid.split("-").at(0)))
-        {
-            curimg = existingforimglist.at(i);
-            break;
-        }
-    }
-    */
-    QString curlayout = "";
+    QString layout = "";
     quint64 logicalsize = 0;
     if(curimg->ImgType() == 15)
-        curlayout = "0," + QString::number(curimg->Size()) + ";";
+    {
+        layout = "0," + QString::number(curimg->Size()) + ";";
+        logicalsize = curimg->Size();
+    }
     else
     {
-        QFile fpropfile(curimg->MountPath() + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
-        if(!fpropfile.isOpen())
-            fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        while(!fpropfile.atEnd())
+        if(objectid.contains("-c"))
         {
-            QString line = fpropfile.readLine();
-            if(line.startsWith("Layout|"))
-                curlayout = line.split("|").at(1);
-            else if(line.startsWith("Logical Size|"))
-                logicalsize = line.split("|").at(1).toULongLong();
+            QFile cfile(wombatvariable.tmpmntpath + "carved/" + objectid + ".prop");
+            if(!cfile.isOpen())
+                cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(cfile.isOpen())
+            {
+                layout = cfile.readLine();
+                cfile.close();
+            }
+            logicalsize = layout.split(";").at(0).split(",").at(1).toULongLong();
         }
-        fpropfile.close();
+        else if(objectid.contains("-z"))
+        {
+            qDebug() << "objectid:" << objectid;
+            /*
+            int err = 0;
+            RewriteSelectedIdContent(indexlist.at(0).parent()); // writes parent content to use to load zip content
+            QString fnamestr = wombatvariable.tmpfilepath + objectid.split("-z").at(0) + "-fhex";
+            zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+            struct zip_stat zipstat;
+            zip_stat_init(&zipstat);
+            int zipid = objectid.split("-z").at(1).toInt();
+            zip_stat_index(curzip, zipid, 0, &zipstat);
+            char* zipbuf = new char[zipstat.size];
+            zip_file_t* curfile = NULL;
+            if(zipstat.encryption_method == ZIP_EM_NONE)
+                curfile = zip_fopen_index(curzip, zipid, 0);
+            if(curfile != NULL)
+            {
+                zip_fread(curfile, zipbuf, zipstat.size);
+                zip_fclose(curfile);
+            }
+            filecontent.append(zipbuf, zipstat.size);
+            delete[] zipbuf;
+             */ 
+        }
+        else
+        {
+            QFile fpropfile(curimg->MountPath() + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
+            if(!fpropfile.isOpen())
+                fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            while(!fpropfile.atEnd())
+            {
+                QString line = fpropfile.readLine();
+                if(line.startsWith("Layout|"))
+                    layout = line.split("|").at(1);
+                else if(line.startsWith("Logical Size|"))
+                    logicalsize = line.split("|").at(1).toULongLong();
+            }
+            fpropfile.close();
+        }
     }
-    //layout = &curlayout;
-    QStringList layoutlist = curlayout.split(";", Qt::SkipEmptyParts);
-    //QByteArray filecontent;
-    //filecontent.clear();
+    QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
     quint64 curlogsize = 0;
     QString fnamestr = wombatvariable.tmpmntpath + objectid + "-fhex";
     QFile tmpfile(fnamestr);
@@ -916,7 +945,7 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
 
     //return filecontent;
 
-    return curlayout;
+    return layout;
 
     /*
     // STILL NEED TO HANDLE ZIP AND CARVED
