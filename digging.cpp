@@ -242,8 +242,8 @@ void GenerateArchiveExpansion(QString objectid)
                 nodedata.insert("modify", QString::number(zipstat.mtime));
                 //nodedata.insert("status", "0");
                 //nodedata.insert("hash", "0");
-                //nodedata.insert("cat", mimestr.split("/").at(0));
-                //nodedata.insert("sig", mimestr.split("/").at(1));
+                nodedata.insert("cat", mimestr.split("/").at(0));
+                nodedata.insert("sig", mimestr.split("/").at(1));
                 //nodedata.insert("tag", "");
                 nodedata.insert("id", QString(objectid + "-z" + QString::number(i)));
                 mutex.lock();
