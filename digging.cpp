@@ -57,8 +57,8 @@ void GenerateArchiveExpansion(QString objectid)
         }
         */
         QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        QString filename = indxlist.first().sibling(indxlist.first().row(), 0).data().toString();
-        QString filepath = indxlist.first().sibling(indxlist.first().row(), 1).data().toString();
+        QString filename = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("name")).data().toString();
+        QString filepath = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("path")).data().toString();
 
         ForImg* curimg = NULL;
         for(int i=0; i < existingforimglist.count(); i++)
