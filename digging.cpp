@@ -862,12 +862,15 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
         }
         else if(objectid.contains("-z"))
         {
+            /*
+            QString parid = objectid.left(objectid.lastIndexOf("-z"));
+            qDebug() << "parid:" << parid;
             //qDebug() << "objectid:" << objectid;
             int err = 0;
             QString parlayout = "";
             quint64 parlogsize = 0;
             // Populate Parent -fhex file here
-            QFile fpropfile(curimg->MountPath() + "/" + objectid.split("-").at(1) + "/" + objectid.split("-").at(2) + ".prop");
+            QFile fpropfile(curimg->MountPath() + "/" + parid.split("-").at(1) + "/" + parid.split("-").at(2) + ".prop");
             if(!fpropfile.isOpen())
                 fpropfile.open(QIODevice::ReadOnly | QIODevice::Text);
             while(!fpropfile.atEnd())
@@ -880,14 +883,35 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
             }
             fpropfile.close();
             QStringList parlaylist = parlayout.split(";", Qt::SkipEmptyParts);
-            /*
-            int err = 0;
-            RewriteSelectedIdContent(indexlist.at(0).parent()); // writes parent content to use to load zip content
-            QString fnamestr = wombatvariable.tmpfilepath + objectid.split("-z").at(0) + "-fhex";
-            zip* curzip = zip_open(fnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+            quint64 curparsize = 0;
+            QString pnamestr = wombatvariable.tmpmntpath + parid + "-fhex";
+            QFile parfile(pnamestr);
+            if(!parfile.isOpen())
+                parfile.open(QIODevice::WriteOnly | QIODevice::Append);
+            if(parfile.isOpen())
+            {
+                for(int i=1; i <= parlaylist.count(); i++)
+                {
+                    QByteArray filecontent;
+                    filecontent.clear();
+                    quint64 curoffset = parlaylist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
+                    quint64 cursize = parlaylist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
+                    curparsize += cursize;
+                    if(curparsize <= parlogsize)
+                        filecontent.append(curimg->ReadContent(curoffset, cursize));
+                    else
+                        filecontent.append(curimg->ReadContent(curoffset, (parlogsize - ((i-1) * cursize))));
+                    parfile.write(filecontent);
+                }
+                parfile.close();
+            }
+            zip* curzip = zip_open(pnamestr.toStdString().c_str(), ZIP_RDONLY, &err);
+            //RewriteSelectedIdContent(indexlist.at(0).parent()); // writes parent content to use to load zip content
+            //QString fnamestr = wombatvariable.tmpfilepath + objectid.split("-z").at(0) + "-fhex";
             struct zip_stat zipstat;
             zip_stat_init(&zipstat);
-            int zipid = objectid.split("-z").at(1).toInt();
+            int zipid = objectid.split("-z").last().toInt();
+            //int zipid = objectid.split("-z").at(1).toInt();
             zip_stat_index(curzip, zipid, 0, &zipstat);
             char* zipbuf = new char[zipstat.size];
             zip_file_t* curfile = NULL;
@@ -898,9 +922,10 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
                 zip_fread(curfile, zipbuf, zipstat.size);
                 zip_fclose(curfile);
             }
-            filecontent.append(zipbuf, zipstat.size);
+            //filecontent.append(zipbuf, zipstat.size);
             delete[] zipbuf;
-             */ 
+            */
+            // STILL NEED TO WRITE THE FILECONTENT TO THE RESPECTIVE -FHEX FILE AND THEN RETURN THE LAYOUT FOR THE ARCHIVE EXPANSION TO WORK...
         }
         else
         {
