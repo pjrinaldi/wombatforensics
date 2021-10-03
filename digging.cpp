@@ -800,6 +800,16 @@ void GenerateDigging(QString thumbid)
 
 void GenerateThumbnails(QString thumbid)
 {
+    ForImg* curimg = NULL;
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+        if(existingforimglist.at(i)->MountPath().endsWith(objectid.split("-").at(0)))
+        {
+            curimg = existingforimglist.at(i);
+            break;
+        }
+    }
+
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();
@@ -816,8 +826,8 @@ void GenerateThumbnails(QString thumbid)
 	if(filesize > 0 && !isclosing)
 	{
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
-	    QByteArray filebytes;
-	    filebytes.clear();
+	    //QByteArray filebytes;
+	    //filebytes.clear();
 	    //filebytes = ReturnFileContent(thumbid);
 	    QByteArray ba;
 	    ba.clear();
