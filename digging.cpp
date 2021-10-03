@@ -803,7 +803,7 @@ void GenerateThumbnails(QString thumbid)
     ForImg* curimg = NULL;
     for(int i=0; i < existingforimglist.count(); i++)
     {
-        if(existingforimglist.at(i)->MountPath().endsWith(objectid.split("-").at(0)))
+        if(existingforimglist.at(i)->MountPath().endsWith(thumbid.split("-").at(0)))
         {
             curimg = existingforimglist.at(i);
             break;
@@ -826,6 +826,7 @@ void GenerateThumbnails(QString thumbid)
 	if(filesize > 0 && !isclosing)
 	{
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
+            QString layout = ReturnFileContent(curimg, thumbid);
 	    //QByteArray filebytes;
 	    //filebytes.clear();
 	    //filebytes = ReturnFileContent(thumbid);
@@ -838,8 +839,10 @@ void GenerateThumbnails(QString thumbid)
 	    {
 		if(!isclosing)
 		{
-		    Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
-		    Magick::Image master(blob);
+                    Magick::Image master;
+                    master.read(QString(wombatvariable.tmpfilepath + thumbid + "-fhex").toStdString());
+		    //Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
+		    //Magick::Image master(blob);
 		    master.quiet(false);
 		    master.resize(thumbgeometry);
 		    master.magick("PNG");
