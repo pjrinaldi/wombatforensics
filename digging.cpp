@@ -421,10 +421,70 @@ void GenerateHash(QString objectid)
     //if((objectid.split("-").count() == 5 || objectid.contains("-c")) && !isclosing)
     if((objectid.split("-").count() == 3 || objectid.contains("-c")) && !isclosing)
     {
-        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        QString objectname = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("name")).data().toString();
-	int curhashcount = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("hash")).data().toString().count();
+        ForImg* curimg = NULL;
+        for(int i=0; i < existingforimglist.count(); i++)
+        {
+            if(existingforimglist.at(i)->MountPath().endsWith(objectid.split("-").at(0)))
+            {
+                curimg = existingforimglist.at(i);
+                break;
+            }
+        }
+
+        //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        //QString objectname = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("name")).data().toString();
+        //int hashvalue = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("hash")).data().toString().count();
+	//int curhashcount = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("hash")).data().toString().count();
         // CAN REMOVE HASH IF
+        //if(hashvalue != 64)
+        //{
+	    QString hashstr = "";
+            QString layout = ReturnFileContent(curimg, objectid);
+            QFile curfile(wombatvariable.tmpfilepath + objectid + "-fhex");
+            if(!curfile.isOpen())
+                curfile.open(QIODevice::ReadOnly);
+            if(curfile.isOpen())
+            {
+                qint64 filesize = curfile.size();
+                if(curfile.size() > 0)
+                {
+                    blake3_hasher filehash;
+                    blake3_hasher_init(&filehash);
+                    while(!curfile.atEnd())
+                    {
+                        QByteArray filebytes;
+                        filebytes.clear();
+                        filebytes = curfile.read(65536);
+                        blake3_hasher_update(&filehash, filebytes.data(), filebytes.count());
+                    }
+                    uint8_t blake3hash[BLAKE3_OUT_LEN];
+                    blake3_hasher_finalize(&filehash, blake3hash, BLAKE3_OUT_LEN);
+                    //std::stringstream b3str;
+                    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+                    {
+                        hashstr.append(QString("%1").arg(blake3hash[i], 2, 16, QChar('0')));
+                        //alchash.append(QString("%1").arg(imghash[i], 2, 16, QChar('0')));
+                        //printf("
+                        //b3str << std::hex << (int)blake3hash[i];
+                    }
+                    //std::string b3hash = "";
+                    hashstr = hashstr.toUpper();
+                    //hashstr = QString::fromStdString(b3str.str()).toUpper();
+                }
+                else
+                    hashstr = QString("af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262").toUpper(); // BLAKE3 zero file
+                curfile.close();
+            }
+            if(!isclosing)
+            {
+                hashlist.insert(objectid, hashstr);
+                mutex.lock();
+                treenodemodel->UpdateNode(objectid, "hash", hashstr);
+                mutex.unlock();
+                dighashcount++;
+		isignals->DigUpd(4, dighashcount);
+            }
+        /*
 	if((hashsum == 1 && curhashcount != 32) || (hashsum == 2 && curhashcount != 40) || (hashsum == 4 && curhashcount != 64) || (hashsum == 11 && curhashcount != 64))
 	{
 	    TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
@@ -439,8 +499,6 @@ void GenerateHash(QString objectid)
 		//filebytes = ReturnFileContent(objectid);
                 if(hashsum == 11)
                 {
-                    /*
-                    */
                     blake3_hasher filehash;
                     blake3_hasher_init(&filehash);
                     blake3_hasher_update(&filehash, filebytes.data(), filebytes.count());
@@ -490,9 +548,10 @@ void GenerateHash(QString objectid)
                 hashtype = 4;
 	    if(!isclosing)
 		isignals->DigUpd(hashtype, dighashcount);
-	}
-	else
-	    qInfo() << "File Hash:" << objectid << "already exists. Skipping...";
+            */
+	//}
+	//else
+	//    qInfo() << "File Hash:" << objectid << "already exists. Skipping...";
     }
 }
 
@@ -946,10 +1005,10 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
     }
     QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
     quint64 curlogsize = 0;
-    QString fnamestr = wombatvariable.tmpmntpath + objectid + "-fhex";
+    QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
     QFile tmpfile(fnamestr);
     if(!tmpfile.isOpen())
-        tmpfile.open(QIODevice::WriteOnly | QIODevice::Append);
+        tmpfile.open(QIODevice::WriteOnly);
     if(tmpfile.isOpen())
     {
         for(int i=1; i <= layoutlist.count(); i++)

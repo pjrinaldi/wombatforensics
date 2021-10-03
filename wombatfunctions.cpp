@@ -177,7 +177,7 @@ void RewriteSelectedIdContent(QModelIndex selectedindex)
 	    hexstring = wombatvariable.tmpfilepath + selectedid + "-fhex";
 	    QFile tmpfile(hexstring);
 	    if(!tmpfile.isOpen())
-		tmpfile.open(QIODevice::WriteOnly | QIODevice::Append);
+		tmpfile.open(QIODevice::WriteOnly);
 	    if(tmpfile.isOpen())
 	    {
 		for(int j=0; j < layoutlist.count(); j++)

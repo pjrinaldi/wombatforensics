@@ -962,12 +962,12 @@ void WombatForensics::InitializeAppStructure()
 {
     wombatvariable.iscaseopen = false;
     QString tmppath = QDir::tempPath();
-    tmppath += "/wombatforensics/";
+    //tmppath += "/wombatforensics/";
     QString homepath = QDir::homePath();
     homepath += "/.local/share/wombatforensics/";
-    wombatvariable.tmpfilepath = tmppath + "tmpfiles/";
+    wombatvariable.tmpfilepath = tmppath + "/wombatforensics/";
     wombatvariable.tmpmntpath = homepath + "mntpt/";
-    wombatvariable.imgdatapath = tmppath + "datamnt/";
+    //wombatvariable.imgdatapath = tmppath + "datamnt/";
     QDir dir;
     if(dir.mkpath(tmppath) == false)
         DisplayError("1.6", "App tmppath folder failed", "App tmppath folder was not created");
@@ -977,8 +977,8 @@ void WombatForensics::InitializeAppStructure()
         DisplayError("1.2", "App tmpmnt folder failed", "App tmpmnt folder was not created");
     if(dir.mkpath(homepath) == false)
         DisplayError("1.4", "App homepath folder failed", "App homepath folder was not created");
-    if(dir.mkpath(wombatvariable.imgdatapath) == false)
-        DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
+    //if(dir.mkpath(wombatvariable.imgdatapath) == false)
+    //    DisplayError("1.5", "App imgdatapath folder failed", "App imgdatapath folder was not created");
 
     viewerfile.setFileName(homepath + "viewers");
     if(!FileExists(QString(homepath + "viewers").toStdString()))
@@ -3472,6 +3472,9 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
     */
     hasarchive = true;
+    hashash = true;
+    hasvid = true;
+    hasimg = true;
 
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
 
