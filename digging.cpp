@@ -839,14 +839,40 @@ void GenerateThumbnails(QString thumbid)
 	    {
 		if(!isclosing)
 		{
-                    Magick::Image master;
-                    master.read(QString(wombatvariable.tmpfilepath + thumbid + "-fhex").toStdString());
+		    Magick::Blob blob;
+                    //Magick::Image master;
+		    QFile bfile(wombatvariable.tmpfilepath + thumbid + "-fhex");
+		    if(!bfile.isOpen())
+			bfile.open(QIODevice::ReadOnly);
+		    if(bfile.isOpen())
+		    {
+			qDebug() << "bfile is open:" << bfile.fileName();
+                    //master.read(QString(wombatvariable.tmpfilepath + thumbid + "-fhex").toStdString());
+		    try
+		    {
+		    blob = Magick::Blob(static_cast<const void*>(bfile.readAll().data()), bfile.readAll().size());
+		    }
+		    catch(Magick::WarningCoder &cwarn)
+		    {
+			qDebug() << "Item:" << thumbid << "magick blob load warning:" << cwarn.what() << ".";
+		    }
+		    catch(Magick::Warning &warn)
+		    {
+			qDebug() << "Item:" << thumbid << "magick blob load warning:" << warn.what() << ".";
+		    }
+		    catch(Magick::Exception &err)
+		    {
+			qDebug() << "Item:" << thumbid << "magick blob load error:" << err.what() << ".";
+		    }
 		    //Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
-		    //Magick::Image master(blob);
+		    Magick::Image master(blob);
+		    master.display();
 		    master.quiet(false);
 		    master.resize(thumbgeometry);
 		    master.magick("PNG");
 		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+		    bfile.close();
+		    }
 		}
 	    }
 	    catch(Magick::Exception &error)
