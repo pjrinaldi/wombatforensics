@@ -800,6 +800,7 @@ void GenerateDigging(QString thumbid)
 
 void GenerateThumbnails(QString thumbid)
 {
+    genthmbpath = wombatvariable.tmpmntpath;
     ForImg* curimg = NULL;
     for(int i=0; i < existingforimglist.count(); i++)
     {
@@ -827,9 +828,6 @@ void GenerateThumbnails(QString thumbid)
 	{
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
             QString layout = ReturnFileContent(curimg, thumbid);
-	    //QByteArray filebytes;
-	    //filebytes.clear();
-	    //filebytes = ReturnFileContent(thumbid);
 	    QByteArray ba;
 	    ba.clear();
 	    QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
@@ -839,40 +837,14 @@ void GenerateThumbnails(QString thumbid)
 	    {
 		if(!isclosing)
 		{
-		    Magick::Blob blob;
-                    //Magick::Image master;
-		    QFile bfile(wombatvariable.tmpfilepath + thumbid + "-fhex");
-		    if(!bfile.isOpen())
-			bfile.open(QIODevice::ReadOnly);
-		    if(bfile.isOpen())
-		    {
-			qDebug() << "bfile is open:" << bfile.fileName();
-                    //master.read(QString(wombatvariable.tmpfilepath + thumbid + "-fhex").toStdString());
-		    try
-		    {
-		    blob = Magick::Blob(static_cast<const void*>(bfile.readAll().data()), bfile.readAll().size());
-		    }
-		    catch(Magick::WarningCoder &cwarn)
-		    {
-			qDebug() << "Item:" << thumbid << "magick blob load warning:" << cwarn.what() << ".";
-		    }
-		    catch(Magick::Warning &warn)
-		    {
-			qDebug() << "Item:" << thumbid << "magick blob load warning:" << warn.what() << ".";
-		    }
-		    catch(Magick::Exception &err)
-		    {
-			qDebug() << "Item:" << thumbid << "magick blob load error:" << err.what() << ".";
-		    }
-		    //Magick::Blob blob(static_cast<const void*>(filebytes.data()), filebytes.size());
-		    Magick::Image master(blob);
-		    master.display();
+                    Magick::Image master;
+                    master.read(QString(wombatvariable.tmpfilepath + thumbid + "-fhex").toStdString());
+		    //qDebug() << "genthmbpath:" << QString(genthmbpath + "thumbs/" + thumbid + ".jpg");
+		    //qDebug() << "thumbgeometry:" << thumbsize;
 		    master.quiet(false);
 		    master.resize(thumbgeometry);
-		    master.magick("JPEG");
-		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".jpg").toStdString());
-		    bfile.close();
-		    }
+		    master.magick("PNG");
+		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
 		}
 	    }
 	    catch(Magick::Exception &error)

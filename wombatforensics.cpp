@@ -3475,6 +3475,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     hashash = true;
     hasvid = true;
     hasimg = true;
+    //genthmbpath = wombatvariable.tmpmntpath;
 
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
 
