@@ -869,8 +869,8 @@ void GenerateThumbnails(QString thumbid)
 		    master.display();
 		    master.quiet(false);
 		    master.resize(thumbgeometry);
-		    master.magick("PNG");
-		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+		    master.magick("JPEG");
+		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".jpg").toStdString());
 		    bfile.close();
 		    }
 		}
