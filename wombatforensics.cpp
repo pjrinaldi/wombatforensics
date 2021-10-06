@@ -3471,10 +3471,21 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
     */
-    hasarchive = true;
-    hashash = true;
-    hasvid = true;
-    hasimg = true;
+    for(int i = 0; i < digoptions.count(); i++)
+    {
+        if(digoptions.at(i) == 0)
+            hasimg = true;
+        else if(digoptions.at(i) == 1)
+            hasvid = true;
+        else if(digoptions.at(i) == 2)
+            hashash = true;
+        else if(digoptions.at(i) == 3)
+        {
+            // hash list comparison here...
+        }
+        else if(digoptions.at(i) == 4)
+            hasarchive = true;
+    }
     //genthmbpath = wombatvariable.tmpmntpath;
 
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
