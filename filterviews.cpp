@@ -556,6 +556,7 @@ FileCategoryFilter::FileCategoryFilter(QWidget* parent) : QDialog(parent), ui(ne
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->categorycheckBox, SIGNAL(clicked()), this, SLOT(ToggleBox()));
 }
 
 FileCategoryFilter::~FileCategoryFilter()
@@ -599,6 +600,14 @@ void FileCategoryFilter::HideClicked()
 void FileCategoryFilter::CancelClicked()
 {
     this->hide();
+}
+
+void FileCategoryFilter::ToggleBox()
+{
+    if(ui->categorycheckBox->isChecked())
+        ui->categorycomboBox->setEnabled(true);
+    else
+        ui->categorycomboBox->setEnabled(false);
 }
 
 HashFilter::HashFilter(QWidget* parent) : QDialog(parent), ui(new Ui::HashFilter)

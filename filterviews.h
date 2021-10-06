@@ -248,6 +248,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void ToggleBox();
 
 private:
     Ui::FileCategoryFilter* ui;
