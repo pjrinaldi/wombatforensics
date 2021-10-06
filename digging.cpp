@@ -557,6 +557,16 @@ void GenerateHash(QString objectid)
 
 void GenerateVidThumbnails(QString thumbid)
 {
+    genthmbpath = wombatvariable.tmpmntpath;
+    ForImg* curimg = NULL;
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+        if(existingforimglist.at(i)->MountPath().endsWith(thumbid.split("-").at(0)))
+        {
+            curimg = existingforimglist.at(i);
+            break;
+        }
+    }
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();
@@ -572,9 +582,12 @@ void GenerateVidThumbnails(QString thumbid)
 	if(filesize > 0 && !isclosing)
 	{
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
-	    QByteArray filebytes;
-	    filebytes.clear();
+	    //QByteArray filebytes;
+	    //filebytes.clear();
 	    //filebytes = ReturnFileContent(thumbid);
+            QString layout = ReturnFileContent(curimg, thumbid);
+            QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-fhex";
+            /*
 	    QDir dir;
 	    dir.mkpath(wombatvariable.tmpfilepath);
 	    QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
@@ -586,6 +599,7 @@ void GenerateVidThumbnails(QString thumbid)
 	    }
 	    else
 		qDebug() << "Item:" << thumbid << "couldn't open file for writing contents.";
+            */
 	    QByteArray ba;
 	    QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
 	    ba.clear();
