@@ -557,6 +557,7 @@ void GenerateHash(QString objectid)
 
 void GenerateVidThumbnails(QString thumbid)
 {
+    qDebug() << "start generating video thumbnail for:" << thumbid;
     genthmbpath = wombatvariable.tmpmntpath;
     ForImg* curimg = NULL;
     for(int i=0; i < existingforimglist.count(); i++)
@@ -567,6 +568,7 @@ void GenerateVidThumbnails(QString thumbid)
             break;
         }
     }
+    qDebug() << "curimg path:" << curimg->ImgPath();
     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();
@@ -577,15 +579,19 @@ void GenerateVidThumbnails(QString thumbid)
     }
     else
     {
+        qDebug() << "thumbnail doesn't exist, generate it.";
 	TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
 	qint64 filesize = curitem->Data("size").toLongLong();
+        qDebug() << "filesize:" << filesize << "isclosing:" << isclosing;
 	if(filesize > 0 && !isclosing)
 	{
+            qDebug() << "in right if statement.";
 	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
 	    //QByteArray filebytes;
 	    //filebytes.clear();
 	    //filebytes = ReturnFileContent(thumbid);
             QString layout = ReturnFileContent(curimg, thumbid);
+            //qDebug() << "layout:" << layout;
             QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-fhex";
             /*
 	    QDir dir;
@@ -602,6 +608,7 @@ void GenerateVidThumbnails(QString thumbid)
             */
 	    QByteArray ba;
 	    QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
+            qDebug() << "fullpath:" << fullpath;
 	    ba.clear();
 	    ba.append(fullpath.toUtf8());
 	    if(!isclosing)
@@ -759,6 +766,8 @@ void GenerateVidThumbnails(QString thumbid)
 		qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
 	    }
 	}
+        else
+            qDebug() << "why does it think we are closing?";
     }
     if(!isclosing)
     {
@@ -789,6 +798,7 @@ void GeneratePreDigging(QString thumbid)
 
 void GenerateDigging(QString thumbid)
 {
+    qDebug() << "thumbid:" << thumbid;
     TreeNode* curitem = NULL;
     QModelIndexList indxlist;
     QString category = "";
@@ -797,15 +807,21 @@ void GenerateDigging(QString thumbid)
         indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
         curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         category = curitem->Data("cat").toString();
+        qDebug() << "cat:" << category;
     }
     bool isvid = false;
     bool isimg = false;
     isvid = category.contains("Video");
     isimg = category.contains("Image");
+    qDebug() << "isvid:" << isvid;
     if(hashash && !isclosing)
         GenerateHash(thumbid);
     if(hasvid && isvid && !isclosing)
+    {
+        qDebug() << "start vidthumbnailer";
         GenerateVidThumbnails(thumbid);
+        qDebug() << "end vid thumbnailer";
+    }
     if(hasimg && isimg && !isclosing)
         GenerateThumbnails(thumbid);
     //if(hasarchive && !isclosing)
@@ -947,6 +963,7 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
         }
         else if(objectid.contains("-z"))
         {
+            qDebug() << "need to handle zip here...";
             /*
             QString parid = objectid.left(objectid.lastIndexOf("-z"));
             qDebug() << "parid:" << parid;
@@ -1028,27 +1045,39 @@ QString ReturnFileContent(ForImg* curimg, QString objectid)
             fpropfile.close();
         }
     }
+    qDebug() << "RFC logicalsize:" << logicalsize;
+    //qDebug() << "layout str:" << layout;
     QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
     quint64 curlogsize = 0;
     QString fnamestr = wombatvariable.tmpfilepath + objectid + "-fhex";
+    //qDebug() << "fnamestr:" << fnamestr;
     QFile tmpfile(fnamestr);
     if(!tmpfile.isOpen())
         tmpfile.open(QIODevice::WriteOnly);
     if(tmpfile.isOpen())
     {
+        //qDebug() << "file is open";
         for(int i=1; i <= layoutlist.count(); i++)
         {
-            QByteArray filecontent;
-            filecontent.clear();
+            //QByteArray filecontent;
+            //filecontent.clear();
             quint64 curoffset = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
             quint64 cursize = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
+            qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
             curlogsize += cursize;
             if(curlogsize <= logicalsize)
-                filecontent.append(curimg->ReadContent(curoffset, cursize));
+            {
+                tmpfile.write(curimg->ReadContent(curoffset, cursize));
+                //filecontent.append(curimg->ReadContent(curoffset, cursize));
+            }
             else
-                filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((i-1) * cursize))));
-            tmpfile.write(filecontent);
+            {
+                tmpfile.write(curimg->ReadContent(curoffset,  (logicalsize - ((i-1) * cursize))));
+                //filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((i-1) * cursize))));
+            }
+            //tmpfile.write(filecontent);
         }
+        qDebug() << "tmpfile size:" << tmpfile.size();
         tmpfile.close();
     }
 
