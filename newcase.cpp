@@ -5247,6 +5247,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     uint64_t refsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 3, 8)); // should be 0x00 00 00 00 53 46 65 52 (0 0 0 0 S F e R) prior to endian flip
     uint32_t f2fsig = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1024, 4));
     quint64 zfssig = qFromLittleEndian<quint64>(curimg->ReadContent(curstartsector*512 + 135168, 8));
+    //0xE0F5E1E2
     // WILL WRITE FILE SYSTEM INFORMATION IN THIS FUNCTION AND ONLY RETURN THE QSTRING(FILESYSTEMNAME,FILESYSTEMTYPE) TO BE USED BY THE PARTITION
     if(winsig == 0xaa55) // FAT OR NTFS
     {
@@ -5870,7 +5871,13 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
         partitionname += " [REFS]";
     }
-    // need to implement iso-14, udf-15, hfs-16, zfs-17, refs-18
+    else if(f2fsig == 0xe0f5e1e2) // EROFS
+    {
+        out << "File System Type Int|19|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|EROFS|File System Type String." << Qt::endl;
+        partitionname += " [EROFS]";
+    }
+    // need to implement iso-14, udf-15, hfs-16, zfs-17, refs-18, erofs-19
     out.flush();
     propfile.close();
 
