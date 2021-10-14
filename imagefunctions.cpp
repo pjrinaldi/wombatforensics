@@ -473,6 +473,46 @@ std::string Verify(QString outstr)
     // NEED TO SWITCH THIS TO QCRYPTOGRAPHICHASH HASH(), ADDDATA(), RESULT()
     if(hashtype == 0)
     {
+	QCryptographicHash tmphash(QCryptographicHash::Md5);
+	quint64 curpos = 0;
+	// this method worked but failed, i need to actually call ReadContent() to read the content for the img type.
+	FILE* outfile = fopen(outstr.toStdString().c_str(), "rb");
+	int obytes = 0;
+	unsigned char odata[sectorsize];
+	while((obytes = fread(odata, 1, sectorsize, outfile)) != 0)
+	{
+	    curpos = curpos + sectorsize;
+	    tmphash.addData(reinterpret_cast<const char*>(odata), obytes);
+	    printf("Bytes Read: %lld/%lld\r", curpos, totalbytes);
+	    fflush(stdout);
+	}
+	fclose(outfile);
+	QString hashstr = QString(tmphash.result().toHex()).toUpper();
+	qDebug() << "MD5 hashstr:" << hashstr;
+	if(md5hash.compare(hashstr.toStdString()) == 0)
+	{
+	    printf("Verification Successful\n");
+	    imgname += "Successful";
+	}
+	else if(md5hash.empty())
+	{
+	    printf("Manual MD5 Hash Verification Comparison Required\n");
+	    imgname += "Requires Manual Comparison";
+	}
+	else
+	{
+	    printf("Verification Failed\n");
+	    imgname += "Failed";
+	}
+	/* EXAMPLE CRYPTOGRAPHICHASH CODE
+		QByteArray filebytes;
+		filebytes.clear();
+		//filebytes = ReturnFileContent(objectid);
+		QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum); ::MD5
+
+		//hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
+		filebytes.clear();
+	 */ 
         /*
         unsigned char o[MD5_DIGEST_LENGTH];
         int i;

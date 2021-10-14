@@ -497,25 +497,8 @@ void GenerateHash(QString objectid)
 		QByteArray filebytes;
 		filebytes.clear();
 		//filebytes = ReturnFileContent(objectid);
-                if(hashsum == 11)
-                {
-                    blake3_hasher filehash;
-                    blake3_hasher_init(&filehash);
-                    blake3_hasher_update(&filehash, filebytes.data(), filebytes.count());
-                    uint8_t blake3hash[BLAKE3_OUT_LEN];
-                    blake3_hasher_finalize(&filehash, blake3hash, BLAKE3_OUT_LEN);
-                    std::stringstream b3str;
-                    for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
-                        b3str << std::hex << (int)blake3hash[i];
-                    std::string b3hash = "";
-                    hashstr = QString::fromStdString(b3str.str());
-                    qDebug() << "blake3 hash:" << hashstr;
-                }
-                else
-                {
-		    QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
-		    hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
-                }
+		QCryptographicHash tmphash((QCryptographicHash::Algorithm)hashsum);
+		hashstr = QString(tmphash.hash(filebytes, (QCryptographicHash::Algorithm)hashsum).toHex()).toUpper();
 		filebytes.clear();
 	    }
 	    else

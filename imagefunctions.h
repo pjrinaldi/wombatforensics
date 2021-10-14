@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QDataStream>
 #include <QtEndian>
+#include <QCryptographicHash>
 
 #include <blake3.h>
 #include <lz4.h>
