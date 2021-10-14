@@ -822,7 +822,8 @@ QString HashFiles(QString itemid)
 		if(curlogsize <= logicalsize)
 		    tmparray.append(curimg->ReadContent(curoffset, cursize));
 		else
-		    tmparray.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
+		    tmparray.append(curimg->ReadContent(curoffset, (cursize - (curlogsize - logicalsize))));
+		    //tmparray.append(curimg->ReadContent(curoffset, (logicalsize - ((j-1) * cursize))));
 		blake3_hasher_update(&hasher, tmparray.data(), tmparray.count());
 	    }
 	    uint8_t output[BLAKE3_OUT_LEN];

@@ -3471,7 +3471,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
     */
-    qDebug() << "digoptions:" << digoptions;
+    //qDebug() << "digoptions:" << digoptions;
     for(int i = 0; i < digoptions.count(); i++)
     {
         if(digoptions.at(i) == 0)
@@ -3487,7 +3487,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         else if(digoptions.at(i) == 4)
             hasarchive = true;
     }
-    qDebug() << "hasvid:" << hasvid;
+    //qDebug() << "hasvid:" << hasvid;
     //genthmbpath = wombatvariable.tmpmntpath;
 
     digtotalcountstring = "Dug: 0 of " + digtotalcount;
