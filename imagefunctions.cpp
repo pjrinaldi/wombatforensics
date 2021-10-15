@@ -476,6 +476,16 @@ std::string Verify(QString outstr)
 	QCryptographicHash tmphash(QCryptographicHash::Md5);
 	quint64 curpos = 0;
 	// this method worked but failed, i need to actually call ReadContent() to read the content for the img type.
+	ForImg* curimg = new ForImg(outstr);
+	qDebug() << "curimg size:" << curimg->Size();
+	while(curpos <= curimg->Size())
+	{
+	    tmphash.addData(curimg->ReadContent(curpos, sectorsize));
+	    curpos = curpos + sectorsize;
+	    printf("Bytes Read: %lld/%lld\r", curpos, curimg->Size());
+	    fflush(stdout);
+	}
+	/*
 	FILE* outfile = fopen(outstr.toStdString().c_str(), "rb");
 	int obytes = 0;
 	unsigned char odata[sectorsize];
@@ -487,6 +497,7 @@ std::string Verify(QString outstr)
 	    fflush(stdout);
 	}
 	fclose(outfile);
+	*/
 	QString hashstr = QString(tmphash.result().toHex()).toUpper();
 	qDebug() << "MD5 hashstr:" << hashstr;
 	if(md5hash.compare(hashstr.toStdString()) == 0)
