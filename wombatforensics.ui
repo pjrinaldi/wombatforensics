@@ -60,16 +60,16 @@
        <property name="whatsThis">
         <string>QHexEdit widget allow to edit the data in hex view.</string>
        </property>
-       <property name="bytesPerLine">
+       <property name="bytesPerLine" stdset="0">
         <number>49</number>
        </property>
-       <property name="hexCaps">
+       <property name="hexCaps" stdset="0">
         <bool>true</bool>
        </property>
-       <property name="dynamicBytesPerLine">
+       <property name="dynamicBytesPerLine" stdset="0">
         <bool>true</bool>
        </property>
-       <property name="readOnly">
+       <property name="readOnly" stdset="0">
         <bool>true</bool>
        </property>
       </widget>
@@ -83,7 +83,7 @@
      <x>0</x>
      <y>0</y>
      <width>1641</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="acceptDrops">
@@ -602,6 +602,12 @@
    </property>
   </action>
   <action name="actionVerifyForensicImage">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="wombatforensics.qrc">
      <normaloff>:/bar/reverify</normaloff>:/bar/reverify</iconset>
