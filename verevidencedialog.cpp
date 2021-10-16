@@ -6,6 +6,7 @@
 VerEvidenceDialog::VerEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new Ui::VerEvidenceDialog)
 {
     ui->setupUi(this);
+    ui->progressBar->setVisible(false);
     connect(ui->verifybutton, SIGNAL(clicked()), this, SLOT(VerifyEvidence()));
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(Cancel()));
 
@@ -29,9 +30,16 @@ void VerEvidenceDialog::VerifyEvidence()
     tmplist.clear();
     for(int i=0; i < ui->evidencelist->selectedItems().count(); i++)
     {
+        /**/
         // ADD PROGRESS BARS HERE
+        QProgressBar* tmpbar = new QProgressBar(this);
+        qDebug() << "progressbar objectname:" << ui->evidencelist->selectedItems().at(i)->text().split("/").last();
+        tmpbar->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last());
+        ui->progressgroupbox->layout()->addWidget(tmpbar);
+        //tmpbar->
         // will have to be like the tmp menu's, which i can access by some value maybe
         //ui->progressgroupbox
+        /**/
         tmplist.append(ui->evidencelist->selectedItems().at(i)->text());
     }
     emit VerEvid(tmplist);

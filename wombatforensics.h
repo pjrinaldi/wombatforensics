@@ -316,6 +316,7 @@ private slots:
     void FinishWombatCaseFile(void);
     void FinishVerify(void);
     void ShowHideColumn(void);
+    void VerifyUpdate(qint64 size);
 
     void SetRootIndex(void);
 
