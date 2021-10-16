@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>750</width>
-    <height>400</height>
+    <height>410</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -23,7 +23,7 @@
    <bool>true</bool>
   </property>
   <property name="modal">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -91,15 +91,24 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Verification in Progress</string>
+    <widget class="QGroupBox" name="progressgroupbox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="title">
+      <string>Verification(s) in Progress</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <widget class="QProgressBar" name="progressBar">
         <property name="value">
-         <number>24</number>
+         <number>0</number>
+        </property>
+        <property name="format">
+         <string>Image Name Verification Progress %p%</string>
         </property>
        </widget>
       </item>

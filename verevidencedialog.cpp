@@ -28,12 +28,28 @@ void VerEvidenceDialog::VerifyEvidence()
     QStringList tmplist;
     tmplist.clear();
     for(int i=0; i < ui->evidencelist->selectedItems().count(); i++)
+    {
+        // ADD PROGRESS BARS HERE
+        // will have to be like the tmp menu's, which i can access by some value maybe
+        //ui->progressgroupbox
         tmplist.append(ui->evidencelist->selectedItems().at(i)->text());
+    }
     emit VerEvid(tmplist);
-    this->close();
+    //this->hide();
+    //emit HideVerifyWindow(false);
 }
 
 void VerEvidenceDialog::Cancel()
 {
-    this->close();
+    this->hide();
+    emit HideVerifyWindow(false);
+    //this->close();
+}
+
+void VerEvidenceDialog::Show()
+{
+    ui->evidencelist->clear();
+    for(int i=0; i < existingforimglist.count(); i++)
+	ui->evidencelist->addItem(existingforimglist.at(i)->ImgPath());
+    this->show();
 }

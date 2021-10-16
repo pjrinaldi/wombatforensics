@@ -22,11 +22,13 @@ class VerEvidenceDialog : public QDialog
 public:
     VerEvidenceDialog(QWidget* parent = 0);
     ~VerEvidenceDialog();
+    void Show();
 private slots:
     void VerifyEvidence();
     void Cancel();
 signals:
     void VerEvid(QStringList verevidlist);
+    void HideVerifyWindow(bool checkstate);
 private:
     Ui::VerEvidenceDialog* ui;
 protected:

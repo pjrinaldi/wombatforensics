@@ -75,6 +75,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     previewreport = new HtmlViewer(this);
     aboutbox = new AboutBox(this);
     searchdialog = new SearchDialog(ui->hexview, this);
+    verevidencedialog = new VerEvidenceDialog(this);
     imagewindow->setWindowIcon(QIcon(":/thumb"));
     msgviewer->setWindowIcon(QIcon(":/bar/logview"));
     byteviewer->setWindowIcon(QIcon(":/bar/byteconverter"));
@@ -96,6 +97,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
+    connect(verevidencedialog, SIGNAL(VerEvid(QStringList)), this, SLOT(VerifyEvidence(QStringList)));
+    connect(verevidencedialog, SIGNAL(HideVerifyWindow(bool)), this, SLOT(HideVerifyWindow(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(ExportUpdate(void)), this, SLOT(UpdateExport()), Qt::QueuedConnection);
@@ -139,7 +142,8 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(ui->actionchomp, SIGNAL(triggered()), this, SLOT(LaunchChomp()), Qt::DirectConnection);
     connect(ui->actionCreateForensicImage, SIGNAL(triggered()), this, SLOT(ShowForImgDialog()), Qt::DirectConnection);
     connect(ui->actionExportForensicImage, SIGNAL(triggered()), this, SLOT(ExportForensicImage()), Qt::DirectConnection);
-    connect(ui->actionVerifyForensicImage, SIGNAL(triggered()), this, SLOT(VerEvidence()), Qt::DirectConnection);
+    connect(ui->actionVerifyForensicImage, SIGNAL(triggered(bool)), this, SLOT(VerEvidence(bool)), Qt::DirectConnection);
+    //connect(ui->actionVerifyForensicImage, SIGNAL(triggered()), this, SLOT(VerEvidence()), Qt::DirectConnection);
 
     selectionmenu = new QMenu();
     selectionmenu->addAction(ui->actionSection);
@@ -690,11 +694,17 @@ void WombatForensics::ExportForensicImage()
     qDebug() << "popup export dialog here...";
 }
 
-void WombatForensics::VerEvidence()
+//void WombatForensics::VerEvidence()
+void WombatForensics::VerEvidence(bool checked)
 {
-    verevidencedialog = new VerEvidenceDialog(this);
-    connect(verevidencedialog, SIGNAL(VerEvid(QStringList)), this, SLOT(VerifyEvidence(QStringList)));
-    verevidencedialog->exec();
+    if(!checked) // hide viewer
+        verevidencedialog->hide();
+    else
+        verevidencedialog->Show();
+        //verevidencedialog->show();
+    //verevidencedialog = new VerEvidenceDialog(this);
+    //connect(verevidencedialog, SIGNAL(VerEvid(QStringList)), this, SLOT(VerifyEvidence(QStringList)));
+    //verevidencedialog->exec();
 }
 
 void WombatForensics::ShowExternalViewer()
@@ -946,6 +956,11 @@ void WombatForensics::ReadSettings()
 void WombatForensics::HideMessageViewer(bool checkstate)
 {
     ui->actionViewMessageLog->setChecked(checkstate);
+}
+
+void WombatForensics::HideVerifyWindow(bool checkstate)
+{
+    ui->actionVerifyForensicImage->setChecked(checkstate);
 }
 
 void WombatForensics::HideByteViewer(bool checkstate)
@@ -3594,6 +3609,7 @@ WombatForensics::~WombatForensics()
     delete hashcheckedmenu;
     delete selectionmenu;
     delete msgviewer;
+    delete verevidencedialog;
     delete idfilterview;
     delete jumpfilterview;
     delete namefilterview;
@@ -3675,6 +3691,7 @@ void WombatForensics::closeEvent(QCloseEvent* event)
     event->accept();
     //msglog->clear();
     msgviewer->close();
+    verevidencedialog->close();
     //delete ui;
     //delete ui->mainStatusBar;
 }

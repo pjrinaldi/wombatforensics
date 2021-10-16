@@ -75,7 +75,7 @@ public:
         if (ForImgDialog->objectName().isEmpty())
             ForImgDialog->setObjectName(QString::fromUtf8("ForImgDialog"));
         ForImgDialog->setWindowModality(Qt::ApplicationModal);
-        ForImgDialog->resize(587, 426);
+        ForImgDialog->resize(622, 426);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/bar/newforimg"), QSize(), QIcon::Normal, QIcon::Off);
         ForImgDialog->setWindowIcon(icon);
@@ -86,6 +86,7 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         label = new QLabel(ForImgDialog);
         label->setObjectName(QString::fromUtf8("label"));
+        label->setMinimumSize(QSize(150, 0));
 
         horizontalLayout->addWidget(label);
 
@@ -105,6 +106,7 @@ public:
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         label_2 = new QLabel(ForImgDialog);
         label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setMinimumSize(QSize(150, 0));
 
         horizontalLayout_2->addWidget(label_2);
 
@@ -144,6 +146,7 @@ public:
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         label_3 = new QLabel(ForImgDialog);
         label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setMinimumSize(QSize(150, 0));
 
         horizontalLayout_3->addWidget(label_3);
 
@@ -163,6 +166,7 @@ public:
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         label_4 = new QLabel(ForImgDialog);
         label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setMinimumSize(QSize(150, 0));
 
         horizontalLayout_4->addWidget(label_4);
 
@@ -185,6 +189,7 @@ public:
         horizontalLayout_6->setContentsMargins(-1, 0, -1, 0);
         label_5 = new QLabel(ForImgDialog);
         label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setMinimumSize(QSize(150, 0));
 
         horizontalLayout_6->addWidget(label_5);
 
@@ -205,6 +210,7 @@ public:
         horizontalLayout_7->setContentsMargins(-1, 0, -1, 0);
         label_6 = new QLabel(ForImgDialog);
         label_6->setObjectName(QString::fromUtf8("label_6"));
+        label_6->setMinimumSize(QSize(150, 0));
 
         horizontalLayout_7->addWidget(label_6);
 
@@ -225,6 +231,7 @@ public:
         horizontalLayout_8->setContentsMargins(-1, 0, -1, 0);
         label_7 = new QLabel(ForImgDialog);
         label_7->setObjectName(QString::fromUtf8("label_7"));
+        label_7->setMinimumSize(QSize(150, 0));
 
         horizontalLayout_8->addWidget(label_7);
 
@@ -245,6 +252,7 @@ public:
         horizontalLayout_9->setContentsMargins(-1, 0, -1, 0);
         label_8 = new QLabel(ForImgDialog);
         label_8->setObjectName(QString::fromUtf8("label_8"));
+        label_8->setMinimumSize(QSize(150, 0));
         label_8->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
 
         horizontalLayout_9->addWidget(label_8);

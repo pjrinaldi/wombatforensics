@@ -15,6 +15,7 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QListWidget>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
@@ -28,6 +29,9 @@ public:
     QGroupBox *groupbox;
     QVBoxLayout *verticalLayout_2;
     QListWidget *evidencelist;
+    QGroupBox *progressgroupbox;
+    QVBoxLayout *verticalLayout_3;
+    QProgressBar *progressBar;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_2;
     QPushButton *cancelbutton;
@@ -37,11 +41,11 @@ public:
     {
         if (VerEvidenceDialog->objectName().isEmpty())
             VerEvidenceDialog->setObjectName(QString::fromUtf8("VerEvidenceDialog"));
-        VerEvidenceDialog->setWindowModality(Qt::ApplicationModal);
-        VerEvidenceDialog->resize(750, 400);
+        VerEvidenceDialog->setWindowModality(Qt::NonModal);
+        VerEvidenceDialog->resize(750, 410);
         VerEvidenceDialog->setAcceptDrops(true);
         VerEvidenceDialog->setSizeGripEnabled(true);
-        VerEvidenceDialog->setModal(true);
+        VerEvidenceDialog->setModal(false);
         verticalLayout = new QVBoxLayout(VerEvidenceDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         groupbox = new QGroupBox(VerEvidenceDialog);
@@ -69,6 +73,20 @@ public:
 
 
         verticalLayout->addWidget(groupbox);
+
+        progressgroupbox = new QGroupBox(VerEvidenceDialog);
+        progressgroupbox->setObjectName(QString::fromUtf8("progressgroupbox"));
+        progressgroupbox->setMinimumSize(QSize(0, 0));
+        verticalLayout_3 = new QVBoxLayout(progressgroupbox);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        progressBar = new QProgressBar(progressgroupbox);
+        progressBar->setObjectName(QString::fromUtf8("progressBar"));
+        progressBar->setValue(0);
+
+        verticalLayout_3->addWidget(progressBar);
+
+
+        verticalLayout->addWidget(progressgroupbox);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
@@ -99,6 +117,8 @@ public:
     {
         VerEvidenceDialog->setWindowTitle(QCoreApplication::translate("VerEvidenceDialog", "Verify Evidence", nullptr));
         groupbox->setTitle(QCoreApplication::translate("VerEvidenceDialog", "Evidence", nullptr));
+        progressgroupbox->setTitle(QCoreApplication::translate("VerEvidenceDialog", "Verification(s) in Progress", nullptr));
+        progressBar->setFormat(QCoreApplication::translate("VerEvidenceDialog", "Image Name Verification Progress %p%", nullptr));
         cancelbutton->setText(QCoreApplication::translate("VerEvidenceDialog", "Cancel", nullptr));
         verifybutton->setText(QCoreApplication::translate("VerEvidenceDialog", "Verify", nullptr));
     } // retranslateUi

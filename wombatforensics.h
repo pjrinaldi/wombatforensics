@@ -197,7 +197,8 @@ signals:
 private slots:
     void AddEvidence();
     void RemEvidence();
-    void VerEvidence();
+    void VerEvidence(bool checked);
+    //void VerEvidence();
     void RemoveEvidence(QStringList remlist);
     void VerifyEvidence(QStringList verlist);
     void ExportEvidence();
@@ -241,6 +242,7 @@ private slots:
     void HidePreviewReport(bool checkstate);
     void ShowExternalViewer();
     void ShowForImgDialog();
+    void HideVerifyWindow(bool checkstate);
     void DisplayError(QString errorNumber, QString errorType, QString errorValue);
     void ResizeColumns(void);
     void ResizeViewColumns(const QModelIndex &index)
