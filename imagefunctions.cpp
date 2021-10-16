@@ -1,4 +1,5 @@
 #include "imagefunctions.h"
+#include "globals.h"
 //#include "makezmg.h"
 
 void FindNextFrame(qint64 initialindex, QList<qint64>* framelist, QFile* wfi)
@@ -482,6 +483,7 @@ std::string Verify(QString outstr)
 	{
 	    tmphash.addData(curimg->ReadContent(curpos, sectorsize));
 	    curpos = curpos + sectorsize;
+            isignals->VerUp(curpos);
 	    printf("Bytes Read: %lld/%lld\r", curpos, curimg->Size());
 	    fflush(stdout);
 	}

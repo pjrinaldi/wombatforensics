@@ -3070,6 +3070,7 @@ void WombatForensics::VerifyUpdate(qint64 cursize)
 {
     QProgressBar* curbar = verevidencedialog->findChild<QProgressBar*>();
     qDebug() << "curbar objectname:" << curbar->objectName();
+    qDebug() << "cursize:" << cursize;
     //QPushButton *button = parentWidget->findChild<QPushButton *>("button1");
 }
 
