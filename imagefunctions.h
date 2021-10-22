@@ -32,6 +32,20 @@
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
 
+class ImageSignals : public QObject
+{
+    Q_OBJECT
+public:
+    ImageSignals() { };
+    ~ImageSignals() { };
+
+    //void ProgUpd(void) { emit(ProgressUpdate(filesfound)); }
+signals:
+    //void ProgressUpdate(qint64 filecount);
+};
+
+//ImageSignals* imgsignals = new ImageSignals();
+
 static char* GetDateTime(char *buff)
 {
     time_t t = time(0);
