@@ -33,6 +33,7 @@ void VerEvidenceDialog::VerifyEvidence()
         /**/
         // ADD PROGRESS BARS HERE
         QProgressBar* tmpbar = new QProgressBar(this);
+	//tmpbar->
         qDebug() << "progressbar objectname:" << ui->evidencelist->selectedItems().at(i)->text().split("/").last();
         tmpbar->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last());
         ui->progressgroupbox->layout()->addWidget(tmpbar);

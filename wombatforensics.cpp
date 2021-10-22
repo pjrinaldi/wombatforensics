@@ -3086,15 +3086,20 @@ void WombatForensics::FinishVerify()
 
 void WombatForensics::VerProgChange(int progval)
 {
+    qDebug() << "prog val:" << progval;
+    /*
     qDebug() << "prog value:" << progval;
     QProgressBar* curbar = verevidencedialog->findChild<QProgressBar*>();
     qDebug() << "curbar objectname:" << curbar->objectName();
+    */
 }
 
 void WombatForensics::VerifyEvidence(QStringList verevidlist)
 {
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
-    connect(&verifywatcher, SIGNAL(progressValueChanged(int)), this, SLOT(VerProgChange(int)));
+    // the below progressValueChanged is from 0 to 1, i.e. the number of items sent to the mapped command.
+    // so this is worthless, I need to get the verify information... which means i need an isignal...
+    //connect(&verifywatcher, SIGNAL(progressValueChanged(int)), this, SLOT(VerProgChange(int)));
     verfuture = QtConcurrent::mapped(verevidlist, Verify);
     verifywatcher.setFuture(verfuture);
 }
