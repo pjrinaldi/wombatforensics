@@ -3084,9 +3084,17 @@ void WombatForensics::FinishVerify()
     QMessageBox::information(this, "Finished", " " + resultstring, QMessageBox::Ok);
 }
 
+void WombatForensics::VerProgChange(int progval)
+{
+    qDebug() << "prog value:" << progval;
+    QProgressBar* curbar = verevidencedialog->findChild<QProgressBar*>();
+    qDebug() << "curbar objectname:" << curbar->objectName();
+}
+
 void WombatForensics::VerifyEvidence(QStringList verevidlist)
 {
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
+    connect(&verifywatcher, SIGNAL(progressValueChanged(int)), this, SLOT(VerProgChange(int)));
     verfuture = QtConcurrent::mapped(verevidlist, Verify);
     verifywatcher.setFuture(verfuture);
 }

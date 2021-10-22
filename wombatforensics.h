@@ -201,6 +201,7 @@ private slots:
     //void VerEvidence();
     void RemoveEvidence(QStringList remlist);
     void VerifyEvidence(QStringList verlist);
+    void VerProgChange(int progval);
     void ExportEvidence();
     void on_actionNew_Case_triggered();
     void on_actionOpen_Case_triggered();
