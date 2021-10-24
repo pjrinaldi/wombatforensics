@@ -39,8 +39,10 @@ public:
     ImageSignals() { };
     ~ImageSignals() { };
 
+    void VerUpd(QString imgname, qint64 bytesread) { emit(VerUpdate(imgname, bytesread)); }
     //void ProgUpd(void) { emit(ProgressUpdate(filesfound)); }
 signals:
+    void VerUpdate(QString imgname, qint64 bytesread);
     //void ProgressUpdate(qint64 filecount);
 };
 

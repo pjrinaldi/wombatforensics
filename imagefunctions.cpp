@@ -483,6 +483,7 @@ std::string Verify(QString outstr)
 	{
 	    tmphash.addData(curimg->ReadContent(curpos, sectorsize));
 	    curpos = curpos + sectorsize;
+            //imgsignals->VerUp(curimg->ImgPath().split("/").last(), curpos);
             //isignals->VerUp(curpos);
 	    printf("Bytes Read: %lld/%lld\r", curpos, curimg->Size());
 	    fflush(stdout);
