@@ -26,6 +26,7 @@ public:
 private slots:
     void VerifyEvidence();
     void Cancel();
+    void UpdateProgress(QString pname, qint64 bytesread);
 signals:
     void VerEvid(QStringList verevidlist);
     void HideVerifyWindow(bool checkstate);

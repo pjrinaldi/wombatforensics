@@ -46,7 +46,7 @@ signals:
     //void ProgressUpdate(qint64 filecount);
 };
 
-//ImageSignals* imgsignals = new ImageSignals();
+extern ImageSignals* imgsignals;
 
 static char* GetDateTime(char *buff)
 {

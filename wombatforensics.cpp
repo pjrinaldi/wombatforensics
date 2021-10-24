@@ -105,7 +105,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(isignals, SIGNAL(ReloadPreview()), previewreport, SLOT(Reload()), Qt::QueuedConnection);
     //connect(isignals, SIGNAL(CarveUpdate(QString, int)), this, SLOT(UpdateCarve(QString, int)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(StatUpdate(QString)), this, SLOT(StatusUpdate(QString)), Qt::QueuedConnection);
-    connect(isignals, SIGNAL(VerifyUpdate(qint64)), this, SLOT(VerifyUpdate(qint64)), Qt::QueuedConnection);
+    //connect(isignals, SIGNAL(VerifyUpdate(qint64)), this, SLOT(VerifyUpdate(qint64)), Qt::QueuedConnection);
     InitializeAppStructure();
     bookmarkmenu = new QMenu();
     bookmarkmenu->setTitle("Tag Selected As");
@@ -3068,10 +3068,12 @@ void WombatForensics::RemEvidence()
 
 void WombatForensics::VerifyUpdate(qint64 cursize)
 {
+    /*
     QProgressBar* curbar = verevidencedialog->findChild<QProgressBar*>();
     qDebug() << "curbar objectname:" << curbar->objectName();
     qDebug() << "cursize:" << cursize;
     //QPushButton *button = parentWidget->findChild<QPushButton *>("button1");
+    */
 }
 
 void WombatForensics::FinishVerify()

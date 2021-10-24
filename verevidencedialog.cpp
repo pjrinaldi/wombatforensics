@@ -5,10 +5,12 @@
 
 VerEvidenceDialog::VerEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new Ui::VerEvidenceDialog)
 {
+    ImageSignals* imgsignals = new ImageSignals();
     ui->setupUi(this);
     ui->progressBar->setVisible(false);
     connect(ui->verifybutton, SIGNAL(clicked()), this, SLOT(VerifyEvidence()));
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(Cancel()));
+    connect(imgsignals, SIGNAL(VerUpdate(QString, qint64)), this, SLOT(UpdateProgress(QString, qint64)), Qt::QueuedConnection);
 
     // POPULATE EVIDENCE LIST
     //qDebug() << "existing evidence:" << existingevidence;
@@ -22,6 +24,13 @@ VerEvidenceDialog::VerEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
 
 VerEvidenceDialog::~VerEvidenceDialog()
 {
+}
+
+void VerEvidenceDialog::UpdateProgress(QString pname, qint64 bytesread)
+{
+    QProgressBar* curbar = verevidencedialog->findChild<QProgressBar*>(pname);
+    qDebug() << "curbar objectname:" << curbar->objectName();
+    qDebug() << "bytes read:" << bytesread;
 }
 
 void VerEvidenceDialog::VerifyEvidence()
