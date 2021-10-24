@@ -2,6 +2,7 @@
 //#include "globals.h"
 //#include "makezmg.h"
 
+ImageSignals* imgsignals = new ImageSignals();
 void FindNextFrame(qint64 initialindex, QList<qint64>* framelist, QFile* wfi)
 {
     //qDebug() << "initial index:" << initialindex;
@@ -471,7 +472,6 @@ std::string Verify(QString outstr)
     //logfile.open(outstr + ".log", std::ofstream::out | std::ofstream::app);
     //logfile << "\nStarting Image Verification at " << GetDateTime(buff) << "\n";
     
-    //ImageSignals* imgsignals = new ImageSignals();
 
     // NEED TO SWITCH THIS TO QCRYPTOGRAPHICHASH HASH(), ADDDATA(), RESULT()
     if(hashtype == 0)
@@ -485,7 +485,7 @@ std::string Verify(QString outstr)
 	{
 	    tmphash.addData(curimg->ReadContent(curpos, sectorsize));
 	    curpos = curpos + sectorsize;
-            imgsignals->VerUp(curimg->ImgPath().split("/").last(), curpos);
+            imgsignals->VerUpd(curimg->ImgPath().split("/").last(), curpos);
 	    printf("Bytes Read: %lld/%lld\r", curpos, curimg->Size());
 	    fflush(stdout);
 	}

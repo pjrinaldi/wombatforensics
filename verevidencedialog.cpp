@@ -5,7 +5,7 @@
 
 VerEvidenceDialog::VerEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new Ui::VerEvidenceDialog)
 {
-    ImageSignals* imgsignals = new ImageSignals();
+    //ImageSignals* imgsignals = new ImageSignals();
     ui->setupUi(this);
     ui->progressBar->setVisible(false);
     connect(ui->verifybutton, SIGNAL(clicked()), this, SLOT(VerifyEvidence()));
@@ -14,8 +14,11 @@ VerEvidenceDialog::VerEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
 
     // POPULATE EVIDENCE LIST
     //qDebug() << "existing evidence:" << existingevidence;
+    
+    /*
     for(int i=0; i < existingforimglist.count(); i++)
 	ui->evidencelist->addItem(existingforimglist.at(i)->ImgPath());
+    */
     /*
     for(int i=0; i < existingevidence.count(); i++)
         ui->evidencelist->addItem(existingevidence.at(i));
@@ -28,9 +31,23 @@ VerEvidenceDialog::~VerEvidenceDialog()
 
 void VerEvidenceDialog::UpdateProgress(QString pname, qint64 bytesread)
 {
-    QProgressBar* curbar = verevidencedialog->findChild<QProgressBar*>(pname);
-    qDebug() << "curbar objectname:" << curbar->objectName();
-    qDebug() << "bytes read:" << bytesread;
+    QProgressBar* curbar = this->findChild<QProgressBar*>(pname);
+    //qDebug() << "curbar objectname:" << curbar->objectName();
+    //qDebug() << "bytes read:" << bytesread;
+    qint64 imgsize = 0;
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+        if(existingforimglist.at(i)->ImgPath().contains(pname))
+        {
+            imgsize = existingforimg.at(i)->Size();
+            //qDebug() << "img size:" << existingforimglist.at(i)->Size();
+            break;
+        }
+        //else
+        //    qDebug() << "error in my logic to get forimg size.";
+    }
+    int curpercent = ((float)bytesread / (float)imgsize) * 100.0;
+    curbar->setValue(curpercent);
 }
 
 void VerEvidenceDialog::VerifyEvidence()
