@@ -39,7 +39,7 @@ void VerEvidenceDialog::UpdateProgress(QString pname, qint64 bytesread)
     {
         if(existingforimglist.at(i)->ImgPath().contains(pname))
         {
-            imgsize = existingforimg.at(i)->Size();
+            imgsize = existingforimglist.at(i)->Size();
             //qDebug() << "img size:" << existingforimglist.at(i)->Size();
             break;
         }
