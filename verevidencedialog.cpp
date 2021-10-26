@@ -28,7 +28,8 @@ VerEvidenceDialog::~VerEvidenceDialog()
 
 void VerEvidenceDialog::UpdateProgress(QString pname, qint64 bytesread)
 {
-    QProgressBar* curbar = this->findChild<QProgressBar*>(pname);
+    QLabel* curlabel = this->findChild<QLabel*>(pname);
+    //QProgressBar* curbar = this->findChild<QProgressBar*>(pname);
     //qDebug() << "curbar objectname:" << curbar->objectName();
     //qDebug() << "bytes read:" << bytesread;
     qint64 imgsize = 0;
@@ -44,7 +45,8 @@ void VerEvidenceDialog::UpdateProgress(QString pname, qint64 bytesread)
         //    qDebug() << "error in my logic to get forimg size.";
     }
     int curpercent = ((float)bytesread / (float)imgsize) * 100.0;
-    curbar->setValue(curpercent);
+    curlabel->setText(pname + ": " + QString::number(bytesread) + " of " + QString::number(imgsize) + " " + QString::number(curpercent) + "%");
+    //curbar->setValue(curpercent);
 }
 
 void VerEvidenceDialog::VerifyEvidence()
@@ -55,11 +57,16 @@ void VerEvidenceDialog::VerifyEvidence()
     {
         /**/
         // ADD PROGRESS BARS HERE
-        QProgressBar* tmpbar = new QProgressBar(this);
+        QLabel* tmplabel = new QLabel(this);
+        tmplabel->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last());
+        QString labeltext = "Start Verification for " + ui->evidencelist->selectedItems().at(i)->text().split("/").last();
+        tmplabel->setText(labeltext);
+        ui->progressgroupbox->layout()->addWidget(tmplabel);
+        //QProgressBar* tmpbar = new QProgressBar(this);
 	//tmpbar->
         //qDebug() << "progressbar objectname:" << ui->evidencelist->selectedItems().at(i)->text().split("/").last();
-        tmpbar->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last());
-        ui->progressgroupbox->layout()->addWidget(tmpbar);
+        //tmpbar->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last());
+        //ui->progressgroupbox->layout()->addWidget(tmpbar);
         //tmpbar->
         // will have to be like the tmp menu's, which i can access by some value maybe
         //ui->progressgroupbox
