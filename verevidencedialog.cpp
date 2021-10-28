@@ -110,8 +110,7 @@ void VerEvidenceDialog::Show()
 	ui->evidencelist->addItem(existingforimglist.at(i)->ImgPath());
     this->show();
 }
-/*
-void WombatForensics::FinishVerify()
+void VerEvidenceDialog::FinishVerify()
 {
     QString resultstring = "";
     for(int i=0; i < verfuture.resultCount(); i++)
@@ -120,4 +119,3 @@ void WombatForensics::FinishVerify()
     }
     QMessageBox::information(this, "Finished", " " + resultstring, QMessageBox::Ok);
 }
-*/

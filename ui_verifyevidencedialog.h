@@ -119,7 +119,7 @@ public:
         groupbox->setTitle(QCoreApplication::translate("VerEvidenceDialog", "Evidence", nullptr));
         progressgroupbox->setTitle(QCoreApplication::translate("VerEvidenceDialog", "Verification(s) in Progress", nullptr));
         progressBar->setFormat(QCoreApplication::translate("VerEvidenceDialog", "Image Name Verification Progress %p%", nullptr));
-        cancelbutton->setText(QCoreApplication::translate("VerEvidenceDialog", "Cancel", nullptr));
+        cancelbutton->setText(QCoreApplication::translate("VerEvidenceDialog", "Close", nullptr));
         verifybutton->setText(QCoreApplication::translate("VerEvidenceDialog", "Verify", nullptr));
     } // retranslateUi
 

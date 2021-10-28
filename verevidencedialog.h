@@ -28,6 +28,7 @@ private slots:
     void Cancel();
     void UpdateProgress(QString pname, qint64 bytesread);
     void CancelVer(void);
+    void FinishVerify(void);
 signals:
     void VerEvid(QStringList verevidlist);
     void HideVerifyWindow(bool checkstate);
