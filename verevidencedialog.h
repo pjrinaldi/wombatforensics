@@ -27,12 +27,15 @@ private slots:
     void VerifyEvidence();
     void Cancel();
     void UpdateProgress(QString pname, qint64 bytesread);
+    void CancelVer(void);
 signals:
     void VerEvid(QStringList verevidlist);
     void HideVerifyWindow(bool checkstate);
 private:
     Ui::VerEvidenceDialog* ui;
 protected:
+    QFuture<std::string> verfuture;
+    QFutureWatcher<std::string> verifywatcher;
 };
 
 Q_DECLARE_METATYPE(VerEvidenceDialog*)

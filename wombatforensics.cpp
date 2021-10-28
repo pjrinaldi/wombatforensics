@@ -97,7 +97,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(msgviewer, SIGNAL(HideMessageViewerWindow(bool)), this, SLOT(HideMessageViewer(bool)), Qt::DirectConnection);
     connect(byteviewer, SIGNAL(HideByteConverterWindow(bool)), this, SLOT(HideByteViewer(bool)), Qt::DirectConnection);
     connect(previewreport, SIGNAL(HideReportPreviewWindow(bool)), this, SLOT(HidePreviewReport(bool)), Qt::DirectConnection);
-    connect(verevidencedialog, SIGNAL(VerEvid(QStringList)), this, SLOT(VerifyEvidence(QStringList)));
+    //connect(verevidencedialog, SIGNAL(VerEvid(QStringList)), this, SLOT(VerifyEvidence(QStringList)));
     connect(verevidencedialog, SIGNAL(HideVerifyWindow(bool)), this, SLOT(HideVerifyWindow(bool)), Qt::DirectConnection);
     connect(isignals, SIGNAL(ProgressUpdate(qint64)), this, SLOT(UpdateProgress(qint64)), Qt::QueuedConnection);
     connect(isignals, SIGNAL(DigUpdate(int, int)), this, SLOT(UpdateDig(int, int)), Qt::QueuedConnection);
@@ -3078,12 +3078,14 @@ void WombatForensics::VerifyUpdate(qint64 cursize)
 
 void WombatForensics::FinishVerify()
 {
+    /*
     QString resultstring = "";
     for(int i=0; i < verfuture.resultCount(); i++)
     {
         resultstring += QString::fromStdString(verfuture.resultAt(i)) + "\n";
     }
     QMessageBox::information(this, "Finished", " " + resultstring, QMessageBox::Ok);
+    */
 }
 
 void WombatForensics::VerProgChange(int progval)
@@ -3098,12 +3100,15 @@ void WombatForensics::VerProgChange(int progval)
 
 void WombatForensics::VerifyEvidence(QStringList verevidlist)
 {
+    // I should move this code to the verevidencedialog and cut out going back to wombatforensics at all...
+    /*
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
     // the below progressValueChanged is from 0 to 1, i.e. the number of items sent to the mapped command.
     // so this is worthless, I need to get the verify information... which means i need an isignal...
     //connect(&verifywatcher, SIGNAL(progressValueChanged(int)), this, SLOT(VerProgChange(int)));
     verfuture = QtConcurrent::mapped(verevidlist, Verify);
     verifywatcher.setFuture(verfuture);
+    */
 }
 
 void WombatForensics::RemoveEvidence(QStringList remevidlist)

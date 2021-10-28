@@ -61,7 +61,15 @@ void VerEvidenceDialog::VerifyEvidence()
         tmplabel->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last());
         QString labeltext = "Start Verification for " + ui->evidencelist->selectedItems().at(i)->text().split("/").last();
         tmplabel->setText(labeltext);
-        ui->progressgroupbox->layout()->addWidget(tmplabel);
+        QPushButton* tmpbutton = new QPushButton("Cancel Verification", this);
+        tmpbutton->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last() + "but");
+        connect(tmpbutton, SIGNAL(clicked()), this, SLOT(CancelVer()));
+        QHBoxLayout* hlayout = new QHBoxLayout(this);
+        hlayout->addWidget(tmplabel);
+        hlayout->addStretch();
+        hlayout->addWidget(tmpbutton);
+        ((QVBoxLayout*)ui->progressgroupbox->layout())->addLayout(hlayout);
+        //ui->progressgroupbox->layout()->addWidget(tmplabel);
         //QProgressBar* tmpbar = new QProgressBar(this);
 	//tmpbar->
         //qDebug() << "progressbar objectname:" << ui->evidencelist->selectedItems().at(i)->text().split("/").last();
@@ -73,11 +81,21 @@ void VerEvidenceDialog::VerifyEvidence()
         /**/
         tmplist.append(ui->evidencelist->selectedItems().at(i)->text());
     }
-    emit VerEvid(tmplist);
+
+    connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
+    verfuture = QtConcurrent::mapped(tmplist, Verify);
+    verifywatcher.setFuture(verfuture);
+    //emit VerEvid(tmplist); // (Goes to WombatForensics)
     //this->hide();
     //emit HideVerifyWindow(false);
 }
 
+void VerEvidenceDialog::CancelVer()
+{
+    QPushButton* tagaction = qobject_cast<QPushButton*>(sender());
+    qDebug() << "Cancelled pressed:" << tagaction->objectName();
+    //emit CancelVerWatcher(tagaction->objectName);
+}
 void VerEvidenceDialog::Cancel()
 {
     this->hide();
@@ -92,3 +110,14 @@ void VerEvidenceDialog::Show()
 	ui->evidencelist->addItem(existingforimglist.at(i)->ImgPath());
     this->show();
 }
+/*
+void WombatForensics::FinishVerify()
+{
+    QString resultstring = "";
+    for(int i=0; i < verfuture.resultCount(); i++)
+    {
+        resultstring += QString::fromStdString(verfuture.resultAt(i)) + "\n";
+    }
+    QMessageBox::information(this, "Finished", " " + resultstring, QMessageBox::Ok);
+}
+*/

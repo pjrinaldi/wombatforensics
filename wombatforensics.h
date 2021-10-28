@@ -368,8 +368,8 @@ private:
     QFuture<void> openfuture;
     QFutureWatcher<void> openwatcher;
     QFutureWatcher<void> savewcfwatcher;
-    QFuture<std::string> verfuture;
-    QFutureWatcher<std::string> verifywatcher;
+    //QFuture<std::string> verfuture;
+    //QFutureWatcher<std::string> verifywatcher;
 
     QProcess* xmntprocess;
 
