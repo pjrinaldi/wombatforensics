@@ -32,6 +32,7 @@ private slots:
 signals:
     void VerEvid(QStringList verevidlist);
     void HideVerifyWindow(bool checkstate);
+    //void CancelVerWatcher(void);
 private:
     Ui::VerEvidenceDialog* ui;
 protected:

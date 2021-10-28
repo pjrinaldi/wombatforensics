@@ -83,6 +83,7 @@ void VerEvidenceDialog::VerifyEvidence()
     }
 
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
+    //connect(this, SIGNAL(CancelVerWatcher()), &verifywatcher, SLOT(cancel()));
     verfuture = QtConcurrent::mapped(tmplist, Verify);
     verifywatcher.setFuture(verfuture);
     //emit VerEvid(tmplist); // (Goes to WombatForensics)
@@ -94,7 +95,9 @@ void VerEvidenceDialog::CancelVer()
 {
     QPushButton* tagaction = qobject_cast<QPushButton*>(sender());
     qDebug() << "Cancelled pressed:" << tagaction->objectName();
+    verifywatcher.cancel();
     //emit CancelVerWatcher(tagaction->objectName);
+    //emit CancelVerWatcher();
 }
 void VerEvidenceDialog::Cancel()
 {
