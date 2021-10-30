@@ -11,6 +11,7 @@ VerEvidenceDialog::VerEvidenceDialog(QWidget* parent) : QDialog(parent), ui(new 
     connect(ui->verifybutton, SIGNAL(clicked()), this, SLOT(VerifyEvidence()));
     connect(ui->cancelbutton, SIGNAL(clicked()), this, SLOT(Cancel()));
     connect(imgsignals, SIGNAL(VerUpdate(QString, qint64)), this, SLOT(UpdateProgress(QString, qint64)), Qt::QueuedConnection);
+    connect(this, SIGNAL(StopVerify(quint8)), imgsignals, SLOT(StopVerify(quint8)), Qt::QueuedConnection);
 
     // POPULATE EVIDENCE LIST
     //qDebug() << "existing evidence:" << existingevidence;
@@ -96,6 +97,7 @@ void VerEvidenceDialog::CancelVer()
     QPushButton* tagaction = qobject_cast<QPushButton*>(sender());
     qDebug() << "Cancelled pressed:" << tagaction->objectName();
     verifywatcher.cancel();
+    emit StopVerify(1);
     //emit CancelVerWatcher(tagaction->objectName);
     //emit CancelVerWatcher();
 }

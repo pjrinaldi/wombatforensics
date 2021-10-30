@@ -481,7 +481,7 @@ std::string Verify(QString outstr)
 	// this method worked but failed, i need to actually call ReadContent() to read the content for the img type.
 	ForImg* curimg = new ForImg(outstr);
 	qDebug() << "curimg size:" << curimg->Size();
-	while(curpos <= curimg->Size())
+	while(curpos <= curimg->Size() && imgsignals->cancelverify == 0)
 	{
 	    tmphash.addData(curimg->ReadContent(curpos, sectorsize));
 	    curpos = curpos + sectorsize;
@@ -489,6 +489,10 @@ std::string Verify(QString outstr)
 	    printf("Bytes Read: %lld/%lld\r", curpos, curimg->Size());
 	    fflush(stdout);
 	}
+        if(imgsignals->cancelverify == 1)
+        {
+            qDebug() << " Verification Cancelled.";
+        }
 	/*
 	FILE* outfile = fopen(outstr.toStdString().c_str(), "rb");
 	int obytes = 0;

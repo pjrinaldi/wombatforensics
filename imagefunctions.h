@@ -39,11 +39,16 @@ public:
     ImageSignals() { };
     ~ImageSignals() { };
 
+    quint8 cancelverify = 0;
+
     void VerUpd(QString imgname, qint64 bytesread) { emit(VerUpdate(imgname, bytesread)); }
     //void ProgUpd(void) { emit(ProgressUpdate(filesfound)); }
 signals:
     void VerUpdate(QString imgname, qint64 bytesread);
+    //void CancelVerify(quint8 vercancel);
     //void ProgressUpdate(qint64 filecount);
+private slots:
+    void StopVerify(quint8 stopverify) { cancelverify = stopverify; };
 };
 
 extern ImageSignals* imgsignals;
