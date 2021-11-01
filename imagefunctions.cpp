@@ -434,7 +434,14 @@ std::string Verify(QString outstr)
             libewf_handle_open(ewfhandle, filenames, 1, LIBEWF_OPEN_READ, &ewferror);
             uint8_t md5_hash[32];
             libewf_handle_get_utf8_hash_value_md5(ewfhandle, md5_hash, 32, &ewferror);
-            md5hash = QString::fromUtf8(reinterpret_cast<char*>(md5_hash)).toStdString();
+	    //QByteArray md5ray;
+	    //md5ray.clear();
+	    //md5ray.append(reinterpret_cast<const char*>(md5_hash));
+	    //qDebug() << "md5ray hex:" << md5ray;
+	    //qDebug() << "md5ray str:" << QString::fromUtf8(md5ray).toUpper();
+	    //QString givenmd5 = QString::fromUtf8(reinterpret_cast<char*>(md5_hash)).toUpper();
+	    //qDebug() << "given md5:" << givenmd5;
+            md5hash = QString::fromUtf8(reinterpret_cast<const char*>(md5_hash)).toUpper().left(32).toStdString();
             libewf_handle_close(ewfhandle, &ewferror);
             libewf_handle_free(&ewfhandle, &ewferror);
             printf("MD5 hash from E01 file: %s\n", md5hash.c_str());
