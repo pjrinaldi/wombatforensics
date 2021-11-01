@@ -311,6 +311,10 @@ void ReadBytes(std::string instring, std::string outstr, std::string footstr)
 
 std::string Verify(QString outstr)
 {
+    // 1GiB = 1073741824
+    // 1MiB = 1048576
+    // 1KiB = 1024
+    // 1 sector = 512
     qint64 imagesize = 0;
     uint8_t hashtype = 0;
     unsigned long long totalbytes = 0;
@@ -433,7 +437,7 @@ std::string Verify(QString outstr)
             md5hash = QString::fromUtf8(reinterpret_cast<char*>(md5_hash)).toStdString();
             libewf_handle_close(ewfhandle, &ewferror);
             libewf_handle_free(&ewfhandle, &ewferror);
-            //printf("MD5 hash from E01 file: %s\n", md5hash.c_str());
+            printf("MD5 hash from E01 file: %s\n", md5hash.c_str());
         }
         else if(outstr.toLower().endsWith(".aff"))
         {
@@ -481,7 +485,15 @@ std::string Verify(QString outstr)
 	// this method worked but failed, i need to actually call ReadContent() to read the content for the img type.
 	ForImg* curimg = new ForImg(outstr);
 	qDebug() << "curimg size:" << curimg->Size();
-	while(curpos <= curimg->Size() && imgsignals->cancelverify == 0)
+	// GetVerificationStepSize()
+	// 256MiB = 268435456
+	if(curimg->Size() % 1073741824 == 0)
+	{
+	    qDebug() << "I can use 1GiB.";
+	    sectorsize = 1073741824;
+	}
+	//else if(curimg->Size() % 
+	while(curpos < curimg->Size() && imgsignals->cancelverify == 0)
 	{
 	    tmphash.addData(curimg->ReadContent(curpos, sectorsize));
 	    curpos = curpos + sectorsize;

@@ -62,14 +62,12 @@ void VerEvidenceDialog::VerifyEvidence()
         tmplabel->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last());
         QString labeltext = "Start Verification for " + ui->evidencelist->selectedItems().at(i)->text().split("/").last();
         tmplabel->setText(labeltext);
-        QPushButton* tmpbutton = new QPushButton("Cancel Verification", this);
-        tmpbutton->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last() + "but");
-        connect(tmpbutton, SIGNAL(clicked()), this, SLOT(CancelVer()));
-        QHBoxLayout* hlayout = new QHBoxLayout(this);
-        hlayout->addWidget(tmplabel);
-        hlayout->addStretch();
-        hlayout->addWidget(tmpbutton);
-        ((QVBoxLayout*)ui->progressgroupbox->layout())->addLayout(hlayout);
+	ui->progressgroupbox->layout()->addWidget(tmplabel);
+        //QHBoxLayout* hlayout = new QHBoxLayout(this);
+        //hlayout->addWidget(tmplabel);
+        //hlayout->addStretch();
+        //hlayout->addWidget(tmpbutton);
+        //((QVBoxLayout*)ui->progressgroupbox->layout())->addLayout(hlayout);
         //ui->progressgroupbox->layout()->addWidget(tmplabel);
         //QProgressBar* tmpbar = new QProgressBar(this);
 	//tmpbar->
@@ -82,6 +80,10 @@ void VerEvidenceDialog::VerifyEvidence()
         /**/
         tmplist.append(ui->evidencelist->selectedItems().at(i)->text());
     }
+    QPushButton* tmpbutton = new QPushButton("Cancel Verification(s)", this);
+    //tmpbutton->setObjectName(ui->evidencelist->selectedItems().at(i)->text().split("/").last() + "but");
+    connect(tmpbutton, SIGNAL(clicked()), this, SLOT(CancelVer()));
+    ui->progressgroupbox->layout()->addWidget(tmpbutton);
 
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
     //connect(this, SIGNAL(CancelVerWatcher()), &verifywatcher, SLOT(cancel()));
