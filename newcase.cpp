@@ -4623,6 +4623,14 @@ void ProcessForensicImage(ForImg* curimg)
     //nodedata.insert("tag", "0");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last()));
     //nodedata.insert("match", "0");
+
+    QString reportstring = "";
+    reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table width='98%'>";
+    reportstring += "<tr><th colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "):" + curimg->ImgPath() + "</th></tr>";
+    QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString("%L1").arg(curimg->Size()) + " bytes</td></tr>";
+    AddELinkItem(curimg->MountPath().split("/").last().split("-e").last().toInt(), curimg->ImgPath().split("/").last());
+    AddEvidItem(reportstring);
     /*
      * NEED TO WRITE THIS AS I GO.... AND CLEAR STRING AS I GO
      *
@@ -4632,6 +4640,8 @@ void ProcessForensicImage(ForImg* curimg)
     reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table width='98%'>";
     reportstring += "<tr><th colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "):" + curimg->ImgPath() + "</th></tr>";
     reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString::number(curimg->Size()) + " bytes</td></tr>";
+    QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    return QString("%L1").arg(itemnode->Data(columnorder.at(index.column())).toLongLong());
     EvidenceReportData tmpdata;
     tmpdata.evidid = evidcnt;
     tmpdata.evidname = evidencename;

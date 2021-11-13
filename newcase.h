@@ -7,6 +7,7 @@
 #include "wombatinclude.h"
 #include "globals.h"
 #include "wombatfunctions.h"
+#include "reporting.h"
 
 void ProcessForensicImage(ForImg* curimg);
 QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
