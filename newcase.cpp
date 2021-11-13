@@ -4591,8 +4591,8 @@ void ProcessForensicImage(ForImg* curimg)
 {
     qInfo() << "Parsing Forensic Image:" << curimg->ImgPath();
     isignals->StatUp("Parsing Forensic Image...");
-    //qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
-    //qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
+    qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
+    qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
     //qDebug() << "imgsize:" << curimg->Size();
     QHash<QString, QVariant> nodedata;
     nodedata.clear();
@@ -4626,11 +4626,18 @@ void ProcessForensicImage(ForImg* curimg)
 
     QString reportstring = "";
     reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table width='98%'>";
-    reportstring += "<tr><th colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "):" + curimg->ImgPath() + "</th></tr>";
+    reportstring += "<tr><th colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "): " + curimg->ImgPath() + "</th></tr>";
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString("%L1").arg(curimg->Size()) + " bytes</td></tr>";
+    reportstring += "</table></div><br/>\n";
+    // THESE 2 FUNCTIONS CAN'T BE CALLED BECAUSE THEY WOULD BE CALLED IN A CONCURRENT THREADING FUNCTION, SO IT IS UNPREDICTABLE...
+    // UNLESS MAYBE I MUTEX-LOCK/UNLOCK IT...
+    mutex.lock();
     AddELinkItem(curimg->MountPath().split("/").last().split("-e").last().toInt(), curimg->ImgPath().split("/").last());
     AddEvidItem(reportstring);
+    mutex.unlock();
+
+
     /*
      * NEED TO WRITE THIS AS I GO.... AND CLEAR STRING AS I GO
      *
