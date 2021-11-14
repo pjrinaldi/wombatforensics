@@ -4624,11 +4624,12 @@ void ProcessForensicImage(ForImg* curimg)
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last()));
     //nodedata.insert("match", "0");
 
+    //QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
     QString reportstring = "";
-    reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table width='98%'>";
-    reportstring += "<tr><th colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "): " + curimg->ImgPath() + "</th></tr>";
+    reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table style='" + ReturnCssString(2) + "' width='98%'>";
+    reportstring += "<tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "' colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "): " + curimg->ImgPath() + "</th></tr>";
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
-    reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString("%L1").arg(curimg->Size()) + " bytes</td></tr>";
+    reportstring += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(7) + "'>Image Size:</td><td style='" + ReturnCssString(7) + "'>" + QString("%L1").arg(curimg->Size()) + " bytes</td></tr>";
     reportstring += "</table></div><br/>\n";
     // THESE 2 FUNCTIONS CAN'T BE CALLED BECAUSE THEY WOULD BE CALLED IN A CONCURRENT THREADING FUNCTION, SO IT IS UNPREDICTABLE...
     // UNLESS MAYBE I MUTEX-LOCK/UNLOCK IT...
