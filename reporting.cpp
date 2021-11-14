@@ -143,6 +143,71 @@ void AddEvidItem(QString content)
     isignals->ActivateReload();
 }
 
+void AddPartItem(QString content)
+{
+    /* REMOVE CODE WHICH LOOPS OVER THE EVID ITEMS WHICH I WILL NEED TO FIND WHICH TO ADD THE PARTITION TO...
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firstevid-->", Qt::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firstevid-->";
+    QString curcontent = beginsplit.last().split("<!--lastevid-->").first();
+    QString postcontent = beginsplit.last().split("<!--lastevid-->").last();
+    postcontent = "<!--lastevid-->" + postcontent;
+    QStringList curlist = curcontent.split("\n", Qt::SkipEmptyParts);
+    QString updatedcontent = "";
+    for(int i=0; i < curlist.count(); i++)
+    {
+        if(!curlist.at(i).contains(evidname))
+            updatedcontent += curlist.at(i) + "\n";
+    }
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + updatedcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+     *
+     *
+    QString origstr = "";
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        origstr = previewfile.readAll();
+    previewfile.close();
+    QStringList beginsplit = origstr.split("<!--firstevid-->", Qt::SkipEmptyParts);
+    QString precontent = beginsplit.first();
+    precontent += "<!--firstevid-->";
+    QString curcontent = beginsplit.last().split("<!--lastevid-->").first();
+    QString postcontent = beginsplit.last().split("<!--lastevid-->").last();
+    postcontent = "<!--lastevid-->" + postcontent;
+    QStringList evidlist = curcontent.split("\n", Qt::SkipEmptyParts);
+    bool elinkexists = false;
+    if(evidlist.count() > 0)
+    {
+        for(int i=0; i < evidlist.count(); i++)
+        {
+            if(evidlist.at(i).contains(content))
+                elinkexists = true;
+        }
+        if(!elinkexists)
+            curcontent += content;
+    }
+    else
+        curcontent += content;
+    if(!previewfile.isOpen())
+        previewfile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if(previewfile.isOpen())
+        previewfile.write(QString(precontent + curcontent + postcontent).toStdString().c_str());
+    previewfile.close();
+    isignals->ActivateReload();
+    */
+}
+
 void AddELinkItem(int evidid, QString evidname)
 {
     QString origstr = "";

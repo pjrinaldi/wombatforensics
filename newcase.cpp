@@ -4591,8 +4591,8 @@ void ProcessForensicImage(ForImg* curimg)
 {
     qInfo() << "Parsing Forensic Image:" << curimg->ImgPath();
     isignals->StatUp("Parsing Forensic Image...");
-    qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
-    qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
+    //qDebug() << "imgpath at start of parsingforensicimage:" << curimg->ImgPath();
+    //qDebug() << "mount path at start of parseforensicimage:" << curimg->MountPath();
     //qDebug() << "imgsize:" << curimg->Size();
     QHash<QString, QVariant> nodedata;
     nodedata.clear();
@@ -4624,40 +4624,20 @@ void ProcessForensicImage(ForImg* curimg)
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last()));
     //nodedata.insert("match", "0");
 
-    //QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
+    /*
+     * NEED TO WRITE THIS AS I GO.... AND CLEAR STRING AS I GO
+     * MIGHT BE BETTER TO GENERATE THE PREVIEW REPORT AFTER ALL THIS WITHIN THE "UPDATESTATUS()" FUNCTION
+    */
     QString reportstring = "";
     reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table style='" + ReturnCssString(2) + "' width='98%'>";
     reportstring += "<tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "' colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "): " + curimg->ImgPath() + "</th></tr>";
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     reportstring += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(7) + "'>Image Size:</td><td style='" + ReturnCssString(7) + "'>" + QString("%L1").arg(curimg->Size()) + " bytes</td></tr>";
     reportstring += "</table></div><br/>\n";
-    // THESE 2 FUNCTIONS CAN'T BE CALLED BECAUSE THEY WOULD BE CALLED IN A CONCURRENT THREADING FUNCTION, SO IT IS UNPREDICTABLE...
-    // UNLESS MAYBE I MUTEX-LOCK/UNLOCK IT...
     mutex.lock();
     AddELinkItem(curimg->MountPath().split("/").last().split("-e").last().toInt(), curimg->ImgPath().split("/").last());
     AddEvidItem(reportstring);
     mutex.unlock();
-
-
-    /*
-     * NEED TO WRITE THIS AS I GO.... AND CLEAR STRING AS I GO
-     *
-     * MIGHT BE BETTER TO GENERATE THE PREVIEW REPORT AFTER ALL THIS WITHIN THE "UPDATESTATUS()" FUNCTION
-     *
-    QString reportstring = "";
-    reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table width='98%'>";
-    reportstring += "<tr><th colspan='2'>Evidence Item (E" + curimg->MountPath().split("/").last().split("-e").last() + "):" + curimg->ImgPath() + "</th></tr>";
-    reportstring += "<tr class='odd vtop'><td>Image Size:</td><td>" + QString::number(curimg->Size()) + " bytes</td></tr>";
-    QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
-    return QString("%L1").arg(itemnode->Data(columnorder.at(index.column())).toLongLong());
-    EvidenceReportData tmpdata;
-    tmpdata.evidid = evidcnt;
-    tmpdata.evidname = evidencename;
-    tmpdata.evidcontent = reportstring;
-    evidrepdatalist.append(tmpdata);
-    AddELinkItem(evidrepdatalist.at(i).evidid, evidrepdatalist.at(i).evidname);
-    AddEvidItem(evidrepdatalist.at(i).evidcontent);
-    */
     mutex.lock();
     treenodemodel->AddNode(nodedata, "-1", -1, -1);
     mutex.unlock();
@@ -5105,6 +5085,16 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
 	pstatfile.close();
     }
     //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+
+    QString reportstring = "";
+    reportstring += "<tr style='" + ReturnCssString(15) + "'><td style='" + ReturnCssString(7) + "'>Partition (P" + QString::number(ptreecnt) + "):</td><td style='" + ReturnCssString(7) + "'>";
+    if(allocstatus == 0)
+        reportstring += "UNALLOCATED";
+    else if(allocstatus == 1)
+        reportstring += pname;
+    reportstring += "</td></tr>";
+    // I WILL NEED TO CREATE A FUNCTION TO INSERT THIS INFORMATION INTO THE EVIDENCE AREA UNDER THE CORRECT EVIDENCE HTML STRING..
+    // OOH, WHAT A PAIN THIS IS TO OFFER A PREVIEW REPORT....
     /*
     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>" + fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]</td></tr>";

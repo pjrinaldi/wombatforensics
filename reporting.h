@@ -25,6 +25,8 @@ void UpdateTLinkItem(int tagid, QString oldname, QString tagname);
 void UpdateTagItem(int tagid, QString oldname, QString tagname);
 void AddFileItem(QString tagname, QString content);
 void RemoveFileItem(QString fileid);
+void AddPartItem(QString content);
+//void RemovePartItem(QString partname);
 
 void InitializeTaggedList(void);
 void SaveTaggedList(void);
