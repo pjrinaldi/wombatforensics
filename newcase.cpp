@@ -5093,6 +5093,7 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     else if(allocstatus == 1)
         reportstring += pname;
     reportstring += "</td></tr>";
+    // CODE MOSTLY WORKS EXCEPT THE HTML TABLE CODE IS OFF AND THE EXT CODE SEEMS TO KILL THE HTML SO IT STOPS ADDING ANY OTHER CODE TO IT, WHATEVER THAT KW_SEARCH THING IS....
     mutex.lock();
     AddPartItem(reportstring, curimg->ImgPath());
     mutex.unlock();
