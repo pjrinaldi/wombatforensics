@@ -5093,6 +5093,9 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     else if(allocstatus == 1)
         reportstring += pname;
     reportstring += "</td></tr>";
+    mutex.lock();
+    AddPartItem(reportstring, curimg->ImgPath());
+    mutex.unlock();
     // I WILL NEED TO CREATE A FUNCTION TO INSERT THIS INFORMATION INTO THE EVIDENCE AREA UNDER THE CORRECT EVIDENCE HTML STRING..
     // OOH, WHAT A PAIN THIS IS TO OFFER A PREVIEW REPORT....
     /*
