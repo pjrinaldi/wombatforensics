@@ -5087,12 +5087,16 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
 
     QString reportstring = "";
+    //reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table style='" + ReturnCssString(2) + "' width='98%'>";
+    reportstring += "<table style='" + ReturnCssString(2) + "' width='98%'>";
     reportstring += "<tr style='" + ReturnCssString(15) + "'><td style='" + ReturnCssString(7) + "'>Partition (P" + QString::number(ptreecnt) + "):</td><td style='" + ReturnCssString(7) + "'>";
     if(allocstatus == 0)
         reportstring += "UNALLOCATED";
     else if(allocstatus == 1)
         reportstring += pname;
     reportstring += "</td></tr>";
+    reportstring += "</table><br/>\n";
+    //reportstring += "</table></div><br/>\n";
     // CODE MOSTLY WORKS EXCEPT THE HTML TABLE CODE IS OFF AND THE EXT CODE SEEMS TO KILL THE HTML SO IT STOPS ADDING ANY OTHER CODE TO IT, WHATEVER THAT KW_SEARCH THING IS....
     mutex.lock();
     AddPartItem(reportstring, curimg->ImgPath());
@@ -5492,7 +5496,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             else
                 partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 1144 + i, 1).toStdString());
         }
-        qDebug() << "partition name:" << partitionname;
+        //qDebug() << "partition name:" << partitionname;
         out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
         out << "Created Time|" << QDateTime::fromSecsSinceEpoch(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1288, 4)), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Creation time for the file system." << Qt::endl;
         out << "Mount Time|" << QDateTime::fromSecsSinceEpoch(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1068, 4)), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Mount time for the file system." << Qt::endl;
@@ -5607,7 +5611,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             out << "EXT2";
             partitionname += QString(" [EXT2]");
         }
-        qDebug() << "partition name with fstype:" << partitionname;
+        //qDebug() << "partition name with fstype:" << partitionname;
         out << "|File system type string." << Qt::endl;
         uint16_t grpdescsize = 32;
 	if(incompatflags & 0x80)

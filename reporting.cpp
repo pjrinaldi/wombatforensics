@@ -145,6 +145,7 @@ void AddEvidItem(QString content)
 
 void AddPartItem(QString content, QString imgpath)
 {
+    qDebug() << "content:" << content;
     QString origstr = "";
     if(!previewfile.isOpen())
 	previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
