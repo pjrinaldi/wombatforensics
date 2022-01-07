@@ -5485,7 +5485,17 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     else if(extsig == 0xef53) // EXT2/3/4
     {
         out << "File System Type Int|6|Internal File System Type represented as an integer." << Qt::endl;
+        // REWRITE CODE SO IT OMITS 00 ENTRIES...
         partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 1144, 16).toStdString());
+        partitionname = "";
+        for(int i=0; i < 16; i++)
+        {
+            if(curimg->ReadContent(curstartsector*512 + 1144 + i, 1) == 0x00)
+                break;
+            else
+                partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 1144 + i, 1).toStdString());
+        }
+        qDebug() << "partition name:" << partitionname;
         out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
         out << "Created Time|" << QDateTime::fromSecsSinceEpoch(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1288, 4)), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Creation time for the file system." << Qt::endl;
         out << "Mount Time|" << QDateTime::fromSecsSinceEpoch(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1068, 4)), QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Mount time for the file system." << Qt::endl;
@@ -5600,6 +5610,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             out << "EXT2";
             partitionname += QString(" [EXT2]");
         }
+        qDebug() << "partition name with fstype:" << partitionname;
         out << "|File system type string." << Qt::endl;
         uint16_t grpdescsize = 32;
 	if(incompatflags & 0x80)
