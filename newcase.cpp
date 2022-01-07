@@ -5485,12 +5485,9 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     else if(extsig == 0xef53) // EXT2/3/4
     {
         out << "File System Type Int|6|Internal File System Type represented as an integer." << Qt::endl;
-        // REWRITE CODE SO IT OMITS 00 ENTRIES...
-        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 1144, 16).toStdString());
-        partitionname = "";
         for(int i=0; i < 16; i++)
         {
-            if(curimg->ReadContent(curstartsector*512 + 1144 + i, 1) == 0x00)
+            if(qFromBigEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 1144 + i, 1)) == 0x00)
                 break;
             else
                 partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 1144 + i, 1).toStdString());
