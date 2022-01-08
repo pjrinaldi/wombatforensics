@@ -145,7 +145,6 @@ void AddEvidItem(QString content)
 
 void AddPartItem(QString content, QString imgpath)
 {
-    qDebug() << "content:" << content;
     QString origstr = "";
     if(!previewfile.isOpen())
 	previewfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -155,7 +154,7 @@ void AddPartItem(QString content, QString imgpath)
     QStringList beginsplit = origstr.split("<!--firstevid-->", Qt::SkipEmptyParts);
     QString precontent = beginsplit.first();
     precontent += "<!--firstevid-->";
-    QString curcontent = beginsplit.last().split("<!-lastevid-->").first();
+    QString curcontent = beginsplit.last().split("<!--lastevid-->").first();
     QString postcontent = beginsplit.last().split("<!--lastevid-->").last();
     postcontent = "<!--lastevid-->" + postcontent;
     QStringList curlist = curcontent.split("\n", Qt::SkipEmptyParts);
