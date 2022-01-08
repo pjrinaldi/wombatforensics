@@ -5087,17 +5087,18 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
 
     QString reportstring = "";
-    //reportstring += "<div id='e" + curimg->MountPath().split("/").last().split("-e").last() + "'><table style='" + ReturnCssString(2) + "' width='98%'>";
-    reportstring += "<table style='" + ReturnCssString(2) + "' width='98%'>";
+    reportstring += "<table style='" + ReturnCssString(2) + "'>";
+    //reportstring += "<table style='" + ReturnCssString(2) + "' width='98%'>";
     reportstring += "<tr style='" + ReturnCssString(15) + "'><td style='" + ReturnCssString(7) + "'>Partition (P" + QString::number(ptreecnt) + "):</td><td style='" + ReturnCssString(7) + "'>";
     if(allocstatus == 0)
         reportstring += "UNALLOCATED";
     else if(allocstatus == 1)
         reportstring += pname;
     reportstring += "</td></tr>";
+    // NEED TO ADD THE RELEVANT PARTITION/FS DATA TO THE TABLE FOR THE OUTPUT... THEN PARTITIONS ARE DONE AND I CAN MOVE ONTO
+    // TAGGED ITEMS
     reportstring += "</table><br/>\n";
     //reportstring += "</table></div><br/>\n";
-    // CODE MOSTLY WORKS EXCEPT THE HTML TABLE CODE IS OFF AND THE EXT CODE SEEMS TO KILL THE HTML SO IT STOPS ADDING ANY OTHER CODE TO IT, WHATEVER THAT KW_SEARCH THING IS....
     mutex.lock();
     AddPartItem(reportstring, curimg->ImgPath());
     mutex.unlock();

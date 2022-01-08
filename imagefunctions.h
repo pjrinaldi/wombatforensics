@@ -95,7 +95,8 @@ class ForImg : public QIODevice
         qint64 imgoffset = 0;
         QString imgpath = "";
         QString mntpath = "";
-        int imgtype = -1;
+        int imgtype = 15;
+        //int imgtype = -1;
         uint8_t hashtype = 0;
         int blake3hash = 0;
         QList<qint64> framelist;
