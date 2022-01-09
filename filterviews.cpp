@@ -88,13 +88,27 @@ void IdFilter::BuildId(QString curstring)
     int a = 0;
     builtstring = "";
     if(sender()->objectName().contains("espinBox"))
+    {
+        ui->espinBox->setEnabled(ui->echeckBox->isChecked());
         estring = curstring;
+    }
+    /*
     else if(sender()->objectName().contains("vspinBox"))
+    {
+        ui->vspinBox->setEnabled(ui->vcheckBox->isChecked());
         vstring = curstring;
+    }
+    */
     else if(sender()->objectName().contains("pspinBox"))
+    {
+        ui->pspinBox->setEnabled(ui->pcheckBox->isChecked());
         pstring = curstring;
+    }
     else if(sender()->objectName().contains("fspinBox"))
+    {
+        ui->fspinBox->setEnabled(ui->fcheckBox->isChecked());
         fstring = curstring;
+    }
     if(ui->espinBox->isEnabled())
     {
         builtstring += estring;
@@ -169,6 +183,7 @@ NameFilter::NameFilter(QWidget* parent) : QDialog(parent), ui(new Ui::NameFilter
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->checkBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 NameFilter::~NameFilter()
@@ -190,6 +205,10 @@ void NameFilter::DisplayFilter()
     */
 }
 
+void NameFilter::EnableFilter()
+{
+    ui->lineEdit->setEnabled(ui->checkBox->isChecked());
+}
 void NameFilter::HideClicked()
 {
     filtervalues.namebool = ui->checkBox->isChecked();
@@ -210,6 +229,7 @@ PathFilter::PathFilter(QWidget* parent) : QDialog(parent), ui(new Ui::PathFilter
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->checkBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 PathFilter::~PathFilter()
@@ -229,6 +249,11 @@ void PathFilter::DisplayFilter()
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
     */
+}
+
+void PathFilter::EnableFilter()
+{
+    ui->lineEdit->setEnabled(ui->checkBox->isChecked());
 }
 
 void PathFilter::HideClicked()

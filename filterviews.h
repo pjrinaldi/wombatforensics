@@ -96,6 +96,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::NameFilter* ui;
@@ -116,6 +117,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::PathFilter* ui;
