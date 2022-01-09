@@ -276,6 +276,8 @@ SizeFilter::SizeFilter(QWidget* parent) : QDialog(parent), ui(new Ui::SizeFilter
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->morecheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
+    connect(ui->lesscheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 SizeFilter::~SizeFilter()
@@ -294,6 +296,15 @@ void SizeFilter::DisplayFilter()
         this->move(this->mapFromGlobal(QCursor::pos()));
     this->show();
     */
+}
+
+void SizeFilter::EnableFilter()
+{
+    if(sender()->objectName().contains("morecheckBox"))
+        ui->morespinBox->setEnabled(ui->morecheckBox->isChecked());
+    else if(sender()->objectName().contains("lesscheckBox"))
+        ui->lessspinBox->setEnabled(ui->lesscheckBox->isChecked());
+    //if(sender()->objectName().contains("echeckBox"))
 }
 
 void SizeFilter::HideClicked()
@@ -318,6 +329,8 @@ CreatedDateFilter::CreatedDateFilter(QWidget* parent) : QDialog(parent), ui(new 
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->morecheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
+    connect(ui->lesscheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 CreatedDateFilter::~CreatedDateFilter()
@@ -333,6 +346,14 @@ void CreatedDateFilter::DisplayFilter()
     if(this->pos().x() == 0)
         this->move(newpos);
     this->show();
+}
+
+void CreatedDateFilter::EnableFilter()
+{
+    if(sender()->objectName().contains("morecheckBox"))
+        ui->moredateTimeEdit->setEnabled(ui->morecheckBox->isChecked());
+    else if(sender()->objectName().contains("lesscheckBox"))
+        ui->lessdateTimeEdit->setEnabled(ui->lesscheckBox->isChecked());
 }
 
 void CreatedDateFilter::HideClicked()
@@ -358,6 +379,8 @@ AccessedDateFilter::AccessedDateFilter(QWidget* parent) : QDialog(parent), ui(ne
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->morecheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
+    connect(ui->lesscheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 AccessedDateFilter::~AccessedDateFilter()
@@ -387,6 +410,14 @@ void AccessedDateFilter::HideClicked()
     emit HeaderChanged();
 }
 
+void AccessedDateFilter::EnableFilter()
+{
+    if(sender()->objectName().contains("morecheckBox"))
+        ui->moredateTimeEdit->setEnabled(ui->morecheckBox->isChecked());
+    else if(sender()->objectName().contains("lesscheckBox"))
+        ui->lessdateTimeEdit->setEnabled(ui->lesscheckBox->isChecked());
+}
+
 void AccessedDateFilter::CancelClicked()
 {
     this->hide();
@@ -398,10 +429,20 @@ ModifiedDateFilter::ModifiedDateFilter(QWidget* parent) : QDialog(parent), ui(ne
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->morecheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
+    connect(ui->lesscheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 ModifiedDateFilter::~ModifiedDateFilter()
 {
+}
+
+void ModifiedDateFilter::EnableFilter()
+{
+    if(sender()->objectName().contains("morecheckBox"))
+        ui->moredateTimeEdit->setEnabled(ui->morecheckBox->isChecked());
+    else if(sender()->objectName().contains("lesscheckBox"))
+        ui->lessdateTimeEdit->setEnabled(ui->lesscheckBox->isChecked());
 }
 
 void ModifiedDateFilter::DisplayFilter()
@@ -438,10 +479,20 @@ ChangedDateFilter::ChangedDateFilter(QWidget* parent) : QDialog(parent), ui(new 
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->morecheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
+    connect(ui->lesscheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 ChangedDateFilter::~ChangedDateFilter()
 {
+}
+
+void ChangedDateFilter::EnableFilter()
+{
+    if(sender()->objectName().contains("morecheckBox"))
+        ui->moredateTimeEdit->setEnabled(ui->morecheckBox->isChecked());
+    else if(sender()->objectName().contains("lesscheckBox"))
+        ui->lessdateTimeEdit->setEnabled(ui->lesscheckBox->isChecked());
 }
 
 void ChangedDateFilter::DisplayFilter()
@@ -478,10 +529,16 @@ FileTypeFilter::FileTypeFilter(QWidget* parent) : QDialog(parent), ui(new Ui::Fi
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->typecheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 FileTypeFilter::~FileTypeFilter()
 {
+}
+
+void FileTypeFilter::EnableFilter()
+{
+    ui->typecomboBox->setEnabled(ui->typecheckBox->isChecked());
 }
 
 void FileTypeFilter::DisplayFilter()
@@ -531,6 +588,7 @@ TagFilter::TagFilter(QWidget* parent) : QDialog(parent), ui(new Ui::TagFilter)
     this->hide();
     connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(HideClicked()));
     connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(CancelClicked()));
+    connect(ui->tagcheckBox, SIGNAL(clicked()), this, SLOT(EnableFilter()));
 }
 
 TagFilter::~TagFilter()
@@ -568,6 +626,11 @@ void TagFilter::HideClicked()
         filtervalues.tag = ui->tagcomboBox->currentText();
     this->hide();
     emit HeaderChanged();
+}
+
+void TagFilter::EnableFilter()
+{
+    ui->tagcomboBox->setEnabled(ui->tagcheckBox->isChecked());
 }
 
 void TagFilter::CancelClicked()

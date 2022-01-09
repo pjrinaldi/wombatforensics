@@ -137,6 +137,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::SizeFilter* ui;
@@ -156,6 +157,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::CreatedDateFilter* ui;
@@ -175,6 +177,8 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
+
 private:
     Ui::AccessedDateFilter* ui;
 };
@@ -193,6 +197,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::ModifiedDateFilter* ui;
@@ -212,6 +217,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::ChangedDateFilter* ui;
@@ -231,6 +237,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::FileTypeFilter* ui;
@@ -270,6 +277,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::TagFilter* ui;
