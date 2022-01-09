@@ -347,7 +347,8 @@ void AddFileItem(QString tagname, QString content)
 
 void RemoveFileItem(QString fileid)
 {
-    QString itemstr = "<td class='fitem' id='" + fileid + "'>";
+    QString itemstr = "<td style='" + ReturnCssString(11) + "' id='" + fileid + "'>"; 
+    //QString itemstr = "<td class='fitem' id='" + fileid + "'>";
     QString origstr = "";
     QString postcontent = "";
     if(!previewfile.isOpen())
