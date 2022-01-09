@@ -168,6 +168,7 @@ public:
     FileCategoryFilter* filecategoryfilterview;
     HashFilter* hashfilterview;
     TagFilter* tagfilterview;
+    HashMatchFilter* hashmatchfilterview;
     ImageViewer* imagewindow;
     ImageWindow* imageviewer;
     VideoViewer* videowindow;

@@ -21,6 +21,7 @@
 #include "ui_jumphex.h"
 #include "ui_filecategoryfilter.h"
 #include "ui_tagfilter.h"
+#include "ui_hashmatchfilter.h"
 
 namespace Ui {
     class IdFilter;
@@ -35,6 +36,7 @@ namespace Ui {
     class FileCategoryFilter;
     class HashFilter;
     class TagFilter;
+    class HashMatchFilter;
     class JumpHex;
 }
 
@@ -283,6 +285,26 @@ private:
     Ui::TagFilter* ui;
 };
 
+class HashMatchFilter : public QDialog
+{
+    Q_OBJECT
+public:
+    HashMatchFilter(QWidget* parent = 0);
+    ~HashMatchFilter();
+    void DisplayFilter();
+
+signals:
+    void HeaderChanged();
+
+private slots:
+    void HideClicked();
+    void CancelClicked();
+    void EnableFilter();
+
+private:
+    Ui::HashMatchFilter* ui;
+};
+
 class HashFilter : public QDialog
 {
     Q_OBJECT
@@ -297,6 +319,7 @@ signals:
 private slots:
     void HideClicked();
     void CancelClicked();
+    void EnableFilter();
 
 private:
     Ui::HashFilter* ui;
@@ -314,5 +337,6 @@ Q_DECLARE_METATYPE(FileTypeFilter*);
 Q_DECLARE_METATYPE(FileCategoryFilter*);
 Q_DECLARE_METATYPE(HashFilter*);
 Q_DECLARE_METATYPE(TagFilter*);
+Q_DECLARE_METATYPE(HashMatchFilter*);
 Q_DECLARE_METATYPE(JumpHex*);
 #endif

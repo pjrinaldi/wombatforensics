@@ -69,6 +69,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     filecategoryfilterview = new FileCategoryFilter(this);
     hashfilterview = new HashFilter(this);
     tagfilterview = new TagFilter(this);
+    hashmatchfilterview = new HashMatchFilter(this);
     imagewindow = new ImageViewer(this);
     msgviewer = new MessageViewer(this);
     byteviewer = new ByteConverter(this);
@@ -220,6 +221,7 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(filecategoryfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(hashfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(tagfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
+    connect(hashmatchfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(jumpfilterview, SIGNAL(SetOffset()), this, SLOT(SetHexOffset()));
     /*
     jumpforward = new QShortcut(ui->dirTreeView);
@@ -3652,6 +3654,7 @@ WombatForensics::~WombatForensics()
     delete filecategoryfilterview;
     delete hashfilterview;
     delete tagfilterview;
+    delete hashmatchfilterview;
     delete byteviewer;
     delete previewreport;
     delete imagewindow;
@@ -4110,28 +4113,30 @@ void WombatForensics::SetFilter(int headercolumn)
 {
     if(headercolumn == treenodemodel->GetColumnIndex("id"))
         idfilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("name"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("name"))
         namefilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("path"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("path"))
         pathfilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("size"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("size"))
         sizefilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("create"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("create"))
         createfilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("access"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("access"))
         accessfilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("modify"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("modify"))
         modifyfilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("status"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("status"))
         changefilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("hash"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("hash"))
         hashfilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("cat"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("cat"))
         filecategoryfilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("sig"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("sig"))
         filetypefilterview->DisplayFilter();
-    if(headercolumn == treenodemodel->GetColumnIndex("tag"))
+    else if(headercolumn == treenodemodel->GetColumnIndex("tag"))
         tagfilterview->DisplayFilter();
+    else if(headercolumn == treenodemodel->GetColumnIndex("match"))
+        hashmatchfilterview->DisplayFilter();
     ResizeColumns();
 }
 
