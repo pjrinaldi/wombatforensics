@@ -5095,6 +5095,9 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     else if(allocstatus == 1)
         reportstring += pname;
     reportstring += "</td></tr>";
+    reportstring += "<tr style='" + ReturnCssString(15) + "'><td style='" + ReturnCssString(7) + "'>Offset:</td><td style='" + ReturnCssString(7) + "'>" + QString::number((qint64)cursectoroffset * 512) + "</td></tr>";
+    reportstring += "<tr style='" + ReturnCssString(15) + "'><td style='" + ReturnCssString(7) + "'>Size:</td><td style='" + ReturnCssString(7) + "'>" + QString::number((qint64)cursectorsize * 512) + "</td></tr>";
+
     // NEED TO ADD THE RELEVANT PARTITION/FS DATA TO THE TABLE FOR THE OUTPUT... THEN PARTITIONS ARE DONE AND I CAN MOVE ONTO
     // TAGGED ITEMS
     reportstring += "</table><br/>\n";
