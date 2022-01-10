@@ -654,6 +654,19 @@ HashMatchFilter::~HashMatchFilter()
 
 void HashMatchFilter::DisplayFilter()
 {
+    QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
+    QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
+    for(int i=0; i < whllist.count(); i++)
+        ui->hashcombobox->addItem(whllist.at(i).fileName());
+    if(filtervalues.hashmatch.compare("") != 0)
+        ui->hashcombobox->setCurrentText(filtervalues.hashmatch);
+    /*
+     *
+    QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
+    QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
+    for(int i=0; i < whllist.count(); i++)
+        ui->hashlistwidget->addItem(whllist.at(i).fileName());
+     */
     /*
     QStringList tags;
     tags.clear();
@@ -679,6 +692,9 @@ void HashMatchFilter::DisplayFilter()
 
 void HashMatchFilter::HideClicked()
 {
+    filtervalues.hashmatchbool = ui->hashcheckbox->isChecked();
+    if(filtervalues.hashmatchbool)
+        filtervalues.hashmatch = ui->hashcombobox->currentText();
     /*
     filtervalues.tagbool = ui->tagcheckBox->isChecked();
     if(filtervalues.tagbool)

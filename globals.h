@@ -131,6 +131,8 @@ struct FilterValues
     QStringList hashlist;
     bool tagbool;
     QString tag;
+    bool hashmatchbool;
+    QString hashmatch;
 };
 
 extern FilterValues filtervalues;
@@ -513,6 +515,11 @@ public:
                     if(itemnode->Data("tag").toString().compare(filtervalues.tag) != 0)
                         return QColor(Qt::lightGray);
                 }
+                if(filtervalues.hashmatchbool)
+                {
+                    if(itemnode->Data("match").toString().compare(filtervalues.hashmatch) != 0)
+                        return QColor(Qt::lightGray);
+                }
             }
             else if(nodetype < 3) // used to be 4
                 return QColor(Qt::darkBlue);
@@ -769,6 +776,8 @@ public:
             if(columnorder.at(section) == "sig" && filtervalues.filetypebool)
                 return QIcon(":/basic/filterimg");
             if(columnorder.at(section) == "tag" && filtervalues.tagbool)
+                return QIcon(":/basic/filterimg");
+            if(columnorder.at(section) == "match" && filtervalues.hashmatchbool)
                 return QIcon(":/basic/filterimg");
         }
         return QVariant();
