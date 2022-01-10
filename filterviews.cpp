@@ -655,6 +655,7 @@ HashMatchFilter::~HashMatchFilter()
 void HashMatchFilter::DisplayFilter()
 {
     QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
+    ui->hashcombobox->clear();
     QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
     for(int i=0; i < whllist.count(); i++)
         ui->hashcombobox->addItem(whllist.at(i).fileName());
