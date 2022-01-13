@@ -5087,13 +5087,21 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     //qDebug() << "partition id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
 
     QString reportstring = "";
+    QString partstring = "";
     reportstring += "<table style='" + ReturnCssString(2) + "'>";
     //reportstring += "<table style='" + ReturnCssString(2) + "' width='98%'>";
     reportstring += "<tr style='" + ReturnCssString(15) + "'><td style='" + ReturnCssString(7) + "'>Partition (P" + QString::number(ptreecnt) + "):</td><td style='" + ReturnCssString(7) + "'>";
+    partstring += "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + ": ";
     if(allocstatus == 0)
+    {
+        partstring += "UNALLOCATED";
         reportstring += "UNALLOCATED";
+    }
     else if(allocstatus == 1)
+    {
+        partstring += pname;
         reportstring += pname;
+    }
     reportstring += "</td></tr>";
     reportstring += "<tr style='" + ReturnCssString(15) + "'><td style='" + ReturnCssString(7) + "'>Offset:</td><td style='" + ReturnCssString(7) + "'>" + QString::number((qint64)cursectoroffset * 512) + "</td></tr>";
     reportstring += "<tr style='" + ReturnCssString(15) + "'><td style='" + ReturnCssString(7) + "'>Size:</td><td style='" + ReturnCssString(7) + "'>" + QString::number((qint64)cursectorsize * 512) + "</td></tr>";
@@ -5111,6 +5119,7 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>UNALLOCATED</td></tr>";
     reportstring += "<tr class='even vtop'><td>Partition (P" + QString::number(ptreecnt) + "):</td><td>" + fsinfolist.at(i).value("vollabel").toString() + " [" + fsinfolist.at(i).value("typestr").toString() + "]</td></tr>";
     */
+    partitionlist.append(partstring);
     //partitionlist.append("e" + QString::number(evidcnt) + "-p" + QString::number(ptreecnt) + ": UNALLOCATED");
     nodedata.clear();
     if(allocstatus == 0)
