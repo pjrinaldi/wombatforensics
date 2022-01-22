@@ -66,6 +66,28 @@ void GetCarvers(QStringList& ctypelist, QStringList flist)
 
 void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid)
 {
+    // HERE IS WHERE I NEED TO SWITCH IT FROM RAWFILE QFILE TO THE FORIMG VALUE...
+    /*
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::Dirs | QDir::NoSymLinks);
+    existingforimglist.clear();
+    for(int i=0; i < evidfiles.count(); i++)
+    {
+        QString tmpstr = "";
+        QFile efile(wombatvariable.tmpmntpath + evidfiles.at(i) + "/stat");
+        if(!efile.isOpen())
+            efile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(efile.isOpen())
+        {
+            tmpstr = efile.readLine();
+        }
+        efile.close();
+	ForImg* tmpimg = new ForImg(tmpstr.split(",").at(0));
+	tmpimg->SetMountPath(wombatvariable.tmpmntpath + evidfiles.at(i) + "/");
+	existingforimglist.append(tmpimg);
+    }
+
+     */ 
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*-" + curpartid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
     QFile estatfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
@@ -453,6 +475,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	qint64 partoffset = 0; // partition offset
 	qint64 blocksize = 512; // sector size
 	qint64 partsize = 0; // partition size
+        // NEED TO CONVERT RAWFILE FORIMG OBJECT AND APPLY ACCORDINGLY...
+        // NEED TO FIGURE OUT HOW TO GET THE FORIMG VALUE...
 	QFile rawfile; // rawfile dd to pull content from
 	GetPartitionValues(partoffset, blocksize, partsize, rawfile, plist.at(i));
 	qint64 blockcount = partsize / blocksize;
