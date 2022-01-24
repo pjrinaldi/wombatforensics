@@ -64,7 +64,8 @@ void GetCarvers(QStringList& ctypelist, QStringList flist)
     }
 }
 
-void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid)
+//void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid)
+void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, ForImg* rawfile, QString curpartid)
 {
     // HERE IS WHERE I NEED TO SWITCH IT FROM RAWFILE QFILE TO THE FORIMG VALUE...
     /*
@@ -99,9 +100,13 @@ void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize,
         tmpstr = estatfile.readLine();
         estatfile.close();
     }
+    rawfile = new ForImg(tmpstr.split(",", Qt::SkipEmptyParts).at(0));
+    rawfile->SetMountPath(wombatvariable.tmpmntpath + evidfiles.at(0) + "/");
+    /*
     rawfile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     if(!rawfile.isOpen())
         rawfile.open(QIODevice::ReadOnly);
+    */
     QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + curpartid.split("-").at(1) + "/stat");
     if(!partfile.isOpen())
         partfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -138,7 +143,8 @@ void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize)
     }
 }
 
-void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile, qint64& blocksize, qint64& partoffset)
+//void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, QFile& rawfile, qint64& blocksize, qint64& partoffset)
+void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklist, QHash<int, QString>& headhash, ForImg* rawfile, qint64& blocksize, qint64& partoffset)
 {
     for(int i=0; i < blockcount; i++)
     {
@@ -147,12 +153,14 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
 	    for(int j=0; j < ctypelist.count(); j++)
 	    {
 		QString curheadnam = ctypelist.at(j).split(",").at(1);
+                /*
 		if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
 		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
         	else if(curheadnam.contains("MPEG"))
 		    FooterSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
 		else
 		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
+                */
 	    }
 	}
     }
@@ -477,7 +485,8 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	qint64 partsize = 0; // partition size
         // NEED TO CONVERT RAWFILE FORIMG OBJECT AND APPLY ACCORDINGLY...
         // NEED TO FIGURE OUT HOW TO GET THE FORIMG VALUE...
-	QFile rawfile; // rawfile dd to pull content from
+	//QFile rawfile; // rawfile dd to pull content from
+	ForImg* rawfile = NULL; // rawfile dd to pull content from
 	GetPartitionValues(partoffset, blocksize, partsize, rawfile, plist.at(i));
 	qint64 blockcount = partsize / blocksize;
 
@@ -487,14 +496,17 @@ void GenerateCarving(QStringList plist, QStringList flist)
 
 	QList<int> blocklist;
 	blocklist.clear();
+	//FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	qInfo() << blocklist.count() << "Headers found. Starting Footer search...";
         QByteArray footerarray;
         footerarray.clear();
 	QString curplist = plist.at(i);
-        SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray, curplist);
+        //SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray, curplist);
+        /*
 	if(rawfile.isOpen())
 	    rawfile.close();
+        */
         /*
 	QDir cdir = QDir(wombatvariable.tmpmntpath + "carved/");
 	QStringList cfiles = cdir.entryList(QStringList(plist.at(i) + "-c*"), QDir::NoSymLinks | QDir::Files);
