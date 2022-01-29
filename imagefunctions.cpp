@@ -889,6 +889,7 @@ ForImg::ForImg(QString imgfile)
         imgtype = 8;
     else // any old file..
         imgtype = 15;
+    //qDebug() << "imgtype:" << imgtype;
     imgpath = imgfile;
     //qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
@@ -1092,6 +1093,7 @@ ForImg::~ForImg()
 
 QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 {
+    //qDebug() << "imgtype in ReadContent:" << imgtype;
     char* data = new char[size];
     QByteArray tmparray;
     tmparray.clear();

@@ -65,7 +65,8 @@ void GetCarvers(QStringList& ctypelist, QStringList flist)
 }
 
 //void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QFile& rawfile, QString curpartid)
-void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, ForImg* rawfile, QString curpartid)
+//void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, ForImg* rawfile, QString curpartid)
+void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize, QString &imgfile, QString &imgpath, QString curpartid)
 {
     // HERE IS WHERE I NEED TO SWITCH IT FROM RAWFILE QFILE TO THE FORIMG VALUE...
     /*
@@ -100,8 +101,10 @@ void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize,
         tmpstr = estatfile.readLine();
         estatfile.close();
     }
-    rawfile = new ForImg(tmpstr.split(",", Qt::SkipEmptyParts).at(0));
-    rawfile->SetMountPath(wombatvariable.tmpmntpath + evidfiles.at(0) + "/");
+    imgfile = tmpstr.split(",", Qt::SkipEmptyParts).at(0);
+    imgpath = wombatvariable.tmpmntpath + evidfiles.at(0) + "/";
+    //rawfile = new ForImg(tmpstr.split(",", Qt::SkipEmptyParts).at(0));
+    //rawfile->SetMountPath(wombatvariable.tmpmntpath + evidfiles.at(0) + "/");
     /*
     rawfile.setFileName(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
     if(!rawfile.isOpen())
@@ -112,12 +115,12 @@ void GetPartitionValues(qint64& partoffset, qint64& blocksize, qint64& partsize,
         partfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(partfile.isOpen())
     {
-        tmpstr = partfile.readLine(); // partition name, offset, size, partition type, id
+        tmpstr = partfile.readLine(); // offset, size
         partfile.close();
     }
-    partoffset = tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong();
+    partoffset = tmpstr.split(",", Qt::SkipEmptyParts).at(0).toLongLong();
     blocksize = 512;
-    partsize = tmpstr.split(",", Qt::SkipEmptyParts).at(2).toLongLong();
+    partsize = tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong();
 }
 
 void GetExistingCarvedFiles(QHash<int, QString>& headhash, qint64& blocksize)
@@ -153,6 +156,12 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
 	    for(int j=0; j < ctypelist.count(); j++)
 	    {
 		QString curheadnam = ctypelist.at(j).split(",").at(1);
+		if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
+		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
+        	else if(curheadnam.contains("MPEG"))
+		    FooterSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
+		else
+		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
                 /*
 		if(curheadnam.contains("JPEG") || curheadnam.contains("PNG") || curheadnam.contains("GIF") || curheadnam.contains("PDF"))
 		    HeaderSearch(i, ctypelist.at(j), rawfile, blocksize, partoffset, blocklist, headhash);
@@ -166,7 +175,8 @@ void FirstCarve(qint64& blockcount, QStringList& ctypelist, QList<int>& blocklis
     }
 }
 
-void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, QString& curplist)
+//void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, QString& curplist)
+void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& blocksize, ForImg* rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, QString& curplist)
 {
     for(int i=0; i < blocklist.count(); i++)
     {
@@ -189,7 +199,8 @@ void SecondCarve(QList<int>& blocklist, QHash<int, QString>& headhash, qint64& b
     }
 }
 
-void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset, QList<int>& blocklist, QHash<int, QString>& headhash)
+//void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset, QList<int>& blocklist, QHash<int, QString>& headhash)
+void HeaderSearch(int& j, QString carvetype, ForImg* rawfile, qint64& blocksize, qint64& partoffset, QList<int>& blocklist, QHash<int, QString>& headhash)
 {
     QString curheadcat = carvetype.split(",").at(0);
     QString curheadnam = carvetype.split(",").at(1);
@@ -202,9 +213,13 @@ void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, 
         bytecount = 11;
     QByteArray headerarray;
     headerarray.clear();
+    /*
     bool isseek = rawfile.seek(partoffset + (j * blocksize));
     if(isseek)
         headerarray = rawfile.read(bytecount);
+    */
+    // IT APPEARS THE FORIMG FUNCTION IS NULL HERE... SO WHY DOES MY RAWFILE WHICH IS DEFINED EARLIER DROP TO ZERO AND NOT GET PASSED????
+    headerarray = rawfile->ReadContent(partoffset + (j * blocksize), bytecount);
     QString blockheader = QString::fromStdString(headerarray.toHex(0).toStdString()).toUpper();
     if(curheadnam.contains("JPEG"))
     {
@@ -249,7 +264,8 @@ void HeaderSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, 
     }
 }
 
-void FooterSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset, QList<int>& blocklist, QHash<int, QString>& headhash)
+//void FooterSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, qint64& partoffset, QList<int>& blocklist, QHash<int, QString>& headhash)
+void FooterSearch(int& j, QString carvetype, ForImg* rawfile, qint64& blocksize, qint64& partoffset, QList<int>& blocklist, QHash<int, QString>& headhash)
 {
     QString curheadcat = carvetype.split(",").at(0);
     QString curheadnam = carvetype.split(",").at(1);
@@ -259,9 +275,12 @@ void FooterSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, 
     QString curmaxsize = carvetype.split(",").at(5);
     QByteArray footerarray;
     footerarray.clear();
+    /*
     bool isseek = rawfile.seek(partoffset + (j * blocksize));
     if(isseek)
 	footerarray = rawfile.read(blocksize);
+    */
+    footerarray = rawfile->ReadContent(partoffset + (j * blocksize), blocksize);
     QString blockfooter = QString::fromStdString(footerarray.toHex(0).toStdString()).toUpper();
     if(curheadnam.contains("MPEG"))
     {
@@ -288,7 +307,8 @@ void FooterSearch(int& j, QString carvetype, QFile& rawfile, qint64& blocksize, 
     }
 }
 
-void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize)
+//void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize)
+void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, ForImg* rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize)
 {
     qint64 blockdifference = 0;
     qint64 curmaxsize = carvetype.split(",").at(5).toLongLong();
@@ -310,9 +330,12 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
     qint64 lastfooterpos = -1;
     if(!curfooter.isEmpty()) // if footer exists
     {
+        /*
         bool isseek = rawfile.seek(partoffset + (blocklist.at(j) * blocksize));
         if(isseek)
             footerarray = rawfile.read(arraysize);
+        */
+        footerarray = rawfile->ReadContent(partoffset + (blocklist.at(j) * blocksize), arraysize);
         QString footerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
 
         lastfooterpos = footerstr.lastIndexOf(curfooter);
@@ -325,7 +348,8 @@ void HeaderFooterSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
         carvedstringsize = arraysize;
 }
 
-void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize, qint64& byteoffset)
+//void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, QFile& rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize, qint64& byteoffset)
+void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j, qint64& blocksize, ForImg* rawfile, qint64& partoffset, qint64& blockcount, QByteArray& footerarray, qint64& carvedstringsize, qint64& byteoffset)
 {
     qint64 blockdifference = 0;
     qint64 arraysize = 0;
@@ -340,9 +364,12 @@ void FooterHeaderSearch(QString& carvetype, QList<int>& blocklist, int& j, qint6
     }
     arraysize = blockdifference;
     qint64 firstheaderpos = -1;
+    /*
     bool isseek = rawfile.seek(seekstart);
     if(isseek)
 	footerarray = rawfile.read(arraysize);
+    */
+    footerarray = rawfile->ReadContent(seekstart, arraysize);
     QString headerstr = QString::fromStdString(footerarray.toHex().toStdString()).toUpper();
     firstheaderpos = headerstr.indexOf(curheader);
     byteoffset = seekstart + firstheaderpos / 2;
@@ -483,11 +510,16 @@ void GenerateCarving(QStringList plist, QStringList flist)
 	qint64 partoffset = 0; // partition offset
 	qint64 blocksize = 512; // sector size
 	qint64 partsize = 0; // partition size
+        QString imgfile = "";
+        QString imgpath = "";
         // NEED TO CONVERT RAWFILE FORIMG OBJECT AND APPLY ACCORDINGLY...
         // NEED TO FIGURE OUT HOW TO GET THE FORIMG VALUE...
 	//QFile rawfile; // rawfile dd to pull content from
 	ForImg* rawfile = NULL; // rawfile dd to pull content from
-	GetPartitionValues(partoffset, blocksize, partsize, rawfile, plist.at(i));
+	GetPartitionValues(partoffset, blocksize, partsize, imgfile, imgpath, plist.at(i));
+        //qDebug() << "imgfile:" << imgfile << "imgpath:" << imgpath;
+        rawfile = new ForImg(imgfile);
+        rawfile->SetMountPath(imgpath);
 	qint64 blockcount = partsize / blocksize;
 
 	QHash<int, QString> headhash;
@@ -496,13 +528,12 @@ void GenerateCarving(QStringList plist, QStringList flist)
 
 	QList<int> blocklist;
 	blocklist.clear();
-	//FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	FirstCarve(blockcount, ctypelist, blocklist, headhash, rawfile, blocksize, partoffset);
 	qInfo() << blocklist.count() << "Headers found. Starting Footer search...";
         QByteArray footerarray;
         footerarray.clear();
 	QString curplist = plist.at(i);
-        //SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray, curplist);
+        SecondCarve(blocklist, headhash, blocksize, rawfile, partoffset, blockcount, footerarray, curplist);
         /*
 	if(rawfile.isOpen())
 	    rawfile.close();
