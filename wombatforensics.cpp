@@ -2144,7 +2144,7 @@ void WombatForensics::PopulateHexContents()
             ui->hexview->setCursorPosition(0);
             ui->hexview->SetColor(QString("0," + QString::number(selectednode->Data("size").toLongLong()) + ";"), selectednode->Data("size").toLongLong());
         }
-        else if(nodeid.split("-").count() == 2) // unallocated, file system, or partition, possibly carved, zip, etc...
+        else if(nodeid.split("-").count() == 2) // unallocated, file system, or partition, possibly manually carved, zip, etc...
         {
             if(nodeid.contains("-c")) // manually carved file
             {
@@ -2175,7 +2175,7 @@ void WombatForensics::PopulateHexContents()
                 ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(0) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(1) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong());
             }
         }
-        else if(nodeid.split("-").count() == 3) // file/directory
+        else if(nodeid.split("-").count() == 3) // file/directory or semi-smart carved file
         {
             QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
             //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
