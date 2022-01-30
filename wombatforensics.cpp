@@ -2175,7 +2175,21 @@ void WombatForensics::PopulateHexContents()
                 ui->hexview->SetColor(QString(tmpstr.split(",", Qt::SkipEmptyParts).at(0) + "," + tmpstr.split(",", Qt::SkipEmptyParts).at(1) + ";"), tmpstr.split(",", Qt::SkipEmptyParts).at(1).toLongLong());
             }
         }
-        else if(nodeid.split("-").count() == 3) // file/directory or semi-smart carved file
+        else if(nodeid.split("-").count() == 3 && nodeid.contains("-c") && !nodeid.split("-c").contains("u") && !nodeid.split("-c").contains("v")) // semi smart carved file
+        {
+            QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".prop");
+            if(!cfile.isOpen())
+                cfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(cfile.isOpen())
+            {
+                tmpstr = QString(cfile.readLine()).split(";", Qt::SkipEmptyParts).at(0);
+                cfile.close();
+            }
+            ui->hexview->setCursorPosition(tmpstr.split(",", Qt::SkipEmptyParts).at(0).toULongLong()*2);
+            ui->hexview->SetColor(tmpstr + ";", selectednode->Data("size").toULongLong());
+            ui->hexview->BypassColor(true);
+        }
+        else if(nodeid.split("-").count() == 3) // file/directory
         {
             QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
             //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
