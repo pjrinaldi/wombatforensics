@@ -2011,6 +2011,7 @@ void WombatForensics::GenerateHexFile(const QModelIndex curindex)
     }
     else if(curid.contains("-c")) // carved file
     {
+        hexstring = wombatvariable.tmpfilepath + curid + "-fhex";
         QFile cfile(wombatvariable.tmpmntpath + "carved/" + curid + ".prop");
         QString tmpstr;
         if(!cfile.isOpen())
