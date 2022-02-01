@@ -9,6 +9,7 @@ void ProcessExport(QString objectid)
     TreeNode* curitem = NULL;
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList("*-" + objectid.split("-").at(0)), QDir::NoSymLinks | QDir::Dirs);
+    /*
     QString evidencename = evidfiles.at(0).split("-e").first();
     QString tmpstr = "";
     QFile estatfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
@@ -19,10 +20,11 @@ void ProcessExport(QString objectid)
         tmpstr = estatfile.readLine();
         estatfile.close();
     }
+    */
     QByteArray filecontent;
     filecontent.clear();
     QString layout = "";
-    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, 11, QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
     if(objectid.contains("-z"))
     {
@@ -80,6 +82,26 @@ void ProcessExport(QString objectid)
     if(!objectid.contains("-z"))
     {
         QStringList layoutlist = layout.split(";", Qt::SkipEmptyParts);
+        ForImg* curimg = NULL;
+        for(int i=0; i < existingforimglist.count(); i++)
+        {
+            curimg = existingforimglist.at(i);
+            if(curimg->MountPath().endsWith(objectid.split("-").at(0)))
+            {
+                break;
+                //qDebug() << curimg->ImgPath() << curimg->MountPath();
+            }
+        }
+        if(curimg != NULL)
+        {
+            //QString tmpstr = "";
+            for(int i=0; i < layoutlist.count(); i++)
+            {
+                filecontent.append(curimg->ReadContent(layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(0).toULongLong(), layoutlist.at(i).split(",", Qt::SkipEmptyParts).at(1).toULongLong()));
+            }
+        }
+
+        /*
         QFile efile(tmpstr.split(",", Qt::SkipEmptyParts).at(1));
         if(!efile.isOpen())
             efile.open(QIODevice::ReadOnly);
@@ -92,6 +114,7 @@ void ProcessExport(QString objectid)
             }
             efile.close();
         }
+        */
     }
     QString tmppath = "";
     QString tmpname = "";
