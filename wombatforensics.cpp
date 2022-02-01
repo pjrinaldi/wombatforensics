@@ -1060,6 +1060,10 @@ void WombatForensics::InitializeAppStructure()
     ui->actionCarve->setEnabled(false);
     ui->actionExportForensicImage->setEnabled(false);
     ui->actionHashListManager->setEnabled(false);
+    // DISABLED BUTTONS UNTIL THE FUNCTIONALITY IS IMLEMENTED ENOUGH TO BE CONSIDERED FUNCTIONAL
+    ui->actionCreateForensicImage->setEnabled(false); // Create Forensic Image
+    ui->actionVerifyForensicImage->setEnabled(false); // Verify Forensic Image
+    ui->actionExportForensicImage->setEnabled(false); // Export Files to Logical Forensic Image
     QList<int> sizelist;
     sizelist.append(height()/2);
     sizelist.append(height()/2);
