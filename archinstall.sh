@@ -1,11 +1,14 @@
 #!/bin/bash
 
 ### INFO BEFORE BEGIN
-# You need an arch linux installation with blackarch (for afflib or use AUR), X and a window manager/desktop environment.
-# The test system for this script was a VM with a base install and X, XFCE. Alsa, firefox, some fonts, and git;
+# You need an arch linux installation , X/Wayland and a window manager/desktop environment.
+# The test system for this script was a VM with a base install and Wayland, sway, labwc. alsa, firefox, some fonts, and git;
 # so i can clone the repository and launch this script.
 # This script will install afflib from the AUR for you.
 # No development tools were installed prior other than git to be able to clone this repository
+
+# This isn't a very good install script, makes a ton of assumptions about user settings and tools not installed.
+# If you just run it, you will be reinstalling stuff you might already have.
 
 ### installing afflib
 # install base-devel package set

@@ -6,18 +6,17 @@
 AboutBox::AboutBox(QWidget* parent) : QDialog(parent), ui(new Ui::AboutBox)
 {
     ui->setupUi(this);
-    QString abouttext = "<h3>About WombatForensics v0.2</h3>";
+    QString abouttext = "<h3>About WombatForensics v0.4</h3>";
     abouttext += "<h5>License: GPLv2</h5>";
-    abouttext += "<4>Copyright 2013-2020 Pasquale J. Rinaldi, Jr.</h4>";
+    abouttext += "<h4>Copyright 2013-2022 Pasquale J. Rinaldi, Jr.</h4>";
     abouttext += "<h5>Email: pjrinaldi@gmail.com</h5>";
     abouttext += "<p>This program incorporates modified code from the qhexedit2 project to implement the hexviewers.";
     abouttext += " qhexedit2 is provided under the GPLv2.1. I also used Qt5.15.0, provided by the LGPL, libtar provided under the BSD 4-Clause, and some of the elementary (GPLv3), and tango (public domain) icons. The Video thumbnail error icon was created by unlimicon from Noun Project.";
-    abouttext += "<p>I also make use of the ewfmount (LPGLv3), zmgmnt (public domain), and affuse (public domain) programs.";
+    abouttext += "<p>I also make use of the libewf (LPGLv3), and afflib (public domain) to read content from these forensic image types.";
     abouttext += " Lnk file parser uses the liblnk library from Joachim Metz provided under the LGPLv3+.";
     abouttext += " Used libfwnt library from Joachim Metz (LGPLv3) to uncompress the MAM prefetch file format.";
     abouttext += " PDF page generation and display provided by the Poppler Qt5 library which is released under the GPL.";
-    abouttext += " Make use of libudev to get a list of devices to select for creating a forensic imager.";
-    abouttext += " Forensic imager generates either raw or a raw inside a read only zmg file system making use of zmg-utils code (public domain).";
+    abouttext += " Make use of libudev to get a list of devices to select for creating a forensic image.";
     abouttext += " Registry parsing provided by libregf library from Joachim Metz provided under the LGPLv3.";
     abouttext += " Image thumbnails were generated using the Magick++ library which is provided under a modified Apache 2.0. Video thumbnails were generated using the libffmpegthumbnailer library and Magick++.";
     abouttext += " The libffmpegthumbnailer library is provided under the GPLv2. Video player makes use of the QtAV library.";
