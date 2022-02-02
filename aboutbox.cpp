@@ -18,10 +18,11 @@ AboutBox::AboutBox(QWidget* parent) : QDialog(parent), ui(new Ui::AboutBox)
     abouttext += " PDF page generation and display provided by the Poppler Qt5 library which is released under the GPL.";
     abouttext += " Make use of libudev to get a list of devices to select for creating a forensic image.";
     abouttext += " Registry parsing provided by libregf library from Joachim Metz provided under the LGPLv3.";
-    abouttext += " Image thumbnails were generated using the Magick++ library which is provided under a modified Apache 2.0. Video thumbnails were generated using the libffmpegthumbnailer library and Magick++.";
+    abouttext += "<p>Image thumbnails were generated using the Magick++ library which is provided under a modified Apache 2.0. Video thumbnails were generated using the libffmpegthumbnailer library and Magick++.";
     abouttext += " The libffmpegthumbnailer library is provided under the GPLv2. Video player makes use of the QtAV library.";
-    abouttext += " Zip archive extraction and preview uses the libzip library released under 3-clause BSD license and Copyright (C) 1999-2019 Dieter Baron and Thomas Klausner.";
-    abouttext += " xchomp didn't have a license that I could find, but was created by Polygen Corporation, Jerry J. Shekhel.";
+    abouttext += "<p>Zip archive extraction and preview uses the libzip library released under 3-clause BSD license and Copyright (C) 1999-2019 Dieter Baron and Thomas Klausner.";
+    abouttext += " Hashing makes use of the BLAKE3 hashing function which is released under the CC0 1.0 Universal license by the BLAKE3-team.";
+    abouttext += "<p>xchomp didn't have a license that I could find, but was created by Polygen Corporation, Jerry J. Shekhel.";
     abouttext += "<p>The wombat icon as well as the About dialog graphic was designed by Lindsey Pargman and a lot of the design implementation ideas were brainstormed with Mark Smith.</p>";
     abouttext += "<p>If I have forgotten to mention any library or anyone, let me know and I will update this content accordingly.</p>";
     ui->textlabel->setText(abouttext);
