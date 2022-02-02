@@ -8349,6 +8349,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 	adsout.setDevice(&adsprop);
 	adsout << adsproplist.at(i).at(0) << Qt::endl;
 	adsout << adsproplist.at(i).at(1) << Qt::endl;
+        adsout << adsproplist.at(i).at(2) << Qt::endl;
 	adsout.flush();
 	adsprop.close();
 	inodecnt++;
