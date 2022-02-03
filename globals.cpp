@@ -40,8 +40,6 @@ QStringList propertylist;
 QStringList exportlist;
 QStringList digfilelist;
 QStringList listeditems;
-//QStringList existingevidence;
-//QStringList newevidence;
 QStringList partitionlist;
 //QStringList carvedtypeslist;
 QString casepath = QDir::homePath(); // case path settings variable
@@ -63,10 +61,7 @@ QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 QHash<QString, QString> mftblockhash; //  list of mft blockstrings for each partition for each evidence item
 QHash<QString, QString> passwordhash; // list of passwords for encrypted pool volume's/fs's
 QMutex mutex;
-//EwfImage* testimage;
 FilterValues filtervalues;
 QList<EvidenceReportData> evidrepdatalist;
-//QList<ForensicImage*> newevid;
-//QList<ForensicImage*> existingevid;
 QList<ForImg*> newforimglist;
 QList<ForImg*> existingforimglist;

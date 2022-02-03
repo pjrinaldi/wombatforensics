@@ -201,7 +201,7 @@ private slots:
     void VerEvidence(bool checked);
     //void VerEvidence();
     void RemoveEvidence(QStringList remlist);
-    void VerifyEvidence(QStringList verlist);
+    //void VerifyEvidence(QStringList verlist);
     void VerProgChange(int progval);
     void ExportEvidence();
     void on_actionNew_Case_triggered();
@@ -232,7 +232,6 @@ private slots:
     //void UpdateCarve(QString partid, int carvecount);
     void OpenUpdate(void);
     void UpdateCheckCount(void);
-    //void SelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void PathSelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
     void HideImageWindow(bool checkstate);
     void HideViewerManager(void);
@@ -300,7 +299,6 @@ private slots:
     //void RotateDig(void);
     //void RotateCarve(void);
     void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
-    void PrepareEvidenceImage(void);
     void SetHexOffset(void);
     void CreateNewTag(void);
     void CreateEmptyHashList(void);
@@ -316,9 +314,9 @@ private slots:
     void LaunchChomp(void);
     void UpdateTimeZone(QString newtz);
     void FinishWombatCaseFile(void);
-    void FinishVerify(void);
+    //void FinishVerify(void);
     void ShowHideColumn(void);
-    void VerifyUpdate(qint64 size);
+    //void VerifyUpdate(qint64 size);
 
     void SetRootIndex(void);
 
@@ -336,7 +334,6 @@ private:
     void InitializePreviewReport(void);
     void CloseCurrentCase(void);
     void UpdateProperties(void);
-    void LoadHexContents(void);
     void PopulateHexContents(void);
     void GenerateHexFile(const QModelIndex index);
     QStringList GetFileLists(int filelisttype);
@@ -422,10 +419,6 @@ private:
     QString currentreportpath = "";
     QHash<QString, int>carvecounthash;
     QStringList whlcomparisonlist;
-    //std::vector<struct fuse_session*> fuserlist;
-    //std::vector<ForensicImage*> evidimglist;
-    //std::vector<struct fuse*> fuserlist;
-    //pthread_t fusethread;
 };
 
 #endif // WOMBATFORENSICS_H

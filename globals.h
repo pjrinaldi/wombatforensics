@@ -4,7 +4,6 @@
 #include "wombatinclude.h"
 #include "wombatvariable.h"
 #include "imagefunctions.h"
-//#include "ewfimage.h"
 
 // Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -44,8 +43,6 @@ extern QStringList exportlist; // contains list of files to be exported
 extern QStringList digfilelist; // contains list of files to dig
 extern QStringList listeditems; // contains checked or all list of files for a case
 
-//extern QStringList existingevidence; // contains the list of existing evidence
-//extern QStringList newevidence; // contains the list of new evidence items
 
 extern QStringList partitionlist; // contains the list of partitions for file carving
 //extern QStringList carvedtypeslist; // contains the user selected list of file carving types
@@ -68,9 +65,7 @@ extern QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 extern QHash<QString, QString> mftblockhash; // list of mft blockstrings for each partition for each evidence item
 extern QHash<QString, QString> passwordhash; // list of passwords for encrypted pool volume's/fs's
 extern QMutex mutex; // mutex so my code will work when multithreaded (mainly for adding treeview nodes)
-//extern EwfImage* testimage;
-//extern QList<ForensicImage*> newevid;
-//extern QList<ForensicImage*> existingevid;
+
 extern QList<ForImg*> newforimglist;
 extern QList<ForImg*> existingforimglist;
 

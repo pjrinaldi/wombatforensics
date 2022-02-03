@@ -1,13 +1,6 @@
 #include "wombatforensics.h"
-//#include "fusefunctions.h"
-//#include "affuse.h"
-//#include "ewffuse.h"
-//#include "sqfuse.h"
-//#include "zmgfuse.h"
-//#include "ewfimage.h"
-//#include "forimg.h"
 
-// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new Ui::WombatForensics)
@@ -236,7 +229,6 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     */
     checkhash.clear();
     listeditems.clear();
-    //existingevidence.clear();
     partitionlist.clear();
     carvecounthash.clear();
     treenodemodel = new TreeNodeModel();
@@ -501,7 +493,6 @@ void WombatForensics::CreateEmptyHashList(void)
                 QStringList checkeditems = GetFileLists(1);
                 filestohash.append(checkeditems);
             }
-	    //qDebug() << "existing evidence:" << existingevidence;
 	    // SHOULD SWITCH FROM NEWEVIDENCE/EXISTINGEVIDENCE TO NEWFORIMGLIST/EXISTINGFORIMGLIST
 	    //qDebug() << "existingforimglist:" << existingforimglist.first()->ImgPath() << existingforimglist.first()->MountPath();
             //qDebug() << "filestoshash:" << filestohash;
@@ -1220,58 +1211,10 @@ void WombatForensics::OpenCaseMountFinished(int exitcode, QProcess::ExitStatus e
     ui->actionpublishresults->setEnabled(true);
     autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
     UpdateEvidenceList();
-    //if(existingevidence.count() > 0)
     if(existingforimglist.count() > 0)
     {
-        /*
-        for(int i=0; i < existingevidence.count(); i++)
-        {
-            QString emntpath = wombatvariable.imgdatapath + existingevidence.at(i).split("/").last() + "/";
-	    if(existingevidence.at(i).toLower().endsWith("sfs") || existingevidence.at(i).toLower().endsWith(".zmg") || existingevidence.at(i).toLower().endsWith(".aff") || existingevidence.at(i).endsWith(".000") || existingevidence.at(i).endsWith(".001") || existingevidence.at(i).toLower().endsWith(".e01"))
-	    {
-                QDir dir;
-	        dir.mkpath(emntpath);
-	    }
-            QStringList args;
-            args << existingevidence.at(i) << emntpath;
-            if(existingevidence.at(i).endsWith(".sfs"))
-            {
-                //SquashFuser(emntpath,  existingevidence.at(i));
-            }
-            else if(existingevidence.at(i).endsWith(".zmg"))
-            {
-                QProcess::execute("zmgmnt", args);
-                //fuserlist.push_back(ZmgFuser(emntpath.toStdString(), existingevidence.at(i).toStdString()));
-            }
-            else if(existingevidence.at(i).toLower().endsWith(".aff") || existingevidence.at(i).endsWith(".000") || existingevidence.at(i).endsWith(".001"))
-            {
-                QProcess::execute("affuse", args);
-                //fuserlist.push_back(AffFuser(emntpath, existingevidence.at(i)));
-            }
-            else if(existingevidence.at(i).toLower().endsWith(".e01"))
-            {
-                QProcess::execute("ewfmount", args);
-                //fuserlist.push_back(EwfFuser(emntpath, existingevidence.at(i)));
-            }
-        }
-        */
         QFuture<void> tmpfuture = QtConcurrent::run(LoadTreeModel);
         openwatcher.setFuture(tmpfuture);
-        /*
-        for(int i=0; i < existingevidence.count(); i++)
-        {
-            LoadTreeModel(existingevidence.at(i));
-            //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
-            //ProcessVolume(existingevidence.at(i));
-        }
-        OpenUpdate();
-        */
-        
-        //QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, LoadTreeModel);
-        //openwatcher.setFuture(tmpfuture);
-        //QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTskTree);
-	//QFuture<void> tmpfuture = QtConcurrent::map(existingevidence, PopulateTreeModel);
-        //openwatcher.setFuture(tmpfuture);
     }
     else
     {
@@ -1338,7 +1281,6 @@ void WombatForensics::OpenUpdate()
     // THE BELOW MAY ALSO BE REPLACED, BUT HAVE TO CHECK
     //InitializeHashList();
     //InitializeTaggedList();
-    //PrepareEvidenceImage();
     pathtreeview->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     pathtreeview->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -1433,7 +1375,7 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        TreeNode* curnode = static_cast<TreeNode*>(selectedindex.internalPointer());
+        //TreeNode* curnode = static_cast<TreeNode*>(selectedindex.internalPointer());
         /*
         if(treenodemodel->rowCount(selectedindex) > 0)
             qDebug() << selectedindex.sibling(selectedindex.row(), 0).data().toString() << "has children";
@@ -1473,67 +1415,6 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
         QApplication::restoreOverrideCursor();
     }
 }
-
-
-/*
-void WombatForensics::SelectionChanged(const QItemSelection &curitem, const QItemSelection &previtem)
-{
-    if(previtem.indexes().count() > 0)
-        oldselectedindex = previtem.indexes().at(0);
-    if(curitem.indexes().count() > 0)
-    {
-        selectedindex = curitem.indexes().at(0);
-        bool boolok;
-	QLocale clocale(QLocale(QLocale::English, QLocale::UnitedStates));
-        qint64 sizeval = clocale.toLongLong(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("size")).data().toString(), &boolok);
-        //qDebug() << "sizevalue:" << sizeval;
-        //qDebug() << "size locale to longlong:" << QLocale(selectedindex.sibling(selectedindex.row(), 2).data().toString())::toLongLong();
-        //if(selectedindex.sibling(selectedindex.row(), 2).data().toLongLong() > 0) // file size
-        if(sizeval > 0)
-            ui->actionView_File->setEnabled(true);
-        else
-            ui->actionView_File->setEnabled(false);
-        //ui->actionView_Properties->setEnabled(true);
-        //ui->actionView_File->setEnabled(true);
-        ui->actionView_Image_Gallery->setEnabled(true);
-        ui->actionTextViewer->setEnabled(true);
-        ui->actionExport_Evidence->setEnabled(true);
-        ui->actionExportForensicImage->setEnabled(true);
-        ui->actionByteConverter->setEnabled(true);
-        ui->actionJumpToHex->setEnabled(true);
-        ui->actionsearchhex->setEnabled(true);
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        /*
-        ui->pathToolBar->clear();
-        uint8_t hasparent = 1;
-        QList<QAction*> actionlist;
-        actionlist.clear();
-        QModelIndex curindex = selectedindex;
-        while(hasparent == 1)
-        {
-            TreeNode* curnode = static_cast<TreeNode*>(curindex.internalPointer());
-            if(curnode->itemtype == -1 || curnode->itemtype == 3 || curnode->itemtype == 2 || curnode->itemtype == 1)
-            {
-                QAction* tmpaction = new QAction(curindex.sibling(curindex.row(), 0).data().toString(), this);
-                tmpaction->setData(curindex.sibling(curindex.row(), 11).data());
-                connect(tmpaction, SIGNAL(triggered()), this, SLOT(TestData()));
-                actionlist.prepend(tmpaction);
-            }
-            QModelIndex curparent = curindex.parent();
-            if(curparent == QModelIndex())
-                hasparent = 0;
-            else
-                curindex = curparent;
-        }
-        ui->pathToolBar->addActions(actionlist);
-        */
-        //PopulateHexContents();
-        //LoadHexContents();
-/*        GenerateHexFile(selectedindex);
-        QApplication::restoreOverrideCursor();
-    }
-}
-*/
 
 void WombatForensics::SetRootIndex()
 {
@@ -1594,7 +1475,7 @@ void WombatForensics::HeaderContextMenu(const QPoint &pt)
 	connect(tmpaction, SIGNAL(triggered()), this, SLOT(ShowHideColumn()));
 	headermenu->addAction(tmpaction);
     }
-    int headerindex = pathtreeview->header()->logicalIndexAt(pt);
+    //int headerindex = pathtreeview->header()->logicalIndexAt(pt);
     headermenu->exec(pathtreeview->header()->mapToGlobal(pt));
 }
 
@@ -1611,86 +1492,6 @@ void WombatForensics::UpdateDataTable()
     qInfo() << "Evidence has been successfully added";
     //LogMessage("Evidence has been successfully added");
     StatusUpdate("Evidence ready");
-}
-
-void WombatForensics::PrepareEvidenceImage()
-{
-    /*
-    QString tmpstr = "";
-    QString mntstr = "";
-    for(int i=0; i < existingevidence.count(); i++)
-    {
-        QDir eviddir(wombatvariable.tmpmntpath);
-        QStringList evidfiles = eviddir.entryList(QStringList(QString(existingevidence.at(i).split("/").last() + ".e*")), QDir::NoSymLinks | QDir::Dirs);
-        //qDebug() << wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat";
-        QFile evidfile(wombatvariable.tmpmntpath + evidfiles.at(0) + "/stat");
-        evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(evidfile.isOpen())
-           tmpstr = evidfile.readLine();
-        evidfile.close();
-        if(!tmpstr.isEmpty())
-        {
-	    int imgtype = tmpstr.split(",").at(0).toInt();
-	    QString imagefile = tmpstr.split(",").at(3);
-            //qDebug() << "imagefile:" << imagefile;
-            //qDebug() << "imgtype:" << imgtype;
-	    if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)imgtype) || imagefile.endsWith(".aff")) // AFF
-	    {
-                //qDebug() << "is aff";
-		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                    AffFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
-	    }
-	    else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)imgtype) || imagefile.endsWith(".e01")) // EWF
-	    {
-		//if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/ewf1"))
-		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                    EwfFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
-	    }
-	    else if(imagefile.endsWith(".sfs")) // SFS
-	    {
-                /*
-	        if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
-                    SquashFuser(wombatvariable.imgdatapath,  existingevidence.at(i));
-                */
-/*	    }
-            else if(imagefile.endsWith(".zmg")) // ZMG
-            {
-		if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".dd"))
-                    ZmgFuser(QString(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last()).toStdString(), existingevidence.at(i).toStdString());
-            }
-	    else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)imgtype)) // RAW
-	    {
-		QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
-		if(imgext.contains(".000"))
-		{
-		    if(!QFileInfo::exists(wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + ".raw"))
-                        AffFuser(wombatvariable.imgdatapath, tmpstr.split(",").at(3));
-			//mntstr = "affuse " + tmpstr.split(",").at(3) + " " + wombatvariable.imgdatapath;
-		}
-		else
-		    mntstr = "";
-	    }
-	    else
-	    {
-		qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)imgtype)) + " is not supported.");
-	    }
-	    if(!mntstr.isEmpty())
-	    {
-                /*
-                qDebug() << "call affuse:" << mntstr;
-		xmntprocess = new QProcess();
-		connect(xmntprocess, SIGNAL(readyReadStandardOutput()), this, SLOT(ReadXMountOut()), Qt::QueuedConnection);
-		connect(xmntprocess, SIGNAL(readyReadStandardError()), this, SLOT(ReadXMountErr()), Qt::QueuedConnection);
-		xmntprocess->setProgram(mntstr);
-		xmntprocess->start();
-		//xmntprocess->start(mntstr); // removes WARNING Messages but does not capture them.. NEED TO FIX
-		//xmntprocess->start(mntstr, QStringList());
-                */
-/*	    }
-            //else
-            //    qDebug() << "affuse command not called, function call instead..";
-        }
-    }*/
 }
 
 void WombatForensics::ReadXMountOut()
@@ -1715,21 +1516,11 @@ void WombatForensics::UpdateStatus()
     StatusUpdate("Building Initial Evidence Tree...");
     qInfo() << "Building Initial Evidence Tree...";
     //qInfo() << QTime::currentTime().toString(
-    //UpdateEvidenceList();
-    /*
-    for(int i=0; i < newevidence.count(); i++)
-    {
-	//existingevid.append(newevid.at(i));
-	existingevidence.append(newevidence.at(i));
-    }
-    */
     //newevid.clear();
     //for(int i=0; i < newforimglist.count(); i++)
     existingforimglist.append(newforimglist);
 
-    //newevidence.clear();
     newforimglist.clear();
-    //PrepareEvidenceImage();
     //qDebug() << "evidrepdatalist count" << evidrepdatalist.count();
     for(int i=0; i < evidrepdatalist.count(); i++)
     {
@@ -1792,82 +1583,29 @@ QList<ForImg*> existingforimglist;
      */ 
     //newevid.clear();
     newforimglist.clear();
-    //newevidence.clear();
     addevidencedialog = new AddEvidenceDialog(this);
     addevidencedialog->exec();
     QDir eviddir = QDir(wombatvariable.tmpmntpath);
     QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::NoSymLinks | QDir::Dirs);
     ecount = evidfiles.count();
-    //for(int i=0; i < newevidence.count(); i++)
     for(int i=0; i < newforimglist.count(); i++)
     {
-        //QString evidencepath = wombatvariable.tmpmntpath + newevidence.at(i).split("/").last() + "-e" + QString::number(ecount) + "/";
         QString evidencepath = wombatvariable.tmpmntpath + newforimglist.at(i)->ImgPath().split("/").last() + "-e" + QString::number(ecount) + "/";
 	QString emntpath = "";
         QDir dir;
         dir.mkpath(evidencepath);
         newforimglist.at(i)->SetMountPath(evidencepath);
-	/*
-	if(newevidence.at(i).toLower().endsWith(".zmg") || newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001") || newevidence.at(i).toLower().endsWith(".e01"))
-	{
-            emntpath = wombatvariable.imgdatapath + newevidence.at(i).split("/").last() + "/";
-	    dir.mkpath(emntpath);
-	}
-	*/
         // need to delete emntpath directories on close for cleanup purposes after unmount...
         ecount++;
-	/*
-        QStringList args;
-        args << newevidence.at(i) << emntpath;
-        if(newevidence.at(i).toLower().endsWith(".zmg"))
-        {
-            QProcess::execute("zmgmnt", args);
-            //ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString());
-            //QtConcurrent::run(ZmgFuser, emntpath.toStdString(), newevidence.at(i).toStdString());
-            //fuserlist.push_back(ZmgFuser(emntpath.toStdString(), newevidence.at(i).toStdString()));
-            //system(QString("zmgmnt " + newevidence.at(i) + " " + emntpath).toStdString().c_str());
-        }
-        else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
-        {
-            QProcess::execute("affuse", args);
-        }
-        else if(newevidence.at(i).toLower().endsWith(".e01"))
-        {
-            //ForensicImage* tmpimage = new ForensicImage(newevidence.at(i));
-            //evidimglist.push_back(tmpimage);
-            //EwfImage* tmpimage = new EwfImage(newevidence.at(i));
-            //evidimglist.push_back(tmpimage);
-            //testimage->size();
-            //ui->hexview->setData(*testimage);
-            //QProcess::execute("ewfmount", args);
-        }
-	*/
-        /*
-        else if(newevidence.at(i).toLower().endsWith(".aff") || newevidence.at(i).endsWith(".000") || newevidence.at(i).endsWith(".001"))
-            fuserlist.push_back(AffFuser(emntpath, newevidence.at(i)));
-        else if(newevidence.at(i).toLower().endsWith(".e01"))
-            fuserlist.push_back(EwfFuser(emntpath, newevidence.at(i)));
-        */
     }
-    //if(newevidence.count() > 0)
     if(newforimglist.count() > 0)
     {
         evidrepdatalist.clear();
-        /*
-        for(int i=0; i < newevidence.count(); i++)
-        {
-            //int libewf_handle_get_media_size(libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error );
-            ProcessVolume(newevidence.at(i));
-        }
-        */
-        //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, ProcessVolume);
         QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessForensicImage);
         volwatcher.setFuture(tmpfuture);
         //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
         //QFuture<void> tmpfuture = QtConcurrent::map(newevid, ProcessVolume);
         //UpdateStatus();
-        //QFuture<void> tmpfuture = QtConcurrent::map(newevidence, InitializeEvidenceStructure);
-        //sqlwatcher.setFuture(tmpfuture);
     }
 }
 
@@ -2585,284 +2323,6 @@ void WombatForensics::PopulateHexContents()
 
      */ 
 }
-void WombatForensics::LoadHexContents()
-{
-    /*
-    // NEED TO GET EVIDENCE NAME FROM STAT FILE
-    selectednode = static_cast<TreeNode*>(selectedindex.internalPointer());
-    QString nodeid = selectednode->Data(11).toString();
-    qDebug() << "nodeid:" << nodeid;
-    if(nodeid.split("-f").last().startsWith("z"))
-    {
-        selectednode = static_cast<TreeNode*>(selectedindex.parent().internalPointer());
-        nodeid = selectednode->Data(11).toString();
-    }
-    QString evidid = nodeid.split("-").first();
-    qDebug() << "evidid:" << evidid;
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-*" + evidid)), QDir::NoSymLinks | QDir::Dirs);
-    qDebug() << "evidfiles:" << evidfiles;
-    QString evidname = evidfiles.first().split(QString("-" + evidid)).first();
-    QString tmpstr = "";
-    /*
-    QFile evidfile(wombatvariable.tmpmntpath + evidfiles.first() + "/stat");
-    evidfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(evidfile.isOpen())
-        tmpstr = evidfile.readLine();
-    evidfile.close();
-    */
-/*    QString datastring = wombatvariable.imgdatapath;
-    //if(TSK_IMG_TYPE_ISAFF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).endsWith(".aff"))
-    if(evidname.toLower().endsWith(".aff"))
-    {
-        datastring += evidname + "/" + evidname + ".raw";
-        //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
-    }
-    else if(evidname.toLower().endsWith(".e01"))
-    //else if(TSK_IMG_TYPE_ISEWF((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()) || tmpstr.split(",").at(3).toLower().endsWith(".e01"))
-    {
-        datastring += evidname + "/" + evidname + ".raw";
-        //datastring += tmpstr.split(",").at(3).split("/").last() + "/ewf1";
-        //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
-    }
-    /*else if(TSK_IMG_TYPE_ISRAW((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt()))
-    {
-        QString imgext = evidname.split(".").last();
-        //QString imgext = tmpstr.split(",").at(3).split("/").last().split(".").last();
-        if(imgext.contains(".000") || imgext.contains(".001"))
-        {
-            datastring += evidname + "/" + evidname + ".raw";
-            //datastring += tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last() + ".raw";
-        }
-        else
-        {
-            datastring = "get raw path...";
-            //datastring = tmpstr.split(",").at(3);
-        }
-    }*/
-    //else
-    //{
-    //    qDebug() << QString("Image type: " + QString(tsk_img_type_toname((TSK_IMG_TYPE_ENUM)tmpstr.split(",").at(0).toInt())) + " is not supported.");
-    //}
-    //if(datastring.endsWith(".sfs"))
-    //{
-	//datastring = 
-        //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".sfs").first() + ".dd";
-    //}
-/*    else if(datastring.endsWith(".zmg"))
-    {
-	datastring += evidname + "/" + evidname.split(".zmg").first() + ".dd";
-        //datastring = wombatvariable.imgdatapath + tmpstr.split(",").at(3).split("/").last() + "/" + tmpstr.split(",").at(3).split("/").last().split(".zmg").first() + ".dd";
-    }
-    //qDebug() << "datastring:" << datastring;
-    casedatafile.setFileName(datastring);
-    ui->hexview->BypassColor(false);
-    ui->hexview->setData(casedatafile);
-
-    // determine offset location in the editor
-    if(nodeid.split("-").count() == 1) // image file
-        ui->hexview->setCursorPosition(0);
-    else if(nodeid.split("-").count() == 2 && !nodeid.contains("-c")) // volume file
-    {
-        QFile volfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
-        volfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(volfile.isOpen())
-            tmpstr = volfile.readLine();
-        volfile.close();
-        ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toInt()*2);
-    }
-    else if(nodeid.contains("-c"))//else if(nodeid.split("-").count() == 2 && nodeid.contains("-c")) // carved file
-    {
-        QFile cfile(wombatvariable.tmpmntpath + "carved/" + nodeid + ".stat");
-        if(!cfile.isOpen())
-            cfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(cfile.isOpen())
-            tmpstr = cfile.readLine();
-        cfile.close();
-        ui->hexview->BypassColor(true);
-        ui->hexview->SetColorInformation(0, 0, 0, 0, tmpstr.split(",").at(16), tmpstr.split(",").at(8).toULongLong(), 0);
-        if(tmpstr.split(",").count() > 15)
-            ui->hexview->setCursorPosition(tmpstr.split(",").at(16).toULongLong()*2);
-    }
-    else if(nodeid.split("-").count() == 3) // partition/file system
-    {
-        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
-        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(partfile.isOpen())
-            tmpstr = partfile.readLine();
-        partfile.close();
-        ui->hexview->setCursorPosition(tmpstr.split(",").at(4).toLongLong()*2);
-    }
-    else if(nodeid.split("-").count() == 4) // $Carved directory
-    {
-        casedatafile.setFileName(QDir::tempPath() + "/zfile");
-        casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
-        casedatafile.write("dummy zerofile");
-        casedatafile.close();
-        ui->hexview->BypassColor(true);
-        ui->hexview->setData(casedatafile);
-        ui->hexview->setEnabled(false);
-        ui->actionsearchhex->setEnabled(false);
-    }
-    else if(nodeid.split("-").count() == 5) // dir/file
-    {
-        QString estring = nodeid.split("-", Qt::SkipEmptyParts).at(0);
-        QString vstring = nodeid.split("-", Qt::SkipEmptyParts).at(1);
-        QString pstring = nodeid.split("-", Qt::SkipEmptyParts).at(2);
-        QString fstring = nodeid.split("-", Qt::SkipEmptyParts).at(3);
-        QString astring = nodeid.split("-", Qt::SkipEmptyParts).at(4);
-        QString paridstr = astring.mid(1);
-        QStringList partlist;
-        partlist.clear();
-        QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/" + nodeid.split("-").at(2) + "/stat");
-        partfile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(partfile.isOpen())
-            partlist = QString(partfile.readLine()).split(",");
-        partfile.close();
-        qint64 fsoffset = partlist.at(4).toLongLong();
-        qint64 rootinum = partlist.at(3).toLongLong();
-        int blocksize = partlist.at(6).toInt();
-        int fstype = partlist.at(0).toInt();
-        if(paridstr.contains("-"))
-            paridstr = QString::number(rootinum);
-        int mftaddress = 0;
-        if(fstring.contains("a"))
-            mftaddress = astring.mid(2).toInt();
-        else
-            mftaddress = fstring.mid(1).toInt();
-        ui->hexview->setEnabled(true);
-        ui->actionsearchhex->setEnabled(true);
-        if(selectednode->Data(2).toInt() == 0) // zero file
-        {
-            casedatafile.setFileName(QDir::tempPath() + "/zfile");
-            casedatafile.open(QIODevice::WriteOnly | QIODevice::Text);
-            casedatafile.write("dummy zerofile");
-            casedatafile.close();
-            ui->hexview->BypassColor(true);
-            ui->hexview->setData(casedatafile);
-            ui->hexview->setEnabled(false);
-            ui->actionsearchhex->setEnabled(false);
-        }
-        else
-        {
-            QString blockstring = "";
-            QString residentstring = "";
-            QString bytestring = "";
-            QFile filefileprop;
-            filefileprop.setFileName(wombatvariable.tmpmntpath + evidfiles.first() + "/" + vstring + "/" + pstring + "/" + fstring + ".a" + paridstr + ".prop");
-            filefileprop.open(QIODevice::ReadOnly | QIODevice::Text);
-            while(!filefileprop.atEnd())
-            {
-                QString tmpstring = filefileprop.readLine();
-                if(tmpstring.contains("Block Address"))
-                    blockstring = tmpstring.split("||").at(1);
-                else if(tmpstring.contains("Byte Offset"))
-                    bytestring = tmpstring.split("||").at(1);
-                else if(tmpstring.contains("Data Attribute"))
-                    residentstring = tmpstring.split("||").at(1);
-            }
-            filefileprop.close();
-            bool isresident = true;
-            if(residentstring.contains("Non"))
-                isresident = false;
-            // ALTERNATIVE IF/ELSE METHOD TO SHORTEN CODE
-            bool isres = isresident;
-            bool isntfs = false;
-            bool isads = false;
-            bool isdir = false;
-	    bool isapfs = false;
-	    bool ishfs = false;
-	    if(fstype == TSK_FS_TYPE_APFS_DETECT)
-		isapfs = true;
-	    if(fstype == TSK_FS_TYPE_HFS_DETECT)
-		ishfs = true;
-            if(fstype == TSK_FS_TYPE_NTFS_DETECT)
-                isntfs = true;
-            if(fstring.contains("a"))
-	        isads = true;
-            if(selectednode->itemtype == 3 || selectednode->itemtype == 11) // IF DIRECTORY (ALWAYS RESIDENT)
-	        isdir = true;
-
-	    // ADD APFS FEATURES HERE...
-            if(isntfs && isres) // NTFS & RESIDENT
-            {
-    	        unsigned int curoffset = 0;
-		uint16_t mftoffset = 0;
-	        uint32_t atrtype = 0;
-	        uint8_t namelength = 0;
-	        uint32_t attrlength = 0;
-	        uint16_t resoffset = 0;
-		QStringList mftblocklist;
-		mftblocklist.clear();
-		QString mftid = nodeid.split("-").first() + "-" + nodeid.split("-").at(1) + "-" + nodeid.split("-").at(2) + "-f0-a5";
-		mftblocklist = mftblockhash.value(mftid).split("^^", Qt::SkipEmptyParts);
-                // NEW RESIDENT OFFSET CALCULATION
-                qint64 residentoffset = 0;
-                if((mftaddress * 1024/blocksize) % 2 == 0) // even number, get the starting block.
-                {
-                    residentoffset = (mftblocklist.at(mftaddress * 1024/blocksize).toLongLong() * blocksize) + fsoffset;
-                }
-                else // odd number, get starting block and jump the fractional amount to get to the correct entry.
-                {
-                    float mftblock = mftaddress * 1024.0/blocksize;
-                    int mftblockint = floor(mftblock);
-                    residentoffset = (mftblocklist.at(mftblockint).toLongLong() * blocksize) + fsoffset + (blocksize * (mftblock - mftblockint));
-                }
-                QByteArray resbuffer = ui->hexview->dataAt(residentoffset, 1024); // MFT Entry
-	        if(resbuffer.count() > 0)
-	        {
-                    curoffset = 0;
-		    mftoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(20, 2)); // offset to first attribute
-		    uint16_t attrcnt = qFromLittleEndian<uint16_t>(resbuffer.mid(40, 2)); // next attribute id
-		    curoffset += mftoffset;
-		    // Loop over attributes...
-                    for(uint i = 0; i < attrcnt; i++)
-                    {
-			atrtype = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset, 4)); // attribute type
-			namelength = qFromLittleEndian<uint8_t>(resbuffer.mid(curoffset + 9, 1)); // length of name
-			attrlength = qFromLittleEndian<uint32_t>(resbuffer.mid(curoffset + 4, 4)); // attribute length
-		        if(isdir && atrtype == 144)
-                        {
-			    break;
-                        }
-		        if(!isdir && isads && namelength > 0 && atrtype == 128)
-                        {
-			    break;
-                        }
-		        else if(!isdir && !isads && namelength == 0 && atrtype == 128)
-                        {
-			    break;
-                        }
-                        if(atrtype == 4294967295)
-                        {
-                            //qDebug() << "next attribute is 0xFFFFFFFF";
-                            break;
-                        }
-                        curoffset += attrlength;
-                    }
-		    resoffset = qFromLittleEndian<uint16_t>(resbuffer.mid(curoffset + 20, 2)); // resident attribute content offset
-                    ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, QString::number(residentoffset + curoffset + resoffset - fsoffset), bytestring, selectednode->Data(2).toLongLong(), (curoffset + resoffset));
-                    ui->hexview->setCursorPosition((residentoffset + curoffset + resoffset)*2);
-                }
-            }
-            else if(isapfs || ishfs)
-            {
-                // NO BYTESTRING AND BLOCKLIST FOR APFS... NEED TO FIGURE OUT HOW APFS DOES IT...
-                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
-                ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
-                //qDebug() << "apfs works...";
-            }
-            else // NTFS NON-RESIDENT or ALTERNATIVE FILE SYSTEM
-	    {
-                ui->hexview->SetColorInformation(partlist.at(4).toLongLong(), partlist.at(6).toLongLong(), blockstring, "", bytestring, selectednode->Data(2).toLongLong(), 0);
-                ui->hexview->setCursorPosition(bytestring.toLongLong()*2);
-	    }
-        }
-    }
-    //else
-    //    qDebug() << "count for nodeid:" << nodeid.split("-").count();
-    ui->hexview->ensureVisible();*/
-}
 
 void WombatForensics::CloseCurrentCase()
 {
@@ -2926,125 +2386,11 @@ void WombatForensics::CloseCurrentCase()
     filecountlabel->setText("Parsed: " + QString::number(filesfound));
     checkedcountlabel->setText("Checked: " + QString::number(fileschecked));
 
-    // UNMOUNT ALL FUSE MOUNTED IMAGES
-    /*
-    for(int i=0; i < fuserlist.size(); i++)
-    {
-        struct fuse_session* curfuser = (struct fuse_session*)(fuserlist.at(i));
-        QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
-        if(imgext.endsWith("e01") || imgext.endsWith("aff") || imgext.endsWith("000") || imgext.endsWith("zmg")) // ewfmount
-        {
-            if(curfuser != NULL)
-            {
-                fuse_session_unmount(curfuser);
-                /*
-                if(i == fuserlist.size() - 1)
-                {
-                    //fuse_destroy(curfuser);
-                }
-                */
-            /*}
-        }
-    }
-    if(fuserlist.size() > 0)
-    {
-        // REMOVE EWFMOUNT DIRECTORIES RECURSIVELY HERE...
-        // might need to get an entrylist for the directory and then call remove() for each
-        // directory or rmdir() for each directory...
-        //QDir edir = QDir(wombatvariable.tmpmntpath + evidfiles.first());
-        //edir.removeRecursively();
-    }
-    */
-    // UNMOUNT EVIDENCEIMAGEDATAFILE
-    // NEED TO CHANGE THIS LOOP FROM EXISTINGEVIDENCE.COUNT() TO FUSELIST.COUNT()
-    /*
-    for(int i=0; i < evidimglist.size(); i++)
-    {
-        delete evidimglist.at(i);
-    }
-    */
-    /*
-    for(int i=0; i < existingevidence.count(); i++)
-    {
-        QStringList args;
-        args << "-u" << wombatvariable.imgdatapath + existingevidence.at(i).split("/").last();
-        //qDebug() << "existing evidence:" << existingevidence.at(i);
-        QString imgext = existingevidence.at(i).split("/").last().split(".").last().toLower();
-        //qDebug() << "imgext:" << imgext;
-        if(imgext.contains("e01")) // ewfmount
-        {
-            /*
-            QProcess::execute("fusermount", args);
-            QDir dir(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last());
-            if(dir.exists())
-                dir.rmdir(dir.absolutePath());
-            */
-            /*
-            if(ewfuser != NULL)
-            {
-                fuse_unmount(ewfuser);
-                fuse_destroy(ewfuser);
-            }
-            else
-                qDebug() << "ewfuser was null";
-            */
-       /* }
-        else if(imgext.contains("aff") || imgext.contains("000") || imgext.contains("001")) // affuse
-        {
-            QProcess::execute("fusermount", args);
-            //QDir::rmdir(QString(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last()));
-            QDir dir(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last());
-            if(dir.exists())
-                dir.rmdir(dir.absolutePath());
-            /*
-            if(affuser != NULL)
-            {
-                fuse_unmount(affuser);
-                fuse_destroy(affuser);
-            }
-            else
-                qDebug() << "affuser was null";
-            */
-        /*}
-        else if(imgext.contains("zmg")) // zmgfuse
-        {
-            QProcess::execute("fusermount", args);
-            //QDir::rmdir(QString(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last()));
-            QDir dir(wombatvariable.imgdatapath + existingevidence.at(i).split("/").last());
-            if(dir.exists())
-                dir.rmdir(dir.absolutePath());
-            /*
-            if(zmgfuser != NULL)
-            {
-                fuse_unmount(zmgfuser);
-                fuse_destroy(zmgfuser);
-            }
-            */
-        /*}
-        else if(imgext.contains("sfs")) // squashfuse
-        {
-            /*
-            if(sqfuser != NULL)
-            {
-                fuse_unmount(sqfuser);
-                fuse_destroy(sqfuser);
-            }
-            */
-        /*}
-        /*
-        else // raw, so nothing to unmount
-        {
-        }
-        */
-    /*}
-    qInfo() << "Forensic Image(s) unmounted";
-    */
     carvecounthash.clear();
     partitionlist.clear();
     //existingevidence.clear();
     newforimglist.clear();
     existingforimglist.clear();
-    //newevidence.clear();
     //newevid.clear();
     //existingevid.clear();
     // BEGIN TAR METHOD
@@ -3087,27 +2433,27 @@ void WombatForensics::RemEvidence()
     remevidencedialog->exec();
 }
 
+/*
 void WombatForensics::VerifyUpdate(qint64 cursize)
 {
-    /*
     QProgressBar* curbar = verevidencedialog->findChild<QProgressBar*>();
     qDebug() << "curbar objectname:" << curbar->objectName();
     qDebug() << "cursize:" << cursize;
     //QPushButton *button = parentWidget->findChild<QPushButton *>("button1");
-    */
 }
+*/
 
+/*
 void WombatForensics::FinishVerify()
 {
-    /*
     QString resultstring = "";
     for(int i=0; i < verfuture.resultCount(); i++)
     {
         resultstring += QString::fromStdString(verfuture.resultAt(i)) + "\n";
     }
     QMessageBox::information(this, "Finished", " " + resultstring, QMessageBox::Ok);
-    */
 }
+*/
 
 void WombatForensics::VerProgChange(int progval)
 {
@@ -3119,18 +2465,18 @@ void WombatForensics::VerProgChange(int progval)
     */
 }
 
+/*
 void WombatForensics::VerifyEvidence(QStringList verevidlist)
 {
     // I should move this code to the verevidencedialog and cut out going back to wombatforensics at all...
-    /*
     connect(&verifywatcher, SIGNAL(finished()), this, SLOT(FinishVerify()), Qt::QueuedConnection);
     // the below progressValueChanged is from 0 to 1, i.e. the number of items sent to the mapped command.
     // so this is worthless, I need to get the verify information... which means i need an isignal...
     //connect(&verifywatcher, SIGNAL(progressValueChanged(int)), this, SLOT(VerProgChange(int)));
     verfuture = QtConcurrent::mapped(verevidlist, Verify);
     verifywatcher.setFuture(verfuture);
-    */
 }
+*/
 
 void WombatForensics::RemoveEvidence(QStringList remevidlist)
 {
@@ -3375,167 +2721,6 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     digtotalcount = digfilelist.count();
 
     //qDebug() << "digfilelist:" << digfilelist;
-    /*
-    // THIS LOOP MIGHT BE JUST TO GET THE COUNTS FOR THE STATUS, NOT NECESSARILY THE FILEIDLISTS FOR RESPECTIVE DIGGING
-    // GET COUNTS FOR EACH DIGGING CHOICE
-    for(int i = 0; i < digoptions.count(); i++)
-    {
-        if(digoptions.at(i) == 0) // Generate Image Thumbnails
-        {
-            if(dtype == 1) // checked so get all images in a tmp list and then reduce the checked list to just checked images
-            {
-                //qDebug() << "all checked files:" << digfilelist;
-                QStringList tmpimglist = GetFileLists(4);
-                for(int j=0; j < digfilelist.count(); j++)
-                {
-                    if(!tmpimglist.contains(digfilelist.at(j)))
-                        digimgthumbtotal++;
-                        //digfilelist.removeAt(j);
-                }
-                //qDebug() << "checked images only:" << digfilelist;
-            }
-            else if(dtype == 2) // all files, replace all files with just images.
-                digimgthumbtotal = GetFileLists(4).count();
-        }
-        else if(digoptions.at(i) == 1) // Generate Video Thumbnails
-        {
-            if(dtype == 1) // checked, so get all videos in a tmplist and then reduce the checked list to just checked videos
-            {
-                //qDebug() << "all checked files:" << digfilelist;
-                QStringList tmpvidlist = GetFileLists(5);
-                for(int j=0; j < digfilelist.count(); j++)
-                {
-                    if(!tmpvidlist.contains(digfilelist.at(j)))
-                        digvidthumbtotal++;
-                        //digfilelist.removeAt(j);
-                }
-                //qDebug() << "checked videos only:" << digfilelist;
-            }
-            else if(dtype == 2) // all files, replace all files with just videos
-                digvidthumbtotal = GetFileLists(5).count();
-        }
-        else if(digoptions.at(i) == 2) // Generate BlAKE3 Hash
-        {
-            dighashtotal = digfilelist.count();
-        }
-        else if(digoptions.at(i) == 3) // Compare with Selected HashLists
-        {
-            digmatchtotal = digfilelist.count();
-            // global variable is whlcomparisonlist
-        }
-        else if(digoptions.at(i) == 4) // Expand Zip Archives
-        {
-        }
-        /*
-        // I MAY NOT NEED 4,5,6 IF I DO THE CHECK ON THE LIST PRIOR TO CALCULATION OTHERWISE I WILL HAVE TO REDUCE THE SELECTED OR CHECKED OR ALL LIST HERE...
-        if(digoptions.at(i) == 0 || digoptions.at(i) == 4 || digoptions.at(i) == 5) // Generate Image Thumbnails || video || both
-        {
-            genthmbpath = wombatvariable.tmpmntpath;
-            if(digoptions.at(i) == 0 || digoptions.at(i) == 5)
-            {
-                isimgthumb = true;
-                if(dtype == 2) // all files, only get images...
-                {
-                    digimgthumbtotal = GetFileLists(4).count(); // images only
-                }
-                else if(dtype == 1 || dtype == 3) // checked files, only get images...
-                {
-                    QStringList allimglist = GetFileLists(4); // all images
-                    for(int i=0; i < digfilelist.count(); i++)
-                    {
-                        if(allimglist.contains(digfilelist.at(i)))
-                            digimgthumbtotal++;
-                    }
-                }
-                else if(dtype == 0) // selected file, only get image
-                {
-                    QStringList allimglist = GetFileLists(4); // all images
-                    if(allimglist.contains(digfilelist.first()))
-                        digimgthumbtotal = 1;
-                }
-		digimgcountstring = "Thumbnailed: 0 of " + QString::number(digimgthumbtotal) + " Images";
-                if(digimgthumbtotal > 0)
-                {
-                    hasimg = true;
-                }
-            }
-            if(digoptions.at(i) == 4 || digoptions.at(i) == 5)
-            {
-                isvidthumb = true;
-                if(dtype == 2) // all files, only get videos
-                {
-                    digvidthumbtotal = GetFileLists(5).count(); // videos only
-                }
-                else if(dtype == 1 || dtype == 3)
-                {
-                    QStringList allvidlist = GetFileLists(5); // all videos
-                    for(int i=0; i < digfilelist.count(); i++)
-                    {
-                        if(allvidlist.contains(digfilelist.at(i)))
-                            digvidthumbtotal++;
-                    }
-                }
-                else if(dtype == 0) // selected file, only get video
-                {
-                    QStringList allvidlist = GetFileLists(5); // all videos
-                    if(allvidlist.contains(digfilelist.first()))
-                        digvidthumbtotal = 1;
-                }
-		digvidcountstring = "Thumbnailed: 0 of " + QString::number(digvidthumbtotal) + " Videos";
-                if(digvidthumbtotal > 0)
-                {
-                    hasvid = true;
-                }
-            }
-        }
-        else if(digoptions.at(i) == 1 || digoptions.at(i) == 2 || digoptions.at(i) == 3 || digoptions.at(i) == 7) // 1 - MD5 || 2 - SHA1 || 3 - SHA256 || 7 - BLAKE3
-        {
-            if(digoptions.at(i) == 2)
-                hashsum = 2;
-            else if(digoptions.at(i) == 3)
-                hashsum = 4;
-            else if(digoptions.at(i) == 1)
-                hashsum = 1;
-            else if(digoptions.at(i) == 7)
-                hashsum = 11;
-            dighashtotal = digfilelist.count();
-	    dighashcountstring = "Hashed: 0 of " + QString::number(dighashtotal);
-            if(dighashtotal > 0)
-            {
-                hashash = true;
-            }
-        }
-        else if(digoptions.at(i) == 6) // 6- EXPAND ARCHIVES
-        {
-            if(dtype == 2) // all files, only get images...
-            {
-                digarchivetotal = GetFileLists(6).count(); // archives only
-                qDebug() << "digarchivetotal:" << digarchivetotal;
-            }
-            else if(dtype == 1 || dtype == 3) // checked files, only get images...
-            {
-                QStringList archiveslist = GetFileLists(6); // all archives
-                for(int i=0; i < digfilelist.count(); i++)
-                {
-                    if(archiveslist.contains(digfilelist.at(i)))
-                        digarchivetotal++;
-                }
-            }
-            else if(dtype == 0) // selected file, only get image
-            {
-                QStringList archiveslist = GetFileLists(6); // all archives
-                if(archiveslist.contains(digfilelist.first()))
-                    digarchivetotal = 1;
-            }
-            digarchivecountstring = "Expanded: 0 of " + QString::number(digarchivetotal) + " Archives";
-            if(digarchivetotal > 0)
-                hasarchive = true;
-        }
-        */
-    /*}
-    digtotalcount = digimgthumbtotal + digvidthumbtotal + dighashtotal + digarchivetotal;
-    digtotalcountstring = "Dug: 0 of " + digtotalcount;
-    */
     //qDebug() << "digoptions:" << digoptions;
     for(int i = 0; i < digoptions.count(); i++)
     {
@@ -4464,6 +3649,7 @@ void WombatForensics::AutoSaveState()
 /*
 void WombatForensics::RotateCarve()
 {
+*/
     /*
     QHashIterator<QString, int> i(carvecounthash);
     while (i.hasNext())
