@@ -16,7 +16,7 @@ sudo pacman -S base-devel
 # move up a directory from wombatforensics clone
 cd ../
 # download AUR snapshot
-curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/afflib.tar.gz
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/afflib.tar.gz
 # extract the afflib PKGBUILD
 tar -xzf afflib.tar.gz
 # cd into the afflib directory
@@ -36,7 +36,7 @@ sudo pacman -S zip unzip p7zip libheif
 # move up a directory from wombatforensics clone
 cd ../
 # download AUR snapshot
-curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/liblnk-git.tar.gz
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/liblnk-git.tar.gz
 # extract the liblnk-git PKGBUILD
 tar -xzf liblnk-git.tar.gz
 # cd into the liblnk-git directory
