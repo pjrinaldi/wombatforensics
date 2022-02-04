@@ -1156,7 +1156,21 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
 
         // VOLUME LABEL IS THE FILE NAME FOR THE ROOT DIRECTORY, CATALOG ID: 2...
-
+        // NEED TO GET THE CATALOG START BLOCK * BLOCK SIZE + (CNID - 1)*4096 = 991232 + (2-1)*4096 = 995328
+        // THIS IS THE START OF THE CATALOG LEAF NODE FOR THE ROOT FOLDER (CNID 2)
+        // FIRST 14 BYTES ARE NODE DESCRIPTOR [BYTE 8 IS THE KIND AND SHOULD BE 0xFF], [BYTE 9 IS THE HEIGHT AND SHOULD BE 1 FOR LEAF NODE]
+        // NEXT 2 BYTES ARE THE KEY LENGTH, 4 BYTES ARE PARENT CNID [SHOULD BE 0x00000001]
+        // NEXT 4 BYTES ARE THE DATA LENGTH NODE FOR THE KEY DATA, KEY DATA IS THE VOLUME NAME
+        quint32 catalogstartoffset = qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1312, 4));
+        //qDebug() << "catalog start offset:" << catalogstartoffset;
+        quint64 catalogstartinbytes = catalogstartoffset * 4096 + 4096; // second 4096 is (2-1) * 4096
+        //qDebug() << "catalog start offset for root folder:" << catalogstartinbytes << "should be <995328>";
+        //qDebug() << "THE KIND:" << curimg->ReadContent(catalogstartinbytes + 8, 1).toHex();
+        //qDebug() << "HEIGHT:" << curimg->ReadContent(catalogstartinbytes + 9, 1).toHex();
+        quint32 keydatalength = qFromBigEndian<quint16>(curimg->ReadContent(catalogstartinbytes + 20, 2));
+        //qDebug() << "KEY DATA LENGTH:" << keydatalength;
+        for(uint8_t i=0; i < keydatalength; i++)
+            partitionname += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(catalogstartinbytes + 22 + i*2, 2))));
         if(hfssig == "H+")
         {
             partitionname += " [HFS+]";
@@ -1190,9 +1204,6 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                 out << QString::number(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1316 + i*8, 4))) << ",";
         }
         out << "|Block count for each extent for Catalog file." << Qt::endl;
-        // CATALOG START BLOCK 242 * 4096 = 991232 BYTES
-        // VOLUME HEADER START OFFSET 1024 BYTES
-        // VOLUME HEADER LENGTH 512 BYTES
 
         /*
         int curoffset = 1024;
@@ -1215,7 +1226,6 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         fsinfo.insert("catalogextent0blkcnt", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 292, 4))));
         qDebug() << "catalog startblk:" << fsinfo.value("catalogextent0startblk").toUInt();
         qDebug() << "catalog blkcnt:" << fsinfo.value("catalogextent0blkcnt").toUInt();
-        // 995344 is where the volume name is stored.... in sector 1944
         */
     }
     else if(xfssig == "XFSB") // XFS
