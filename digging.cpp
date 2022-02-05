@@ -419,8 +419,22 @@ void GenerateHashCompare(QString itemid)
 {
     // determine if it has a hash already...
     // get object id content
-    qDebug() << "itemid hash value:" << itemid << treenodemodel->GetNodeColumnValue(itemid, "hash").toString();
+    //qDebug() << "itemid hash value:" << itemid << treenodemodel->GetNodeColumnValue(itemid, "hash").toString();
     //QVariant GetNodeColumnValue(QString itemid, QString column)
+    QString curhash = treenodemodel->GetNodeColumnValue(itemid, "hash").toString().toLower();
+    if(curhash.count() <= 1)
+    {
+        qDebug() << "hash does not exist, calculate hash here.";
+    }
+    if(knownhashlisthash.contains(curhash)) // hash matches a known item, update itemid value
+    {
+        //qDebug() << "hash match value is:" << knownhashlisthash.value(curhash);
+        mutex.lock();
+        treenodemodel->UpdateNode(itemid, "match", knownhashlisthash.value(curhash));
+        mutex.unlock();
+    }
+    //else
+    //    qDebug() << "hash doesn't match";
 }
 
 void GenerateHash(QString objectid)
@@ -769,6 +783,7 @@ void GenerateVidThumbnails(QString thumbid)
 
 void GeneratePreDigging(QString thumbid)
 {
+    /*
     // Generate Known Hash List Hash if hascompare == true
     if(hascompare)
     {
@@ -793,6 +808,7 @@ void GeneratePreDigging(QString thumbid)
         qDebug() << "knownhashlisthash:" << knownhashlisthash;
     }
     // End Known hash list hash generation
+    */
 
     TreeNode* curitem = NULL;
     QModelIndexList indxlist;
@@ -843,7 +859,7 @@ void GenerateDigging(QString thumbid)
     if(hascompare && !isclosing)
     {
         GenerateHashCompare(thumbid);
-        qDebug() << "run known hash list comparison here...";
+        //qDebug() << "run known hash list comparison here...";
     }
     //if(hasarchive && !isclosing)
     //    GenerateArchiveExpansion(thumbid);

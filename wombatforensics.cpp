@@ -2779,27 +2779,34 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             //
             // POSSIBLY MOVE THE KNOWNHASHLISTHASH GENERATION TO PREDIGGING....
             hascompare = true;
-            /*
-            knownhashlisthash.clear();
-            for(int j=0; j < whlcomparisonlist.count(); j++)
+            StatusUpdate("Initializing Hash List(s) prior to Comparison...");
+            qInfo() << "Initializing Hash List(s) prior to Comparison...";
+            // Generate Known Hash List Hash if hascompare == true
+            if(hascompare)
             {
-                qDebug() << "whlcomparison list:" << whlcomparisonlist.at(j);
-                QFile whlfile(wombatvariable.tmpmntpath + "hashlists/" + whlcomparisonlist.at(j));
-                if(!whlfile.isOpen())
-                    whlfile.open(QIODevice::ReadOnly | QIODevice::Text);
-                if(whlfile.isOpen())
+                knownhashlisthash.clear();
+                for(int j=0; j < knownhashlist.count(); j++)
                 {
-                    QTextStream in(&whlfile);
-                    while(!in.atEnd())
+                    //qDebug() << "whlcomparison list:" << knownhashlist.at(j);
+                    QFile whlfile(wombatvariable.tmpmntpath + "hashlists/" + knownhashlist.at(j));
+                    if(!whlfile.isOpen())
+                        whlfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                    if(whlfile.isOpen())
                     {
-                        QString line = in.readLine();
-                        knownhashlisthash.insert(line.split(",",Qt::SkipEmptyParts).at(0), QString(whlcomparisonlist.at(j) + "," + line.split(",", Qt::SkipEmptyParts).at(1)));
+                        QTextStream in(&whlfile);
+                        while(!in.atEnd())
+                        {
+                            QString line = in.readLine();
+                            knownhashlisthash.insert(line.split(",",Qt::SkipEmptyParts).at(0), QString(knownhashlist.at(j) + "|" + line.split(",", Qt::SkipEmptyParts).at(1)));
+                        }
+                        whlfile.close();
                     }
-                    whlfile.close();
                 }
+                //qDebug() << "knownhashlisthash:" << knownhashlisthash;
             }
-            qDebug() << "knownhashlisthash:" << knownhashlisthash;
-            */
+            // End Known hash list hash generation
+            qInfo() << "Hash List(s) Initialization Completed...";
+            StatusUpdate("Hash List(s) Initialization Completed...");
         }
         else if(digoptions.at(i) == 4)
             hasarchive = true;
@@ -3084,7 +3091,7 @@ void WombatForensics::on_actionDigDeeper_triggered()
     digvidthumbcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
     connect(digdeeperdialog, SIGNAL(StartDig(int, QVector<int>)), this, SLOT(DigFiles(int, QVector<int>)), Qt::DirectConnection);
-    connect(digdeeperdialog, SIGNAL(HashComparison(QStringList)), this, SLOT(GetHashComparisons(QStringList)), Qt::DirectConnection);
+    //connect(digdeeperdialog, SIGNAL(HashComparison(QStringList)), this, SLOT(GetHashComparisons(QStringList)), Qt::DirectConnection);
     digdeeperdialog->show();
 }
 
