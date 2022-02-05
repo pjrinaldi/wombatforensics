@@ -392,11 +392,14 @@ void WombatForensics::RemoveTag()
         QStringList checkeditems = GetFileLists(1);
         for(int i=0; i < checkeditems.count(); i++)
         {
-            int colindex = treenodemodel->GetColumnIndex("id");
-            QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-            if(indexlist.count() > 0)
-            {
-                QModelIndex curindex = ((QModelIndex)indexlist.first());
+            //int colindex = treenodemodel->GetColumnIndex("id");
+            RemoveFileItem(treenodemodel->GetNodeColumnValue(checkeditems.at(i), "id").toString());
+            treenodemodel->UpdateNode(checkeditems.at(i), "tag", "0");
+
+            //QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            //if(indexlist.count() > 0)
+            //{
+            //    QModelIndex curindex = ((QModelIndex)indexlist.first());
                 /*
                 QModelIndex parindex = ((QModelIndex)indexlist.first()).parent();
                 QString paridstr = parindex.sibling(parindex.row(), 11).data().toString().split("-f").last();
@@ -433,7 +436,7 @@ void WombatForensics::RemoveTag()
                     tmpstr = filefile.readLine();
                 filefile.close();
                 */
-                RemoveFileItem(curindex.sibling(curindex.row(), colindex).data().toString());
+             //   RemoveFileItem(curindex.sibling(curindex.row(), colindex).data().toString());
                 /*
                 if(tmpstr.split(",").count() > 15)
                     tmplist = tmpstr.split(",", Qt::SkipEmptyParts);
@@ -450,8 +453,8 @@ void WombatForensics::RemoveTag()
                     filefile.write(tmpstr.toStdString().c_str());
                 filefile.close();
                 */
-                treenodemodel->UpdateNode(curindex.sibling(curindex.row(), colindex).data().toString(), "tag", "0");
-            }
+             //   treenodemodel->UpdateNode(curindex.sibling(curindex.row(), colindex).data().toString(), "tag", "0");
+            //}
         }
     }
 }
@@ -508,6 +511,8 @@ void WombatForensics::CreateEmptyHashList(void)
                 QStringList checkeditems = GetFileLists(1);
                 for(int i=0; i < checkeditems.count(); i++)
                 {
+                    filestohash.append(QString(checkeditems.at(i) + "," + treenodemodel->GetNodeColumnValue(checkeditems.at(i), "name").toString()));
+                    /*
                     QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
                     if(indxlist.count() > 0)
                     {
@@ -515,6 +520,7 @@ void WombatForensics::CreateEmptyHashList(void)
                         filestohash.append(QString(checkeditems.at(i) + "," + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString()));
                         //qDebug() << "id:" << checkeditems.at(i) << "name:" << curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString();
                     }
+                    */
                 }
                 //TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
                 // STRINGLIST OF THE ID'S FOR THE CHECKED ITEMS, NEED TO GET THE NODE
@@ -664,6 +670,8 @@ void WombatForensics::AddExistingHashList(void)
         QStringList checkeditems = GetFileLists(1);
         for(int i=0; i < checkeditems.count(); i++)
         {
+            filestohash.append(QString(checkeditems.at(i) + "," + treenodemodel->GetNodeColumnValue(checkeditems.at(i), "name").toString()));
+            /*
             QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
             if(indxlist.count() > 0)
             {
@@ -671,6 +679,7 @@ void WombatForensics::AddExistingHashList(void)
                 filestohash.append(QString(checkeditems.at(i) + "," + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString()));
                 //qDebug() << "id:" << checkeditems.at(i) << "name:" << curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString();
             }
+            */
         }
         //filestohash.append(checkeditems);
     }

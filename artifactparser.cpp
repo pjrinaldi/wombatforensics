@@ -954,22 +954,22 @@ void TransferFiles(QString thumbid, QString reppath)
             {
                 if(curnode->Data("sig").toString().contains("Shortcut"))
                 {
-                    QString lnkstr = ParseLnkArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    QString lnkstr = ParseLnkArtifact(indexlist.first().sibling(indexlist.first().row(), treenodemodel->GetColumnIndex("id")).data().toString(), thumbid);
                     tmpfile.write(lnkstr.toStdString().c_str());
                 }
                 else if(curnode->Data("sig").toString().contains("Recycler"))
                 {
-                    QString info2str = ParseInfo2Artifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    QString info2str = ParseInfo2Artifact(indexlist.first().sibling(indexlist.first().row(), treenodemodel->GetColumnIndex("id")).data().toString(), thumbid);
                     tmpfile.write(info2str.toStdString().c_str());
                 }
                 else if(curnode->Data("sig").toString().contains("Recycle.Bin"))
                 {
-                    QString idollarstr = ParseIDollarArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    QString idollarstr = ParseIDollarArtifact(indexlist.first().sibling(indexlist.first().row(), treenodemodel->GetColumnIndex("id")).data().toString(), thumbid);
                     tmpfile.write(idollarstr.toStdString().c_str());
                 }
                 else if(curnode->Data("sig").toString().contains("Prefetch"))
                 {
-                    QString pfstr = ParsePrefetchArtifact(indexlist.first().sibling(indexlist.first().row(), 0).data().toString(), thumbid);
+                    QString pfstr = ParsePrefetchArtifact(indexlist.first().sibling(indexlist.first().row(), treenodemodel->GetColumnIndex("id")).data().toString(), thumbid);
                     tmpfile.write(pfstr.toStdString().c_str());
                 }
                 /*

@@ -56,9 +56,11 @@ void GenerateArchiveExpansion(QString objectid)
             //idstring = estring + "-" + vstring + "-" + pstring;
         }
         */
-        QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        QString filename = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("name")).data().toString();
-        QString filepath = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("path")).data().toString();
+        //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        //QString filename = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("name")).data().toString();
+        //QString filepath = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("path")).data().toString();
+        QString filename = treenodemodel->GetNodeColumnValue(objectid, "name").toString();
+        QString filepath = treenodemodel->GetNodeColumnValue(objectid, "path").toString();
 
         ForImg* curimg = NULL;
         for(int i=0; i < existingforimglist.count(); i++)
@@ -621,7 +623,7 @@ void GenerateVidThumbnails(QString thumbid)
         }
     }
     //qDebug() << "curimg path:" << curimg->ImgPath();
-    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();
     bool imgbool = testimage->load(thumbtestpath);
@@ -632,8 +634,9 @@ void GenerateVidThumbnails(QString thumbid)
     else
     {
         //qDebug() << "thumbnail doesn't exist, generate it.";
-	TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-	qint64 filesize = curitem->Data("size").toLongLong();
+	//TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+	//qint64 filesize = curitem->Data("size").toLongLong();
+        qint64 filesize = treenodemodel->GetNodeColumnValue(thumbid, "size").toLongLong();
         //qDebug() << "filesize:" << filesize << "isclosing:" << isclosing;
 	if(filesize > 0 && !isclosing)
 	{
@@ -659,7 +662,8 @@ void GenerateVidThumbnails(QString thumbid)
 		qDebug() << "Item:" << thumbid << "couldn't open file for writing contents.";
             */
 	    QByteArray ba;
-	    QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
+            QString fullpath = treenodemodel->GetNodeColumnValue(thumbid, "path").toString() + treenodemodel->GetNodeColumnValue(thumbid, "name").toString();
+	    //QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
             //qDebug() << "fullpath:" << fullpath;
 	    ba.clear();
 	    ba.append(fullpath.toUtf8());
@@ -863,10 +867,11 @@ void GeneratePreDigging(QString thumbid)
     QString signature = "";
     if(!isclosing)
     {
-        indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+        signature = treenodemodel->GetNodeColumnValue(thumbid, "sig").toString();
+        //indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+        //curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
         //category = curitem->Data("cat").toString();
-        signature = curitem->Data("sig").toString();
+        //signature = curitem->Data("sig").toString();
     }
     bool isarchive = false;
     //isarchive = category.contains("Archive");
@@ -921,7 +926,7 @@ void GenerateThumbnails(QString thumbid)
         }
     }
 
-    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();
     bool imgbool = testimage->load(thumbtestpath);
@@ -931,8 +936,10 @@ void GenerateThumbnails(QString thumbid)
     }
     else
     {
-	TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-	qint64 filesize = curitem->Data("size").toLongLong();
+        //category = treenodemodel->GetNodeColumnValue(thumbid, "cat").toString();
+	//TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+	//qint64 filesize = curitem->Data("size").toLongLong();
+        qint64 filesize = treenodemodel->GetNodeColumnValue(thumbid, "size").toLongLong();
 	Magick::Geometry thumbgeometry(thumbsize, thumbsize);
 	if(filesize > 0 && !isclosing)
 	{
@@ -940,7 +947,8 @@ void GenerateThumbnails(QString thumbid)
             QString layout = ReturnFileContent(curimg, thumbid);
 	    QByteArray ba;
 	    ba.clear();
-	    QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
+            QString fullpath = treenodemodel->GetNodeColumnValue(thumbid, "path").toString() + treenodemodel->GetNodeColumnValue(thumbid, "name").toString();
+	    //QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
 	    ba.append(fullpath.toUtf8());
 	    imageshash.insert(thumbid, QString(ba.toBase64()));
 	    try
