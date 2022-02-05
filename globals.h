@@ -52,6 +52,7 @@ extern bool hashash; // whether we are calculating the hash for the item
 extern bool hasvid; // whether we are calculating the vid thumbnail for the item
 extern bool hasimg; // whether we are calculating the img thumbnail for the item
 extern bool hasarchive; // whether we are calculating the archive for the item
+extern bool hascompare; // whether we are comparing the file(s) hash against the selected hash list
 extern bool isclosing; // whether the application is closing and threads should not write back to the application
 extern QString genthmbpath; // global path to place thumbs for each operationgal call of generate thumbnails (mntpt/thumbs or rep/thmb)
 extern QString casepath; // case path settings variable

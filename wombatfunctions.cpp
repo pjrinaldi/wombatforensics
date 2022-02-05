@@ -776,8 +776,10 @@ QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
     return extentstring;
 }
 
-QString HashFiles(QString itemid)
+QString HashFiles(QString itemstr)
 {
+    QString itemid = itemstr.split(",", Qt::SkipEmptyParts).at(0);
+    QString itemname = itemstr.split(",", Qt::SkipEmptyParts).at(1);
     QString hashstr = "";
     for(int i=0; i < existingforimglist.count(); i++)
     {
@@ -833,7 +835,7 @@ QString HashFiles(QString itemid)
 	    // NOT SURE HOW TO GET FILENAME OR BEST WAY TO DO THAT, WHETHER IT SHOULD BE THE ID OR THE PATH+FILENAME OR JUST FILENAME
 	    // ID WILL ENABLE IT TO BE TIED BACK TO A PIECE OF EVIDENCE AND AVOID CONFUSION AS TO WHICH FILE IN WHICH EVIDENCE IMAGE IS IT SUCH AS IMAGE_100.JPG
 	    // FOR NOW I WILL PUT itemid IN PLACE OF THE PATH+FILENAME
-	    hashstr += "," + itemid;
+	    hashstr += "," + itemstr;
 	}
     }
 

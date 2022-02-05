@@ -486,12 +486,40 @@ void WombatForensics::CreateEmptyHashList(void)
             if(parentmenu.contains("Selected")) // single file
             {
                 int colindex = treenodemodel->GetColumnIndex("id");
-                filestohash.append(selectedindex.sibling(selectedindex.row(), colindex).data().toString());
+                filestohash.append(QString(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + "," + selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString()));
             }
             else if(parentmenu.contains("Checked")) // checked files
             {
+                // NEED TO MODIFY THE GETFILES LIST TO RETURN THE ID,NAME RATHER THAN JUST THE ID...
+                /*
+                 *
+                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("tag"), QModelIndex()), Qt::DisplayRole, QVariant(tr("*[A-Za-z0-9]*")), -1, Qt::MatchFlags(Qt::MatchRecursive | Qt::MatchWildcard));
+                    foreach(QModelIndex index, indexlist)
+                        tmplist.append(QString(index.sibling(index.row(), treenodemodel->GetColumnIndex("id")).data().toString()));
+                    return tmplist;
+                    
+                    QModelIndexList indexlist = treenodemodel->match(treenodemodel->index(0, colindex, QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                    if(indexlist.count() > 0)
+                    {
+                        QModelIndex curindex = ((QModelIndex)indexlist.first());
+                        TagFile(curindex, tagname);
+                    }
+                 */
                 QStringList checkeditems = GetFileLists(1);
-                filestohash.append(checkeditems);
+                for(int i=0; i < checkeditems.count(); i++)
+                {
+                    QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+                    if(indxlist.count() > 0)
+                    {
+                        QModelIndex curindex = ((QModelIndex)indxlist.first());
+                        filestohash.append(QString(checkeditems.at(i) + "," + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString()));
+                        //qDebug() << "id:" << checkeditems.at(i) << "name:" << curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString();
+                    }
+                }
+                //TreeNode* itemnode = static_cast<TreeNode*>(index.internalPointer());
+                // STRINGLIST OF THE ID'S FOR THE CHECKED ITEMS, NEED TO GET THE NODE
+                // FOR EACH CHECKEDITEM, GET THE NAME AND ADD IT TO THE FILESTOHASH
+                //filestohash.append(checkeditems);
             }
 	    // SHOULD SWITCH FROM NEWEVIDENCE/EXISTINGEVIDENCE TO NEWFORIMGLIST/EXISTINGFORIMGLIST
 	    //qDebug() << "existingforimglist:" << existingforimglist.first()->ImgPath() << existingforimglist.first()->MountPath();
@@ -629,12 +657,22 @@ void WombatForensics::AddExistingHashList(void)
     // open this file, adn loop over returned hash+files and add to the resepective file.
     if(parentmenu.contains("Selected")) // single file
     {
-        filestohash.append(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString());
+        filestohash.append(QString(selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("id")).data().toString() + "," + selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString()));
     }
     else if(parentmenu.contains("Checked")) // checked files
     {
         QStringList checkeditems = GetFileLists(1);
-        filestohash.append(checkeditems);
+        for(int i=0; i < checkeditems.count(); i++)
+        {
+            QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(checkeditems.at(i)), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+            if(indxlist.count() > 0)
+            {
+                QModelIndex curindex = ((QModelIndex)indxlist.first());
+                filestohash.append(QString(checkeditems.at(i) + "," + curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString()));
+                //qDebug() << "id:" << checkeditems.at(i) << "name:" << curindex.sibling(curindex.row(), treenodemodel->GetColumnIndex("name")).data().toString();
+            }
+        }
+        //filestohash.append(checkeditems);
     }
     QStringList fileshashes = QtConcurrent::blockingMapped(filestohash, HashFiles);
     QFile tmpfile(wombatvariable.tmpmntpath + "hashlists/" + hashlistfilename);
@@ -2686,7 +2724,7 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
     // digtype = selected (0) | checked (1) | all (2)
     // digoptions = thumbimg (0) | thumbvid (1) | hash (2) | hashlistcompare (3) | expandarchive zip (4)
     // provides access to the whlcomparisonlist to give access to the files...
-    //qDebug() << "whlfiles:" << whlcomparisonlist;
+    qDebug() << "whlfiles:" << whlcomparisonlist;
     /*
     digimgthumbtotal = 0;
     digvidthumbtotal = 0;
@@ -2733,6 +2771,9 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         else if(digoptions.at(i) == 3)
         {
             // hash list comparison here...
+            // POSSIBLY PUT IT ON ANOTHER THREAD AND WHEN IT FINISHES, THEN LAUNCH THE MAPPED COMPARISON
+            // GENERATE COMPARISON LIST QHASH HERE WHICH IS THE hashcomparehash.insert(blake3hash, "listname,filename");
+            hascompare = true;
         }
         else if(digoptions.at(i) == 4)
             hasarchive = true;
@@ -3090,7 +3131,7 @@ void WombatForensics::FinishPreDigging()
     //else if(digtype == 1) // checked
     if(hasarchive && !isclosing && digtype == 2) // all items (now including expanded archives.)
         digfilelist = GetFileLists(2);
-    qDebug() << "digfilelist:" << digfilelist;
+    //qDebug() << "digfilelist:" << digfilelist;
     digfuture = QtConcurrent::map(digfilelist, GenerateDigging);
     digwatcher.setFuture(digfuture);
 }

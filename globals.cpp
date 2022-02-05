@@ -52,6 +52,7 @@ bool hashash = false;
 bool hasimg = false;
 bool hasvid = false;
 bool hasarchive = false;
+bool hascompare = false;
 bool isclosing = false;
 QString hexstring = "";
 QHash<QString, bool> checkhash;

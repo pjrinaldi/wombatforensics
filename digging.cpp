@@ -807,6 +807,10 @@ void GenerateDigging(QString thumbid)
     }
     if(hasimg && isimg && !isclosing)
         GenerateThumbnails(thumbid);
+    if(hascompare && !isclosing)
+    {
+
+    }
     //if(hasarchive && !isclosing)
     //    GenerateArchiveExpansion(thumbid);
 }
