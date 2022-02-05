@@ -1350,8 +1350,36 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     {
         out << "File System Type Int|16|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|HFS|File System Type String." << Qt::endl;
-        //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        uint8_t volnamelength = qFromBigEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 1060, 1));
+        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 1061, volnamelength).toStdString());
         partitionname += " [HFS]";
+        out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        
+        /*
+        // NEED TO CONVERT THE 2 DATES LISTED TO ACTUAL HUMAN READABLE DATES
+        out << "Volume Creation Date|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1040, 4))) << "|Creation Date of the volume stored in local time." << Qt::endl;
+        out << "Last Modification Date|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1044, 4))) << "|UTC Last modification date of the volume." << Qt::endl;
+        out << "File Count|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1056, 4))) << "|Number of files on the volume." << Qt::endl;
+        out << "Folder Count|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1060, 4))) << "|Number of folders on the volume." << Qt::endl;
+        out << "Cluster Size|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1064, 4))) << "|Allocation Cluster Size, usually 4096 bytes." << Qt::endl;
+        out << "Next Catalog ID|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1088, 4))) << "|Next available catalog ID (node id)." << Qt::endl;
+        out << "Catalog Logical Size|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 1296, 8))) << "|Logical size for the catalog file." << Qt::endl;
+        out << "Catalog Total Blocks|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1308, 4))) << "|Total number of blocks for the Catalog file." << Qt::endl;
+        out << "Catalog Extents Start Block Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1312 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1312 + i*8, 4))) << ",";
+        }
+        out << "|Start block for each extent for Catalog file." << Qt::endl;
+        out << "Catalog Extents Block Count Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1316 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1316 + i*8, 4))) << ",";
+        }
+        out << "|Block count for each extent for Catalog file." << Qt::endl;
+         */
     }
     else if(zfssig == 0x00bab10c) // ZFS
     {
@@ -1500,6 +1528,11 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     {
 	quint64 curinode = 0;
 	curinode = ParseExtDirectory(curimg, curstartsector, ptreecnt, 2, 0, "", "");
+    }
+    else if(fstype == 8) // HFS+/X
+    {
+        quint64 curinode = 0;
+        curinode = ParseHfsPlusDirectory(curimg, curstartsector, ptreecnt, 0, "");
     }
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }
