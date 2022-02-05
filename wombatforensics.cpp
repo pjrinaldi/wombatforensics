@@ -2714,17 +2714,19 @@ void WombatForensics::StartCarving(QStringList plist, QStringList flist)
     carvewatcher.setFuture(tmpfuture);
 }
 
+/*
 void WombatForensics::GetHashComparisons(QStringList whlfiles)
 {
     whlcomparisonlist.append(whlfiles);
 }
+*/
 
 void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
 {
     // digtype = selected (0) | checked (1) | all (2)
     // digoptions = thumbimg (0) | thumbvid (1) | hash (2) | hashlistcompare (3) | expandarchive zip (4)
     // provides access to the whlcomparisonlist to give access to the files...
-    qDebug() << "whlfiles:" << whlcomparisonlist;
+    //qDebug() << "whlfiles:" << whlcomparisonlist;
     /*
     digimgthumbtotal = 0;
     digvidthumbtotal = 0;
@@ -2773,7 +2775,31 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
             // hash list comparison here...
             // POSSIBLY PUT IT ON ANOTHER THREAD AND WHEN IT FINISHES, THEN LAUNCH THE MAPPED COMPARISON
             // GENERATE COMPARISON LIST QHASH HERE WHICH IS THE hashcomparehash.insert(blake3hash, "listname,filename");
+            //QHash<QString, QString> knownhashlisthash; // list of known hashes, key hash, value "hashlist,filename"
+            //
+            // POSSIBLY MOVE THE KNOWNHASHLISTHASH GENERATION TO PREDIGGING....
             hascompare = true;
+            /*
+            knownhashlisthash.clear();
+            for(int j=0; j < whlcomparisonlist.count(); j++)
+            {
+                qDebug() << "whlcomparison list:" << whlcomparisonlist.at(j);
+                QFile whlfile(wombatvariable.tmpmntpath + "hashlists/" + whlcomparisonlist.at(j));
+                if(!whlfile.isOpen())
+                    whlfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                if(whlfile.isOpen())
+                {
+                    QTextStream in(&whlfile);
+                    while(!in.atEnd())
+                    {
+                        QString line = in.readLine();
+                        knownhashlisthash.insert(line.split(",",Qt::SkipEmptyParts).at(0), QString(whlcomparisonlist.at(j) + "," + line.split(",", Qt::SkipEmptyParts).at(1)));
+                    }
+                    whlfile.close();
+                }
+            }
+            qDebug() << "knownhashlisthash:" << knownhashlisthash;
+            */
         }
         else if(digoptions.at(i) == 4)
             hasarchive = true;

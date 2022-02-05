@@ -65,7 +65,10 @@ extern QHash<QString, QString> taggedhash; // list of tagged files: [id], tag
 extern QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 extern QHash<QString, QString> mftblockhash; // list of mft blockstrings for each partition for each evidence item
 extern QHash<QString, QString> passwordhash; // list of passwords for encrypted pool volume's/fs's
+extern QHash<QString, QString> knownhashlisthash; // list of known hashes, key hash, value "hashlist,filename"
 extern QMutex mutex; // mutex so my code will work when multithreaded (mainly for adding treeview nodes)
+
+extern QStringList knownhashlist; // list of selected hashlist files for use in comparison digging
 
 extern QList<ForImg*> newforimglist;
 extern QList<ForImg*> existingforimglist;
@@ -882,6 +885,11 @@ public:
         const QVariant tmpvar(hash);
         //parents.value(itemid.split("-a").first())->SetData(column, tmpvar);
         parents.value(itemid)->SetData(column, tmpvar);
+    };
+
+    QVariant GetNodeColumnValue(QString itemid, QString column)
+    {
+        return parents.value(itemid)->Data(column);
     };
     
     /*

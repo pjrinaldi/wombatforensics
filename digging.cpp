@@ -8,7 +8,7 @@
 // LIBPOPPLER-QT5 HEADER
 #include <poppler-qt5.h>
 
-// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 void GenerateArchiveExpansion(QString objectid)
@@ -415,6 +415,14 @@ void GenerateArchiveExpansion(QString objectid)
     }
 }
 
+void GenerateHashCompare(QString itemid)
+{
+    // determine if it has a hash already...
+    // get object id content
+    qDebug() << "itemid hash value:" << itemid << treenodemodel->GetNodeColumnValue(itemid, "hash").toString();
+    //QVariant GetNodeColumnValue(QString itemid, QString column)
+}
+
 void GenerateHash(QString objectid)
 {
     // update Hash header: 32 = md5, 40 = sha1, 64 = sha256
@@ -761,6 +769,31 @@ void GenerateVidThumbnails(QString thumbid)
 
 void GeneratePreDigging(QString thumbid)
 {
+    // Generate Known Hash List Hash if hascompare == true
+    if(hascompare)
+    {
+        knownhashlisthash.clear();
+        for(int j=0; j < knownhashlist.count(); j++)
+        {
+            //qDebug() << "whlcomparison list:" << knownhashlist.at(j);
+            QFile whlfile(wombatvariable.tmpmntpath + "hashlists/" + knownhashlist.at(j));
+            if(!whlfile.isOpen())
+                whlfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            if(whlfile.isOpen())
+            {
+                QTextStream in(&whlfile);
+                while(!in.atEnd())
+                {
+                    QString line = in.readLine();
+                    knownhashlisthash.insert(line.split(",",Qt::SkipEmptyParts).at(0), QString(knownhashlist.at(j) + "," + line.split(",", Qt::SkipEmptyParts).at(1)));
+                }
+                whlfile.close();
+            }
+        }
+        qDebug() << "knownhashlisthash:" << knownhashlisthash;
+    }
+    // End Known hash list hash generation
+
     TreeNode* curitem = NULL;
     QModelIndexList indxlist;
     //QString category = "";
@@ -809,7 +842,8 @@ void GenerateDigging(QString thumbid)
         GenerateThumbnails(thumbid);
     if(hascompare && !isclosing)
     {
-
+        GenerateHashCompare(thumbid);
+        qDebug() << "run known hash list comparison here...";
     }
     //if(hasarchive && !isclosing)
     //    GenerateArchiveExpansion(thumbid);

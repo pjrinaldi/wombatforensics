@@ -256,7 +256,7 @@ private slots:
     void ExportForensicImage(void);
     //void VerifyForensicImage(void);
     void DigFiles(int digtype, QVector<int> digoptions);
-    void GetHashComparisons(QStringList whlfiles);
+    //void GetHashComparisons(QStringList whlfiles);
     void StartCarving(QStringList plist, QStringList flist);
     void SetOffsetLabel(qint64 pos);
     void HexSelectionChanged(void);
@@ -366,6 +366,7 @@ private:
     QFuture<void> openfuture;
     QFutureWatcher<void> openwatcher;
     QFutureWatcher<void> savewcfwatcher;
+    QFutureWatcher<void> hashmatchwatcher;
     //QFuture<std::string> verfuture;
     //QFutureWatcher<std::string> verifywatcher;
 
@@ -418,7 +419,7 @@ private:
     QString digtotalcountstring = "";
     QString currentreportpath = "";
     QHash<QString, int>carvecounthash;
-    QStringList whlcomparisonlist;
+    //QStringList whlcomparisonlist;
 };
 
 #endif // WOMBATFORENSICS_H

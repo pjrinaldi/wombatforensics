@@ -82,11 +82,12 @@ void DigDeeperDialog::DigDeeperFiles()
     if(ui->hashlistcheckbox->isChecked())
     {
 	// ALSO NEED A WAY TO TRACK THE WHL FILES SELECTED
-        hashlists.clear();
+        //hashlists.clear();
 	digoptions.append(3);
         for(int i=0; i < ui->hashlistwidget->selectedItems().count(); i++)
-            hashlists.append(ui->hashlistwidget->selectedItems().at(i)->text());
-        emit HashComparison(hashlists);
+            knownhashlist.append(ui->hashlistwidget->selectedItems().at(i)->text());
+            //hashlists.append(ui->hashlistwidget->selectedItems().at(i)->text());
+        //emit HashComparison(hashlists);
     }
     if(ui->expandarchivescheckbox->isChecked())
         digoptions.append(4);

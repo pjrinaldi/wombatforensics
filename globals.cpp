@@ -61,7 +61,11 @@ QHash<QString, QString> taggedhash; // list of tagged files: [id], tag
 QHash<QString, QString> hashlist; // list of file hashes: ids, hash
 QHash<QString, QString> mftblockhash; //  list of mft blockstrings for each partition for each evidence item
 QHash<QString, QString> passwordhash; // list of passwords for encrypted pool volume's/fs's
+QHash<QString, QString> knownhashlisthash; // list of known hashes, key hash, value "hashlist,filename"
 QMutex mutex;
+
+QStringList knownhashlist; // list of selected hashlist files for use in comparison digging
+
 FilterValues filtervalues;
 QList<EvidenceReportData> evidrepdatalist;
 QList<ForImg*> newforimglist;

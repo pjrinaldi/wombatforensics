@@ -7,7 +7,7 @@
 #include <liblnk.h>
 #include <zip.h>
 
-// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 #define TICKS_PER_SECOND 10000000
@@ -19,6 +19,7 @@ void GenerateVidThumbnails(QString thumbid);
 void GenerateArchiveExpansion(QString thumbid);
 void GenerateDigging(QString thumbid);
 void GeneratePreDigging(QString thumbid);
+void GenerateHashCompare(QString itemid);
 //QByteArray ReturnFileContent(QString objectid);
 QByteArray ReturnFileContent(ForImg* curimg, QString objectid, QString* layout);
 QString ReturnFileContent(ForImg* curimg, QString objectid);
