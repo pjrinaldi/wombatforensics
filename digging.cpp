@@ -419,12 +419,59 @@ void GenerateHashCompare(QString itemid)
 {
     // determine if it has a hash already...
     // get object id content
-    //qDebug() << "itemid hash value:" << itemid << treenodemodel->GetNodeColumnValue(itemid, "hash").toString();
     //QVariant GetNodeColumnValue(QString itemid, QString column)
     QString curhash = treenodemodel->GetNodeColumnValue(itemid, "hash").toString().toLower();
     if(curhash.count() <= 1)
     {
-        qDebug() << "hash does not exist, calculate hash here.";
+        ForImg* curimg = NULL;
+        for(int i=0; i < existingforimglist.count(); i++)
+        {
+            if(existingforimglist.at(i)->MountPath().endsWith(itemid.split("-").at(0)))
+            {
+                curimg = existingforimglist.at(i);
+                break;
+            }
+        }
+        QString hashstr = "";
+        QString layout = ReturnFileContent(curimg, itemid);
+        QFile curfile(wombatvariable.tmpfilepath + itemid + "-tmp");
+        if(!curfile.isOpen())
+            curfile.open(QIODevice::ReadOnly);
+        if(curfile.isOpen())
+        {
+            qint64 filesize = curfile.size();
+            if(curfile.size() > 0)
+            {
+                blake3_hasher filehash;
+                blake3_hasher_init(&filehash);
+                while(!curfile.atEnd())
+                {
+                    QByteArray filebytes;
+                    filebytes.clear();
+                    filebytes = curfile.read(65536);
+                    blake3_hasher_update(&filehash, filebytes.data(), filebytes.count());
+                }
+                uint8_t blake3hash[BLAKE3_OUT_LEN];
+                blake3_hasher_finalize(&filehash, blake3hash, BLAKE3_OUT_LEN);
+                for(size_t i=0; i < BLAKE3_OUT_LEN; i++)
+                {
+                    hashstr.append(QString("%1").arg(blake3hash[i], 2, 16, QChar('0')));
+                }
+                hashstr = hashstr.toUpper();
+            }
+            else
+                hashstr = QString("af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262").toUpper(); // BLAKE3 zero file
+            curfile.close();
+        }
+        if(!isclosing)
+        {
+            hashlist.insert(itemid, hashstr);
+            mutex.lock();
+            treenodemodel->UpdateNode(itemid, "hash", hashstr);
+            mutex.unlock();
+        }
+        curhash = hashstr.toLower();
+        //qDebug() << "hash does not exist, calculate hash here.";
     }
     if(knownhashlisthash.contains(curhash)) // hash matches a known item, update itemid value
     {
@@ -831,15 +878,11 @@ void GeneratePreDigging(QString thumbid)
 void GenerateDigging(QString thumbid)
 {
     //qDebug() << "thumbid:" << thumbid;
-    TreeNode* curitem = NULL;
-    QModelIndexList indxlist;
     QString category = "";
     if(!isclosing)
     {
-        indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-        category = curitem->Data("cat").toString();
-        //qDebug() << "cat:" << category;
+        // ATTEMPT TO REPLACE MATCH WITH GET
+        category = treenodemodel->GetNodeColumnValue(thumbid, "cat").toString();
     }
     bool isvid = false;
     bool isimg = false;
