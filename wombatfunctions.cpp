@@ -510,6 +510,13 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	    else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
 		mimestr = "Windows System/Registry";
 	}
+        else if(mimestr.contains("Text/Plain"))
+        {
+            if(filename.endsWith(".mbox"))
+            {
+                mimestr = "Email/MBox";
+            }
+        }
     }
     //else if(filename.startsWith("$INDEX_ROOT:") || filename.startsWith("$DATA:") || filename.startWith("$INDEX_ALLOCATION:"))
     

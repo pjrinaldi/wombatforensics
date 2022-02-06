@@ -45,6 +45,7 @@
 #include "newforimg.h"
 #include "verevidencedialog.h"
 #include "hashlistmanager.h"
+#include "mboxviewer.h"
 
 class StatusLabel : public QLabel
 {
@@ -190,6 +191,7 @@ public:
     ForImgDialog* forimgdialog;
     VerEvidenceDialog* verevidencedialog;
     HashListManager* hashlistmanager;
+    MBoxDialog* mboxviewer;
 
 signals:
     void CancelCurrentThread();

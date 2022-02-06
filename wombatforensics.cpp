@@ -804,6 +804,19 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         htmlviewer->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " HTML Viewer");
         htmlviewer->ShowHtml(index);
     }
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("MBox"))
+    {
+        mboxviewer = new MBoxDialog();
+        mboxviewer->setAttribute(Qt::WA_DeleteOnClose);
+        mboxviewer->setWindowTitle("MBox Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
+        mboxviewer->LoadMBoxFile(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
+        /*
+        regviewer = new RegistryDialog();
+        regviewer->setAttribute(Qt::WA_DeleteOnClose);
+        regviewer->setWindowTitle("Registry Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
+        regviewer->LoadRegistryFile(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
+         */ 
+    }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Text"))
     {
         // toggle the button...
