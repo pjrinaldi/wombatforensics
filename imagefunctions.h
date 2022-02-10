@@ -28,6 +28,7 @@
 #include <blake3.h>
 #include <lz4.h>
 #include <lz4frame.h>
+//#include <libbde.h>
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35

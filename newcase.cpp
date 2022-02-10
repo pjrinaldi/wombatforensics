@@ -1279,6 +1279,9 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 118, qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 112, 2)) - 8).toStdString());
         out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
         partitionname += " [BITLOCKER]";
+        // HERE IS WHERE I WILL GET THE KEY(S) INFORMATION AND ALSO GET THE USER PASSWORD AND/OR RECOVERY KEY FROM THE EXAMINER
+        // PLACE THAT PROMPT HERE BASED ON THE KEY INFORMATION I READ FROM THE ENCRYPTED VOLUME
+        // ATTEMPTED TO USE LIBBDE.H, BUT IT REQUIRES A FILE, AND I DON'T HAVE A FILE PER SE
         /*
         // NEED AN IMAGE TO TEST BITLOCKER
         fsinfo.insert("type", QVariant(11));
@@ -1533,6 +1536,10 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     {
         quint64 curinode = 0;
         curinode = ParseHfsPlusDirectory(curimg, curstartsector, ptreecnt, 0, "");
+    }
+    else if(fstype == 11) // BITLOCKER
+    {
+        quint64 curinode = 0;
     }
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }

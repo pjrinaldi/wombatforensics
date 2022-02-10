@@ -16,6 +16,7 @@
 #include "ntfs.h"
 #include "hfs.h"
 #include "hfsplus.h"
+#include "bitlocker.h"
 
 void ProcessForensicImage(ForImg* curimg);
 QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);

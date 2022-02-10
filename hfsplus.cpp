@@ -41,15 +41,30 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
     qDebug() << "start block cnt:" << catalogextstartblockarray.split(",", Qt::SkipEmptyParts).count();
 
     uint16_t nodesize = 0;
+    quint64 curoffset = 0;
+    quint64 curblocksize = 0;
+    curoffset = curstartsector*512;
+    QStringList catalogblocklist = catalogextstartblockarray.split(",", Qt::SkipEmptyParts);
+    QStringList catalogblockcntlist = catalogextblockcntarray.split(",", Qt::SkipEmptyParts);
     // catalog file can be split, so i need to parse the 
-    for(int i=0; i < catalogextstartblockarray.split(",", Qt::SkipEmptyParts).count(); i++)
+    for(int i=0; i < catalogblocklist.count(); i++)
     {
+        curblocksize = catalogblockcntlist.at(i).toUInt() * clustersize;
+        qDebug() << "curblocksize:" << curblocksize;
+        uint32_t curpos = 0;
         // parse the catalog file by pieces here.
         if(i == 0) // header node
         {
-            nodesize = qFromBigEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + catalogextstartblockarray.split(",", Qt::SkipEmptyParts).at(i).toUInt() * clustersize + 32, 2));
+            curoffset += catalogblocklist.at(i).toUInt() * clustersize; // curoffset at the first catalog block offset
+            nodesize = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + 32, 2));
             qDebug() << "nodesize:" << nodesize;
-            // need to clean this up a little and put the split in a variable earlier
+            // NEED TO JUMP TO CATALOG ROOT DIRECTORY NODE START, WHICH IS CATALOG NODE ID (CNID) 2, SO IT IS (CNID - 1) * NODESIZE
+            // SO FOR THIS EXAMPLE, IT IS (2-1) * 4096, NEED TO SET THE OFFSET TO BE 
+            curoffset += nodesize; // SHOULD PUT ME AT 4096, START OF THE CATALOG ROOT DIRECTORY NODE
+            // READING THE NODE DESCRIPTOR IS ONLY IN THE i=0 PORTION OF THE CATALOG ROOT DIRECTORY
+            qDebug() << curimg->ReadContent(curoffset, 14).toHex();
+            cufoffset += 14; // THIS PUTS THE CUROFFSET INTO THE KEY/DATA LOOP FOR THE CATALOG LEAF NODE, SO ITERATING SHOULD WORK HERE
         }
+        // THIS IS WHERE THE KEY/DATA LOOP ITERATION SHOULD START... WHILE (CURPOS < CURBLOCKSIZE
     }
 }
