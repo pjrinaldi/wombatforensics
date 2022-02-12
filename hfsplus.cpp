@@ -364,7 +364,11 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 keyfilename = "";
                 for(int j=0; j < keynamelength; j++)
                 {
-                    keyfilename += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos + j*2, 2))));
+                    QChar tmpchar = QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos + j*2, 2)));
+                    if(tmpchar == '\x0')
+                        keyfilename += QString("^");
+                    else
+                        keyfilename += QString(tmpchar);
                 }
                 curpos += 2*keynamelength;
                 //qDebug() << "keyfilename:" << keyfilename;
