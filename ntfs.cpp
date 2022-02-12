@@ -775,7 +775,7 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     nodedata.insert("access", accessdate);
     nodedata.insert("modify", modifydate);
     nodedata.insert("status", statusdate);
-    nodedata.insert("hash", "0");
+    //nodedata.insert("hash", "0");
     if(logicalsize > 0) // Get Category/Signature
     {
         if(itemtype == 3 && isdeleted == 0)
@@ -797,9 +797,9 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     }
     quint64 adsparentinode = inodecnt; // adsparentinode = curfile inode
     QString adsparentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)); // adsparentstr = curfile id
-    nodedata.insert("tag", "0");
+    //nodedata.insert("tag", "0");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
-    nodedata.insert("match", 0);
+    //nodedata.insert("match", 0);
     QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
     if(parinode > 0)
         parentstr += QString("-f" + QString::number(parinode));

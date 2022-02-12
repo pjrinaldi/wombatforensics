@@ -6,7 +6,7 @@
 qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
     quint64 inodecnt = 0;
-    quint64 parinode = 0;
+    //quint64 parinode = 0;
     QString layout = "";
     QHash<QString, QVariant> nodedata;
     QFile fileprop;
@@ -106,7 +106,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
         fileprop.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&fileprop);
     out << "Catalog Node ID|6|Catalog node id for the allocation file." << Qt::endl;
-    out << "Parent Catalog Node ID|2|File's parent NTFS inode value." << Qt::endl;
+    out << "Parent Catalog Node ID|2|File's parent catalog node ID value." << Qt::endl;
     out << "Physical Size|" << QString::number(clustersize * alloctotalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
     out << "Logical Size|" << QString::number(allocsize) << "|Size in Bytes for the file." << Qt::endl;
     out << "Mode|r---------|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
@@ -129,8 +129,8 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
     nodedata.insert("sig", "Allocation File");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
     parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-    if(parinode > 0)
-        parentstr += QString("-f" + QString::number(parinode));
+    //if(parinode > 0)
+    //    parentstr += QString("-f" + QString::number(parinode));
     mutex.lock();
     treenodemodel->AddNode(nodedata, parentstr, 10, 0); // virtual file, not deleted
     mutex.unlock();
@@ -145,7 +145,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
         fileprop.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&fileprop);
     out << "Catalog Node ID|3|Catalog node id for the extents overflow file." << Qt::endl;
-    out << "Parent Catalog Node ID|2|File's parent NTFS inode value." << Qt::endl;
+    out << "Parent Catalog Node ID|2|File's parent catalog node ID value." << Qt::endl;
     out << "Physical Size|" << QString::number(clustersize * extenttotalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
     out << "Logical Size|" << QString::number(extentsize) << "|Size in Bytes for the file." << Qt::endl;
     out << "Mode|r---------|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
@@ -171,8 +171,8 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
     nodedata.insert("sig", "Extents Overflow File");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
     parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-    if(parinode > 0)
-        parentstr += QString("-f" + QString::number(parinode));
+    //if(parinode > 0)
+    //    parentstr += QString("-f" + QString::number(parinode));
     mutex.lock();
     treenodemodel->AddNode(nodedata, parentstr, 10, 0); // virtual file, not deleted
     mutex.unlock();
@@ -187,7 +187,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
         fileprop.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&fileprop);
     out << "Catalog Node ID|4|Catalog node id for the catalog file." << Qt::endl;
-    out << "Parent Catalog Node ID|2|File's parent NTFS inode value." << Qt::endl;
+    out << "Parent Catalog Node ID|2|File's parent catalog node ID value." << Qt::endl;
     out << "Physical Size|" << QString::number(clustersize * catalogtotalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
     out << "Logical Size|" << QString::number(catalogsize) << "|Size in Bytes for the file." << Qt::endl;
     out << "Mode|r---------|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
@@ -213,8 +213,8 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
     nodedata.insert("sig", "Catalog File");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
     parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-    if(parinode > 0)
-        parentstr += QString("-f" + QString::number(parinode));
+    //if(parinode > 0)
+    //    parentstr += QString("-f" + QString::number(parinode));
     mutex.lock();
     treenodemodel->AddNode(nodedata, parentstr, 10, 0); // virtual file, not deleted
     mutex.unlock();
@@ -229,7 +229,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
         fileprop.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&fileprop);
     out << "Catalog Node ID|8|Catalog node id for the attributes file." << Qt::endl;
-    out << "Parent Catalog Node ID|2|File's parent NTFS inode value." << Qt::endl;
+    out << "Parent Catalog Node ID|2|File's parent catalog node ID value." << Qt::endl;
     out << "Physical Size|" << QString::number(clustersize * attrtotalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
     out << "Logical Size|" << QString::number(attrsize) << "|Size in Bytes for the file." << Qt::endl;
     out << "Mode|r---------|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
@@ -255,8 +255,8 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
     nodedata.insert("sig", "Attributes File");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
     parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-    if(parinode > 0)
-        parentstr += QString("-f" + QString::number(parinode));
+    //if(parinode > 0)
+    //    parentstr += QString("-f" + QString::number(parinode));
     mutex.lock();
     treenodemodel->AddNode(nodedata, parentstr, 10, 0); // virtual file, not deleted
     mutex.unlock();
@@ -271,7 +271,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
         fileprop.open(QIODevice::Append | QIODevice::Text);
     out.setDevice(&fileprop);
     out << "Catalog Node ID|7|Catalog node id for the startup file." << Qt::endl;
-    out << "Parent Catalog Node ID|2|File's parent NTFS inode value." << Qt::endl;
+    out << "Parent Catalog Node ID|2|File's parent catalog node ID value." << Qt::endl;
     out << "Physical Size|" << QString::number(clustersize * starttotalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
     out << "Logical Size|" << QString::number(startsize) << "|Size in Bytes for the file." << Qt::endl;
     out << "Mode|r---------|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
@@ -297,8 +297,8 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
     nodedata.insert("sig", "Startup File");
     nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
     parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-    if(parinode > 0)
-        parentstr += QString("-f" + QString::number(parinode));
+    //if(parinode > 0)
+    //    parentstr += QString("-f" + QString::number(parinode));
     mutex.lock();
     treenodemodel->AddNode(nodedata, parentstr, 10, 0); // virtual file, not deleted
     mutex.unlock();
@@ -339,8 +339,12 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
         }
         // THIS IS WHERE THE KEY/DATA LOOP ITERATION SHOULD START... WHILE (CURPOS < CURBLOCKSIZE)
         //qDebug() << "curoffset:" << curoffset << "curpos:" << curpos << "curblocksize:" << curblocksize;
+        QHash<uint32_t, QString> dirhash; // QHash<parentcnid, QString("inode, filename")>
+        dirhash.clear();
+        dirhash.insert(2, "0,/");
         while(curpos < curblocksize)
         {
+            QString keyfilename = "";
             uint16_t curkeylength = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos, 2));
             curpos += 2;
             if(curkeylength == 0)
@@ -357,7 +361,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
             //qDebug() << "keynamelength:" << keynamelength;
             if(keynamelength > 0)
             {
-                QString keyfilename = "";
+                keyfilename = "";
                 for(int j=0; j < keynamelength; j++)
                 {
                     keyfilename += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos + j*2, 2))));
@@ -370,8 +374,11 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
             uint16_t datarecordtype = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos, 2));
             curpos += 2;
             //qDebug() << "datarecordtype:" << datarecordtype;
-            if(datarecordtype == 0x01 || datarecordtype == 0x02) // FOLDER RECORD 0x0001/FILE RECORD 0x0002 - 88 bytes/248 bytes
+            if(datarecordtype == 0x0001 || datarecordtype == 0x0002) // FOLDER RECORD 0x0001/FILE RECORD 0x0002 - 88 bytes/248 bytes
             {
+                layout = "";
+                uint8_t itemtype = 0;
+                uint8_t isdeleted = 0;
                 uint16_t flags = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos, 2));
                 uint32_t valence = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 2, 4));
                 uint32_t cnid = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 6, 4));
@@ -387,28 +394,26 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 uint8_t ownerflags = qFromBigEndian<uint8_t>(curimg->ReadContent(curoffset + curpos + 39, 1));
                 uint16_t filemode = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos + 40, 2));
                 uint32_t inodelinkraw = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 42, 4));
+                quint64 logicalsize = 0;
+                uint32_t clumpsize = 0;
+                uint32_t totalblocks = 0;
                 //qDebug() << "createdate:" << ConvertUnixTimeToString(ConvertHfsTimeToUnixTime(createdate));
                 // 16 bytes for user information i currently don't care about
                 // 16 bytes for finder information i currently don't care about
                 // 4 bytes for text encoding i don't care about
                 // 4 bytes reserved, so it doesn't matter
-                if(datarecordtype == 0x01) // FOLDER RECORD
+                if(datarecordtype == 0x0001) // FOLDER RECORD
                 {
                     //qDebug() << "folder record";
+                    dirhash.insert(cnid, QString(QString::number(inodecnt) + "," + keyfilename));
                     curpos += 86;
                 }
-                else if(datarecordtype == 0x02) // FILE RECORD
+                else if(datarecordtype == 0x0002) // FILE RECORD
                 {
-                    //uint8_t logic_sz[8];        // The size (in bytes) of the fork //
-                    //uint8_t clmp_sz[4];         // For "special files" in volume header, clump size.  For
-                    //uint8_t total_blk[4];       // total blocks in all extents of the fork //
-
-                    quint64 logicalsize = qFromBigEndian<quint64>(curimg->ReadContent(curoffset + curpos + 86, 8));
-                    uint32_t clumpsize = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 94, 4));
-                    uint32_t totalblocks = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 98, 4));
+                    logicalsize = qFromBigEndian<quint64>(curimg->ReadContent(curoffset + curpos + 86, 8));
+                    clumpsize = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 94, 4));
+                    totalblocks = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 98, 4));
                     //qDebug() << "logical size:" << logicalsize << "clumpsize:" << clumpsize << "totalblocks:" << totalblocks;
-                    
-                    layout = "";
                     // PARSE DATA FORK
                     for(int j=0; j < 8; j++)
                     {
@@ -417,10 +422,143 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                         if(qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 106 + j*8, 4)) > 0)
                             layout += QString::number(clustersize * qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 106 + j*8, 4))) + ";";
                     }
-                    //qDebug() << "file record";
                     curpos += 246;
                     //qDebug() << "layout:" << layout;
                 }
+                fileprop.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+                if(!fileprop.isOpen())
+                    fileprop.open(QIODevice::Append | QIODevice::Text);
+                out.setDevice(&fileprop);
+                out << "Catalog Node ID|" << QString::number(cnid) << "|Catalog node id for the file/folder." << Qt::endl;
+                out << "Parent Catalog Node ID|" << QString::number(parentcnid) << "|File's parent catalog node id value." << Qt::endl;
+                QString filemodestr = "---------";
+                if(filemode & 0xc000) // unix socket
+		{
+                    filemodestr.replace(0, 1, "s");
+		    itemtype = 9;
+		}
+                if(filemode & 0xa000) // symbolic link
+		{
+                    filemodestr.replace(0, 1, "l");
+		    itemtype = 12;
+		}
+                if(filemode & 0x6000) // block device
+		{
+                    filemodestr.replace(0, 1, "b");
+		    itemtype = 7;
+		}
+                if(filemode & 0x2000) // char device
+		{
+                    filemodestr.replace(0, 1, "c");
+		    itemtype = 6;
+		}
+                if(filemode & 0x1000) // FIFO (pipe)
+		{
+                    filemodestr.replace(0, 1, "p");
+		    itemtype = 8;
+		}
+                if(filemode & 0x8000) // regular file
+                {
+                    filemodestr.replace(0, 1, "-");
+		    itemtype = 5;
+		    if(isdeleted == 1)
+			itemtype = 4;
+                }
+                else if(filemode & 0x4000) // directory
+                {
+                    filemodestr.replace(0, 1, "d");
+		    itemtype = 3;
+		    if(isdeleted == 1)
+			itemtype = 2;
+                }
+                if(filemode & 0x100) // user read
+                    filemodestr.replace(1, 1, "r");
+                if(filemode & 0x080) // user write
+                    filemodestr.replace(2, 1, "w");
+                if(filemode & 0x040) // user execute
+                    filemodestr.replace(3, 1, "x");
+                if(filemode & 0x020) // group read
+                    filemodestr.replace(4, 1, "r");
+                if(filemode & 0x010) // group write
+                    filemodestr.replace(5, 1, "w");
+                if(filemode & 0x008) // group execute
+                    filemodestr.replace(6, 1, "x");
+                if(filemode & 0x004) // other read
+                    filemodestr.replace(7, 1, "r");
+                if(filemode & 0x002) // other write
+                    filemodestr.replace(8, 1, "w");
+                if(filemode & 0x001) // other execute
+                    filemodestr.replace(9, 1, "x");
+                //qDebug() << "filemodestr:" << filemodestr;
+                out << "Mode|" << filemodestr << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
+                out << "uid / gid|" << QString::number(ownerid) << " / " << QString::number(groupid) << "|User ID and Group ID." << Qt::endl;
+                out << "File Attributes|Allocated|Attributes list for the file." << Qt::endl;
+                out << "Backup Date|" << ConvertUnixTimeToString(ConvertHfsTimeToUnixTime(backupdate)) << "|Date time the file/folder was last backed up." << Qt::endl;
+                //qDebug() << "createdate:" << ConvertUnixTimeToString(ConvertHfsTimeToUnixTime(createdate));
+                out << "Physical Size|" << QString::number(clustersize * totalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
+                out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
+                out << "Layout|" << layout << "|File layout in offset,size; format." << Qt::endl;
+                out.flush();
+                fileprop.close();
+                nodedata.clear();
+                nodedata.insert("name", QByteArray(keyfilename.toUtf8()).toBase64());
+                // FIX PATH HERE BASED ON PARENTCNID AND DIRHASH
+                QString parentinfo = dirhash.value(parentcnid);
+                qDebug() << "parentinfo:" << parentinfo;
+                if(parentcnid > 2)
+                    nodedata.insert("path", QByteArray(QString("/" + parentinfo.split(",").at(1)).toUtf8()).toBase64());
+                nodedata.insert("size", logicalsize);
+                nodedata.insert("create", ConvertHfsTimeToUnixTime(createdate));
+                nodedata.insert("access", ConvertHfsTimeToUnixTime(accessdate));
+                nodedata.insert("modify", ConvertHfsTimeToUnixTime(contentmoddate));
+                nodedata.insert("status", ConvertHfsTimeToUnixTime(attrmoddate));
+                if(logicalsize > 0) // Get Category/Signature
+                {
+                    if(itemtype == 3 && isdeleted == 0)
+                    {
+                        nodedata.insert("cat", "Directory");
+                        nodedata.insert("sig", "Directory");
+                    }
+                    else
+                    {
+                        QString catsig = GenerateCategorySignature(curimg, keyfilename, layout.split(";").at(0).split(",").at(0).toULongLong());
+                        nodedata.insert("cat", catsig.split("/").first());
+                        nodedata.insert("sig", catsig.split("/").last());
+                    }
+                }
+                else
+                {
+                    if(itemtype == 3 && isdeleted == 0)
+                    {
+                        nodedata.insert("cat", "Directory");
+                        nodedata.insert("sig", "Directory");
+                    }
+                    else
+                    {
+                        nodedata.insert("cat", "Empty");
+                        nodedata.insert("sig", "Zero File");
+                    }
+                }
+                nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
+                parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+                // need a list which contains cnid, inode, filename for folders...
+                if(cnid != 1 && cnid != 2)
+                {
+                    QString parinode = parentinfo.split(",").at(0);
+                    if(parentcnid > 2)
+                    {
+                        parentstr += QString("-f" + parinode);
+                    }
+                    //qDebug() << parentcnid << "parentcnid info:" << dirhash.value(parentcnid);
+                    mutex.lock();
+                    treenodemodel->AddNode(nodedata, parentstr, itemtype, 0); // virtual file, not deleted
+                    mutex.unlock();
+                    listeditems.append(nodedata.value("id").toString());
+                    filesfound++;
+                    isignals->ProgUpd();
+                    inodecnt++;
+                }
+                nodedata.clear();
             }
             //else if(datarecordtype == 0x02) // FILE RECORD 0x0002 - 248 bytes
             //{
@@ -445,7 +583,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 // file record is the same as folder, except it has the data fork (80 bytes) and resource fork (80 bytes)...
                 // resource fork should be an ads, the data fork should be the data layout variable...
             //}
-            else if(datarecordtype == 0x03 || datarecordtype == 0x04) // FOLDER THREAD RECORD 0x03/ FILE THREAD RECORD 0x04 - SKIP
+            else if(datarecordtype == 0x0003 || datarecordtype == 0x0004) // FOLDER THREAD RECORD 0x03/ FILE THREAD RECORD 0x04 - SKIP
             {
                 // keylength should be 6 bytes...
                 // data length should another 6 bytes
