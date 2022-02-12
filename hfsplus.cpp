@@ -105,12 +105,34 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
             qDebug() << "datarecordtype:" << datarecordtype;
             if(datarecordtype == 0x01) // FOLDER RECORD 0x0001 - 88 bytes
             {
+                uint16_t flags = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos, 2));
+                uint32_t valence = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 2, 4));
+                uint32_t cnid = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 6, 4));
+                uint32_t createdate = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 10, 4));
+                uint32_t contentmoddate = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 14, 4));
+                uint32_t attrmoddate = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 18, 4));
+                uint32_t accessdate = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 22, 4));
+                uint32_t backupdate = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 26, 4));
+                uint32_t ownerid = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 30, 4));
+                uint32_t groupid = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 34, 4));
+                uint8_t adminflags = qFromBigEndian<uint8_t>(curimg->ReadContent(curoffset + curpos + 38, 1));
+                uint8_t ownerflags = qFromBigEndian<uint8_t>(curimg->ReadContent(curoffset + curpos + 39, 1));
+                uint16_t filemode = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos + 40, 2));
+                uint32_t inodelinkraw = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 42, 4));
+                qDebug() << "createdate:" << ConvertUnixTimeToString(ConvertHfsTimeToUnixTime(createdate));
+                // 16 bytes for user information i currently don't care about
+                // 16 bytes for finder information i currently don't care about
+                // 4 bytes for text encoding i don't care about
+                // 4 bytes reserved, so it doesn't matter
                 qDebug() << "folder record";
                 curpos += 86;
             }
             else if(datarecordtype == 0x02) // FILE RECORD 0x0002 - 248 bytes
             {
                 qDebug() << "file record";
+                // need to combine these two fields and split at the 86 mark and add the difference accordingly.
+                // file record is the same as folder, except it has the data fork (80 bytes) and resource fork (80 bytes)...
+                // resource fork should be an ads, the data fork should be the data layout variable...
                 curpos += 246;
             }
             else if(datarecordtype == 0x03 || datarecordtype == 0x04) // FOLDER THREAD RECORD 0x03/ FILE THREAD RECORD 0x04 - SKIP
@@ -440,3 +462,20 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
     }
     return inodecnt;
 */
+
+/*
+typedef struct {
+    uint8_t logic_sz[8];        // The size (in bytes) of the fork //
+    uint8_t clmp_sz[4];         // For "special files" in volume header, clump size.  For
+                                // catalog files, this is number of blocks read or not used. //
+    uint8_t total_blk[4];       // total blocks in all extents of the fork //
+    hfs_ext_desc extents[8]; // 8 sets of 4 byte start block, 4 byte block count
+} hfs_fork;
+
+// structure for file data in catalog leaf records
+typedef struct {
+    hfs_file_fold_std std;      // standard data that files and folders share //
+    hfs_fork data;              // data fork //
+    hfs_fork resource;          // resource fork //
+} hfs_file;
+ */ 

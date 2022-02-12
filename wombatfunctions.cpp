@@ -749,6 +749,13 @@ uint32_t ConvertNtfsTimeToUnixTime(uint64_t ntdate)
     return (uint32_t) ntdate;
 }
 
+uint32_t ConvertHfsTimeToUnixTime(uint32_t hfsdate)
+{
+    if (hfsdate < NSEC_BTWN_1904_1970)
+        return 0;
+    return (uint32_t) (hfsdate - NSEC_BTWN_1904_1970);
+}
+
 QString ConvertBlocksToExtents(QList<uint32_t> blocklist, uint blocksize)
 {
     QString extentstring = "";
