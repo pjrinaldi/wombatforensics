@@ -1182,8 +1182,8 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             out << "File System Type|HFSX|File System Type String." << Qt::endl;
         }
         // NEED TO CONVERT THE 2 DATES LISTED TO ACTUAL HUMAN READABLE DATES
-        out << "Volume Creation Date|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1040, 4))) << "|Creation Date of the volume stored in local time." << Qt::endl;
-        out << "Last Modification Date|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1044, 4))) << "|UTC Last modification date of the volume." << Qt::endl;
+        out << "Volume Creation Date|" << ConvertUnixTimeToString(ConvertHfsTimeToUnixTime(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1040, 4)))) << "|Creation Date of the volume stored in local time." << Qt::endl;
+        out << "Last Modification Date|" << ConvertUnixTimeToString(ConvertHfsTimeToUnixTime(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1044, 4)))) << "|UTC Last modification date of the volume." << Qt::endl;
         out << "File Count|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1056, 4))) << "|Number of files on the volume." << Qt::endl;
         out << "Folder Count|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1060, 4))) << "|Number of folders on the volume." << Qt::endl;
         out << "Cluster Size|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1064, 4))) << "|Allocation Cluster Size, usually 4096 bytes." << Qt::endl;
