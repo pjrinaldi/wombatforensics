@@ -1188,6 +1188,41 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "Folder Count|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1060, 4))) << "|Number of folders on the volume." << Qt::endl;
         out << "Cluster Size|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1064, 4))) << "|Allocation Cluster Size, usually 4096 bytes." << Qt::endl;
         out << "Next Catalog ID|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1088, 4))) << "|Next available catalog ID (node id)." << Qt::endl;
+        // ALLOCATION FILE INFORMATION
+        out << "Allocation Logical Size|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 1136, 8))) << "|Logical size for the allocation file." << Qt::endl;
+        out << "Allocation Total Blocks|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1148, 4))) << "|Total number of blocks for the allocation file." << Qt::endl;
+        out << "Allocation Extents Start Block Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1152 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1152 + i*8, 4))) << ",";
+        }
+        out << "|Start block for each extent for allocation file." << Qt::endl;
+        out << "Allocation Extents Block Count Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1156 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1156 + i*8, 4))) << ",";
+        }
+        out << "|Block count for each extent for allocation file." << Qt::endl;
+        // EXTENTS OVERFLOW FILE INFORMATION
+        out << "Extents Overflow Logical Size|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 1216, 8))) << "|Logical size for the extents overflow file." << Qt::endl;
+        out << "Extents Overflow Total Blocks|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1228, 4))) << "|Total number of blocks for the extents overflow file." << Qt::endl;
+        out << "Extents Overflow Extents Start Block Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1232 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1232 + i*8, 4))) << ",";
+        }
+        out << "|Start block for each extent for extents overflow file." << Qt::endl;
+        out << "Extents Overflow Extents Block Count Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1236 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1236 + i*8, 4))) << ",";
+        }
+        out << "|Block count for each extent for extents overflow file." << Qt::endl;
+        // CATALOG FILE INFORMATION
         out << "Catalog Logical Size|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 1296, 8))) << "|Logical size for the catalog file." << Qt::endl;
         out << "Catalog Total Blocks|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1308, 4))) << "|Total number of blocks for the Catalog file." << Qt::endl;
         out << "Catalog Extents Start Block Array|";
@@ -1205,28 +1240,40 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         }
         out << "|Block count for each extent for Catalog file." << Qt::endl;
 
-        /*
-        int curoffset = 1024;
-        fsinfo.insert("type", QVariant(8));
-        if(hfssig == "H+")
-            fsinfo.insert("typestr", QVariant("HFS+"));
-        else if(hfssig == "HX")
-            fsinfo.insert("typestr", QVariant("HFSX"));
-        fsinfo.insert("createdate", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 16, 4))));
-        fsinfo.insert("modifydate", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 20, 4))));
-        fsinfo.insert("backupdate", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 24, 4))));
-        fsinfo.insert("filecount", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 32, 4))));
-        fsinfo.insert("foldercount", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 36, 4))));
-        fsinfo.insert("blocksize", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 40, 4))));
-        fsinfo.insert("totalblocks", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 44, 4))));
-        qDebug() << "block size:" << fsinfo.value("blocksize").toUInt();
-        fsinfo.insert("cataloglogsize", QVariant(qFromBigEndian<qulonglong>(partbuf.mid(curoffset + 272, 8))));
-        fsinfo.insert("catalogtotalblocks", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 284, 4))));
-        fsinfo.insert("catalogextent0startblk", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 288, 4))));
-        fsinfo.insert("catalogextent0blkcnt", QVariant(qFromBigEndian<uint32_t>(partbuf.mid(curoffset + 292, 4))));
-        qDebug() << "catalog startblk:" << fsinfo.value("catalogextent0startblk").toUInt();
-        qDebug() << "catalog blkcnt:" << fsinfo.value("catalogextent0blkcnt").toUInt();
-        */
+        // ATTRIBUTES FILE INFORMATION
+        out << "Attributes Logical Size|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 1376, 8))) << "|Logical size for the attributes file." << Qt::endl;
+        out << "Attributes Total Blocks|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1388, 4))) << "|Total number of blocks for the attributes file." << Qt::endl;
+        out << "Attributes Extents Start Block Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1392 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1392 + i*8, 4))) << ",";
+        }
+        out << "|Start block for each extent for attributes file." << Qt::endl;
+        out << "Attributes Extents Block Count Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1396 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1396 + i*8, 4))) << ",";
+        }
+        out << "|Block count for each extent for attributes file." << Qt::endl;
+        // STARTUP FILE INFORMATION
+        out << "Startup Logical Size|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 1456, 8))) << "|Logical size for the startup file." << Qt::endl;
+        out << "Startup Total Blocks|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1468, 4))) << "|Total number of blocks for the startup file." << Qt::endl;
+        out << "Startup Extents Start Block Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1472 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1472 + i*8, 4))) << ",";
+        }
+        out << "|Start block for each extent for startup file." << Qt::endl;
+        out << "Startup Extents Block Count Array|";
+        for(int i=0; i < 8; i++)
+        {
+            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1476 + i*8, 4)) > 0)
+                out << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 1476 + i*8, 4))) << ",";
+        }
+        out << "|Block count for each extent for startup file." << Qt::endl;
     }
     else if(xfssig == "XFSB") // XFS
     {
@@ -1535,7 +1582,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     else if(fstype == 8) // HFS+/X
     {
         quint64 curinode = 0;
-        curinode = ParseHfsPlusDirectory(curimg, curstartsector, ptreecnt, 0, "");
+        curinode = ParseHfsPlusDirectory(curimg, curstartsector, ptreecnt);
     }
     else if(fstype == 11) // BITLOCKER
     {

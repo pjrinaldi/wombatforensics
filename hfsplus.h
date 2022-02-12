@@ -9,6 +9,7 @@
 #include "wombatfunctions.h"
 #include "commonfs.h"
 
-qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename);
+// might not need parinode and parfilename as it were...
+qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
 
 #endif // hfsplus.h
