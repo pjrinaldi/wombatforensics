@@ -341,7 +341,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
         //qDebug() << "curoffset:" << curoffset << "curpos:" << curpos << "curblocksize:" << curblocksize;
         QHash<uint32_t, QString> dirhash; // QHash<parentcnid, QString("inode, filename")>
         dirhash.clear();
-        dirhash.insert(2, "0,/");
+        dirhash.insert(2, "0,2,/");
         while(curpos < curblocksize)
         {
             QString keyfilename = "";
@@ -405,7 +405,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 if(datarecordtype == 0x0001) // FOLDER RECORD
                 {
                     //qDebug() << "folder record";
-                    dirhash.insert(cnid, QString(QString::number(inodecnt) + "," + keyfilename));
+                    dirhash.insert(cnid, QString(QString::number(inodecnt) + "," + QString::number(parentcnid) + "," + keyfilename));
                     curpos += 86;
                 }
                 else if(datarecordtype == 0x0002) // FILE RECORD
@@ -504,9 +504,14 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 nodedata.insert("name", QByteArray(keyfilename.toUtf8()).toBase64());
                 // FIX PATH HERE BASED ON PARENTCNID AND DIRHASH
                 QString parentinfo = dirhash.value(parentcnid);
-                qDebug() << "parentinfo:" << parentinfo;
+                //qDebug() << "parentinfo:" << parentinfo;
+                // THE PATH VARIABLE ISN'T QUITE RIGHT... IF ITS NESTED, THIS IGNORES THE NESTING...
+                // SO I NEED AN ITERATIVE PATH STRING BUILDER BASED ON CHECKING DIRHASH FOR EACH CNID...
+                QString parentpath = "/";
                 if(parentcnid > 2)
-                    nodedata.insert("path", QByteArray(QString("/" + parentinfo.split(",").at(1)).toUtf8()).toBase64());
+                    BuildPath(&parentpath, &dirhash, parentcnid);
+                    //nodedata.insert("path", QByteArray(QString("/" + parentinfo.split(",").at(1) + "/").toUtf8()).toBase64());
+                nodedata.insert("path", QByteArray(parentpath.toUtf8()).toBase64());
                 nodedata.insert("size", logicalsize);
                 nodedata.insert("create", ConvertHfsTimeToUnixTime(createdate));
                 nodedata.insert("access", ConvertHfsTimeToUnixTime(accessdate));
@@ -560,29 +565,6 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 }
                 nodedata.clear();
             }
-            //else if(datarecordtype == 0x02) // FILE RECORD 0x0002 - 248 bytes
-            //{
-                // METHOD TO PARSE DATA FORK AND RESOURCE FORK
-                /*
-                out << "Catalog Extents Start Block Array|";
-                for(int i=0; i < 8; i++)
-                {
-                    if(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1312 + i*8, 4)) > 0)
-                        out << QString::number(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1312 + i*8, 4))) << ",";
-                }
-                out << "|Start block for each extent for Catalog file." << Qt::endl;
-                out << "Catalog Extents Block Count Array|";
-                for(int i=0; i < 8; i++)
-                {
-                    if(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1316 + i*8, 4)) > 0)
-                        out << QString::number(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1316 + i*8, 4))) << ",";
-                }
-                out << "|Block count for each extent for Catalog file." << Qt::endl;
-                */
-                // need to combine these two fields and split at the 86 mark and add the difference accordingly.
-                // file record is the same as folder, except it has the data fork (80 bytes) and resource fork (80 bytes)...
-                // resource fork should be an ads, the data fork should be the data layout variable...
-            //}
             else if(datarecordtype == 0x0003 || datarecordtype == 0x0004) // FOLDER THREAD RECORD 0x03/ FILE THREAD RECORD 0x04 - SKIP
             {
                 // keylength should be 6 bytes...
@@ -600,5 +582,15 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 break;
             }
         }
+    }
+}
+
+void BuildPath(QString* path, QHash<uint32_t, QString>* dirhash, quint64 curparcnid)
+{
+    while(curparcnid > 2)
+    {
+        QString parentinfo = dirhash->value(curparcnid);
+        curparcnid = parentinfo.split(",").at(1).toULongLong();
+        path->prepend("/" + parentinfo.split(",").at(2));
     }
 }

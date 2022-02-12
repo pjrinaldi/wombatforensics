@@ -11,5 +11,6 @@
 
 // might not need parinode and parfilename as it were...
 qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
+void BuildPath(QString* path, QHash<uint32_t, QString>* dirhash, quint64 curparcnid);
 
 #endif // hfsplus.h
