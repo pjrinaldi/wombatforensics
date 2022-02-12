@@ -182,8 +182,131 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
     inodecnt++;
     nodedata.clear();
     // CATALOG FILE
+    fileprop.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+    if(!fileprop.isOpen())
+        fileprop.open(QIODevice::Append | QIODevice::Text);
+    out.setDevice(&fileprop);
+    out << "Catalog Node ID|4|Catalog node id for the catalog file." << Qt::endl;
+    out << "Parent Catalog Node ID|2|File's parent NTFS inode value." << Qt::endl;
+    out << "Physical Size|" << QString::number(clustersize * catalogtotalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
+    out << "Logical Size|" << QString::number(catalogsize) << "|Size in Bytes for the file." << Qt::endl;
+    out << "Mode|r---------|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
+    out << "uid / gid|0 / 0|User ID and Group ID." << Qt::endl;
+    out << "File Attributes|Allocated|Attributes list for the file." << Qt::endl;
+    curstartblock = 0;
+    curblockcount = 0;
+    layout = "";
+    for(int i=0; i < catalogextstartblockarray.split(",", Qt::SkipEmptyParts).count(); i++) // build layout
+    {
+        curstartblock = catalogextstartblockarray.split(",", Qt::SkipEmptyParts).at(i).toUInt();
+        curblockcount = catalogextblockcntarray.split(",", Qt::SkipEmptyParts).at(i).toUInt();
+        layout += QString::number(curstartsector*512 + clustersize * curstartblock) + "," + QString::number(clustersize * curblockcount) + ";";
+    }
+    out << "Layout|" << layout << "|File layout in offset,size; format." << Qt::endl;
+    out.flush();
+    fileprop.close();
+    nodedata.clear();
+    nodedata.insert("name", QByteArray(QString("$CatalogFile").toUtf8()).toBase64());
+    nodedata.insert("path", QByteArray(QString("/").toUtf8()).toBase64());
+    nodedata.insert("size", catalogsize);
+    nodedata.insert("cat", "System File");
+    nodedata.insert("sig", "Catalog File");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
+    parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+    if(parinode > 0)
+        parentstr += QString("-f" + QString::number(parinode));
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, parentstr, 10, 0); // virtual file, not deleted
+    mutex.unlock();
+    listeditems.append(nodedata.value("id").toString());
+    filesfound++;
+    isignals->ProgUpd();
+    inodecnt++;
+    nodedata.clear();
     // ATTRIBUTES FILE
+    fileprop.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+    if(!fileprop.isOpen())
+        fileprop.open(QIODevice::Append | QIODevice::Text);
+    out.setDevice(&fileprop);
+    out << "Catalog Node ID|8|Catalog node id for the attributes file." << Qt::endl;
+    out << "Parent Catalog Node ID|2|File's parent NTFS inode value." << Qt::endl;
+    out << "Physical Size|" << QString::number(clustersize * attrtotalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
+    out << "Logical Size|" << QString::number(attrsize) << "|Size in Bytes for the file." << Qt::endl;
+    out << "Mode|r---------|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
+    out << "uid / gid|0 / 0|User ID and Group ID." << Qt::endl;
+    out << "File Attributes|Allocated|Attributes list for the file." << Qt::endl;
+    curstartblock = 0;
+    curblockcount = 0;
+    layout = "";
+    for(int i=0; i < attrextstartblockarray.split(",", Qt::SkipEmptyParts).count(); i++) // build layout
+    {
+        curstartblock = attrextstartblockarray.split(",", Qt::SkipEmptyParts).at(i).toUInt();
+        curblockcount = attrextblockcntarray.split(",", Qt::SkipEmptyParts).at(i).toUInt();
+        layout += QString::number(curstartsector*512 + clustersize * curstartblock) + "," + QString::number(clustersize * curblockcount) + ";";
+    }
+    out << "Layout|" << layout << "|File layout in offset,size; format." << Qt::endl;
+    out.flush();
+    fileprop.close();
+    nodedata.clear();
+    nodedata.insert("name", QByteArray(QString("$AttributesFile").toUtf8()).toBase64());
+    nodedata.insert("path", QByteArray(QString("/").toUtf8()).toBase64());
+    nodedata.insert("size", attrsize);
+    nodedata.insert("cat", "System File");
+    nodedata.insert("sig", "Attributes File");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
+    parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+    if(parinode > 0)
+        parentstr += QString("-f" + QString::number(parinode));
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, parentstr, 10, 0); // virtual file, not deleted
+    mutex.unlock();
+    listeditems.append(nodedata.value("id").toString());
+    filesfound++;
+    isignals->ProgUpd();
+    inodecnt++;
+    nodedata.clear();
     // STARTUP FILE
+    fileprop.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+    if(!fileprop.isOpen())
+        fileprop.open(QIODevice::Append | QIODevice::Text);
+    out.setDevice(&fileprop);
+    out << "Catalog Node ID|7|Catalog node id for the startup file." << Qt::endl;
+    out << "Parent Catalog Node ID|2|File's parent NTFS inode value." << Qt::endl;
+    out << "Physical Size|" << QString::number(clustersize * starttotalblocks) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
+    out << "Logical Size|" << QString::number(startsize) << "|Size in Bytes for the file." << Qt::endl;
+    out << "Mode|r---------|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
+    out << "uid / gid|0 / 0|User ID and Group ID." << Qt::endl;
+    out << "File Attributes|Allocated|Attributes list for the file." << Qt::endl;
+    curstartblock = 0;
+    curblockcount = 0;
+    layout = "";
+    for(int i=0; i < startextstartblockarray.split(",", Qt::SkipEmptyParts).count(); i++) // build layout
+    {
+        curstartblock = startextstartblockarray.split(",", Qt::SkipEmptyParts).at(i).toUInt();
+        curblockcount = startextblockcntarray.split(",", Qt::SkipEmptyParts).at(i).toUInt();
+        layout += QString::number(curstartsector*512 + clustersize * curstartblock) + "," + QString::number(clustersize * curblockcount) + ";";
+    }
+    out << "Layout|" << layout << "|File layout in offset,size; format." << Qt::endl;
+    out.flush();
+    fileprop.close();
+    nodedata.clear();
+    nodedata.insert("name", QByteArray(QString("$StartupFile").toUtf8()).toBase64());
+    nodedata.insert("path", QByteArray(QString("/").toUtf8()).toBase64());
+    nodedata.insert("size", startsize);
+    nodedata.insert("cat", "System File");
+    nodedata.insert("sig", "Startup File");
+    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
+    parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+    if(parinode > 0)
+        parentstr += QString("-f" + QString::number(parinode));
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, parentstr, 10, 0); // virtual file, not deleted
+    mutex.unlock();
+    listeditems.append(nodedata.value("id").toString());
+    filesfound++;
+    isignals->ProgUpd();
+    inodecnt++;
+    nodedata.clear();
     // FINISH THE RESPECTIVE RESERVED FILES HERE
     uint16_t nodesize = 0;
     quint64 curoffset = 0;
