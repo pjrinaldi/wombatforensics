@@ -33,8 +33,8 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
         }
         propfile.close();
     }
-    /*
     qDebug() << "cluster size:" << clustersize;
+    /*
     qDebug() << "catalogs logical size:" << catalogsize;
     qDebug() << "catalogtotalblocks:" << catalogtotalblocks;
     qDebug() << "catalogextstartblockarray:" << catalogextstartblockarray;
@@ -79,7 +79,8 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
             curpos += 2;
             if(curkeylength == 0)
             {
-                qDebug() << "keylength is wrong...";
+                qDebug() << "keylength is wrong, probably out of records...";
+                break;
             }
             qDebug() << "curkeylength:" << curkeylength; // in case i want to skip a record
             uint32_t parentcnid = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos, 4));
@@ -103,11 +104,13 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
             uint16_t datarecordtype = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos, 2));
             curpos += 2;
             qDebug() << "datarecordtype:" << datarecordtype;
-            if(datarecordtype == 0x01) // FOLDER RECORD 0x0001 - 88 bytes
+            if(datarecordtype == 0x01 || datarecordtype == 0x02) // FOLDER RECORD 0x0001/FILE RECORD 0x0002 - 88 bytes/248 bytes
             {
+                QString layout = "";
                 uint16_t flags = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos, 2));
                 uint32_t valence = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 2, 4));
                 uint32_t cnid = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 6, 4));
+                qDebug() << "cnid:" << cnid;
                 uint32_t createdate = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 10, 4));
                 uint32_t contentmoddate = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 14, 4));
                 uint32_t attrmoddate = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 18, 4));
@@ -124,17 +127,59 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 // 16 bytes for finder information i currently don't care about
                 // 4 bytes for text encoding i don't care about
                 // 4 bytes reserved, so it doesn't matter
-                qDebug() << "folder record";
-                curpos += 86;
+                if(datarecordtype == 0x01) // FOLDER RECORD
+                {
+                    qDebug() << "folder record";
+                    curpos += 86;
+                }
+                else if(datarecordtype == 0x02) // FILE RECORD
+                {
+                    //uint8_t logic_sz[8];        // The size (in bytes) of the fork //
+                    //uint8_t clmp_sz[4];         // For "special files" in volume header, clump size.  For
+                    //uint8_t total_blk[4];       // total blocks in all extents of the fork //
+
+                    quint64 logicalsize = qFromBigEndian<quint64>(curimg->ReadContent(curoffset + curpos + 86, 8));
+                    uint32_t clumpsize = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 94, 4));
+                    uint32_t totalblocks = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 98, 4));
+                    qDebug() << "logical size:" << logicalsize << "clumpsize:" << clumpsize << "totalblocks:" << totalblocks;
+                    
+                    layout = "";
+                    // PARSE DATA FORK
+                    for(int j=0; j < 8; j++)
+                    {
+                        if(qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 102 + j*8, 4)) > 0)
+                            layout += QString::number(curstartsector*512 + clustersize * qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 102 + j*8, 4))) + ",";
+                        if(qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 106 + j*8, 4)) > 0)
+                            layout += QString::number(clustersize * qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 106 + j*8, 4))) + ";";
+                    }
+                    qDebug() << "file record";
+                    curpos += 246;
+                    qDebug() << "layout:" << layout;
+                }
             }
-            else if(datarecordtype == 0x02) // FILE RECORD 0x0002 - 248 bytes
-            {
-                qDebug() << "file record";
+            //else if(datarecordtype == 0x02) // FILE RECORD 0x0002 - 248 bytes
+            //{
+                // METHOD TO PARSE DATA FORK AND RESOURCE FORK
+                /*
+                out << "Catalog Extents Start Block Array|";
+                for(int i=0; i < 8; i++)
+                {
+                    if(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1312 + i*8, 4)) > 0)
+                        out << QString::number(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1312 + i*8, 4))) << ",";
+                }
+                out << "|Start block for each extent for Catalog file." << Qt::endl;
+                out << "Catalog Extents Block Count Array|";
+                for(int i=0; i < 8; i++)
+                {
+                    if(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1316 + i*8, 4)) > 0)
+                        out << QString::number(qFromBigEndian<quint32>(curimg->ReadContent(curstartsector*512 + 1316 + i*8, 4))) << ",";
+                }
+                out << "|Block count for each extent for Catalog file." << Qt::endl;
+                */
                 // need to combine these two fields and split at the 86 mark and add the difference accordingly.
                 // file record is the same as folder, except it has the data fork (80 bytes) and resource fork (80 bytes)...
                 // resource fork should be an ads, the data fork should be the data layout variable...
-                curpos += 246;
-            }
+            //}
             else if(datarecordtype == 0x03 || datarecordtype == 0x04) // FOLDER THREAD RECORD 0x03/ FILE THREAD RECORD 0x04 - SKIP
             {
                 // keylength should be 6 bytes...
