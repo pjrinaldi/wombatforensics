@@ -26,6 +26,7 @@ void MBoxDialog::closeEvent(QCloseEvent* e)
 void MBoxDialog::LoadMBoxFile(QString mboxid, QString mboxname)
 {
     qDebug() << "parse mbox file here...";
+    // NEED TO SPLIT ON THE REGEXPRESSION (From<single space>email address<single space>timestamp<end of line marker>
     // need to get the offset for the start of each message and the length, to load the content...
     // i'll need more for mime type ones, but this a good start
     this->show();
