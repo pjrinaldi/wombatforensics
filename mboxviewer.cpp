@@ -6,6 +6,39 @@
 MBoxDialog::MBoxDialog(QWidget* parent) : QDialog(parent), ui(new Ui::MBoxDialog)
 {
     ui->setupUi(this);
+    ui->mailtable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->mailtable->setHorizontalHeaderLabels({"ID", "From", "Subject", "Date Time", "Tag"});
+    /*
+    QStringList taglist;
+    taglist.clear();
+    tagmenu = new QMenu(ui->tableWidget);
+    bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(bookmarkfile.isOpen())
+	taglist = QString(bookmarkfile.readLine()).split(",", Qt::SkipEmptyParts);
+    bookmarkfile.close();
+    for(int i=0; i < taglist.count(); i++)
+    {
+	QAction* tmpaction = new QAction(taglist.at(i), tagmenu);
+	tmpaction->setIcon(QIcon(":/bar/addtotag"));
+	tmpaction->setData(QVariant("t" + QString::number(i)));
+	connect(tmpaction, SIGNAL(triggered()), this, SLOT(SetTag()));
+	tagmenu->addAction(tmpaction);
+    }
+    tagmenu->addSeparator();
+    QAction* remtagaction = new QAction("Remove Tag", tagmenu);
+    remtagaction->setIcon(QIcon(":/bar/tag-rem"));
+    connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
+    tagmenu->addAction(remtagaction);
+    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
+    QFile registryfile;
+    registryfile.setFileName(wombatvariable.tmpmntpath + "registrytags");
+    registryfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    registrytaglist.clear();
+    if(registryfile.isOpen())
+	registrytaglist = QString(registryfile.readLine()).split(",", Qt::SkipEmptyParts);
+    registryfile.close();
+     */ 
 }
 
 MBoxDialog::~MBoxDialog()
@@ -25,26 +58,7 @@ void MBoxDialog::closeEvent(QCloseEvent* e)
 
 void MBoxDialog::LoadMBoxFile(QString mboxid, QString mboxname)
 {
-    QRegularExpression re("From [A-Za-z0-9\\@\\.]+ \\w+ \\w+ \\w+ \\d\\d:\\d\\d:\\d\\d [[A-Za-z0-9\\+]+\\n"); // without timezone offset
-    QRegularExpression re2("From [A-Za-z0-9\\@\\.]+ \\w+ \\w+ \\w+ \\d\\d:\\d\\d:\\d\\d [[A-Za-z0-9\\+]+ [0-9]+\\n"); // with timezone offset
-    QFile mboxfile(wombatvariable.tmpfilepath + mboxid + "-fhex");
-    if(!mboxfile.isOpen())
-        mboxfile.open(QIODevice::Text | QIODevice::ReadOnly);
-    if(mboxfile.isOpen())
-    {
-        while(!mboxfile.atEnd())
-        {
-            QString line = mboxfile.readLine();
-            QRegularExpressionMatch tmpmatch = re.match(line);
-            QRegularExpressionMatch tmpmatch2 = re2.match(line);
-            if(tmpmatch.hasMatch() || tmpmatch2.hasMatch())
-            {
-                qDebug() << "offset pos:" << mboxfile.pos() << "match line:" << line;
-                qDebug() << "split: From" << line.split("From ").last().split(" ").at(0);
-            }
-        }
-        mboxfile.close();
-    }
+    qDebug() << "display mbox email files here...";
     // NEED TO SPLIT ON THE REGEXPRESSION (From<single space>email address<single space>timestamp<end of line marker>
     // need to get the offset for the start of each message and the length, to load the content...
     // i'll need more for mime type ones, but this a good start

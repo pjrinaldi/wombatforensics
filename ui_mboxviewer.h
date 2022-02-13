@@ -52,8 +52,8 @@ public:
         splitter->setOrientation(Qt::Vertical);
         splitter->setOpaqueResize(true);
         mailtable = new QTableWidget(splitter);
-        if (mailtable->columnCount() < 4)
-            mailtable->setColumnCount(4);
+        if (mailtable->columnCount() < 5)
+            mailtable->setColumnCount(5);
         if (mailtable->rowCount() < 3)
             mailtable->setRowCount(3);
         mailtable->setObjectName(QString::fromUtf8("mailtable"));
@@ -63,9 +63,10 @@ public:
         mailtable->setAlternatingRowColors(true);
         mailtable->setSelectionBehavior(QAbstractItemView::SelectRows);
         mailtable->setRowCount(3);
-        mailtable->setColumnCount(4);
+        mailtable->setColumnCount(5);
         splitter->addWidget(mailtable);
         mailtable->horizontalHeader()->setStretchLastSection(true);
+        mailtable->verticalHeader()->setVisible(false);
         mailcontent = new QPlainTextEdit(splitter);
         mailcontent->setObjectName(QString::fromUtf8("mailcontent"));
         splitter->addWidget(mailcontent);

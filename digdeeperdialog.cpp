@@ -1,7 +1,7 @@
 #include "digdeeperdialog.h"
 #include "ui_digdeeperdialog.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 curlistcount) :
@@ -18,7 +18,6 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
     ui->listedFileRadioButton->setText(listtext);
     ui->processButton->setEnabled(false);
     ui->hashlistwidget->setEnabled(false);
-    ui->hashlistcheckbox->setEnabled(false);
     ui->selectedFileRadioButton->setChecked(true);
     if(checkcount <= 0)
         ui->checkedFileRadioButton->setEnabled(false);
@@ -33,6 +32,7 @@ DigDeeperDialog::DigDeeperDialog(QWidget *parent, qint64 curcheckcount, qint64 c
     connect(ui->hashcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->expandarchivescheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->hashlistcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
+    connect(ui->emailcheckbox, SIGNAL(clicked(bool)), this, SLOT(EnableProcess(bool)));
     connect(ui->processButton, SIGNAL(clicked()), this, SLOT(DigDeeperFiles()));
     // Get Hash Lists populated
     ui->hashlistwidget->clear();
@@ -58,7 +58,7 @@ void DigDeeperDialog::EnableProcess(bool checked)
     }
     else
 	ui->hashlistwidget->setEnabled(false);
-    if(ui->hashcheckbox->isChecked() || ui->thumbnailcheckBox->isChecked() || ui->videocheckBox->isChecked() || ui->expandarchivescheckbox->isChecked() || ui->hashlistcheckbox->isChecked())
+    if(ui->hashcheckbox->isChecked() || ui->thumbnailcheckBox->isChecked() || ui->videocheckBox->isChecked() || ui->expandarchivescheckbox->isChecked() || ui->hashlistcheckbox->isChecked() || ui->emailcheckbox->isChecked())
         ui->processButton->setEnabled(true);
 }
 
@@ -81,16 +81,14 @@ void DigDeeperDialog::DigDeeperFiles()
     }
     if(ui->hashlistcheckbox->isChecked())
     {
-	// ALSO NEED A WAY TO TRACK THE WHL FILES SELECTED
-        //hashlists.clear();
 	digoptions.append(3);
         for(int i=0; i < ui->hashlistwidget->selectedItems().count(); i++)
             knownhashlist.append(ui->hashlistwidget->selectedItems().at(i)->text());
-            //hashlists.append(ui->hashlistwidget->selectedItems().at(i)->text());
-        //emit HashComparison(hashlists);
     }
     if(ui->expandarchivescheckbox->isChecked())
         digoptions.append(4);
+    if(ui->emailcheckbox->isChecked())
+        digoptions.append(5);
     emit StartDig(digtype, digoptions);
     this->close();
 }

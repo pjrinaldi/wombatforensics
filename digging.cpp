@@ -11,6 +11,174 @@
 // Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
+void GenerateMailBoxExpansion(QString objectid)
+{
+    if(!isclosing)
+    {
+        // NEED TO DECIDE IF I WANT THE MBOX FILE TO BE A PARENT WITH THE EMAILS AS CHILDREN, SIMILAR TO A ZIP
+        // IN ADDITION TO THE MBOXVIEWER TO VIEW THE EMAILS. I THINK I MIGHT
+        QRegularExpression mboxre1("From [A-Za-z0-9\\@\\.]+ \\w+ \\w+ \\w+ \\d\\d:\\d\\d:\\d\\d [[A-Za-z0-9\\+]+\\n"); // no tz
+        QRegularExpression mboxre2("From [A-Za-z0-9\\@\\.]+ \\w+ \\w+ \\w+ \\d\\d:\\d\\d:\\d\\d [[A-Za-z0-9\\+]+ [0-9]+\\n"); // tz
+        QString filename = treenodemodel->GetNodeColumnValue(objectid, "name").toString();
+        QString filepath = treenodemodel->GetNodeColumnValue(objectid, "path").toString();
+        ForImg* curimg = NULL;
+        for(int i=0; i < existingforimglist.count(); i++)
+        {
+            if(existingforimglist.at(i)->MountPath().endsWith(objectid.split("-").at(0)))
+            {
+                curimg = existingforimglist.at(i);
+                break;
+            }
+        }
+        QString layout = "";
+        QList<qint64> poslist;
+        QStringList headerlist;
+        poslist.clear();
+        headerlist.clear();
+        layout = ReturnFileContent(curimg, objectid);
+        QFile mboxfile(wombatvariable.tmpfilepath + objectid + "-tmp");
+        if(!mboxfile.isOpen())
+            mboxfile.open(QIODevice::Text | QIODevice::ReadOnly);
+        if(mboxfile.isOpen())
+        {
+            while(!mboxfile.atEnd())
+            {
+                QString line = mboxfile.readLine();
+                QRegularExpressionMatch tmpmatch = mboxre1.match(line);
+                QRegularExpressionMatch tmpmatch2 = mboxre2.match(line);
+                if(tmpmatch.hasMatch() || tmpmatch2.hasMatch())
+                {
+                    headerlist.append(line);
+                    poslist.append(mboxfile.pos());
+                }
+            }
+            poslist.append(mboxfile.size());
+            mboxfile.close();
+        }
+        //qDebug() << "poslist:" << poslist;
+        //QString mboxlayout = "";
+        for(int i=0; i < poslist.count() - 1; i++)
+        {
+            QString tmpsubj = "";
+            QString tmpfrom = "";
+            QString tmpdate = "";
+            QString propstr = wombatvariable.tmpmntpath + "mailboxes/" + objectid + "-m" + QString::number(i) + ".prop";
+            if(!QFile::exists(propstr))
+            {
+                QFile propfile(propstr);
+                if(!propfile.isOpen())
+                    propfile.open(QIODevice::WriteOnly | QIODevice::Text);
+                if(propfile.isOpen())
+                {
+                    if(!mboxfile.isOpen())
+                        mboxfile.open(QIODevice::ReadOnly | QIODevice::Text);
+                    if(mboxfile.isOpen())
+                    {
+                        QTextStream proplist(&propfile);
+                        mboxfile.seek(poslist.at(i));
+                        QString msg = mboxfile.read(poslist.at(i+1) - poslist.at(i));
+                        int fromstart = msg.indexOf("From: ");
+                        int datestart = msg.indexOf("Date: ");
+                        int subjstart = msg.indexOf("Subject: ");
+                        int fromend = msg.mid(fromstart, datestart - fromstart).lastIndexOf("\n");
+                        if(fromend == -1)
+                            fromend = msg.mid(fromstart, subjstart - fromstart).lastIndexOf("\n");
+                        int dateend = msg.mid(datestart, subjstart - datestart).lastIndexOf("\n");
+                        if(dateend == -1)
+                            dateend = 50;
+                        int subjend = msg.mid(subjstart).indexOf("\n");
+
+                        //qDebug() << "from date subj start:" << fromstart << datestart << subjstart;
+                        //qDebug() << "from date subj end:" << fromend << dateend << subjend;
+                        proplist << "From|" + msg.mid(fromstart + 6, fromend - 6).remove("\n") + "|From field from the email message." << Qt::endl;
+                        proplist << "Date|" + msg.mid(datestart + 6, dateend - 6).remove("\n") + "|Date field from the email message." << Qt::endl;
+                        proplist << "Subject|" + msg.mid(subjstart + 9, subjend - 9).remove("\n") + "|Subject field from the email message." << Qt::endl;
+                        //qDebug() << "from:" << msg.mid(fromstart + 6, fromend - 6);
+                        //qDebug() << "date:" << msg.mid(datestart + 6, dateend - 6);
+                        //qDebug() << "subj:" << msg.mid(subjstart + 9, subjend - 9);
+
+                        //qDebug() << "msg:" << msg;
+                        // the below mostly works, but doesn't account for multi line from: as in the sample....
+                        /*
+                        while(mboxfile.pos() <= poslist.at(i+1))
+                        {
+                            QString line = mboxfile.readLine();
+                            if(line.startsWith("From:"))
+                            {
+                                if(tmpfrom.isEmpty())
+                                    tmpfrom = line.mid(6);
+                                qDebug() << propstr.split("/").last().split(".prop").first();
+                                qDebug() << line.mid(6); 
+                            }
+                            else if(line.startsWith("Subject:"))
+                            {
+                                if(tmpsubj.isEmpty())
+                                    tmpsubj = line.mid(9);
+                                qDebug() << propstr.split("/").last().split(".prop").first();
+                                qDebug() << line.mid(9);
+                            }
+                            else if(line.startsWith("Date:"))
+                            {
+                                if(tmpdate.isEmpty())
+                                    tmpdate = line.mid(6);
+                                qDebug() << propstr.split("/").last().split(".prop").first();
+                                qDebug() << line.mid(6);
+                            }
+                            if(!tmpfrom.isEmpty() && !tmpsubj.isEmpty() && !tmpdate.isEmpty())
+                                break;
+                            if(mboxfile.atEnd())
+                                break;
+                        }
+                        */
+                        proplist << "Layout|" + QString::number(poslist.at(i)) + "," + QString::number(poslist.at(i+1) - poslist.at(i)) + ";|Layout for the mbox email item in the format of (offset, length;) in bytes." << Qt::endl;
+                        proplist.flush();
+                        propfile.close();
+                        mboxfile.close();
+                    }
+                }
+            }
+            //qDebug() << "prop fileid:" << objectid + "-m" + QString::number(i);
+            //mboxlayout += QString::number(poslist.at(i)) + "," + QString::number(poslist.at(i+1) - poslist.at(i)) + ";";
+        }
+        //qDebug() << "mboxlayout:" << mboxlayout;
+        //qDebug() << "headerlist:" << headerlist;
+        //qDebug() << "headerlist count:" << headerlist.count();
+    }
+    /*
+    QHash<QString, QVariant> nodedata;
+    nodedata.clear();
+    nodedata.insert("name", QByteArray(QString::fromStdString(std::string(zipstat.name)).toUtf8()).toBase64());
+    nodedata.insert("path", QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64());
+    nodedata.insert("size", (quint64)zipstat.size);
+    nodedata.insert("modify", QString::number(zipstat.mtime));
+    nodedata.insert("cat", mimestr.split("/").at(0));
+    nodedata.insert("sig", mimestr.split("/").at(1));
+    nodedata.insert("id", QString(objectid + "-z" + QString::number(i)));
+    mutex.lock();
+    treenodemodel->AddNode(nodedata, objectid, 1, 0);
+    mutex.unlock();
+    filesfound++;
+    listeditems.append(QString(objectid + "-z" + QString::number(i)));
+    if(!QFile::exists(propstr))
+    {
+        QFile propfile(propstr);
+        if(!propfile.isOpen())
+            propfile.open(QIODevice::WriteOnly | QIODevice::Text);
+        if(propfile.isOpen())
+        {
+            QTextStream proplist(&propfile);
+            proplist << "Compressed Size|" << zipstat.comp_size << " bytes|Compressed size of the file in bytes." << Qt::endl;
+            proplist << "Compression Method|";
+            proplist << "|Compression Method used to add the files to the archive." << Qt::endl;
+            proplist << "Encryption Method|";
+            proplist << "|Encryption Method used to protect the contents of the files added to the archive." << Qt::endl;
+            proplist << "Layout|" << layout << "|File Content Layout based on byte offset and size." << Qt::endl;
+            proplist.flush();
+            propfile.close();
+        }
+    }
+     */
+}
 void GenerateArchiveExpansion(QString objectid)
 {
     // NEED TO FIGURE OUT HOW I WANT TO RECORD ZIP FILES.... UNDER THE NEW ID PARADIGM
@@ -56,9 +224,6 @@ void GenerateArchiveExpansion(QString objectid)
             //idstring = estring + "-" + vstring + "-" + pstring;
         }
         */
-        //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(objectid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-        //QString filename = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("name")).data().toString();
-        //QString filepath = indxlist.first().sibling(indxlist.first().row(), treenodemodel->GetColumnIndex("path")).data().toString();
         QString filename = treenodemodel->GetNodeColumnValue(objectid, "name").toString();
         QString filepath = treenodemodel->GetNodeColumnValue(objectid, "path").toString();
 
@@ -874,10 +1039,14 @@ void GeneratePreDigging(QString thumbid)
         //signature = curitem->Data("sig").toString();
     }
     bool isarchive = false;
+    bool isemail = false;
     //isarchive = category.contains("Archive");
     isarchive = signature.contains("Zip");
     if(hasarchive && isarchive && !isclosing)
         GenerateArchiveExpansion(thumbid);
+    isemail = signature.contains("MBox");
+    if(hasemail && isemail && !isclosing)
+        GenerateMailBoxExpansion(thumbid);
 }
 
 void GenerateDigging(QString thumbid)

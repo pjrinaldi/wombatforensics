@@ -810,12 +810,6 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         mboxviewer->setAttribute(Qt::WA_DeleteOnClose);
         mboxviewer->setWindowTitle("MBox Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
         mboxviewer->LoadMBoxFile(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
-        /*
-        regviewer = new RegistryDialog();
-        regviewer->setAttribute(Qt::WA_DeleteOnClose);
-        regviewer->setWindowTitle("Registry Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
-        regviewer->LoadRegistryFile(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
-         */ 
     }
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("cat")).data().toString().contains("Text"))
     {
@@ -1145,6 +1139,7 @@ void WombatForensics::InitializeCaseStructure()
         dir.mkpath(wombatvariable.tmpmntpath + "carved/");
         dir.mkpath(wombatvariable.tmpmntpath + "archives/");
         dir.mkpath(wombatvariable.tmpmntpath + "hashlists/");
+        dir.mkpath(wombatvariable.tmpmntpath + "mailboxes/");
         wombatvariable.iscaseopen = true;
         InitializePreviewReport();
         bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
@@ -1300,6 +1295,8 @@ void WombatForensics::OpenUpdate()
     //treenodemodel->UpdateHeaderNode(7, "BLAKE3 Hash");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "carved/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "archives/");
+    thumbdir.mkpath(wombatvariable.tmpmntpath + "hashlists/");
+    thumbdir.mkpath(wombatvariable.tmpmntpath + "mailboxes/");
     thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/"); // won't do anything if it already exists
     QDir tdir = QDir(QString(wombatvariable.tmpmntpath + "thumbs/"));
     if(!tdir.isEmpty())
@@ -1688,6 +1685,7 @@ void WombatForensics::UpdateProperties()
     }
     else if(nodeid.split("-").count() == 3) // file/directory
     {
+        // this won't work for archives, i changed the paradigm to split("-").count() == 4 [e0-p0-f0-z0]
         if(nodeid.contains("fz")) // archive, change default directory
             propfile.setFileName(wombatvariable.tmpmntpath + "archives" + nodeid + ".prop");
         else
@@ -2832,6 +2830,8 @@ void WombatForensics::DigFiles(int dtype, QVector<int> doptions)
         }
         else if(digoptions.at(i) == 4)
             hasarchive = true;
+        else if(digoptions.at(i) == 5)
+            hasemail = true;
     }
     //qDebug() << "hasvid:" << hasvid;
     //genthmbpath = wombatvariable.tmpmntpath;
@@ -3113,7 +3113,6 @@ void WombatForensics::on_actionDigDeeper_triggered()
     digvidthumbcount = 0;
     digdeeperdialog = new DigDeeperDialog(this, totalchecked, totalcount);
     connect(digdeeperdialog, SIGNAL(StartDig(int, QVector<int>)), this, SLOT(DigFiles(int, QVector<int>)), Qt::DirectConnection);
-    //connect(digdeeperdialog, SIGNAL(HashComparison(QStringList)), this, SLOT(GetHashComparisons(QStringList)), Qt::DirectConnection);
     digdeeperdialog->show();
 }
 

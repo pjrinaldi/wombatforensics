@@ -39,6 +39,7 @@ public:
     QVBoxLayout *verticalLayout_4;
     QHBoxLayout *horizontalLayout_4;
     QCheckBox *expandarchivescheckbox;
+    QCheckBox *emailcheckbox;
     QCheckBox *thumbnailcheckBox;
     QCheckBox *videocheckBox;
     QHBoxLayout *horizontalLayout_3;
@@ -59,7 +60,7 @@ public:
         if (DigDeeperDialog->objectName().isEmpty())
             DigDeeperDialog->setObjectName(QString::fromUtf8("DigDeeperDialog"));
         DigDeeperDialog->setWindowModality(Qt::ApplicationModal);
-        DigDeeperDialog->resize(516, 368);
+        DigDeeperDialog->resize(516, 397);
         DigDeeperDialog->setModal(true);
         verticalLayout_2 = new QVBoxLayout(DigDeeperDialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
@@ -113,6 +114,11 @@ public:
 
 
         verticalLayout_4->addLayout(horizontalLayout_4);
+
+        emailcheckbox = new QCheckBox(groupBox);
+        emailcheckbox->setObjectName(QString::fromUtf8("emailcheckbox"));
+
+        verticalLayout_4->addWidget(emailcheckbox);
 
         thumbnailcheckBox = new QCheckBox(groupBox);
         thumbnailcheckBox->setObjectName(QString::fromUtf8("thumbnailcheckBox"));
@@ -210,6 +216,7 @@ public:
         listedFileRadioButton->setText(QCoreApplication::translate("DigDeeperDialog", "All (#)", nullptr));
         groupBox->setTitle(QCoreApplication::translate("DigDeeperDialog", "For the Following Options", nullptr));
         expandarchivescheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Expand Archives (zip)", nullptr));
+        emailcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Expand E-Mail Mailboxes (mbox)", nullptr));
         thumbnailcheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for Image Files", nullptr));
         videocheckBox->setText(QCoreApplication::translate("DigDeeperDialog", "Generate Thumbnails for Video Files", nullptr));
         hashcheckbox->setText(QCoreApplication::translate("DigDeeperDialog", "Calcuate BLAKE3 Hash", nullptr));

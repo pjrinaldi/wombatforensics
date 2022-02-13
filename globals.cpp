@@ -46,13 +46,14 @@ QString casepath = QDir::homePath(); // case path settings variable
 QString reportpath = QDir::homePath(); // report path settings variable
 QString exportpath = "";
 QString genthmbpath = "";
-QString hfsreserveinfo = ""; // hfsreserveinfo file which contains the info for catalog, attribute, allocation, extents, and startup
+//QString hfsreserveinfo = ""; // hfsreserveinfo file which contains the info for catalog, attribute, allocation, extents, and startup
 bool originalpath = true;
 bool hashash = false;
 bool hasimg = false;
 bool hasvid = false;
 bool hasarchive = false;
 bool hascompare = false;
+bool hasemail; // whether we are parsing email mailbox to split out the individual messages
 bool isclosing = false;
 QString hexstring = "";
 QHash<QString, bool> checkhash;

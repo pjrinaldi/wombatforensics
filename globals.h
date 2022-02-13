@@ -53,12 +53,13 @@ extern bool hasvid; // whether we are calculating the vid thumbnail for the item
 extern bool hasimg; // whether we are calculating the img thumbnail for the item
 extern bool hasarchive; // whether we are calculating the archive for the item
 extern bool hascompare; // whether we are comparing the file(s) hash against the selected hash list
+extern bool hasemail; // whether we are parsing email mailbox to split out the individual messages
 extern bool isclosing; // whether the application is closing and threads should not write back to the application
 extern QString genthmbpath; // global path to place thumbs for each operationgal call of generate thumbnails (mntpt/thumbs or rep/thmb)
 extern QString casepath; // case path settings variable
 extern QString reportpath; // report path settings variable
 extern QString hexstring; // tmp hex file filename with path
-extern QString hfsreserveinfo; // hfsreserveinfo file which contains the info for catalog, attribute, allocation, extents, and startup
+//extern QString hfsreserveinfo; // hfsreserveinfo file which contains the info for catalog, attribute, allocation, extents, and startup
 extern QHash<QString, bool> checkhash; // hash value list for check boxes.
 extern QHash<QString, QString> imageshash; // list of thumbnail ids, paths
 extern QHash<QString, QString> taggedhash; // list of tagged files: [id], tag

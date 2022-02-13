@@ -17,10 +17,10 @@ void GenerateThumbnails(QString thumbid);
 void GenerateHash(QString itemid);
 void GenerateVidThumbnails(QString thumbid);
 void GenerateArchiveExpansion(QString thumbid);
+void GenerateMailBoxExpansion(QString objectid);
 void GenerateDigging(QString thumbid);
 void GeneratePreDigging(QString thumbid);
 void GenerateHashCompare(QString itemid);
-//QByteArray ReturnFileContent(QString objectid);
 QByteArray ReturnFileContent(ForImg* curimg, QString objectid, QString* layout);
 QString ReturnFileContent(ForImg* curimg, QString objectid);
 

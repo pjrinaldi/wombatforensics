@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>516</width>
-    <height>368</height>
+    <height>397</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -108,6 +108,13 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="emailcheckbox">
+          <property name="text">
+           <string>Expand E-Mail Mailboxes (mbox)</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="thumbnailcheckBox">
