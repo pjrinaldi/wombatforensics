@@ -58,11 +58,118 @@ void MBoxDialog::closeEvent(QCloseEvent* e)
 
 void MBoxDialog::LoadMBoxFile(QString mboxid, QString mboxname)
 {
-    qDebug() << "display mbox email files here...";
-    // NEED TO SPLIT ON THE REGEXPRESSION (From<single space>email address<single space>timestamp<end of line marker>
-    // need to get the offset for the start of each message and the length, to load the content...
-    // i'll need more for mime type ones, but this a good start
+    QDir mailboxdir(wombatvariable.tmpmntpath + "mailboxes/");
+    QStringList mailboxfiles = mailboxdir.entryList(QStringList() << QString(mboxid + "-m*.prop"), QDir::Files);
+    qDebug() << "mailboxfiles:" << mailboxfiles;
+    //QFile propfile(wombatvariable.tmpmntpath + "mailboxes/" + mboxid
+    ui->mailtable->clear();
+    //qDebug() << "display mbox email files here...";
+    //qDebug() << "mboxid:" << mboxid << "mboxname:" << mboxname;
+    //this->setWindowTitle("MBoxViewer - " + mboxname);
     this->show();
+    /*
+    QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
+    QFileInfoList whllist = hashdir.entryInfoList(QStringList() << "*.whl", QDir::Files);
+    for(int i=0; i < whllist.count(); i++)
+	new QListWidgetItem(whllist.at(i).fileName(), ui->hashlistwidget);
+    if(ui->hashlistwidget->count() > 0)
+
+    ui->tableWidget->clear();
+    ui->plainTextEdit->setPlainText("");
+    ui->tableWidget->setRowCount(valuecount);
+    for(int i=0; i < valuecount; i++)
+    {
+	libregf_value_t* curval = NULL;
+	libregf_key_get_value(curkey, i, &curval, &regerr);
+	size_t namesize = 0;
+	libregf_value_get_utf8_name_size(curval, &namesize, &regerr);
+	uint8_t name[namesize];
+	libregf_value_get_utf8_name(curval, name, namesize, &regerr);
+	uint32_t type = 0;
+	libregf_value_get_value_type(curval, &type, &regerr);
+	QString curtagvalue = this->windowTitle().mid(16) + "|" + keypath + "\\";
+	if(namesize == 0)
+	{
+	    curtagvalue += "(unnamed)";
+	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value", "Tag"});
+	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem("(unnamed)"));
+	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(type, 16)));
+	    //ui->tableWidget->setItem(i, 2, new QTableWidgetItem(""));
+	}
+	else
+	{
+	    curtagvalue += QString::fromUtf8(reinterpret_cast<char*>(name));
+            QString valuetypestr = "";
+	    ui->tableWidget->setHorizontalHeaderLabels({"Value Name", "Value Type", "Tag"});
+	    ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::fromUtf8(reinterpret_cast<char*>(name))));
+            if(type == 0x00) // none
+            {
+            }
+            else if(type == 0x01) // reg_sz
+            {
+                valuetypestr = "REG_SZ";
+            }
+            else if(type == 0x02) // reg_expand_sz
+            {
+                valuetypestr = "REG_EXPAND_SZ";
+            }
+            else if(type == 0x03) // reg_binary
+            {
+                valuetypestr = "REG_BINARY";
+            }
+            else if(type == 0x04) // reg_dword reg_dword_little_endian (4 bytes)
+            {
+                valuetypestr = "REG_DWORD";
+            }
+            else if(type == 0x05) // reg_dword_big_endian (4 bytes)
+            {
+                valuetypestr = "REG_DWORD_BIG_ENDIAN";
+            }
+            else if(type == 0x06) // reg_link
+            {
+                valuetypestr = "REG_LINK";
+            }
+            else if(type == 0x07) // reg_multi_sz
+            {
+                valuetypestr = "REG_MULTI_SZ";
+            }
+            else if(type == 0x08) // reg_resource_list
+            {
+                valuetypestr = "REG_RESOURCE_LIST";
+            }
+            else if(type == 0x09) // reg_full_resource_descriptor
+            {
+                valuetypestr = "REG_FULL_RESOURCE_DESCRIPTOR";
+            }
+            else if(type == 0x0a) // reg_resource_requirements_list
+            {
+                valuetypestr = "REG_RESOURCE_REQUIREMENTS_LIST";
+            }
+            else if(type == 0x0b) // reg_qword_little_endian (8 bytes)
+            {
+                valuetypestr = "REG_QWORD";
+            }
+            else
+            {
+            }
+	    ui->tableWidget->setItem(i, 1, new QTableWidgetItem(valuetypestr));
+	    //ui->tableWidget->setItem(i, 2, new QTableWidgetItem(""));
+	}
+	//qDebug() << "curtagvalue:" << curtagvalue;
+	QString tagstr = "";
+	for(int j=0; j < registrytaglist.count(); j++)
+	{
+	    //qDebug() << "registry tag list at(" << j << ") :" << registrytaglist.at(j);
+	    if(registrytaglist.at(j).contains(curtagvalue))
+		tagstr = registrytaglist.at(j).split("|", Qt::SkipEmptyParts).last();
+	}
+	//qDebug() << "tagstr:" << tagstr;
+	ui->tableWidget->setItem(i, 2, new QTableWidgetItem(tagstr));
+        ui->tableWidget->resizeColumnToContents(0);
+        ui->tableWidget->setCurrentCell(0, 0);
+	libregf_value_free(&curval, &regerr);
+
+     */ 
 }
 
 /*
