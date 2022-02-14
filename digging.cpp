@@ -83,7 +83,7 @@ void GenerateMailBoxExpansion(QString objectid)
                         int fromend = msg.mid(fromstart, datestart - fromstart).lastIndexOf("\n");
                         if(fromend == -1)
                             fromend = msg.mid(fromstart, subjstart - fromstart).lastIndexOf("\n");
-                        int dateend = msg.mid(datestart, subjstart - datestart).lastIndexOf("\n");
+                        int dateend = msg.mid(datestart, subjstart - datestart).indexOf("\n");
                         if(dateend == -1)
                             dateend = 50;
                         int subjend = msg.mid(subjstart).indexOf("\n");

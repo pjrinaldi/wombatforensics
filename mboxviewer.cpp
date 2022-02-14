@@ -7,7 +7,8 @@ MBoxDialog::MBoxDialog(QWidget* parent) : QDialog(parent), ui(new Ui::MBoxDialog
 {
     ui->setupUi(this);
     ui->mailtable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->mailtable->setHorizontalHeaderLabels({"ID", "From", "Subject", "Date Time", "Tag"});
+    ui->mailtable->setHorizontalHeaderLabels({"ID", "From", "Date Time", "Subject", "Tag"});
+    connect(ui->mailtable, SIGNAL(itemSelectionChanged()), this, SLOT(EmailSelected()), Qt::DirectConnection);
     /*
     QStringList taglist;
     taglist.clear();
@@ -51,6 +52,21 @@ void MBoxDialog::HideClicked()
     this->close();
 }
 
+void MBoxDialog::EmailSelected()
+{
+    QString mboxid = ui->mailtable->item(ui->mailtable->currentRow(), 0)->text().split("-m").at(0);
+    QString layout = ui->mailtable->item(ui->mailtable->currentRow(), 0)->toolTip();
+    QFile mboxfile(wombatvariable.tmpfilepath + mboxid + "-fhex");
+    if(!mboxfile.isOpen())
+        mboxfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(mboxfile.isOpen())
+    {
+        mboxfile.seek(layout.split(";").at(0).split(",").at(0).toULongLong());
+        ui->mailcontent->setPlainText(mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong()));
+        mboxfile.close();
+    }
+}
+
 void MBoxDialog::closeEvent(QCloseEvent* e)
 {
     e->accept();
@@ -58,11 +74,39 @@ void MBoxDialog::closeEvent(QCloseEvent* e)
 
 void MBoxDialog::LoadMBoxFile(QString mboxid, QString mboxname)
 {
+    ui->mailtable->clear();
+    ui->mailcontent->setPlainText("");
     QDir mailboxdir(wombatvariable.tmpmntpath + "mailboxes/");
     QStringList mailboxfiles = mailboxdir.entryList(QStringList() << QString(mboxid + "-m*.prop"), QDir::Files);
-    qDebug() << "mailboxfiles:" << mailboxfiles;
+    ui->mailtable->setHorizontalHeaderLabels({"ID", "From", "Date Time", "Subject", "Tag"});
+    ui->mailtable->setRowCount(mailboxfiles.count());
+    for(int i=0; i < mailboxfiles.count(); i++)
+    {
+        QTableWidgetItem* tmpitem = new QTableWidgetItem(QString(mailboxfiles.at(i)).remove(".prop"));
+        QFile propfile(wombatvariable.tmpmntpath + "mailboxes/" + mailboxfiles.at(i));
+        if(!propfile.isOpen())
+            propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        if(propfile.isOpen())
+        {
+            while(!propfile.atEnd())
+            {
+                QString tmpstr = propfile.readLine();
+                if(tmpstr.startsWith("From|"))
+                    ui->mailtable->setItem(i, 1, new QTableWidgetItem(tmpstr.split("|").at(1)));
+                if(tmpstr.startsWith("Date|"))
+                    ui->mailtable->setItem(i, 2, new QTableWidgetItem(tmpstr.split("|").at(1)));
+                if(tmpstr.startsWith("Subject|"))
+                    ui->mailtable->setItem(i, 3, new QTableWidgetItem(tmpstr.split("|").at(1)));
+                if(tmpstr.startsWith("Layout|"))
+                    tmpitem->setToolTip(tmpstr.split("|").at(1));
+            }
+            propfile.close();
+        }
+        ui->mailtable->setItem(i, 0, tmpitem);
+	//ui->mailtable->setItem(i, 0, new QTableWidgetItem(mailboxfiles.at(i)));
+    }
+    //qDebug() << "mailboxfiles:" << mailboxfiles;
     //QFile propfile(wombatvariable.tmpmntpath + "mailboxes/" + mboxid
-    ui->mailtable->clear();
     //qDebug() << "display mbox email files here...";
     //qDebug() << "mboxid:" << mboxid << "mboxname:" << mboxname;
     //this->setWindowTitle("MBoxViewer - " + mboxname);

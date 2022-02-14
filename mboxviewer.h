@@ -27,13 +27,13 @@ public:
     
 private slots:
     void HideClicked();
+    void EmailSelected();
     
 protected:
     void closeEvent(QCloseEvent* event);
 
 private:
     Ui::MBoxDialog* ui;
-
 };
 
 Q_DECLARE_METATYPE(MBoxDialog*);

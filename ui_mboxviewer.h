@@ -61,6 +61,7 @@ public:
         mailtable->setProperty("showDropIndicator", QVariant(false));
         mailtable->setDragDropOverwriteMode(false);
         mailtable->setAlternatingRowColors(true);
+        mailtable->setSelectionMode(QAbstractItemView::SingleSelection);
         mailtable->setSelectionBehavior(QAbstractItemView::SelectRows);
         mailtable->setRowCount(3);
         mailtable->setColumnCount(5);
