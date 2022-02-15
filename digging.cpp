@@ -32,8 +32,10 @@ void GenerateMailBoxExpansion(QString objectid)
         }
         QString layout = "";
         QList<qint64> poslist;
+        QList<qint64> linelength;
         //QStringList headerlist;
         poslist.clear();
+        linelength.clear();
         //headerlist.clear();
         // if pos list is start pos, next start pos - line length, next start pos
         // then i would have to handle processing it...
@@ -53,16 +55,18 @@ void GenerateMailBoxExpansion(QString objectid)
                     //headerlist.append(line);
                     //qDebug() << "mbox pos:" << mboxfile.pos() - line.count();
                     poslist.append(mboxfile.pos());
-                    poslist.append(mboxfile.pos() - line.count());
+                    linelength.append(mboxfile.pos() - line.count());
+                   //poslist.append(mboxfile.pos() - line.count());
                 }
             }
             poslist.append(mboxfile.size());
             mboxfile.close();
         }
         qDebug() << "poslist count:" << poslist.count();
+        qDebug() << "linelength count:" << linelength.count();
         qDebug() << "poslist:" << poslist;
         //QString mboxlayout = "";
-        for(int i=0; i < (poslist.count() - 1) / 2; i++)
+        for(int i=0; i < poslist.count() - 1; i++)
         {
             QString tmpsubj = "";
             QString tmpfrom = "";
@@ -81,7 +85,7 @@ void GenerateMailBoxExpansion(QString objectid)
                     {
                         QTextStream proplist(&propfile);
                         mboxfile.seek(poslist.at(i));
-                        QString msg = mboxfile.read(poslist.at(i+1) - poslist.at(i));
+                        QString msg = mboxfile.read(poslist.at(i+1) - poslist.at(i) - linelength.at(i));
                         int fromstart = msg.indexOf("From: ");
                         int datestart = msg.indexOf("Date: ");
                         int subjstart = msg.indexOf("Subject: ");
