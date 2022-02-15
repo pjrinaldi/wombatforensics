@@ -6,13 +6,15 @@
 MBoxDialog::MBoxDialog(QWidget* parent) : QDialog(parent), ui(new Ui::MBoxDialog)
 {
     ui->setupUi(this);
+    ui->toolButton->setVisible(false);
+    ui->label->setVisible(false);
     ui->mailtable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->mailtable->setHorizontalHeaderLabels({"ID", "From", "Date Time", "Subject", "Tag"});
     connect(ui->mailtable, SIGNAL(itemSelectionChanged()), this, SLOT(EmailSelected()), Qt::DirectConnection);
-    /*
+
     QStringList taglist;
     taglist.clear();
-    tagmenu = new QMenu(ui->tableWidget);
+    tagmenu = new QMenu(ui->mailtable);
     bookmarkfile.open(QIODevice::ReadOnly | QIODevice::Text);
     if(bookmarkfile.isOpen())
 	taglist = QString(bookmarkfile.readLine()).split(",", Qt::SkipEmptyParts);
@@ -30,16 +32,16 @@ MBoxDialog::MBoxDialog(QWidget* parent) : QDialog(parent), ui(new Ui::MBoxDialog
     remtagaction->setIcon(QIcon(":/bar/tag-rem"));
     connect(remtagaction, SIGNAL(triggered()), this, SLOT(RemoveTag()));
     tagmenu->addAction(remtagaction);
-    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->tableWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
-    QFile registryfile;
-    registryfile.setFileName(wombatvariable.tmpmntpath + "registrytags");
-    registryfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    registrytaglist.clear();
-    if(registryfile.isOpen())
-	registrytaglist = QString(registryfile.readLine()).split(",", Qt::SkipEmptyParts);
-    registryfile.close();
-     */ 
+    ui->mailtable->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->mailtable, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(TagMenu(const QPoint &)), Qt::DirectConnection);
+    QFile mboxtagfile;
+    mboxtagfile.setFileName(wombatvariable.tmpmntpath + "mboxtags");
+    if(!mboxtagfile.isOpen())
+        mboxtagfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    mboxtaglist.clear();
+    if(mboxtagfile.isOpen())
+        mboxtaglist = QString(mboxtagfile.readLine()).split(",", Qt::SkipEmptyParts);
+    mboxtagfile.close();
 }
 
 MBoxDialog::~MBoxDialog()
@@ -105,11 +107,6 @@ void MBoxDialog::LoadMBoxFile(QString mboxid, QString mboxname)
         ui->mailtable->setItem(i, 0, tmpitem);
 	//ui->mailtable->setItem(i, 0, new QTableWidgetItem(mailboxfiles.at(i)));
     }
-    //qDebug() << "mailboxfiles:" << mailboxfiles;
-    //QFile propfile(wombatvariable.tmpmntpath + "mailboxes/" + mboxid
-    //qDebug() << "display mbox email files here...";
-    //qDebug() << "mboxid:" << mboxid << "mboxname:" << mboxname;
-    //this->setWindowTitle("MBoxViewer - " + mboxname);
     this->show();
     /*
     QDir hashdir(wombatvariable.tmpmntpath + "hashlists/");
@@ -214,6 +211,59 @@ void MBoxDialog::LoadMBoxFile(QString mboxid, QString mboxname)
 	libregf_value_free(&curval, &regerr);
 
      */ 
+}
+
+void MBoxDialog::TagMenu(const QPoint &pt)
+{
+    // when i need the current value for the right click, i can use a class variable defined in .h so i can access it in the SetTag and CreateNewTag right click menu options...
+    //QTableWidgetItem* curitem = ui->tableWidget->itemAt(pt);
+    //qDebug() << "cur item:" << ui->tableWidget->item(curitem->row(), 0)->text();
+    tagmenu->exec(ui->mailtable->mapToGlobal(pt));
+}
+
+void MBoxDialog::SetTag()
+{
+    QString curtag = "";
+    QString mboxstring = "";
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    mboxstring += this->windowTitle().mid(16) + "|"; // file id
+    //mboxstring += ui->label->text() + "\\"; // key
+    mboxstring += ui->mailtable->selectedItems().first()->text() + "|";
+    if(!ui->mailtable->selectedItems().last()->text().isEmpty())
+	curtag = mboxstring + ui->mailtable->selectedItems().last()->text();
+    mboxstring += tagaction->iconText();
+    QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
+    ui->mailtable->selectedItems().last()->setText(tagaction->iconText());
+    //qDebug() << "curtag to remove:" << curtag;
+    if(!curtag.isEmpty())
+	RemTag("mbox", curtag);
+    AddTag("mbox", mboxstring); // add htmlentry and htmlvalue to this function...
+    RemoveFileItem(idkeyvalue);
+    RemoveArtifactFile("mbox", idkeyvalue);
+    AddFileItem(tagaction->iconText(), htmlentry);
+    CreateArtifactFile("mbox", idkeyvalue, htmlvalue);
+    // ADD TO PREVIEW REPORT
+    //RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
+    //AddFileItem(tagname, filestr);
+    //CreateArtifactFile("registry", curtag, htmlvalue);
+}
+
+void MBoxDialog::RemoveTag()
+{
+    //qDebug() << "remove tag";
+    QString mboxstring = "";
+    QAction* tagaction = qobject_cast<QAction*>(sender());
+    mboxstring += this->windowTitle().mid(16) + "|"; // file id
+    //mboxstring += ui->label->text() + "\\"; // key
+    mboxstring += ui->mailtable->selectedItems().first()->text() + "|";
+    mboxstring += tagaction->iconText() + ",";
+    QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
+    ui->mailtable->selectedItems().last()->setText("");
+    RemTag("mbox", idkeyvalue + "|" + ui->mailtable->selectedItems().last()->text());
+    // REMOVE FROM PREVIEW REPORT
+    RemoveFileItem(idkeyvalue);
+    RemoveArtifactFile("mbox", idkeyvalue);
+    //RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
 }
 
 /*

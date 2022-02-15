@@ -42,6 +42,7 @@ public:
         MBoxDialog->setModal(true);
         verticalLayout = new QVBoxLayout(MBoxDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
         toolButton = new QToolButton(MBoxDialog);
         toolButton->setObjectName(QString::fromUtf8("toolButton"));
 
