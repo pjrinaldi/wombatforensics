@@ -32,9 +32,11 @@ void GenerateMailBoxExpansion(QString objectid)
         }
         QString layout = "";
         QList<qint64> poslist;
-        QStringList headerlist;
+        //QStringList headerlist;
         poslist.clear();
-        headerlist.clear();
+        //headerlist.clear();
+        // if pos list is start pos, next start pos - line length, next start pos
+        // then i would have to handle processing it...
         layout = ReturnFileContent(curimg, objectid);
         QFile mboxfile(wombatvariable.tmpfilepath + objectid + "-tmp");
         if(!mboxfile.isOpen())
@@ -48,16 +50,19 @@ void GenerateMailBoxExpansion(QString objectid)
                 QRegularExpressionMatch tmpmatch2 = mboxre2.match(line);
                 if(tmpmatch.hasMatch() || tmpmatch2.hasMatch())
                 {
-                    headerlist.append(line);
+                    //headerlist.append(line);
+                    //qDebug() << "mbox pos:" << mboxfile.pos() - line.count();
                     poslist.append(mboxfile.pos());
+                    poslist.append(mboxfile.pos() - line.count());
                 }
             }
             poslist.append(mboxfile.size());
             mboxfile.close();
         }
-        //qDebug() << "poslist:" << poslist;
+        qDebug() << "poslist count:" << poslist.count();
+        qDebug() << "poslist:" << poslist;
         //QString mboxlayout = "";
-        for(int i=0; i < poslist.count() - 1; i++)
+        for(int i=0; i < (poslist.count() - 1) / 2; i++)
         {
             QString tmpsubj = "";
             QString tmpfrom = "";
