@@ -55,16 +55,15 @@ void GenerateMailBoxExpansion(QString objectid)
                     //headerlist.append(line);
                     //qDebug() << "mbox pos:" << mboxfile.pos() - line.count();
                     poslist.append(mboxfile.pos());
-                    linelength.append(mboxfile.pos() - line.count());
+                    linelength.append(line.count());
                    //poslist.append(mboxfile.pos() - line.count());
                 }
             }
             poslist.append(mboxfile.size());
             mboxfile.close();
         }
-        qDebug() << "poslist count:" << poslist.count();
-        qDebug() << "linelength count:" << linelength.count();
-        qDebug() << "poslist:" << poslist;
+        //qDebug() << "poslist:" << poslist;
+        //qDebug() << "linelength:" << linelength;
         //QString mboxlayout = "";
         for(int i=0; i < poslist.count() - 1; i++)
         {
@@ -139,7 +138,7 @@ void GenerateMailBoxExpansion(QString objectid)
                                 break;
                         }
                         */
-                        proplist << "Layout|" + QString::number(poslist.at(i)) + "," + QString::number(poslist.at(i+1) - poslist.at(i)) + ";|Layout for the mbox email item in the format of (offset, length;) in bytes." << Qt::endl;
+                        proplist << "Layout|" + QString::number(poslist.at(i)) + "," + QString::number(poslist.at(i+1) - poslist.at(i) - linelength.at(i)) + ";|Layout for the mbox email item in the format of (offset, length;) in bytes." << Qt::endl;
                         proplist.flush();
                         propfile.close();
                         mboxfile.close();
