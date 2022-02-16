@@ -396,22 +396,24 @@ void MBoxDialog::TagMenu(const QPoint &pt)
 
 void MBoxDialog::SetTag()
 {
+    // FOR MBOX, I NEED THE FILE ID, MAIL ID, AND MAIL MESSAGE
     QString curtag = "";
     QString mboxstring = "";
     QAction* tagaction = qobject_cast<QAction*>(sender());
-    mboxstring += this->windowTitle().mid(16) + "|"; // file id
+    mboxstring += this->windowTitle().mid(12) + "|"; // file id
+    mboxstring += ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "|";
+    if(ui->mailtable->item(ui->mailtable->currentRow(), 4) != NULL)
+        curtag = mboxstring + ui->mailtable->item(ui->mailtable->currentRow(), 4)->text();
     //mboxstring += ui->label->text() + "\\"; // key
-    mboxstring += ui->mailtable->selectedItems().first()->text() + "|";
-    if(!ui->mailtable->selectedItems().last()->text().isEmpty())
-	curtag = mboxstring + ui->mailtable->selectedItems().last()->text();
-    mboxstring += tagaction->iconText();
+    //QString mboxid = ui->mailtable->item(ui->mailtable->currentRow(), 0)->text().split("-m").at(0);
+    //mboxstring += ui->mailtable->selectedItems().first()->text() + "|"; // mbox email id
+    mboxstring += tagaction->iconText(); // tag name
     qDebug() << "mboxstring:" << mboxstring;
     qDebug() << "curtag:" << curtag;
-    QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
+    QString idkeyvalue = this->windowTitle().mid(12) + "|" + ui->mailtable->selectedItems().first()->text();
     qDebug() << "idkeyvalue:" << idkeyvalue;
     ui->mailtable->selectedItems().last()->setText(tagaction->iconText());
     //qDebug() << "curtag to remove:" << curtag;
-    /*
     if(!curtag.isEmpty())
 	RemTag("mbox", curtag);
     AddTag("mbox", mboxstring); // add htmlentry and htmlvalue to this function...
@@ -419,7 +421,6 @@ void MBoxDialog::SetTag()
     RemoveArtifactFile("mbox", idkeyvalue);
     AddFileItem(tagaction->iconText(), htmlentry);
     CreateArtifactFile("mbox", idkeyvalue, htmlvalue);
-    */
     // ADD TO PREVIEW REPORT
     //RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
     //AddFileItem(tagname, filestr);
