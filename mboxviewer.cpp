@@ -405,9 +405,13 @@ void MBoxDialog::SetTag()
     if(!ui->mailtable->selectedItems().last()->text().isEmpty())
 	curtag = mboxstring + ui->mailtable->selectedItems().last()->text();
     mboxstring += tagaction->iconText();
+    qDebug() << "mboxstring:" << mboxstring;
+    qDebug() << "curtag:" << curtag;
     QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
+    qDebug() << "idkeyvalue:" << idkeyvalue;
     ui->mailtable->selectedItems().last()->setText(tagaction->iconText());
     //qDebug() << "curtag to remove:" << curtag;
+    /*
     if(!curtag.isEmpty())
 	RemTag("mbox", curtag);
     AddTag("mbox", mboxstring); // add htmlentry and htmlvalue to this function...
@@ -415,6 +419,7 @@ void MBoxDialog::SetTag()
     RemoveArtifactFile("mbox", idkeyvalue);
     AddFileItem(tagaction->iconText(), htmlentry);
     CreateArtifactFile("mbox", idkeyvalue, htmlvalue);
+    */
     // ADD TO PREVIEW REPORT
     //RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
     //AddFileItem(tagname, filestr);
@@ -432,9 +437,11 @@ void MBoxDialog::RemoveTag()
     mboxstring += tagaction->iconText() + ",";
     QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
     ui->mailtable->selectedItems().last()->setText("");
+    /*
     RemTag("mbox", idkeyvalue + "|" + ui->mailtable->selectedItems().last()->text());
     // REMOVE FROM PREVIEW REPORT
     RemoveFileItem(idkeyvalue);
     RemoveArtifactFile("mbox", idkeyvalue);
+    */
     //RemoveFileItem(selectedindex.sibling(selectedindex.row(), 11).data().toString());
 }
