@@ -64,8 +64,8 @@ void MBoxDialog::EmailSelected()
     if(mboxfile.isOpen())
     {
         mboxfile.seek(layout.split(";").at(0).split(",").at(0).toULongLong());
-        //htmlentry = mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong());
-        ui->mailcontent->setPlainText(mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong()));
+        htmlvalue = mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong());
+        ui->mailcontent->setPlainText(htmlvalue);
         mboxfile.close();
     }
     /*
@@ -451,8 +451,16 @@ void MBoxDialog::SetTag()
     htmlentry += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='" + ReturnCssString(7) + "'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='./mbox/" + ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "'>Link</a></td></tr>";
     htmlentry += "</table></td>";
 
+    QString htmlcontent = "";
+    htmlcontent = "<html><body style='" + ReturnCssString(0) + "'>";
+    htmlcontent += "<div style='" + ReturnCssString(1) + "'>MBox Email Analysis</div><br/>";
+    htmlcontent += "<pre>";
+    htmlcontent += htmlvalue;
+    htmlcontent += "</pre>";
+    htmlcontent += "</body></html>";
+
     AddFileItem(tagaction->iconText(), htmlentry);
-    //CreateArtifactFile("mbox", ui->mailtable->item(ui->mailtable->currentRow(), 0)->text(), htmlvalue);
+    CreateArtifactFile("mbox", ui->mailtable->item(ui->mailtable->currentRow(), 0)->text(), htmlcontent);
     // ADD TO PREVIEW REPORT
     //RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
     //AddFileItem(tagname, filestr);

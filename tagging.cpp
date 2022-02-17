@@ -62,11 +62,11 @@ void CreateArtifactFile(QString artifact, QString idkeyvalue, QString htmlconten
 {
     QDir pdir;
     pdir.mkpath(wombatvariable.tmpmntpath + artifact);
-    QString filepath = "";
+    QString filepath = wombatvariable.tmpmntpath + artifact + "/";
     if(artifact == "registry")
-        filepath = wombatvariable.tmpmntpath + artifact + "/" + idkeyvalue.replace("|", ".").replace("\\", "-");
+        filepath += idkeyvalue.replace("|", ".").replace("\\", "-");
     else
-        filepath = idkeyvalue;
+        filepath += idkeyvalue;
     QFile artfile;
     artfile.setFileName(filepath);
     artfile.open(QIODevice::WriteOnly | QIODevice::Text);
