@@ -251,6 +251,7 @@ void MBoxDialog::closeEvent(QCloseEvent* e)
 
 void MBoxDialog::LoadMBoxFile(QString mboxid, QString mboxname)
 {
+    mboxparentname = mboxname;
     ui->mailtable->clear();
     ui->mailcontent->setPlainText("");
     QDir mailboxdir(wombatvariable.tmpmntpath + "mailboxes/");
@@ -446,7 +447,7 @@ void MBoxDialog::SetTag()
     htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Date:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 2)->text() + "</span></td></tr>";
     htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Subject:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 3)->text() + "</span></td></tr>";
     htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Mbox Id:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "</span></td></tr>";
-    htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Mbox File Name:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>PLACE MBOX PARENT FILE HERE</span></td></tr>";
+    htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Mbox File Name:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + mboxparentname + "</span></td></tr>";
     htmlentry += "</table></td>";
 
     // NEED TO FIX THE HTMLENTRY SO IT IS BETTER, IT SHOULD BE SOMETHING, BUT NOT SURE WHAT...

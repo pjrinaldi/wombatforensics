@@ -42,6 +42,7 @@ private:
     QMenu* tagmenu;
     QString htmlentry;
     QString htmlvalue;
+    QString mboxparentname;
     QStringList mboxtaglist;
 };
 
