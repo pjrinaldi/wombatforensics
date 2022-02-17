@@ -64,7 +64,8 @@ void MBoxDialog::EmailSelected()
     if(mboxfile.isOpen())
     {
         mboxfile.seek(layout.split(";").at(0).split(",").at(0).toULongLong());
-        ui->mailcontent->setPlainText(mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong()));
+        htmlentry = mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong());
+        ui->mailcontent->setPlainText(htmlentry);
         mboxfile.close();
     }
     /*
@@ -279,6 +280,26 @@ void MBoxDialog::LoadMBoxFile(QString mboxid, QString mboxname)
             propfile.close();
         }
         ui->mailtable->setItem(i, 0, tmpitem);
+        QString tagstr = "";
+        for(int j=0; j < mboxtaglist.count(); j++)
+        {
+            if(mboxtaglist.at(j).contains(QString(mailboxfiles.at(i)).remove(".prop")))
+                tagstr = mboxtaglist.at(j).split("|", Qt::SkipEmptyParts).last();
+        }
+        ui->mailtable->setItem(i, 4, new QTableWidgetItem(tagstr));
+        /*
+	QString tagstr = "";
+	for(int j=0; j < registrytaglist.count(); j++)
+	{
+	    //qDebug() << "registry tag list at(" << j << ") :" << registrytaglist.at(j);
+	    if(registrytaglist.at(j).contains(curtagvalue))
+		tagstr = registrytaglist.at(j).split("|", Qt::SkipEmptyParts).last();
+	}
+	//qDebug() << "tagstr:" << tagstr;
+	ui->tableWidget->setItem(i, 2, new QTableWidgetItem(tagstr));
+        ui->tableWidget->resizeColumnToContents(0);
+         */ 
+        //if(tag exists, then setItem(i, 4, tagname);
 	//ui->mailtable->setItem(i, 0, new QTableWidgetItem(mailboxfiles.at(i)));
     }
     this->show();
@@ -400,7 +421,7 @@ void MBoxDialog::SetTag()
     QString curtag = "";
     QString mboxstring = "";
     QAction* tagaction = qobject_cast<QAction*>(sender());
-    mboxstring += this->windowTitle().mid(12) + "|"; // file id
+    //mboxstring += this->windowTitle().mid(12) + "|"; // file id
     mboxstring += ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "|";
     if(ui->mailtable->item(ui->mailtable->currentRow(), 4) != NULL)
         curtag = mboxstring + ui->mailtable->item(ui->mailtable->currentRow(), 4)->text();
@@ -408,19 +429,18 @@ void MBoxDialog::SetTag()
     //QString mboxid = ui->mailtable->item(ui->mailtable->currentRow(), 0)->text().split("-m").at(0);
     //mboxstring += ui->mailtable->selectedItems().first()->text() + "|"; // mbox email id
     mboxstring += tagaction->iconText(); // tag name
-    qDebug() << "mboxstring:" << mboxstring;
-    qDebug() << "curtag:" << curtag;
-    QString idkeyvalue = this->windowTitle().mid(12) + "|" + ui->mailtable->selectedItems().first()->text();
-    qDebug() << "idkeyvalue:" << idkeyvalue;
-    ui->mailtable->selectedItems().last()->setText(tagaction->iconText());
+    //qDebug() << "mboxstring:" << mboxstring;
+    //qDebug() << "curtag:" << curtag;
+    //QString idkeyvalue = this->windowTitle().mid(12) + "|" + ui->mailtable->selectedItems().first()->text();
+    //qDebug() << "idkeyvalue:" << idkeyvalue;
+    ui->mailtable->setItem(ui->mailtable->currentRow(), 4, new QTableWidgetItem(tagaction->iconText()));
     //qDebug() << "curtag to remove:" << curtag;
     if(!curtag.isEmpty())
 	RemTag("mbox", curtag);
-    AddTag("mbox", mboxstring); // add htmlentry and htmlvalue to this function...
-    RemoveFileItem(idkeyvalue);
-    RemoveArtifactFile("mbox", idkeyvalue);
+    AddTag("mbox", mboxstring); // this adds the id and tag to the mboxtags file // add htmlentry and htmlvalue to this function...
+    //RemoveArtifactFile("mbox", idkeyvalue);
     AddFileItem(tagaction->iconText(), htmlentry);
-    CreateArtifactFile("mbox", idkeyvalue, htmlvalue);
+    //CreateArtifactFile("mbox", idkeyvalue, htmlvalue);
     // ADD TO PREVIEW REPORT
     //RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
     //AddFileItem(tagname, filestr);
@@ -432,14 +452,14 @@ void MBoxDialog::RemoveTag()
     //qDebug() << "remove tag";
     QString mboxstring = "";
     QAction* tagaction = qobject_cast<QAction*>(sender());
-    mboxstring += this->windowTitle().mid(16) + "|"; // file id
+    //mboxstring += this->windowTitle().mid(16) + "|"; // file id
     //mboxstring += ui->label->text() + "\\"; // key
     mboxstring += ui->mailtable->selectedItems().first()->text() + "|";
     mboxstring += tagaction->iconText() + ",";
-    QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
+    //QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
     ui->mailtable->selectedItems().last()->setText("");
+    RemTag("mbox", mboxstring);
     /*
-    RemTag("mbox", idkeyvalue + "|" + ui->mailtable->selectedItems().last()->text());
     // REMOVE FROM PREVIEW REPORT
     RemoveFileItem(idkeyvalue);
     RemoveArtifactFile("mbox", idkeyvalue);
