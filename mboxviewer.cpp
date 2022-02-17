@@ -441,6 +441,11 @@ void MBoxDialog::SetTag()
     //RemoveArtifactFile("mbox", idkeyvalue);
 
     // NEED TO FIX THE HTMLENTRY SO IT IS BETTER, IT SHOULD BE SOMETHING, BUT NOT SURE WHAT...
+    // MAYBE EMAIL MESSAGE 1 - # COMES FROM -M# OF THE ID
+    // DATE: LSKJDFLKDJ
+    // SUBJECT: KLSJFLSDJFL
+    // MBOX ID: E0-P0-F1
+    // MBOX FILE NAME: SAMPLE.MBOX
     AddFileItem(tagaction->iconText(), htmlentry);
     //CreateArtifactFile("mbox", idkeyvalue, htmlvalue);
     // ADD TO PREVIEW REPORT
