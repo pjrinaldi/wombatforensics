@@ -439,6 +439,8 @@ void MBoxDialog::SetTag()
 	RemTag("mbox", curtag);
     AddTag("mbox", mboxstring); // this adds the id and tag to the mboxtags file // add htmlentry and htmlvalue to this function...
     //RemoveArtifactFile("mbox", idkeyvalue);
+
+    // NEED TO FIX THE HTMLENTRY SO IT IS BETTER, IT SHOULD BE SOMETHING, BUT NOT SURE WHAT...
     AddFileItem(tagaction->iconText(), htmlentry);
     //CreateArtifactFile("mbox", idkeyvalue, htmlvalue);
     // ADD TO PREVIEW REPORT
