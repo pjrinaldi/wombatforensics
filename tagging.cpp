@@ -62,7 +62,11 @@ void CreateArtifactFile(QString artifact, QString idkeyvalue, QString htmlconten
 {
     QDir pdir;
     pdir.mkpath(wombatvariable.tmpmntpath + artifact);
-    QString filepath = wombatvariable.tmpmntpath + artifact + "/" + idkeyvalue.replace("|", ".").replace("\\", "-");
+    QString filepath = "";
+    if(artifact == "registry")
+        filepath = wombatvariable.tmpmntpath + artifact + "/" + idkeyvalue.replace("|", ".").replace("\\", "-");
+    else
+        filepath = idkeyvalue;
     QFile artfile;
     artfile.setFileName(filepath);
     artfile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -76,7 +80,10 @@ void CreateArtifactFile(QString artifact, QString idkeyvalue, QString htmlconten
 void RemoveArtifactFile(QString artifact, QString idkeyvalue)
 {
     QDir tdir = QDir(wombatvariable.tmpmntpath + artifact + "/");
-    tdir.remove(idkeyvalue.replace("|", ".").replace("\\", "-"));
+    if(artifact == "registry")
+        tdir.remove(idkeyvalue.replace("|", ".").replace("\\", "-"));
+    else
+        tdir.remove(idkeyvalue);
     //qDebug() << wombatvariable.tmpmntpath + artifact + "/" << idkeyvalue.replace("|", ".").replace("\\", "-");
     //QDir tdir = QDir(wombatvariable.tmpmntpath + "thumbs/");
     //tdir.remove(tfiles.at(j));

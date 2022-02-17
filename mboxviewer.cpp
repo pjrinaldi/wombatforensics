@@ -448,16 +448,11 @@ void MBoxDialog::SetTag()
     htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Subject:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 3)->text() + "</span></td></tr>";
     htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Mbox Id:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "</span></td></tr>";
     htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Mbox File Name:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + mboxparentname + "</span></td></tr>";
+    htmlentry += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(13) + "'>&nbsp;</td><td style='" + ReturnCssString(7) + "'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='./mbox/" + ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "'>Link</a></td></tr>";
     htmlentry += "</table></td>";
 
-    // NEED TO FIX THE HTMLENTRY SO IT IS BETTER, IT SHOULD BE SOMETHING, BUT NOT SURE WHAT...
-    // MAYBE EMAIL MESSAGE 1 - # COMES FROM -M# OF THE ID
-    // DATE: LSKJDFLKDJ
-    // SUBJECT: KLSJFLSDJFL
-    // MBOX ID: E0-P0-F1
-    // MBOX FILE NAME: SAMPLE.MBOX
     AddFileItem(tagaction->iconText(), htmlentry);
-    //CreateArtifactFile("mbox", idkeyvalue, htmlvalue);
+    //CreateArtifactFile("mbox", ui->mailtable->item(ui->mailtable->currentRow(), 0)->text(), htmlvalue);
     // ADD TO PREVIEW REPORT
     //RemoveFileItem(curindex.sibling(curindex.row(), 11).data().toString());
     //AddFileItem(tagname, filestr);

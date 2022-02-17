@@ -36,7 +36,7 @@ public:
     {
         if (MBoxDialog->objectName().isEmpty())
             MBoxDialog->setObjectName(QString::fromUtf8("MBoxDialog"));
-        MBoxDialog->setWindowModality(Qt::ApplicationModal);
+        MBoxDialog->setWindowModality(Qt::NonModal);
         MBoxDialog->resize(904, 684);
         MBoxDialog->setSizeGripEnabled(true);
         MBoxDialog->setModal(true);
