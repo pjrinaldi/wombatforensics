@@ -90,7 +90,11 @@
       <column/>
       <column/>
      </widget>
-     <widget class="QPlainTextEdit" name="mailcontent"/>
+     <widget class="QPlainTextEdit" name="mailcontent">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>

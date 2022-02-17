@@ -64,8 +64,8 @@ void MBoxDialog::EmailSelected()
     if(mboxfile.isOpen())
     {
         mboxfile.seek(layout.split(";").at(0).split(",").at(0).toULongLong());
-        htmlentry = mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong());
-        ui->mailcontent->setPlainText(htmlentry);
+        //htmlentry = mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong());
+        ui->mailcontent->setPlainText(mboxfile.read(layout.split(";").at(0).split(",").at(1).toULongLong()));
         mboxfile.close();
     }
     /*
@@ -439,6 +439,15 @@ void MBoxDialog::SetTag()
 	RemTag("mbox", curtag);
     AddTag("mbox", mboxstring); // this adds the id and tag to the mboxtags file // add htmlentry and htmlvalue to this function...
     //RemoveArtifactFile("mbox", idkeyvalue);
+    htmlentry = "";
+    htmlentry += "<td style='" + ReturnCssString(11) + "' id='" + ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "'>";
+    htmlentry += "<table style='" + ReturnCssString(2) + "' width=300px'><tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "' colspan='2'>Email Message " + ui->mailtable->item(ui->mailtable->currentRow(), 0)->text().split("-m").at(1) + "</th></tr>";
+    htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>From:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 1)->text() + "</span></td></tr>";
+    htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Date:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 2)->text() + "</span></td></tr>";
+    htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Subject:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 3)->text() + "</span></td></tr>";
+    htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Mbox Id:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>" + ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "</span></td></tr>";
+    htmlentry += "<tr style='" + ReturnCssString(12) + "'><td style='" + ReturnCssString(13) + "'>Mbox File Name:</td><td style='" + ReturnCssString(14) + "'><span style='word-wrap:break-word;'>PLACE MBOX PARENT FILE HERE</span></td></tr>";
+    htmlentry += "</table></td>";
 
     // NEED TO FIX THE HTMLENTRY SO IT IS BETTER, IT SHOULD BE SOMETHING, BUT NOT SURE WHAT...
     // MAYBE EMAIL MESSAGE 1 - # COMES FROM -M# OF THE ID

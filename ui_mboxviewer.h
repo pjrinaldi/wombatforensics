@@ -71,6 +71,7 @@ public:
         mailtable->verticalHeader()->setVisible(false);
         mailcontent = new QPlainTextEdit(splitter);
         mailcontent->setObjectName(QString::fromUtf8("mailcontent"));
+        mailcontent->setReadOnly(true);
         splitter->addWidget(mailcontent);
 
         verticalLayout->addWidget(splitter);
