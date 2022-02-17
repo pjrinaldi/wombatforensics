@@ -1,4 +1,4 @@
-QT += widgets core concurrent multimedia multimediawidgets gui avwidgets
+QT += widgets core concurrent multimedia multimediawidgets gui avwidgets webengine
 #QT -= opengl quick network qml
 linux:CONFIG += debug_and_release debug_and_release_target qt x11 build_all c++14 
 DEFINES += MAGICKCORE_HDRI_ENABLE=0
