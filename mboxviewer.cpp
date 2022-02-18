@@ -485,6 +485,7 @@ void MBoxDialog::RemoveTag()
     //ui->mailtable->selectedItems().last()->setText("");
     RemTag("mbox", mboxstring);
     RemoveFileItem(ui->mailtable->item(ui->mailtable->currentRow(), 0)->text());
+    RemoveArtifactFile("mbox", ui->mailtable->item(ui->mailtable->currentRow(), 0)->text());
     /*
     // REMOVE FROM PREVIEW REPORT
     RemoveFileItem(idkeyvalue);
