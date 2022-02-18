@@ -39,7 +39,7 @@ public:
         MBoxDialog->setWindowModality(Qt::NonModal);
         MBoxDialog->resize(904, 684);
         MBoxDialog->setSizeGripEnabled(true);
-        MBoxDialog->setModal(true);
+        MBoxDialog->setModal(false);
         verticalLayout = new QVBoxLayout(MBoxDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);

@@ -474,11 +474,17 @@ void MBoxDialog::RemoveTag()
     QAction* tagaction = qobject_cast<QAction*>(sender());
     //mboxstring += this->windowTitle().mid(16) + "|"; // file id
     //mboxstring += ui->label->text() + "\\"; // key
-    mboxstring += ui->mailtable->selectedItems().first()->text() + "|";
-    mboxstring += tagaction->iconText() + ",";
+    mboxstring += ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "|";
+    mboxstring += ui->mailtable->item(ui->mailtable->currentRow(), 4)->text();
+    //mboxstring += tagaction->iconText() + ",";
+    qDebug() << "mboxstring:" << mboxstring;
+    //mboxstring += ui->mailtable->selectedItems().first()->text() + "|";
+    //mboxstring += tagaction->iconText() + ",";
     //QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
-    ui->mailtable->selectedItems().last()->setText("");
+    ui->mailtable->item(ui->mailtable->currentRow(), 4)->setText("");
+    //ui->mailtable->selectedItems().last()->setText("");
     RemTag("mbox", mboxstring);
+    RemoveFileItem(ui->mailtable->item(ui->mailtable->currentRow(), 0)->text());
     /*
     // REMOVE FROM PREVIEW REPORT
     RemoveFileItem(idkeyvalue);
