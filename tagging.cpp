@@ -45,7 +45,7 @@ void RemTag(QString artifact, QString tagstring)
     {
 	if(artifactlist.at(i).contains(tagstring))
         {
-            qDebug() << artifactlist.at(i) << tagstring;
+            //qDebug() << artifactlist.at(i) << tagstring;
 	    artifactlist.removeAt(i);
         }
     }

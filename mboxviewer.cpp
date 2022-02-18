@@ -477,7 +477,7 @@ void MBoxDialog::RemoveTag()
     mboxstring += ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "|";
     mboxstring += ui->mailtable->item(ui->mailtable->currentRow(), 4)->text();
     //mboxstring += tagaction->iconText() + ",";
-    qDebug() << "mboxstring:" << mboxstring;
+    //qDebug() << "mboxstring:" << mboxstring;
     //mboxstring += ui->mailtable->selectedItems().first()->text() + "|";
     //mboxstring += tagaction->iconText() + ",";
     //QString idkeyvalue = this->windowTitle().mid(16) + "|" + ui->mailtable->selectedItems().first()->text();
