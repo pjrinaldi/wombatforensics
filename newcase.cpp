@@ -1121,7 +1121,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         //out << "Object Flags|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 26, 2))) << "|APFS object flags: 0 - OBJ_VIRTUAL, 80 - OBJ_EPHEMERAL, 40 - OBJ_PHYSICAL, 20 - OBJ_NOHEADER, 10 - OBJ_ENCRYPTED, 08 - OBJ_NONPERSISTENT." << Qt::endl;
         //out << "Object SubType|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 28, 4))) << "|APFS object subtype: 0 - none, 11 - object map (OMAP), 14 - file system tree." << Qt::endl;
         out << "Block Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4))) << "|APFS block size in bytes, usually 4096." << Qt::endl;
-        qDebug() << "block size:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4));
+        //qDebug() << "block size:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4));
         out << "Block Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 40, 8))) << "|Number of blocks for the AFPS container." << Qt::endl;
         // NEED TO DO AN IF & THING FOR THE 3 FEATURES SET AS WELL
         //out << "Container Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 48, 8))) << "|Container features options uint64_t." << Qt::endl;
@@ -1133,15 +1133,15 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "Next Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 88, 8))) << "|Next object id." << Qt::endl;
         out << "Next Transaction ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 96, 8))) << "|Next transaction id." << Qt::endl;
         out << "Maximum Container Volumes|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4))) << "|Maximum number of volumes in the APFS container." << Qt::endl;
-        qDebug() << "max containers:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4));
+        //qDebug() << "max containers:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4));
         out << "Volume Object ID List|";
         for(int i=0; i < qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4)); i++)
         {
             out << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8))) << ",";
-            qDebug() << QString("fs [" + QString::number(i) + "] objid:") << qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8));
+            //qDebug() << QString("fs [" + QString::number(i) + "] objid:") << qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8));
         }
         out << "|List of object id's for each volume within the container." << Qt::endl;
-        partitionname += " [APFS]";
+        partitionname += "Container [APFS]";
         /*
         fsinfo.insert("descblocks", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(104, 4))));
         fsinfo.insert("datablocks", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(108, 4))));
