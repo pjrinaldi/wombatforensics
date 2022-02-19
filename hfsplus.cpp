@@ -381,6 +381,7 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
             if(datarecordtype == 0x0001 || datarecordtype == 0x0002) // FOLDER RECORD 0x0001/FILE RECORD 0x0002 - 88 bytes/248 bytes
             {
                 layout = "";
+                QString reslayout = "";
                 uint8_t itemtype = 0;
                 uint8_t isdeleted = 0;
                 uint16_t flags = qFromBigEndian<uint16_t>(curimg->ReadContent(curoffset + curpos, 2));
@@ -435,8 +436,58 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                     restotalblocks = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 178, 4));
                     if(reslogicalsize > 0)
                     {
-                        qDebug() << "reslogicalsize:" << reslogicalsize;
-                        qDebug() << "restotalblocks:" << restotalblocks;
+                        for(int j=0; j < 8; j++)
+                        {
+                            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 182 + j*8, 4)) > 0)
+                                reslayout += QString::number(curstartsector*512 + clustersize * qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 182 + j*8, 4))) + ",";
+                            if(qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 186 + j*8, 4)) > 0)
+                                reslayout += QString::number(clustersize * qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 186 + j*8, 4))) + ";";
+                        }
+                        //qDebug() << "reslogicalsize:" << reslogicalsize;
+                        //qDebug() << "restotalblocks:" << restotalblocks;
+                        //qDebug() << "reslayout:" << reslayout;
+                        /*
+                    else // alternate data stream
+		    {
+			attrname = "";
+			for(int k=0; k < namelength; k++)
+			    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + k*2, 2))));
+			//qDebug() << "ads:" << QString("$DATA:" + attrname);
+			quint64 logicalsize = 0;
+			quint64 physicalsize = 0;
+			layout = "";
+			if(resflags == 0x00) // resident
+			{
+			    uint32_t contentsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 16, 4));
+			    uint16_t contentoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 20, 2));
+			    logicalsize = contentsize;
+			    physicalsize = contentsize;
+			    layout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentsize) + ";");
+			}
+			else if(resflags == 0x01) // non-resident
+			{
+			    logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
+			    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
+			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
+				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+			}
+                        QList<QVariant> tmpnode;
+                        tmpnode.clear();
+                        QList<QString> tmpprop;
+                        tmpprop.clear();
+                        tmpnode << QString("$DATA:" + attrname) << logicalsize;
+                        tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
+			tmpprop.append(QString("Logical Size|" + QString::number(logicalsize) + "|Logical size for the file in bytes."));
+                        tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
+                        adsnodelist.append(tmpnode);
+                        adsproplist.append(tmpprop);
+                        tmpnode.clear();
+                        tmpprop.clear();
+                        // RETURN ATTRNAME, LOGICALSIZE FOR ADS NODE DATA AND PHYSICALSIZE AND LAYOUT FOR PROPERTIES FILE
+			// NEED TO DO SOMETHING WITH THE ADS PROPERTIES AS WELL AS THE FILE PROPERTIES...
+		    }
+
+                         */ 
                     }
                     curpos += 246;
                     //qDebug() << "layout:" << layout;
@@ -580,6 +631,43 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                     inodecnt++;
                 }
                 nodedata.clear();
+                /*
+    quint64 adsparentinode = inodecnt; // adsparentinode = curfile inode
+    QString adsparentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)); // adsparentstr = curfile id
+        // do catsig here and adsfilepath here as well... filepath + filename + "/"
+        QHash<QString, QVariant> adsnode;
+        adsnode.clear();
+	adsnode.insert("name", QByteArray(adsnodelist.at(i).at(0).toString().toUtf8()).toBase64());
+        adsnode.insert("path", QByteArray(QString(filepath + filename + "/").toUtf8()).toBase64());
+        adsnode.insert("size", adsnodelist.at(i).at(1));
+	if(adsnodelist.at(i).at(1).toULongLong() > 0)
+	{
+	    QString catsig = GenerateCategorySignature(curimg, filename, adsproplist.at(i).at(1).split(";").at(0).split(",").at(0).toULongLong());
+	    adsnode.insert("cat", catsig.split("/").first());
+            adsnode.insert("sig", catsig.split("/").last());
+	}
+	else
+        {
+	    adsnode.insert("cat", "Empty");
+            adsnode.insert("sig", "Zero File");
+        }
+        adsnode.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
+	mutex.lock();
+	treenodemodel->AddNode(adsnode, adsparentstr, 10, 0);
+	mutex.unlock();
+	// WRITE ADS PROPERTIES
+	QTextStream adsout;
+	QFile adsprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+	if(!adsprop.isOpen())
+	    adsprop.open(QIODevice::Append | QIODevice::Text);
+	adsout.setDevice(&adsprop);
+	adsout << adsproplist.at(i).at(0) << Qt::endl;
+	adsout << adsproplist.at(i).at(1) << Qt::endl;
+        adsout << adsproplist.at(i).at(2) << Qt::endl;
+	adsout.flush();
+	adsprop.close();
+	inodecnt++;
+                 */ 
             }
             else if(datarecordtype == 0x0003 || datarecordtype == 0x0004) // FOLDER THREAD RECORD 0x03/ FILE THREAD RECORD 0x04 - SKIP
             {
