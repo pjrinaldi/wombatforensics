@@ -453,7 +453,7 @@ void MBoxDialog::SetTag()
 
     QString htmlcontent = "";
     htmlcontent = "<html><body style='" + ReturnCssString(0) + "'>";
-    htmlcontent += "<div style='" + ReturnCssString(1) + "'>MBox Email Analysis</div><br/>";
+    htmlcontent += "<div style='" + ReturnCssString(1) + "'>MBox Email Analysis - " + ui->mailtable->item(ui->mailtable->currentRow(), 0)->text() + "</div><br/>";
     htmlcontent += "<pre>";
     htmlcontent += htmlvalue;
     htmlcontent += "</pre>";

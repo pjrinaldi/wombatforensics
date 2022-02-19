@@ -1,11 +1,21 @@
 #include "htmlviewer.h"
 
-// Copyright 2013-2019 Pasquale J. Rinaldi, Jr.
+// Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
 HtmlViewer::HtmlViewer(QWidget* parent) : QDialog(parent), ui(new Ui::HtmlViewer)
 {
     ui->setupUi(this);
+    //pagehistory.clear();
+    ui->homebutton->setVisible(false);
+    //connect(ui->homebutton, SIGNAL(clicked()), this, SLOT(GoHome()));
+    connect(ui->backbutton, SIGNAL(clicked()), ui->textbrowser, SLOT(backward()));
+    connect(ui->forbutton, SIGNAL(clicked()), ui->textbrowser, SLOT(forward()));
+    connect(ui->textbrowser, SIGNAL(sourceChanged(const QUrl&)), this, SLOT(SourceChanged(const QUrl&)));
+    connect(ui->textbrowser, SIGNAL(backwardAvailable(bool)), ui->backbutton, SLOT(setEnabled(bool)));
+    connect(ui->textbrowser, SIGNAL(forwardAvailable(bool)), ui->forbutton, SLOT(setEnabled(bool)));
+    //homepage = wombatvariable.tmpmntpath + "previewreport.html";
+    //qDebug() << "homepage:" << homepage;
 }
 
 HtmlViewer::~HtmlViewer()
@@ -14,6 +24,33 @@ HtmlViewer::~HtmlViewer()
     this->close();
 }
 
+void HtmlViewer::SourceChanged(const QUrl &url)
+{
+    //pagehistory.append(url->
+    //qDebug() << "url:" << url;
+}
+
+/*
+void HtmlViewer::GoHome()
+{
+    //homepage = wombatvariable.tmpmntpath + "previewreport.html";
+    //qDebug() << "go home:" << homepage;
+    ui->textbrowser->setSource(QUrl::fromLocalFile(homepage));
+    //Reload();
+}
+*/
+/*
+void HtmlViewer::GoBackward()
+{
+    ui->textbrowser->backward();
+}
+
+void HtmlViewer::GoForward()
+{
+    ui->textbrowser->forward();
+}
+*/
+
 void HtmlViewer::HideClicked()
 {
     this->close();
@@ -21,10 +58,12 @@ void HtmlViewer::HideClicked()
 
 void HtmlViewer::ShowHtml(const QModelIndex &index)
 {
-    QString oldfile = wombatvariable.tmpfilepath + index.sibling(index.row(), 11).data().toString() + "-fhex";
-    QString newfile = oldfile + ".html";
-    QFile::copy(oldfile, newfile);
-    ui->textbrowser->setSource(QUrl::fromLocalFile(newfile));
+    //ui->homebutton->setEnabled(false);
+    QString oldfile = wombatvariable.tmpfilepath + index.sibling(index.row(), treenodemodel->GetColumnIndex("id")).data().toString() + "-fhex";
+    //qDebug() << "oldfile:" << oldfile;
+    //QString newfile = oldfile + ".html";
+    //QFile::copy(oldfile, newfile);
+    ui->textbrowser->setSource(QUrl::fromLocalFile(oldfile));
     //ui->webView->setUrl(QUrl::fromLocalFile(newfile));
     this->show();
 }
@@ -55,6 +94,10 @@ void HtmlViewer::ShowArtifact(int artifactid, const QModelIndex &index)
 
 void HtmlViewer::LoadHtml(QString filepath)
 {
+    //ui->homebutton->setEnabled(true);
+    //qDebug() << "curpage:" << ui->textbrowser->source().path();
+    //qDebug() << "nextpage:" << filepath;
+    //qDebug() << "is backward available:" << ui->textbrowser->isBackwardAvailable();
     ui->textbrowser->setSource(QUrl::fromLocalFile(filepath));
     /*
     // populate html here
@@ -73,6 +116,7 @@ void HtmlViewer::Reload()
 
 void HtmlViewer::mousePressEvent(QMouseEvent* e)
 {
+    //qDebug() << "url history:" << ui->textbrowser->historyUrl(
     if(e->type() == QEvent::MouseButtonPress)
         isignals->ActivateReload();
 }

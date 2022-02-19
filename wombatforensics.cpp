@@ -796,7 +796,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         videowindow->setWindowTitle(selectedindex.sibling(selectedindex.row(), colindex).data().toString() + " Video Viewer");
         videowindow->ShowVideo(index);
     }
-    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("HTML"))
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().contains("Html"))
     {
         htmlviewer = new HtmlViewer();
         htmlviewer->setAttribute(Qt::WA_DeleteOnClose);
