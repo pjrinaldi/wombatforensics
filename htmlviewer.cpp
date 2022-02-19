@@ -7,7 +7,7 @@ HtmlViewer::HtmlViewer(QWidget* parent) : QDialog(parent), ui(new Ui::HtmlViewer
 {
     ui->setupUi(this);
     //pagehistory.clear();
-    ui->homebutton->setVisible(false);
+    //ui->homebutton->setVisible(false);
     //connect(ui->homebutton, SIGNAL(clicked()), this, SLOT(GoHome()));
     connect(ui->backbutton, SIGNAL(clicked()), ui->textbrowser, SLOT(backward()));
     connect(ui->forbutton, SIGNAL(clicked()), ui->textbrowser, SLOT(forward()));

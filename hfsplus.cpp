@@ -401,6 +401,9 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                 quint64 logicalsize = 0;
                 uint32_t clumpsize = 0;
                 uint32_t totalblocks = 0;
+                quint64 reslogicalsize = 0;
+                uint32_t resclumpsize = 0;
+                uint32_t restotalblocks = 0;
                 //qDebug() << "createdate:" << ConvertUnixTimeToString(ConvertHfsTimeToUnixTime(createdate));
                 // 16 bytes for user information i currently don't care about
                 // 16 bytes for finder information i currently don't care about
@@ -425,6 +428,15 @@ qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_
                             layout += QString::number(curstartsector*512 + clustersize * qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 102 + j*8, 4))) + ",";
                         if(qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 106 + j*8, 4)) > 0)
                             layout += QString::number(clustersize * qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 106 + j*8, 4))) + ";";
+                    }
+                    // PARSE RESOURCE FORK
+                    reslogicalsize = qFromBigEndian<quint64>(curimg->ReadContent(curoffset + curpos + 166, 8));
+                    resclumpsize = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 174, 4));
+                    restotalblocks = qFromBigEndian<uint32_t>(curimg->ReadContent(curoffset + curpos + 178, 4));
+                    if(reslogicalsize > 0)
+                    {
+                        qDebug() << "reslogicalsize:" << reslogicalsize;
+                        qDebug() << "restotalblocks:" << restotalblocks;
                     }
                     curpos += 246;
                     //qDebug() << "layout:" << layout;

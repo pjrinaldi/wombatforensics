@@ -44,7 +44,6 @@
     <file alias="filterimg">./Resources/filterlist.png</file>
   </qresource>
   <qresource prefix="/bar">
-    <file alias="home">Resources/home.png</file>
     <file alias="addtohash">Resources/existinghash.png</file>
     <file alias="newhash">Resources/newhash.png</file>
     <file alias="hashlist">Resources/hashlist.png</file>
