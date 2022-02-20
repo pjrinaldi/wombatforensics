@@ -1132,6 +1132,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	//qDebug() << "container uuid:" << (fsinfo.value("containeruuid").toString().left(8) + "-" + fsinfo.value("containeruuid").toString().mid(8, 4) + "-" + fsinfo.value("containeruuid").toString().mid(12, 4) + "-" + fsinfo.value("containeruuid").toString().mid(16, 4) + "-" + fsinfo.value("containeruuid").toString().right(12));
         out << "Next Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 88, 8))) << "|Next object id." << Qt::endl;
         out << "Next Transaction ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 96, 8))) << "|Next transaction id." << Qt::endl;
+        out << "Container Object Map Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 160, 8))) << "|Object id for the container's object map." << Qt::endl;
         out << "Maximum Container Volumes|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4))) << "|Maximum number of volumes in the APFS container." << Qt::endl;
         //qDebug() << "max containers:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4));
         out << "Volume Object ID List|";
@@ -1141,7 +1142,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             //qDebug() << QString("fs [" + QString::number(i) + "] objid:") << qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8));
         }
         out << "|List of object id's for each volume within the container." << Qt::endl;
-        partitionname += "Container [APFS]";
+        partitionname += "APFS Container [APFS]";
         /*
         fsinfo.insert("descblocks", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(104, 4))));
         fsinfo.insert("datablocks", QVariant(qFromLittleEndian<uint32_t>(partbuf.mid(108, 4))));
@@ -1589,6 +1590,11 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     {
 	quint64 curinode = 0;
 	curinode = ParseExtDirectory(curimg, curstartsector, ptreecnt, 2, 0, "", "");
+    }
+    else if(fstype == 7) // APFS
+    {
+        quint64 curinode = 0;
+        curinode = ParseApfsVolumes(curimg, curstartsector, ptreecnt);
     }
     else if(fstype == 8) // HFS+/X
     {

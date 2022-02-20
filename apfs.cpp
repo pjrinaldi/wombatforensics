@@ -3,6 +3,41 @@
 // Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
+quint64 ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
+{
+    quint64 inodecnt = 0;
+    quint64 nxomapoid = 0;
+    quint64 nxomapbtreeoid = 0;
+    uint32_t blocksize = 0;
+    uint32_t maxvolumes = 0;
+    QStringList volumeoidlist;
+    volumeoidlist.clear();
+    QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
+    if(!propfile.isOpen())
+	propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(propfile.isOpen())
+    {
+        while(!propfile.atEnd())
+        {
+            QString line = propfile.readLine();
+            if(line.startsWith("Block Size|"))
+                blocksize = line.split("|").at(1).toUInt();
+            if(line.startsWith("Container Object Map Object ID|"))
+                nxomapoid = line.split("|").at(1).toUInt();
+            if(line.startsWith("Maximum Container Volumes|"))
+                maxvolumes = line.split("|").at(1).toUInt();
+            if(line.startsWith("Volume Object ID List|"))
+                volumeoidlist = line.split("|").at(1).split(",", Qt::SkipEmptyParts);
+        }
+        propfile.close();
+    }
+    //qDebug() << "blocksize:" << blocksize << "nxmapoid:" << nxomapoid << "maxvolumes:" << maxvolumes << "volumeoidlist:" << volumeoidlist;
+    //qDebug() << "byte offset for container object map oid:" << curstartsector*512 + blocksize * nxomapoid;
+    // 32 + 4 + 4 + 4 + 4 = 48
+    nxomapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapoid + 48, 8));
+    //qDebug() << "nxomapbtreeoid:" << nxomapbtreeoid;
+
+}
 /*
 qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
