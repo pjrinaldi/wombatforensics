@@ -96,6 +96,9 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         quint64 curoffset = curstartsector*512 + blocksize * volumevallist.at(i);
         QDir dir; // current partition directory
         dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/");
+        QFile contstatfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
+        // copy partition stat file to the volume stat file since they are the same
+        contstatfile.copy(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/stat");
         QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/prop");
         //dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
         //QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");

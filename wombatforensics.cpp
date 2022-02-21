@@ -1964,7 +1964,11 @@ void WombatForensics::PopulateHexContents()
             }
             else
             {
-                QFile partfile(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
+                QFile partfile;
+                if(nodeid.contains("v")) // virtual volume of a container or pool
+                    partfile.setFileName(curimg->MountPath() + "/p" + nodeid.split("-").at(1).split("v").at(0).mid(1) + "/v" + nodeid.split("-").at(1).split("v").at(1) + "/stat");
+                else
+                    partfile.setFileName(curimg->MountPath() + "/" + nodeid.split("-").at(1) + "/stat");
                 //qDebug() << "partfile:" << partfile.fileName();
                 //QFile partfile(wombatvariable.tmpmntpath + evidfiles.first() + "/" + nodeid.split("-").at(1) + "/stat");
                 partfile.open(QIODevice::ReadOnly | QIODevice::Text);
