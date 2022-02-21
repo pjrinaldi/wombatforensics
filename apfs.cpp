@@ -195,6 +195,18 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         nodedata.insert("name", apfsvolname);
         //nodedata.insert("path", "/");
         nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "v" + QString::number(i)));
+        QFile statfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/stat");
+        if(!statfile.isOpen())
+            statfile.open(QIODevice::ReadOnly | QIODevice::Text);
+        QString tmpstr = "";
+        if(statfile.isOpen())
+        {
+            tmpstr = statfile.readLine(); // partition name, offset, size, partition type, id
+            statfile.close();
+        }
+        qDebug() << "tmpstr:" << tmpstr;
+        nodedata.insert("size", tmpstr.split(",").at(1).toULongLong());
+        //contstatfile.copy(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/stat");
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, -1, 0);
         mutex.unlock();
