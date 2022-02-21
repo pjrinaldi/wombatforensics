@@ -93,6 +93,8 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     for(int i=0; i < volumekeylist.count(); i++)
     {
         QString apfsvolname = "";
+        quint64 encryptionstate = 0;
+        quint64 apfsflags = 0;
         quint64 curoffset = curstartsector*512 + blocksize * volumevallist.at(i);
         QDir dir; // current partition directory
         dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/");
@@ -183,9 +185,40 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
             // NEXT 2 BYTES ARE RESERVED
             out << "Root To XID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 976, 8))) << "|Transaction ID of Snapshot to Root." << Qt::endl;
             out << "Encryption State OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 984, 8))) << "|Current State of Encryption/Decryption." << Qt::endl;
-            quint64 encryptionstate = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 984, 8));
-            quint64 apfsflags = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 264, 8));
+            encryptionstate = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 984, 8));
+            apfsflags = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 264, 8));
+            if(apfsflags & 0x00000001)
+            {
+                qDebug() << "apfs fs unencrypted.";
+            }
+            else if(apfsflags & 0x00000008)
+            {
+                qDebug() << "if i go into the keybag, i can find the key entry with the password hint...";
+                qDebug() << "apfs fs encrypted using VEK, please provide password...";
+            }
             //qDebug() << "encryption state:" << encryptionstate << "fsflags:" << apfsflags;
+            /*
+            working on apfs volume, need to build the encryption dialog...
+            Hardware Encryption Detected, can't do anything... skipping...
+            Software Encryption Detected, provide user password or recovery key to parse...
+            No Encryption Detected, parsing...
+             */ 
+            /*
+            // create new case here
+            QInputDialog* casedialog = new QInputDialog(this);
+            casedialog->setCancelButtonText("Cancel");
+            casedialog->setInputMode(QInputDialog::TextInput);
+            casedialog->setLabelText("Enter Case Name");
+            casedialog->setOkButtonText("Create Case");
+            casedialog->setTextEchoMode(QLineEdit::Normal);
+            casedialog->setWindowTitle("New Case");
+            if(casedialog->exec())
+                wombatvariable.casename = casedialog->textValue();
+            if(!wombatvariable.casename.isEmpty())
+            {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
+             */ 
             out.flush();
             propfile.close();
         }

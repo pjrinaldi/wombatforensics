@@ -1141,6 +1141,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             out << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8))) << ",";
             //qDebug() << QString("fs [" + QString::number(i) + "] objid:") << qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8));
         }
+        // NEED TO GET THE PROPERTIES NX_KEYLOCKER FOR KEYBAG LOCATION AND NX_FLAGS FOR WHETHER IT IS SOFTWARE KEY
         out << "|List of object id's for each volume within the container." << Qt::endl;
         partitionname += "APFS Container [APFS]";
         /*
