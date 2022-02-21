@@ -4,7 +4,7 @@
 // Distrubted under the terms of the GNU General Public License version 2
 
 //quint64 ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
-uint8_t ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
+void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
     quint64 inodecnt = 0;
     quint64 nxomapoid = 0;
@@ -92,66 +92,112 @@ uint8_t ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreec
     QString parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt);
     for(int i=0; i < volumekeylist.count(); i++)
     {
+        QString apfsvolname = "";
         quint64 curoffset = curstartsector*512 + blocksize * volumevallist.at(i);
-        ptreecnt++;
-        QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
+        QDir dir; // current partition directory
+        dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/");
+        QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/prop");
+        //dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/");
+        //QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
+        //QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt-1) + "/p" + QString::number(ptreecnt) + ".prop");
         QTextStream out;
         if(!propfile.isOpen())
-            propfile.open(QIODevice::ReadOnly | QIODevice::Text);
+            propfile.open(QIODevice::Append | QIODevice::Text);
+        out.setDevice(&propfile);
         if(propfile.isOpen())
         {
-            fileprop.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
-            if(!fileprop.isOpen())
-                fileprop.open(QIODevice::Append | QIODevice::Text);
-            out.setDevice(&fileprop);
-            out << "Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 8, 8))) << "|APFS object id." << Qt:endl;
+            //propfile.setFileName(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
+            out << "Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 8, 8))) << "|APFS object id." << Qt::endl;
             out << "Transaction ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 16, 8))) << "|APFS transaction id." << Qt::endl;
             // NEED TO PROCESS PROPERLY AND DO AN IF & THING FOR IT...
             //out << "Object Type|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 24, 2))) << "|APFS object type: 1 - container super block, 2 - btree, 3 btree node, 5 - spaceman, 11 - object map (OMAP), 13 - file system (volume super block), 17 - reaper." << Qt::endl;
             //out << "Object Flags|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 26, 2))) << "|APFS object flags: 0 - OBJ_VIRTUAL, 80 - OBJ_EPHEMERAL, 40 - OBJ_PHYSICAL, 20 - OBJ_NOHEADER, 10 - OBJ_ENCRYPTED, 08 - OBJ_NONPERSISTENT." << Qt::endl;
             //out << "Object SubType|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 28, 4))) << "|APFS object subtype: 0 - none, 11 - object map (OMAP), 14 - file system tree." << Qt::endl;
-            out << "APFS FileSystem Index|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 36, 4))) << "|Index number in the volume array for the APFS file system." << Qt::endl;
+            out << "FileSystem Index|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 36, 4))) << "|Index number in the volume array for the APFS file system." << Qt::endl;
             // NEED TO PROCESS PROPERLY AND DO AN IF & THING FOR IT...
-            out << "APFS Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8))) << "|Features for the APFS volume." << Qt::endl;
-            out << "APFS Read-Only Compatible Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8))) << "|Read-only compatible features for the APFS volume." << Qt::endl;
-            out << "APFS Incompatible Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 56, 8))) << "|Incompatible APFS features." << Qt::endl;
+            out << "Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 40, 8))) << "|Features for the APFS volume." << Qt::endl;
+            out << "Read-Only Compatible Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8))) << "|Read-only compatible features for the APFS volume." << Qt::endl;
+            out << "Incompatible Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 56, 8))) << "|Incompatible APFS features." << Qt::endl;
             // NEED TO FIX THE TIME TO A STRING AND CONVERT TO UNIX TIME
-            out << "APFS Unmount Time|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 64, 8))) << "|Time when the volume was last unmounted." << Qt::endl;
-            out << "APFS FileSystem Reserve Block Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 72, 8))) << "|Block pre-allocated for volume." << Qt::endl;
-            out << "APFS FileSystem Quota Block Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 80, 8))) << "|Block quota (maximum block allocated) for volume." << Qt::endl;
-            out << "APFS FileSystem Allocation Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 88, 8))) << "|Number of blocks currently allocation." << Qt::endl;
-            out << "APFS Wrapped Crypto State Major Version|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 96, 2))) << "|Major version for the APFS wrapped crypto state." << Qt::endl;
-            out << "APFS Wrapped Crypto State Minor Version|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 98, 2))) << "|Minor version for the APFS wrapped crypto state." << Qt::endl;
-            out << "APFS Wrapped Crypto State Flags|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 100, 4))) << "|Flags for the APFS wrapped crypto state." << Qt::endl;
-            out << "APFS Wrapped Crypto State Persistent Class|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 104, 4))) << "|Persistent class for the APFS wrapped crypto state." << Qt::endl;
-            out << "APFS Wrapped Crypto State Key OS Version|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 108, 4))) << "|Key OS version for the APFS wrapped crypto state." << Qt::endl;
-            out << "APFS Wrapped Crypto State Key Revision|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 112, 2))) << "|Key revision for the APFS wrapped crypto state." << Qt::endl;
-            out << "APFS Wrapped Crypto State Key Length|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 114, 2))) << "|Key length for the APFS wrapped crypto state, 0 for no encryption." << Qt::endl;
+            out << "Unmount Time|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 64, 8))) << "|Time when the volume was last unmounted." << Qt::endl;
+            out << "FileSystem Reserve Block Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 72, 8))) << "|Block pre-allocated for volume." << Qt::endl;
+            out << "FileSystem Quota Block Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 80, 8))) << "|Block quota (maximum block allocated) for volume." << Qt::endl;
+            out << "FileSystem Allocation Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 88, 8))) << "|Number of blocks currently allocation." << Qt::endl;
+            out << "Wrapped Crypto State Major Version|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 96, 2))) << "|Major version for the APFS wrapped crypto state." << Qt::endl;
+            out << "Wrapped Crypto State Minor Version|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 98, 2))) << "|Minor version for the APFS wrapped crypto state." << Qt::endl;
+            out << "Wrapped Crypto State Flags|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 100, 4))) << "|Flags for the APFS wrapped crypto state." << Qt::endl;
+            out << "Wrapped Crypto State Persistent Class|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 104, 4))) << "|Persistent class for the APFS wrapped crypto state." << Qt::endl;
+            out << "Wrapped Crypto State Key OS Version|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 108, 4))) << "|Key OS version for the APFS wrapped crypto state." << Qt::endl;
+            out << "Wrapped Crypto State Key Revision|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 112, 2))) << "|Key revision for the APFS wrapped crypto state." << Qt::endl;
+            out << "Wrapped Crypto State Key Length|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 114, 2))) << "|Key length for the APFS wrapped crypto state, 0 for no encryption." << Qt::endl;
             uint16_t cryptokeylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 114, 2));
             // NEED TO FIX THIS TO DISPLAY THE KEY BASED ON KEY LENGTH ABOVE...
             //curoffset + 116 + cryptokeylength 
             //out << "APFS Wrapped Crypto State Persistent Key|" < QString::number
             // NEED TO FIX THIS TO DISPLAY THE ROOT TREE TYPE PROPERLY WITH & SWITCHES
-            out << "APFS Root Tree Type|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 116 + cryptokeylength, 4))) << "|Type of root file system tree. Object Type and Object SubType." << Qt::endl;
-            out << "APFS Extent Reference Tree Type|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + cryptokeylength + 120, 4))) << "|Type of extent reference tree." << Qt::endl;
-            out << "APFS Snapshot Metadata Tree Type|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + cryptokeylength + 124, 4))) << "|Type of snapshot metadata tree." << Qt::endl;
-            out << "APFS Object Map OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 128, 8))) << "|Physical object ID of the APFS object map." << Qt::endl;
-            out << "APFS Root Tree OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 136, 8))) << "|Virtual object ID of the root APFS tree." << Qt::endl;
+            out << "Root Tree Type|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 116 + cryptokeylength, 4))) << "|Type of root file system tree. Object Type and Object SubType." << Qt::endl;
+            out << "Extent Reference Tree Type|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + cryptokeylength + 120, 4))) << "|Type of extent reference tree." << Qt::endl;
+            out << "Snapshot Metadata Tree Type|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + cryptokeylength + 124, 4))) << "|Type of snapshot metadata tree." << Qt::endl;
+            out << "Object Map OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 128, 8))) << "|Physical object ID of the APFS object map." << Qt::endl;
+            out << "Root Tree OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 136, 8))) << "|Virtual object ID of the root APFS tree." << Qt::endl;
+            out << "Extent Reference Tree OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 144, 8))) << "|Physical Object ID of the APFS extent reference tree." << Qt::endl;
+            out << "Snapshot Metadata Tree OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 152, 8))) << "|Virtual Object ID of the APFS snapshot metadata tree." << Qt::endl;
+            out << "Revert To XID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 160, 8))) << "|Transaction ID that the APFS volume will revert to." << Qt::endl;
+            out << "Revert to Super Block OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 168, 8))) << "|Virtual Object ID of the Volume Super Block to revert to." << Qt::endl;
+            out << "Next Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 176, 8))) << "|Next object ID for the APFS volume." << Qt::endl;
+            out << "Number of Regular Files|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 184, 8))) << "|Number of regular files." << Qt::endl;
+            out << "Number of Directories|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 192, 8))) << "|Number of directories." << Qt::endl;
+            out << "Number of Symbolic Links|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 200, 8))) << "|Number of symbolic links." << Qt::endl;
+            out << "Number of Other Files|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 208, 8))) << "|Number of other files." << Qt::endl;
+            out << "Number of Snapshots|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 216, 8))) << "|Number of snapshots." << Qt::endl;
+            out << "Total Blocks Allocated|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 224, 8))) << "|Blocks allocated by the volume." << Qt::endl;
+            out << "Total Blocks Freed|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 232, 8))) << "|Blocks freed by the volume." << Qt::endl;
+            // NEED TO FORMAT PROPERLY
+            out << "Volume UUID|" << QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 240, 16).toHex().toStdString()) << "|Universal Unique Identifier for the volume." << Qt::endl;
+            // NEED TO FORMAT AS HUMAN READABLE STRING
+            out << "Last Modified Time|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 256, 8))) << "|Last modified time stamp for the volume." << Qt::endl;
+            // NEED TO FORMAT PROPERLY
+            out << "File System Flags|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 264, 8))) << "|Flags for the file system." << Qt::endl;
+            out << "Formatted By ID|" << QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 272, 32).toStdString()) << "|Program and version that formatted the volume." << Qt::endl;
+            out << "Formatted Timestamp|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 304, 8))) << "|Timestamp when the volume was formatted." << Qt::endl;
+            out << "Formatted XID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 312, 8))) << "|Transaction ID for the formatting of the volume." << Qt::endl;
+            out << "Last Modified ID|" << QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 320, 32).toStdString()) << "|Program and version that last modified the volume." << Qt::endl;
+            out << "Last Modified Timestamp|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 352, 8))) << "|Timestamp when the volume was last modified." << Qt::endl;
+            out << "Last Modified XID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 360, 8))) << "|Transaction ID the volume was last modified." << Qt::endl;
+            // LOOP AND GET THE LAST MODIFIED ARRAY, 8 OF THEM
+            for(int j=0; j < 8; j++)
+            {
+                out << "Last Modified " << QString::number(j+1) <<  " ID|" << QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 368 + i*48, 32).toStdString()) << "|Program and version that last modified the volume." << Qt::endl;
+                out << "Last Modified " << QString::number(j+1) << " Timestamp|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 400 + i*8, 8))) << "|Timestamp when the volume was last modified." << Qt::endl;
+                out << "Last Modified " << QString::number(j+1) << " XID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 406 + i*8, 8))) << "|Transaction ID the volume was last modified." << Qt::endl;
+            }
+            apfsvolname = QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 704, 256).toStdString());
+            out << "Volume Name|" << QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 704, 256).toStdString()) << "|Volume name for the APFS volume." << Qt::endl;
+            //qDebug() << "APFS volume name:" << apfsvolname;
+            out << "Next Document ID|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + cryptokeylength + 960, 4))) << "|Next document ID." << Qt::endl;
+            // NEED TO FORMAT PROPERLY
+            out << "Role|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + cryptokeylength + 964, 2))) << "|APFS role. 0x00 - none, etc." << Qt::endl;
+            // NEXT 2 BYTES ARE RESERVED
+            out << "Root To XID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 976, 8))) << "|Transaction ID of Snapshot to Root." << Qt::endl;
+            out << "Encryption State OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 984, 8))) << "|Current State of Encryption/Decryption." << Qt::endl;
+            quint64 encryptionstate = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 984, 8));
+            quint64 apfsflags = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 264, 8));
+            //qDebug() << "encryption state:" << encryptionstate << "fsflags:" << apfsflags;
             out.flush();
             propfile.close();
         }
         //qDebug() << "parent id:" << parentstr;
         QHash<QString, QVariant> nodedata;
         nodedata.clear();
-        nodedata.insert("name", "APFS VOL TEST");
+        nodedata.insert("name", apfsvolname);
         //nodedata.insert("path", "/");
-        nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt + i + 1)));
+        nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "v" + QString::number(i)));
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, -1, 0);
         mutex.unlock();
         //qDebug() << "volume super block magic number:" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + blocksize*volumevallist.at(i) + 32, 4).toStdString());
     }
-    return ptreecnt;
+    //return ptreecnt;
 }
 /*
 qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)

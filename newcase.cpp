@@ -1595,7 +1595,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     {
         //quint64 curinode = 0;
         //qDebug() << "ptreecnt:" << ptreecnt << "partitionlist.count():" << partitionlist.count();
-        ptreecnt = ParseApfsVolumes(curimg, curstartsector, ptreecnt);
+        ParseApfsVolumes(curimg, curstartsector, ptreecnt);
         //qDebug() << "ptreecnt:" << ptreecnt;
     }
     else if(fstype == 8) // HFS+/X
