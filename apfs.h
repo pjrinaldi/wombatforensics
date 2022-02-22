@@ -11,6 +11,8 @@
 
 //quint64 ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
 void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
+QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid);
+void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid);
 //qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
 //void BuildPath(QString* path, QHash<uint32_t, QString>* dirhash, quint64 curparcnid);
 

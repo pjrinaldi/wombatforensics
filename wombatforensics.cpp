@@ -1681,7 +1681,11 @@ void WombatForensics::UpdateProperties()
     }
     else if(nodeid.split("-").count() == 2) // file system/partition or carved file (maybe)
     {
-        propfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + nodeid.split("-").at(1) + "/prop");
+        //qDebug() << "nodeid:" << nodeid;
+        if(nodeid.split("-").at(1).contains("v"))
+            propfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + nodeid.split("-").at(1).split("v").at(0) + "/v" + nodeid.split("-").at(1).split("v").at(1) + "/prop");
+        else
+            propfile.setFileName(wombatvariable.tmpmntpath + evidfiles.at(0) + "/" + nodeid.split("-").at(1) + "/prop");
     }
     else if(nodeid.split("-").count() == 3) // file/directory
     {

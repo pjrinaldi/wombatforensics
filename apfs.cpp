@@ -172,9 +172,9 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
             // LOOP AND GET THE LAST MODIFIED ARRAY, 8 OF THEM
             for(int j=0; j < 8; j++)
             {
-                out << "Last Modified " << QString::number(j+1) <<  " ID|" << QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 368 + i*48, 32).toStdString()) << "|Program and version that last modified the volume." << Qt::endl;
-                out << "Last Modified " << QString::number(j+1) << " Timestamp|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 400 + i*8, 8))) << "|Timestamp when the volume was last modified." << Qt::endl;
-                out << "Last Modified " << QString::number(j+1) << " XID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 406 + i*8, 8))) << "|Transaction ID the volume was last modified." << Qt::endl;
+                out << "Last Modified " << QString::number(j+1) <<  " ID|" << QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 368 + j*48, 32).toStdString()) << "|Program and version that last modified the volume." << Qt::endl;
+                out << "Last Modified " << QString::number(j+1) << " Timestamp|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 400 + j*48, 8))) << "|Timestamp when the volume was last modified." << Qt::endl;
+                out << "Last Modified " << QString::number(j+1) << " XID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 406 + j*48, 8))) << "|Transaction ID the volume was last modified." << Qt::endl;
             }
             apfsvolname = QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 704, 256).toStdString());
             out << "Volume Name|" << QString::fromStdString(curimg->ReadContent(curoffset + cryptokeylength + 704, 256).toStdString()) << "|Volume name for the APFS volume." << Qt::endl;
@@ -190,6 +190,10 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
             if(apfsflags & 0x00000001)
             {
                 qDebug() << "apfs fs unencrypted.";
+                uint64_t objectmapoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 128, 8));
+                uint64_t roottreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 136, 8));
+                QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, ptreecnt, i, blocksize, objectmapoid, roottreeoid);
+                ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, objectmapoid, roottreeoid);
             }
             else if(apfsflags & 0x00000008)
             {
@@ -246,6 +250,16 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         //qDebug() << "volume super block magic number:" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + blocksize*volumevallist.at(i) + 32, 4).toStdString());
     }
     //return ptreecnt;
+}
+
+QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
+{
+    qDebug() << "curstartsector:" << curstartsector << "ptreecnt:" << ptreecnt << "objectmapoid:" << objectmapoid << "roottreeoid:" << roottreeoid << "volid:" << volid << "blocksize:" << blocksize;
+}
+
+void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
+{
+    qDebug() << "curstartsector:" << curstartsector << "ptreecnt:" << ptreecnt << "objectmapoid:" << objectmapoid << "roottreeoid:" << roottreeoid;
 }
 /*
 qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
