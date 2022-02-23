@@ -279,7 +279,6 @@ QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bloc
     uint32_t btreekeycount = 0;
     uint16_t btreeflags = 0;
     uint64_t omapbtreeoid = 0;
-    //qDebug() << "curstartsector:" << curstartsector << "ptreecnt:" << ptreecnt << "objectmapoid:" << objectmapoid << "roottreeoid:" << roottreeoid << "volid:" << volid << "blocksize:" << blocksize;
     omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 48, 8));
     qDebug() << "omapbtreeoid:" << omapbtreeoid;
     /*
