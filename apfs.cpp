@@ -260,7 +260,7 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         mutex.unlock();
         if(encryptionstatus == 0) // not encrypted
         {
-            //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
+            QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
             //mutex.lock();
             //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid, volidstr);
             //mutex.unlock();
@@ -320,6 +320,7 @@ QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bloc
         //qDebug() << "volume info:" << volumekeylist << volumevallist << volumesizlist;
     }
      */ 
+    return "btree";
 }
 
 void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
