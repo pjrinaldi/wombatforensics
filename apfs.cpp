@@ -9,10 +9,13 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     quint64 inodecnt = 0;
     quint64 nxomapoid = 0;
     quint64 nxomapbtreeoid = 0;
+    uint64_t objectmapoid = 0;
+    uint64_t roottreeoid = 0;
     uint32_t blocksize = 0;
     uint32_t maxvolumes = 0;
     uint32_t btreekeycount = 0;
     uint16_t btreeflags = 0;
+    uint8_t encryptionstatus = 0;
     /*
     uint16_t btreetocoff = 0;
     uint16_t btreetoclen = 0;
@@ -92,6 +95,7 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     QString parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt);
     for(int i=0; i < volumekeylist.count(); i++)
     {
+        QString volidstr = "p" + QString::number(ptreecnt) + "v" + QString::number(i);
         QString apfsvolname = "";
         quint64 encryptionstate = 0;
         quint64 apfsflags = 0;
@@ -187,18 +191,25 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
             out << "Encryption State OID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 984, 8))) << "|Current State of Encryption/Decryption." << Qt::endl;
             encryptionstate = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 984, 8));
             apfsflags = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 264, 8));
+            qDebug() << "encryption state:" << encryptionstate;
             if(apfsflags & 0x00000001)
             {
+                encryptionstatus = 0; // not encrypted
                 qDebug() << "apfs fs unencrypted.";
-                uint64_t objectmapoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 128, 8));
-                uint64_t roottreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 136, 8));
-                QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, ptreecnt, i, blocksize, objectmapoid, roottreeoid);
-                ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, objectmapoid, roottreeoid);
+                objectmapoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 128, 8));
+                roottreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + cryptokeylength + 136, 8));
+                //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, ptreecnt, i, blocksize, objectmapoid, roottreeoid);
+                //ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, objectmapoid, roottreeoid);
             }
             else if(apfsflags & 0x00000008)
             {
+                encryptionstatus = 1; // software encrypted, can decrypt
                 qDebug() << "if i go into the keybag, i can find the key entry with the password hint...";
                 qDebug() << "apfs fs encrypted using VEK, please provide password...";
+            }
+            else // not sure what flag will tell me if it is hardware encrypted
+            {
+                encryptionstatus = 2; // hardware encrypted, can not decrypt
             }
             //qDebug() << "encryption state:" << encryptionstate << "fsflags:" << apfsflags;
             /*
@@ -247,14 +258,68 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         mutex.lock();
         treenodemodel->AddNode(nodedata, parentstr, -1, 0);
         mutex.unlock();
+        if(encryptionstatus == 0) // not encrypted
+        {
+            //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
+            //mutex.lock();
+            //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid, volidstr);
+            //mutex.unlock();
+        }
         //qDebug() << "volume super block magic number:" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + blocksize*volumevallist.at(i) + 32, 4).toStdString());
     }
     //return ptreecnt;
 }
 
-QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
+QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
 {
-    qDebug() << "curstartsector:" << curstartsector << "ptreecnt:" << ptreecnt << "objectmapoid:" << objectmapoid << "roottreeoid:" << roottreeoid << "volid:" << volid << "blocksize:" << blocksize;
+    QStringList volumeoidlist;
+    QList<quint64> volumekeylist;
+    QList<quint64> volumevallist;
+    QList<uint32_t> volumesizlist;
+    uint32_t btreekeycount = 0;
+    uint16_t btreeflags = 0;
+    uint64_t omapbtreeoid = 0;
+    //qDebug() << "curstartsector:" << curstartsector << "ptreecnt:" << ptreecnt << "objectmapoid:" << objectmapoid << "roottreeoid:" << roottreeoid << "volid:" << volid << "blocksize:" << blocksize;
+    omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 48, 8));
+    qDebug() << "omapbtreeoid:" << omapbtreeoid;
+    /*
+     *    btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 32, 2));
+    // BTREE FLAGS TELLS ME IF ITS BTNODE_FIXED_KV_SIZE & 0x04
+    */
+    /*
+    if(accessflags & 0x01) // READ ONLY
+        attrstr += "Read Only,";
+    if(accessflags & 0x02) // Hidden
+        attrstr += "Hidden,";
+    */
+    /*
+    //qDebug() << "btreeflags:" << QString::number(btreeflags, 16);
+    btreekeycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 36, 4));
+    //qDebug() << "btreekeycount:" << btreekeycount;
+    for(int i=0; i < btreekeycount; i++)
+    {
+        uint16_t btreetocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 40 + i*16, 2));
+        uint16_t btreetoclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 42 + i*16, 2));
+        uint16_t btreefreeoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 44 + i*16, 2));
+        uint16_t btreefreelen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 46 + i*16, 2));
+        uint16_t btreekeyoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 48 + i*16, 2));
+        uint16_t btreekeylen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 50 + i*16, 2));
+        uint16_t btreevaloff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 52 + i*16, 2));
+        uint16_t btreevallen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 54 + i*16, 2));
+        //qDebug() << i << "BTree TOC off:" << btreetocoff << "BTree TOC len:" << btreetoclen;
+        //qDebug() << i << "BTree FREE off:" << btreefreeoff << "BTree FREE len:" << btreefreelen;
+        //qDebug() << i << "BTree KEY off:" << btreekeyoff << "BTree KEY len:" << btreekeylen;
+        //qDebug() << i << "BTree VAL off:" << btreevaloff << "BTree VAL len:" << btreevallen;
+        //qDebug() << i << "apfs volume oid key:" << qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen, 8));
+        volumekeylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen, 8)));
+        //qDebug() << i << "apfs volume volume flags:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen, 4));
+        //qDebug() << i << "apfs volume volume size:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen + 4, 4)); // bytes
+        //qDebug() << i << "apfs volume volume physical address:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen + 8, 8));
+        volumesizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen + 4, 4))); // bytes
+        volumevallist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen + 8, 8)));
+        //qDebug() << "volume info:" << volumekeylist << volumevallist << volumesizlist;
+    }
+     */ 
 }
 
 void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
