@@ -56,6 +56,12 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     //qDebug() << "blocksize:" << blocksize << "nxmapoid:" << nxomapoid << "maxvolumes:" << maxvolumes << "volumeoidlist:" << volumeoidlist;
     //qDebug() << "byte offset for container object map oid:" << curstartsector*512 + blocksize * nxomapoid;
     // 32 + 4 + 4 + 4 + 4 = 48
+
+
+    // THIS CODE IS WRONG RIGHT NOW AND NEEDS TO BE FIXED....
+    
+
+
     nxomapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapoid + 48, 8));
     //qDebug() << "nxomapbtreeoid:" << nxomapbtreeoid;
     btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 32, 2));
@@ -260,7 +266,10 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         mutex.unlock();
         if(encryptionstatus == 0) // not encrypted
         {
+            qDebug() << "objectmapoid:" << objectmapoid;
+            qDebug() << "roottreeoid:" << roottreeoid;
             QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
+            qDebug() << "rootbtrelayout:" << rootbtreelayout;
             //mutex.lock();
             //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid, volidstr);
             //mutex.unlock();
@@ -276,50 +285,39 @@ QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bloc
     QList<quint64> volumekeylist;
     QList<quint64> volumevallist;
     QList<uint32_t> volumesizlist;
+    volumekeylist.clear();
+    volumevallist.clear();
+    volumesizlist.clear();
+    volumeoidlist.clear();
     uint32_t btreekeycount = 0;
     uint16_t btreeflags = 0;
     uint64_t omapbtreeoid = 0;
     omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 48, 8));
     qDebug() << "omapbtreeoid:" << omapbtreeoid;
-    /*
-     *    btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 32, 2));
-    // BTREE FLAGS TELLS ME IF ITS BTNODE_FIXED_KV_SIZE & 0x04
-    */
-    /*
-    if(accessflags & 0x01) // READ ONLY
-        attrstr += "Read Only,";
-    if(accessflags & 0x02) // Hidden
-        attrstr += "Hidden,";
-    */
-    /*
-    //qDebug() << "btreeflags:" << QString::number(btreeflags, 16);
-    btreekeycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 36, 4));
-    //qDebug() << "btreekeycount:" << btreekeycount;
+    btreekeycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 36, 4));
+    qDebug() << "btreekeycount:" << btreekeycount;
+    uint16_t btreetocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 40, 2));
+    uint16_t btreetoclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 42, 2));
+    uint16_t bfreeoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 44, 2));
+    uint16_t bfreelen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 46, 2));
+    uint16_t btreekeyoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 48, 2));
+    uint16_t btreekeylen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 50, 2));
+    uint16_t btreevaloff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 52, 2));
+    uint16_t btreevallen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 54, 2));
+    QString keylayout = "";
     for(int i=0; i < btreekeycount; i++)
     {
-        uint16_t btreetocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 40 + i*16, 2));
-        uint16_t btreetoclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 42 + i*16, 2));
-        uint16_t btreefreeoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 44 + i*16, 2));
-        uint16_t btreefreelen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 46 + i*16, 2));
-        uint16_t btreekeyoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 48 + i*16, 2));
-        uint16_t btreekeylen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 50 + i*16, 2));
-        uint16_t btreevaloff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 52 + i*16, 2));
-        uint16_t btreevallen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 54 + i*16, 2));
-        //qDebug() << i << "BTree TOC off:" << btreetocoff << "BTree TOC len:" << btreetoclen;
-        //qDebug() << i << "BTree FREE off:" << btreefreeoff << "BTree FREE len:" << btreefreelen;
-        //qDebug() << i << "BTree KEY off:" << btreekeyoff << "BTree KEY len:" << btreekeylen;
-        //qDebug() << i << "BTree VAL off:" << btreevaloff << "BTree VAL len:" << btreevallen;
-        //qDebug() << i << "apfs volume oid key:" << qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen, 8));
-        volumekeylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen, 8)));
-        //qDebug() << i << "apfs volume volume flags:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen, 4));
-        //qDebug() << i << "apfs volume volume size:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen + 4, 4)); // bytes
-        //qDebug() << i << "apfs volume volume physical address:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen + 8, 8));
-        volumesizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen + 4, 4))); // bytes
-        volumevallist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize*nxomapbtreeoid + 56 + btreetocoff + btreetoclen + btreefreeoff + btreefreelen + 8, 8)));
-        //qDebug() << "volume info:" << volumekeylist << volumevallist << volumesizlist;
+        volumekeylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen + i*16, 8)));
+        volumevallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 8, 8)));
+        volumesizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 4, 4)));
     }
-     */ 
-    return "btree";
+    for(int i=0 ; i < volumekeylist.count(); i++)
+    {
+        if(roottreeoid == volumekeylist.at(i))
+            keylayout = QString::number(volumevallist.at(i) * blocksize + curstartsector*512) + "," + QString::number(volumesizlist.at(i)) + ";";
+    }
+    //qDebug() << "keylayout:" << keylayout;
+    return keylayout;
 }
 
 void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
