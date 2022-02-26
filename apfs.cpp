@@ -31,8 +31,10 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         }
         propfile.close();
     }
+    qDebug() << "volumeoidlist count:" << volumeoidlist.count() << "volumeoidlist:" << volumeoidlist;
     for(int i=0; i < volumeoidlist.count(); i++)
         vollayoutlist.append(ReturnBTreeLayout(curimg, curstartsector, blocksize, nxomapoid, volumeoidlist.at(i).toULongLong()));
+    qDebug() << "vollayoutlist:" << vollayoutlist;
     QString parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt);
     for(int i=0; i < vollayoutlist.count(); i++)
     {
@@ -195,7 +197,9 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         mutex.unlock();
         if(encryptionstatus == 0) // not encrypted
         {
+            qInfo() << "Parse Root Directory...";
             QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
+            qDebug() << "root btree layout:" << rootbtreelayout;
             ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, rootbtreelayout);
         }
     }
@@ -212,7 +216,10 @@ QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bloc
     uint32_t btreekeycount = 0;
     //uint16_t btreeflags = 0;
     uint64_t omapbtreeoid = 0;
+    qDebug() << "object map oid:" << objectmapoid;
+    qDebug() << "omapoid offset:" << objectmapoid * blocksize + curstartsector*512;
     omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 48, 8));
+    qDebug() << "omap btree oid:" << omapbtreeoid;
     btreekeycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 36, 4));
     uint16_t btreetocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 40, 2));
     uint16_t btreetoclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 42, 2));
@@ -223,16 +230,21 @@ QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bloc
     //uint16_t btreevaloff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 52, 2));
     //uint16_t btreevallen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 54, 2));
     QString keylayout = "";
+    qDebug() << "btree count:" << btreekeycount;
     for(uint i=0; i < btreekeycount; i++)
     {
         keylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen + i*16, 8)));
         vallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 8, 8)));
         sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 4, 4)));
     }
+    qDebug() << "roottreeoid:" << roottreeoid << "keylist count:" << keylist.count();
     for(int i=0 ; i < keylist.count(); i++)
     {
         if(roottreeoid == keylist.at(i))
+        {
             keylayout = QString::number(vallist.at(i) * blocksize + curstartsector*512) + "," + QString::number(sizlist.at(i)) + ";";
+            break;
+        }
     }
     return keylayout;
 }

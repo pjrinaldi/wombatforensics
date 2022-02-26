@@ -1138,7 +1138,9 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "Volume Object ID List|";
         for(int i=0; i < qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4)); i++)
         {
-            out << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8))) << ",";
+            uint64_t apfsvoloid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8));
+            if(apfsvoloid > 0)
+                out << QString::number(apfsvoloid) << ",";
             //qDebug() << QString("fs [" + QString::number(i) + "] objid:") << qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8));
         }
         // NEED TO GET THE PROPERTIES NX_KEYLOCKER FOR KEYBAG LOCATION AND NX_FLAGS FOR WHETHER IT IS SOFTWARE KEY
@@ -1596,6 +1598,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     {
         //quint64 curinode = 0;
         //qDebug() << "ptreecnt:" << ptreecnt << "partitionlist.count():" << partitionlist.count();
+        qInfo() << "Parsing APFS Volumes...";
         ParseApfsVolumes(curimg, curstartsector, ptreecnt);
         //qDebug() << "ptreecnt:" << ptreecnt;
     }
