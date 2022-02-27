@@ -11,8 +11,10 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     uint32_t blocksize = 0;
     uint8_t encryptionstatus = 0;
     QStringList volumeoidlist;
-    QStringList vollayoutlist;
-    vollayoutlist.clear();
+    QList<uint64_t> volofflist;
+    volofflist.clear();
+    //QStringList vollayoutlist;
+    //vollayoutlist.clear();
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -32,17 +34,20 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         propfile.close();
     }
     qDebug() << "volumeoidlist count:" << volumeoidlist.count() << "volumeoidlist:" << volumeoidlist;
+
     for(int i=0; i < volumeoidlist.count(); i++)
-        vollayoutlist.append(ReturnBTreeLayout(curimg, curstartsector, blocksize, nxomapoid, volumeoidlist.at(i).toULongLong()));
-    qDebug() << "vollayoutlist:" << vollayoutlist;
+        volofflist.append(ReturnBTreeLayout(curimg, curstartsector, blocksize, nxomapoid, volumeoidlist.at(i).toULongLong()));
+    qDebug() << "volofflist:" << volofflist;
+
     QString parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt);
-    for(int i=0; i < vollayoutlist.count(); i++)
+    for(int i=0; i < volofflist.count(); i++)
     {
         QString volidstr = "p" + QString::number(ptreecnt) + "v" + QString::number(i);
         QString apfsvolname = "";
         quint64 encryptionstate = 0;
         quint64 apfsflags = 0;
-        quint64 curoffset = vollayoutlist.at(i).split(",").at(0).toULongLong();
+        quint64 curoffset = volofflist.at(i);
+        //quint64 curoffset = vollayoutlist.at(i).split(",").at(0).toULongLong();
         QDir dir; // current partition directory
         dir.mkpath(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/v" + QString::number(i) + "/");
         QFile contstatfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/stat");
@@ -198,15 +203,17 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         if(encryptionstatus == 0) // not encrypted
         {
             qInfo() << "Parse Root Directory...";
-            QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
+            uint64_t rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
+            //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
             qDebug() << "root btree layout:" << rootbtreelayout;
-            ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, rootbtreelayout);
+            ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, QString::number(rootbtreelayout));
         }
     }
 }
 
-QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
+uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
 {
+    qDebug() << "roottreeoid to match:" << roottreeoid;
     QList<uint64_t> keylist;
     QList<uint64_t> vallist;
     QList<uint32_t> sizlist;
@@ -244,7 +251,8 @@ QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bloc
     uint16_t btreekeylen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 50, 2));
     //uint16_t btreevaloff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 52, 2));
     //uint16_t btreevallen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 54, 2));
-    QString keylayout = "";
+    uint64_t keyoffset = 0;
+    //QString keylayout = "";
     qDebug() << "btree count:" << btreekeycount;
     for(uint i=0; i < btreekeycount; i++)
     {
@@ -253,15 +261,18 @@ QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bloc
         sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 4, 4)));
     }
     qDebug() << "roottreeoid:" << roottreeoid << "keylist count:" << keylist.count();
+    qDebug() << "keylist:" << keylist;
     for(int i=0 ; i < keylist.count(); i++)
     {
         if(roottreeoid == keylist.at(i))
         {
-            keylayout = QString::number(vallist.at(i) * blocksize + curstartsector*512) + "," + QString::number(sizlist.at(i)) + ";";
+            keyoffset = vallist.at(i) * blocksize + curstartsector*512;
+            //keylayout = QString::number(vallist.at(i) * blocksize + curstartsector*512) + "," + QString::number(sizlist.at(i)) + ";";
             break;
         }
     }
-    return keylayout;
+    return keyoffset;
+    //return keylayout;
 }
 
 void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, QString dirlayout)
