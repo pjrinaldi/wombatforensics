@@ -216,9 +216,24 @@ QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t bloc
     uint32_t btreekeycount = 0;
     //uint16_t btreeflags = 0;
     uint64_t omapbtreeoid = 0;
+    uint16_t objecttype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 24, 2));
+    uint16_t objectflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 26, 2));
+    uint32_t objectsubtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 28, 4));
+    qDebug() << "object type:" << QString::number(objecttype, 16);
+    qDebug() << "object falgs:" << QString::number(objectflags, 16);
+    qDebug() << "object subtype:" << QString::number(objectsubtype, 16);
     qDebug() << "object map oid:" << objectmapoid;
     qDebug() << "omapoid offset:" << objectmapoid * blocksize + curstartsector*512;
-    omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 48, 8));
+    if(objecttype == 0x02 || objecttype == 0x03) // BTREE || BTREE_NODE
+    {
+        qDebug() << "in a btree, no need to go to an object map btree oid.";
+        omapbtreeoid = objectmapoid;
+    }
+    else if(objecttype == 0x0b) // OMAP
+    {
+        omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * objectmapoid + 48, 8));
+        qDebug() << "not in a btree, need to go to the object map btree.";
+    }
     qDebug() << "omap btree oid:" << omapbtreeoid;
     btreekeycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 36, 4));
     uint16_t btreetocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 40, 2));
