@@ -8,13 +8,12 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     quint64 nxomapoid = 0;
     uint64_t objectmapoid = 0;
     uint64_t roottreeoid = 0;
+    uint64_t nxxpdescbase = 0;
     uint32_t blocksize = 0;
     uint8_t encryptionstatus = 0;
     QStringList volumeoidlist;
     QList<uint64_t> volofflist;
     volofflist.clear();
-    //QStringList vollayoutlist;
-    //vollayoutlist.clear();
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -30,11 +29,32 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
                 nxomapoid = line.split("|").at(1).toUInt();
             if(line.startsWith("Volume Object ID List|"))
                 volumeoidlist = line.split("|").at(1).split(",", Qt::SkipEmptyParts);
+            if(line.startsWith("CheckPoint Descriptor Base|"))
+                nxxpdescbase = line.split("|").at(1).toULongLong();
         }
         propfile.close();
     }
+    qDebug() << "NX XP DESC BASE:" << nxxpdescbase;
     qDebug() << "volumeoidlist count:" << volumeoidlist.count() << "volumeoidlist:" << volumeoidlist;
 
+    // NEED TO CHECK NXOMAPOID BLOCK AND SEE IF IT IS AN OMAP OBJECT TYPE.. IF NOT, CHECK THE NX_XP_DESC_BASE, THEN SEE IF THAT IS
+    // AN NXSB, IF IT'S AN NXSB, THEN GET THAT NXOMAPOID, AND MODIFY ACCORDINGLY
+    qDebug() << "nxomapoid:" << nxomapoid;
+    uint16_t nxomapobjecttype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + nxomapoid * blocksize + 24, 2));
+    qDebug() << "nx omap objecttype:" << nxomapobjecttype;
+    if(nxomapobjecttype != 0x0b)
+    {
+        uint16_t tmpobjtype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 24, 2));
+        uint32_t tmpnxsig = qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 32, 4));
+        if(tmpobjtype == 0x01 && tmpnxsig == 0x4e585342)
+        {
+            nxomapoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 160, 8));
+            qDebug() << "new nxomapoid:" << nxomapoid;
+            //qDebug() << "get the nx omap oid to replace the old one here...";
+        }
+        else
+            qDebug() << "something went wrong...";
+    }
     for(int i=0; i < volumeoidlist.count(); i++)
         volofflist.append(ReturnBTreeLayout(curimg, curstartsector, blocksize, nxomapoid, volumeoidlist.at(i).toULongLong()));
     qDebug() << "volofflist:" << volofflist;
