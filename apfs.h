@@ -16,6 +16,8 @@ void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 //qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
 //void BuildPath(QString* path, QHash<uint32_t, QString>* dirhash, quint64 curparcnid);
 
+bool CheckChecksum(ForImg* curimg, uint64_t blockbyteoffset, uint32_t size, uint64_t curchecksum);
+
 typedef int64_t paddr_t;
 
 struct prange

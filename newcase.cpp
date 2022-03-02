@@ -1111,6 +1111,10 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(apfsig == "NXSB") // APFS Container
     {
+
+        qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
+        // may need to subtract 8 from the block size...
+
         out << "File System Type Int|7|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|APFS|File System Type String." << Qt::endl;
         //out << "Fletcher Checksum|" << QString::fromStdString(curimg->ReadContent(curstartsector*512, 8.toHex()).toStdString()) << "|Fletcher checksum value." << Qt::endl;

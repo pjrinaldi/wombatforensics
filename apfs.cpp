@@ -3,6 +3,37 @@
 // Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
+bool CheckChecksum(ForImg* curimg, uint64_t blockbyteoffset, uint32_t size, uint64_t curchecksum)
+{
+    uint64_t lower32bit = 0;
+    uint64_t upper32bit = 0;
+    uint32_t value32bit = 0;
+    size_t bufferoffset = 0;
+    uint64_t initialvalue = 0;
+    uint64_t checksum = 0;
+    lower32bit = initialvalue & 0xffffffffUL;
+    upper32bit = (initialvalue >> 32) & 0xffffffffUL;
+    //QByteArray blockminus8 = curimg->ReadContent(blockbyteoffset + 8, 
+    for(bufferoffset = 0; bufferoffset < size; bufferoffset += 4)
+    {
+        value32bit = qFromLittleEndian<uint32_t>(curimg->ReadContent(blockbyteoffset + bufferoffset, 4));
+        lower32bit += value32bit;
+        upper32bit += lower32bit;
+    }
+    lower32bit %= 0xffffffffUL;
+    upper32bit %= 0xffffffffUL;
+    value32bit = 0xffffffffUL - ((lower32bit + upper32bit) % 0xffffffffUL);
+    upper32bit = 0xffffffffUL - ((lower32bit + value32bit) % 0xffffffffUL);
+
+    checksum = (upper32bit << 32) | value32bit;
+    //qDebug() << "checksum:" << checksum << "curchecksum:" << curchecksum;
+
+    if(checksum == curchecksum)
+        return true;
+    else
+        return false;
+}
+
 void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
     quint64 nxomapoid = 0;
