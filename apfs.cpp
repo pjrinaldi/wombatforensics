@@ -302,6 +302,8 @@ uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blo
     uint16_t bfreelen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 46, 2));
     uint16_t btreekeyoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 48, 2));
     uint16_t btreekeylen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 50, 2));
+    // FOR OMAP B-TREE, THE KEY AND VALUES ARE SET AND THE KEY'S START AFTER THE TOC AND THE VALUES START AT THE END DEPENDING
+    // ON WHETHER THERE IS A BTREE_INFO_T
     //uint16_t btreevaloff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 52, 2));
     //uint16_t btreevallen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 54, 2));
     uint64_t keyoffset = 0;
