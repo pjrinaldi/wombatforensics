@@ -31,6 +31,7 @@ typedef unsigned char uuid_t[16];
 typedef uint64_t oid_t;
 typedef uint64_t xid_t;
 
+/*
 typedef enum
 {
     NX_SUPERBLOCK = 0x0001,
@@ -40,30 +41,45 @@ typedef enum
     SPACEMAN_CAB = 0x0006,
     SPACEMAN_CIB = 0x0007,
     SPACEMAN_BITMAP = 0x0008,
-    SPACEMAN_FREE_QUEUE = 0x0009,
-    EXTENT_LIST_TREE = 0x000a,
     OMAP = 0x000b,
     CHECKPOINT_MAP = 0x000c,
     FS = 0x000d,
-    FSTREE = 0x000e,
-    BLOCKREFTREE = 0x000f,
-    SNAPMETATREE = 0x0010,
     NX_REAPER = 0x0011,
     NX_REAP_LIST = 0x0012,
-    OMAP_SNAPSHOT = 0x0013,
     EFI_JUMPSTART = 0x0014,
-    FUSION_MIDDLE_TREE = 0x0015,
     NX_FUSION_WBC = 0x0016,
     NX_FUSION_WBC_LIST = 0x0017,
     ER_STATE = 0x0018,
     GBITMAP = 0x0019,
-    GBITMAP_TREE = 0x001a,
     GBITMAP_BLOCK = 0x001b,
     INVALID = 0x0000,
     TEST = 0x00ff,
     CONTAINER_KEYBAG = 0x6b657973,
     VOLUME_KEYBAG = 0x72656373
-} objecttype;
+} objecttypeenum;
+
+typedef enum
+{
+    VIRTUAL = 0x0000,
+    EPHEMERAL = 0x8000,
+    PHYSICAL = 0x4000,
+    NOHEADER = 0x2000,
+    ENCRYPTED  = 0x1000,
+    NONPRESISTENT = 0x0800
+} objecttypeflagsenum;
+
+typedef enum
+{
+    SPACEMAN_FREE_QUEUE = 0x0009,
+    EXTENT_LIST_TREE = 0x000a,
+    FSTREE = 0x000e,
+    BLOCKREFTREE = 0x000f,
+    SNAPMETATREE = 0x0010,
+    OMAP_SNAPSHOT = 0x0013,
+    FUSION_MIDDLE_TREE = 0x0015,
+    GBITMAP_TREE = 0x001a,
+} objectsubtypeenum;
+*/
 
 struct obj_phys
 {
