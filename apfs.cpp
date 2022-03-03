@@ -69,7 +69,8 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     qDebug() << "NX XP DESC BASE:" << nxxpdescbase;
     qDebug() << "volumeoidlist count:" << volumeoidlist.count() << "volumeoidlist:" << volumeoidlist;
     // up to this point seems to work, need to check the next part...
-
+    qDebug() << "is nx superblock at 0 valid:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
+        //qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
     // NEED TO CHECK NXOMAPOID BLOCK AND SEE IF IT IS AN OMAP OBJECT TYPE.. IF NOT, CHECK THE NX_XP_DESC_BASE, THEN SEE IF THAT IS
     // AN NXSB, IF IT'S AN NXSB, THEN GET THAT NXOMAPOID, AND MODIFY ACCORDINGLY
     qDebug() << "nxomapoid:" << nxomapoid;
@@ -269,10 +270,12 @@ uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blo
     qDebug() << "roottreeoid to match:" << roottreeoid;
     QList<uint64_t> keylist;
     QList<uint64_t> vallist;
-    QList<uint32_t> sizlist;
+    //QList<uint32_t> sizlist;
+    QList<uint64_t> xidlist;
     keylist.clear();
     vallist.clear();
-    sizlist.clear();
+    //sizlist.clear();
+    xidlist.clear();
     uint32_t btreekeycount = 0;
     //uint16_t btreeflags = 0;
     uint64_t omapbtreeoid = 0;
@@ -295,6 +298,8 @@ uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blo
         qDebug() << "not in a btree, need to go to the object map btree.";
     }
     qDebug() << "omap btree oid:" << omapbtreeoid;
+    uint16_t btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 32, 2));
+    qDebug() << "btree flags:" << QString::number(btreeflags, 16);
     btreekeycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 36, 4));
     uint16_t btreetocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 40, 2));
     uint16_t btreetoclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 42, 2));
@@ -309,23 +314,35 @@ uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blo
     uint64_t keyoffset = 0;
     //QString keylayout = "";
     qDebug() << "btree count:" << btreekeycount;
+    uint64_t keyoffstart = curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen;
+    uint64_t valoffstart = blocksize - btreekeycount * 16;
+    if(btreeflags & 0x0002)
+    {
+        qDebug() << "btree is leaf node";
+        valoffstart = valoffstart - 40;
+    }
+    qDebug() << "keyoffstart:" << keyoffstart << "valoffstart:" << valoffstart;
+    qDebug() << "valueoffstart:" << keyoffstart + bfreeoff + bfreelen;
     for(uint i=0; i < btreekeycount; i++)
     {
-        keylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen + i*16, 8)));
-        vallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 8, 8)));
-        sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 4, 4)));
+        keylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(keyoffstart + i*16, 8)));
+        xidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(keyoffstart + i*16 + 8, 8)));
+        vallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(valoffstart + i*16 + 8, 8)));
+        //keylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen + i*16, 8)));
+        //vallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 8, 8)));
+        //sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 4, 4)));
     }
+    qDebug() << "keylist:" << keylist << "xidlist:" << xidlist << "vallist:" << vallist;
     qDebug() << "roottreeoid:" << roottreeoid << "keylist count:" << keylist.count();
-    qDebug() << "keylist:" << keylist;
-    for(int i=0 ; i < keylist.count(); i++)
-    {
-        if(roottreeoid == keylist.at(i))
-        {
-            keyoffset = vallist.at(i) * blocksize + curstartsector*512;
+    //for(int i=0 ; i < keylist.count(); i++)
+    //{
+    //    if(roottreeoid == keylist.at(i))
+    //    {
+    //        keyoffset = vallist.at(i) * blocksize + curstartsector*512;
             //keylayout = QString::number(vallist.at(i) * blocksize + curstartsector*512) + "," + QString::number(sizlist.at(i)) + ";";
-            break;
-        }
-    }
+    //        break;
+    //    }
+    //}
     return keyoffset;
     //return keylayout;
 }

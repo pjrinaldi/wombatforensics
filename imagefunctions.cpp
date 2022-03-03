@@ -1094,7 +1094,7 @@ ForImg::~ForImg()
 QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 {
     //qDebug() << "imgtype in ReadContent:" << imgtype;
-    char* data = new char[size];
+    //char* data = new char[size];
     QByteArray tmparray;
     tmparray.clear();
     int retopen = 0;
@@ -1123,6 +1123,8 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         //else
         //    printf("libewf glob was successful: %d\n", retopen);
 
+        char* data[size] = {NULL};
+        //char* data = new char[size];
         retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
         retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
         if(retopen == -1)
@@ -1134,9 +1136,11 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         libewf_handle_close(ewfhandle, &ewferror);
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
+        //delete[] data;
     }
     else if(imgtype == 1) // AFF
     {
+        char* data = new char[size];
         AFFILE* afimage = NULL;
         afimage = af_open(imgpath.toStdString().c_str(), O_RDONLY|O_EXCL, 0);
         af_seek(afimage, pos, SEEK_SET);
@@ -1144,6 +1148,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         res = af_read(afimage, (unsigned char*)data, size);
         tmparray = QByteArray::fromRawData((const char*)data, size);
         af_close(afimage);
+        delete[] data;
     }
     else if(imgtype == 2) // RAW
     {
@@ -1365,6 +1370,7 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     {
         //tmparray.append("zero");
     }
+    //delete[] data;
 
     return tmparray;
 }
