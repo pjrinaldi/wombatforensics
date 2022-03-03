@@ -36,6 +36,7 @@ bool CheckChecksum(ForImg* curimg, uint64_t blockbyteoffset, uint32_t size, uint
 
 void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
+    //qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
     quint64 nxomapoid = 0;
     uint64_t objectmapoid = 0;
     uint64_t roottreeoid = 0;
@@ -67,13 +68,14 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     }
     qDebug() << "NX XP DESC BASE:" << nxxpdescbase;
     qDebug() << "volumeoidlist count:" << volumeoidlist.count() << "volumeoidlist:" << volumeoidlist;
+    // up to this point seems to work, need to check the next part...
 
     // NEED TO CHECK NXOMAPOID BLOCK AND SEE IF IT IS AN OMAP OBJECT TYPE.. IF NOT, CHECK THE NX_XP_DESC_BASE, THEN SEE IF THAT IS
     // AN NXSB, IF IT'S AN NXSB, THEN GET THAT NXOMAPOID, AND MODIFY ACCORDINGLY
     qDebug() << "nxomapoid:" << nxomapoid;
     uint16_t nxomapobjecttype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + nxomapoid * blocksize + 24, 2));
     qDebug() << "nx omap objecttype:" << nxomapobjecttype;
-    if(nxomapobjecttype != 0x0b)
+    if(nxomapobjecttype != 0x0b) // not an objectmap
     {
         uint16_t tmpobjtype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 24, 2));
         uint32_t tmpnxsig = qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 32, 4));
