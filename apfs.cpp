@@ -39,8 +39,11 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     //qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
     quint64 nxomapoid = 0;
     uint64_t objectmapoid = 0;
+    uint64_t nxoid = 0;
+    uint64_t nxxid = 0;
     uint64_t roottreeoid = 0;
     uint64_t nxxpdescbase = 0;
+    uint32_t nxxpdescblocks = 0;
     uint32_t blocksize = 0;
     uint8_t encryptionstatus = 0;
     QStringList volumeoidlist;
@@ -55,6 +58,10 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         while(!propfile.atEnd())
         {
             QString line = propfile.readLine();
+            if(line.startsWith("Object ID|"))
+                nxoid = line.split("|").at(1).toULongLong();
+            if(line.startsWith("Transaction ID|"))
+                nxxid = line.split("|").at(1).toULongLong();
             if(line.startsWith("Block Size|"))
                 blocksize = line.split("|").at(1).toUInt();
             if(line.startsWith("Container Object Map Object ID|"))
@@ -63,19 +70,34 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
                 volumeoidlist = line.split("|").at(1).split(",", Qt::SkipEmptyParts);
             if(line.startsWith("CheckPoint Descriptor Base|"))
                 nxxpdescbase = line.split("|").at(1).toULongLong();
+            if(line.startsWith("CheckPoint Description Blocks|"))
+                nxxpdescblocks = line.split("|").at(1).toULong();
         }
         propfile.close();
     }
+    qDebug() << "nxoid:" << nxoid << "nxxid:" << nxxid;
     qDebug() << "NX XP DESC BASE:" << nxxpdescbase;
+    qDebug() << "nx xp desc blocks:" << QString::number(nxxpdescblocks & 0x0fff);
+    qDebug() << "nx xp desc flag:" << QString::number(nxxpdescblocks & 0xf000);
+    //qDebug() << "nx xp desc flag:" << nxxpdescflag;
     qDebug() << "volumeoidlist count:" << volumeoidlist.count() << "volumeoidlist:" << volumeoidlist;
     // up to this point seems to work, need to check the next part...
-    qDebug() << "is nx superblock at 0 valid:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
+    //qDebug() << "is nx superblock at 0 valid:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
         //qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
     // NEED TO CHECK NXOMAPOID BLOCK AND SEE IF IT IS AN OMAP OBJECT TYPE.. IF NOT, CHECK THE NX_XP_DESC_BASE, THEN SEE IF THAT IS
     // AN NXSB, IF IT'S AN NXSB, THEN GET THAT NXOMAPOID, AND MODIFY ACCORDINGLY
     qDebug() << "nxomapoid:" << nxomapoid;
     uint16_t nxomapobjecttype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + nxomapoid * blocksize + 24, 2));
     qDebug() << "nx omap objecttype:" << nxomapobjecttype;
+    // NEED TO NAVIGATE THE CHECKPOINTS AND ENSURE THE XID AT BLOCK 0 IS THE LATEST ONE...
+    for(int i=0; i < nxxpdescblocks & 0x0fff; i++)
+    {
+        uint64_t checkpointoffset = curstartsector*512 + nxxpdescbase * blocksize + i * blocksize;
+        qDebug() << "i:" << i << "checkpoint block offset:" << checkpointoffset;
+        qDebug() << "checkpoint oid:" << qFromLittleEndian<uint64_t>(curimg->ReadContent(checkpointoffset + 16, 8)) << "checkpoint xid:" << qFromLittleEndian<uint64_t>(curimg->ReadContent(checkpointoffset + 24, 8));
+        //qDebug() << "i:" << i;
+    }
+    /*
     if(nxomapobjecttype != 0x0b) // not an objectmap
     {
         uint16_t tmpobjtype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 24, 2));
@@ -89,10 +111,13 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         else
             qDebug() << "something went wrong...";
     }
+    */
+    /*
     for(int i=0; i < volumeoidlist.count(); i++)
         volofflist.append(ReturnBTreeLayout(curimg, curstartsector, blocksize, nxomapoid, volumeoidlist.at(i).toULongLong()));
     qDebug() << "volofflist:" << volofflist;
-
+    */
+    /*
     QString parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt);
     for(int i=0; i < volofflist.count(); i++)
     {
@@ -232,6 +257,7 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
                 QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
              */ 
+    /*
             out.flush();
             propfile.close();
         }
@@ -257,16 +283,18 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         if(encryptionstatus == 0) // not encrypted
         {
             qInfo() << "Parse Root Directory...";
-            uint64_t rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
+            //uint64_t rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
             //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
-            qDebug() << "root btree layout:" << rootbtreelayout;
-            ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, QString::number(rootbtreelayout));
+            //qDebug() << "root btree layout:" << rootbtreelayout;
+            //ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, QString::number(rootbtreelayout));
         }
     }
+    */
 }
 
 uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
 {
+    /*
     qDebug() << "roottreeoid to match:" << roottreeoid;
     QList<uint64_t> keylist;
     QList<uint64_t> vallist;
@@ -345,6 +373,8 @@ uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blo
     //}
     return keyoffset;
     //return keylayout;
+    */
+        return 0;
 }
 
 void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, QString dirlayout)
