@@ -1130,11 +1130,14 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                 break; // break out of for loop
             switch(curtype)
             {
+                // MAY NOT NEED THIS CODE SINCE I DON'T CARE ABOUT THE 
+                /*
                 case 0x4000000c: // PHYSICAL CHECKPOINT MAP
                     // NEED TO IMPLEMENT THIS PART OF THE CODE NEXT...
                     qDebug() << "use checkpoint map to get the latest superblock with whcih to parse";
                     qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
                     break;
+                */
                 case 0x80000001: // EPHEMERAL SUPERBLOCK
                     //qDebug() << "it's a superblock so see if it's newer and use it.";
                     if(curxid > nxxid)
@@ -1146,12 +1149,25 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             }
         }
         qDebug() << "new superblock offset:" << nxoffset;
+        // NOW TO DO THE OBJECT MAP PARSING FOR WHAT I NEED
+        uint64_t nxomapoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 160, 8));
+        uint64_t nxomapoffset = curstartsector*512 + nxomapoid * blocksize;
+        qDebug() << "nxomapoid:" << nxomapoid << "nxomapoffset:" << nxomapoffset;
+        /*
+        uint64_t omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxomapoffset + 48, 8));
+        uint32_t omapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxomapoffset + 24, 4));
+        if(omapobjtype != 0x4000000b) // PHYSICAL OBJECT MAP
+        {
+            qDebug() << "error, not a valid object map..";
+        }
+        */
         // ONCE I GET THE ABOVE RIGHT, I WILL NEED TO SET THE NEW SUPERBLOCK OFFSET, SO THE BELOW PULLS THE INFORMATION
         // FROM THE CORRECT SUPERBLOCK
         //qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
         out << "File System Type Int|7|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|APFS|File System Type String." << Qt::endl;
         //out << "Fletcher Checksum|" << QString::fromStdString(curimg->ReadContent(nxoffset, 8.toHex()).toStdString()) << "|Fletcher checksum value." << Qt::endl;
+        out << "SuperBlock Offset|" << QString::number(nxoffset) << "|Byte offset to the current superblock." << Qt::endl;
         out << "Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 8, 8))) << "|APFS object id." << Qt::endl;
         out << "Transaction ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 16, 8))) << "|APFS transaction id." << Qt::endl;
         // NEED TO PROCESS PROPERLY AND DO AN IF & THING FOR IT...
@@ -1640,7 +1656,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
         //quint64 curinode = 0;
         //qDebug() << "ptreecnt:" << ptreecnt << "partitionlist.count():" << partitionlist.count();
         qInfo() << "Parsing APFS Volumes...";
-        //ParseApfsVolumes(curimg, curstartsector, ptreecnt);
+        ParseApfsVolumes(curimg, curstartsector, ptreecnt);
         //qDebug() << "ptreecnt:" << ptreecnt;
     }
     else if(fstype == 8) // HFS+/X

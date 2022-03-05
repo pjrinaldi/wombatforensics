@@ -37,7 +37,7 @@ bool CheckChecksum(ForImg* curimg, uint64_t blockbyteoffset, uint32_t size, uint
 void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
     //qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
-    quint64 nxomapoid = 0;
+    uint64_t nxomapoid = 0;
     uint64_t objectmapoid = 0;
     uint64_t nxoid = 0;
     uint64_t nxxid = 0;
@@ -68,35 +68,42 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
                 nxomapoid = line.split("|").at(1).toUInt();
             if(line.startsWith("Volume Object ID List|"))
                 volumeoidlist = line.split("|").at(1).split(",", Qt::SkipEmptyParts);
+            /*
             if(line.startsWith("CheckPoint Descriptor Base|"))
                 nxxpdescbase = line.split("|").at(1).toULongLong();
             if(line.startsWith("CheckPoint Description Blocks|"))
                 nxxpdescblocks = line.split("|").at(1).toULong();
+            */
         }
         propfile.close();
-    }
+    }   
+    // NOW TO DO THE OBJECT MAP PARSING FOR WHAT I NEED
     qDebug() << "nxoid:" << nxoid << "nxxid:" << nxxid;
-    qDebug() << "NX XP DESC BASE:" << nxxpdescbase;
-    qDebug() << "nx xp desc blocks:" << QString::number(nxxpdescblocks & 0x0fff);
-    qDebug() << "nx xp desc flag:" << QString::number(nxxpdescblocks & 0xf000);
-    //qDebug() << "nx xp desc flag:" << nxxpdescflag;
     qDebug() << "volumeoidlist count:" << volumeoidlist.count() << "volumeoidlist:" << volumeoidlist;
+    uint64_t nxomapoffset = curstartsector*512 + nxomapoid * blocksize;
+    qDebug() << "nxomapoid:" << nxomapoid << "nxomapoffset:" << nxomapoffset;
+    uint64_t omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxomapoffset + 48, 8));
+    qDebug() << "omapbtreeoid:" << omapbtreeoid;
+    uint64_t omapbtreeoff = omapbtreeoid * blocksize + curstartsector*512;
+    qDebug() << "omapbtreeoff:" << omapbtreeoff;
+    // IGNORE THIS IF/ELSE FOR NOW, SINCE IT SEEMS TO INCLUDE STUFF
+    //uint32_t omapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxomapoffset + 24, 4));
+    //qDebug() << "omapobjtype:" << QString::number(omapobjtype, 16);
+    /*
+    if(omapobjtype != 0x4000000b) // PHYSICAL OBJECT MAP
+    {
+        qDebug() << "error, not a valid object map..";
+    }
+    else
+        qDebug() << "object map type is good, continue...";
+    */
+    // START TO PARSE THE BTREE NODE
+    uint16_t btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(omapbtreeoff + 32, 2));
+    qDebug() << "btreeflags:" << QString::number(btreeflags, 16);
+
+
     // up to this point seems to work, need to check the next part...
     //qDebug() << "is nx superblock at 0 valid:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
-        //qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
-    // NEED TO CHECK NXOMAPOID BLOCK AND SEE IF IT IS AN OMAP OBJECT TYPE.. IF NOT, CHECK THE NX_XP_DESC_BASE, THEN SEE IF THAT IS
-    // AN NXSB, IF IT'S AN NXSB, THEN GET THAT NXOMAPOID, AND MODIFY ACCORDINGLY
-    qDebug() << "nxomapoid:" << nxomapoid;
-    uint16_t nxomapobjecttype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + nxomapoid * blocksize + 24, 2));
-    qDebug() << "nx omap objecttype:" << nxomapobjecttype;
-    // NEED TO NAVIGATE THE CHECKPOINTS AND ENSURE THE XID AT BLOCK 0 IS THE LATEST ONE...
-    for(int i=0; i < nxxpdescblocks & 0x0fff; i++)
-    {
-        uint64_t checkpointoffset = curstartsector*512 + nxxpdescbase * blocksize + i * blocksize;
-        qDebug() << "i:" << i << "checkpoint block offset:" << checkpointoffset;
-        qDebug() << "checkpoint oid:" << qFromLittleEndian<uint64_t>(curimg->ReadContent(checkpointoffset + 16, 8)) << "checkpoint xid:" << qFromLittleEndian<uint64_t>(curimg->ReadContent(checkpointoffset + 24, 8));
-        //qDebug() << "i:" << i;
-    }
     /*
     if(nxomapobjecttype != 0x0b) // not an objectmap
     {
