@@ -1117,8 +1117,8 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         uint64_t nxxid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 16, 8));
         qDebug() << "nxoid:" << nxoid << "nxxid:" << nxxid;
         uint32_t blocksize = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 36, 4));
-        uint32_t nxcmapblk = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 104, 4));
-        int64_t nxcmapblkcnt = qFromLittleEndian<int64_t>(curimg->ReadContent(nxoffset + 112, 8));
+        uint32_t nxcmapblkcnt = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 104, 4));
+        int64_t nxcmapblk = qFromLittleEndian<int64_t>(curimg->ReadContent(nxoffset + 112, 8));
         qDebug() << "nxcmapblk:" << nxcmapblk << "nxcmapblkcnt:" << nxcmapblkcnt;
         uint64_t nxcmapoffset = nxcmapblk * blocksize + curstartsector*512;
         for(int i=0; i <= nxcmapblkcnt; i++)
