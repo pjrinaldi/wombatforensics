@@ -1111,41 +1111,78 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(apfsig == "NXSB") // APFS Container
     {
+        uint64_t nxoffset = curstartsector*512;
+        // THIS POSSIBLY NEEDS TO OCCUR WITHIN THE FOR LOOP OF THE CHECKPOINT DESCRIPTOR LOOP
+        uint64_t nxoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 8, 8));
+        uint64_t nxxid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 16, 8));
+        qDebug() << "nxoid:" << nxoid << "nxxid:" << nxxid;
+        uint32_t blocksize = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 36, 4));
+        uint32_t nxcmapblk = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 104, 4));
+        int64_t nxcmapblkcnt = qFromLittleEndian<int64_t>(curimg->ReadContent(nxoffset + 112, 8));
+        qDebug() << "nxcmapblk:" << nxcmapblk << "nxcmapblkcnt:" << nxcmapblkcnt;
+        uint64_t nxcmapoffset = nxcmapblk * blocksize + curstartsector*512;
+        for(int i=0; i <= nxcmapblkcnt; i++)
+        {
+            uint64_t curoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 8, 8));
+            uint64_t curxid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 16, 8));
+            uint32_t curtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 24, 4));
+            if(curoid == 0 && curxid == 0 && curtype == 0)
+                break; // break out of for loop
+            switch(curtype)
+            {
+                case 0x4000000c: // PHYSICAL CHECKPOINT MAP
+                    // NEED TO IMPLEMENT THIS PART OF THE CODE NEXT...
+                    qDebug() << "use checkpoint map to get the latest superblock with whcih to parse";
+                    qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
+                    break;
+                case 0x80000001: // EPHEMERAL SUPERBLOCK
+                    //qDebug() << "it's a superblock so see if it's newer and use it.";
+                    if(curxid > nxxid)
+                        nxoffset = nxcmapoffset + i*blocksize;
+                    //qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
+                    break;
+                default:
+                    break;
+            }
+        }
+        qDebug() << "new superblock offset:" << nxoffset;
+        // ONCE I GET THE ABOVE RIGHT, I WILL NEED TO SET THE NEW SUPERBLOCK OFFSET, SO THE BELOW PULLS THE INFORMATION
+        // FROM THE CORRECT SUPERBLOCK
         //qDebug() << "superblock checksum:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
         out << "File System Type Int|7|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|APFS|File System Type String." << Qt::endl;
-        //out << "Fletcher Checksum|" << QString::fromStdString(curimg->ReadContent(curstartsector*512, 8.toHex()).toStdString()) << "|Fletcher checksum value." << Qt::endl;
-        out << "Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 8, 8))) << "|APFS object id." << Qt::endl;
-        out << "Transaction ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 16, 8))) << "|APFS transaction id." << Qt::endl;
+        //out << "Fletcher Checksum|" << QString::fromStdString(curimg->ReadContent(nxoffset, 8.toHex()).toStdString()) << "|Fletcher checksum value." << Qt::endl;
+        out << "Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 8, 8))) << "|APFS object id." << Qt::endl;
+        out << "Transaction ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 16, 8))) << "|APFS transaction id." << Qt::endl;
         // NEED TO PROCESS PROPERLY AND DO AN IF & THING FOR IT...
-        //out << "Object Type|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 24, 2))) << "|APFS object type: 1 - container super block, 2 - btree, 3 btree node, 5 - spaceman, 11 - object map (OMAP), 13 - file system (volume super block), 17 - reaper." << Qt::endl;
-        //out << "Object Flags|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 26, 2))) << "|APFS object flags: 0 - OBJ_VIRTUAL, 80 - OBJ_EPHEMERAL, 40 - OBJ_PHYSICAL, 20 - OBJ_NOHEADER, 10 - OBJ_ENCRYPTED, 08 - OBJ_NONPERSISTENT." << Qt::endl;
-        //out << "Object SubType|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 28, 4))) << "|APFS object subtype: 0 - none, 11 - object map (OMAP), 14 - file system tree." << Qt::endl;
-        out << "Block Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4))) << "|APFS block size in bytes, usually 4096." << Qt::endl;
-        //qDebug() << "block size:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4));
-        out << "Block Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 40, 8))) << "|Number of blocks for the AFPS container." << Qt::endl;
+        //out << "Object Type|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(nxoffset + 24, 2))) << "|APFS object type: 1 - container super block, 2 - btree, 3 btree node, 5 - spaceman, 11 - object map (OMAP), 13 - file system (volume super block), 17 - reaper." << Qt::endl;
+        //out << "Object Flags|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(nxoffset + 26, 2))) << "|APFS object flags: 0 - OBJ_VIRTUAL, 80 - OBJ_EPHEMERAL, 40 - OBJ_PHYSICAL, 20 - OBJ_NOHEADER, 10 - OBJ_ENCRYPTED, 08 - OBJ_NONPERSISTENT." << Qt::endl;
+        //out << "Object SubType|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 28, 4))) << "|APFS object subtype: 0 - none, 11 - object map (OMAP), 14 - file system tree." << Qt::endl;
+        out << "Block Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 36, 4))) << "|APFS block size in bytes, usually 4096." << Qt::endl;
+        //qDebug() << "block size:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 36, 4));
+        out << "Block Count|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 40, 8))) << "|Number of blocks for the AFPS container." << Qt::endl;
         // NEED TO DO AN IF & THING FOR THE 3 FEATURES SET AS WELL
-        //out << "Container Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 48, 8))) << "|Container features options uint64_t." << Qt::endl;
-        //out << "Container Read-Only Compatible Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 56, 8))) << "|Container read-only compatible features options uint64_t." << Qt::endl;
-        //out << "Container Incompatible Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 64, 8))) << "|Container incompatible features options uint64_t." << Qt::endl;
-        out << "Container UUID|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 72, 16).toHex().toStdString()) << "|Container's universal unique id." << Qt::endl;
+        //out << "Container Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 48, 8))) << "|Container features options uint64_t." << Qt::endl;
+        //out << "Container Read-Only Compatible Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 56, 8))) << "|Container read-only compatible features options uint64_t." << Qt::endl;
+        //out << "Container Incompatible Features|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 64, 8))) << "|Container incompatible features options uint64_t." << Qt::endl;
+        out << "Container UUID|" << QString::fromStdString(curimg->ReadContent(nxoffset + 72, 16).toHex().toStdString()) << "|Container's universal unique id." << Qt::endl;
         // NEED TO DISPLAY THE CONTAINER ID IN THE PROPER FORMAT BELOW
 	//qDebug() << "container uuid:" << (fsinfo.value("containeruuid").toString().left(8) + "-" + fsinfo.value("containeruuid").toString().mid(8, 4) + "-" + fsinfo.value("containeruuid").toString().mid(12, 4) + "-" + fsinfo.value("containeruuid").toString().mid(16, 4) + "-" + fsinfo.value("containeruuid").toString().right(12));
-        out << "Next Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 88, 8))) << "|Next object id." << Qt::endl;
-        out << "Next Transaction ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 96, 8))) << "|Next transaction id." << Qt::endl;
-        //out << "CheckPoint Descriptor Flag|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 107, 1).toStdString()) << "|Flag for the checkpoint descriptor." << Qt::endl;
-        out << "CheckPoint Description Blocks|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 104, 4))) << "|Number of blocks used by the checkpoint descriptor area." << Qt::endl;
-        out << "CheckPoint Descriptor Base|" << QString::number(qFromLittleEndian<int64_t>(curimg->ReadContent(curstartsector*512 + 112, 8))) << "|Base address of the checkpoint descriptor area or the physical object identifier of a tree that contains address information." << Qt::endl;
-        out << "Container Object Map Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 160, 8))) << "|Object id for the container's object map." << Qt::endl;
-        out << "Maximum Container Volumes|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4))) << "|Maximum number of volumes in the APFS container." << Qt::endl;
-        //qDebug() << "max containers:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4));
+        out << "Next Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 88, 8))) << "|Next object id." << Qt::endl;
+        out << "Next Transaction ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 96, 8))) << "|Next transaction id." << Qt::endl;
+        //out << "CheckPoint Descriptor Flag|" << QString::fromStdString(curimg->ReadContent(nxoffset + 107, 1).toStdString()) << "|Flag for the checkpoint descriptor." << Qt::endl;
+        out << "CheckPoint Description Blocks|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 104, 4))) << "|Number of blocks used by the checkpoint descriptor area." << Qt::endl;
+        out << "CheckPoint Descriptor Base|" << QString::number(qFromLittleEndian<int64_t>(curimg->ReadContent(nxoffset + 112, 8))) << "|Base address of the checkpoint descriptor area or the physical object identifier of a tree that contains address information." << Qt::endl;
+        out << "Container Object Map Object ID|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 160, 8))) << "|Object id for the container's object map." << Qt::endl;
+        out << "Maximum Container Volumes|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 180, 4))) << "|Maximum number of volumes in the APFS container." << Qt::endl;
+        //qDebug() << "max containers:" << qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 180, 4));
         out << "Volume Object ID List|";
-        for(int i=0; i < qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 180, 4)); i++)
+        for(int i=0; i < qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 180, 4)); i++)
         {
-            uint64_t apfsvoloid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8));
+            uint64_t apfsvoloid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 184 + i*8, 8));
             if(apfsvoloid > 0)
                 out << QString::number(apfsvoloid) << ",";
-            //qDebug() << QString("fs [" + QString::number(i) + "] objid:") << qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 184 + i*8, 8));
+            //qDebug() << QString("fs [" + QString::number(i) + "] objid:") << qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 184 + i*8, 8));
         }
         // NEED TO GET THE PROPERTIES NX_KEYLOCKER FOR KEYBAG LOCATION AND NX_FLAGS FOR WHETHER IT IS SOFTWARE KEY
         out << "|List of object id's for each volume within the container." << Qt::endl;
@@ -1603,7 +1640,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
         //quint64 curinode = 0;
         //qDebug() << "ptreecnt:" << ptreecnt << "partitionlist.count():" << partitionlist.count();
         qInfo() << "Parsing APFS Volumes...";
-        ParseApfsVolumes(curimg, curstartsector, ptreecnt);
+        //ParseApfsVolumes(curimg, curstartsector, ptreecnt);
         //qDebug() << "ptreecnt:" << ptreecnt;
     }
     else if(fstype == 8) // HFS+/X

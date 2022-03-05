@@ -2428,6 +2428,7 @@ void WombatForensics::CloseCurrentCase()
         delete treenodemodel;
         autosavetimer->stop();
     }
+    /*
     if(ui->hexview->data().size() > 0)
     {
         // maybe i want to run this but also load a small empty image maybe...
@@ -2442,8 +2443,8 @@ void WombatForensics::CloseCurrentCase()
         ui->hexview->setData(casedatafile);
 	//qInfo() << "end of error?";
     */
-    }
-    qInfo() << "Hexviewer Reset";
+    //}
+    //qInfo() << "Hexviewer Reset";
     setWindowTitle("WombatForensics");
     filesfound = 0;
     fileschecked = 0;
