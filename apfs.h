@@ -18,6 +18,7 @@ void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 
 bool CheckChecksum(ForImg* curimg, uint64_t blockbyteoffset, uint32_t size, uint64_t curchecksum);
 
+/*
 typedef int64_t paddr_t;
 
 struct prange
@@ -30,7 +31,7 @@ typedef struct prange prange_t;
 typedef unsigned char uuid_t[16];
 typedef uint64_t oid_t;
 typedef uint64_t xid_t;
-
+*/
 /*
 typedef enum
 {
@@ -81,6 +82,7 @@ typedef enum
 } objectsubtypeenum;
 */
 
+/*
 struct obj_phys
 {
     uint8_t checksum[8];
@@ -91,5 +93,6 @@ struct obj_phys
     uint32_t subtype;
 };
 typedef struct obj_phys obj_phys_t;
+*/
 
 #endif // apfs.h

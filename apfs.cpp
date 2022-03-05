@@ -87,16 +87,14 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     uint64_t omapbtreeoff = omapbtreeoid * blocksize + curstartsector*512;
     qDebug() << "omapbtreeoff:" << omapbtreeoff;
     // IGNORE THIS IF/ELSE FOR NOW, SINCE IT SEEMS TO INCLUDE STUFF
-    //uint32_t omapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxomapoffset + 24, 4));
-    //qDebug() << "omapobjtype:" << QString::number(omapobjtype, 16);
-    /*
+    uint32_t omapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxomapoffset + 24, 4));
+    qDebug() << "omapobjtype:" << QString::number(omapobjtype, 16);
     if(omapobjtype != 0x4000000b) // PHYSICAL OBJECT MAP
     {
         qDebug() << "error, not a valid object map..";
     }
     else
         qDebug() << "object map type is good, continue...";
-    */
     // START TO PARSE THE BTREE NODE
     uint16_t btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(omapbtreeoff + 32, 2));
     qDebug() << "btreeflags:" << QString::number(btreeflags, 16);

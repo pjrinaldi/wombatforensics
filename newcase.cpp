@@ -1126,6 +1126,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             uint64_t curoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 8, 8));
             uint64_t curxid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 16, 8));
             uint32_t curtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 24, 4));
+            //qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
             if(curoid == 0 && curxid == 0 && curtype == 0)
                 break; // break out of for loop
             switch(curtype)

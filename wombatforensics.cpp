@@ -1113,7 +1113,7 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
-    SetupHexPage();
+    //SetupHexPage();
 }
 
 void WombatForensics::InitializeCaseStructure()
@@ -1338,6 +1338,7 @@ void WombatForensics::OpenUpdate()
     // THE BELOW MAY ALSO BE REPLACED, BUT HAVE TO CHECK
     //InitializeHashList();
     //InitializeTaggedList();
+    SetupHexPage();
     pathtreeview->setModel(treenodemodel);
     connect(treenodemodel, SIGNAL(CheckedNodesChanged()), this, SLOT(UpdateCheckCount()));
     pathtreeview->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -1605,6 +1606,7 @@ void WombatForensics::UpdateStatus()
     pathtreeview->header()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(pathtreeview->header(), SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(HeaderContextMenu(const QPoint &)));
 
+    SetupHexPage();
     ReadBookmarks();
     ReadHashLists();
     emit treenodemodel->layoutChanged(); // this resolves the issues with the add evidence not updating when you add it later
