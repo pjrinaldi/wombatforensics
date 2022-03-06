@@ -78,86 +78,47 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         propfile.close();
     }   
     // NOW TO DO THE OBJECT MAP PARSING FOR WHAT I NEED
-    qDebug() << "nxoid:" << nxoid << "nxxid:" << nxxid;
-    qDebug() << "volumeoidlist count:" << volumeoidlist.count() << "volumeoidlist:" << volumeoidlist;
     uint64_t nxomapoffset = curstartsector*512 + nxomapoid * blocksize;
-    qDebug() << "nxomapoid:" << nxomapoid << "nxomapoffset:" << nxomapoffset;
     uint64_t omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxomapoffset + 48, 8));
-    qDebug() << "omapbtreeoid:" << omapbtreeoid;
     uint64_t omapbtreeoff = omapbtreeoid * blocksize + curstartsector*512;
-    qDebug() << "omapbtreeoff:" << omapbtreeoff;
     // IGNORE THIS IF/ELSE FOR NOW, SINCE IT SEEMS TO INCLUDE STUFF
     uint32_t omapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxomapoffset + 24, 4));
-    qDebug() << "omapobjtype:" << QString::number(omapobjtype, 16);
+    /*
     if(omapobjtype != 0x4000000b) // PHYSICAL OBJECT MAP
     {
         qDebug() << "error, not a valid object map..";
     }
     else
         qDebug() << "object map type is good, continue...";
+    */
     QList<uint64_t> oidlist;
-    QList<uint64_t> xidlist;
+    //QList<uint64_t> xidlist;
     QList<uint64_t> blklist;
-    QList<uint32_t> sizlist;
     oidlist.clear();
-    xidlist.clear();
+    //xidlist.clear();
     blklist.clear();
-    sizlist.clear();
     // START TO PARSE THE BTREE NODE
     uint16_t btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(omapbtreeoff + 32, 2));
     uint32_t keycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(omapbtreeoff + 36, 4));
     uint16_t tocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(omapbtreeoff + 40, 2));
     uint16_t toclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(omapbtreeoff + 42, 2));
     uint32_t valoff = blocksize - 40 - (keycount+1) * 16;
-    qDebug() << "keycount:" << keycount << "tocoff:" << tocoff << "toclen:" << toclen << "valoff:" << valoff;
+    //qDebug() << "keycount:" << keycount << "tocoff:" << tocoff << "toclen:" << toclen << "valoff:" << valoff;
     for(int i=0; i <= keycount; i++)
     {
         oidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + 56 + tocoff + toclen + i*16, 8)));
-        xidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + 56 + tocoff + toclen + i*16 + 8, 8)));
+        //xidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + 56 + tocoff + toclen + i*16 + 8, 8)));
         blklist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + valoff + i*16 + 8, 8)));
-        sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(omapbtreeoff + valoff + i*16 + 4, 4)));
     }
-    /*
-    uint32_t keycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 36, 4));
-    uint16_t tocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 40, 2));
-    uint16_t toclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 42, 2));
-    uint16_t freeoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 44, 2));
-    uint16_t freelen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 46, 2));
-    uint16_t keyoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 48, 2));
-    uint16_t keylen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 50, 2));
-    */
-    qDebug() << "oidlist:" << oidlist << "xidlist:" << xidlist;
-    qDebug() << "btreeflags:" << QString::number(btreeflags, 16);
-    if(btreeflags & 0x0001 && btreeflags & 0x0002 && btreeflags & 0x0004) // looking good
-        qDebug() << "btree flags are good, let's continue...";
-    if(btreeflags & 0x0004) // fixed with info at end, so reset values to those...
-    {
-    }
-
-
-    // up to this point seems to work, need to check the next part...
-    //qDebug() << "is nx superblock at 0 valid:" << CheckChecksum(curimg, curstartsector*512 + 8, qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 36, 4)) - 8, qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512, 8)));
-    /*
-    if(nxomapobjecttype != 0x0b) // not an objectmap
-    {
-        uint16_t tmpobjtype = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 24, 2));
-        uint32_t tmpnxsig = qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 32, 4));
-        if(tmpobjtype == 0x01 && tmpnxsig == 0x4e585342)
-        {
-            nxomapoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + nxxpdescbase * blocksize + 160, 8));
-            qDebug() << "new nxomapoid:" << nxomapoid;
-            //qDebug() << "get the nx omap oid to replace the old one here...";
-        }
-        else
-            qDebug() << "something went wrong...";
-    }
-    */
-    /*
     for(int i=0; i < volumeoidlist.count(); i++)
-        volofflist.append(ReturnBTreeLayout(curimg, curstartsector, blocksize, nxomapoid, volumeoidlist.at(i).toULongLong()));
-    qDebug() << "volofflist:" << volofflist;
-    */
-    /*
+    {
+        for(int j=0; j < oidlist.count(); j++)
+        {
+            if(volumeoidlist.at(i).toULongLong() == oidlist.at(j))
+                volofflist.append(blklist.at(j) * blocksize + curstartsector*512);
+        }
+    }
+    //qDebug() << "volofflist:" << volofflist;
     QString parentstr = "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt);
     for(int i=0; i < volofflist.count(); i++)
     {
@@ -297,7 +258,6 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
                 QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                 this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
              */ 
-    /*
             out.flush();
             propfile.close();
         }
@@ -329,7 +289,6 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
             //ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, QString::number(rootbtreelayout));
         }
     }
-    */
 }
 
 uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
