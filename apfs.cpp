@@ -282,6 +282,7 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         mutex.unlock();
         if(encryptionstatus == 0) // not encrypted
         {
+            qDebug() << "objectmapoid:" << objectmapoid << "roottreeoid:" << roottreeoid;
             qInfo() << "Parse Root Directory...";
             //uint64_t rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
             //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
