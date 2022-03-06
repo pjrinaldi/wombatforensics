@@ -10,7 +10,8 @@
 #include "commonfs.h"
 
 void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
-uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid);
+//uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid);
+uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid);
 //QString ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid);
 void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, QString dirlayout);
 //qulonglong ParseHfsPlusDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);

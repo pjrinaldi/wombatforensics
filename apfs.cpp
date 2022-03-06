@@ -284,6 +284,8 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
         {
             qDebug() << "objectmapoid:" << objectmapoid << "roottreeoid:" << roottreeoid;
             qInfo() << "Parse Root Directory...";
+            uint64_t rootbtreeoffset = ReturnRootBTreeOffset(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
+            qDebug() << "rootbtreeoffset:" << rootbtreeoffset;
             //uint64_t rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
             //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
             //qDebug() << "root btree layout:" << rootbtreelayout;
@@ -292,8 +294,77 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     }
 }
 
-uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
+uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
 {
+    qDebug() << "roottreeoid to match:" << roottreeoid;
+    QList<uint64_t> oidlist;
+    //QList<uint64_t> xidlist;
+    QList<uint32_t> sizlist;
+    QList<uint64_t> blklist;
+    uint64_t romapoff = objectmapoid * blocksize + curstartsector*512;
+    uint64_t romapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(romapoff + 48, 8));
+    uint64_t romapbtreeoff = romapbtreeoid * blocksize + curstartsector*512;
+    uint32_t romapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(romapoff + 24, 4));
+    qDebug() << "romapobjtype:" << QString::number(romapobjtype, 16);
+    oidlist.clear();
+    sizlist.clear();
+    blklist.clear();
+    // START TO PARSE THE ROOT BTREE NODE
+    uint16_t btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 32, 2));
+    uint32_t keycnt = qFromLittleEndian<uint32_t>(curimg->ReadContent(romapbtreeoff + 36, 4));
+    uint16_t tocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 40, 2));
+    uint16_t toclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 42, 2));
+    uint32_t valoff = blocksize - 40 - (keycnt+1) * 16;
+    qDebug() << "keycount:" << keycnt << "tocoff:" << tocoff << "toclen:" << toclen << "valoff:" << valoff;
+    for(uint32_t i=0; i <= keycnt; i++)
+    {
+        oidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(romapbtreeoff + 56 + tocoff + toclen + i*16, 8)));
+        blklist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(romapbtreeoff + valoff + i*16 + 8, 8)));
+        sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(romapbtreeoff + valoff + i*16 + 4, 4)));
+    }
+    for(int i=0; i < oidlist.count(); i++)
+    {
+        if(roottreeoid == oidlist.at(i))
+        {
+            qDebug() << "size:" << sizlist.at(i);
+            return (blklist.at(i) * blocksize + curstartsector*512);
+        }
+    }
+
+
+
+    return 0;
+    /*
+    // IGNORE THIS IF/ELSE FOR NOW, SINCE IT SEEMS TO INCLUDE STUFF
+    uint32_t omapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxomapoffset + 24, 4));
+    //if(omapobjtype != 0x4000000b) // PHYSICAL OBJECT MAP
+    //{
+    //    qDebug() << "error, not a valid object map..";
+    //}
+    //else
+    //    qDebug() << "object map type is good, continue...";
+    // START TO PARSE THE BTREE NODE
+    //qDebug() << "keycount:" << keycount << "tocoff:" << tocoff << "toclen:" << toclen << "valoff:" << valoff;
+    for(int i=0; i <= keycount; i++)
+    {
+        oidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + 56 + tocoff + toclen + i*16, 8)));
+        //xidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + 56 + tocoff + toclen + i*16 + 8, 8)));
+        blklist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + valoff + i*16 + 8, 8)));
+    }
+    for(int i=0; i < volumeoidlist.count(); i++)
+    {
+        for(int j=0; j < oidlist.count(); j++)
+        {
+            if(volumeoidlist.at(i).toULongLong() == oidlist.at(j))
+                volofflist.append(blklist.at(j) * blocksize + curstartsector*512);
+        }
+    }
+
+     */ 
+}
+
+//uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, uint64_t objectmapoid, uint64_t roottreeoid)
+//{
     /*
     qDebug() << "roottreeoid to match:" << roottreeoid;
     QList<uint64_t> keylist;
@@ -374,8 +445,8 @@ uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blo
     //return keyoffset;
     //return keylayout;
     */
-    return 0;
-}
+    //return 0;
+//}
 
 void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, QString dirlayout)
 {
