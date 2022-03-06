@@ -95,9 +95,44 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     }
     else
         qDebug() << "object map type is good, continue...";
+    QList<uint64_t> oidlist;
+    QList<uint64_t> xidlist;
+    QList<uint64_t> blklist;
+    QList<uint32_t> sizlist;
+    oidlist.clear();
+    xidlist.clear();
+    blklist.clear();
+    sizlist.clear();
     // START TO PARSE THE BTREE NODE
     uint16_t btreeflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(omapbtreeoff + 32, 2));
+    uint32_t keycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(omapbtreeoff + 36, 4));
+    uint16_t tocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(omapbtreeoff + 40, 2));
+    uint16_t toclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(omapbtreeoff + 42, 2));
+    uint32_t valoff = blocksize - 40 - (keycount+1) * 16;
+    qDebug() << "keycount:" << keycount << "tocoff:" << tocoff << "toclen:" << toclen << "valoff:" << valoff;
+    for(int i=0; i <= keycount; i++)
+    {
+        oidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + 56 + tocoff + toclen + i*16, 8)));
+        xidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + 56 + tocoff + toclen + i*16 + 8, 8)));
+        blklist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(omapbtreeoff + valoff + i*16 + 8, 8)));
+        sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(omapbtreeoff + valoff + i*16 + 4, 4)));
+    }
+    /*
+    uint32_t keycount = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 36, 4));
+    uint16_t tocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 40, 2));
+    uint16_t toclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 42, 2));
+    uint16_t freeoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 44, 2));
+    uint16_t freelen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 46, 2));
+    uint16_t keyoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 48, 2));
+    uint16_t keylen = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 50, 2));
+    */
+    qDebug() << "oidlist:" << oidlist << "xidlist:" << xidlist;
     qDebug() << "btreeflags:" << QString::number(btreeflags, 16);
+    if(btreeflags & 0x0001 && btreeflags & 0x0002 && btreeflags & 0x0004) // looking good
+        qDebug() << "btree flags are good, let's continue...";
+    if(btreeflags & 0x0004) // fixed with info at end, so reset values to those...
+    {
+    }
 
 
     // up to this point seems to work, need to check the next part...
@@ -358,12 +393,12 @@ uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blo
     qDebug() << "valueoffstart:" << keyoffstart + bfreeoff + bfreelen;
     for(uint i=0; i < btreekeycount; i++)
     {
-        keylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(keyoffstart + i*16, 8)));
-        xidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(keyoffstart + i*16 + 8, 8)));
-        vallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(valoffstart + i*16 + 8, 8)));
-        //keylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen + i*16, 8)));
-        //vallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 8, 8)));
-        //sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 4, 4)));
+        //keylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(keyoffstart + i*16, 8)));
+        //xidlist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(keyoffstart + i*16 + 8, 8)));
+        //vallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(valoffstart + i*16 + 8, 8)));
+        keylist.append(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + btreekeyoff + btreekeylen + i*16, 8)));
+        vallist.prepend(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 8, 8)));
+        sizlist.prepend(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + blocksize * omapbtreeoid + 56 + btreetocoff + btreetoclen + i*16 + bfreeoff + bfreelen + 4, 4)));
     }
     qDebug() << "keylist:" << keylist << "xidlist:" << xidlist << "vallist:" << vallist;
     qDebug() << "roottreeoid:" << roottreeoid << "keylist count:" << keylist.count();
@@ -376,10 +411,10 @@ uint64_t ReturnBTreeLayout(ForImg* curimg, uint32_t curstartsector, uint32_t blo
     //        break;
     //    }
     //}
-    return keyoffset;
+    //return keyoffset;
     //return keylayout;
     */
-        return 0;
+    return 0;
 }
 
 void ParseApfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, int volid, uint32_t blocksize, QString dirlayout)
