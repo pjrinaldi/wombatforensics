@@ -112,8 +112,10 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
     }
     for(int i=0; i < volumeoidlist.count(); i++)
     {
+        qDebug() << "volume oid:" << volumeoidlist.at(i);
         for(int j=0; j < oidlist.count(); j++)
         {
+            qDebug() << "oidlist:" << oidlist.at(j) << "blklist:" << blklist.at(j);
             if(volumeoidlist.at(i).toULongLong() == oidlist.at(j))
                 volofflist.append(blklist.at(j) * blocksize + curstartsector*512);
         }
@@ -305,7 +307,9 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
     uint64_t romapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(romapoff + 48, 8));
     uint64_t romapbtreeoff = romapbtreeoid * blocksize + curstartsector*512;
     uint32_t romapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(romapoff + 24, 4));
-    qDebug() << "romapobjtype:" << QString::number(romapobjtype, 16);
+    //qDebug() << "romapobjtype:" << QString::number(romapobjtype, 16);
+    //qDebug() << "romapbtreeobjtype:" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(romapbtreeoff + 24, 4)), 16);
+    //qDebug() << "romapbtreesubtype:" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(romapbtreeoff + 28, 4)), 16);
     oidlist.clear();
     sizlist.clear();
     blklist.clear();
@@ -324,9 +328,14 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
     }
     for(int i=0; i < oidlist.count(); i++)
     {
+        qDebug() << "roottreeoid: " << roottreeoid << "oidlist:" << oidlist.at(i);
         if(roottreeoid == oidlist.at(i))
         {
             qDebug() << "size:" << sizlist.at(i);
+            qDebug() << "blk:" << blklist.at(i);
+            qDebug() << "rootbtreeobjtype:" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(blklist.at(i) * blocksize + curstartsector*512 + 24, 4)), 16);
+            qDebug() << "rootbtreesubtype:" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(blklist.at(i) * blocksize + curstartsector*512 + 28, 4)), 16);
+
             return (blklist.at(i) * blocksize + curstartsector*512);
         }
     }
