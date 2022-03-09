@@ -1126,13 +1126,15 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             uint64_t curoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 8, 8));
             uint64_t curxid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 16, 8));
             uint32_t curtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 24, 4));
-            //qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
+            qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
             if(curoid == 0 && curxid == 0 && curtype == 0)
                 break; // break out of for loop
             switch(curtype)
             {
                 // MAY NOT NEED THIS CODE SINCE I DON'T CARE ABOUT THE 
                 /*
+		 * MIGHT NEED TO GO DOWN THIS ROUTE AND SEE IF IT CONTAINS MORE CHECKPOINTS OR LOOK AT THE HEX FOR THE CHECKPOINTS
+		 * AND SEE IF ALL THE ENTRIES ARE IN THERE...
                 case 0x4000000c: // PHYSICAL CHECKPOINT MAP
                     // NEED TO IMPLEMENT THIS PART OF THE CODE NEXT...
                     qDebug() << "use checkpoint map to get the latest superblock with whcih to parse";
@@ -1143,7 +1145,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                     //qDebug() << "it's a superblock so see if it's newer and use it.";
                     if(curxid > nxxid)
                         nxoffset = nxcmapoffset + i*blocksize;
-                    //qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
+                    qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
                     break;
                 default:
                     break;
