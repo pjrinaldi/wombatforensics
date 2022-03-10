@@ -1115,18 +1115,21 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         // THIS POSSIBLY NEEDS TO OCCUR WITHIN THE FOR LOOP OF THE CHECKPOINT DESCRIPTOR LOOP
         uint64_t nxoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 8, 8));
         uint64_t nxxid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 16, 8));
-        qDebug() << "nxoid:" << nxoid << "nxxid:" << nxxid;
+        //qDebug() << "nxoid:" << nxoid << "nxxid:" << nxxid;
         uint32_t blocksize = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 36, 4));
         uint32_t nxcmapblkcnt = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxoffset + 104, 4));
         int64_t nxcmapblk = qFromLittleEndian<int64_t>(curimg->ReadContent(nxoffset + 112, 8));
-        qDebug() << "nxcmapblk:" << nxcmapblk << "nxcmapblkcnt:" << nxcmapblkcnt;
+        //qDebug() << "nxcmapblk:" << nxcmapblk << "nxcmapblkcnt:" << nxcmapblkcnt;
         uint64_t nxcmapoffset = nxcmapblk * blocksize + curstartsector*512;
+        //qDebug() << "nxcmapoffset:" << nxcmapoffset;
+        uint64_t oldxid = nxxid;
         for(int i=0; i <= nxcmapblkcnt; i++)
         {
             uint64_t curoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 8, 8));
             uint64_t curxid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 16, 8));
             uint32_t curtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxcmapoffset + i*blocksize + 24, 4));
-            qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
+            //qDebug() << "i:" << i << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
+            
             if(curoid == 0 && curxid == 0 && curtype == 0)
                 break; // break out of for loop
             switch(curtype)
@@ -1135,27 +1138,34 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
                 /*
 		 * MIGHT NEED TO GO DOWN THIS ROUTE AND SEE IF IT CONTAINS MORE CHECKPOINTS OR LOOK AT THE HEX FOR THE CHECKPOINTS
 		 * AND SEE IF ALL THE ENTRIES ARE IN THERE...
+                 */ 
+                /*
                 case 0x4000000c: // PHYSICAL CHECKPOINT MAP
                     // NEED TO IMPLEMENT THIS PART OF THE CODE NEXT...
                     qDebug() << "use checkpoint map to get the latest superblock with whcih to parse";
+                    qDebug() << "cmap offset:" << nxcmapoffset + i*blocksize;
                     qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
                     break;
                 */
                 case 0x80000001: // EPHEMERAL SUPERBLOCK
                     //qDebug() << "it's a superblock so see if it's newer and use it.";
-                    if(curxid > nxxid)
+                    //qDebug() << "i:" << i << "curxid:" << curxid << "oldxid:" << oldxid;
+                    if(curxid > oldxid)
+                    {
+                        oldxid = curxid;
                         nxoffset = nxcmapoffset + i*blocksize;
-                    qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
+                        //qDebug() << "curoid:" << curoid << "curxid:" << curxid << "curtype:" << QString::number(curtype, 16);
+                    }
                     break;
                 default:
                     break;
             }
         }
-        qDebug() << "new superblock offset:" << nxoffset;
+        //qDebug() << "new superblock oid/offset:" << nxoid << "/" << nxoffset;
         // NOW TO DO THE OBJECT MAP PARSING FOR WHAT I NEED
-        uint64_t nxomapoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 160, 8));
-        uint64_t nxomapoffset = curstartsector*512 + nxomapoid * blocksize;
-        qDebug() << "nxomapoid:" << nxomapoid << "nxomapoffset:" << nxomapoffset;
+        //uint64_t nxomapoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 160, 8));
+        //uint64_t nxomapoffset = curstartsector*512 + nxomapoid * blocksize;
+        //qDebug() << "nxomapoid:" << nxomapoid << "nxomapoffset:" << nxomapoffset;
         /*
         uint64_t omapbtreeoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxomapoffset + 48, 8));
         uint32_t omapobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(nxomapoffset + 24, 4));
