@@ -320,6 +320,7 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
     uint16_t tocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 40, 2));
     uint16_t toclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 42, 2));
     uint32_t valoff = blocksize - 40 - (keycnt+1) * 16;
+    /*
     qDebug() << "start table of content info:" << toclen / 8;
     for(uint16_t i=0; i < toclen / 8; i++)
     {
@@ -333,6 +334,11 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
             break;
     }
     qDebug() << "end table of content info";
+    */
+    // VALID POTENTIAL ROOT PHYSICAL BLOCK #'S: 122247, 122064, 122419, 122525, 122711, 122768, 122787, 122948
+    // 122986, 123091, 123266, 123297, 123832, 126706, 131808, 133084, 133945, 134548, 135298, 138117, 140733,
+    // 146146, 147276, 151773, 152223, 153477, 156856, 172584, 177406, 183394, 185114, 187421, 187675, 187879,
+    // 189335, 189777, 190142, 206822, 206954, 209300, 215190, 215546, 215640, 
     qDebug() << "keycount:" << keycnt << "tocoff:" << tocoff << "toclen:" << toclen << "valoff:" << valoff;
     for(uint32_t i=0; i <= keycnt; i++)
     {
@@ -345,10 +351,16 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
         //qDebug() << "roottreeoid: " << roottreeoid << "oidlist:" << oidlist.at(i);
         if(roottreeoid == oidlist.at(i))
         {
+            uint32_t rootbtreeobjtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(blklist.at(i) * blocksize + curstartsector*512 + 24, 4));
+            uint32_t rootbtreesubtype = qFromLittleEndian<uint32_t>(curimg->ReadContent(blklist.at(i) * blocksize + curstartsector*512 + 28, 4));
             qDebug() << "size:" << sizlist.at(i);
             qDebug() << "blk:" << blklist.at(i);
-            qDebug() << "rootbtreeobjtype:" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(blklist.at(i) * blocksize + curstartsector*512 + 24, 4)), 16);
-            qDebug() << "rootbtreesubtype:" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(blklist.at(i) * blocksize + curstartsector*512 + 28, 4)), 16);
+            qDebug() << "rootbtreeobjtype:" << QString::number(rootbtreeobjtype, 16);
+            qDebug() << "rootbtreesubtype:" << QString::number(rootbtreesubtype, 16);
+            if(rootbtreesubtype != 0x0000000e)
+            {
+                qDebug() << "root tree subtype isn't a FSTREE, so something else needs to be done... but what.?";
+            }
 
             //return (blklist.at(i) * blocksize + curstartsector*512);
         }
