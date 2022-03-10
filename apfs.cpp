@@ -320,6 +320,19 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
     uint16_t tocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 40, 2));
     uint16_t toclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 42, 2));
     uint32_t valoff = blocksize - 40 - (keycnt+1) * 16;
+    qDebug() << "start table of content info:" << toclen / 8;
+    for(uint16_t i=0; i < toclen / 8; i++)
+    {
+        uint64_t curoffset = romapbtreeoff + 56 + tocoff + i*8;
+        qDebug() << "i:" << i;
+        qDebug() << "key off:" << qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset, 2));
+        qDebug() << "key len:" << qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 2, 2));
+        qDebug() << "val off:" << qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 4, 2));
+        qDebug() << "val len:" << qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 6, 2));
+        if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset, 2)) == 0)
+            break;
+    }
+    qDebug() << "end table of content info";
     qDebug() << "keycount:" << keycnt << "tocoff:" << tocoff << "toclen:" << toclen << "valoff:" << valoff;
     for(uint32_t i=0; i <= keycnt; i++)
     {
