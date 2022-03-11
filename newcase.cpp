@@ -1483,6 +1483,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "File System Type Int|14|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|ISO9660|File System Type String." << Qt::endl;
 	out << "Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32768, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
+	out << "Volume Name|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 32808, 31).toStdString()) << "Name of the volume." << Qt::endl;
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
         partitionname += " [ISO9660]";
     }
