@@ -152,7 +152,8 @@ void ProcessForensicImage(ForImg* curimg)
 		QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
 		QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
 		QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
-		if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 W/O PARTITION TABLE
+		QString bfsstr = QString::fromStdString(curimg->ReadContent(544, 4).toStdString());
+		if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || bfsstr == "1SFB") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 | BFS W/O PARTITION TABLE
 		{
 		    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
 		}
@@ -696,7 +697,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     quint64 bcfsig2 = qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 4128, 8));
     //0xE0F5E1E2
     // WILL WRITE FILE SYSTEM INFORMATION IN THIS FUNCTION AND ONLY RETURN THE QSTRING(FILESYSTEMNAME,FILESYSTEMTYPE) TO BE USED BY THE PARTITION
-    if(winsig == 0xaa55) // FAT OR NTFS
+    if(winsig == 0xaa55 && bfssig != "1SFB") // FAT OR NTFS OR BFS
     {
 	QString exfatstr = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 3, 5).toStdString());
 	QString fatstr = QString::fromStdString(curimg->ReadContent(curstartsector*512 + 54, 5).toStdString());
@@ -1453,6 +1454,16 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "File System Type|BFS|File System Type String." << Qt::endl;
         partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 512, 32).toStdString());
         out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+	uint32_t blocksize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 552, 4));
+	//qDebug() << "blocksize:" << blocksize;
+	out << "Block Size|" << QString::number(blocksize) << "|Size in bytes for a file system block." << Qt::endl;
+	out << "Number of Blocks|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 560, 8))) << "|Number of blocks in the file system." << Qt::endl;
+	out << "Used Blocks|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 568, 8))) << "|Number of blocks in use by the file system." << Qt::endl;
+	out << "Inode Size|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 576, 4))) << "|Size in bytes for an inode." << Qt::endl;
+	out << "Blocks per Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 584, 4))) << "|Number of blocks in each allocation group." << Qt::endl;
+	out << "Root Directory Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 628, 4))) << "|Allocation group for the root directory." << Qt::endl;
+	out << "Root Directory Start Block|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 632, 2))) << "|Starting block number for the root directory." << Qt::endl;
+	out << "Root Indices Start Block|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 640, 2))) << "|Starting block number for the root indices." << Qt::endl;
         partitionname += " [BFS]";
         /*
         fsinfo.insert("vollabel", QVariant(QString::fromStdString(partbuf.mid(512, 32).toStdString())));
@@ -1471,6 +1482,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     {
         out << "File System Type Int|14|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|ISO9660|File System Type String." << Qt::endl;
+	out << "Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32768, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
         partitionname += " [ISO9660]";
     }
@@ -1601,10 +1613,18 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     // NEED TO FIGURE OUT WHAT IS NEEDED TO PARSE AN ENTRY FOR EACH FILE SYSTEM TYPE
     // THEN I NEED TO READ THAT INFORMATION FROM THE PROPRETIES FILE SO I CAN PARSE THE DIRECTORIES
     // ALSO SEE IF THERE IS A WAY TO AUTOMATE THE CALL FOR EACH FILE/DIRECTORY
+    // FAT/EXFAT VARIABLES
     uint8_t fstype = 0;
     uint8_t fatcount = 0;
     uint32_t fatsize = 0;
     uint16_t bytespersector = 0;
+    // BFS VARIABLES
+    uint32_t blocksize = 0;
+    int32_t inodesize = 0;
+    int32_t rootdirag = 0;
+    int32_t blksperag = 0;
+    uint16_t rootdirblk = 0;
+    uint16_t rootindxblk = 0;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -1622,6 +1642,18 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 		fatsize = line.split("|").at(1).toUInt();
 	    else if(line.startsWith("Bytes Per Sector|"))
 		bytespersector = line.split("|").at(1).toUInt();
+	    if(line.startsWith("Block Size|"))
+		blocksize = line.split("|").at(1).toUInt();
+	    if(line.startsWith("Inode Size|"))
+		inodesize = line.split("|").at(1).toUInt();
+	    if(line.startsWith("Blocks per Allocation Group|"))
+		blksperag = line.split("|").at(1).toInt();
+	    if(line.startsWith("Root Directory Allocation Group|"))
+		rootdirag = line.split("|").at(1).toInt();
+	    if(line.startsWith("Root Directory Start Block|"))
+		rootdirblk = line.split("|").at(1).toUInt();
+	    if(line.startsWith("Root Indices Start Block|"))
+		rootindxblk = line.split("|").at(1).toUInt();
         }
         propfile.close();
     }
@@ -1680,6 +1712,13 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     else if(fstype == 11) // BITLOCKER
     {
         quint64 curinode = 0;
+    }
+    else if(fstype == 12) // BFS
+    {
+	quint64 curinode = 0;
+	qInfo() << "Parsing BFS...";
+	//curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, 0);
+	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, inodesize, blksperag, rootdirag, rootdirblk, rootindxblk, 0);
     }
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }

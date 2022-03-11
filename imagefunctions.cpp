@@ -873,7 +873,7 @@ ForImg::ForImg(QString imgfile)
         imgtype = 0; // EWF
     else if(imgfile.split("/").last().toLower().endsWith(".aff"))
         imgtype = 1; // AFF
-    else if(imgfile.split("/").last().toLower().endsWith(".dd") || imgfile.split("/").last().toLower().endsWith(".raw"))
+    else if(imgfile.split("/").last().toLower().endsWith(".dd") || imgfile.split("/").last().toLower().endsWith(".raw") || imgfile.split("/").last().toLower().endsWith(".img") || imgfile.split("/").last().toLower().endsWith(".image"))
         imgtype = 2; // RAW
     else if(imgfile.split("/").last().toLower().endsWith(".001") || imgfile.split("/").last().toLower().endsWith(".000") || imgfile.split("/").last().toLower().endsWith("aaa"))
 	imgtype = 3; // SPLIT RAW

@@ -20,6 +20,7 @@
 #include "xfs.h"
 #include "apfs.h"
 #include "bfs.h"
+#include "iso9660.h"
 
 void ProcessForensicImage(ForImg* curimg);
 QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
