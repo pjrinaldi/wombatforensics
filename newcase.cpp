@@ -1505,10 +1505,19 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         uint8_t recmin = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32946, 1));
         uint8_t recsec = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32947, 1));
         uint8_t recutc = qFromLittleEndian<int8_t>(curimg->ReadContent(curstartsector*512 + 32948, 1));
+        // skipped recutc for now.
         out << "Recording Date and Time|" << QString(QString::number(recmonth) + "/" + QString::number(recday) + "/" + QString::number(recyear) + " " + QString::number(rechr) + ":" + QString::number(recmin) + ":" + QString::number(recsec)) << "|Date and time which the information in the extent of the directory record was recorded." << Qt::endl;
         // NEED TO FIX THE FILE FLAGS SO IT READS PROPERLY...
         out << "File Flags|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32949, 1)), 2) << "|Flags for the file." << Qt::endl;
         out << "File Unit Size|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32950, 1))) << "|Assigned file unit size for the file section if the file section is recorded in interleaved mode, otherwise 0." << Qt::endl;
+        //out << "Volume Set Identifier|" << QString::fromStdString(curimg->ReadContent(custartsector*512 + 32958, 128)) << "|complicatted." << Qt::end;
+        out << "Publisher|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33086, 128).toStdString()) << "|User who specified what should be recorded." << Qt::endl;
+        out << "Data Preparer|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33214, 128).toStdString()) << "|Person or other entity which controls prepration of the data to be recorded." << Qt::endl;
+        out << "Application|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33342, 128).toStdString()) << "|How the data was recorded." << Qt::endl;
+        // skipped copyright, abstract, and bilbiographic (112 bytes)
+        // creation date, skipped hundreths of a second and the utc offset
+        out << "Volume Creation Date|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33582, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33586, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33588, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33590, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33592, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33594, 2).toStdString()) << "Creation date and time." << Qt::endl;
+        out << "Volume Modification Date|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33598, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33602, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33604, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33606, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33608, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33610, 2).toStdString()) << "Modification date and time." << Qt::endl;
     }
     else if(isosig == "CD001" && udfsig == "BEA01") // UDF
     {
