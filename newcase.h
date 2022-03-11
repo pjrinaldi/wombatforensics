@@ -19,6 +19,7 @@
 #include "bitlocker.h"
 #include "xfs.h"
 #include "apfs.h"
+#include "bfs.h"
 
 void ProcessForensicImage(ForImg* curimg);
 QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
