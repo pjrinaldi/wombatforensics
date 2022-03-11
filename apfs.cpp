@@ -291,7 +291,7 @@ void ParseApfsVolumes(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
             //uint64_t rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
             //QString rootbtreelayout = ReturnBTreeLayout(curimg, curstartsector, blocksize, objectmapoid, roottreeoid);
             //qDebug() << "root btree layout:" << rootbtreelayout;
-            //ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, QString::number(rootbtreelayout));
+            ParseApfsDirectory(curimg, curstartsector, ptreecnt, i, blocksize, QString::number(rootbtreeoffset));
         }
     }
 }
@@ -320,7 +320,11 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
     uint16_t tocoff = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 40, 2));
     uint16_t toclen = qFromLittleEndian<uint16_t>(curimg->ReadContent(romapbtreeoff + 42, 2));
     uint32_t valoff = blocksize - 40 - (keycnt+1) * 16;
-    /*
+    if(btreeflags & 0x0002)
+    {
+        qDebug() << "btree is leaf node";
+        //valoff = valoff - 40;
+    }
     qDebug() << "start table of content info:" << toclen / 8;
     for(uint16_t i=0; i < toclen / 8; i++)
     {
@@ -330,11 +334,10 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
         qDebug() << "key len:" << qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 2, 2));
         qDebug() << "val off:" << qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 4, 2));
         qDebug() << "val len:" << qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 6, 2));
-        if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset, 2)) == 0)
+        if(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset, 2)) == 0 && qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 2, 2)) == 0 && qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 4, 2)) == 0 && qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 6, 2)) == 0)
             break;
     }
     qDebug() << "end table of content info";
-    */
     // VALID POTENTIAL ROOT PHYSICAL BLOCK #'S:
     // 122247 (87dd01), 122064 (d0dc01), 122419 (33de01), 122525 (9dde01), 122711 (57df01), 122768 (90df01), 122787 (a3df01),
     // 122948 (44e001), 122986 (6ae001), 123091 (d3e001), 123266 (82e101), 123297 (a1e101), 123832 (b8e301), 126706 (f2ef01),
@@ -365,12 +368,11 @@ uint64_t ReturnRootBTreeOffset(ForImg* curimg, uint32_t curstartsector, uint32_t
             {
                 qDebug() << "root tree subtype isn't a FSTREE, so something else needs to be done... but what.?";
             }
+            return (blklist.at(i) * blocksize + curstartsector*512);
 
             //return (blklist.at(i) * blocksize + curstartsector*512);
         }
     }
-
-
 
     return 0;
     /*
