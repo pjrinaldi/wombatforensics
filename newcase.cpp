@@ -1483,9 +1483,32 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "File System Type Int|14|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|ISO9660|File System Type String." << Qt::endl;
 	out << "Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32768, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
-	out << "Volume Name|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 32808, 31).toStdString()) << "|Name of the volume." << Qt::endl;
-        //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 32808, 31).toStdString());
+	out << "Volume Label|" << partitionname << "|Name of the volume." << Qt::endl;
         partitionname += " [ISO9660]";
+        out << "Volume Space Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32848, 4))) << "|Number of logical blocks in which the volume space is recorded." << Qt::endl;
+        out << "Volume Set Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32888, 2))) << "|Volume set size of the volume in bytes." << Qt::endl;
+        out << "Volume Sequence Number|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32892, 2))) << "|Ordinal number of the volume in the volume set which the volume is a member." << Qt::endl;
+        out << "Logical Block Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32896, 2))) << "|Size in bytes of a logical block." << Qt::endl;
+        out << "Path Table Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32990, 4))) << "|Length in bytes of a recorded occurence of the path table identified by the volume descriptor." << Qt::endl;
+        out << "Location of Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32908, 4))) << "|Logical block number of the first logical block allocated to the extent which  contains an occurrence of the path table." << Qt::endl;
+        out << "Location of Optional Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32912, 4))) << "|Logical block number of the first logical block allocated to the extent which contains an optional occurence of the path table. If 0, it means the extent shall not be expected to be recorded." << Qt::endl;
+        // Dir Record for Root Directory - 34 bytes
+        out << "Root Directory Record Length|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32924, 1))) << "|Length in bytes of the root directory record." << Qt::endl;
+        out << "Extended Attribute Record LEngth|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32925, 1))) << "|Length in bytes of the extended attribute record, if recorded, otherwise 0." << Qt::endl;
+        out << "Extent Location|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32926, 4))) << "|Logical block number of the first logical block allocated to the extent." << Qt::endl;
+        out << "Data Length|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32934, 4))) << "|Length in bytes of the data for the file section." << Qt::endl;
+        uint16_t recyear = 1900 + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32942, 1));
+        uint8_t recmonth = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32943, 1));
+        uint8_t recday = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32944, 1));
+        uint8_t rechr = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32945, 1));
+        uint8_t recmin = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32946, 1));
+        uint8_t recsec = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32947, 1));
+        uint8_t recutc = qFromLittleEndian<int8_t>(curimg->ReadContent(curstartsector*512 + 32948, 1));
+        out << "Recording Date and Time|" << QString(QString::number(recmonth) + "/" + QString::number(recday) + "/" + QString::number(recyear) + " " + QString::number(rechr) + ":" + QString::number(recmin) + ":" + QString::number(recsec)) << "|Date and time which the information in the extent of the directory record was recorded." << Qt::endl;
+        // NEED TO FIX THE FILE FLAGS SO IT READS PROPERLY...
+        out << "File Flags|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32949, 1)), 2) << "|Flags for the file." << Qt::endl;
+        out << "File Unit Size|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32950, 1))) << "|Assigned file unit size for the file section if the file section is recorded in interleaved mode, otherwise 0." << Qt::endl;
     }
     else if(isosig == "CD001" && udfsig == "BEA01") // UDF
     {
