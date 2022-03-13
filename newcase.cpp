@@ -1461,8 +1461,11 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	out << "Used Blocks|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 568, 8))) << "|Number of blocks in use by the file system." << Qt::endl;
 	out << "Inode Size|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 576, 4))) << "|Size in bytes for an inode." << Qt::endl;
 	out << "Blocks per Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 584, 4))) << "|Number of blocks in each allocation group." << Qt::endl;
+        // need to implement properly...
+        //out << "Flags|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 596, 4))) << "|What flags means here.." << Qt::endl;
 	out << "Root Directory Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 628, 4))) << "|Allocation group for the root directory." << Qt::endl;
 	out << "Root Directory Start Block|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 632, 2))) << "|Starting block number for the root directory." << Qt::endl;
+        out << "Root Indices Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 636, 4))) << "|Allocation group for the root directory indices." << Qt::endl;
 	out << "Root Indices Start Block|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 640, 2))) << "|Starting block number for the root indices." << Qt::endl;
         partitionname += " [BFS]";
         /*
@@ -1657,6 +1660,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     int32_t rootdirag = 0;
     int32_t blksperag = 0;
     uint16_t rootdirblk = 0;
+    int32_t rootindxag = 0;
     uint16_t rootindxblk = 0;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
@@ -1685,6 +1689,8 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 		rootdirag = line.split("|").at(1).toInt();
 	    if(line.startsWith("Root Directory Start Block|"))
 		rootdirblk = line.split("|").at(1).toUInt();
+	    if(line.startsWith("Root Indices Allocation Group|"))
+		rootindxag = line.split("|").at(1).toInt();
 	    if(line.startsWith("Root Indices Start Block|"))
 		rootindxblk = line.split("|").at(1).toUInt();
         }
@@ -1751,7 +1757,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 	quint64 curinode = 0;
 	qInfo() << "Parsing BFS...";
 	//curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, 0);
-	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, inodesize, blksperag, rootdirag, rootdirblk, rootindxblk, 0);
+	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, inodesize, blksperag, rootdirag, rootdirblk, rootindxag, rootindxblk, 0);
     }
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }

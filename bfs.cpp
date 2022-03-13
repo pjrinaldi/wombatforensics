@@ -3,21 +3,28 @@
 // Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, int32_t inodesize, int32_t blksperag, int32_t dirag, uint16_t dirblk, uint16_t indblk, uint64_t parinode)
+uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, int32_t inodesize, int32_t blksperag, int32_t dirag, uint16_t dirblk, int32_t indag, uint16_t indblk, uint64_t parinode)
 {
     quint64 inodecnt = 0;
     QString parpath = "";
     if(parinode == 0)
 	parpath = "/";
     // read inode provided
-    uint64_t inodeoff = ((blksperag * blocksize * dirag) + dirblk) * blocksize;
-    uint64_t indexoff = blocksize * indblk;
-    qDebug() << "block size:" << blocksize << "inode size:" << inodesize << "rootdirblk:" << dirblk << "rootindxblk:" << indblk;
+    uint64_t inodeoff = curstartsector*512 + (blksperag * blocksize * dirag) + (dirblk * blocksize);
+    uint64_t indexoff = blksperag * blocksize * indag + blocksize * indblk;
+    qDebug() << "block size:" << blocksize << "inode size:" << inodesize << "rootdirag:" << dirag << "rootdirblk:" << dirblk << "rootindxag:" << indag << "rootindxblk:" << indblk;
     qDebug() << "blksperag:" << blksperag << "dirag:" << dirag;
     qDebug() << "inodeoff:" << inodeoff << "indexoff:" << indexoff;
     if(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + inodeoff, 4)) != 0x3bbe0ad9) // not an inode
     {
-	qDebug() << "inode is not valid, don't continue, exit somehow.";
+	qDebug() << "inode is not valid.";
+        qDebug() << "if rootdir, then use indexoff.";
+        if(parinode == 0)
+            inodeoff = indexoff;
+    }
+    if(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + inodeoff, 4)) != 0x3bbe0ad9) // not an inode
+    {
+        qDebug() << "index offset is still not a valid inode, so exit gracefully here...";
     }
     else
     {
@@ -35,9 +42,62 @@ uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         int32_t attrag = qFromLittleEndian<int32_t>(curimg->ReadContent(inodeoff + 52, 4));
         uint16_t attrblk = qFromLittleEndian<uint16_t>(curimg->ReadContent(inodeoff + 56, 2));
         uint16_t attrlen = qFromLittleEndian<uint16_t>(curimg->ReadContent(inodeoff + 58, 2));
+        QList<int32_t> directag;
+        QList<uint16_t> directblk;
+        QList<uint16_t> directlen;
+        directag.clear();
+        directblk.clear();
+        directlen.clear();
         // type not used, so skip 4 bytes (60, 4)
         // inode size is repetitive, so skip 4 bytes (64, 4)
         // binode_etc* etc, i think it's 4 bytes (68, 4)
+        for(int i=0; i < 12; i++)
+        {
+            int32_t curag = qFromLittleEndian<int32_t>(curimg->ReadContent(inodeoff + 72 + i*8, 4));
+            uint16_t curblk = qFromLittleEndian<uint16_t>(curimg->ReadContent(inodeoff + 76 + i*8, 2));
+            uint16_t curlen = qFromLittleEndian<uint16_t>(curimg->ReadContent(inodeoff + 78 + i*8, 2));
+            if(curag == 0x00000000 && curblk == 0x0000 && curlen == 0x0000)
+                break;
+            directag.append(curag);
+            directblk.append(curblk);
+            directlen.append(curlen);
+        }
+        qDebug() << "directag:" << directag << "directblk:" << directblk << "directlen:" << directlen;
+        //uint64_t maxdirectrange = qFromLittleEndian<uint64_t>(curimg->ReadContent(inodeoff + 168, 8));
+        //qDebug() << "max direct range:" << maxdirectrange;
+        int32_t indirectag = qFromLittleEndian<int32_t>(curimg->ReadContent(inodeoff + 176, 4));
+        uint16_t indirectblk = qFromLittleEndian<uint16_t>(curimg->ReadContent(inodeoff + 180, 2));
+        uint16_t indirectlen = qFromLittleEndian<uint16_t>(curimg->ReadContent(inodeoff + 182, 2));
+        if(indirectag == 0x00000000 && indirectblk == 0x0000 && indirectlen == 0x0000)
+        {
+            // doesn't exist, skip
+        }
+        else
+        {
+            qDebug() << "parse this to get the next set of direct blocks out of the indirect block";
+        }
+        int32_t dindirectag = qFromLittleEndian<int32_t>(curimg->ReadContent(inodeoff + 192, 4));
+        uint16_t dindirectblk = qFromLittleEndian<uint16_t>(curimg->ReadContent(inodeoff + 196, 2));
+        uint16_t dindirectlen = qFromLittleEndian<uint16_t>(curimg->ReadContent(inodeoff + 198, 2));
+        if(dindirectag == 0x00000000 && dindirectblk == 0x0000 && dindirectlen == 0x0000)
+        {
+            // doesn't exist, skip
+        }
+        else
+        {
+            qDebug() << "parse this to get the next set of indirect blocks to then get the direct blocks out of the double indirect block";
+        }
+        uint64_t datasize = qFromLittleEndian<uint64_t>(curimg->ReadContent(inodeoff + 208, 8));
+        qDebug() << "data size:" << datasize;
+        // NEXT IS THE SMALL DATA WHICH I NEED TO FIUGRE OUT HOW TO CLASSIFY, EITHER A SINGLE ADS TYPE OR SPLIT IT UP INTO
+        // ITS RESPECTIVE ATTRIBUTES AND LIST ACCORDINGLY AS CHILDREN...
+        // NOW I NEED TO BUILD THE LAYOUT
+        QString layout = "";
+        for(int i=0; i < directblk.count(); i++)
+        {
+            int64_t curoff = (directag.at(i) * blksperag * blocksize) + directblk.at(i) * blocksize;
+            uint64_t curlen = directlen.at(i) * blocksize;
+        }
         // offset 72 - data_stream 12 direct blocks first, which is 12 sets of 8 bytes (ag, blk, len) (4, 2, 2)
         // offset 168, 8 - max_direct_range
         // offset 176, 8 - indirect block run (4, 2, 2)
