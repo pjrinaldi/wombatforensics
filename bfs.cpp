@@ -9,7 +9,7 @@ uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     if(parinode == 0)
 	parpath = "/";
     // read inode provided
-    uint64_t inodeoff = (blksperag * blocksize * dirag * blocksize) + (blocksize * dirblk);
+    uint64_t inodeoff = ((blksperag * blocksize * dirag) + dirblk) * blocksize;
     uint64_t indexoff = blocksize * indblk;
     qDebug() << "block size:" << blocksize << "inode size:" << inodesize << "rootdirblk:" << dirblk << "rootindxblk:" << indblk;
     qDebug() << "blksperag:" << blksperag << "dirag:" << dirag;
