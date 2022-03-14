@@ -1536,7 +1536,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 		out << "PV" << QString::number(pvindx) << " Volume Set Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 120, 2))) << "|Volume set size of the volume in bytes." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Volume Sequence Number|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 124, 2))) << "|Ordinal number of the volume in the volume set which the volume is a member." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Logical Block Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 128, 2))) << "|Size in bytes of a logical block." << Qt::endl;
-		out << "PV" << QString::number(pvindx) << " Path Table Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 222, 4))) << "|Length in bytes of a recorded occurence of the path table identified by the volume descriptor." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Path Table Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 132, 4))) << "|Length in bytes of a recorded occurence of the path table identified by the volume descriptor." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Location of Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 140, 4))) << "|Logical block number of the first logical block allocated to the extent which  contains an occurrence of the path table." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Location of Optional Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 144, 4))) << "|Logical block number of the first logical block allocated to the extent which contains an optional occurence of the path table. If 0, it means the extent shall not be expected to be recorded." << Qt::endl;
 		// Dir Record for Root Directory - 34 bytes
@@ -1568,14 +1568,33 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    }
 	    else if(voldesctype == 0x02) // SUPPLEMENTARY/ENHANCED VOLUME DESCRIPTOR
 	    {
-		qDebug() << "Supplementary/Enhanced Volume Descriptor" << svdindx;
+		//qDebug() << "Supplementary/Enhanced Volume Descriptor" << svdindx;
 		out << "SV" << QString::number(svdindx) << " Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary or Enhanced, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
 		out << "SV" << QString::number(svdindx) << " Volume Descriptor Version|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 6, 1))) << "|Value for volume descriptor version, 1 - Supplementary, 2 - Enhanced." << Qt::endl;
+		out << "SV" << QString::number(svdindx) << " Escape Sequences|";
+		uint32_t escapeseq = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 88, 4));
+		if(escapeseq == 0x00452f25)
+		    out << "Joliet Name Encoding: USC-2 Level 3";
+		else if(escapeseq == 0x00432f25)
+		    out << "Joliet Name Encoding: USC-2 Level 2";
+		else if(escapeseq == 0x00402f25)
+		    out << "Joliet Name Encoding: USC-2 Level 1";
+		out << "|Escape sequence which defines standard. Joliet Level 1: %/@, Level 2: %/C, Level 3: %/E." << Qt::endl;
+		out << "SV" << QString::number(svdindx) << " Path Table Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 132, 4))) << "|Length in bytes of a recorded occurrence of the path table identified by this volume descriptor." << Qt::endl;
+		out << "SV" << QString::number(svdindx) << " Location of Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 140, 4))) << "|Logical block number of the first logical block allocated to the extent which  contains an occurrence of the path table." << Qt::endl;
+		out << "SV" << QString::number(svdindx) << " Location of Optional Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 144, 4))) << "|Logical block number of the first logical block allocated to the extent which contains an optional occurence of the path table. If 0, it means the extent shall not be expected to be recorded." << Qt::endl;
+		// Dir Record for Root Directory - 34 bytes
+		out << "SV" << QString::number(svdindx) << " Root Directory Record Length|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 156, 1))) << "|Length in bytes of the root directory record." << Qt::endl;
+		out << "SV" << QString::number(svdindx) << " Extent Location|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 158, 4))) << "|Logical block number of the first logical block allocated to the extent." << Qt::endl;
+		out << "SV" << QString::number(svdindx) << " Data Length|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 166, 4))) << "|Length in bytes of the data for the file section." << Qt::endl;
 		svdindx++;
 	    }
 	    else if(voldesctype == 0x03) // VOLUME PARTITION DESCRIPTOR
 	    {
 		qDebug() << "Volume Partition Descriptor" << vpdindx;
+		out << "VP" << QString::number(vpdindx) << " Volume Partition Identifier|" << QString::fromStdString(curimg->ReadContent(curoffset + 40, 31).toStdString()) << "|Indentification of the volume partition." << Qt::endl;
+		out << "VP" << QString::number(vpdindx) << " Volume Partition Location|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 72, 4))) << "|Logical block number of the first logical block allocated to the volume partition." << Qt::endl;
+		out << "VP" << QString::number(vpdindx) << " Volume Partition Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 80, 4))) << "|Number of logical blocks in which the volume partition is recorded." << Qt::endl;
 		vpdindx++;
 	    }
 	    else if(voldesctype == 0xFF) // VOLUME DESCRIPTOR SET TERMINATOR
@@ -1831,6 +1850,11 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 	qInfo() << "Parsing BFS...";
 	//curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, 0);
 	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, inodesize, blksperag, rootdirag, rootdirblk, rootindxag, rootindxblk, 0);
+    }
+    else if(fstype == 14) // ISO9660
+    {
+	qInfo() << "Parsing ISO9660...";
+	ParseIsoDirectory(curimg, curstartsector, ptreecnt);
     }
     //qDebug() << "fs type:" << fstype << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
 }

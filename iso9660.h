@@ -9,5 +9,6 @@
 #include "wombatfunctions.h"
 #include "commonfs.h"
 
+void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
 // might need parentinode in here so i can if else root dir...
 #endif // iso9660.h
