@@ -77,7 +77,7 @@ class ForImg : public QIODevice
         QString ImgPath();
         QString MountPath();
         void SetMountPath(QString mountpath);
-	int ImgType();
+	int8_t ImgType();
 
     protected:
 
@@ -97,7 +97,7 @@ class ForImg : public QIODevice
         QString imgpath = "";
         QString mntpath = "";
         //int imgtype = 15;
-        int imgtype = -1;
+        int8_t imgtype = -1;
         uint8_t hashtype = 0;
         int blake3hash = 0;
         QList<qint64> framelist;

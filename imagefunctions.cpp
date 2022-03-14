@@ -867,6 +867,7 @@ std::string Verify(QString outstr)
  */ 
 ForImg::ForImg(QString imgfile)
 {
+    qDebug() << "is null:" << imgfile.isNull() << "is empty:" << imgfile.isEmpty();
     if(imgfile.split("/").count() == 0)
         imgtype = -1;
     if(imgfile.split("/").last().toLower().endsWith(".e01"))
@@ -1095,6 +1096,7 @@ ForImg::~ForImg()
 
 QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 {
+    //qDebug() << "pos:" << pos << "size:" << size;
     //qDebug() << "imgtype in ReadContent:" << imgtype;
     //char* data = new char[size];
     QByteArray tmparray;
@@ -1372,8 +1374,11 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     }
     else if(imgtype == -1) // no file loaded yet
     {
+	tmparray.clear();
         //tmparray.append("zero");
     }
+    else
+	tmparray.clear();
     //delete[] data;
 
     return tmparray;
@@ -1384,7 +1389,7 @@ qint64 ForImg::Size()
     return imgsize;
 }
 
-int ForImg::ImgType()
+int8_t ForImg::ImgType()
 {
     return imgtype;
 }

@@ -1496,7 +1496,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(f2fsig == 0xf2f52010) // F2FS
     {
-	out << "F2FS File System Found. Parsing not yet implemented.";
+	qInfo() << "F2FS File System Found. Parsing not yet implemented.";
         out << "File System Type Int|13|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|F2FS|File System Type String." << Qt::endl;
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
@@ -1504,9 +1504,14 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(isosig == "CD001" && udfsig != "BEA01") // ISO9660
     {
-	out << "ISO9660 File System Found. Parsing...";
+	qInfo() << "ISO9660 File System Found. Parsing...";
         out << "File System Type Int|14|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|ISO9660|File System Type String." << Qt::endl;
+	int8_t pvindx = 1;
+	int8_t svdindx = 1;
+	int8_t evdindx = 1;
+	int8_t vpdindx = 1;
+	int8_t brindx = 1;
 	// NEED A FOR LOOP, WHICH STARTS AT BLOCK 16 AND GOES BY 2048 UNTIL WE GET TO THE VOLUME TERMINATOR WITH TYPE FF
 	for(int i=16; i < (curimg->Size() / 2048) - 15; i++)
 	{
@@ -1514,18 +1519,59 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    if(voldesctype == 0x00) // BOOT RECORD
 	    {
 		qDebug() << "Boot Record";
+		brindx++;
 	    }
 	    else if(voldesctype == 0x01) // PRIMARY VOLUME DESCRIPTOR
 	    {
-		qDebug() << "Primary Volume Descriptor";
+		qDebug() << "Primary Volume Descriptor" << pvindx;
+		// Primary Volume Descriptor
+		out << "PV" << QString::number(pvindx) << " Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32768, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
+		partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 32808, 31).toStdString());
+		out << "PV" << QString::number(pvindx) << " Volume Label|" << partitionname << "|Name of the volume." << Qt::endl;
+		partitionname += " [ISO9660]";
+		out << "PV" << QString::number(pvindx) << " Volume Space Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32848, 4))) << "|Number of logical blocks in which the volume space is recorded." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Volume Set Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32888, 2))) << "|Volume set size of the volume in bytes." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Volume Sequence Number|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32892, 2))) << "|Ordinal number of the volume in the volume set which the volume is a member." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Logical Block Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32896, 2))) << "|Size in bytes of a logical block." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Path Table Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32990, 4))) << "|Length in bytes of a recorded occurence of the path table identified by the volume descriptor." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Location of Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32908, 4))) << "|Logical block number of the first logical block allocated to the extent which  contains an occurrence of the path table." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Location of Optional Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32912, 4))) << "|Logical block number of the first logical block allocated to the extent which contains an optional occurence of the path table. If 0, it means the extent shall not be expected to be recorded." << Qt::endl;
+		// Dir Record for Root Directory - 34 bytes
+		out << "PV" << QString::number(pvindx) << " Root Directory Record Length|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32924, 1))) << "|Length in bytes of the root directory record." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Extended Attribute Record LEngth|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32925, 1))) << "|Length in bytes of the extended attribute record, if recorded, otherwise 0." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Extent Location|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32926, 4))) << "|Logical block number of the first logical block allocated to the extent." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Data Length|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32934, 4))) << "|Length in bytes of the data for the file section." << Qt::endl;
+		uint16_t recyear = 1900 + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32942, 1));
+		uint8_t recmonth = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32943, 1));
+		uint8_t recday = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32944, 1));
+		uint8_t rechr = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32945, 1));
+		uint8_t recmin = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32946, 1));
+		uint8_t recsec = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32947, 1));
+		uint8_t recutc = qFromLittleEndian<int8_t>(curimg->ReadContent(curstartsector*512 + 32948, 1));
+		// skipped recutc for now.
+		out << "PV" << QString::number(pvindx) << " Recording Date and Time|" << QString(QString::number(recmonth) + "/" + QString::number(recday) + "/" + QString::number(recyear) + " " + QString::number(rechr) + ":" + QString::number(recmin) + ":" + QString::number(recsec)) << "|Date and time which the information in the extent of the directory record was recorded." << Qt::endl;
+		// NEED TO FIX THE FILE FLAGS SO IT READS PROPERLY...
+		out << "PV" << QString::number(pvindx) << " File Flags|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32949, 1)), 2) << "|Flags for the file." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " File Unit Size|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32950, 1))) << "|Assigned file unit size for the file section if the file section is recorded in interleaved mode, otherwise 0." << Qt::endl;
+		//out << "PV Volume Set Identifier|" << QString::fromStdString(curimg->ReadContent(custartsector*512 + 32958, 128)) << "|complicatted." << Qt::end;
+		out << "PV" << QString::number(pvindx) << " Publisher|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33086, 128).toStdString()) << "|User who specified what should be recorded." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Data Preparer|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33214, 128).toStdString()) << "|Person or other entity which controls prepration of the data to be recorded." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Application|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33342, 128).toStdString()) << "|How the data was recorded." << Qt::endl;
+		// skipped copyright, abstract, and bilbiographic (112 bytes)
+		// creation date, skipped hundreths of a second and the utc offset
+		out << "PV" << QString::number(pvindx) << " Volume Creation Date|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33581, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33585, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33587, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33589, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33591, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33593, 2).toStdString()) << "|Creation date and time." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Volume Modification Date|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33598, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33602, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33604, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33606, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33608, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33610, 2).toStdString()) << "|Modification date and time." << Qt::endl;
+		pvindx++;
 	    }
 	    else if(voldesctype == 0x02) // SECONDARY VOLUME DESCRIPTOR
 	    {
-		qDebug() << "Secondary Volume Descriptor";
+		qDebug() << "Secondary Volume Descriptor" << svdindx;
+		svdindx++;
 	    }
 	    else if(voldesctype == 0x03) // VOLUME PARTITION DESCRIPTOR
 	    {
-		qDebug() << "Volume Partition Descriptor";
+		qDebug() << "Volume Partition Descriptor" << vpdindx;
+		vpdindx++;
 	    }
 	    else if(voldesctype == 0xFF) // VOLUME DESCRIPTOR SET TERMINATOR
 	    {
@@ -1537,49 +1583,10 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 		break;
 	    }
 	}
-	/*
-	// Primary Volume Descriptor
-	out << "Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32768, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
-        partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 32808, 31).toStdString());
-	out << "Volume Label|" << partitionname << "|Name of the volume." << Qt::endl;
-        partitionname += " [ISO9660]";
-        out << "Volume Space Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32848, 4))) << "|Number of logical blocks in which the volume space is recorded." << Qt::endl;
-        out << "Volume Set Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32888, 2))) << "|Volume set size of the volume in bytes." << Qt::endl;
-        out << "Volume Sequence Number|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32892, 2))) << "|Ordinal number of the volume in the volume set which the volume is a member." << Qt::endl;
-        out << "Logical Block Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 32896, 2))) << "|Size in bytes of a logical block." << Qt::endl;
-        out << "Path Table Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32990, 4))) << "|Length in bytes of a recorded occurence of the path table identified by the volume descriptor." << Qt::endl;
-        out << "Location of Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32908, 4))) << "|Logical block number of the first logical block allocated to the extent which  contains an occurrence of the path table." << Qt::endl;
-        out << "Location of Optional Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32912, 4))) << "|Logical block number of the first logical block allocated to the extent which contains an optional occurence of the path table. If 0, it means the extent shall not be expected to be recorded." << Qt::endl;
-        // Dir Record for Root Directory - 34 bytes
-        out << "Root Directory Record Length|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32924, 1))) << "|Length in bytes of the root directory record." << Qt::endl;
-        out << "Extended Attribute Record LEngth|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32925, 1))) << "|Length in bytes of the extended attribute record, if recorded, otherwise 0." << Qt::endl;
-        out << "Extent Location|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32926, 4))) << "|Logical block number of the first logical block allocated to the extent." << Qt::endl;
-        out << "Data Length|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 32934, 4))) << "|Length in bytes of the data for the file section." << Qt::endl;
-        uint16_t recyear = 1900 + qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32942, 1));
-        uint8_t recmonth = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32943, 1));
-        uint8_t recday = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32944, 1));
-        uint8_t rechr = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32945, 1));
-        uint8_t recmin = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32946, 1));
-        uint8_t recsec = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32947, 1));
-        uint8_t recutc = qFromLittleEndian<int8_t>(curimg->ReadContent(curstartsector*512 + 32948, 1));
-        // skipped recutc for now.
-        out << "Recording Date and Time|" << QString(QString::number(recmonth) + "/" + QString::number(recday) + "/" + QString::number(recyear) + " " + QString::number(rechr) + ":" + QString::number(recmin) + ":" + QString::number(recsec)) << "|Date and time which the information in the extent of the directory record was recorded." << Qt::endl;
-        // NEED TO FIX THE FILE FLAGS SO IT READS PROPERLY...
-        out << "File Flags|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32949, 1)), 2) << "|Flags for the file." << Qt::endl;
-        out << "File Unit Size|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32950, 1))) << "|Assigned file unit size for the file section if the file section is recorded in interleaved mode, otherwise 0." << Qt::endl;
-        //out << "Volume Set Identifier|" << QString::fromStdString(curimg->ReadContent(custartsector*512 + 32958, 128)) << "|complicatted." << Qt::end;
-        out << "Publisher|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33086, 128).toStdString()) << "|User who specified what should be recorded." << Qt::endl;
-        out << "Data Preparer|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33214, 128).toStdString()) << "|Person or other entity which controls prepration of the data to be recorded." << Qt::endl;
-        out << "Application|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33342, 128).toStdString()) << "|How the data was recorded." << Qt::endl;
-        // skipped copyright, abstract, and bilbiographic (112 bytes)
-        // creation date, skipped hundreths of a second and the utc offset
-        out << "Volume Creation Date|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33581, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33585, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33587, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33589, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33591, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33593, 2).toStdString()) << "|Creation date and time." << Qt::endl;
-        out << "Volume Modification Date|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33598, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33602, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33604, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33606, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33608, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33610, 2).toStdString()) << "|Modification date and time." << Qt::endl;
-	*/
     }
     else if(isosig == "CD001" && udfsig == "BEA01") // UDF
     {
-	out << "UDF File System Found. Parsing not yet implemented.";
+	qInfo() << "UDF File System Found. Parsing not yet implemented.";
         out << "File System Type Int|15|Internal File System Type represented as an integer." << Qt::endl;
 	out << "File System Type|UDF|File System Type String." << Qt::endl;
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
@@ -1587,7 +1594,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(hfssig == "BD") // legacy HFS
     {
-	out << "HFS File System Found. Parsing not yet implemented.";
+	qInfo() << "HFS File System Found. Parsing not yet implemented.";
         out << "File System Type Int|16|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|HFS|File System Type String." << Qt::endl;
         uint8_t volnamelength = qFromBigEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 1060, 1));
