@@ -1509,7 +1509,6 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "File System Type|ISO9660|File System Type String." << Qt::endl;
 	int8_t pvindx = 1;
 	int8_t svdindx = 1;
-	int8_t evdindx = 1;
 	int8_t vpdindx = 1;
 	int8_t brindx = 1;
 	// NEED A FOR LOOP, WHICH STARTS AT BLOCK 16 AND GOES BY 2048 UNTIL WE GET TO THE VOLUME TERMINATOR WITH TYPE FF
@@ -1521,6 +1520,8 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    {
 		qDebug() << "Boot Record";
 		out << "BR" << QString::number(brindx) << " Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset, 1))) << "|Value for voluem descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary or Enhanced, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
+		out << "BR" << QString::number(brindx) << " Boot System Identifier|" << QString::fromStdString(curimg->ReadContent(curoffset + 7, 31).toStdString()) << "|System identification which can recognize and act upon the boot system use fields." << Qt::endl;
+		out << "BR" << QString::number(brindx) << " Boot Indentifier|" << QString::fromStdString(curimg->ReadContent(curoffset + 39, 31).toStdString()) << "|Identification of the boot system." << Qt::endl;
 		brindx++;
 	    }
 	    else if(voldesctype == 0x01) // PRIMARY VOLUME DESCRIPTOR
@@ -1565,9 +1566,11 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 		out << "PV" << QString::number(pvindx) << " Volume Modification Date|" << QString::fromStdString(curimg->ReadContent(curoffset + 830, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curoffset + 834, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curoffset + 836, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curoffset + 838, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curoffset + 840, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curoffset + 842, 2).toStdString()) << "|Modification date and time." << Qt::endl;
 		pvindx++;
 	    }
-	    else if(voldesctype == 0x02) // SECONDARY VOLUME DESCRIPTOR
+	    else if(voldesctype == 0x02) // SUPPLEMENTARY/ENHANCED VOLUME DESCRIPTOR
 	    {
-		qDebug() << "Secondary Volume Descriptor" << svdindx;
+		qDebug() << "Supplementary/Enhanced Volume Descriptor" << svdindx;
+		out << "SV" << QString::number(svdindx) << " Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary or Enhanced, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
+		out << "SV" << QString::number(svdindx) << " Volume Descriptor Version|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 6, 1))) << "|Value for volume descriptor version, 1 - Supplementary, 2 - Enhanced." << Qt::endl;
 		svdindx++;
 	    }
 	    else if(voldesctype == 0x03) // VOLUME PARTITION DESCRIPTOR
