@@ -868,7 +868,7 @@ std::string Verify(QString outstr)
 ForImg::ForImg(QString imgfile)
 {
     if(imgfile.split("/").count() == 0)
-        imgfile = -1;
+        imgtype = -1;
     if(imgfile.split("/").last().toLower().endsWith(".e01"))
         imgtype = 0; // EWF
     else if(imgfile.split("/").last().toLower().endsWith(".aff"))
@@ -1079,6 +1079,8 @@ ForImg::ForImg(QString imgfile)
     {
         imgsize = 0;
     }
+    else
+	imgsize = 0;
 }
 
 ForImg::~ForImg()

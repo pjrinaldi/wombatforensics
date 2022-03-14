@@ -96,6 +96,7 @@ void ProcessForensicImage(ForImg* curimg)
 		gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(512, 8));
 		if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
 		{
+		    qInfo() << "GPT Partition Table Found. Parsing...";
 		    uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
 		    uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
 		    uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
@@ -159,6 +160,7 @@ void ProcessForensicImage(ForImg* curimg)
 		}
 		else // MBR
 		{
+		    qInfo() << "MBR Partition Table Found. Parsing...";
 		    uint8_t ptreecnt = 0;
 		    uint8_t pcount = 0;
 		    for(int i=0; i < 4; i++)
@@ -241,6 +243,7 @@ void ProcessForensicImage(ForImg* curimg)
 	}
 	else if(gptsig == 0x5452415020494645) // GPT PARTITION
 	{
+	    qInfo() << "GPT Partition Table Found. Parsing...";
 	    uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
 	    uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
 	    uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
@@ -293,6 +296,7 @@ void ProcessForensicImage(ForImg* curimg)
 	}
 	else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
 	{
+	    qInfo() << "Wombat Logical Image Found. Parsing...";
 	    ParseLogicalImage(curimg);
 	}
 	else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
@@ -511,6 +515,7 @@ void ParsePartition(ForImg* curimg, uint32_t cursectoroffset, uint32_t cursector
     partstring += "e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + ": ";
     if(allocstatus == 0)
     {
+	qInfo() << "Partition" << QString::number(ptreecnt) << "is" << "Unallocated";
         partstring += "UNALLOCATED";
         reportstring += "UNALLOCATED";
     }
@@ -708,22 +713,26 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             {
                 if(fatstr == "FAT12")
                 {
+		    qInfo() << "FAT12 File System Found. Parsing...";
                     out << "File System Type Int|1|Internal File System Type represented as an integer." << Qt::endl;
 	            out << "File System Type|FAT12|File System Type String." << Qt::endl;
                 }
                 else if(fatstr == "FAT16")
                 {
+		    qInfo() << "FAT16 File System Found. Parsing...";
                     out << "File System Type Int|2|Internal File System Type represented as an integer." << Qt::endl;
 	            out << "File System Type|FAT16|File System Type String." << Qt::endl;
                 }
             }
             else if(fat32str == "FAT32")
             {
+		qInfo() << "FAT32 File System Found. Parsing...";
                 out << "File System Type Int|3|Internal File System Type represented as an integer." << Qt::endl;
 	        out << "File System Type|FAT32|File System Type String." << Qt::endl;
             }
             else if(exfatstr == "EXFAT")
             {
+		qInfo() << "EXFAT File System Found. Parsing...";
                 out << "File System Type Int|4|Internal File System Type represented as an integer." << Qt::endl;
 	        out << "File System Type|EXFAT|File System Type String." << Qt::endl;
             }
@@ -860,6 +869,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	}
 	else if(exfatstr.startsWith("NTFS")) // NTFS
 	{
+	    qInfo() << "NTFS File System Found. Parsing...";
 	    out << "File System Type Int|5|Internal File System Type represented as an integer." << Qt::endl;
 	    out << "File System Type|NTFS|File System Type String." << Qt::endl;
 	    out << "Bytes Per Sector|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2))) << "|Number of bytes per sector, usually 512." << Qt::endl;
@@ -1028,16 +1038,19 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "File System Type|";
         if(((compatflags & 0x00000200UL) != 0) || ((incompatflags & 0x0001f7c0UL) != 0) || ((readonlyflags & 0x00000378UL) != 0))
         {
+	    qInfo() << "EXT4 File System Found. Parsing...";
             out << "EXT4";
             partitionname += QString(" [EXT4]");
         }
         else if(((compatflags & 0x00000004UL) != 0) || ((incompatflags & 0x0000000cUL) != 0))
         {
+	    qInfo() << "EXT3 File System Found. Parsing...";
             out << "EXT3";
             partitionname += QString(" [EXT3]");
         }
         else
         {
+	    qInfo() << "EXT2 File System Found. Parsing...";
             out << "EXT2";
             partitionname += QString(" [EXT2]");
         }
@@ -1112,6 +1125,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(apfsig == "NXSB") // APFS Container
     {
+	qInfo() << "APFS Container Found. Parsing...";
         uint64_t nxoffset = curstartsector*512;
         // THIS POSSIBLY NEEDS TO OCCUR WITHIN THE FOR LOOP OF THE CHECKPOINT DESCRIPTOR LOOP
         uint64_t nxoid = qFromLittleEndian<uint64_t>(curimg->ReadContent(nxoffset + 8, 8));
@@ -1266,11 +1280,13 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
             partitionname += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(catalogstartinbytes + 22 + i*2, 2))));
         if(hfssig == "H+")
         {
+	    qInfo() << "HFS+ File System Found. Parsing...";
             partitionname += " [HFS+]";
             out << "File System Type|HFS+|File System Type String." << Qt::endl;
         }
         else if(hfssig == "HX")
         {
+	    qInfo() << "HFSX File System Found. Parsing...";
             partitionname += " [HFSX]";
             out << "File System Type|HFSX|File System Type String." << Qt::endl;
         }
@@ -1370,6 +1386,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(xfssig == "XFSB") // XFS
     {
+	qInfo() << "XFS File System Found. Parsing...";
         out << "File System Type Int|9|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|XFS|File System Type String." << Qt::endl;
         partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 108, 12).toStdString());
@@ -1386,6 +1403,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
+	qInfo() << "BTRFS File System Found. Parsing...";
         out << "File System Type Int|10|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|BTRFS|File System Type String." << Qt::endl;
         partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 65536 + 0x12b, 100).toStdString());
@@ -1407,6 +1425,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(btlsig == "-FVE-FS-") // BITLOCKER
     {
+	qInfo() << "Bitlocker Encryption Found. Analyzing...";
         out << "File System Type Int|11|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|BITLOCKER|File System Type String." << Qt::endl;
         partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 118, qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 112, 2)) - 8).toStdString());
@@ -1450,6 +1469,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(bfssig == "1SFB") // BFS
     {
+	qInfo() << "BFS File System Found. Parsing...";
         out << "File System Type Int|12|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|BFS|File System Type String." << Qt::endl;
         partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 512, 32).toStdString());
@@ -1476,6 +1496,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(f2fsig == 0xf2f52010) // F2FS
     {
+	out << "F2FS File System Found. Parsing not yet implemented.";
         out << "File System Type Int|13|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|F2FS|File System Type String." << Qt::endl;
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
@@ -1483,8 +1504,41 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(isosig == "CD001" && udfsig != "BEA01") // ISO9660
     {
+	out << "ISO9660 File System Found. Parsing...";
         out << "File System Type Int|14|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|ISO9660|File System Type String." << Qt::endl;
+	// NEED A FOR LOOP, WHICH STARTS AT BLOCK 16 AND GOES BY 2048 UNTIL WE GET TO THE VOLUME TERMINATOR WITH TYPE FF
+	for(int i=16; i < (curimg->Size() / 2048) - 15; i++)
+	{
+	    uint8_t voldesctype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 2048*i, 1));
+	    if(voldesctype == 0x00) // BOOT RECORD
+	    {
+		qDebug() << "Boot Record";
+	    }
+	    else if(voldesctype == 0x01) // PRIMARY VOLUME DESCRIPTOR
+	    {
+		qDebug() << "Primary Volume Descriptor";
+	    }
+	    else if(voldesctype == 0x02) // SECONDARY VOLUME DESCRIPTOR
+	    {
+		qDebug() << "Secondary Volume Descriptor";
+	    }
+	    else if(voldesctype == 0x03) // VOLUME PARTITION DESCRIPTOR
+	    {
+		qDebug() << "Volume Partition Descriptor";
+	    }
+	    else if(voldesctype == 0xFF) // VOLUME DESCRIPTOR SET TERMINATOR
+	    {
+		qDebug() << "Volume Descriptor Set Terminator";
+	    }
+	    if(voldesctype == 0xFF)
+	    {
+		qDebug() << "i:" << i;
+		break;
+	    }
+	}
+	/*
+	// Primary Volume Descriptor
 	out << "Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 32768, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
         partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 32808, 31).toStdString());
 	out << "Volume Label|" << partitionname << "|Name of the volume." << Qt::endl;
@@ -1521,9 +1575,11 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         // creation date, skipped hundreths of a second and the utc offset
         out << "Volume Creation Date|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33581, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33585, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33587, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33589, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33591, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33593, 2).toStdString()) << "|Creation date and time." << Qt::endl;
         out << "Volume Modification Date|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33598, 4).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33602, 2).toStdString()) << "-" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33604, 2).toStdString()) << " " << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33606, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33608, 2).toStdString()) << ":" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 33610, 2).toStdString()) << "|Modification date and time." << Qt::endl;
+	*/
     }
     else if(isosig == "CD001" && udfsig == "BEA01") // UDF
     {
+	out << "UDF File System Found. Parsing not yet implemented.";
         out << "File System Type Int|15|Internal File System Type represented as an integer." << Qt::endl;
 	out << "File System Type|UDF|File System Type String." << Qt::endl;
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
@@ -1531,6 +1587,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(hfssig == "BD") // legacy HFS
     {
+	out << "HFS File System Found. Parsing not yet implemented.";
         out << "File System Type Int|16|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|HFS|File System Type String." << Qt::endl;
         uint8_t volnamelength = qFromBigEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 1060, 1));
@@ -1566,12 +1623,14 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(zfssig == 0x00bab10c) // ZFS
     {
+	qInfo() << "ZFS File System Found. Parsing not yet implemeneted.";
         out << "File System Type Int|17|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|ZFS|File System Type String." << Qt::endl;
         partitionname += " [ZFS]";
     }
     else if(refsig == 0x5265465300000000) // ReFS
     {
+	qInfo() << "ReFS File System Found. Parsing not yet implemeneted.";
         out << "File System Type Int|18|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|RES|File System Type String." << Qt::endl;
         //out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
@@ -1579,12 +1638,14 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     }
     else if(f2fsig == 0xe0f5e1e2) // EROFS
     {
+	qInfo() << "EROFS File System Found. Parsing not yet implemeneted.";
         out << "File System Type Int|19|Internal File System Type represented as an integer." << Qt::endl;
         out << "File System Type|EROFS|File System Type String." << Qt::endl;
         partitionname += " [EROFS]";
     }
     else if(bcfsig1 == 0xc68573f64e1a45ca && bcfsig2 == 0x8265f57f48ba6d81) // BCACHEFS
     {
+	qInfo() << "BCACHEFS File System Found. Parsing not yet implemeneted.";
 	out << "File System Type Int|20|Internal File System Type represented as an integer." << Qt::endl;
 	out << "File System Type|BCACHEFS|File System Type String." << Qt::endl;
 	partitionname += "[BCACHEFS]";
