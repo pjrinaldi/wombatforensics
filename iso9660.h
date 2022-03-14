@@ -10,5 +10,6 @@
 #include "commonfs.h"
 
 void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
+void ParseDirectoryContents(ForImg* curimg, uint32_t extblk, uint32_t blocksize);
 // might need parentinode in here so i can if else root dir...
 #endif // iso9660.h

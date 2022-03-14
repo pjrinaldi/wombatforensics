@@ -1528,6 +1528,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    {
 		//qDebug() << "Primary Volume Descriptor" << pvindx;
 		// Primary Volume Descriptor
+		//out << "Primary Volume Descriptor|" << QString::number(pvindx) << "|Identifier for this primary volume descriptor." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset, 1))) << "|Value for volume descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary or Enhanced, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
 		partitionname += QString::fromStdString(curimg->ReadContent(curoffset + 40, 31).toStdString());
 		out << "PV" << QString::number(pvindx) << " Volume Label|" << partitionname << "|Name of the volume." << Qt::endl;
@@ -1537,11 +1538,11 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 		out << "PV" << QString::number(pvindx) << " Volume Sequence Number|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 124, 2))) << "|Ordinal number of the volume in the volume set which the volume is a member." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Logical Block Size|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 128, 2))) << "|Size in bytes of a logical block." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Path Table Size|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 132, 4))) << "|Length in bytes of a recorded occurence of the path table identified by the volume descriptor." << Qt::endl;
-		out << "PV" << QString::number(pvindx) << " Location of Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 140, 4))) << "|Logical block number of the first logical block allocated to the extent which  contains an occurrence of the path table." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Location of Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 140, 4))) << "|Logical block number of the first logical block allocated to the extent which contains an occurrence of the path table." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Location of Optional Occurrence of Type L Path Table|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 144, 4))) << "|Logical block number of the first logical block allocated to the extent which contains an optional occurence of the path table. If 0, it means the extent shall not be expected to be recorded." << Qt::endl;
 		// Dir Record for Root Directory - 34 bytes
 		out << "PV" << QString::number(pvindx) << " Root Directory Record Length|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 156, 1))) << "|Length in bytes of the root directory record." << Qt::endl;
-		out << "PV" << QString::number(pvindx) << " Extended Attribute Record LEngth|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 157, 1))) << "|Length in bytes of the extended attribute record, if recorded, otherwise 0." << Qt::endl;
+		out << "PV" << QString::number(pvindx) << " Extended Attribute Record Length|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 157, 1))) << "|Length in bytes of the extended attribute record, if recorded, otherwise 0." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Extent Location|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 158, 4))) << "|Logical block number of the first logical block allocated to the extent." << Qt::endl;
 		out << "PV" << QString::number(pvindx) << " Data Length|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 166, 4))) << "|Length in bytes of the data for the file section." << Qt::endl;
 		uint16_t recyear = 1900 + qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 174, 1));
@@ -1607,6 +1608,8 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 		break;
 	    }
 	}
+	out << "Primary Volume Count|" << QString::number(pvindx - 1) << "|Number of Primary volumes." << Qt::endl;
+	out << "Supplementary/Enhanced Volume Count|" << QString::number(svdindx - 1) << "|Number of Supplemnentary/Enhanded volumes." << Qt::endl;
     }
     else if(isosig == "CD001" && udfsig == "BEA01") // UDF
     {
