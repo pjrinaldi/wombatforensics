@@ -128,8 +128,8 @@ void ParseDirectoryContents(ForImg* curimg, uint32_t dirextblk, uint32_t blocksi
 	{
 	    qDebug() << "lendr:" << lendr << "extattrlen:" << extattrlen << "extblk:" << extblk << "datalen:" << datalen << "file flags:" << QString::number(fileflags, 2) << QString::number(fileflags, 16) << "fileunitsize:" << fileunitsize << "interleavegapsize:" << interleavegapsize << "lenfi:" << lenfi << "fileid:" << fileid;
 	    qDebug() << "file layout:" << QString(QString::number(extblk * 2048) + "," +  QString::number(datalen) + ";");
-	curoff = curoff + lendr;
 	}
+	curoff = curoff + lendr;
     }
 }
 
