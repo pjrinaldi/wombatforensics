@@ -5,6 +5,7 @@
 
 void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
+    //quint64 curinode = 0;
     uint32_t blocksize = 0;
     uint8_t pvcount = 0;
     uint8_t svcount = 0;
@@ -70,7 +71,7 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 	uint16_t pardirnum = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoff + 6, 2));
 	QByteArray dirid = curimg->ReadContent(curoff + 8, lendi);
 	qDebug() << "curoff:" << curoff << "lendi:" << lendi << "extattrlen:" << extattrlen << "extblk:" << extblk << "pardirnum:" << pardirnum << "dirid:" << dirid;
-	ParseDirectoryContents(curimg, extblk, blocksize);
+	ParseDirectoryContents(curimg, extblk, 0, blocksize, false);
 	//QString dirid = QString::fromStdString(curimg->ReadContent(curoff + 8, lendi).toStdString());
     }
     for(int i=0; i < svpathtableblk.count(); i++)
@@ -82,7 +83,7 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 	uint16_t pardirnum = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoff + 6, 2));
 	QByteArray dirid = curimg->ReadContent(curoff + 8, lendi);
 	qDebug() << "curoff:" << curoff << "lendi:" << lendi << "extattrlen:" << extattrlen << "extblk:" << extblk << "pardirnum:" << pardirnum << "dirid:" << dirid;
-	ParseDirectoryContents(curimg, extblk, blocksize);
+	ParseDirectoryContents(curimg, extblk, 0, blocksize, true);
     }
     // PROCESS IS TO PARSE SMALL PATH TABLE RECORD, WHICH LEADS TO THE DIRECTORY RECORD WHICH THEN TAKES ME TO THE FILE RECORD INFO???
     /*
@@ -93,7 +94,7 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
     qDebug() << "blocksize:" << blocksize;
     */
 }
-void ParseDirectoryContents(ForImg* curimg, uint32_t dirextblk, uint32_t blocksize) // DIRECTORY RECORD
+void ParseDirectoryContents(ForImg* curimg, uint32_t dirextblk, uint32_t parblk, uint32_t blocksize, bool utf16) // DIRECTORY RECORD
 {
     uint64_t extblkoff = dirextblk * blocksize;
     uint16_t curoff = 0; // starting point which goes to 2048
@@ -112,22 +113,28 @@ void ParseDirectoryContents(ForImg* curimg, uint32_t dirextblk, uint32_t blocksi
 	uint8_t interleavegapsize = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 27, 1));
 	uint16_t volseqnumber = qFromLittleEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + 28, 4));
 	uint8_t lenfi = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 32, 1));
-	QString fileid = "";
-	if(lenfi <= 11)
-	    fileid = QString(curimg->ReadContent(extblkoff + curoff + 33, lenfi));
-	else
+	if(extblk != dirextblk && extblk != parblk)
 	{
-	    qDebug() << "curoff bfore filename:" << curoff << extblkoff + curoff;
-	    for(uint8_t i=0; i < lenfi/2; i++)
-		fileid += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + i*2 + 33, 2))));
-	    //int remaining = namelength + 16 - curlength;
-	    //for(int m=1; m < remaining; m++)
-		//filename += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + (j+k)*32 + m*2, 2))));
-	}
-	if(extblk != dirextblk)
-	{
-	    qDebug() << "lendr:" << lendr << "extattrlen:" << extattrlen << "extblk:" << extblk << "datalen:" << datalen << "file flags:" << QString::number(fileflags, 2) << QString::number(fileflags, 16) << "fileunitsize:" << fileunitsize << "interleavegapsize:" << interleavegapsize << "lenfi:" << lenfi << "fileid:" << fileid;
+	    QString fileid = "";
+	    if(!utf16)
+		fileid = QString::fromStdString(curimg->ReadContent(extblkoff + curoff + 33, lenfi).toStdString());
+	    else
+	    {
+		//qDebug() << "curoff before filename:" << curoff << extblkoff + curoff;
+		for(uint8_t i=0; i < lenfi/2; i++)
+		    fileid += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + i*2 + 33, 2))));
+	    }
+	    if(extattrlen > 0) // parse extended attribute record
+	    {
+		qDebug() << "parse extended attribute record here...";
+	    }
+	    qDebug() << "dirblk:" << dirextblk << "lendr:" << lendr << "extattrlen:" << extattrlen << "extblk:" << extblk << "datalen:" << datalen << "file flags:" << QString::number(fileflags, 2) << QString::number(fileflags, 16) << "fileunitsize:" << fileunitsize << "interleavegapsize:" << interleavegapsize << "lenfi:" << lenfi << "fileid:" << fileid;
 	    qDebug() << "file layout:" << QString(QString::number(extblk * 2048) + "," +  QString::number(datalen) + ";");
+	    if(fileflags & 0x02) // directory
+	    {
+		qDebug() << "this is a directory, so parse with ParseDirectoryContents...";
+		ParseDirectoryContents(curimg, extblk, dirextblk, blocksize, utf16);
+	    }
 	}
 	curoff = curoff + lendr;
     }
