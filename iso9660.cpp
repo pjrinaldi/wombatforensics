@@ -5,16 +5,19 @@
 
 void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt)
 {
-    //quint64 curinode = 0;
+    quint64 curinode = 0;
     uint32_t blocksize = 0;
     uint8_t pvcount = 0;
     uint8_t svcount = 0;
-    QList<uint32_t> pvpathtablesize;
-    QList<uint32_t> pvpathtableblk;
+    //QList<uint32_t> pvpathtablesize;
+    //QList<uint32_t> pvpathtableblk;
     QList<uint32_t> pvrootdirblk;
-    QList<uint32_t> svpathtablesize;
-    QList<uint32_t> svpathtableblk;
+    //QList<uint32_t> svpathtablesize;
+    //QList<uint32_t> svpathtableblk;
     QList<uint32_t> svrootdirblk;
+
+    pvrootdirblk.clear();
+    svrootdirblk.clear();
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -37,11 +40,15 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 	    while(!propfile.atEnd())
 	    {
 		QString line = propfile.readLine();
+		/*
 		if(line.startsWith("PV" + QString::number(i) + " Path Table Size|"))
 		    pvpathtablesize.append(line.split("|").at(1).toUInt());
 		else if(line.startsWith("PV" + QString::number(i) + " Location of Occurrence of Type L Path Table|"))
 		    pvpathtableblk.append(line.split("|").at(1).toUInt());
 		else if(line.startsWith("PV" + QString::number(i) + " Extent Location|"))
+		    pvrootdirblk.append(line.split("|").at(1).toUInt());
+		*/
+		if(line.startsWith("PV" + QString::number(i) + " Extent Location|"))
 		    pvrootdirblk.append(line.split("|").at(1).toUInt());
 	    }
 	}
@@ -51,17 +58,35 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 	    while(!propfile.atEnd())
 	    {
 		QString line = propfile.readLine();
+		/*
 		if(line.startsWith("SV" + QString::number(i) + " Path Table Size|"))
 		    svpathtablesize.append(line.split("|").at(1).toUInt());
 		else if(line.startsWith("SV" + QString::number(i) + " Location of Occurrence of Type L Path Table|"))
 		    svpathtableblk.append(line.split("|").at(1).toUInt());
 		else if(line.startsWith("SV" + QString::number(i) + " Extent Location|"))
 		    svrootdirblk.append(line.split("|").at(1).toUInt());
+		*/
+		if(line.startsWith("SV" + QString::number(i) + " Extent Location|"))
+		    svrootdirblk.append(line.split("|").at(1).toUInt());
 	    }
 	}
         propfile.close();
     }
+    qDebug() << "curinode start:" << curinode;
+    for(int i=0; i < pvrootdirblk.count(); i++)
+    {
+	curinode = ParseDirectoryContents(curimg, pvrootdirblk.at(i), 0, blocksize, false, curinode);
+	qDebug() << "curinode:" << curinode;
+    }
+    for(int i=0; i < svrootdirblk.count(); i++)
+    {
+	curinode = ParseDirectoryContents(curimg, svrootdirblk.at(i), 0, blocksize, true, curinode);
+	qDebug() << "curinode:" << curinode;
+    }
+    qDebug() << "curinode end:" << curinode;
+    // what if i skip this operation and just for each pv/sv launch the root directory parse...
     // parse each pv path table
+    /*
     for(int i=0; i < pvpathtableblk.count(); i++)
     {
 	uint64_t curoff = pvpathtableblk.at(i) * blocksize;
@@ -85,6 +110,7 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 	qDebug() << "curoff:" << curoff << "lendi:" << lendi << "extattrlen:" << extattrlen << "extblk:" << extblk << "pardirnum:" << pardirnum << "dirid:" << dirid;
 	ParseDirectoryContents(curimg, extblk, 0, blocksize, true);
     }
+    */
     // PROCESS IS TO PARSE SMALL PATH TABLE RECORD, WHICH LEADS TO THE DIRECTORY RECORD WHICH THEN TAKES ME TO THE FILE RECORD INFO???
     /*
     qDebug() << "parse iso:" << curstartsector << ptreecnt;
@@ -94,13 +120,16 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
     qDebug() << "blocksize:" << blocksize;
     */
 }
-void ParseDirectoryContents(ForImg* curimg, uint32_t dirextblk, uint32_t parblk, uint32_t blocksize, bool utf16) // DIRECTORY RECORD
+//void ParseDirectoryContents(ForImg* curimg, uint32_t dirextblk, uint32_t parblk, uint32_t blocksize, bool utf16) // DIRECTORY RECORD
+quint64 ParseDirectoryContents(ForImg* curimg, uint32_t dirextblk, uint32_t parblk, uint32_t blocksize, bool utf16, quint64 parinode) // DIRECTORY RECORD
 {
+    // MAY NEED TO KEEP TRACK OF FILE/DIR RECORD BLOCKS SO THERE IS NO OVERLAP BETWEEN THE P/S VOLUMES
+    quint64 curinode = parinode + 1;
     uint64_t extblkoff = dirextblk * blocksize;
     uint16_t curoff = 0; // starting point which goes to 2048
     while(curoff <= 2048)
     {
-	qDebug() << "curoff:" << curoff;
+	//qDebug() << "curoff:" << curoff;
 	uint8_t lendr = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff, 1));
 	if(lendr == 0x00)
 	    break;
@@ -128,15 +157,18 @@ void ParseDirectoryContents(ForImg* curimg, uint32_t dirextblk, uint32_t parblk,
 	    {
 		qDebug() << "parse extended attribute record here...";
 	    }
-	    qDebug() << "dirblk:" << dirextblk << "lendr:" << lendr << "extattrlen:" << extattrlen << "extblk:" << extblk << "datalen:" << datalen << "file flags:" << QString::number(fileflags, 2) << QString::number(fileflags, 16) << "fileunitsize:" << fileunitsize << "interleavegapsize:" << interleavegapsize << "lenfi:" << lenfi << "fileid:" << fileid;
+	    qDebug() << "dirblk:" << dirextblk << "lendr:" << lendr << "extattrlen:" << extattrlen << "extblk:" << extblk << "datalen:" << datalen << "file flags:" << QString::number(fileflags, 2) << QString::number(fileflags, 16) << "fileunitsize:" << fileunitsize << "interleavegapsize:" << interleavegapsize << "lenfi:" << lenfi << "fileid:" << fileid << "curinode:" << curinode;
 	    qDebug() << "file layout:" << QString(QString::number(extblk * 2048) + "," +  QString::number(datalen) + ";");
 	    if(fileflags & 0x02) // directory
 	    {
 		qDebug() << "this is a directory, so parse with ParseDirectoryContents...";
-		ParseDirectoryContents(curimg, extblk, dirextblk, blocksize, utf16);
+		curinode = ParseDirectoryContents(curimg, extblk, dirextblk, blocksize, utf16, curinode);
 	    }
+	    else
+		curinode++;
 	}
 	curoff = curoff + lendr;
     }
+    return curinode;
 }
 
