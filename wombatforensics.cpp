@@ -216,6 +216,9 @@ WombatForensics::WombatForensics(QWidget *parent) : QMainWindow(parent), ui(new 
     connect(tagfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(hashmatchfilterview, SIGNAL(HeaderChanged()), this, SLOT(FilterApplied()));
     connect(jumpfilterview, SIGNAL(SetOffset()), this, SLOT(SetHexOffset()));
+    QShortcut* closeit = new QShortcut(this);
+    closeit->setKey(Qt::CTRL + Qt::Key_Q);
+    connect(closeit, SIGNAL(activated()), this, SLOT(close()));
     /*
     jumpforward = new QShortcut(ui->dirTreeView);
     jumpbackward = new QShortcut(ui->dirTreeView);
@@ -2934,6 +2937,7 @@ void WombatForensics::SetupHexPage(void)
     setAutoFillBackground(true);
     //QByteArray zarray;
     //ui->hexview->setData(zarray);
+    ui->hexview->Config();
     ui->hexview->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->hexview, SIGNAL(currentAddressChanged(qint64)), this, SLOT(SetOffsetLabel(qint64)));
     connect(ui->hexview, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ImgHexMenu(const QPoint &)));

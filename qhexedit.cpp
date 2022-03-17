@@ -39,6 +39,7 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
 #else
     setFont(QFont("Monospace", 10));
 #endif
+    /*
     setAddressAreaColor(this->palette().alternateBase().color());
     setHighlightingColor(QColor(0xff, 0xff, 0x99, 0xff));
     setSelectionColor(this->palette().highlight().color());
@@ -51,14 +52,19 @@ QHexEdit::QHexEdit(QWidget *parent) : QAbstractScrollArea(parent)
     _cursorTimer.setInterval(500);
     _cursorTimer.start();
 
+    QByteArray zarray("ZeroFile");
+    setData(zarray);
     setAddressWidth(4);
     setAddressArea(true);
     setAsciiArea(true);
-    setOverwriteMode(true);
+    setOverwriteMode(false);
+    //setOverwriteMode(true);
     setHighlighting(true);
-    setReadOnly(false);
+    setReadOnly(true);
+    //setReadOnly(false);
 
     init();
+    */
 
 }
 
@@ -1277,6 +1283,7 @@ void QHexEdit::refresh()
 
 void QHexEdit::readBuffers()
 {
+    //qDebug() << "data:" << data();
     _dataShown = _chunks->data(_bPosFirst, _bPosLast - _bPosFirst + _bytesPerLine + 1, &_markedShown);
     _hexDataShown = QByteArray(_dataShown.toHex());
 }
@@ -1351,5 +1358,31 @@ void QHexEdit::SetColorInformation(qint64 fsoff, qint64 blksize, QString blockst
 
 void QHexEdit::Reset()
 {
+    init();
+}
+
+void QHexEdit::Config()
+{
+    setAddressAreaColor(this->palette().alternateBase().color());
+    setHighlightingColor(QColor(0xff, 0xff, 0x99, 0xff));
+    setSelectionColor(this->palette().highlight().color());
+
+    connect(&_cursorTimer, SIGNAL(timeout()), this, SLOT(updateCursor()));
+    connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjust()));
+    connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(adjust()));
+    connect(_undoStack, SIGNAL(indexChanged(int)), this, SLOT(dataChangedPrivate(int)));
+
+    _cursorTimer.setInterval(500);
+    _cursorTimer.start();
+
+    //QByteArray zarray("ZeroFile");
+    //setData(zarray);
+    setAddressWidth(4);
+    setAddressArea(true);
+    setAsciiArea(true);
+    setOverwriteMode(false);
+    setHighlighting(true);
+    setReadOnly(true);
+
     init();
 }

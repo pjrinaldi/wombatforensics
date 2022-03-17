@@ -892,7 +892,7 @@ ForImg::ForImg(QString imgfile)
         imgtype = 15;
     //qDebug() << "imgtype:" << imgtype;
     imgpath = imgfile;
-    //qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
+    qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
     if(imgtype == 0) // EWF
     {
         libewf_handle_t* ewfhandle = NULL;

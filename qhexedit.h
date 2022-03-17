@@ -379,6 +379,7 @@ public:
     // May 6, 2021
     // Resets the hexviewer upon closing
     void Reset(void);
+    void Config(void);
 
 protected:
     // Handle events
