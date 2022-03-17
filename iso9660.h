@@ -10,7 +10,7 @@
 #include "commonfs.h"
 
 void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
-quint64 ParseDirectoryContents(ForImg* curimg, uint32_t extblk, uint32_t parblk, uint32_t blocksize, bool utf16, quint64 parinode);
+quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t extblk, uint32_t parblk, uint32_t blocksize, bool utf16, quint64 parinode, QString parpath, QList<uint32_t>* parsedblocks);
 // that's not really parinode, it's curinode, i still need a parentinode probably... i will also need parpath...
 //void ParseDirectoryContents(ForImg* curimg, uint32_t extblk, uint32_t parblk, uint32_t blocksize, bool utf16);
 // might need parentinode in here so i can if else root dir...

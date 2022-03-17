@@ -1604,7 +1604,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    }
 	    if(voldesctype == 0xFF)
 	    {
-		qDebug() << "i:" << i;
+		//qDebug() << "i:" << i;
 		break;
 	    }
 	}

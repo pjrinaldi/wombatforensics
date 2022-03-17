@@ -867,7 +867,8 @@ std::string Verify(QString outstr)
  */ 
 ForImg::ForImg(QString imgfile)
 {
-    qDebug() << "is null:" << imgfile.isNull() << "is empty:" << imgfile.isEmpty();
+    qDebug() << "imgfile:" << imgfile;
+    //qDebug() << "is null:" << imgfile.isNull() << "is empty:" << imgfile.isEmpty();
     if(imgfile.split("/").count() == 0)
         imgtype = -1;
     if(imgfile.split("/").last().toLower().endsWith(".e01"))
