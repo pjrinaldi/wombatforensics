@@ -245,7 +245,19 @@ quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirext
     uint64_t extblkoff = dirextblk * blocksize;
     uint16_t curoff = 0; // starting point which goes to 2048
     qDebug() << "parpath:" << parpath << "dirdatalen:" << dirdatalen;
-    while(curoff <= dirdatalen)
+    qDebug() << "dirdatalen blk cnt:" << dirdatalen / blocksize;
+    qDebug() << "dirdatalen rem:" << dirdatalen % blocksize;
+    int blkcnt = dirdatalen / blocksize;
+    if(dirdatalen % blocksize != 0)
+	blkcnt++;
+    qDebug() << "blockcount:" << blkcnt;
+    //while(curoff <= dirdatalen)
+    for(int i=0; i < blkcnt; i++)
+    {
+	//qDebug() << i << "blocks to loop over to capture all the files...";
+	// NEED TO PLACE THE WHILE WITHIN THIS FOR LOOP, AND THEN FIX EXTBLKOFF TO REFLECT THE NEXT BLOCK...
+    }
+    while(curoff < blocksize)
     {
 	//qDebug() << "curoff:" << curoff;
 	uint8_t lendr = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff, 1));
@@ -253,12 +265,14 @@ quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirext
 	// start of the next block...
 	if(lendr == 0x00)
 	{
-	    curoff = ((curoff / blocksize) + 1) * blocksize;
+	    /*
+	    curoff = (((curoff / blocksize) + 1) * blocksize) - 1;
 	    qDebug() << "curoff:" << curoff;
 	    lendr = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff, 1));
 	    qDebug() << "lendr:" << lendr;
 	    //qDebug() << "curofftest:" << curofftest;
-	    //break;
+	    */
+	    break;
 	}
 	uint8_t extattrlen = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 1, 1));
 	uint32_t extblk = qFromLittleEndian<uint32_t>(curimg->ReadContent(extblkoff + curoff + 2, 4));
@@ -375,14 +389,12 @@ quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirext
 		nodedata.clear();
 		out.flush();
 		fileprop.close();
-		/*
 		if(fileflags & 0x02) // directory
 		{
 		    qDebug() << "node id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode - 1)) << "datalen:" << datalen << "physize:" << physicalsize;
 		    //qDebug() << "this is a directory, so parse with ParseDirectoryContents...";
 		    curinode = ParseDirectoryContents(curimg, ptreecnt, extblk, physicalsize, dirextblk, blocksize, utf16, curinode - 1, QString(filepath + fileid + "/"), parsedblocks);
 		}
-		*/
 	    }
 	}
 	//else
