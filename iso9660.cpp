@@ -242,11 +242,12 @@ quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirext
     if(parblk != 0)
 	curinode = parinode + 1;
     //qDebug() << "curinode:" << curinode;
+    qDebug() << "dirextblk:" << dirextblk << "dirdatalen:" << dirdatalen;
     uint64_t extblkoff = dirextblk * blocksize;
     uint16_t curoff = 0; // starting point which goes to 2048
-    qDebug() << "parpath:" << parpath << "dirdatalen:" << dirdatalen;
-    qDebug() << "dirdatalen blk cnt:" << dirdatalen / blocksize;
-    qDebug() << "dirdatalen rem:" << dirdatalen % blocksize;
+    //qDebug() << "parpath:" << parpath << "dirdatalen:" << dirdatalen;
+    //qDebug() << "dirdatalen blk cnt:" << dirdatalen / blocksize;
+    //qDebug() << "dirdatalen rem:" << dirdatalen % blocksize;
     int blkcnt = dirdatalen / blocksize;
     if(dirdatalen % blocksize != 0)
 	blkcnt++;
@@ -254,154 +255,128 @@ quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirext
     //while(curoff <= dirdatalen)
     for(int i=0; i < blkcnt; i++)
     {
+	extblkoff = extblkoff + i*blocksize;
+	curoff = 0;
+	qDebug() << "i:" << i << "starting extblkoff:" << extblkoff;
 	//qDebug() << i << "blocks to loop over to capture all the files...";
 	// NEED TO PLACE THE WHILE WITHIN THIS FOR LOOP, AND THEN FIX EXTBLKOFF TO REFLECT THE NEXT BLOCK...
-    }
-    while(curoff < blocksize)
-    {
-	//qDebug() << "curoff:" << curoff;
-	uint8_t lendr = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff, 1));
-	// this is the issue. when the last entry is switching blocks, there are zero's which need to be skipped.. to get to
-	// start of the next block...
-	if(lendr == 0x00)
+	while(curoff < blocksize)
 	{
-	    /*
-	    curoff = (((curoff / blocksize) + 1) * blocksize) - 1;
-	    qDebug() << "curoff:" << curoff;
-	    lendr = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff, 1));
-	    qDebug() << "lendr:" << lendr;
-	    //qDebug() << "curofftest:" << curofftest;
-	    */
-	    break;
-	}
-	uint8_t extattrlen = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 1, 1));
-	uint32_t extblk = qFromLittleEndian<uint32_t>(curimg->ReadContent(extblkoff + curoff + 2, 4));
-	uint8_t lenfi = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 32, 1));
-	if(!parsedblocks->contains(extblk))
-	{
-	    // need to fix layout so it's a function of blocksize...
-	    uint32_t datalen = qFromLittleEndian<uint32_t>(curimg->ReadContent(extblkoff + curoff + 10, 4));
-	    //qDebug() << "# of blocks:" << datalen / blocksize;
-	    quint64 physicalsize = 0;
-	    int phyblkcnt = datalen / blocksize;
-	    int phyremcnt = datalen % blocksize;
-	    if(phyblkcnt == 0)
-		physicalsize = blocksize;
-	    else
+	    uint8_t lendr = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff, 1));
+	    if(lendr == 0x00)
+		break;
+	    uint8_t extattrlen = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 1, 1));
+	    uint32_t extblk = qFromLittleEndian<uint32_t>(curimg->ReadContent(extblkoff + curoff + 2, 4));
+	    uint8_t lenfi = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 32, 1));
+	    if(!parsedblocks->contains(extblk))
 	    {
-		physicalsize = blocksize * phyblkcnt;
-		if(phyremcnt > 0)
-		    physicalsize += blocksize;
-	    }
-	    //qDebug() << "physicalsize:" << physicalsize;
-	    // recording date and time (18, 7) need to get 1 at a time and format like before...
-	    uint8_t fileflags = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 25, 1));
-	    uint8_t fileunitsize = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 26, 1));
-	    uint8_t interleavegapsize = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 27, 1));
-	    uint16_t volseqnumber = qFromLittleEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + 28, 4));
-	    if(extblk != dirextblk && extblk != parblk)
-	    {
-		QString filepath = "/";
-		if(!parpath.isEmpty())
-		    filepath = parpath;
-		parsedblocks->append(extblk);
-		QString fileid = "";
-		if(!utf16)
-		    fileid = QString::fromStdString(curimg->ReadContent(extblkoff + curoff + 33, lenfi).toStdString());
+		uint32_t datalen = qFromLittleEndian<uint32_t>(curimg->ReadContent(extblkoff + curoff + 10, 4));
+		quint64 physicalsize = 0;
+		int phyblkcnt = datalen / blocksize;
+		int phyremcnt = datalen % blocksize;
+		if(phyblkcnt == 0)
+		    physicalsize = blocksize;
 		else
 		{
-		    //qDebug() << "curoff before filename:" << curoff << extblkoff + curoff;
-		    for(uint8_t i=0; i < lenfi/2; i++)
-			fileid += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + i*2 + 33, 2))));
+		    physicalsize = blocksize * phyblkcnt;
+		    if(phyremcnt > 0)
+			physicalsize += blocksize;
 		}
-		if(extattrlen > 0) // parse extended attribute record
+		uint8_t fileflags = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 25, 1));
+		uint8_t fileunitsize = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 26, 1));
+		uint8_t interleavegapsize = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 27, 1));
+		uint16_t volseqnumber = qFromLittleEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + 28, 2));
+		if(extblk != dirextblk && extblk != parblk)
 		{
-		    qDebug() << "parse extended attribute record here...";
-		}
-		fileid = fileid.left(fileid.indexOf(QChar(';')));
-		QString curlayout = QString::number(extblk * 2048) + "," + QString::number(physicalsize) + ";";
-		//qDebug() << "dirblk:" << dirextblk << "lendr:" << lendr << "extattrlen:" << extattrlen << "extblk:" << extblk << "datalen:" << datalen << "file flags:" << QString::number(fileflags, 2) << QString::number(fileflags, 16) << "fileunitsize:" << fileunitsize << "interleavegapsize:" << interleavegapsize << "lenfi:" << lenfi << "fileid:" << fileid << "curinode:" << curinode;
-		//qDebug() << "file layout:" << curlayout;
-		// add node and properties here...
-		uint8_t itemtype = 0;
-		uint8_t isdeleted = 0;
-		QTextStream out;
-		QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(curinode) + ".prop");
-		if(!fileprop.isOpen())
-		    fileprop.open(QIODevice::Append | QIODevice::Text);
-		out.setDevice(&fileprop);
-		out << "Layout|" << curlayout << "|File layout in offset,size; format." << Qt::endl;
-		out << "Physical Size|" << QString::number(physicalsize) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
-		out << "Logical Size|" << QString::number(datalen) << "|Size in Bytes for the file." << Qt::endl;
-		QHash<QString, QVariant> nodedata;
-		nodedata.clear();
-		nodedata.insert("name", QByteArray(fileid.toUtf8()).toBase64());
-		nodedata.insert("path", QByteArray(filepath.toUtf8()).toBase64());
-		nodedata.insert("size", datalen);
-		if(fileflags & 0x02) // directory
-		{
-		    itemtype = 3;
-		    if(isdeleted == 1)
-			itemtype = 2;
-		}
-		else
-		{
-		    itemtype = 5;
-		    if(isdeleted == 1)
-			itemtype = 4;
-		}
-		// need to implement cat/sig here...
-		if(datalen > 0) // Get Cat/Sig
-		{
-		    if(fileflags & 0x02) // directory
+		    QString filepath = "/";
+		    if(!parpath.isEmpty())
+			filepath = parpath;
+		    parsedblocks->append(extblk);
+		    QString fileid = "";
+		    if(!utf16)
+			fileid = QString::fromStdString(curimg->ReadContent(extblkoff + curoff + 33, lenfi).toStdString());
+		    else
 		    {
-			nodedata.insert("cat", "Directory");
-			nodedata.insert("sig", "Directory");
+			for(uint8_t j=0; j < lenfi/2; j++)
+			    fileid += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + j*2 + 33, 2))));
+		    }
+		    if(extattrlen > 0) // parse extended attribute record
+		    {
+			qDebug() << "parse extended attr record here...";
+		    }
+		    fileid = fileid.left(fileid.indexOf(QChar(';')));
+		    QString curlayout = QString::number(extblk * blocksize) + "," + QString::number(physicalsize) + ";";
+		    uint8_t itemtype = 5;
+		    //uint8_t isdeleted = 0;
+		    QTextStream out;
+		    QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(curinode) + ".prop");
+		    if(!fileprop.isOpen())
+			fileprop.open(QIODevice::Append | QIODevice::Text);
+		    if(fileprop.isOpen())
+		    {
+			out.setDevice(&fileprop);
+			out << "Layout|" << curlayout << "|File layout in offset,size; format." << Qt::endl;
+			out << "Physical Size|" << QString::number(physicalsize) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
+			out << "Logical Size|" << QString::number(datalen) << "|Size in Bytes for the file." << Qt::endl;
+			out.flush();
+			fileprop.close();
+		    }
+		    QHash<QString, QVariant> nodedata;
+		    nodedata.clear();
+		    nodedata.insert("name", QByteArray(fileid.toUtf8()).toBase64());
+		    nodedata.insert("path", QByteArray(filepath.toUtf8()).toBase64());
+		    nodedata.insert("size", datalen);
+		    if(fileflags & 0x02) // directory
+			itemtype = 3;
+		    if(datalen > 0) // Get Cat/Sig
+		    {
+			if(fileflags & 0x02) // directory
+			{
+			    nodedata.insert("cat", "Directory");
+			    nodedata.insert("sig", "Directory");
+			}
+			else
+			{
+			    QString catsig = GenerateCategorySignature(curimg, fileid, curlayout.split(";").at(0).split(",").at(0).toULongLong());
+			    nodedata.insert("cat", catsig.split("/").first());
+			    nodedata.insert("sig", catsig.split("/").last());
+			}
 		    }
 		    else
 		    {
-			// need to fix this so it doesn't read more than the file size which is 24 bytes.
-			QString catsig = GenerateCategorySignature(curimg, fileid, curlayout.split(";").at(0).split(",").at(0).toULongLong());
-			nodedata.insert("cat", catsig.split("/").first());
-			nodedata.insert("sig", catsig.split("/").last());
+			nodedata.insert("cat", "Empty");
+			nodedata.insert("sig", "Zero File");
+		    }
+		    nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode)));
+		    QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
+		    if(parblk != 0)
+			parentstr += QString("-f" + QString::number(parinode));
+		    mutex.lock();
+		    treenodemodel->AddNode(nodedata, parentstr, itemtype, 0);
+		    mutex.unlock();
+		    if(nodedata.value("id").toString().split("-").count() == 3)
+		    {
+			listeditems.append(nodedata.value("id").toString());
+			filesfound++;
+			isignals->ProgUpd();
+		    }
+		    curinode++;
+		    nodedata.clear();
+		    if(fileflags & 0x02) // directory
+		    {
+			curinode = ParseDirectoryContents(curimg, ptreecnt, extblk, datalen, dirextblk, blocksize, utf16, curinode - 1, QString(filepath + fileid + "/"), parsedblocks);
 		    }
 		}
-		else
-		{
-		    nodedata.insert("cat", "Empty");
-		    nodedata.insert("sig", "Zero File");
-		}
-		nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode)));
-		//qDebug() << "file id:" << nodedata.value("id").toString();
-		QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-		if(parblk != 0)
-		    parentstr += QString("-f" + QString::number(parinode));
-		mutex.lock();
-		treenodemodel->AddNode(nodedata, parentstr, itemtype, isdeleted);
-		mutex.unlock();
-		if(nodedata.value("id").toString().split("-").count() == 3)
-		{
-		    listeditems.append(nodedata.value("id").toString());
-		    filesfound++;
-		    isignals->ProgUpd();
-		}
-		curinode++;
-		nodedata.clear();
-		out.flush();
-		fileprop.close();
-		if(fileflags & 0x02) // directory
-		{
-		    qDebug() << "node id:" << QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(curinode - 1)) << "datalen:" << datalen << "physize:" << physicalsize;
-		    //qDebug() << "this is a directory, so parse with ParseDirectoryContents...";
-		    curinode = ParseDirectoryContents(curimg, ptreecnt, extblk, physicalsize, dirextblk, blocksize, utf16, curinode - 1, QString(filepath + fileid + "/"), parsedblocks);
-		}
 	    }
+	    //else
+	    //    qDebug() << "skipped because this dir/file record was already parsed.";
+	    curoff = curoff + lendr;
 	}
-	//else
-	//    qDebug() << "skipped because this dir/file record was already parsed.";
-	//qDebug() << "lenfi:" << lenfi;
+    }
+    /*
 	curoff = curoff + lendr;
     }
+    */
     return curinode;
 }
         /*
