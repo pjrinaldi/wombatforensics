@@ -255,7 +255,7 @@ quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirext
     //while(curoff <= dirdatalen)
     for(int i=0; i < blkcnt; i++)
     {
-	extblkoff = extblkoff + i*blocksize;
+	extblkoff = (dirextblk + i) * blocksize;
 	curoff = 0;
 	qDebug() << "i:" << i << "starting extblkoff:" << extblkoff;
 	//qDebug() << i << "blocks to loop over to capture all the files...";
