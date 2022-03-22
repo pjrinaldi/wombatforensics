@@ -1518,7 +1518,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    uint8_t voldesctype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset, 1));
 	    if(voldesctype == 0x00) // BOOT RECORD
 	    {
-		qDebug() << "Boot Record";
+		//qDebug() << "Boot Record";
 		out << "BR" << QString::number(brindx) << " Volume Descriptor Type|" << QString::number(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset, 1))) << "|Value for voluem descriptor type, 0 - Boot Record, 1 - Primary, 2 - Supplementary or Enhanced, 3 - Partition, 4-254 - Reserved, 255 - Set Terminator." << Qt::endl;
 		out << "BR" << QString::number(brindx) << " Boot System Identifier|" << QString::fromStdString(curimg->ReadContent(curoffset + 7, 31).toStdString()) << "|System identification which can recognize and act upon the boot system use fields." << Qt::endl;
 		out << "BR" << QString::number(brindx) << " Boot Indentifier|" << QString::fromStdString(curimg->ReadContent(curoffset + 39, 31).toStdString()) << "|Identification of the boot system." << Qt::endl;
@@ -1600,7 +1600,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	    }
 	    else if(voldesctype == 0xFF) // VOLUME DESCRIPTOR SET TERMINATOR
 	    {
-		qDebug() << "Volume Descriptor Set Terminator";
+		//qDebug() << "Volume Descriptor Set Terminator";
 	    }
 	    if(voldesctype == 0xFF)
 	    {
