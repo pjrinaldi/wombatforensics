@@ -17,15 +17,14 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
     QList<uint32_t> svpathtableblk;
     QList<uint32_t> svrootdirblk;
     QList<uint32_t> svrootdirlen;
+    // switch parsedblocks to qhash<uint32_t, QString>
     QList<uint32_t> parsedblocks;
-    //QStringList dirlist;
 
     pvrootdirblk.clear();
     pvrootdirlen.clear();
     svrootdirblk.clear();
     svrootdirlen.clear();
     parsedblocks.clear();
-    //dirlist.clear();
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -79,7 +78,7 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
 	parsedblocks.append(svrootdirblk.at(i));
 	curinode = ParseDirectoryContents(curimg, ptreecnt, svrootdirblk.at(i), svrootdirlen.at(i), 0, blocksize, true, curinode, "", &parsedblocks);
     }
-
+    parsedblocks.clear();
 }
 
 quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirextblk, uint32_t dirdatalen, uint32_t parblk, uint32_t blocksize, bool utf16, quint64 parinode, QString parpath, QList<uint32_t>* parsedblocks) // FILE/DIRECTORY RECORD
