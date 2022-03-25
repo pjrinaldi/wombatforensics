@@ -10,6 +10,6 @@
 #include "commonfs.h"
 
 void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt);
-quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t extblk, uint32_t dirlen, uint32_t parblk, uint32_t blocksize, bool utf16, quint64 parinode, QString parpath, QList<uint32_t>* parsedblocks);
+quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t extblk, uint32_t dirlen, uint32_t parblk, uint32_t blocksize, bool utf16, quint64 parinode, QString parpath, QHash<uint32_t, QString>* parsedblocks);
 
 #endif // iso9660.h

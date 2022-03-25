@@ -17,8 +17,7 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
     QList<uint32_t> svpathtableblk;
     QList<uint32_t> svrootdirblk;
     QList<uint32_t> svrootdirlen;
-    // switch parsedblocks to qhash<uint32_t, QString>
-    QList<uint32_t> parsedblocks;
+    QHash<uint32_t, QString> parsedblocks;
 
     pvrootdirblk.clear();
     pvrootdirlen.clear();
@@ -70,18 +69,18 @@ void ParseIsoDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt
     
     for(int i=0; i < pvrootdirblk.count(); i++)
     {
-	parsedblocks.append(pvrootdirblk.at(i));
+	parsedblocks.insert(pvrootdirblk.at(i), "root");
 	curinode = ParseDirectoryContents(curimg, ptreecnt, pvrootdirblk.at(i), pvrootdirlen.at(i), 0, blocksize, false, curinode, "", &parsedblocks);
     }
     for(int i=0; i < svrootdirblk.count(); i++)
     {
-	parsedblocks.append(svrootdirblk.at(i));
+	parsedblocks.insert(svrootdirblk.at(i), "root");
 	curinode = ParseDirectoryContents(curimg, ptreecnt, svrootdirblk.at(i), svrootdirlen.at(i), 0, blocksize, true, curinode, "", &parsedblocks);
     }
     parsedblocks.clear();
 }
 
-quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirextblk, uint32_t dirdatalen, uint32_t parblk, uint32_t blocksize, bool utf16, quint64 parinode, QString parpath, QList<uint32_t>* parsedblocks) // FILE/DIRECTORY RECORD
+quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirextblk, uint32_t dirdatalen, uint32_t parblk, uint32_t blocksize, bool utf16, quint64 parinode, QString parpath, QHash<uint32_t, QString>* parsedblocks) // FILE/DIRECTORY RECORD
 {
     quint64 curinode = parinode;
     if(parblk != 0)
@@ -103,7 +102,16 @@ quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirext
 	    uint8_t extattrlen = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 1, 1));
 	    uint32_t extblk = qFromLittleEndian<uint32_t>(curimg->ReadContent(extblkoff + curoff + 2, 4));
 	    uint8_t lenfi = qFromLittleEndian<uint8_t>(curimg->ReadContent(extblkoff + curoff + 32, 1));
-	    if(!parsedblocks->contains(extblk))
+	    QString fileid = "";
+	    if(!utf16)
+		fileid = QString::fromStdString(curimg->ReadContent(extblkoff + curoff + 33, lenfi).toStdString());
+	    else
+	    {
+		for(uint8_t j=0; j < lenfi/2; j++)
+		    fileid += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + j*2 + 33, 2))));
+	    }
+	    fileid = fileid.left(fileid.indexOf(QChar(';')));
+	    if(!parsedblocks->contains(extblk) || parsedblocks->contains(extblk) && parsedblocks->value(extblk) != fileid)
 	    {
 		uint32_t datalen = qFromLittleEndian<uint32_t>(curimg->ReadContent(extblkoff + curoff + 10, 4));
 		quint64 physicalsize = 0;
@@ -126,20 +134,11 @@ quint64 ParseDirectoryContents(ForImg* curimg, uint8_t ptreecnt, uint32_t dirext
 		    QString filepath = "/";
 		    if(!parpath.isEmpty())
 			filepath = parpath;
-		    parsedblocks->append(extblk);
-		    QString fileid = "";
-		    if(!utf16)
-			fileid = QString::fromStdString(curimg->ReadContent(extblkoff + curoff + 33, lenfi).toStdString());
-		    else
-		    {
-			for(uint8_t j=0; j < lenfi/2; j++)
-			    fileid += QString(QChar(qFromBigEndian<uint16_t>(curimg->ReadContent(extblkoff + curoff + j*2 + 33, 2))));
-		    }
+		    parsedblocks->insert(extblk, fileid);
 		    if(extattrlen > 0) // parse extended attribute record
 		    {
 			qDebug() << "parse extended attr record here...";
 		    }
-		    fileid = fileid.left(fileid.indexOf(QChar(';')));
 		    QString curlayout = QString::number(extblk * blocksize) + "," + QString::number(physicalsize) + ";";
 		    uint8_t itemtype = 5;
 		    QTextStream out;
