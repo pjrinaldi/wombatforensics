@@ -1477,12 +1477,16 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	uint32_t blocksize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 552, 4));
 	//qDebug() << "blocksize:" << blocksize;
 	out << "Block Size|" << QString::number(blocksize) << "|Size in bytes for a file system block." << Qt::endl;
+        out << "Block Shift|" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 556, 4))) << "|Number of bits needed to shift a block number by to get a byte address." << Qt::endl;
 	out << "Number of Blocks|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 560, 8))) << "|Number of blocks in the file system." << Qt::endl;
 	out << "Used Blocks|" << QString::number(qFromLittleEndian<uint64_t>(curimg->ReadContent(curstartsector*512 + 568, 8))) << "|Number of blocks in use by the file system." << Qt::endl;
 	out << "Inode Size|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 576, 4))) << "|Size in bytes for an inode." << Qt::endl;
 	out << "Blocks per Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 584, 4))) << "|Number of blocks in each allocation group." << Qt::endl;
+        out << "Allocation Shift|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 588, 4))) << "|Number of bits to shift an allocation group number by when converting a block run address to a byte offset." << Qt::endl;
         // need to implement properly...
         //out << "Flags|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 596, 4))) << "|What flags means here.." << Qt::endl;
+        //blockrun rootrun = curimg->ReadContent
+        //out << "Root Directory Inode Address|" <<
 	out << "Root Directory Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 628, 4))) << "|Allocation group for the root directory." << Qt::endl;
 	out << "Root Directory Start Block|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 632, 2))) << "|Starting block number for the root directory." << Qt::endl;
         out << "Root Indices Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 636, 4))) << "|Allocation group for the root directory indices." << Qt::endl;
@@ -1757,6 +1761,8 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     uint16_t rootdirblk = 0;
     int32_t rootindxag = 0;
     uint16_t rootindxblk = 0;
+    uint32_t blockshift = 0;
+    int32_t allocshift = 0;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -1788,6 +1794,10 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 		rootindxag = line.split("|").at(1).toInt();
 	    if(line.startsWith("Root Indices Start Block|"))
 		rootindxblk = line.split("|").at(1).toUInt();
+            if(line.startsWith("Block Shift|"))
+                blockshift = line.split("|").at(1).toUInt();
+            if(line.startsWith("Allocation Shift|"))
+                allocshift = line.split("|").at(1).toInt();
         }
         propfile.close();
     }
@@ -1852,7 +1862,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 	quint64 curinode = 0;
 	qInfo() << "Parsing BFS...";
 	//curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, 0);
-	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, inodesize, blksperag, rootdirag, rootdirblk, rootindxag, rootindxblk, 0);
+	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, blockshift, inodesize, blksperag, allocshift, rootdirag, rootdirblk, rootindxag, rootindxblk, 0);
     }
     else if(fstype == 14) // ISO9660
     {

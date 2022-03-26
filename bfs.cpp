@@ -3,14 +3,31 @@
 // Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
 
-uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, int32_t inodesize, int32_t blksperag, int32_t dirag, uint16_t dirblk, int32_t indag, uint16_t indblk, uint64_t parinode)
+qint64 ToOffset(blockrun run, int32_t agshift, int32_t blkshift)
 {
+    return ToBlock(run, agshift) << blkshift; 
+}
+
+qint64 ToBlock(blockrun run, int32_t agshift)
+{
+    return ((((off_t)run.allocgroup) << agshift) | (off_t)run.start);
+}
+
+uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint32_t blockshift, int32_t inodesize, int32_t blksperag, int32_t allocshift, int32_t dirag, uint16_t dirblk, int32_t indag, uint16_t indblk, uint64_t parinode)
+{
+    qDebug() << "blockshift:" << blockshift << "allocshift:" << allocshift;
+    blockrun rootrun;
+    rootrun.allocgroup = dirag;
+    rootrun.start = dirblk;
+    rootrun.len = 1;
+    uint64_t inodeoff = ToOffset(rootrun, blockshift, allocshift);
+    qDebug() << "root offset:" << inodeoff;
     quint64 inodecnt = 0;
     QString parpath = "";
     if(parinode == 0)
 	parpath = "/";
     // read inode provided
-    uint64_t inodeoff = curstartsector*512 + (blksperag * blocksize * dirag) + (dirblk * blocksize);
+    //uint64_t inodeoff = curstartsector*512 + (blksperag * blocksize * dirag) + (dirblk * blocksize);
     uint64_t indexoff = blksperag * blocksize * indag + blocksize * indblk;
     qDebug() << "block size:" << blocksize << "inode size:" << inodesize << "rootdirag:" << dirag << "rootdirblk:" << dirblk << "rootindxag:" << indag << "rootindxblk:" << indblk;
     qDebug() << "blksperag:" << blksperag << "dirag:" << dirag;
@@ -18,14 +35,16 @@ uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     if(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + inodeoff, 4)) != 0x3bbe0ad9) // not an inode
     {
 	qDebug() << "inode is not valid.";
-        qDebug() << "if rootdir, then use indexoff.";
-        if(parinode == 0)
-            inodeoff = indexoff;
+        //qDebug() << "if rootdir, then use indexoff.";
+        //if(parinode == 0)
+        //    inodeoff = indexoff;
     }
+    /*
     if(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + inodeoff, 4)) != 0x3bbe0ad9) // not an inode
     {
         qDebug() << "index offset is still not a valid inode, so exit gracefully here...";
     }
+    */
     else
     {
         qDebug() << "get properties here and node information for populating tree... including layout";
@@ -95,8 +114,14 @@ uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         QString layout = "";
         for(int i=0; i < directblk.count(); i++)
         {
-            int64_t curoff = (directag.at(i) * blksperag * blocksize) + directblk.at(i) * blocksize;
+            blockrun currun;
+            currun.allocgroup = directag.at(i);
+            currun.start = directblk.at(i);
+            currun.len = directlen.at(i);
+            int64_t curoff = ToOffset(currun, blockshift, allocshift);
+            //int64_t curoff = (directag.at(i) * blksperag * blocksize) + directblk.at(i) * blocksize;
             uint64_t curlen = directlen.at(i) * blocksize;
+            qDebug() << "curoff:" << curoff << "curlen:" << curlen;
         }
         // offset 72 - data_stream 12 direct blocks first, which is 12 sets of 8 bytes (ag, blk, len) (4, 2, 2)
         // offset 168, 8 - max_direct_range
