@@ -11,7 +11,6 @@
 
 // might need parentinode in here so i can if else root dir...
 //uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint64_t parinode);
-uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint32_t blockshift, int32_t inodesize, int32_t blocksperag, int32_t allocshift, int32_t dirag, uint16_t dirblk, int32_t indag, uint16_t indblk, uint64_t parinode);
 
 typedef struct blockrun
 {
@@ -22,5 +21,9 @@ typedef struct blockrun
 
 qint64 ToOffset(blockrun run, int32_t agshift, int32_t blkshift);
 qint64 ToBlock(blockrun run, int32_t agshift);
+blockrun ToBlockRun(off_t start, int16_t length, int32_t agshift);
+blockrun Run(int32_t group, uint16_t start, uint16_t length);
+
+uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint32_t blockshift, int32_t inodesize, int32_t blocksperag, int32_t allocshift, int32_t dirag, uint16_t dirblk, int32_t indag, uint16_t indblk, uint64_t parinode, blockrun rootblkrun);
 
 #endif // bfs.h

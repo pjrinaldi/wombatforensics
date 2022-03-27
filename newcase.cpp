@@ -1485,9 +1485,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         out << "Allocation Shift|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 588, 4))) << "|Number of bits to shift an allocation group number by when converting a block run address to a byte offset." << Qt::endl;
         // need to implement properly...
         //out << "Flags|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 596, 4))) << "|What flags means here.." << Qt::endl;
-        //blockrun rootrun = curimg->ReadContent
-        //out << "Root Directory Inode Address|" <<
-	out << "Root Directory Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 628, 4))) << "|Allocation group for the root directory." << Qt::endl;
+        out << "Root Directory Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 628, 4))) << "|Allocation group for the root directory." << Qt::endl;
 	out << "Root Directory Start Block|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 632, 2))) << "|Starting block number for the root directory." << Qt::endl;
         out << "Root Indices Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 636, 4))) << "|Allocation group for the root directory indices." << Qt::endl;
 	out << "Root Indices Start Block|" << QString::number(qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 640, 2))) << "|Starting block number for the root indices." << Qt::endl;
@@ -1763,6 +1761,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     uint16_t rootindxblk = 0;
     uint32_t blockshift = 0;
     int32_t allocshift = 0;
+    blockrun rootblockrun;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
     if(!propfile.isOpen())
@@ -1862,7 +1861,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 	quint64 curinode = 0;
 	qInfo() << "Parsing BFS...";
 	//curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, 0);
-	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, blockshift, inodesize, blksperag, allocshift, rootdirag, rootdirblk, rootindxag, rootindxblk, 0);
+	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, blockshift, inodesize, blksperag, allocshift, rootdirag, rootdirblk, rootindxag, rootindxblk, 0, rootblockrun);
     }
     else if(fstype == 14) // ISO9660
     {
