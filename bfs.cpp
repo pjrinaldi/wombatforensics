@@ -292,6 +292,45 @@ uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
             inodecnt = ParseExtDirectory(curimg, curstartsector, ptreecnt, extinode, inodecnt - 1, QString(filepath + filename + "/"), curlayout);
         }
         */
+        // NOW SKIP TO THE END OF THE INODE OFFSET AND BEGIN TO PARSE THE BTREE WITH THE HEADER NODE
+        uint64_t btreeoff = inodeoff + datasize;
+        qDebug() << "btreeoff:" << btreeoff;
+        int32_t btreeheadmagic = qFromLittleEndian<int32_t>(curimg->ReadContent(btreeoff, 4));
+        int32_t btreenodesize = qFromLittleEndian<int32_t>(curimg->ReadContent(btreeoff + 4, 4));
+        int32_t btreemaxlevels = qFromLittleEndian<int32_t>(curimg->ReadContent(btreeoff + 8, 4));
+        int32_t btreedatatype = qFromLittleEndian<int32_t>(curimg->ReadContent(btreeoff + 12, 4));
+        uint64_t btreerootnodeptr = qFromLittleEndian<uint64_t>(curimg->ReadContent(btreeoff + 16, 8));
+        uint64_t btreefreenodeptr = qFromLittleEndian<uint64_t>(curimg->ReadContent(btreeoff + 24, 8));
+        uint64_t btreemaxsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(btreeoff + 32, 8));
+        qDebug() << "magic:" << btreeheadmagic << "nodesize:" << btreenodesize << "maxlevels:" << btreemaxlevels;
+        qDebug() << "datatype:" << btreedatatype << "rootnodeptr:" << btreerootnodeptr << "freenodeptr:" << btreefreenodeptr;
+        qDebug() << "maxsize:" << btreemaxsize;
+        // NOW SKIP TO THE ROOT NODE PTR TO GET THE KEY/VAL PAIRS FOR THE ROOT DIRECTORY NODE...
+        uint64_t rnodeoff = btreeoff + btreerootnodeptr;
+        uint64_t leftlink = qFromLittleEndian<uint64_t>(curimg->ReadContent(rnodeoff, 8));
+        uint64_t rghtlink = qFromLittleEndian<uint64_t>(curimg->ReadContent(rnodeoff + 8, 8));
+        uint64_t oflowlnk = qFromLittleEndian<uint64_t>(curimg->ReadContent(rnodeoff + 16, 8));
+        int16_t keycnt = qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 24, 4));
+        int16_t keylen = qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 28, 4));
+        QList<int16_t> keyidxlist;
+        keyidxlist.clear();
+        for(int i=0; i < keylen; i++)
+        {
+            keyidxlist.append(qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 32 + keylen + i*2, 2)));
+            //int16_t keyidx = qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 32 + keylen, 4));
+        }
+        qDebug() << "rnodeoff:" << rnodeoff;
+        qDebug() << "keycnt:" << keycnt << "keylen:" << keylen;
+        qDebug() << "keyidxlist:" << keyidxlist;
+        /*
+        for(int i=0; i < keylen; i++)
+        {
+            // this is wrong, i need to start at (rnodeoff + 32 + keyidxlist.at(i), keyidlist.at(i+1) - keyidxlist.at(i))
+            // if(i == keylen - 1, length is (keyidxlist.at(i), keylen - keyidxlist.at(i))
+            qDebug() << "File Name for:" << i << QString::fromStdString(curimg->ReadContent(rnodeoff + 32 + keyidxlist.at(i), 
+        }
+        */
+        // int64_t array of value for each key...
     }
     return inodecnt;
 }
