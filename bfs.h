@@ -25,5 +25,6 @@ blockrun ToBlockRun(off_t start, int16_t length, int32_t agshift);
 blockrun Run(int32_t group, uint16_t start, uint16_t length);
 
 uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint32_t blockshift, int32_t inodesize, int32_t blocksperag, int32_t allocshift, int32_t dirag, uint16_t dirblk, int32_t indag, uint16_t indblk, uint64_t parinode, blockrun rootblkrun);
+uint64_t ParseInode(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint32_t blockshift, int32_t inodesize, int32_t blocksperag, int32_t allocshift, QString filename, uint64_t inodeoff, uint64_t inodecnt);
 
 #endif // bfs.h

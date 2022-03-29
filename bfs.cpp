@@ -310,27 +310,50 @@ uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         uint64_t leftlink = qFromLittleEndian<uint64_t>(curimg->ReadContent(rnodeoff, 8));
         uint64_t rghtlink = qFromLittleEndian<uint64_t>(curimg->ReadContent(rnodeoff + 8, 8));
         uint64_t oflowlnk = qFromLittleEndian<uint64_t>(curimg->ReadContent(rnodeoff + 16, 8));
-        int16_t keycnt = qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 24, 4));
-        int16_t keylen = qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 28, 4));
+        int16_t keycnt = qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 24, 2));
+        int16_t keylen = qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 26, 2));
+        uint64_t rvaloff = rnodeoff + 28 + keylen + keycnt * 2;
         QList<int16_t> keyidxlist;
         keyidxlist.clear();
-        for(int i=0; i < keylen; i++)
+        keyidxlist.append(0);
+        for(int i=0; i < keycnt; i++)
         {
-            keyidxlist.append(qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 32 + keylen + i*2, 2)));
-            //int16_t keyidx = qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 32 + keylen, 4));
+            keyidxlist.append(qFromLittleEndian<int16_t>(curimg->ReadContent(rnodeoff + 28 + keylen + i*2, 2)));
         }
-        qDebug() << "rnodeoff:" << rnodeoff;
-        qDebug() << "keycnt:" << keycnt << "keylen:" << keylen;
-        qDebug() << "keyidxlist:" << keyidxlist;
-        /*
-        for(int i=0; i < keylen; i++)
+        //keyidxlist.append(keylen);
+        //qDebug() << "rnodeoff:" << rnodeoff;
+        //qDebug() << "keycnt:" << keycnt << "keylen:" << keylen;
+        //qDebug() << "keyidxlist:" << keyidxlist;
+        //qDebug() << "rvaloff:" << rvaloff;
+        QHash<QString, uint64_t> itemlist;
+        itemlist.clear();
+        for(int i=0; i < keycnt; i++)
         {
-            // this is wrong, i need to start at (rnodeoff + 32 + keyidxlist.at(i), keyidlist.at(i+1) - keyidxlist.at(i))
-            // if(i == keylen - 1, length is (keyidxlist.at(i), keylen - keyidxlist.at(i))
-            qDebug() << "File Name for:" << i << QString::fromStdString(curimg->ReadContent(rnodeoff + 32 + keyidxlist.at(i), 
+            QString tmpstring = QString::fromStdString(curimg->ReadContent(rnodeoff + 28 + keyidxlist.at(i), keyidxlist.at(i+1) - keyidxlist.at(i)).toStdString());
+            uint64_t tmpoff = qFromLittleEndian<uint64_t>(curimg->ReadContent(rvaloff + i*8, 8));
+            if(tmpstring != "." && tmpstring != "..")
+                itemlist.insert(tmpstring, tmpoff);
+            //qDebug() << "File Name, Offset for:" << i << tmpstring << tmpoff;
         }
-        */
+        qDebug() << "itemlist:" << itemlist;
+        QHashIterator<QString, uint64_t> i(itemlist);
+        while(i.hasNext())
+        {
+            i.next();
+            ParseInode(curimg, curstartsector, ptreecnt, blocksize, blockshift, inodesize, blksperag, allocshift, i.key(), i.value(), inodecnt);
+        }
+        // this is the list of inode blocks for each directory entry.. parsing these will tell me if it is a directory or file and
+        // stuff about it, so the recursive function should be ParseBfsInode()...
         // int64_t array of value for each key...
     }
+    return inodecnt;
+}
+
+uint64_t ParseInode(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint32_t blockshift, int32_t inodesize, int32_t blocksperag, int32_t allocshift, QString filename, uint64_t inodeoff, uint64_t inodecnt)
+{
+    qDebug() << "inode name:" << filename << "inodeoff:" << inodeoff * blocksize;
+    blockrun tmprun = ToBlockRun(inodeoff, 1, allocshift);
+    qDebug() << "tmprun alloc|start|len:" << tmprun.allocgroup << tmprun.start << tmprun.len;
+    qDebug() << "inode offset:" << ToOffset(tmprun, allocshift, blockshift);
     return inodecnt;
 }
