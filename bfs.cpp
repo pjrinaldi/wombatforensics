@@ -42,18 +42,25 @@ uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
     rootrun.allocgroup = dirag;
     rootrun.start = dirblk;
     rootrun.len = 1;
+    uint64_t inodeblock = ToBlock(rootrun, allocshift);
     uint64_t inodeoff = ToOffset(rootrun, blockshift, allocshift);
-    qDebug() << "root offset:" << inodeoff;
+    qDebug() << "root offset:" << inodeoff << "root block:" << inodeblock;
     quint64 inodecnt = 0;
     QString parpath = "";
     if(parinode == 0)
 	parpath = "/";
     // read inode provided
+    blockrun indxrun;
+    indxrun.allocgroup = indag;
+    indxrun.start = indblk;
+    indxrun.len = 1;
     //uint64_t inodeoff = curstartsector*512 + (blksperag * blocksize * dirag) + (dirblk * blocksize);
-    uint64_t indexoff = blksperag * blocksize * indag + blocksize * indblk;
+    //uint64_t indexoff = blksperag * blocksize * indag + blocksize * indblk;
+    uint64_t indexoff = ToOffset(indxrun, blockshift, allocshift);
+    uint64_t indexblk = ToBlock(indxrun, allocshift);
     qDebug() << "block size:" << blocksize << "inode size:" << inodesize << "rootdirag:" << dirag << "rootdirblk:" << dirblk << "rootindxag:" << indag << "rootindxblk:" << indblk;
     qDebug() << "blksperag:" << blksperag << "dirag:" << dirag;
-    qDebug() << "inodeoff:" << inodeoff << "indexoff:" << indexoff;
+    qDebug() << "inodeoff:" << inodeoff << "indexoff:" << indexoff << "indexblk:" << indexblk;
     if(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + inodeoff, 4)) != 0x3bbe0ad9) // not an inode
     {
 	qDebug() << "inode is not valid.";
@@ -328,13 +335,18 @@ uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
         //qDebug() << "rvaloff:" << rvaloff;
         QHash<QString, uint64_t> itemlist;
         itemlist.clear();
+        qDebug() << "keycnt:" << keycnt;
         for(int i=0; i < keycnt; i++)
         {
             QString tmpstring = QString::fromStdString(curimg->ReadContent(rnodeoff + 28 + keyidxlist.at(i), keyidxlist.at(i+1) - keyidxlist.at(i)).toStdString());
+            //blockrun tmprun;
+            //tmprun.allocgroup = qFromLittleEndian<uint32_t>(curimg->ReadContent(rvaloff + i*8, 4));
+            //tmprun.start = qFromLittleEndian<uint16_t>(curimg->ReadContent(rvaloff + i*8 + 4, 2));
+            //tmprun.len = qFromLittleEndian<uint16_t>(curimg->ReadContent(rvaloff + i*8 + 6, 2));
             uint64_t tmpoff = qFromLittleEndian<uint64_t>(curimg->ReadContent(rvaloff + i*8, 8));
             if(tmpstring != "." && tmpstring != "..")
                 itemlist.insert(tmpstring, tmpoff);
-            //qDebug() << "File Name, Offset for:" << i << tmpstring << tmpoff;
+            qDebug() << "File Name, Offset, for:" << i << tmpstring << tmpoff;
         }
         qDebug() << "itemlist:" << itemlist;
         QHashIterator<QString, uint64_t> i(itemlist);
