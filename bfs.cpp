@@ -34,9 +34,10 @@ blockrun Run(int32_t group, uint16_t start, uint16_t length)
         return run;
 }
 
-uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint32_t blockshift, int32_t inodesize, int32_t blksperag, int32_t allocshift, int32_t dirag, uint16_t dirblk, int32_t indag, uint16_t indblk, uint64_t parinode, blockrun rootblkrun)
+uint64_t ParseBfsDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint32_t blockshift, int32_t inodesize, int32_t blksperag, int32_t allocshift, int32_t agcnt, int32_t dirag, uint16_t dirblk, int32_t indag, uint16_t indblk, uint64_t parinode, blockrun rootblkrun)
 {
     qDebug() << "blockshift:" << blockshift << "allocshift:" << allocshift;
+    qDebug() << "alloc group count:" << agcnt;
     blockrun rootrun;
     rootrun.allocgroup = dirag;
     rootrun.start = dirblk;

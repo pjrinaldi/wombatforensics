@@ -1483,6 +1483,7 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	out << "Inode Size|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 576, 4))) << "|Size in bytes for an inode." << Qt::endl;
 	out << "Blocks per Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 584, 4))) << "|Number of blocks in each allocation group." << Qt::endl;
         out << "Allocation Shift|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 588, 4))) << "|Number of bits to shift an allocation group number by when converting a block run address to a byte offset." << Qt::endl;
+        out << "Number of Allocation Groups|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 592, 4))) << "|Number of allocation groups in the file system." << Qt::endl;
         // need to implement properly...
         //out << "Flags|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 596, 4))) << "|What flags means here.." << Qt::endl;
         out << "Root Directory Allocation Group|" << QString::number(qFromLittleEndian<int32_t>(curimg->ReadContent(curstartsector*512 + 628, 4))) << "|Allocation group for the root directory." << Qt::endl;
@@ -1761,6 +1762,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     uint16_t rootindxblk = 0;
     uint32_t blockshift = 0;
     int32_t allocshift = 0;
+    int32_t agcnt = 0;
     blockrun rootblockrun;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
@@ -1797,6 +1799,8 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 blockshift = line.split("|").at(1).toUInt();
             if(line.startsWith("Allocation Shift|"))
                 allocshift = line.split("|").at(1).toInt();
+            if(line.startsWith("Number of Allocation Groups|"))
+                agcnt = line.split("|").at(1).toInt();
         }
         propfile.close();
     }
@@ -1861,7 +1865,7 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
 	quint64 curinode = 0;
 	qInfo() << "Parsing BFS...";
 	//curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, 0);
-	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, blockshift, inodesize, blksperag, allocshift, rootdirag, rootdirblk, rootindxag, rootindxblk, 0, rootblockrun);
+	curinode = ParseBfsDirectory(curimg, curstartsector, ptreecnt, blocksize, blockshift, inodesize, blksperag, allocshift, agcnt, rootdirag, rootdirblk, rootindxag, rootindxblk, 0, rootblockrun);
     }
     else if(fstype == 14) // ISO9660
     {
