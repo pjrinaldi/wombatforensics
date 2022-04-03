@@ -28,8 +28,8 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
     {
         // start parsing inode structure...
         uint16_t mode = qFromBigEndian<uint16_t>(curimg->ReadContent(rootinodeoff + 2, 2));
-        uint8_t version = qFromBigEndian<uint8_t>(curimg->ReadContent(rootinodeoff + 4, 1));
-        uint8_t format = qFromBigEndian<uint8_t>(curimg->ReadContent(rootinodeoff + 5, 1));
+        int8_t version = qFromBigEndian<int8_t>(curimg->ReadContent(rootinodeoff + 4, 1));
+        int8_t format = qFromBigEndian<int8_t>(curimg->ReadContent(rootinodeoff + 5, 1));
         uint16_t onlink = qFromBigEndian<uint16_t>(curimg->ReadContent(rootinodeoff + 6, 2));
         uint32_t uid = qFromBigEndian<uint32_t>(curimg->ReadContent(rootinodeoff + 8, 4));
         uint32_t gid = qFromBigEndian<uint32_t>(curimg->ReadContent(rootinodeoff + 12, 4));
@@ -48,7 +48,7 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
         quint64 fullinode = qFromBigEndian<quint64>(curimg->ReadContent(rootinodeoff + 148, 8));
         qDebug() << "filesize:" << filesize << "nblocks:" << nblocks << "numextents:" << numextents << "extattrfork:" << extattrfork;
         qDebug() << "full inode:" << fullinode;
-        qDebug() << "mode:" << mode << "format:" << format << "attrforkformat:" << attrforkformat;
+        qDebug() << "mode:" << QString::number(mode, 16) << "format:" << format << "attrforkformat:" << attrforkformat;
         /*
             #define S_IFLNK  0120000
             #define S_IFREG  0100000
