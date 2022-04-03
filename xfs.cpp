@@ -55,6 +55,12 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
             #define S_IFBLK  0060000
             #define S_IFDIR  0040000
             #define S_IFCHR  0020000
+            XFS_DINODE_FMT_DEV,             // xfs_dev_t
+            XFS_DINODE_FMT_LOCAL,           // bulk data
+            XFS_DINODE_FMT_EXTENTS,         // struct xfs_bmbt_rec
+            XFS_DINODE_FMT_BTREE,           // struct xfs_bmdr_block
+            XFS_DINODE_FMT_UUID
+            XFS_DINODE_FMT_RMAP
          */ 
         // data fork starts at byte offset 176
     }
