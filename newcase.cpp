@@ -1394,12 +1394,14 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
         partitionname += " [XFS]";
         out << "Block Size|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 4, 4))) << "|Size of block in bytes." << Qt::endl;
         out << "Data Blocks|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 8, 8))) << "|Total number of blocks available for data." << Qt::endl;
+        out << "Real Time Blocks|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 16, 8))) << "|Number of blocks in the real time device." << Qt::endl;
+        out << "Real Time Extents|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 24, 8))) << "|Number of extents on the real time device." << Qt::endl;
+        out << "UUID|" << QString::fromStdString(curimg->ReadContent(curstartsector*512 + 32, 16).toStdString()) << "Universal unique id for the file system." << Qt::endl;
         out << "Root Inode|" << QString::number(qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 56, 8))) << "|Root inode number for the filesystem." << Qt::endl;
         out << "Allocation Group Blocks|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4))) << "|Size of each allocation group in blocks." << Qt::endl;
         out << "Allocation Group Count|" << QString::number(qFromBigEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 88, 4))) << "|Number of allocation groups in the filesystem." << Qt::endl;
         out << "Inode Size|" << QString::number(qFromBigEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 104, 2))) << "|Size of an inode in bytes." << Qt::endl;
         out << "Inodes Per Block|" << QString::number(qFromBigEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 106, 2))) << "|Number of inodes per block." << Qt::endl;
-        //fsinfo.insert("sectorsize", QVariant(qFromBigEndian<uint16_t>(partbuf.mid(102, 2))));
     }
     else if(btrsig == "_BHRfS_M") // BTRFS
     {
@@ -1763,6 +1765,10 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     uint32_t blockshift = 0;
     int32_t allocshift = 0;
     int32_t agcnt = 0;
+    uint16_t inodesperblock = 0;
+    uint64_t rootinode = 0;
+    uint32_t agblocks = 0;
+    uint32_t agcount = 0;
     blockrun rootblockrun;
 
     QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
@@ -1801,6 +1807,14 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                 allocshift = line.split("|").at(1).toInt();
             if(line.startsWith("Number of Allocation Groups|"))
                 agcnt = line.split("|").at(1).toInt();
+            if(line.startsWith("Inodes Per Block|"))
+                inodesperblock = line.split("|").at(1).toUInt();
+            if(line.startsWith("Root Inode|"))
+                rootinode = line.split("|").at(1).toULongLong();
+            if(line.startsWith("Allocation Group Blocks|"))
+                agblocks = line.split("|").at(1).toUInt();
+            if(line.startsWith("Allocation Group Count|"))
+                agcount = line.split("|").at(1).toUInt();
         }
         propfile.close();
     }
@@ -1855,6 +1869,10 @@ void ParseDirectoryStructure(ForImg* curimg, uint32_t curstartsector, uint8_t pt
     {
         quint64 curinode = 0;
         curinode = ParseHfsPlusDirectory(curimg, curstartsector, ptreecnt);
+    }
+    else if(fstype == 9) // XFS
+    {
+        ParseXfs(curimg, curstartsector, ptreecnt, blocksize, (uint16_t)inodesize, inodesperblock, agblocks, agcount, rootinode);
     }
     else if(fstype == 11) // BITLOCKER
     {
