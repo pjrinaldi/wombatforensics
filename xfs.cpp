@@ -163,8 +163,14 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
             // check format
             if(fmt & 1)
                 qDebug() << "local";
+            if(fmt & 2)
+                qDebug() << "extents";
             if(fmt & 4)
                 qDebug() << "btree";
+            if(fmt & 8)
+                qDebug() << "uuid";
+            if(fmt & 16)
+                qDebug() << "reverse map";
         }
         //out << "Mode|" << filemodestr << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
         // data fork starts at byte offset 176
