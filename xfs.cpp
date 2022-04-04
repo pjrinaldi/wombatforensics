@@ -49,109 +49,124 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
         qDebug() << "filesize:" << filesize << "nblocks:" << nblocks << "numextents:" << numextents << "extattrfork:" << extattrfork;
         qDebug() << "full inode:" << fullinode;
         qDebug() << "mode:" << QString::number(mode, 16) << "format:" << format << "attrforkformat:" << attrforkformat;
-        //qDebug() << "ifreg:" << S_ISREG(mode);
-        //qDebug() << "ifdir:" << S_ISDIR(mode);
-        //if(mode & 0x4000)
-        //    qDebug() << "directory";
-        /*
-            #define S_IFLNK  0120000
-            #define S_IFREG  0100000
-            #define S_IFBLK  0060000
-            #define S_IFDIR  0040000
-            #define S_IFCHR  0020000
-            #define S_IRWXU 00700
-            #define S_IRUSR 00400
-            #define S_IWUSR 00200
-            #define S_IXUSR 00100
-            #define S_IRWXG 00070
-            #define S_IRGRP 00040
-            #define S_IWGRP 00020
-            #define S_IXGRP 00010
-            #define S_IRWXO 00007
-            #define S_IROTH 00004
-            #define S_IWOTH 00002
-            #define S_IXOTH 00001
-
-            XFS_DINODE_FMT_DEV,             // xfs_dev_t
-            XFS_DINODE_FMT_LOCAL,           // bulk data
-            XFS_DINODE_FMT_EXTENTS,         // struct xfs_bmbt_rec
-            XFS_DINODE_FMT_BTREE,           // struct xfs_bmdr_block
-            XFS_DINODE_FMT_UUID
-            XFS_DINODE_FMT_RMAP
-         */ 
-            QString filemodestr = "---------";
-            if(mode & 0xc000) // unix socket
+        //bool isdir = false;
+        uint8_t itemtype = 0;
+        uint8_t isdeleted = 0;
+        uint8_t fmt = 0;
+        //if(format & 0) // device
+        //    qDebug() << "block and character devices";
+        if(format & 1)
+        {
+            fmt += 1;
+            qDebug() << "local";
+        }
+        if(format & 2)
+        {
+            fmt += 2;
+            qDebug() << "extents";
+        }
+        if(format & 3)
+        {
+            fmt += 4;
+            qDebug() << "btree";
+        }
+        if(format & 4)
+        {
+            fmt += 8;
+            qDebug() << "uuid";
+        }
+        if(format & 5)
+        {
+            fmt += 16;
+            qDebug() << "reverse mapping b+tree rooted in the fork.";
+        }
+        qDebug() << "fmt:" << QString::number(fmt, 2);
+        QString filemodestr = "---------";
+        if(mode & 0xc000) // unix socket
+        {
+            filemodestr.replace(0, 1, "s");
+            itemtype = 9;
+        }
+        if(mode & 0xa000) // symbolic link
+        {
+            filemodestr.replace(0, 1, "l");
+            itemtype = 12;
+        }
+        if(mode & 0x6000) // block device
+        {
+            filemodestr.replace(0, 1, "b");
+            itemtype = 7;
+        }
+        if(mode & 0x2000) // char device
+        {
+            filemodestr.replace(0, 1, "c");
+            itemtype = 6;
+        }
+        if(mode & 0x1000) // FIFO (pipe)
+        {
+            filemodestr.replace(0, 1, "p");
+            itemtype = 8;
+        }
+        if(mode & 0x8000) // regular file
+        {
+            /*
+            if(readonlyflags.contains("Allow storing files larger than 2GB,")) // LARGE FILE SUPPORT
             {
-                filemodestr.replace(0, 1, "s");
-                //itemtype = 9;
+                uint32_t lowersize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
+                uint32_t uppersize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 108, 4));
+                logicalsize = ((quint64)uppersize >> 32) + lowersize;
             }
-            if(mode & 0xa000) // symbolic link
+            else
             {
-                filemodestr.replace(0, 1, "l");
-                //itemtype = 12;
+                logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
             }
-            if(mode & 0x6000) // block device
-            {
-                filemodestr.replace(0, 1, "b");
-                //itemtype = 7;
-            }
-            if(mode & 0x2000) // char device
-            {
-                filemodestr.replace(0, 1, "c");
-                //itemtype = 6;
-            }
-            if(mode & 0x1000) // FIFO (pipe)
-            {
-                filemodestr.replace(0, 1, "p");
-                //itemtype = 8;
-            }
-            if(mode & 0x8000) // regular file
-            {
-                /*
-                if(readonlyflags.contains("Allow storing files larger than 2GB,")) // LARGE FILE SUPPORT
-                {
-                    uint32_t lowersize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
-                    uint32_t uppersize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 108, 4));
-                    logicalsize = ((quint64)uppersize >> 32) + lowersize;
-                }
-                else
-                {
-                    logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
-                }
-                */
-                filemodestr.replace(0, 1, "-");
-                //itemtype = 5;
-                //if(isdeleted == 1)
-                //    itemtype = 4;
-            }
-            else if(mode & 0x4000) // directory
-            {
-                //logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
-                filemodestr.replace(0, 1, "d");
-                //itemtype = 3;
-                //if(isdeleted == 1)
-                //    itemtype = 2;
-            }
-            if(mode & 0x100) // user read
-                filemodestr.replace(1, 1, "r");
-            if(mode & 0x080) // user write
-                filemodestr.replace(2, 1, "w");
-            if(mode & 0x040) // user execute
-                filemodestr.replace(3, 1, "x");
-            if(mode & 0x020) // group read
-                filemodestr.replace(4, 1, "r");
-            if(mode & 0x010) // group write
-                filemodestr.replace(5, 1, "w");
-            if(mode & 0x008) // group execute
-                filemodestr.replace(6, 1, "x");
-            if(mode & 0x004) // other read
-                filemodestr.replace(7, 1, "r");
-            if(mode & 0x002) // other write
-                filemodestr.replace(8, 1, "w");
-            if(mode & 0x001) // other execute
-                filemodestr.replace(9, 1, "x");
-            qDebug() << "filemodestr:" << filemodestr;
-            //out << "Mode|" << filemodestr << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
+            */
+            filemodestr.replace(0, 1, "-");
+            itemtype = 5;
+            if(isdeleted == 1)
+                itemtype = 4;
+        }
+        else if(mode & 0x4000) // directory
+        {
+            //isdir = true;
+            //logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
+            filemodestr.replace(0, 1, "d");
+            itemtype = 3;
+            if(isdeleted == 1)
+                itemtype = 2;
+        }
+        if(mode & 0x100) // user read
+            filemodestr.replace(1, 1, "r");
+        if(mode & 0x080) // user write
+            filemodestr.replace(2, 1, "w");
+        if(mode & 0x040) // user execute
+            filemodestr.replace(3, 1, "x");
+        if(mode & 0x020) // group read
+            filemodestr.replace(4, 1, "r");
+        if(mode & 0x010) // group write
+            filemodestr.replace(5, 1, "w");
+        if(mode & 0x008) // group execute
+            filemodestr.replace(6, 1, "x");
+        if(mode & 0x004) // other read
+            filemodestr.replace(7, 1, "r");
+        if(mode & 0x002) // other write
+            filemodestr.replace(8, 1, "w");
+        if(mode & 0x001) // other execute
+            filemodestr.replace(9, 1, "x");
+        qDebug() << "filemodestr:" << filemodestr;
+        if(itemtype == 5) // regular file
+        {
+            // check format
+        }
+        else if(itemtype == 3) // directory
+        {
+            // check format
+            if(fmt & 1)
+                qDebug() << "local";
+            if(fmt & 4)
+                qDebug() << "btree";
+        }
+        //out << "Mode|" << filemodestr << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
         // data fork starts at byte offset 176
     }
 }
