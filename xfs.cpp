@@ -55,6 +55,7 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
         uint8_t fmt = 0;
         //if(format & 0) // device
         //    qDebug() << "block and character devices";
+        //  FORMAT & IS WRONG, NEED TO WORK ON THIS TO GET IT RIGHT...
         if(format & 1)
         {
             fmt += 1;
