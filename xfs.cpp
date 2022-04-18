@@ -19,7 +19,6 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
 {
     qDebug() << "blocksize:" << blocksize << "inodesize:" << inodesize << "inodes per block:" << inodesperblock << "alloc group blocks:" << agblocks << "alloc group count:" << agcount << "root inode:" << rootinode;
     qDebug() << "curstartsector:" << curstartsector << "ptreecnt:" << ptreecnt;
-    //ParseInode(curimg, curstartsector, ptreecnt
     // root inode is 128, so 128/8 puts us in block 16...
     uint64_t rootinodeoff = curstartsector*512 + (rootinode / inodesperblock) * blocksize;
     qDebug() << "root inode off:" << rootinodeoff;
@@ -213,4 +212,7 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
 
 void ParseInode(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint16_t inodesize, uint16_t inodesperblock, uint64_t curinode, uint64_t parinode, QString parpath)
 {
+    // if the curinode is 131, then we take (131 / inodesperblock) to get the inodeblock offset, then we add (131-128) * inodesize to get the curinodeoff
+    // root inode is 128, so 128/8 puts us in block 16...
+    //uint64_t rootinodeoff = curstartsector*512 + (rootinode / inodesperblock) * blocksize;
 }
