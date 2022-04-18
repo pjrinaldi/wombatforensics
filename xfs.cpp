@@ -45,7 +45,7 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
         uint8_t extattrfork = qFromBigEndian<uint8_t>(curimg->ReadContent(rootinodeoff + 86, 1)); // # offset is # * 8
         int8_t attrforkformat = qFromBigEndian<int8_t>(curimg->ReadContent(rootinodeoff + 87, 1));
         uint32_t createtime = qFromBigEndian<uint32_t>(curimg->ReadContent(rootinodeoff + 148, 4));
-        quint64 fullinode = qFromBigEndian<quint64>(curimg->ReadContent(rootinodeoff + 148, 8));
+        quint64 fullinode = qFromBigEndian<quint64>(curimg->ReadContent(rootinodeoff + 152, 8));
         qDebug() << "filesize:" << filesize << "nblocks:" << nblocks << "numextents:" << numextents << "extattrfork:" << extattrfork;
         qDebug() << "full inode:" << fullinode;
         qDebug() << "mode:" << QString::number(mode, 16) << "format:" << format << "attrforkformat:" << attrforkformat;
@@ -81,7 +81,7 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
             fmt += 16;
             qDebug() << "reverse mapping b+tree rooted in the fork.";
         }
-        qDebug() << "fmt:" << QString::number(fmt, 2);
+        qDebug() << "fmt:" << QString::number(fmt, 2) << QString::number(fmt, 16) << fmt;
         QString filemodestr = "---------";
         if(mode & 0xc000) // unix socket
         {
@@ -155,12 +155,54 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
         if(mode & 0x001) // other execute
             filemodestr.replace(9, 1, "x");
         qDebug() << "filemodestr:" << filemodestr;
+        uint64_t dataforkoff = rootinodeoff + 176;
         if(itemtype == 5) // regular file
         {
+            /*
+            qDebug() << "regular file";
             // check format
+            if(fmt & 2)
+                qDebug() << "extents";
+            if(fmt & 4)
+                qDebug() << "btree";
+            if(fmt & 16)
+                qDebug() << "reverse map";
+            */
         }
         else if(itemtype == 3) // directory
         {
+            if(fmt == 21) // local,btree,reversemap - short form directory, xfs_dir2_sf_t
+            {
+                uint8_t entrycount = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff, 1));
+                uint8_t entry64cnt = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + 1, 1));
+                uint32_t parinode = qFromBigEndian<uint32_t>(curimg->ReadContent(dataforkoff + 2, 4));
+                uint8_t curoff = 0;
+                while(curoff < filesize)
+                {
+                    qDebug() << "curoff:" << curoff;
+                    uint8_t namelen = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + curoff + 6, 1));
+                    uint16_t entryoff = qFromBigEndian<uint16_t>(curimg->ReadContent(dataforkoff + curoff + 7, 2));
+                    QString entryname = QString::fromStdString(curimg->ReadContent(dataforkoff + curoff + 9, namelen).toStdString());
+                    uint8_t ftype = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + curoff + 9 + namelen, 1));
+                    uint32_t entryinode = qFromBigEndian<uint32_t>(curimg->ReadContent(dataforkoff + curoff + 10 + namelen, 4));
+                    qDebug() << "name:" << entryname;
+                    curoff = curoff + 14 + namelen;
+                }
+                //for(int i=0; i < entrycount; i++)
+                //{
+                    uint8_t namelen = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + 6, 1));
+                    uint16_t entryoff = qFromBigEndian<uint16_t>(curimg->ReadContent(dataforkoff + 7, 2));
+                    qDebug() << "namelen:" << namelen;
+                    QString entryname = QString::fromStdString(curimg->ReadContent(dataforkoff + 9, namelen).toStdString());
+                    uint8_t ftype = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + 9 + namelen, 1));
+                    qDebug() << "name:" << entryname;
+                    qDebug() << "ftype:" << ftype;
+                    uint32_t entryinode = qFromBigEndian<uint32_t>(curimg->ReadContent(dataforkoff + 9 + namelen + 1, 4));
+                    qDebug() << "entryinode:" << entryinode << QString::number(entryinode, 16);
+                //}
+            }
+            /*
+            qDebug() << "directory";
             // check format
             if(fmt & 1)
                 qDebug() << "local";
@@ -172,6 +214,7 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
                 qDebug() << "uuid";
             if(fmt & 16)
                 qDebug() << "reverse map";
+            */
         }
         //out << "Mode|" << filemodestr << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
         // data fork starts at byte offset 176
