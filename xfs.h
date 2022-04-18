@@ -10,5 +10,6 @@
 #include "commonfs.h"
 
 void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint16_t inodesize, uint16_t inodesperblock, uint32_t agblocks, uint32_t agcount, uint64_t rootinode);
+void ParseInode(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint16_t inodesize, uint16_t inodesperblock, uint64_t curinode, uint64_t parinode, QString parpath);
 
 #endif // xfs.h

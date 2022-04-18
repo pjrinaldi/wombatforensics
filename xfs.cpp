@@ -176,30 +176,20 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
                 uint8_t entrycount = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff, 1));
                 uint8_t entry64cnt = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + 1, 1));
                 uint32_t parinode = qFromBigEndian<uint32_t>(curimg->ReadContent(dataforkoff + 2, 4));
-                uint8_t curoff = 0;
+                uint8_t curoff = 6;
                 while(curoff < filesize)
                 {
                     qDebug() << "curoff:" << curoff;
-                    uint8_t namelen = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + curoff + 6, 1));
-                    uint16_t entryoff = qFromBigEndian<uint16_t>(curimg->ReadContent(dataforkoff + curoff + 7, 2));
-                    QString entryname = QString::fromStdString(curimg->ReadContent(dataforkoff + curoff + 9, namelen).toStdString());
-                    uint8_t ftype = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + curoff + 9 + namelen, 1));
-                    uint32_t entryinode = qFromBigEndian<uint32_t>(curimg->ReadContent(dataforkoff + curoff + 10 + namelen, 4));
-                    qDebug() << "name:" << entryname;
-                    curoff = curoff + 14 + namelen;
+                    uint8_t namelen = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + curoff, 1));
+                    uint16_t entryoff = qFromBigEndian<uint16_t>(curimg->ReadContent(dataforkoff + curoff + 1, 2));
+                    QString entryname = QString::fromStdString(curimg->ReadContent(dataforkoff + curoff + 3, namelen).toStdString());
+                    uint8_t ftype = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + curoff + 3 + namelen, 1)); // 1-file,2-dir,
+                    uint32_t entryinode = qFromBigEndian<uint32_t>(curimg->ReadContent(dataforkoff + curoff + 4 + namelen, 4));
+                    qDebug() << "name|type|inode:" << entryname << ftype << entryinode;
+		    qDebug() << "entry inode offset:" << curstartsector*512 + (entryinode / inodesperblock) * blocksize;
+                    curoff = curoff + 8 + namelen;
+		    ParseInode(curimg, curstartsector, ptreecnt, blocksize, inodesize, inodesperblock, entryinode, parinode, "");
                 }
-                //for(int i=0; i < entrycount; i++)
-                //{
-                    uint8_t namelen = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + 6, 1));
-                    uint16_t entryoff = qFromBigEndian<uint16_t>(curimg->ReadContent(dataforkoff + 7, 2));
-                    qDebug() << "namelen:" << namelen;
-                    QString entryname = QString::fromStdString(curimg->ReadContent(dataforkoff + 9, namelen).toStdString());
-                    uint8_t ftype = qFromBigEndian<uint8_t>(curimg->ReadContent(dataforkoff + 9 + namelen, 1));
-                    qDebug() << "name:" << entryname;
-                    qDebug() << "ftype:" << ftype;
-                    uint32_t entryinode = qFromBigEndian<uint32_t>(curimg->ReadContent(dataforkoff + 9 + namelen + 1, 4));
-                    qDebug() << "entryinode:" << entryinode << QString::number(entryinode, 16);
-                //}
             }
             /*
             qDebug() << "directory";
@@ -219,4 +209,8 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
         //out << "Mode|" << filemodestr << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
         // data fork starts at byte offset 176
     }
+}
+
+void ParseInode(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint16_t inodesize, uint16_t inodesperblock, uint64_t curinode, uint64_t parinode, QString parpath)
+{
 }
