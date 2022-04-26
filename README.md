@@ -14,7 +14,7 @@ Current Features
 * Filtering will gray out non-matches, rather than hide the files in case you still want to look at them. (v0.1+)
 * You can have multiple "File Properties", "File Hex", "Viewer Windows", etc. open for different files for comparative analysis. (v0.2+)
 * File signature analysis is done at ingest. (v0.1+)
-* Hashing files when "Digging Deeper" (cause Wombat's dig). (MD5, SHA1, or SHA256). (v0.1+)
+* Hashing files when "Digging Deeper" (cause Wombat's dig). (Blake3). (v0.3+)
 * Semi-Smart Carving for JPG's, GIF's, PNG's, PDF's, MPG1/2's, as well as the ability for the end user to enter carving information for simple header/footer file size carving. The semi-smart carving uses block information for other carved headers to restrict the file's. It isn't the best carver, but it is better than basic and is a good start. (v0.3+)
 * $I30 Parser, Lnk Parser, PreFetch Parser, Recycle Bin (INFO2, $I) Artifact Parser, Zip Archive Parser (v0.3+)
 * Zip File Extraction added to "Digging Deeper" capability (v0.3+)
@@ -27,6 +27,7 @@ Current Viewers
 * HTML  (v0.1+)
 * PDF   (v0.3+)
 * External Viewer feature where you can specify external programs (v0.1+)
+* Registry Viewer (v0.3+)
 
 Comparison with Other Forensic Suites
 --
