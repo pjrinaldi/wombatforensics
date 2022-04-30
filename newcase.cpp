@@ -700,6 +700,8 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
     quint64 zfssig = qFromLittleEndian<quint64>(curimg->ReadContent(curstartsector*512 + 135168, 8));
     quint64 bcfsig1 = qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 4120, 8));
     quint64 bcfsig2 = qFromBigEndian<quint64>(curimg->ReadContent(curstartsector*512 + 4128, 8));
+    uint32_t zonesig = qFromBigEndian<uint32_t>(curimg->ReadContent(0, 4));
+    // zonefs magic number = 0x5a4f4653 // ZOFS
     //0xE0F5E1E2
     // WILL WRITE FILE SYSTEM INFORMATION IN THIS FUNCTION AND ONLY RETURN THE QSTRING(FILESYSTEMNAME,FILESYSTEMTYPE) TO BE USED BY THE PARTITION
     if(winsig == 0xaa55 && bfssig != "1SFB") // FAT OR NTFS OR BFS
@@ -1689,7 +1691,14 @@ QString ParseFileSystem(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecn
 	out << "File System Type|BCACHEFS|File System Type String." << Qt::endl;
 	partitionname += "[BCACHEFS]";
     }
-    // need to implement iso-14, udf-15, hfs-16, zfs-17, refs-18, erofs-19, bcachefs-20
+    else if(zonesig == 0x5a4f4653) // ZONEFS
+    {
+        qInfo() << "ZoneFS File System Found. Parsing not yet implemented.";
+        out << "File System Type Int|21|Internal File System Type represented as an integer." << Qt::endl;
+        out << "File System Type|ZONEFS|File System Type String." << Qt::endl;
+        partitionname += "[ZONEFS]";
+    }
+    // need to implement bfs-12, udf-15, hfs-16, zfs-17, refs-18, erofs-19, bcachefs-20, zonefs-21
     out.flush();
     propfile.close();
 
