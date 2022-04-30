@@ -1116,7 +1116,7 @@ void WombatForensics::InitializeAppStructure()
     sizelist.append(height()/2);
     sizelist.append(height()/2);
     ui->splitter->setSizes(sizelist);
-    //SetupHexPage();
+    SetupHexPage();
 }
 
 void WombatForensics::InitializeCaseStructure()

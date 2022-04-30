@@ -213,6 +213,15 @@ void ParseXfs(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_
 void ParseInode(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, uint32_t blocksize, uint16_t inodesize, uint16_t inodesperblock, uint64_t curinode, uint64_t parinode, QString parpath)
 {
     // if the curinode is 131, then we take (131 / inodesperblock) to get the inodeblock offset, then we add (131-128) * inodesize to get the curinodeoff
-    // root inode is 128, so 128/8 puts us in block 16...
-    //uint64_t rootinodeoff = curstartsector*512 + (rootinode / inodesperblock) * blocksize;
+    uint64_t firstinode = (curinode / inodesperblock) * inodesperblock;
+    qDebug() << "curinode:" << curinode << "firstinode:" << firstinode;
+    uint64_t inodeoff = curstartsector*512 + (firstinode / inodesperblock) * blocksize + ((curinode - firstinode) * inodesize);
+    qDebug() << "cur inode block offset:" << inodeoff;
+    uint16_t inodemagic = qFromBigEndian<uint16_t>(curimg->ReadContent(inodeoff, 2));
+    if(inodemagic == 0x494e) // xfs inode | IN
+    {
+        qDebug() << "inode offset works.";
+    }
+    else
+        qDebug() << "inode offset fails.";
 }

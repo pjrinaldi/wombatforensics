@@ -1010,12 +1010,10 @@ ForImg::ForImg(QString imgfile)
     }
     else if(imgtype == 6) // AFF4
     {
-        /*
         AFF4_init();
-        int aff4handle = AFF4_open(imgfile.split(imgfile.split("/").last()).first().toStdString().c_str());
-        qint64 imgsize = AFF4_object_size(aff4handle);
+        int aff4handle = AFF4_open(imgfile.toStdString().c_str());
+        imgsize = AFF4_object_size(aff4handle);
         AFF4_close(aff4handle);
-        */
     }
     else if(imgtype == 7) // WFI
     {
@@ -1103,12 +1101,14 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     QByteArray tmparray;
     tmparray.clear();
     int retopen = 0;
-    if(imgtype == 0)
+    if(imgtype == 0) // EWF
     {
         libewf_handle_t* ewfhandle = NULL;
         libewf_error_t* ewferror = NULL;
         char** globfiles = NULL;
         int globfilecnt = 0;
+        if(imgpath == "")
+            return tmparray;
         QString efilepath = imgpath.split(imgpath.split("/").last()).first();
         QDir edir = QDir(imgpath.split(imgpath.split("/").last()).first());
         QStringList efiles = edir.entryList(QStringList() << QString(imgpath.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgpath.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
@@ -1149,6 +1149,8 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         char data[size];
         //char* data = new char[size];
         AFFILE* afimage = NULL;
+        if(imgpath == "")
+            return tmparray;
         afimage = af_open(imgpath.toStdString().c_str(), O_RDONLY|O_EXCL, 0);
         af_seek(afimage, pos, SEEK_SET);
         qint64 res = 0;
@@ -1231,6 +1233,12 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
     }
     else if(imgtype == 6) // AFF4
     {
+        char* data = new char[size];
+        AFF4_init();
+        int aff4handle = AFF4_open(imgpath.toStdString().c_str());
+        int bytesread = AFF4_read(aff4handle, pos, data, size);
+        tmparray = QByteArray::fromRawData((const char*)data, size);
+        AFF4_close(aff4handle);
         /*
         char* data = new char[size];
         QByteArray tmparray;
