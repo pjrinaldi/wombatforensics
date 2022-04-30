@@ -1239,17 +1239,6 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         int bytesread = AFF4_read(aff4handle, pos, data, size);
         tmparray = QByteArray::fromRawData((const char*)data, size);
         AFF4_close(aff4handle);
-        /*
-        char* data = new char[size];
-        QByteArray tmparray;
-        tmparray.clear();
-
-        AFF4_init();
-        int aff4handle = AFF4_open(imgpath.split(imgpath.split("/").last()).first().toStdString().c_str());
-        int bytesread = AFF4_read(aff4handle, pos, data, size);
-        tmparray = QByteArray::fromRawData((const char*)data, size);
-        AFF4_close(aff4handle);
-        */
     }
     else if(imgtype == 7) // WFI
     {
