@@ -879,7 +879,7 @@ void WombatForensics::ShowFile(const QModelIndex &index)
         regviewer->setAttribute(Qt::WA_DeleteOnClose);
         regviewer->setWindowTitle("Registry Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
         regviewer->LoadRegistryFile(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
-    }
+    } // 50 4B 03 04 14 docx,xlsx,pptx format. need to open zip and look at content_types.xml to figure out which it is.
     else
     {
         QApplication::restoreOverrideCursor();
