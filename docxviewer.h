@@ -1,5 +1,5 @@
-#ifndef HTMLVIEWER_H
-#define HTMLVIEWER_H
+#ifndef DOCXVIEWER_H
+#define DOCXVIEWER_H
 
 // Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
 // Distrubted under the terms of the GNU General Public License version 2
@@ -8,7 +8,7 @@
 #include "globals.h"
 #include "artifactparser.h"
 #include "wombatfunctions.h"
-#include "ui_htmlviewer.h"
+#include "ui_docxviewer.h"
 
 namespace Ui
 {
@@ -51,4 +51,4 @@ private:
 
 Q_DECLARE_METATYPE(DocxViewer*);
 
-#endif // HTMLVIEWER_H
+#endif // DOCXVIEWER_H
