@@ -495,6 +495,7 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	    if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
 		mimestr[i] = mimestr[i].toUpper();
 	}
+        qDebug() << "mimestr:" << mimestr;
 	if(mimestr.contains("Application/Octet-Stream"))
 	{
 	    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
@@ -516,6 +517,13 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
             {
                 mimestr = "Email/MBox";
             }
+        }
+        else if(mimestr.contains("/Zip"))
+        {
+            // need to unzip here and determine content types, in particular search for
+            // PartName="/xl | PartName="/ppt | PartName="/word
+            // Then i can read the word/document.xml for DOCX | xl/worksheets/sheet#.xml sharedstrings.xml for spreadsheet | ppt/slides/slide#.xml for PPTX
+            // just work on docx for now and go from there.
         }
     }
     //else if(filename.startsWith("$INDEX_ROOT:") || filename.startsWith("$DATA:") || filename.startWith("$INDEX_ALLOCATION:"))
