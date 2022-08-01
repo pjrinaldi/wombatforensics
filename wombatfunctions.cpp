@@ -1,7 +1,7 @@
 #include "wombatfunctions.h"
 
 // Copyright 2015-2020 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2
+// Distributed under the terms of the GNU General Public License version 2
 
 std::string GetTime()
 {
@@ -484,7 +484,8 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
 	magic_t magical;
 	const char* catsig;
-	magical = magic_open(MAGIC_MIME_TYPE);
+	magical = magic_open(MAGIC_NONE);
+	//magical = magic_open(MAGIC_MIME_TYPE);
 	magic_load(magical, NULL);
 	catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
 	std::string catsigstr(catsig);
@@ -495,7 +496,8 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	    if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
 		mimestr[i] = mimestr[i].toUpper();
 	}
-        qDebug() << "mimestr:" << mimestr;
+	qDebug() << "filename:" << filename << "mimestr:" << mimestr;
+        //qDebug() << "mimestr:" << mimestr;
 	if(mimestr.contains("Application/Octet-Stream"))
 	{
 	    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
@@ -520,6 +522,29 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
         }
         else if(mimestr.contains("/Zip"))
         {
+	    qDebug() << "filename:" << filename << "mimestr:" << mimestr;
+
+	    /*
+	     *    QString archivefilestr = wombatvariable.tmpfilepath + archiveid + "-fhex";
+		    int err = 0;
+		    zip* curzip = zip_open(archivefilestr.toStdString().c_str(), ZIP_RDONLY, &err);
+		    qint64 zipentrycount = zip_get_num_entries(curzip, 0);
+		    for(int i=0; i < zipentrycount; i++)
+		    {
+			struct zip_stat zipstat;
+			zip_stat_init(&zipstat);
+			zip_stat_index(curzip, i, 0, &zipstat);
+			htmlstr += "<tr style='";
+			if(i % 2 == 0)
+			    htmlstr += ReturnCssString(4);
+			else
+			    htmlstr += ReturnCssString(5);
+			time_t modtime = zipstat.mtime;
+			uint64_t temp = (uint64_t)modtime;
+			temp = temp + EPOCH_DIFFERENCE;
+			temp = temp * TICKS_PER_SECOND;
+			htmlstr += "'><td style='" + ReturnCssString(7) + "'>" + QString::fromStdString(std::string(zipstat.name)) + "</td><td style='" + ReturnCssString(7) + "'>" + QString::number(zipstat.size) + "</td><td style='" + ReturnCssString(7) + "'>" + QString::number(zipstat.comp_size) + "</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(temp) + "</td><td style='" + ReturnCssString(7) + "'>";
+	     */ 
             // need to unzip here and determine content types, in particular search for
             // PartName="/xl | PartName="/ppt | PartName="/word
             // Then i can read the word/document.xml for DOCX | xl/worksheets/sheet#.xml sharedstrings.xml for spreadsheet | ppt/slides/slide#.xml for PPTX
