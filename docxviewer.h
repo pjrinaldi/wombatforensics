@@ -6,7 +6,8 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
-#include "artifactparser.h"
+#include <zip.h>
+//#include "artifactparser.h"
 #include "wombatfunctions.h"
 #include "ui_docxviewer.h"
 
