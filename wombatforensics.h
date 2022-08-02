@@ -46,6 +46,7 @@
 #include "verevidencedialog.h"
 #include "hashlistmanager.h"
 #include "mboxviewer.h"
+#include "docxviewer.h"
 
 class StatusLabel : public QLabel
 {
@@ -192,6 +193,7 @@ public:
     VerEvidenceDialog* verevidencedialog;
     HashListManager* hashlistmanager;
     MBoxDialog* mboxviewer;
+    DocxViewer* docxviewer;
 
 signals:
     void CancelCurrentThread();

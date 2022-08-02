@@ -26,6 +26,42 @@ DocxViewer::~DocxViewer()
     this->close();
 }
 
+void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
+{
+    qDebug() << "xmlid:" << xmlid << "xml name:" << xmlname;
+    this->show();
+}
+//docxviewer->LoadDocxFile(selectedindex.sibling(selectedindex.row(), colindex().data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
+/*
+ *void RegistryDialog::LoadRegistryFile(QString regid, QString regname)
+{
+    libregf_file_t* regfile = NULL;
+    libregf_error_t* regerr = NULL;
+    libregf_file_initialize(&regfile, &regerr);
+    QString regfilestr = wombatvariable.tmpfilepath + regid + "-fhex";
+    regfilepath = regfilestr;
+    libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
+    libregf_error_fprint(regerr, stderr);
+    libregf_key_t* rootkey = NULL;
+    libregf_file_get_root_key(regfile, &rootkey, &regerr);
+    libregf_error_fprint(regerr, stderr);
+    int rootsubkeycnt = 0;
+    libregf_key_get_number_of_sub_keys(rootkey, &rootsubkeycnt, &regerr);
+    libregf_error_fprint(regerr, stderr);
+        QTreeWidgetItem* rootitem = new QTreeWidgetItem(ui->treeWidget);
+    rootitem->setText(0, regname.toUpper());
+    ui->treeWidget->addTopLevelItem(rootitem);
+    PopulateChildKeys(rootkey, rootitem, regerr);
+    ui->treeWidget->expandItem(rootitem);
+    libregf_key_free(&rootkey, &regerr);
+    libregf_file_close(regfile, &regerr);
+    libregf_file_free(&regfile, &regerr);
+    libregf_error_free(&regerr);
+    this->show();
+}
+
+ */ 
+
 void DocxViewer::SourceChanged(const QUrl &url)
 {
     //pagehistory.append(url->

@@ -883,6 +883,10 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Microsoft Word 2007"))
     {
 	qDebug() << "get document contents and format and populate in word viewer here...";
+	docxviewer = new DocxViewer();
+	docxviewer->setAttribute(Qt::WA_DeleteOnClose);
+	docxviewer->setWindowTitle("Simple Docx Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
+	docxviewer->LoadDocumentXml(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
     }
     else
     {
