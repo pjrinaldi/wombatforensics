@@ -78,59 +78,6 @@ void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
     ui->textbrowser->setHtml(docxstr);
     this->show();
 }
-/*
-    QString archivefilestr = wombatvariable.tmpfilepath + archiveid + "-fhex";
-    zip* curzip = zip_open(archivefilestr.toStdString().c_str(), ZIP_RDONLY, &err);
-    qint64 zipentrycount = zip_get_num_entries(curzip, 0);
-    for(int i=0; i < zipentrycount; i++)
-    {
-        struct zip_stat zipstat;
-        zip_stat_init(&zipstat);
-        zip_stat_index(curzip, i, 0, &zipstat);
-        htmlstr += "<tr style='";
-        if(i % 2 == 0)
-            htmlstr += ReturnCssString(4);
-        else
-            htmlstr += ReturnCssString(5);
-        time_t modtime = zipstat.mtime;
-        uint64_t temp = (uint64_t)modtime;
-        temp = temp + EPOCH_DIFFERENCE;
-        temp = temp * TICKS_PER_SECOND;
-        htmlstr += "'><td style='" + ReturnCssString(7) + "'>" + QString::fromStdString(std::string(zipstat.name)) + "</td><td style='" + ReturnCssString(7) + "'>" + QString::number(zipstat.size) + "</td><td style='" + ReturnCssString(7) + "'>" + QString::number(zipstat.comp_size) + "</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(temp) + "</td><td style='" + ReturnCssString(7) + "'>";
-        htmlstr += "</td><td style='" + ReturnCssString(7) + "'>";
-    }
-    htmlstr += "</table></body></html>";
-
-    return htmlstr;
-
-void RegistryDialog::LoadRegistryFile(QString regid, QString regname)
-{
-    libregf_file_t* regfile = NULL;
-    libregf_error_t* regerr = NULL;
-    libregf_file_initialize(&regfile, &regerr);
-    QString regfilestr = wombatvariable.tmpfilepath + regid + "-fhex";
-    regfilepath = regfilestr;
-    libregf_file_open(regfile, regfilestr.toStdString().c_str(), LIBREGF_OPEN_READ, &regerr);
-    libregf_error_fprint(regerr, stderr);
-    libregf_key_t* rootkey = NULL;
-    libregf_file_get_root_key(regfile, &rootkey, &regerr);
-    libregf_error_fprint(regerr, stderr);
-    int rootsubkeycnt = 0;
-    libregf_key_get_number_of_sub_keys(rootkey, &rootsubkeycnt, &regerr);
-    libregf_error_fprint(regerr, stderr);
-        QTreeWidgetItem* rootitem = new QTreeWidgetItem(ui->treeWidget);
-    rootitem->setText(0, regname.toUpper());
-    ui->treeWidget->addTopLevelItem(rootitem);
-    PopulateChildKeys(rootkey, rootitem, regerr);
-    ui->treeWidget->expandItem(rootitem);
-    libregf_key_free(&rootkey, &regerr);
-    libregf_file_close(regfile, &regerr);
-    libregf_file_free(&regfile, &regerr);
-    libregf_error_free(&regerr);
-    this->show();
-}
-
- */ 
 
 void DocxViewer::SourceChanged(const QUrl &url)
 {
