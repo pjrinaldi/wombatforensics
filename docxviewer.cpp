@@ -29,6 +29,50 @@ DocxViewer::~DocxViewer()
 void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
 {
     qDebug() << "xmlid:" << xmlid << "xml name:" << xmlname;
+    int err = 0;
+    int zipfileid = 0;
+    QString zipfilename = "";
+    zip_uint64_t zipfilesize = 0;
+    QString docxfilestr = wombatvariable.tmpfilepath + xmlid + "-fhex";
+    zip* curzip = zip_open(docxfilestr.toStdString().c_str(), ZIP_RDONLY, &err);
+    qint64 zipentrycnt = zip_get_num_entries(curzip, 0);
+    struct zip_stat zipstat;
+    zip_stat_init(&zipstat);
+    for(int i=0; i < zipentrycnt; i++)
+    {
+        zip_stat_index(curzip, i, 0, &zipstat);
+        if(zipstat.name = "document.xml")
+        {
+            zipfileid = i;
+            zipfilename = zipstat.name;
+            zipfilesize = zipstat.size;
+            /*
+            zip_file_t* docxml = NULL;
+            docxml = zip_fopen_index(curzip, i, ZIP_FL_UNCHANGED);
+            void* zipbuf = NULL;
+            int64_t bytesread = zip_fread(docxml, zipbuf, zipstat.size);
+            //err = zip_fseek(0)
+            zip_fclose(docxml);
+            if(bytesread == zipstat.size)
+            {
+                qDebug() << "buf has file content";
+            }
+            else
+                qDebug() << "bytes read:" << bytesread << "zipstat.size:" << zipstat.size;
+            qDebug() << "found document.xml, need to parse into plain/markdown/html";
+            */
+        }
+    }
+    qDebug() << "zipfileid:" << zipfileid << "zipfilename:" << zipfilename << "zipfilesize:" << zipfilesize;
+    //zip_file_t* docxml = NULL;
+    zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
+    char zipbuf[zipfilesize];
+    //void* zipbuf = NULL;
+    zip_int64_t bytesread = zip_fread(docxml, zipbuf, zipfilesize);
+    err = zip_fclose(docxml);
+    //qDebug() << "bytesread:" << bytesread;
+    QByteArray filearray = QByteArray::fromRawData(zipbuf, zipfilesize);
+    qDebug() << "document.xml:" << filearray.left(5);
     this->show();
 }
 /*
