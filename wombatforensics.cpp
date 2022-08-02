@@ -1444,6 +1444,8 @@ void WombatForensics::PathSelectionChanged(const QItemSelection &curitem, const 
         ui->actionJumpToHex->setEnabled(true);
         ui->actionsearchhex->setEnabled(true);
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        // PATHTREEVIEW
+        //pathtreeview->resizeColumnToContents(0);
         //TreeNode* curnode = static_cast<TreeNode*>(selectedindex.internalPointer());
         /*
         if(treenodemodel->rowCount(selectedindex) > 0)
@@ -1495,6 +1497,7 @@ void WombatForensics::SetRootIndex()
     if(data == "INDEXVOID")
     {
         pathtreeview->setRootIndex(QModelIndex());
+        pathtreeview->resizeColumnToContents(0);
     }
     else
     {
@@ -1503,6 +1506,7 @@ void WombatForensics::SetRootIndex()
         if(indexlist.count() > 0)
         {
             pathtreeview->setRootIndex(indexlist.at(0).sibling(indexlist.at(0).row(), 0));
+            pathtreeview->resizeColumnToContents(0);
         }
 	QApplication::restoreOverrideCursor();
     }

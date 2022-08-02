@@ -529,7 +529,7 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 		mimestr = "Office Document/Microsoft Word 2007+";
 		//qDebug() << "it's a word document...";
 	    }
-	    else if(officecheck.toHex().contains(QString("78gc2f").toStdString().c_str())) // "xl/" (.xlsx)
+	    else if(officecheck.toHex().contains(QString("786c2f").toStdString().c_str())) // "xl/" (.xlsx)
 	    {
 		mimestr = "Office Document/Microsoft Excel 2007+";
 	    }
