@@ -6,7 +6,6 @@
 
 #include "wombatinclude.h"
 #include "globals.h"
-#include <zip.h>
 #include <magic.h>
 
 void SleepLoop(const int ms);

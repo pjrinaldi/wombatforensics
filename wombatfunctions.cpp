@@ -484,8 +484,8 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
 	magic_t magical;
 	const char* catsig;
-	magical = magic_open(MAGIC_NONE);
-	//magical = magic_open(MAGIC_MIME_TYPE);
+	//magical = magic_open(MAGIC_NONE);
+	magical = magic_open(MAGIC_MIME_TYPE);
 	magic_load(magical, NULL);
 	catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
 	std::string catsigstr(catsig);
@@ -496,8 +496,7 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 	    if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
 		mimestr[i] = mimestr[i].toUpper();
 	}
-	qDebug() << "filename:" << filename << "mimestr:" << mimestr;
-        //qDebug() << "mimestr:" << mimestr;
+	//qDebug() << "filename:" << filename << "mimestr:" << mimestr;
 	if(mimestr.contains("Application/Octet-Stream"))
 	{
 	    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
@@ -522,37 +521,33 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
         }
         else if(mimestr.contains("/Zip"))
         {
-	    qDebug() << "filename:" << filename << "mimestr:" << mimestr;
-
-	    /*
-	     *    QString archivefilestr = wombatvariable.tmpfilepath + archiveid + "-fhex";
-		    int err = 0;
-		    zip* curzip = zip_open(archivefilestr.toStdString().c_str(), ZIP_RDONLY, &err);
-		    qint64 zipentrycount = zip_get_num_entries(curzip, 0);
-		    for(int i=0; i < zipentrycount; i++)
-		    {
-			struct zip_stat zipstat;
-			zip_stat_init(&zipstat);
-			zip_stat_index(curzip, i, 0, &zipstat);
-			htmlstr += "<tr style='";
-			if(i % 2 == 0)
-			    htmlstr += ReturnCssString(4);
-			else
-			    htmlstr += ReturnCssString(5);
-			time_t modtime = zipstat.mtime;
-			uint64_t temp = (uint64_t)modtime;
-			temp = temp + EPOCH_DIFFERENCE;
-			temp = temp * TICKS_PER_SECOND;
-			htmlstr += "'><td style='" + ReturnCssString(7) + "'>" + QString::fromStdString(std::string(zipstat.name)) + "</td><td style='" + ReturnCssString(7) + "'>" + QString::number(zipstat.size) + "</td><td style='" + ReturnCssString(7) + "'>" + QString::number(zipstat.comp_size) + "</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(temp) + "</td><td style='" + ReturnCssString(7) + "'>";
-	     */ 
-            // need to unzip here and determine content types, in particular search for
-            // PartName="/xl | PartName="/ppt | PartName="/word
-            // Then i can read the word/document.xml for DOCX | xl/worksheets/sheet#.xml sharedstrings.xml for spreadsheet | ppt/slides/slide#.xml for PPTX
-            // just work on docx for now and go from there.
-        }
+	    //qDebug() << "filename:" << filename << "mimestr:" << mimestr;
+	    QByteArray officecheck = curimg->ReadContent(fileoffset, 4096);
+	    //qDebug() << QString(officecheck.toHex());
+	    if(officecheck.toHex().contains(QString("776f72642f").toStdString().c_str())) // "word/" (.docx)
+	    {
+		mimestr = "Office Document/Microsoft Word 2007+";
+		//qDebug() << "it's a word document...";
+	    }
+	    else if(officecheck.toHex().contains(QString("78gc2f").toStdString().c_str())) // "xl/" (.xlsx)
+	    {
+		mimestr = "Office Document/Microsoft Excel 2007+";
+	    }
+	    else if(officecheck.toHex().contains(QString("7070742f").toStdString().c_str())) // "ppt/" (.pptx)
+	    {
+		mimestr = "Office Document/Microsoft PowerPoint 2007+";
+	    }
+	}
     }
+	    //else
+		//qDebug() << "something went wrong...";
+
+	    // might not need the full contents, just need more hex and see if it has the:
+	    // word/ folder (0x776f72642f) for .docx
+	    // xl/ folder (0x786c2f) for .xlsx
+	    // ppt/ folder (0x7070742f) for .pptx
+
     //else if(filename.startsWith("$INDEX_ROOT:") || filename.startsWith("$DATA:") || filename.startWith("$INDEX_ALLOCATION:"))
-    
 
     return mimestr;
     //return QString(mimecategory + "/" + mimesignature);

@@ -213,6 +213,7 @@ qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t pt
                     }
 		    else
 		    {
+			//QString catsig = GenerateCategorySignature(curimg, filename, layout); might not need this method, could just read more and see if it has word/ in hex.
 			QString catsig = GenerateCategorySignature(curimg, filename, layout.split(";").at(0).split(",").at(0).toULongLong());
 			//qDebug() << filename.left(20) << catsig;
                         nodedata.insert("cat", catsig.split("/").first());
