@@ -28,7 +28,8 @@ DocxViewer::~DocxViewer()
 
 void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
 {
-    qDebug() << "xmlid:" << xmlid << "xml name:" << xmlname;
+    QString docxstr = "<html><body style='" + ReturnCssString(0) + "'>";
+    //qDebug() << "xmlid:" << xmlid << "xml name:" << xmlname;
     int err = 0;
     int zipfileid = 0;
     QString zipfilename = "";
@@ -46,24 +47,9 @@ void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
             zipfileid = i;
             zipfilename = zipstat.name;
             zipfilesize = zipstat.size;
-            /*
-            zip_file_t* docxml = NULL;
-            docxml = zip_fopen_index(curzip, i, ZIP_FL_UNCHANGED);
-            void* zipbuf = NULL;
-            int64_t bytesread = zip_fread(docxml, zipbuf, zipstat.size);
-            //err = zip_fseek(0)
-            zip_fclose(docxml);
-            if(bytesread == zipstat.size)
-            {
-                qDebug() << "buf has file content";
-            }
-            else
-                qDebug() << "bytes read:" << bytesread << "zipstat.size:" << zipstat.size;
-            qDebug() << "found document.xml, need to parse into plain/markdown/html";
-            */
         }
     }
-    qDebug() << "zipfileid:" << zipfileid << "zipfilename:" << zipfilename << "zipfilesize:" << zipfilesize;
+    //qDebug() << "zipfileid:" << zipfileid << "zipfilename:" << zipfilename << "zipfilesize:" << zipfilesize;
     //zip_file_t* docxml = NULL;
     zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
     char zipbuf[zipfilesize];
@@ -72,7 +58,24 @@ void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
     err = zip_fclose(docxml);
     //qDebug() << "bytesread:" << bytesread;
     QByteArray filearray = QByteArray::fromRawData(zipbuf, zipfilesize);
-    qDebug() << "document.xml:" << filearray.left(5);
+    //qDebug() << "document.xml:" << filearray.left(5);
+    QXmlStreamReader xmlreader;
+    xmlreader.addData(filearray);
+    while(!xmlreader.atEnd())
+    {
+        xmlreader.readNext();
+        if(xmlreader.isCharacters() || xmlreader.isDTD() || xmlreader.isEntityReference() || xmlreader.isComment())
+        {
+            docxstr += "<p>";
+            docxstr += xmlreader.text();
+            //docxstr += "\n";
+            docxstr += "</p>";
+            //qDebug() << "Text:" << xmlreader.text();
+        }
+    }
+    xmlreader.clear();
+    docxstr += "</body></html>";
+    ui->textbrowser->setHtml(docxstr);
     this->show();
 }
 /*
