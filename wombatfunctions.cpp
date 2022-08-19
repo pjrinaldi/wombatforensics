@@ -538,6 +538,10 @@ QString GenerateCategorySignature(ForImg* curimg, QString filename, qulonglong f
 		mimestr = "Office Document/Microsoft PowerPoint 2007+";
 	    }
 	}
+	else if(mimestr.contains("/Vnd.oasis.opendocument.text"))
+	{
+	    mimestr = "Office Document/Open Document Text";
+	}
     }
 	    //else
 		//qDebug() << "something went wrong...";

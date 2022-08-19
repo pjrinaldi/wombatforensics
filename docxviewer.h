@@ -26,7 +26,8 @@ public:
     void ShowHtml(const QModelIndex &index);
     void ShowArtifact(int artifacttype, const QModelIndex &index);
     void LoadHtml(QString filepath);
-    void LoadDocumentXml(QString xmlid, QString xmlname);
+    void LoadDocumentXml(QString xmlid, QString xmlname, QString xmlcontent);
+    //void LoadDocumentXml(QString xmlid, QString xmlname);
     //void RegistryDialog::LoadRegistryFile(QString regid, QString regname)
 
 private slots:

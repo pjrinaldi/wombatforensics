@@ -26,7 +26,8 @@ DocxViewer::~DocxViewer()
     this->close();
 }
 
-void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
+//void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
+void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname, QString xmlcontent)
 {
     QString docxstr = "<html><body style='" + ReturnCssString(0) + "'>";
     //qDebug() << "xmlid:" << xmlid << "xml name:" << xmlname;
@@ -42,7 +43,8 @@ void DocxViewer::LoadDocumentXml(QString xmlid, QString xmlname)
     for(int i=0; i < zipentrycnt; i++)
     {
         zip_stat_index(curzip, i, 0, &zipstat);
-        if(zipstat.name = "document.xml")
+        //if(zipstat.name = "document.xml")
+        if(zipstat.name == xmlcontent)
         {
             zipfileid = i;
             zipfilename = zipstat.name;

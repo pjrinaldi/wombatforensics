@@ -882,11 +882,19 @@ void WombatForensics::ShowFile(const QModelIndex &index)
     } // 50 4B 03 04 14 docx,xlsx,pptx format. need to open zip and look at content_types.xml to figure out which it is.
     else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Microsoft Word 2007"))
     {
-	qDebug() << "get document contents and format and populate in word viewer here...";
+	//qDebug() << "get document contents and format and populate in word viewer here...";
 	docxviewer = new DocxViewer();
 	docxviewer->setAttribute(Qt::WA_DeleteOnClose);
 	docxviewer->setWindowTitle("Simple Docx Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
-	docxviewer->LoadDocumentXml(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString());
+	docxviewer->LoadDocumentXml(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString(), "document.xml");
+    }
+    else if(index.sibling(index.row(), treenodemodel->GetColumnIndex("sig")).data().toString().startsWith("Open Document Text"))
+    {
+	//qDebug() << "get document contents and format and populate in word viewer here...";
+	docxviewer = new DocxViewer();
+	docxviewer->setAttribute(Qt::WA_DeleteOnClose);
+	docxviewer->setWindowTitle("Simple Odt Viewer " + selectedindex.sibling(selectedindex.row(), colindex).data().toString());
+	docxviewer->LoadDocumentXml(selectedindex.sibling(selectedindex.row(), colindex).data().toString(), selectedindex.sibling(selectedindex.row(), treenodemodel->GetColumnIndex("name")).data().toString(), "content.xml");
     }
     else
     {
