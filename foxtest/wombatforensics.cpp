@@ -7,17 +7,6 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
     pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
-    /*
-    topframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    pagelabel = new FXLabel(topframe, "Page: ");
-    pagespinner = new FXSpinner(topframe, 3, this, ID_PAGESPIN);
-    ofpagelabel = new FXLabel(topframe, " of ");
-    */
-    //vsplitter = new FXSplitter(mainframe, SPLITTER_NORMAL|LAYOUT_FILL);
-    /*
-    sqlfilelist = new FXList(vsplitter, this, ID_SQLLIST);
-    proptable = new FXTable(vsplitter, this, ID_PROPTABLE, TABLE_COL_SIZABLE);
-    */
     hsplitter = new FXSplitter(mainframe, SPLITTER_VERTICAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     tablelist = new FXTable(hsplitter, this, ID_TABLESELECT, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     tablelist->setTableSize(4, 3);
@@ -31,70 +20,21 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X);
-    /*
-    editorframe = new FXHorizontalFrame(hsplitter, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    offsettext = new FXText(editorframe, this, ID_OFFTEXT, LAYOUT_FIX_WIDTH|LAYOUT_FILL_Y);
-    hextext = new FXText(editorframe, this, ID_HEXTEXT, LAYOUT_FIX_WIDTH|LAYOUT_FILL_Y);
-    asciitext = new FXText(editorframe, this, ID_ASCTEXT, LAYOUT_FIX_WIDTH|LAYOUT_FILL_Y);
-    offsettext->setScrollStyle(VSCROLLER_NEVER|HSCROLLER_NEVER);
-    hextext->setScrollStyle(VSCROLLER_NEVER|HSCROLLER_NEVER);
-    asciitext->setScrollStyle(VSCROLLER_NEVER|HSCROLLER_NEVER);
-    textscrollbar = new FXScrollBar(editorframe, this, ID_SCROLLBAR, LAYOUT_FIX_WIDTH|LAYOUT_FILL_Y);
-    textscrollbar->setWidth(15);
-    */
-    /*
-    sqlfilelist->setWidth(this->getWidth() / 4);
-    editorframe->setHeight(this->getHeight() / 2);
-    offsettext->setEditable(false);
-    offsettext->setWidth(55);
-    offsettext->setFont(plainfont);
-    offsettext->setText("000000");
-    hextext->setEditable(false);
-    hextext->setFont(plainfont);
-    hextext->setWidth(390);
-    hextext->setText("00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff");
-    asciitext->setEditable(false);
-    asciitext->setFont(plainfont);
-    asciitext->setWidth(140);
-    asciitext->setText("1234567890abcdef");
-    asciitext->setHiliteBackColor(FX::colorFromName("green"));
-    hsplitter->setWidth(offsettext->getWidth() + hextext->getWidth() + asciitext->getWidth() + textscrollbar->getWidth() + 16);
-    proptable->setRowHeaderWidth(0);
-    tablelist->setRowHeaderWidth(0);
-    proptable->setEditable(false);
-    proptable->setTableSize(4, 3);
-    tablelist->setEditable(false);
-    tablelist->setTableSize(5, 6);
-    proptable->setColumnText(0, "Offset, Length");
-    proptable->setColumnText(1, "Value");
-    proptable->setColumnText(2, "Description");
-    proptable->setColumnHeaderHeight(proptable->getColumnHeaderHeight() + 5);
-    tablelist->setColumnText(0, "Tag");
-    tablelist->setColumnText(1, "Is Live");
-    tablelist->setColumnText(2, "Row ID");
-    tablelist->setColumnText(3, "Offset, Length");
-    tablelist->setColumnText(4, "Type");
-    tablelist->setColumnText(5, "Value");
-    tablelist->setColumnHeaderHeight(tablelist->getColumnHeaderHeight() + 5);
-    */
-    /*
-    treelist->setWidth(this->getWidth() / 4);
-    hsplitter = new FXSplitter(vsplitter, SPLITTER_VERTICAL);
-    tablelist = new FXTable(hsplitter, this, ID_TABLESELECT, TABLE_COL_SIZABLE|LAYOUT_FILL_X, LAYOUT_FILL_Y);
-    plainfont = new FXFont(a, "monospace");
-    plaintext = new FXText(hsplitter);
-    plaintext->setFont(plainfont);
-    plaintext->setEditable(false);
-    tablelist->setHeight(this->getHeight() / 3);
-    tablelist->setEditable(false);
-    tablelist->setTableSize(4, 3);
-    tablelist->setColumnText(0, "Tag");
-    tablelist->setColumnText(1, "Value Name");
-    tablelist->setColumnText(2, "Value Type");
-    tablelist->setColumnHeaderHeight(tablelist->getColumnHeaderHeight() + 5);
-    */
+    // TOOLBAR ICONS
+    // WOMBAT CASE FILE ICONS
+    newicon = new FXPNGIcon(this->getApp(), documentnew);
+    newbutton = new FXButton(toolbar, "", newicon, this, ID_NEW, BUTTON_TOOLBAR);
     openicon = new FXPNGIcon(this->getApp(), folderopen);
     openbutton = new FXButton(toolbar, "", openicon, this, ID_OPEN, BUTTON_TOOLBAR);
+    saveicon = new FXPNGIcon(this->getApp(), documentsave);
+    savebutton = new FXButton(toolbar, "", saveicon, this, ID_SAVE, BUTTON_TOOLBAR);
+    new FXVerticalSeparator(toolbar);
+    // EVIDENCE ICONS
+    listaddicon = new FXPNGIcon(this->getApp(), listadd);
+    listaddbutton = new FXButton(toolbar, "", listaddicon, this, ID_ADDEVID, BUTTON_TOOLBAR);
+    listremicon = new FXPNGIcon(this->getApp(), listrem);
+    listrembutton = new FXButton(toolbar, "", listremicon, this, ID_REMEVID, BUTTON_TOOLBAR);
+    new FXVerticalSeparator(toolbar);
     managetagsicon = new FXPNGIcon(this->getApp(), managetags);
     managetagsbutton = new FXButton(toolbar, "", managetagsicon, this, ID_MANAGETAGS, BUTTON_TOOLBAR);
     previewicon = new FXPNGIcon(this->getApp(), reportpreview1);
@@ -103,9 +43,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     publishbutton = new FXButton(toolbar, "", publishicon, this, ID_PUBLISH, BUTTON_TOOLBAR);
     abouticon = new FXPNGIcon(this->getApp(), helpcontents);
     aboutbutton = new FXButton(toolbar, "", abouticon, this, ID_ABOUT, BUTTON_TOOLBAR);
-
+    // PATH TOOLBAR HOME ICON
     burrowicon = new FXPNGIcon(this->getApp(), burrow);
     burrowbutton = new FXButton(pathtoolbar, "", burrowicon, this, ID_HOME, BUTTON_TOOLBAR);
+
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
     sqlitefiles.clear();

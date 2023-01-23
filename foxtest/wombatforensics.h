@@ -94,27 +94,25 @@ class WombatForensics : public FXMainWindow
 
     private:
         FXVerticalFrame* mainframe;
-        //FXHorizontalFrame* topframe;
-        //FXHorizontalFrame* editorframe;
-        FXSplitter* hsplitter;
-        //FXSplitter* vsplitter;
-        //FXSplitter* vsplitter2;
-        //FXList* sqlfilelist;
         FXToolBar* toolbar;
         FXToolBar* pathtoolbar;
-        /*
-        FXText* offsettext;
-        FXText* hextext;
-        FXText* asciitext;
-        FXScrollBar* textscrollbar;
-        FXLabel* pagelabel;
-        FXSpinner* pagespinner;
-        FXLabel* ofpagelabel;
-        FXTable* proptable;
-        */
+        FXSplitter* hsplitter;
         FXTable* tablelist;
+        FXStatusBar* statusbar;
+        FXFont* plainfont;
+        FXText* plaintext;
+
+        FXIcon* newicon;
+        FXButton* newbutton;
 	FXIcon* openicon;
         FXButton* openbutton;
+        FXIcon* saveicon;
+        FXButton* savebutton;
+        FXIcon* listaddicon;
+        FXButton* listaddbutton;
+        FXIcon* listremicon;
+        FXButton* listrembutton;
+
 	FXIcon* managetagsicon;
 	FXButton* managetagsbutton;
 	FXIcon* previewicon;
@@ -125,9 +123,6 @@ class WombatForensics : public FXMainWindow
 	FXButton* aboutbutton;
         FXIcon* burrowicon;
         FXButton* burrowbutton;
-        FXStatusBar* statusbar;
-        FXFont* plainfont;
-        FXText* plaintext;
 
         /*
         FXString prevsqlitepath;
@@ -162,7 +157,11 @@ class WombatForensics : public FXMainWindow
         enum
         {
             ID_TREELIST = 1,
+            ID_NEW = 99,
             ID_OPEN = 100,
+            ID_SAVE = 98,
+            ID_ADDEVID = 97,
+            ID_REMEVID = 96,
             ID_TREESELECT = 101,
 	    ID_MANAGETAGS = 102,
 	    ID_PREVIEW = 103,

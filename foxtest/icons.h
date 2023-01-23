@@ -1,4 +1,4 @@
-/*********** Generated on 2023/01/23 14:13:51 by reswrap version 6.0.0 *********/
+/*********** Generated on 2023/01/23 14:40:40 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file resources/folder-open.png */
 extern const unsigned char folderopen[];
@@ -32,4 +32,16 @@ extern const unsigned char aboutwombat[];
 
 /* Created by reswrap from file resources/burrow.png */
 extern const unsigned char burrow[];
+
+/* Created by reswrap from file resources/document-new.png */
+extern const unsigned char documentnew[];
+
+/* Created by reswrap from file resources/document-save.png */
+extern const unsigned char documentsave[];
+
+/* Created by reswrap from file resources/list-add.png */
+extern const unsigned char listadd[];
+
+/* Created by reswrap from file resources/list-rem.png */
+extern const unsigned char listrem[];
 
