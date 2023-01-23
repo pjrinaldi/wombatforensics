@@ -108,10 +108,18 @@ class WombatForensics : public FXMainWindow
         FXButton* openbutton;
         FXIcon* saveicon;
         FXButton* savebutton;
+
         FXIcon* listaddicon;
         FXButton* listaddbutton;
         FXIcon* listremicon;
         FXButton* listrembutton;
+
+        FXIcon* settingsicon;
+        FXButton* settingsbutton;
+        FXIcon* viewmanageicon;
+        FXButton* viewmanagebutton;
+        FXIcon* messagelogicon;
+        FXButton* messagelogbutton;
 
 	FXIcon* managetagsicon;
 	FXButton* managetagsbutton;
@@ -121,6 +129,7 @@ class WombatForensics : public FXMainWindow
 	FXButton* publishbutton;
 	FXIcon* abouticon;
 	FXButton* aboutbutton;
+
         FXIcon* burrowicon;
         FXButton* burrowbutton;
 
@@ -162,6 +171,9 @@ class WombatForensics : public FXMainWindow
             ID_SAVE = 98,
             ID_ADDEVID = 97,
             ID_REMEVID = 96,
+            ID_SETTINGS = 95,
+            ID_VIEWMANAGE = 94,
+            ID_MSGLOG = 93,
             ID_TREESELECT = 101,
 	    ID_MANAGETAGS = 102,
 	    ID_PREVIEW = 103,
@@ -188,6 +200,7 @@ class WombatForensics : public FXMainWindow
         */
         long OpenTagManager(FXObject*, FXSelector, void*);
 	long OpenAboutBox(FXObject*, FXSelector, void*);
+        long PreviewReport(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -195,7 +208,6 @@ class WombatForensics : public FXMainWindow
         long SetTag(FXObject* sender, FXSelector, void*);
         long CreateNewTag(FXObject*, FXSelector, void*);
         long RemoveTag(FXObject*, FXSelector, void*);
-        long PreviewReport(FXObject*, FXSelector, void*);
         long PublishReport(FXObject*, FXSelector, void*);
         long FileSelected(FXObject*, FXSelector, void*);
         long PropertySelected(FXObject*, FXSelector, void*);
@@ -236,8 +248,9 @@ class WombatForensics : public FXMainWindow
 FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
-    //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
     /*
+    //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
@@ -246,7 +259,6 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_NEWTAG, WombatForensics::CreateNewTag),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTAG, WombatForensics::SetTag),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_REMTAG, WombatForensics::RemoveTag),
-    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PUBLISH, WombatForensics::PublishReport),
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_SQLLIST, WombatForensics::FileSelected),
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_PROPTABLE, WombatForensics::PropertySelected),

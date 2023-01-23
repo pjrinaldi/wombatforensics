@@ -1,4 +1,4 @@
-/*********** Generated on 2023/01/23 14:40:40 by reswrap version 6.0.0 *********/
+/*********** Generated on 2023/01/23 22:52:29 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file resources/folder-open.png */
 extern const unsigned char folderopen[];
@@ -44,4 +44,13 @@ extern const unsigned char listadd[];
 
 /* Created by reswrap from file resources/list-rem.png */
 extern const unsigned char listrem[];
+
+/* Created by reswrap from file resources/viewmanage.png */
+extern const unsigned char viewmanage[];
+
+/* Created by reswrap from file resources/messagelog.png */
+extern const unsigned char messagelog[];
+
+/* Created by reswrap from file resources/settings.png */
+extern const unsigned char settings[];
 

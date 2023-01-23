@@ -35,12 +35,25 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     listremicon = new FXPNGIcon(this->getApp(), listrem);
     listrembutton = new FXButton(toolbar, "", listremicon, this, ID_REMEVID, BUTTON_TOOLBAR);
     new FXVerticalSeparator(toolbar);
+    // WOMBAT FORENSIC APP ICONS
+    settingsicon = new FXPNGIcon(this->getApp(), settings);
+    settingsbutton = new FXButton(toolbar, "", settingsicon, this, ID_SETTINGS, BUTTON_TOOLBAR);
+    viewmanageicon = new FXPNGIcon(this->getApp(), viewmanage);
+    viewmanagebutton = new FXButton(toolbar, "", viewmanageicon, this, ID_VIEWMANAGE, BUTTON_TOOLBAR);
+    messagelogicon = new FXPNGIcon(this->getApp(), messagelog);
+    messagelogbutton = new FXButton(toolbar, "", messagelogicon, this, ID_MSGLOG, BUTTON_TOOLBAR);
+    new FXVerticalSeparator(toolbar);
+    // ARTIFACT ICONS
+    new FXVerticalSeparator(toolbar);
+    // REPORTING ICONS
     managetagsicon = new FXPNGIcon(this->getApp(), managetags);
     managetagsbutton = new FXButton(toolbar, "", managetagsicon, this, ID_MANAGETAGS, BUTTON_TOOLBAR);
     previewicon = new FXPNGIcon(this->getApp(), reportpreview1);
     previewbutton = new FXButton(toolbar, "", previewicon, this, ID_PREVIEW, BUTTON_TOOLBAR);
     publishicon = new FXPNGIcon(this->getApp(), paperairplane2);
     publishbutton = new FXButton(toolbar, "", publishicon, this, ID_PUBLISH, BUTTON_TOOLBAR);
+    // IMAGING ICONS
+    // ABOUT ICONS
     abouticon = new FXPNGIcon(this->getApp(), helpcontents);
     aboutbutton = new FXButton(toolbar, "", abouticon, this, ID_ABOUT, BUTTON_TOOLBAR);
     // PATH TOOLBAR HOME ICON
@@ -666,7 +679,6 @@ long  WombatForensics::OpenAboutBox(FXObject*, FXSelector, void*)
     return 1;
 }
 
-/*
 long WombatForensics::PreviewReport(FXObject*, FXSelector, void*)
 {
     viewer = new Viewer(this, "Report Preview");
@@ -676,6 +688,7 @@ long WombatForensics::PreviewReport(FXObject*, FXSelector, void*)
     return 1;
 }
 
+/*
 long WombatForensics::PublishReport(FXObject*, FXSelector, void*)
 {
     FXString startpath = FXString(getenv("HOME")) + "/";
