@@ -4,10 +4,10 @@ FXIMPLEMENT(Settings,FXDialogBox,NULL, 0)
 
 Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 500, 290, 0,0,0,0, 0, 0)
 {
-    mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
+    mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 10, 10, 10, 10);
     hframe1 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    thumbsizelabel = new FXLabel(hframe1, "Thumbnail Size (pixels):", NULL, JUSTIFY_LEFT);
-    new FXSpring(hframe1, 400);
+    thumbsizelabel = new FXLabel(hframe1, "Thumbnail Size (pixels):", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
+    new FXSpring(hframe1);
     thumbsizespinner = new FXSpinner(hframe1, 5);
     thumbsizespinner->setRange(64, 384);
     thumbsizespinner->setIncrement(64);
