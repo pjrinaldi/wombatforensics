@@ -166,6 +166,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         ui->actionpreviewreport->setEnabled(true);
         ui->actionBookmark_Manager->setEnabled(true);
         ui->actionpublishresults->setEnabled(true);
+
         ui->actionHashListManager->setEnabled(true);
         qInfo() << "Case was Created";
         //LogMessage("Case was Created");
