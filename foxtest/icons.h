@@ -1,4 +1,4 @@
-/*********** Generated on 2023/01/23 22:52:29 by reswrap version 6.0.0 *********/
+/*********** Generated on 2023/01/24 00:15:01 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file resources/folder-open.png */
 extern const unsigned char folderopen[];
@@ -53,4 +53,40 @@ extern const unsigned char messagelog[];
 
 /* Created by reswrap from file resources/settings.png */
 extern const unsigned char settings[];
+
+/* Created by reswrap from file resources/byteconverter.png */
+extern const unsigned char byteconverter[];
+
+/* Created by reswrap from file resources/carving.png */
+extern const unsigned char carving[];
+
+/* Created by reswrap from file resources/digdeeper.png */
+extern const unsigned char digdeeper[];
+
+/* Created by reswrap from file resources/exportfiles.png */
+extern const unsigned char exportfiles[];
+
+/* Created by reswrap from file resources/exportwli.png */
+extern const unsigned char exportwli[];
+
+/* Created by reswrap from file resources/hashlist.png */
+extern const unsigned char hashlist[];
+
+/* Created by reswrap from file resources/imgvidthumbs.png */
+extern const unsigned char imgvidthumbs[];
+
+/* Created by reswrap from file resources/jumptohex.png */
+extern const unsigned char jumptohex[];
+
+/* Created by reswrap from file resources/searchhex.png */
+extern const unsigned char searchhex[];
+
+/* Created by reswrap from file resources/verifywfi.png */
+extern const unsigned char verifywfi[];
+
+/* Created by reswrap from file resources/xchomp.png */
+extern const unsigned char xchomp[];
+
+/* Created by reswrap from file resources/createwfi.png */
+extern const unsigned char createwfi[];
 
