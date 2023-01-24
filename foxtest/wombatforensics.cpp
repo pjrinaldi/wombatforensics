@@ -83,12 +83,105 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     sqlitefiles.clear();
     tags.clear();
     taggedlist.clear();
+    iscaseopen = false;
 }
 
 void WombatForensics::create()
 {
     FXMainWindow::create();
     show(PLACEMENT_SCREEN);
+}
+
+long WombatForensics::NewCase(FXObject*, FXSelector, void*)
+{
+    if(iscaseopen)
+    {
+        FXuint result = FXMessageBox::question(this, MBOX_YES_NO, "Existing Case Status", "There is a case already open. Are you sure you want to close it?"); // no is 2, yes is 1
+        if(result == 1) // YES
+        {
+            //CloseCurrentCase();
+            iscaseopen = false;
+        }
+        else // NO
+            return 1;
+    }
+    StatusUpdate("Creating New Case...");
+    /*
+    StatusUpdate("Generating Case Structure...");
+    // create new case here
+    QInputDialog* casedialog = new QInputDialog(this);
+    casedialog->setCancelButtonText("Cancel");
+    casedialog->setInputMode(QInputDialog::TextInput);
+    casedialog->setLabelText("Enter Case Name");
+    casedialog->setOkButtonText("Create Case");
+    casedialog->setTextEchoMode(QLineEdit::Normal);
+    casedialog->setWindowTitle("New Case");
+    if(casedialog->exec())
+        wombatvariable.casename = casedialog->textValue();
+    if(!wombatvariable.casename.isEmpty())
+    {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
+        wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename + "/";
+        QDir dir;
+        dir.mkpath(wombatvariable.tmpmntpath);
+        dir.mkpath(wombatvariable.tmpmntpath + "carved/");
+        dir.mkpath(wombatvariable.tmpmntpath + "archives/");
+        dir.mkpath(wombatvariable.tmpmntpath + "hashlists/");
+        dir.mkpath(wombatvariable.tmpmntpath + "mailboxes/");
+        wombatvariable.iscaseopen = true;
+        InitializePreviewReport();
+        bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
+        if(!FileExists(QString(wombatvariable.tmpmntpath + "bookmarks").toStdString()))
+        {
+            bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
+            bookmarkfile.close();
+        }
+        qInfo() << "Bookmarks File Created";
+        ReadBookmarks();
+        ReadHashLists();
+        logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
+        logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+        msglog->clear();
+        qInfo() << "Log File Created";
+        //LogMessage("Log File Created");
+        thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
+        InitializeCheckState();
+        ui->actionAdd_Evidence->setEnabled(true);
+        ui->actionpreviewreport->setEnabled(true);
+        ui->actionBookmark_Manager->setEnabled(true);
+        ui->actionpublishresults->setEnabled(true);
+        ui->actionHashListManager->setEnabled(true);
+        qInfo() << "Case was Created";
+        //LogMessage("Case was Created");
+        QApplication::restoreOverrideCursor();
+        StatusUpdate("Ready");
+        autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
+    }
+
+     */ 
+    /*
+    // determine if a case is open
+    if(wombatvariable.iscaseopen)
+    {
+        int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
+        if(ret == QMessageBox::Yes)
+        {
+            CloseCurrentCase();
+            treenodemodel = new TreeNodeModel();
+            InitializeCaseStructure();
+        }
+    }
+    else
+        InitializeCaseStructure();
+}
+     */ 
+    return 1;
+}
+
+long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
+{
+    return 1;
 }
 
 /*

@@ -173,6 +173,8 @@ class WombatForensics : public FXMainWindow
         FXArray<FXString> fileuserdata;
         FXString curfileuserdata;
         Viewer* viewer;
+
+        bool iscaseopen;
         /*
         uint8_t filetype = 0;
         uint64_t filesize = 0;
@@ -238,6 +240,8 @@ class WombatForensics : public FXMainWindow
         /*
         long OpenSqliteFile(FXObject*, FXSelector, void*);
         */
+        long NewCase(FXObject*, FXSelector, void*);
+        long OpenCase(FXObject*, FXSelector, void*);
         long OpenTagManager(FXObject*, FXSelector, void*);
 	long OpenAboutBox(FXObject*, FXSelector, void*);
         long PreviewReport(FXObject*, FXSelector, void*);
@@ -286,6 +290,8 @@ class WombatForensics : public FXMainWindow
 };
 
 FXDEFMAP(WombatForensics) WombatForensicsMap[]={
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_NEW, WombatForensics::NewCase),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenCase),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
