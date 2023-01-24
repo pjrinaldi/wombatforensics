@@ -17,6 +17,7 @@
 #include "aboutbox.h"
 #include "viewer.h"
 #include "common.h"
+#include "settings.h"
 
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
@@ -368,6 +369,7 @@ class WombatForensics : public FXMainWindow
 	long OpenAboutBox(FXObject*, FXSelector, void*);
         long PreviewReport(FXObject*, FXSelector, void*);
         long TagMenu(FXObject*, FXSelector, void*);
+        long OpenSettings(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -424,6 +426,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTINGS, WombatForensics::OpenSettings),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),

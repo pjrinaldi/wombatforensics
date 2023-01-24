@@ -797,6 +797,14 @@ long WombatForensics::PreviewReport(FXObject*, FXSelector, void*)
     return 1;
 }
 
+long WombatForensics::OpenSettings(FXObject*, FXSelector, void*)
+{
+    Settings settings(this, "Settings");
+    settings.execute(PLACEMENT_OWNER);
+
+    return 1;
+}
+
 /*
 long WombatForensics::PublishReport(FXObject*, FXSelector, void*)
 {
