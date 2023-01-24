@@ -114,6 +114,13 @@ class WombatForensics : public FXMainWindow
         FXIcon* listremicon;
         FXButton* listrembutton;
 
+        FXIcon* jumptohexicon;
+        FXButton* jumptohexbutton;
+        FXIcon* searchhexicon;
+        FXButton* searchhexbutton;
+        FXIcon* byteconvertericon;
+        FXButton* byteconverterbutton;
+
         FXIcon* settingsicon;
         FXButton* settingsbutton;
         FXIcon* viewmanageicon;
@@ -121,12 +128,33 @@ class WombatForensics : public FXMainWindow
         FXIcon* messagelogicon;
         FXButton* messagelogbutton;
 
+        FXIcon* imgvidthumbicon;
+        FXButton* imgvidthumbbutton;
+        FXIcon* digdeepericon;
+        FXButton* digdeeperbutton;
+        FXIcon* carvingicon;
+        FXButton* carvingbutton;
+        FXIcon* exportfilesicon;
+        FXButton* exportfilesbutton;
+        FXIcon* exportwliicon;
+        FXButton* exportwlibutton;
+
 	FXIcon* managetagsicon;
 	FXButton* managetagsbutton;
+        FXIcon* managehashicon;
+        FXButton* managehashbutton;
 	FXIcon* previewicon;
 	FXButton* previewbutton;
 	FXIcon* publishicon;
 	FXButton* publishbutton;
+
+        FXIcon* createwfiicon;
+        FXButton* createwfibutton;
+        FXIcon* verifywfiicon;
+        FXButton* verifywfibutton;
+
+        FXIcon* xchompicon;
+        FXButton* xchompbutton;
 	FXIcon* abouticon;
 	FXButton* aboutbutton;
 
