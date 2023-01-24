@@ -9,9 +9,22 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
     hsplitter = new FXSplitter(mainframe, SPLITTER_VERTICAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     tablelist = new FXTable(hsplitter, this, ID_TABLESELECT, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    tablelist->setTableSize(4, 3);
+    tablelist->setTableSize(10, 14);
     tablelist->setEditable(false);
-    tablelist->setColumnText(0, "ID");
+    tablelist->setColumnText(0, "");
+    tablelist->setColumnText(1, "ID");
+    tablelist->setColumnText(2, "Name");
+    tablelist->setColumnText(3, "Path");
+    tablelist->setColumnText(4, "Size (bytes)");
+    tablelist->setColumnText(5, "Created");
+    tablelist->setColumnText(6, "Accessed");
+    tablelist->setColumnText(7, "Modified");
+    tablelist->setColumnText(8, "Changed");
+    tablelist->setColumnText(9, "Hash");
+    tablelist->setColumnText(10, "Category");
+    tablelist->setColumnText(11, "Signature");
+    tablelist->setColumnText(12, "Tagged");
+    tablelist->setColumnText(13, "Hash Match");
     tablelist->setColumnHeaderHeight(tablelist->getColumnHeaderHeight() + 5);
     tablelist->setRowHeaderWidth(0);
     tablelist->setHeight(this->getHeight() / 2);
@@ -84,6 +97,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tags.clear();
     taggedlist.clear();
     iscaseopen = false;
+    homepath = FXString(getenv("HOME")) + "/";
+    tmppath = "/tmp/";
 }
 
 void WombatForensics::create()
@@ -106,46 +121,46 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
             return 1;
     }
     StatusUpdate("Creating New Case...");
-    /*
-    StatusUpdate("Generating Case Structure...");
-    // create new case here
-    QInputDialog* casedialog = new QInputDialog(this);
-    casedialog->setCancelButtonText("Cancel");
-    casedialog->setInputMode(QInputDialog::TextInput);
-    casedialog->setLabelText("Enter Case Name");
-    casedialog->setOkButtonText("Create Case");
-    casedialog->setTextEchoMode(QLineEdit::Normal);
-    casedialog->setWindowTitle("New Case");
-    if(casedialog->exec())
-        wombatvariable.casename = casedialog->textValue();
-    if(!wombatvariable.casename.isEmpty())
+    casename = "";
+    bool isset = FXInputDialog::getString(casename, this, "Enter Case Name", "New Case");
+    if(isset)
     {
+        iscaseopen = true;
+        tmppath = "/tmp/wf/" + casename + "/";
+        this->setTitle("Wombat Forensics - " + casename);
+        FXDir::create("/tmp/wf/");
+        FXDir::create(tmppath);
+        FXDir::create(tmppath + "carved/");
+        FXDir::create(tmppath + "archives/");
+        FXDir::create(tmppath + "hashlists/");
+        FXDir::create(tmppath + "mailboxes/");
+        FXDir::create(tmppath + "thumbs/");
+        FXFile::create(tmppath + "tags", FXIO::OwnerReadWrite);
+        FXFile::create(tmppath + "msglog", FXIO::OwnerReadWrite);
+        LogEntry("Case Structure Created Successfully");
+        StatusUpdate("Ready");
+        /*
+        // CHECK TEST AND IT WORKS WITH ID IN CHECK
+        CheckTableItem* checkitem = new CheckTableItem(tablelist, NULL, NULL, "e0-p0-f1");
+        tablelist->setItem(0, 0, checkitem);
+        tablelist->fitColumnsToContents(0);
+        tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+        */
+        // CHECK TEST AND IT WORKS WITHOUT ID IN CHECK
+        CheckTableItem* checkitem = new CheckTableItem(tablelist, NULL, NULL, "");
+        tablelist->setItem(0, 0, checkitem);
+        tablelist->fitColumnsToContents(0);
+        tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+    }
+    /*
+    // create new case here
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        this->setWindowTitle(QString("Wombat Forensics - ") + wombatvariable.casename);
-        wombatvariable.tmpmntpath = wombatvariable.tmpmntpath + wombatvariable.casename + "/";
-        QDir dir;
-        dir.mkpath(wombatvariable.tmpmntpath);
-        dir.mkpath(wombatvariable.tmpmntpath + "carved/");
-        dir.mkpath(wombatvariable.tmpmntpath + "archives/");
-        dir.mkpath(wombatvariable.tmpmntpath + "hashlists/");
-        dir.mkpath(wombatvariable.tmpmntpath + "mailboxes/");
-        wombatvariable.iscaseopen = true;
-        InitializePreviewReport();
-        bookmarkfile.setFileName(wombatvariable.tmpmntpath + "bookmarks");
-        if(!FileExists(QString(wombatvariable.tmpmntpath + "bookmarks").toStdString()))
-        {
-            bookmarkfile.open(QIODevice::WriteOnly | QIODevice::Text);
-            bookmarkfile.close();
-        }
         qInfo() << "Bookmarks File Created";
         ReadBookmarks();
         ReadHashLists();
-        logfile.setFileName(wombatvariable.tmpmntpath + "msglog");
-        logfile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
         msglog->clear();
         qInfo() << "Log File Created";
         //LogMessage("Log File Created");
-        thumbdir.mkpath(wombatvariable.tmpmntpath + "thumbs/");
         InitializeCheckState();
         ui->actionAdd_Evidence->setEnabled(true);
         ui->actionpreviewreport->setEnabled(true);
@@ -157,24 +172,6 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
         autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
-    }
-
-     */ 
-    /*
-    // determine if a case is open
-    if(wombatvariable.iscaseopen)
-    {
-        int ret = QMessageBox::question(this, tr("Close Current Case"), tr("There is a case already open. Are you sure you want to close it?"), QMessageBox::Yes | QMessageBox::No);
-        if(ret == QMessageBox::Yes)
-        {
-            CloseCurrentCase();
-            treenodemodel = new TreeNodeModel();
-            InitializeCaseStructure();
-        }
-    }
-    else
-        InitializeCaseStructure();
-}
      */ 
     return 1;
 }
@@ -256,10 +253,10 @@ long WombatForensics::ScrollChanged(FXObject*, FXSelector, void*)
 
     return 1;
 }
+*/
 
 long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
 {
-    / *
     FXEvent* event = (FXEvent*)ptr;
     if(tablelist->getCurrentRow() > -1 && !tablelist->getItemText(tablelist->getCurrentRow(), 1).empty())
     {
@@ -280,10 +277,10 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
             getApp()->runModalWhileShown(&tagmenu);
         }
     }
-    * /
     return 1;
 }
 
+/*
 long WombatForensics::CreateNewTag(FXObject*, FXSelector, void*)
 {
     / *

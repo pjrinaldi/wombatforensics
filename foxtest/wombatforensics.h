@@ -88,6 +88,117 @@ struct FrameHeader
     uint32_t checksum2; // checksum-2 second half of cumulative checksum
 };
 */
+/*
+class FXAPI FXComboTableItem : public FXTableItem {
+FXDECLARE(FXComboTableItem)
+protected:
+    FXString selections;
+private:
+    FXComboTableItem(const FXComboTableItem&);
+    FXComboTableItem& operator=(const FXComboTableItem&);
+protected:
+    FXComboTableItem(){}
+public:
+    FXComboTableItem(const FXString& text,FXIcon* ic=nullptr,void* ptr=nullptr);
+    virtual FXWindow *getControlFor(FXTable* table);
+    virtual void setFromControl(FXWindow *control);
+    void setSelections(const FXString& strings);
+    const FXString& getSelections() const { return selections; }
+};
+ */ 
+
+//---------------------------------------------------------------
+//
+//  Derived checkbox table item
+//
+//---------------------------------------------------------------
+class CheckTableItem : public FXTableItem
+{
+    FXDECLARE(CheckTableItem)
+
+  protected:
+
+    CheckTableItem() {}
+
+  private:
+
+    FXTable	    *Table;
+    FXObject	    *Target;
+    FXSelector	    Selector;
+
+    FXCheckButton   *check;
+
+    virtual void drawContent(const FXTable* table,FXDC& dc,FXint
+x,FXint y,FXint w,FXint h) const;
+
+  public:
+
+    long onCheck(FXObject *, FXSelector, void *);
+
+    enum {
+	ID_CHECK = 1,
+	ID_LAST
+    };
+
+  public:
+
+    CheckTableItem(FXTable *table, FXIcon *ic=NULL, void *ptr=NULL, FXString str=FXString::null);
+    virtual ~CheckTableItem(void) { delete check; }
+
+    void setCheck(FXbool state=true, FXbool notify=false) {
+check->setCheck(state, notify); }
+    FXbool getCheck() const { return check->getCheck(); }
+};
+
+
+//---------------------------------------------------------------
+//	CheckTableItem
+//---------------------------------------------------------------
+FXDEFMAP(CheckTableItem) CheckTableItemMap[] = {
+  FXMAPFUNC(SEL_COMMAND, CheckTableItem::ID_CHECK, CheckTableItem::onCheck),
+};
+
+FXIMPLEMENT(CheckTableItem, FXTableItem, CheckTableItemMap,
+ARRAYNUMBER(CheckTableItemMap))
+
+// Construct new table item
+CheckTableItem::CheckTableItem(FXTable *table, FXIcon *ic, void *ptr, FXString str):
+    FXTableItem(str,ic,ptr)
+{
+    Table = table;
+    Target = table->getTarget();
+    Selector = table->getSelector();
+    check = new FXCheckButton(table, str, this, ID_CHECK);
+    check->setBackColor(table->getBackColor());
+    check->create();
+}
+
+//
+//	drawContent - override
+//
+void CheckTableItem::drawContent(const FXTable *table, FXDC &dc,
+    FXint x, FXint y, FXint w, FXint h) const
+{
+    check->position(x+1,y+1,w-2,h-2);
+    return;
+}
+
+//
+//	onCheck
+//
+long CheckTableItem::onCheck(FXObject *, FXSelector, void *vp)
+{
+    if (Target) {
+	FXTableRange tablerange;
+	tablerange.fm.row = tablerange.to.row = Table->rowAtY(check->getY());
+	tablerange.fm.col = tablerange.to.col = Table->colAtX(check->getX());
+        //fxmessage("[%d,%d] = %p\n", tablerange.fm.row, tablerange.fm.col, vp);
+	Target->handle(this, FXSEL(SEL_REPLACED,Selector), &tablerange);
+    }
+    return 1;
+}
+
+
 class WombatForensics : public FXMainWindow
 {
     FXDECLARE(WombatForensics)
@@ -166,15 +277,26 @@ class WombatForensics : public FXMainWindow
         FXString sqlitefilepath;
         FXString curfilepath;
         */
+
         FXArray<FXString> sqlitefiles;
         std::vector<std::string> tags;
         FXArray<FXString> taggedlist;
         std::ifstream filebuffer;
         FXArray<FXString> fileuserdata;
         FXString curfileuserdata;
+        FXString homepath;
+        FXString tmppath;
+        FXString casename;
+        
+        FXFile tagsfile;
+        FXFile logfile;
+        
+        char dtbuf[35];
+        bool iscaseopen;
+        
         Viewer* viewer;
 
-        bool iscaseopen;
+
         /*
         uint8_t filetype = 0;
         uint64_t filesize = 0;
@@ -245,10 +367,10 @@ class WombatForensics : public FXMainWindow
         long OpenTagManager(FXObject*, FXSelector, void*);
 	long OpenAboutBox(FXObject*, FXSelector, void*);
         long PreviewReport(FXObject*, FXSelector, void*);
+        long TagMenu(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
-        long TagMenu(FXObject*, FXSelector, void*);
         long SetTag(FXObject* sender, FXSelector, void*);
         long CreateNewTag(FXObject*, FXSelector, void*);
         long RemoveTag(FXObject*, FXSelector, void*);
@@ -281,6 +403,13 @@ class WombatForensics : public FXMainWindow
         void AddContent(int row, FXString islive, FXString rowid, FXString offlen, FXString type, FXString val, FXString tag);
         void AlignColumn(FXTable* curtable, int row, FXuint justify);
         */
+        void LogEntry(FXString logstring)
+        {
+            FXString tmpstr = FXString(GetDateTime(dtbuf)) + " | " + logstring + "\n";
+            FXFile* logfile = new FXFile(tmppath + "msglog", FXIO::ReadWrite|FXIO::Append, FXIO::OwnerReadWrite);
+            int wrerr = logfile->writeBlock(tmpstr.text(), tmpstr.length());
+            logfile->close();
+        };
 	void StatusUpdate(FXString tmptext)
 	{
 	    statusbar->getStatusLine()->setNormalText(tmptext);
@@ -295,13 +424,13 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
+    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
     //FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ValueSelected),
-    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_NEWTAG, WombatForensics::CreateNewTag),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTAG, WombatForensics::SetTag),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_REMTAG, WombatForensics::RemoveTag),

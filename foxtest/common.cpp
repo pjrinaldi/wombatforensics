@@ -21,6 +21,13 @@ uint8_t* substr(uint8_t* arr, int begin, int len)
     return res;
 }
 
+char* GetDateTime(char *buff)
+{
+    time_t t = time(0);
+    strftime(buff, DTTMSZ, DTTMFMT, localtime(&t));
+    return buff;
+};
+
 void ReadContent(std::ifstream* rawcontent, uint8_t* tmpbuf, uint64_t offset, uint64_t size)
 {
     rawcontent->seekg(offset);
