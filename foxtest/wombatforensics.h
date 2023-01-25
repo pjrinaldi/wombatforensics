@@ -18,6 +18,7 @@
 #include "viewer.h"
 #include "common.h"
 #include "settings.h"
+#include "managecarving.h"
 
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
@@ -235,6 +236,8 @@ class WombatForensics : public FXMainWindow
 
         FXIcon* settingsicon;
         FXButton* settingsbutton;
+        FXIcon* managecarvedicon;
+        FXButton* managecarvedbutton;
         FXIcon* viewmanageicon;
         FXButton* viewmanagebutton;
         FXIcon* messagelogicon;
@@ -344,6 +347,7 @@ class WombatForensics : public FXMainWindow
             ID_CREATEWFI = 83,
             ID_VERIFYWFI = 82,
             ID_XCHOMP = 81,
+            ID_MANAGECARVED = 80,
             ID_TREESELECT = 101,
 	    ID_MANAGETAGS = 102,
 	    ID_PREVIEW = 103,
@@ -375,6 +379,7 @@ class WombatForensics : public FXMainWindow
         long PreviewReport(FXObject*, FXSelector, void*);
         long TagMenu(FXObject*, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
+        long OpenManageCarved(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -432,6 +437,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTINGS, WombatForensics::OpenSettings),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),

@@ -1,4 +1,4 @@
-/*********** Generated on 2023/01/24 18:47:17 by reswrap version 6.0.0 *********/
+/*********** Generated on 2023/01/25 22:01:00 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file resources/folder-open.png */
 extern const unsigned char folderopen[];
@@ -89,4 +89,7 @@ extern const unsigned char xchomp[];
 
 /* Created by reswrap from file resources/createwfi.png */
 extern const unsigned char createwfi[];
+
+/* Created by reswrap from file resources/managecarved.png */
+extern const unsigned char managecarved[];
 

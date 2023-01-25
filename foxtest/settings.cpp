@@ -2,7 +2,7 @@
 
 FXIMPLEMENT(Settings,FXDialogBox,SettingsMap,ARRAYNUMBER(SettingsMap))
 
-Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 480, 300, 0,0,0,0, 10, 10)
+Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 480, 260, 0,0,0,0, 10, 10)
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 10, 10, 10, 10);
     hframe1 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
@@ -38,10 +38,6 @@ Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     autosavespinner = new FXSpinner(hframe6, 5);
     autosavespinner->setRange(1, 120);
     autosavespinner->setIncrement(1);
-    hframe7 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    carvingmanagerlabel = new FXLabel(hframe7, "Manage Carving File Types List:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe7);
-    carvingmanagerbutton = new FXButton(hframe7, "Manage", NULL, this, ID_MANAGE, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
     hframe8 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     new FXLabel(hframe8, "", NULL, LAYOUT_FILL_X);
     new FXSpring(hframe8);
@@ -89,31 +85,6 @@ long Settings::SetReportPath(FXObject*, FXSelector, void*)
     FXString reportpathstring = FXDirDialog::getOpenDirectory(this, "Select the Directory to store the Reports", reportpathtextfield->getText());
     if(!reportpathstring.empty())
         reportpathtextfield->setText(reportpathstring + "/");
-
-    return 1;
-}
-
-long Settings::OpenCarvingManager(FXObject*, FXSelector, void*)
-{
-    std::cout << "open carving manager dialog here." << std::endl;
-    ManageCarving managecarving(this, "Manage Carving");
-    //managecarving.LoadManageCarving(carvetypes);
-    bool tosave = managecarving.execute(PLACEMENT_OWNER);
-    if(tosave == 1)
-    {
-    }
-    /*
-    Settings settings(this, "Settings");
-    settings.LoadSettings(currentsettings);
-    bool tosave = settings.execute(PLACEMENT_OWNER);
-    if(tosave == 1)
-    {
-        currentsettings = settings.ReturnSettings();
-        settingfile.open(configpath + "settings", FXIO::Writing, FXIO::OwnerReadWrite);
-        settingfile.writeBlock(currentsettings.text(), currentsettings.length());
-        settingfile.close();
-    }
-    */
 
     return 1;
 }

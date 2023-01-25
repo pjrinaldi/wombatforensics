@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "icons.h"
-#include "managecarving.h"
 
 #include "/usr/local/include/fox-1.7/fx.h"
 
@@ -37,9 +36,6 @@ class Settings : public FXDialogBox
         FXHorizontalFrame* hframe6;
         FXLabel* autosavelabel;
         FXSpinner* autosavespinner;
-        FXHorizontalFrame* hframe7;
-        FXLabel* carvingmanagerlabel;
-        FXButton* carvingmanagerbutton;
         FXHorizontalFrame* hframe8;
         FXButton* cancelbutton;
         FXButton* savebutton;
@@ -47,21 +43,12 @@ class Settings : public FXDialogBox
 
     protected:
         Settings() {}
-        //long onSomeCommand(FXObject* sender, FXSelector sel, void* ptr);
 
     public:
         enum
         {
             ID_CASEPATH = 1,
             ID_REPORTPATH = 2,
-            ID_MANAGE = 103,
-            //ID_CANCEL = 1,
-            //ID_ACCEPT = 2,
-            //ID_TREELIST = 1,
-            //ID_LISTSELECT = 100,
-            //ID_NEWTAG = 101,
-            //ID_EDITTAG = 102,
-            //ID_REMTAG = 103,
             ID_LAST
         };
         Settings(FXWindow* parent, const FXString& title);
@@ -70,13 +57,11 @@ class Settings : public FXDialogBox
 
         long SetCasePath(FXObject*, FXSelector, void*);
         long SetReportPath(FXObject*, FXSelector, void*);
-        long OpenCarvingManager(FXObject*, FXSelector, void*);
 };
 
 FXDEFMAP(Settings) SettingsMap[]={
     FXMAPFUNC(SEL_COMMAND, Settings::ID_CASEPATH, Settings::SetCasePath),
     FXMAPFUNC(SEL_COMMAND, Settings::ID_REPORTPATH, Settings::SetReportPath),
-    FXMAPFUNC(SEL_COMMAND, Settings::ID_MANAGE, Settings::OpenCarvingManager),
 };
 
 #endif // ABOUTBOX_H

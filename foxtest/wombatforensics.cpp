@@ -52,6 +52,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     // WOMBAT FORENSIC APP ICONS
     settingsicon = new FXPNGIcon(this->getApp(), settings);
     settingsbutton = new FXButton(toolbar, "", settingsicon, this, ID_SETTINGS, BUTTON_TOOLBAR|FRAME_RAISED);
+    managecarvedicon = new FXPNGIcon(this->getApp(), managecarved);
+    managecarvedbutton = new FXButton(toolbar, "", managecarvedicon, this, ID_MANAGECARVED, BUTTON_TOOLBAR|FRAME_RAISED);
     viewmanageicon = new FXPNGIcon(this->getApp(), viewmanage);
     viewmanagebutton = new FXButton(toolbar, "", viewmanageicon, this, ID_VIEWMANAGE, BUTTON_TOOLBAR|FRAME_RAISED);
     messagelogicon = new FXPNGIcon(this->getApp(), messagelog);
@@ -127,7 +129,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 	carvetypesfile.close();
 	FXFile::create(configpath + "carvetypes", FXIO::OwnerReadWrite);
 	carvetypesfile.open(configpath + "carvetypes", FXIO::Writing, FXIO::OwnerReadWrite);
-	currentcarvetypes = "Image,JPEG,FFD8,FFD9,JPG,2500000\nImage,PNG,89504E470D0A1A0A,49454E44AE426082,PNG,2500000\nImage,GIF,47494638??61,003B,GIF,2500000\nDocument,PDF,25504446,2525454F46,PDF,2500000\nVideo,MPEG-1/2,000001B?,000001B?,MPG,5000000";
+	currentcarvetypes = "Image,JPEG,FFD8,FFD9,JPG,2500000\nImage,PNG,89504E470D0A1A0A,49454E44AE426082,PNG,2500000\nImage,GIF,47494638??61,003B,GIF,2500000\nDocument,PDF,25504446,2525454F46,PDF,2500000\nVideo,MPEG-1/2,000001B?,000001B?,MPG,5000000\n";
 	carvetypesfile.writeBlock(currentcarvetypes.text(), currentcarvetypes.length());
 	carvetypesfile.close();
     }
@@ -857,6 +859,21 @@ long WombatForensics::OpenSettings(FXObject*, FXSelector, void*)
     return 1;
 }
 
+long WombatForensics::OpenManageCarved(FXObject*, FXSelector, void*)
+{
+    ManageCarving managecarving(this, "Manage Carving");
+    managecarving.LoadManageCarving(currentcarvetypes);
+    bool tosave = managecarving.execute(PLACEMENT_OWNER);
+    if(tosave == 1)
+    {
+        currentcarvetypes = managecarving.ReturnManageCarving();
+        carvetypesfile.open(configpath + "carvetypes", FXIO::Writing, FXIO::OwnerReadWrite);
+        carvetypesfile.writeBlock(currentcarvetypes.text(), currentcarvetypes.length());
+        carvetypesfile.close();
+    }
+    
+    return 1;
+}
 /*
 long WombatForensics::PublishReport(FXObject*, FXSelector, void*)
 {

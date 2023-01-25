@@ -6,7 +6,7 @@ ManageCarving::ManageCarving(FXWindow* parent, const FXString& title):FXDialogBo
 {
     //plainfont = new FXFont(this->getApp(), "monospace");
 
-    mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 10, 10, 10, 10);
+    mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     hframe1 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     new FXLabel(hframe1, "", NULL, LAYOUT_FILL_X);
     new FXSpring(hframe1);
@@ -50,6 +50,19 @@ FXString ManageCarving::ReturnManageCarving()
 
 void ManageCarving::LoadManageCarving(FXString cursettings)
 {
+    /*
+    int i = 0;
+    FXArray<FXString> filetypearray;
+    filetypearray.clear();
+    while(i < cursettings.length())
+    {
+        int found1 = cursettings.find("\n", i);
+        int found2 = cursettings.find("\n", found1+1);
+        filetypearray.append(cursettings.mid(found1+1, found2 - found1 - 1));
+        i = found2 + 1;
+        std::cout << "filetypearray: " << cursettings.mid(found1+1, found2 - found1 - 1).text() << std::endl;
+    }
+    */
     /*
     int found1 = cursettings.find("|");
     int found2 = cursettings.find("|", found1+1);
