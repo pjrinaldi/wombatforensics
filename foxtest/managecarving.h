@@ -17,7 +17,7 @@ class ManageCarving : public FXDialogBox
     private:
         FXVerticalFrame* mainframe;
         FXHorizontalFrame* hframe1;
-	FXText* filetypetext;
+	//FXText* filetypetext;
 	FXTable* filetypetable;
 	FXButton* addrowbutton;
 	FXButton* savebutton;
@@ -79,10 +79,11 @@ class ManageCarving : public FXDialogBox
         long SetCasePath(FXObject*, FXSelector, void*);
         long SetReportPath(FXObject*, FXSelector, void*);
         long OpenCarvingManager(FXObject*, FXSelector, void*);
+	long AddRow(FXObject*, FXSelector, void*);
 };
 
 FXDEFMAP(ManageCarving) ManageCarvingMap[]={
-    //FXMAPFUNC(SEL_COMMAND, ManageCarving::ID_CASEPATH, ManageCarving::SetCasePath),
+    FXMAPFUNC(SEL_COMMAND, ManageCarving::ID_ADDROW, ManageCarving::AddRow),
     //FXMAPFUNC(SEL_COMMAND, ManageCarving::ID_REPORTPATH, ManageCarving::SetReportPath),
     //FXMAPFUNC(SEL_COMMAND, ManageCarving::ID_MANAGE, ManageCarving::OpenCarvingManager),
 };

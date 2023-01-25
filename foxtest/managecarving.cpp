@@ -2,7 +2,7 @@
 
 FXIMPLEMENT(ManageCarving,FXDialogBox,ManageCarvingMap,ARRAYNUMBER(ManageCarvingMap))
 
-ManageCarving::ManageCarving(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 480, 300, 0,0,0,0, 10, 10)
+ManageCarving::ManageCarving(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_RESIZE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 680, 400, 0,0,0,0, 10, 10)
 {
     //plainfont = new FXFont(this->getApp(), "monospace");
 
@@ -13,69 +13,25 @@ ManageCarving::ManageCarving(FXWindow* parent, const FXString& title):FXDialogBo
     addrowbutton = new FXButton(hframe1, "Add Row", NULL, this, ID_ADDROW, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
     savebutton = new FXButton(hframe1, "Save", NULL, this, FXDialogBox::ID_ACCEPT,FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
     closebutton = new FXButton(hframe1, "Cancel", NULL, this, FXDialogBox::ID_CANCEL, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
-    filetypetext = new FXText(mainframe, this, ID_FTTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    //filetypetext = new FXText(mainframe, this, ID_FTTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     //filetypetext->setFont(plainfont);
     filetypetable = new FXTable(mainframe, this, ID_FTTABLE, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    filetypetable->setTableSize(5, 6);
+    filetypetable->setTableSize(10, 6);
+    filetypetable->setColumnText(0, "Category");
+    filetypetable->setColumnText(1, "Description");
+    filetypetable->setColumnText(2, "Header");
+    filetypetable->setColumnText(3, "Footer");
+    filetypetable->setColumnText(4, "Extension");
+    filetypetable->setColumnText(5, "Maximum File Size");
+    filetypetable->setRowHeaderWidth(0);
+    filetypetable->setColumnHeaderHeight(filetypetable->getColumnHeaderHeight() + 5);
+}
 
-    /*
-     * 
-	FXText* filetypetext;
-	FXTable* filetypetable;
-	FXButton* addrowbutton;
-	FXButton* savebutton;
-	FXButton* saveclosebutton;
-	FXButton* closebutton;
-    plainfont = new FXFont(a, "monospace");
-    plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    plaintext->setFont(plainfont);
-    tablelist = new FXTable(hsplitter, this, ID_TABLESELECT, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    tablelist->setTableSize(10, 14);
-    tablelist->setEditable(false);
-    tablelist->setColumnText(0, "");
-     *
-    thumbsizelabel = new FXLabel(hframe1, "Thumbnail Size (pixels):", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe1);
-    thumbsizespinner = new FXSpinner(hframe1, 5);
-    thumbsizespinner->setRange(64, 384);
-    thumbsizespinner->setIncrement(64);
-    hframe2 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    vidthumblabel = new FXLabel(hframe2, "Generate Video Thumbnail Every (%): ", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe2);
-    vidthumbspinner = new FXSpinner(hframe2, 5);
-    vidthumbspinner->setRange(10, 100);
-    vidthumbspinner->setIncrement(5);
-    hframe3 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    casepathlabel = new FXLabel(hframe3, "Set Case Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe3);
-    casepathtextfield = new FXTextField(hframe3, 40);
-    casepathbutton = new FXButton(hframe3, "Browse", NULL, this, ID_CASEPATH);
-    hframe4 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    reportpathlabel = new FXLabel(hframe4, "Set Report Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe4);
-    reportpathtextfield = new FXTextField(hframe4, 40);
-    reportpathbutton = new FXButton(hframe4, "Browse", NULL, this, ID_REPORTPATH);
-    hframe5 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    reporttzlabel = new FXLabel(hframe5, "Report TimeZone:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    reporttzcombo = new FXComboBox(hframe5, 45);
-    reporttzcombo->fillItems(timezones);
-    reporttzcombo->setNumVisible(10);
-    hframe6 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    autosavelabel = new FXLabel(hframe6, "Set Autosave Interval (minutes):", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe6);
-    autosavespinner = new FXSpinner(hframe6, 5);
-    autosavespinner->setRange(1, 120);
-    autosavespinner->setIncrement(1);
-    hframe7 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    carvingmanagerlabel = new FXLabel(hframe7, "Manage Carving File Types List:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe7);
-    carvingmanagerbutton = new FXButton(hframe7, "Manage", NULL, this, ID_MANAGE);
-    hframe8 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    new FXLabel(hframe8, "", NULL, LAYOUT_FILL_X);
-    new FXSpring(hframe8);
-    cancelbutton = new FXButton(hframe8, "Cancel", NULL, this, FXDialogBox::ID_CANCEL);
-    savebutton = new FXButton(hframe8, "Save", NULL, this, FXDialogBox::ID_ACCEPT);
-    */
+long ManageCarving::AddRow(FXObject*, FXSelector, void*)
+{
+    filetypetable->insertRows(filetypetable->getNumRows(), 1);
+
+    return 1;
 }
 
 FXString ManageCarving::ReturnManageCarving()
