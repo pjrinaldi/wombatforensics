@@ -1,5 +1,5 @@
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef MANAGECARVING_H
+#define MANAGECARVING_H
 
 #include <iostream>
 #include <stdio.h>
@@ -7,18 +7,24 @@
 #include <vector>
 
 #include "icons.h"
-#include "managecarving.h"
 
 #include "/usr/local/include/fox-1.7/fx.h"
 
-class Settings : public FXDialogBox
+class ManageCarving : public FXDialogBox
 {
-    FXDECLARE(Settings)
+    FXDECLARE(ManageCarving)
 
     private:
         FXVerticalFrame* mainframe;
         FXHorizontalFrame* hframe1;
-        FXLabel* thumbsizelabel;
+	FXText* filetypetext;
+	FXTable* filetypetable;
+	FXButton* addrowbutton;
+	FXButton* savebutton;
+	FXButton* saveclosebutton;
+	FXButton* closebutton;
+	/*
+	FXLabel* thumbsizelabel;
         FXSpinner* thumbsizespinner;
         FXHorizontalFrame* hframe2;
         FXLabel* vidthumblabel;
@@ -44,17 +50,19 @@ class Settings : public FXDialogBox
         FXButton* cancelbutton;
         FXButton* savebutton;
         FXString timezones = "America/New_York\nAmerica/Chicago\n";
+	*/
 
     protected:
-        Settings() {}
+        ManageCarving() {}
         //long onSomeCommand(FXObject* sender, FXSelector sel, void* ptr);
 
     public:
         enum
         {
-            ID_CASEPATH = 1,
-            ID_REPORTPATH = 2,
             ID_MANAGE = 103,
+	    ID_ADDROW = 104,
+	    ID_FTTEXT = 105,
+	    ID_FTTABLE = 106,
             //ID_CANCEL = 1,
             //ID_ACCEPT = 2,
             //ID_TREELIST = 1,
@@ -64,19 +72,19 @@ class Settings : public FXDialogBox
             //ID_REMTAG = 103,
             ID_LAST
         };
-        Settings(FXWindow* parent, const FXString& title);
-        FXString ReturnSettings(void);
-        void LoadSettings(FXString cursettings);
+        ManageCarving(FXWindow* parent, const FXString& title);
+        FXString ReturnManageCarving(void);
+        void LoadManageCarving(FXString cursettings);
 
         long SetCasePath(FXObject*, FXSelector, void*);
         long SetReportPath(FXObject*, FXSelector, void*);
         long OpenCarvingManager(FXObject*, FXSelector, void*);
 };
 
-FXDEFMAP(Settings) SettingsMap[]={
-    FXMAPFUNC(SEL_COMMAND, Settings::ID_CASEPATH, Settings::SetCasePath),
-    FXMAPFUNC(SEL_COMMAND, Settings::ID_REPORTPATH, Settings::SetReportPath),
-    FXMAPFUNC(SEL_COMMAND, Settings::ID_MANAGE, Settings::OpenCarvingManager),
+FXDEFMAP(ManageCarving) ManageCarvingMap[]={
+    //FXMAPFUNC(SEL_COMMAND, ManageCarving::ID_CASEPATH, ManageCarving::SetCasePath),
+    //FXMAPFUNC(SEL_COMMAND, ManageCarving::ID_REPORTPATH, ManageCarving::SetReportPath),
+    //FXMAPFUNC(SEL_COMMAND, ManageCarving::ID_MANAGE, ManageCarving::OpenCarvingManager),
 };
 
 #endif // ABOUTBOX_H

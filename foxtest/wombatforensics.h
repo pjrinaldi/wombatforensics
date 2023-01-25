@@ -290,10 +290,12 @@ class WombatForensics : public FXMainWindow
         FXString casename;
         FXString configpath;
         FXString currentsettings;
+	FXString currentcarvetypes;
         
         FXFile tagsfile;
         FXFile logfile;
         FXFile settingfile;
+	FXFile carvetypesfile;
         
         char dtbuf[35];
         bool iscaseopen;

@@ -120,6 +120,24 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
         settingfile.close();
         currentsettings = FXString(oldsettings);
     }
+    bool iscarvetypes = carvetypesfile.open(configpath + "carvetypes", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(iscarvetypes == false)
+    {
+	carvetypesfile.close();
+	FXFile::create(configpath + "carvetypes", FXIO::OwnerReadWrite);
+	carvetypesfile.open(configpath + "carvetypes", FXIO::Writing, FXIO::OwnerReadWrite);
+	currentcarvetypes = "Image,JPEG,FFD8,FFD9,JPG,2500000\nImage,PNG,89504E470D0A1A0A,49454E44AE426082,PNG,2500000\nImage,GIF,47494638??61,003B,GIF,2500000\nDocument,PDF,25504446,2525454F46,PDF,2500000\nVideo,MPEG-1/2,000001B?,000001B?,MPG,5000000";
+	carvetypesfile.writeBlock(currentcarvetypes.text(), currentcarvetypes.length());
+	carvetypesfile.close();
+    }
+    else
+    {
+	carvetypesfile.open(configpath + "carvetypes", FXIO::Reading, FXIO::OwnerReadWrite);
+	char* oldcarvetypes = new char[carvetypesfile.size()+1];
+	carvetypesfile.readBlock(oldcarvetypes, carvetypesfile.size());
+	carvetypesfile.close();
+	currentcarvetypes = FXString(oldcarvetypes);
+    }
 }
 
 void WombatForensics::create()

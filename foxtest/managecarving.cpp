@@ -1,11 +1,39 @@
-#include "settings.h"
+#include "managecarving.h"
 
-FXIMPLEMENT(Settings,FXDialogBox,SettingsMap,ARRAYNUMBER(SettingsMap))
+FXIMPLEMENT(ManageCarving,FXDialogBox,ManageCarvingMap,ARRAYNUMBER(ManageCarvingMap))
 
-Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 480, 300, 0,0,0,0, 10, 10)
+ManageCarving::ManageCarving(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 480, 300, 0,0,0,0, 10, 10)
 {
+    //plainfont = new FXFont(this->getApp(), "monospace");
+
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 10, 10, 10, 10);
     hframe1 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
+    new FXLabel(hframe1, "", NULL, LAYOUT_FILL_X);
+    new FXSpring(hframe1);
+    addrowbutton = new FXButton(hframe1, "Add Row", NULL, this, ID_ADDROW, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    savebutton = new FXButton(hframe1, "Save", NULL, this, FXDialogBox::ID_ACCEPT,FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    closebutton = new FXButton(hframe1, "Cancel", NULL, this, FXDialogBox::ID_CANCEL, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    filetypetext = new FXText(mainframe, this, ID_FTTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    //filetypetext->setFont(plainfont);
+    filetypetable = new FXTable(mainframe, this, ID_FTTABLE, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    filetypetable->setTableSize(5, 6);
+
+    /*
+     * 
+	FXText* filetypetext;
+	FXTable* filetypetable;
+	FXButton* addrowbutton;
+	FXButton* savebutton;
+	FXButton* saveclosebutton;
+	FXButton* closebutton;
+    plainfont = new FXFont(a, "monospace");
+    plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    plaintext->setFont(plainfont);
+    tablelist = new FXTable(hsplitter, this, ID_TABLESELECT, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    tablelist->setTableSize(10, 14);
+    tablelist->setEditable(false);
+    tablelist->setColumnText(0, "");
+     *
     thumbsizelabel = new FXLabel(hframe1, "Thumbnail Size (pixels):", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
     new FXSpring(hframe1);
     thumbsizespinner = new FXSpinner(hframe1, 5);
@@ -21,12 +49,12 @@ Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     casepathlabel = new FXLabel(hframe3, "Set Case Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
     new FXSpring(hframe3);
     casepathtextfield = new FXTextField(hframe3, 40);
-    casepathbutton = new FXButton(hframe3, "Browse", NULL, this, ID_CASEPATH, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    casepathbutton = new FXButton(hframe3, "Browse", NULL, this, ID_CASEPATH);
     hframe4 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     reportpathlabel = new FXLabel(hframe4, "Set Report Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
     new FXSpring(hframe4);
     reportpathtextfield = new FXTextField(hframe4, 40);
-    reportpathbutton = new FXButton(hframe4, "Browse", NULL, this, ID_REPORTPATH, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    reportpathbutton = new FXButton(hframe4, "Browse", NULL, this, ID_REPORTPATH);
     hframe5 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     reporttzlabel = new FXLabel(hframe5, "Report TimeZone:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
     reporttzcombo = new FXComboBox(hframe5, 45);
@@ -41,16 +69,18 @@ Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     hframe7 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     carvingmanagerlabel = new FXLabel(hframe7, "Manage Carving File Types List:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
     new FXSpring(hframe7);
-    carvingmanagerbutton = new FXButton(hframe7, "Manage", NULL, this, ID_MANAGE, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    carvingmanagerbutton = new FXButton(hframe7, "Manage", NULL, this, ID_MANAGE);
     hframe8 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     new FXLabel(hframe8, "", NULL, LAYOUT_FILL_X);
     new FXSpring(hframe8);
-    cancelbutton = new FXButton(hframe8, "Cancel", NULL, this, FXDialogBox::ID_CANCEL, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
-    savebutton = new FXButton(hframe8, "Save", NULL, this, FXDialogBox::ID_ACCEPT, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    cancelbutton = new FXButton(hframe8, "Cancel", NULL, this, FXDialogBox::ID_CANCEL);
+    savebutton = new FXButton(hframe8, "Save", NULL, this, FXDialogBox::ID_ACCEPT);
+    */
 }
 
-FXString Settings::ReturnSettings()
+FXString ManageCarving::ReturnManageCarving()
 {
+    /*
     FXString settingsstring = FXString::value(thumbsizespinner->getValue());
     settingsstring += "|" + FXString::value(vidthumbspinner->getValue());
     settingsstring += "|" + casepathtextfield->getText();
@@ -58,10 +88,13 @@ FXString Settings::ReturnSettings()
     settingsstring += "|" + reporttzcombo->getItemText(reporttzcombo->getCurrentItem());
     settingsstring += "|" + FXString::value(autosavespinner->getValue());
     return settingsstring;
+    */
+    return "";
 }
 
-void Settings::LoadSettings(FXString cursettings)
+void ManageCarving::LoadManageCarving(FXString cursettings)
 {
+    /*
     int found1 = cursettings.find("|");
     int found2 = cursettings.find("|", found1+1);
     int found3 = cursettings.find("|", found2+1);
@@ -73,47 +106,34 @@ void Settings::LoadSettings(FXString cursettings)
     reportpathtextfield->setText(cursettings.mid(found3+1, found4 - found3 - 1));
     reporttzcombo->setCurrentItem(cursettings.mid(found4+1, found5 - found4 - 1).toUInt());
     autosavespinner->setValue(cursettings.mid(found5+1, cursettings.length() - found5 - 1).toUInt());
+    */
 }
 
-long Settings::SetCasePath(FXObject*, FXSelector, void*)
+long ManageCarving::SetCasePath(FXObject*, FXSelector, void*)
 {
+    /*
     FXString casepathstring = FXDirDialog::getOpenDirectory(this, "Select the Directory to store Wombat Case Files", casepathtextfield->getText());
     if(!casepathstring.empty())
         casepathtextfield->setText(casepathstring + "/");
+    */
 
     return 1;
 }
 
-long Settings::SetReportPath(FXObject*, FXSelector, void*)
+long ManageCarving::SetReportPath(FXObject*, FXSelector, void*)
 {
+    /*
     FXString reportpathstring = FXDirDialog::getOpenDirectory(this, "Select the Directory to store the Reports", reportpathtextfield->getText());
     if(!reportpathstring.empty())
         reportpathtextfield->setText(reportpathstring + "/");
+    */
 
     return 1;
 }
 
-long Settings::OpenCarvingManager(FXObject*, FXSelector, void*)
+long ManageCarving::OpenCarvingManager(FXObject*, FXSelector, void*)
 {
-    std::cout << "open carving manager dialog here." << std::endl;
-    ManageCarving managecarving(this, "Manage Carving");
-    //managecarving.LoadManageCarving(carvetypes);
-    bool tosave = managecarving.execute(PLACEMENT_OWNER);
-    if(tosave == 1)
-    {
-    }
-    /*
-    Settings settings(this, "Settings");
-    settings.LoadSettings(currentsettings);
-    bool tosave = settings.execute(PLACEMENT_OWNER);
-    if(tosave == 1)
-    {
-        currentsettings = settings.ReturnSettings();
-        settingfile.open(configpath + "settings", FXIO::Writing, FXIO::OwnerReadWrite);
-        settingfile.writeBlock(currentsettings.text(), currentsettings.length());
-        settingfile.close();
-    }
-    */
+    //std::cout << "open carving manager dialog here." << std::endl;
 
     return 1;
 }
