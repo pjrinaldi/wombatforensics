@@ -50,32 +50,32 @@ FXString ManageCarving::ReturnManageCarving()
 
 void ManageCarving::LoadManageCarving(FXString cursettings)
 {
-    /*
-    int i = 0;
-    FXArray<FXString> filetypearray;
-    filetypearray.clear();
-    while(i < cursettings.length())
+    FXArray<FXint> posarray;
+    posarray.clear();
+    int found = 0;
+    posarray.append(-1);
+    //std::cout << cursettings.text() << std::endl;
+    while(found > -1)
     {
-        int found1 = cursettings.find("\n", i);
-        int found2 = cursettings.find("\n", found1+1);
-        filetypearray.append(cursettings.mid(found1+1, found2 - found1 - 1));
-        i = found2 + 1;
-        std::cout << "filetypearray: " << cursettings.mid(found1+1, found2 - found1 - 1).text() << std::endl;
+        found = cursettings.find('\n', found+1);
+        if(found > -1)
+            posarray.append(found);
     }
-    */
-    /*
-    int found1 = cursettings.find("|");
-    int found2 = cursettings.find("|", found1+1);
-    int found3 = cursettings.find("|", found2+1);
-    int found4 = cursettings.find("|", found3+1);
-    int found5 = cursettings.find("|", found4+1);
-    thumbsizespinner->setValue(cursettings.left(found1).toUInt());
-    vidthumbspinner->setValue(cursettings.mid(found1+1, found2 - found1 - 1).toUInt());
-    casepathtextfield->setText(cursettings.mid(found2+1, found3 - found2 - 1));
-    reportpathtextfield->setText(cursettings.mid(found3+1, found4 - found3 - 1));
-    reporttzcombo->setCurrentItem(cursettings.mid(found4+1, found5 - found4 - 1).toUInt());
-    autosavespinner->setValue(cursettings.mid(found5+1, cursettings.length() - found5 - 1).toUInt());
-    */
+    for(int i=0; i < posarray.no() - 1; i++)
+    {
+        FXString curstring = cursettings.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i));
+        int found1 = curstring.find(",");
+        int found2 = curstring.find(",", found1+1);
+        int found3 = curstring.find(",", found2+1);
+        int found4 = curstring.find(",", found3+1);
+        int found5 = curstring.find(",", found4+1);
+        filetypetable->setItemText(i, 0, curstring.left(found1));
+        filetypetable->setItemText(i, 1, curstring.mid(found1+1, found2 - found1 - 1));
+        filetypetable->setItemText(i, 2, curstring.mid(found2+1, found3 - found2 - 1));
+        filetypetable->setItemText(i, 3, curstring.mid(found3+1, found4 - found3 - 1));
+        filetypetable->setItemText(i, 4, curstring.mid(found4+1, found5 - found4 - 1));
+        filetypetable->setItemText(i, 5, curstring.mid(found5+1, curstring.length() - found5 -3));
+    }
 }
 
 long ManageCarving::SetCasePath(FXObject*, FXSelector, void*)
