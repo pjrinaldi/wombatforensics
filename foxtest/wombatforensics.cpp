@@ -36,60 +36,61 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     // TOOLBAR ICONS
     // WOMBAT CASE FILE ICONS
     newicon = new FXPNGIcon(this->getApp(), documentnew);
-    newbutton = new FXButton(toolbar, "", newicon, this, ID_NEW, BUTTON_TOOLBAR);
+    newbutton = new FXButton(toolbar, "", newicon, this, ID_NEW, BUTTON_TOOLBAR|FRAME_RAISED);
+    newbutton->setTipText("Create New Case");
     openicon = new FXPNGIcon(this->getApp(), folderopen);
-    openbutton = new FXButton(toolbar, "", openicon, this, ID_OPEN, BUTTON_TOOLBAR);
+    openbutton = new FXButton(toolbar, "", openicon, this, ID_OPEN, BUTTON_TOOLBAR|FRAME_RAISED);
     saveicon = new FXPNGIcon(this->getApp(), documentsave);
-    savebutton = new FXButton(toolbar, "", saveicon, this, ID_SAVE, BUTTON_TOOLBAR);
+    savebutton = new FXButton(toolbar, "", saveicon, this, ID_SAVE, BUTTON_TOOLBAR|FRAME_RAISED);
     new FXVerticalSeparator(toolbar);
     // EVIDENCE ICONS
     listaddicon = new FXPNGIcon(this->getApp(), listadd);
-    listaddbutton = new FXButton(toolbar, "", listaddicon, this, ID_ADDEVID, BUTTON_TOOLBAR);
+    listaddbutton = new FXButton(toolbar, "", listaddicon, this, ID_ADDEVID, BUTTON_TOOLBAR|FRAME_RAISED);
     listremicon = new FXPNGIcon(this->getApp(), listrem);
-    listrembutton = new FXButton(toolbar, "", listremicon, this, ID_REMEVID, BUTTON_TOOLBAR);
+    listrembutton = new FXButton(toolbar, "", listremicon, this, ID_REMEVID, BUTTON_TOOLBAR|FRAME_RAISED);
     new FXVerticalSeparator(toolbar);
     // WOMBAT FORENSIC APP ICONS
     settingsicon = new FXPNGIcon(this->getApp(), settings);
-    settingsbutton = new FXButton(toolbar, "", settingsicon, this, ID_SETTINGS, BUTTON_TOOLBAR);
+    settingsbutton = new FXButton(toolbar, "", settingsicon, this, ID_SETTINGS, BUTTON_TOOLBAR|FRAME_RAISED);
     viewmanageicon = new FXPNGIcon(this->getApp(), viewmanage);
-    viewmanagebutton = new FXButton(toolbar, "", viewmanageicon, this, ID_VIEWMANAGE, BUTTON_TOOLBAR);
+    viewmanagebutton = new FXButton(toolbar, "", viewmanageicon, this, ID_VIEWMANAGE, BUTTON_TOOLBAR|FRAME_RAISED);
     messagelogicon = new FXPNGIcon(this->getApp(), messagelog);
-    messagelogbutton = new FXButton(toolbar, "", messagelogicon, this, ID_MSGLOG, BUTTON_TOOLBAR);
+    messagelogbutton = new FXButton(toolbar, "", messagelogicon, this, ID_MSGLOG, BUTTON_TOOLBAR|FRAME_RAISED);
     new FXVerticalSeparator(toolbar);
     // ARTIFACT ICONS
     imgvidthumbicon = new FXPNGIcon(this->getApp(), imgvidthumbs);
-    imgvidthumbbutton = new FXButton(toolbar, "", imgvidthumbicon, this, ID_IMGVIDTHUMB, BUTTON_TOOLBAR);
+    imgvidthumbbutton = new FXButton(toolbar, "", imgvidthumbicon, this, ID_IMGVIDTHUMB, BUTTON_TOOLBAR|FRAME_RAISED);
     digdeepericon = new FXPNGIcon(this->getApp(), digdeeper);
-    digdeeperbutton = new FXButton(toolbar, "", digdeepericon, this, ID_DIGDEEPER, BUTTON_TOOLBAR);
+    digdeeperbutton = new FXButton(toolbar, "", digdeepericon, this, ID_DIGDEEPER, BUTTON_TOOLBAR|FRAME_RAISED);
     carvingicon = new FXPNGIcon(this->getApp(), carving);
-    carvingbutton = new FXButton(toolbar, "", carvingicon, this, ID_CARVING, BUTTON_TOOLBAR);
+    carvingbutton = new FXButton(toolbar, "", carvingicon, this, ID_CARVING, BUTTON_TOOLBAR|FRAME_RAISED);
     exportfilesicon = new FXPNGIcon(this->getApp(), exportfiles);
-    exportfilesbutton = new FXButton(toolbar, "", exportfilesicon, this, ID_EXPORTFILES, BUTTON_TOOLBAR);
+    exportfilesbutton = new FXButton(toolbar, "", exportfilesicon, this, ID_EXPORTFILES, BUTTON_TOOLBAR|FRAME_RAISED);
     exportwliicon = new FXPNGIcon(this->getApp(), exportwli);
-    exportwlibutton = new FXButton(toolbar, "", exportwliicon, this, ID_EXPORTWLI, BUTTON_TOOLBAR);
+    exportwlibutton = new FXButton(toolbar, "", exportwliicon, this, ID_EXPORTWLI, BUTTON_TOOLBAR|FRAME_RAISED);
     new FXVerticalSeparator(toolbar);
     // REPORTING ICONS
     managetagsicon = new FXPNGIcon(this->getApp(), managetags);
-    managetagsbutton = new FXButton(toolbar, "", managetagsicon, this, ID_MANAGETAGS, BUTTON_TOOLBAR);
+    managetagsbutton = new FXButton(toolbar, "", managetagsicon, this, ID_MANAGETAGS, BUTTON_TOOLBAR|FRAME_RAISED);
     managehashicon = new FXPNGIcon(this->getApp(), hashlist);
-    managehashbutton = new FXButton(toolbar, "", managehashicon, this, ID_MANAGEHASH, BUTTON_TOOLBAR);
+    managehashbutton = new FXButton(toolbar, "", managehashicon, this, ID_MANAGEHASH, BUTTON_TOOLBAR|FRAME_RAISED);
     previewicon = new FXPNGIcon(this->getApp(), reportpreview1);
-    previewbutton = new FXButton(toolbar, "", previewicon, this, ID_PREVIEW, BUTTON_TOOLBAR);
+    previewbutton = new FXButton(toolbar, "", previewicon, this, ID_PREVIEW, BUTTON_TOOLBAR|FRAME_RAISED);
     publishicon = new FXPNGIcon(this->getApp(), paperairplane2);
-    publishbutton = new FXButton(toolbar, "", publishicon, this, ID_PUBLISH, BUTTON_TOOLBAR);
+    publishbutton = new FXButton(toolbar, "", publishicon, this, ID_PUBLISH, BUTTON_TOOLBAR|FRAME_RAISED);
     // IMAGING ICONS
     createwfiicon = new FXPNGIcon(this->getApp(), createwfi);
-    createwfibutton = new FXButton(toolbar, "", createwfiicon, this, ID_CREATEWFI, BUTTON_TOOLBAR);
+    createwfibutton = new FXButton(toolbar, "", createwfiicon, this, ID_CREATEWFI, BUTTON_TOOLBAR|FRAME_RAISED);
     verifywfiicon = new FXPNGIcon(this->getApp(), verifywfi);
-    verifywfibutton = new FXButton(toolbar, "", verifywfiicon, this, ID_VERIFYWFI, BUTTON_TOOLBAR);
+    verifywfibutton = new FXButton(toolbar, "", verifywfiicon, this, ID_VERIFYWFI, BUTTON_TOOLBAR|FRAME_RAISED);
     // ABOUT ICONS
     xchompicon = new FXPNGIcon(this->getApp(), xchomp);
-    xchompbutton = new FXButton(toolbar, "", xchompicon, this, ID_XCHOMP, BUTTON_TOOLBAR);
+    xchompbutton = new FXButton(toolbar, "", xchompicon, this, ID_XCHOMP, BUTTON_TOOLBAR|FRAME_RAISED);
     abouticon = new FXPNGIcon(this->getApp(), helpcontents);
-    aboutbutton = new FXButton(toolbar, "", abouticon, this, ID_ABOUT, BUTTON_TOOLBAR);
+    aboutbutton = new FXButton(toolbar, "", abouticon, this, ID_ABOUT, BUTTON_TOOLBAR|FRAME_RAISED);
     // PATH TOOLBAR HOME ICON
     burrowicon = new FXPNGIcon(this->getApp(), burrow);
-    burrowbutton = new FXButton(pathtoolbar, "", burrowicon, this, ID_HOME, BUTTON_TOOLBAR);
+    burrowbutton = new FXButton(pathtoolbar, "", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED);
 
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
