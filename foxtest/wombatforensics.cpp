@@ -800,7 +800,11 @@ long WombatForensics::PreviewReport(FXObject*, FXSelector, void*)
 long WombatForensics::OpenSettings(FXObject*, FXSelector, void*)
 {
     Settings settings(this, "Settings");
-    settings.execute(PLACEMENT_OWNER);
+    bool tosave = settings.execute(PLACEMENT_OWNER);
+    if(tosave == 1)
+        std::cout << settings.ReturnSettings().text() << std::endl;
+    else
+        std::cout << "cancelled" << std::endl;
 
     return 1;
 }

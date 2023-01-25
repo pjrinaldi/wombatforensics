@@ -34,6 +34,8 @@ Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     hframe5 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     reporttzlabel = new FXLabel(hframe5, "Report TimeZone:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
     reporttzcombo = new FXComboBox(hframe5, 45);
+    reporttzcombo->fillItems(timezones);
+    reporttzcombo->setNumVisible(10);
     hframe6 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     autosavelabel = new FXLabel(hframe6, "Set Autosave Interval (minutes):", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
     new FXSpring(hframe6);
@@ -48,8 +50,8 @@ Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     hframe8 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     new FXLabel(hframe8, "", NULL, LAYOUT_FILL_X);
     new FXSpring(hframe8);
-    cancelbutton = new FXButton(hframe8, "Cancel");
-    savebutton = new FXButton(hframe8, "Save");
+    cancelbutton = new FXButton(hframe8, "Cancel", NULL, this, FXDialogBox::ID_CANCEL);
+    savebutton = new FXButton(hframe8, "Save", NULL, this, FXDialogBox::ID_ACCEPT);
     //mainimage = new FXPNGImage(this->getApp(), aboutwombat);
     //imgframe = new FXImageFrame(mainframe, mainimage, FRAME_NONE);
     /*
@@ -72,4 +74,9 @@ Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     //this->setBackColor(FX::colorFromName("white"));
     //mainframe->setBackColor(FX::colorFromName("white"));
     //mainlabel->setBackColor(FX::colorFromName("white"));
+}
+
+FXString Settings::ReturnSettings()
+{
+    return "save settings string here.";
 }
