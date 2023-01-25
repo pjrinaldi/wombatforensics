@@ -288,9 +288,12 @@ class WombatForensics : public FXMainWindow
         FXString homepath;
         FXString tmppath;
         FXString casename;
+        FXString configpath;
+        FXString currentsettings;
         
         FXFile tagsfile;
         FXFile logfile;
+        FXFile settingfile;
         
         char dtbuf[35];
         bool iscaseopen;

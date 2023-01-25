@@ -98,7 +98,28 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     taggedlist.clear();
     iscaseopen = false;
     homepath = FXString(getenv("HOME")) + "/";
+    configpath = homepath + ".wombatforensics/";
     tmppath = "/tmp/";
+    FXDir::create(configpath);
+    bool issettings = settingfile.open(configpath + "settings", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(issettings == false)
+    {
+        // CREATE SETTINGS FILE AND LOAD DEFAULT SETTINGS TO THE FILE
+        settingfile.close();
+        FXFile::create(configpath + "settings", FXIO::OwnerReadWrite);
+        settingfile.open(configpath + "settings", FXIO::Writing, FXIO::OwnerReadWrite);
+        currentsettings = "128|25|/home/pasquale/WombatCases/|/home/pasquale/Reports/|America/New_York|20";
+        settingfile.writeBlock(currentsettings.text(), currentsettings.length());
+        settingfile.close();
+    }
+    else
+    {
+        settingfile.open(configpath + "settings", FXIO::Reading, FXIO::OwnerReadWrite);
+        char* oldsettings = new char[settingfile.size()+1];
+        settingfile.readBlock(oldsettings, settingfile.size());
+        settingfile.close();
+        currentsettings = FXString(oldsettings);
+    }
 }
 
 void WombatForensics::create()
@@ -800,11 +821,19 @@ long WombatForensics::PreviewReport(FXObject*, FXSelector, void*)
 long WombatForensics::OpenSettings(FXObject*, FXSelector, void*)
 {
     Settings settings(this, "Settings");
+    settings.LoadSettings(currentsettings);
     bool tosave = settings.execute(PLACEMENT_OWNER);
     if(tosave == 1)
-        std::cout << settings.ReturnSettings().text() << std::endl;
+    {
+        currentsettings = settings.ReturnSettings();
+        settingfile.open(configpath + "settings", FXIO::Writing, FXIO::OwnerReadWrite);
+        settingfile.writeBlock(currentsettings.text(), currentsettings.length());
+        settingfile.close();
+    }
     else
-        std::cout << "cancelled" << std::endl;
+    {
+        //std::cout << "cancelled" << std::endl;
+    }
 
     return 1;
 }

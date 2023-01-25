@@ -49,10 +49,11 @@ class Settings : public FXDialogBox
         //long onSomeCommand(FXObject* sender, FXSelector sel, void* ptr);
 
     public:
-        /*
         enum
         {
-            ID_SAVE = 1,
+            ID_CASEPATH = 1,
+            ID_REPORTPATH = 2,
+            ID_MANAGE = 103,
             //ID_CANCEL = 1,
             //ID_ACCEPT = 2,
             //ID_TREELIST = 1,
@@ -62,9 +63,19 @@ class Settings : public FXDialogBox
             //ID_REMTAG = 103,
             ID_LAST
         };
-        */
         Settings(FXWindow* parent, const FXString& title);
         FXString ReturnSettings(void);
+        void LoadSettings(FXString cursettings);
+
+        long SetCasePath(FXObject*, FXSelector, void*);
+        long SetReportPath(FXObject*, FXSelector, void*);
+        long OpenCarvingManager(FXObject*, FXSelector, void*);
+};
+
+FXDEFMAP(Settings) SettingsMap[]={
+    FXMAPFUNC(SEL_COMMAND, Settings::ID_CASEPATH, Settings::SetCasePath),
+    FXMAPFUNC(SEL_COMMAND, Settings::ID_REPORTPATH, Settings::SetReportPath),
+    FXMAPFUNC(SEL_COMMAND, Settings::ID_MANAGE, Settings::OpenCarvingManager),
 };
 
 #endif // ABOUTBOX_H
