@@ -851,10 +851,6 @@ long WombatForensics::OpenSettings(FXObject*, FXSelector, void*)
         settingfile.writeBlock(currentsettings.text(), currentsettings.length());
         settingfile.close();
     }
-    else
-    {
-        //std::cout << "cancelled" << std::endl;
-    }
 
     return 1;
 }
