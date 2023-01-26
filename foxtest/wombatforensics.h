@@ -226,10 +226,14 @@ class WombatForensics : public FXMainWindow
         FXIcon* saveicon;
         FXButton* savebutton;
 
+	FXIcon* evidmanicon;
+	FXButton* evidmanbutton;
+	/*
         FXIcon* listaddicon;
         FXButton* listaddbutton;
         FXIcon* listremicon;
         FXButton* listrembutton;
+	*/
 
         FXIcon* jumptohexicon;
         FXButton* jumptohexbutton;
@@ -267,10 +271,12 @@ class WombatForensics : public FXMainWindow
 	FXIcon* publishicon;
 	FXButton* publishbutton;
 
+	/*
         FXIcon* createwfiicon;
         FXButton* createwfibutton;
         FXIcon* verifywfiicon;
         FXButton* verifywfibutton;
+	*/
 
         FXIcon* xchompicon;
         FXButton* xchompbutton;
@@ -280,13 +286,7 @@ class WombatForensics : public FXMainWindow
         FXIcon* burrowicon;
         FXButton* burrowbutton;
 
-        /*
-        FXString prevsqlitepath;
-        FXString sqlitefilepath;
-        FXString curfilepath;
-        */
-
-        FXArray<FXString> sqlitefiles;
+        //FXArray<FXString> sqlitefiles;
         std::vector<std::string> tags;
         FXArray<FXString> taggedlist;
         std::ifstream filebuffer;
@@ -336,8 +336,9 @@ class WombatForensics : public FXMainWindow
             ID_NEW = 99,
             ID_OPEN = 100,
             ID_SAVE = 98,
-            ID_ADDEVID = 97,
-            ID_REMEVID = 96,
+	    ID_EVIDMANAGE = 97,
+            //ID_ADDEVID = 97,
+            //ID_REMEVID = 96,
             ID_SETTINGS = 95,
             ID_VIEWMANAGE = 94,
             ID_MSGLOG = 93,
@@ -381,7 +382,7 @@ class WombatForensics : public FXMainWindow
         long NewCase(FXObject*, FXSelector, void*);
         long OpenCase(FXObject*, FXSelector, void*);
         long SaveCase(FXObject*, FXSelector, void*);
-	long AddEvidence(FXObject*, FXSelector, void*);
+	long ManageEvidence(FXObject*, FXSelector, void*);
         long OpenTagManager(FXObject*, FXSelector, void*);
 	long OpenAboutBox(FXObject*, FXSelector, void*);
         long PreviewReport(FXObject*, FXSelector, void*);
@@ -445,7 +446,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_NEW, WombatForensics::NewCase),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenCase),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SAVE, WombatForensics::SaveCase),
-    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ADDEVID, WombatForensics::AddEvidence),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_EVIDMANAGE, WombatForensics::ManageEvidence),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),

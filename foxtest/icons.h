@@ -1,4 +1,4 @@
-/*********** Generated on 2023/01/26 13:45:21 by reswrap version 6.0.0 *********/
+/*********** Generated on 2023/01/26 18:48:09 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file resources/folder-open.png */
 extern const unsigned char folderopen[];
@@ -39,12 +39,6 @@ extern const unsigned char documentnew[];
 /* Created by reswrap from file resources/document-save.png */
 extern const unsigned char documentsave[];
 
-/* Created by reswrap from file resources/list-add.png */
-extern const unsigned char listadd[];
-
-/* Created by reswrap from file resources/list-rem.png */
-extern const unsigned char listrem[];
-
 /* Created by reswrap from file resources/viewmanage.png */
 extern const unsigned char viewmanage[];
 
@@ -81,15 +75,12 @@ extern const unsigned char jumptohex[];
 /* Created by reswrap from file resources/searchhex.png */
 extern const unsigned char searchhex[];
 
-/* Created by reswrap from file resources/verifywfi.png */
-extern const unsigned char verifywfi[];
-
 /* Created by reswrap from file resources/xchomp.png */
 extern const unsigned char xchomp[];
 
-/* Created by reswrap from file resources/createwfi.png */
-extern const unsigned char createwfi[];
-
 /* Created by reswrap from file resources/managecarved.png */
 extern const unsigned char managecarved[];
+
+/* Created by reswrap from file resources/evidencemanager.png */
+extern const unsigned char evidencemanager[];
 

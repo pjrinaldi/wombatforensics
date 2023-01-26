@@ -44,10 +44,14 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     savebutton = new FXButton(toolbar, "", saveicon, this, ID_SAVE, BUTTON_TOOLBAR|FRAME_RAISED);
     new FXVerticalSeparator(toolbar);
     // EVIDENCE ICONS
+    evidmanicon = new FXPNGIcon(this->getApp(), evidencemanager);
+    evidmanbutton = new FXButton(toolbar, "", evidmanicon, this, ID_EVIDMANAGE, BUTTON_TOOLBAR|FRAME_RAISED);
+    /*
     listaddicon = new FXPNGIcon(this->getApp(), listadd);
     listaddbutton = new FXButton(toolbar, "", listaddicon, this, ID_ADDEVID, BUTTON_TOOLBAR|FRAME_RAISED);
     listremicon = new FXPNGIcon(this->getApp(), listrem);
     listrembutton = new FXButton(toolbar, "", listremicon, this, ID_REMEVID, BUTTON_TOOLBAR|FRAME_RAISED);
+    */
     new FXVerticalSeparator(toolbar);
     // WOMBAT FORENSIC APP ICONS
     settingsicon = new FXPNGIcon(this->getApp(), settings);
@@ -80,11 +84,15 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     previewbutton = new FXButton(toolbar, "", previewicon, this, ID_PREVIEW, BUTTON_TOOLBAR|FRAME_RAISED);
     publishicon = new FXPNGIcon(this->getApp(), paperairplane2);
     publishbutton = new FXButton(toolbar, "", publishicon, this, ID_PUBLISH, BUTTON_TOOLBAR|FRAME_RAISED);
+    new FXVerticalSeparator(toolbar);
     // IMAGING ICONS
+    /*
     createwfiicon = new FXPNGIcon(this->getApp(), createwfi);
     createwfibutton = new FXButton(toolbar, "", createwfiicon, this, ID_CREATEWFI, BUTTON_TOOLBAR|FRAME_RAISED);
     verifywfiicon = new FXPNGIcon(this->getApp(), verifywfi);
     verifywfibutton = new FXButton(toolbar, "", verifywfiicon, this, ID_VERIFYWFI, BUTTON_TOOLBAR|FRAME_RAISED);
+    new FXVerticalSeparator(toolbar);
+    */
     // ABOUT ICONS
     xchompicon = new FXPNGIcon(this->getApp(), xchomp);
     xchompbutton = new FXButton(toolbar, "", xchompicon, this, ID_XCHOMP, BUTTON_TOOLBAR|FRAME_RAISED);
@@ -96,7 +104,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
-    sqlitefiles.clear();
+    //sqlitefiles.clear();
     tags.clear();
     taggedlist.clear();
     iscaseopen = false;
@@ -332,16 +340,33 @@ void WombatForensics::CloseCurrentCase()
     }
 }
 
-long WombatForensics::AddEvidence(FXObject*, FXSelector, void*)
+long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
 {
     if(prevevidpath.empty())
 	prevevidpath = homepath;
-    FXString evidencefilename = FXFileDialog::getOpenFilename(this, "Add Evidence Item", prevevidpath);
+    //FXString evidencefilename = FXFileDialog::getOpenFilename(this, "Add Evidence Item", prevevidpath);
+    /*
+    AddEvidenceDialog addevidence(this, "Add Evidence");
+    addevidence.execute(PLACEMENT_OWNER);
+    settings.LoadSettings(currentsettings);
+    bool tosave = settings.execute(PLACEMENT_OWNER);
+    if(tosave == 1)
+    {
+        currentsettings = settings.ReturnSettings();
+        settingfile.open(configpath + "settings", FXIO::Writing, FXIO::OwnerReadWrite);
+        settingfile.writeBlock(currentsettings.text(), currentsettings.length());
+        settingfile.close();
+    }
+    */
+
+    /*
     if(!evidencefilename.empty())
     {
 	prevevidpath = evidencefilename;
 	std::cout << evidencefilename.text() << std:endl;
     }
+    */
+
     return 1;
 }
 /*
@@ -969,6 +994,7 @@ long WombatForensics::OpenTagManager(FXObject*, FXSelector, void*)
     ManageTags tagmanager(this, "Manage Tags");
     tagmanager.SetTagList(&tags);
     tagmanager.execute(PLACEMENT_OWNER);
+
     return 1;
 }
 
@@ -976,6 +1002,7 @@ long  WombatForensics::OpenAboutBox(FXObject*, FXSelector, void*)
 {
     AboutBox aboutbox(this, "About Wombat Forensics");
     aboutbox.execute(PLACEMENT_OWNER);
+
     return 1;
 }
 
