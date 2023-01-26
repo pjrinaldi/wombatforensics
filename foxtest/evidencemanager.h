@@ -17,29 +17,17 @@ class EvidenceManager : public FXDialogBox
     private:
         FXVerticalFrame* mainframe;
         FXHorizontalFrame* hframe1;
-        FXLabel* thumbsizelabel;
-        FXSpinner* thumbsizespinner;
+        FXButton* addbutton;
+        FXButton* rembutton;
+        FXGroupBox* groupbox;
+        FXList* evidlist;
         FXHorizontalFrame* hframe2;
-        FXLabel* vidthumblabel;
-        FXSpinner* vidthumbspinner;
-        FXHorizontalFrame* hframe3;
-        FXLabel* casepathlabel;
-        FXTextField* casepathtextfield;
-        FXButton* casepathbutton;
-        FXHorizontalFrame* hframe4;
-        FXLabel* reportpathlabel;
-        FXTextField* reportpathtextfield;
-        FXButton* reportpathbutton;
-        FXHorizontalFrame* hframe5;
-        FXLabel* reporttzlabel;
-        FXComboBox* reporttzcombo;
-        FXHorizontalFrame* hframe6;
-        FXLabel* autosavelabel;
-        FXSpinner* autosavespinner;
-        FXHorizontalFrame* hframe8;
         FXButton* cancelbutton;
-        FXButton* savebutton;
-        FXString timezones = "America/New_York\nAmerica/Chicago\n";
+        FXButton* donebutton;
+
+        FXArray<FXString> evidarray;
+        FXString evidliststr;
+        FXString prevevidpath;
 
     protected:
         EvidenceManager() {}
@@ -47,21 +35,22 @@ class EvidenceManager : public FXDialogBox
     public:
         enum
         {
-            ID_CASEPATH = 1,
-            ID_REPORTPATH = 2,
+            ID_ADDEVID = 100,
+            ID_REMEVID = 101,
+            ID_EVIDLIST = 102,
             ID_LAST
         };
         EvidenceManager(FXWindow* parent, const FXString& title);
-        FXString ReturnEvidenceManager(void);
-        void LoadEvidenceManager(FXString cursettings);
+        FXString ReturnEvidence(void);
+        void LoadEvidence(FXString cursettings);
 
-        long SetCasePath(FXObject*, FXSelector, void*);
-        long SetReportPath(FXObject*, FXSelector, void*);
+        long AddEvidence(FXObject*, FXSelector, void*);
+        long RemEvidence(FXObject*, FXSelector, void*);
 };
 
 FXDEFMAP(EvidenceManager) EvidenceManagerMap[]={
-    FXMAPFUNC(SEL_COMMAND, EvidenceManager::ID_CASEPATH, EvidenceManager::SetCasePath),
-    FXMAPFUNC(SEL_COMMAND, EvidenceManager::ID_REPORTPATH, EvidenceManager::SetReportPath),
+    FXMAPFUNC(SEL_COMMAND, EvidenceManager::ID_ADDEVID, EvidenceManager::AddEvidence),
+    FXMAPFUNC(SEL_COMMAND, EvidenceManager::ID_REMEVID, EvidenceManager::RemEvidence),
 };
 
 #endif // EVIDENCEMANAGER_H

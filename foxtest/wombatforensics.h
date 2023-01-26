@@ -301,6 +301,7 @@ class WombatForensics : public FXMainWindow
         FXArray<FXString> taggedlist;
         std::ifstream filebuffer;
         FXArray<FXString> fileuserdata;
+        FXString evidencelist;
         FXString curfileuserdata;
         FXString homepath;
         FXString tmppath;
