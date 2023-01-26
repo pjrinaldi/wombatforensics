@@ -20,6 +20,7 @@
 #include "common.h"
 #include "settings.h"
 #include "managecarving.h"
+#include "evidencemanager.h"
 // SHARED LIBRARIES
 #include <tar.h>
 #include <libtar.h>
@@ -27,6 +28,15 @@
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
 #define NSEC_BTWN_1904_1970	(uint32_t) 2082844800U
+
+// may not need this structure, if i just in time load the table items.
+struct EvidenceItem
+{
+    int id;
+    FXString fullpath;
+    FXString evidencename; // may not need these
+    FXString evidencepath; // may not need these
+};
 
 /*
 struct WalHeader

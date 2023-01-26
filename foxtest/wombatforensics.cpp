@@ -344,28 +344,17 @@ long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
 {
     if(prevevidpath.empty())
 	prevevidpath = homepath;
-    //FXString evidencefilename = FXFileDialog::getOpenFilename(this, "Add Evidence Item", prevevidpath);
-    /*
-    AddEvidenceDialog addevidence(this, "Add Evidence");
-    addevidence.execute(PLACEMENT_OWNER);
-    settings.LoadSettings(currentsettings);
-    bool tosave = settings.execute(PLACEMENT_OWNER);
-    if(tosave == 1)
+    EvidenceManager evidencemanager(this, "Manage Evidence");
+    evidencemanager.LoadEvidence(evidencelist);
+    bool tosave = evidencemanager.execute(PLACEMENT_OWNER);
+    if(tosave)
     {
-        currentsettings = settings.ReturnSettings();
-        settingfile.open(configpath + "settings", FXIO::Writing, FXIO::OwnerReadWrite);
-        settingfile.writeBlock(currentsettings.text(), currentsettings.length());
-        settingfile.close();
+	evidencelist = evidencemanager.ReturnEvidence();
+	// write evidence to file
+        //settingfile.open(configpath + "settings", FXIO::Writing, FXIO::OwnerReadWrite);
+        //settingfile.writeBlock(currentsettings.text(), currentsettings.length());
+        //settingfile.close();
     }
-    */
-
-    /*
-    if(!evidencefilename.empty())
-    {
-	prevevidpath = evidencefilename;
-	std::cout << evidencefilename.text() << std:endl;
-    }
-    */
 
     return 1;
 }
