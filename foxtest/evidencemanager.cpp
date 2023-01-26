@@ -17,6 +17,7 @@ EvidenceManager::EvidenceManager(FXWindow* parent, const FXString& title):FXDial
     new FXSpring(hframe2);
     cancelbutton = new FXButton(hframe2, "Cancel", NULL, this, FXDialogBox::ID_CANCEL, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
     donebutton = new FXButton(hframe2, "Done", NULL, this, FXDialogBox::ID_ACCEPT, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    isexist = false;
 }
 
 FXString EvidenceManager::ReturnEvidence()
@@ -33,7 +34,7 @@ FXString EvidenceManager::ReturnEvidence()
     return "";
 }
 
-void EvidenceManager::LoadEvidence(FXString cursettings)
+void EvidenceManager::LoadEvidence(FXString curevidence)
 {
     /*
     int found1 = cursettings.find("|");
@@ -58,7 +59,16 @@ long EvidenceManager::AddEvidence(FXObject*, FXSelector, void*)
     if(!evidpathstring.empty())
     {
         prevevidpath = evidpathstring;
-        evidlist->appendItem(new FXListItem(evidpathstring));
+        for(int i=0; i < evidarray.no(); i++)
+        {
+            if(FXString::compare(evidarray.at(i), evidpathstring))
+                isexist = true;
+        }
+        if(!isexist)
+        {
+            evidlist->appendItem(new FXListItem(evidpathstring));
+            evidarray.append(evidpathstring);
+        }
         //std::cout << "evidpathstring:" << evidpathstring.text() << std::endl;
     }
 

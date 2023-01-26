@@ -28,6 +28,7 @@ class EvidenceManager : public FXDialogBox
         FXArray<FXString> evidarray;
         FXString evidliststr;
         FXString prevevidpath;
+        bool isexist;
 
     protected:
         EvidenceManager() {}
