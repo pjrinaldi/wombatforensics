@@ -123,6 +123,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
         settingfile.close();
         currentsettings = FXString(oldsettings);
     }
+    //std::cout << "casepath: " << GetSettings(2).text() << std::endl;
     bool iscarvetypes = carvetypesfile.open(configpath + "carvetypes", FXIO::Reading, FXIO::OwnerReadWrite);
     if(iscarvetypes == false)
     {
@@ -149,6 +150,25 @@ void WombatForensics::create()
     show(PLACEMENT_SCREEN);
 }
 
+FXString WombatForensics::GetSettings(int setting)
+{
+    FXArray<FXint> posarray;
+    posarray.clear();
+    int found = 0;
+    posarray.append(-1);
+    while(found > -1)
+    {
+        found = currentsettings.find("|", found+1);
+        if(found > -1)
+            posarray.append(found);
+    }
+    posarray.append(currentsettings.length());
+    if(setting < posarray.no())
+        return currentsettings.mid(posarray.at(setting)+1, posarray.at(setting+1) - posarray.at(setting) - 1);
+    else
+        return "";
+}
+
 long WombatForensics::NewCase(FXObject*, FXSelector, void*)
 {
     if(iscaseopen)
@@ -156,7 +176,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         FXuint result = FXMessageBox::question(this, MBOX_YES_NO, "Existing Case Status", "There is a case already open. Are you sure you want to close it?"); // no is 2, yes is 1
         if(result == 1) // YES
         {
-            //CloseCurrentCase();
+            CloseCurrentCase();
             iscaseopen = false;
         }
         else // NO
@@ -222,6 +242,41 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
 long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
 {
     return 1;
+}
+
+void WombatForensics::CloseCurrentCase()
+{
+    this->setTitle("Wombat Forensics");
+    // BEGIN TAR METHOD
+    FXDir::create(GetSettings(2));
+    FXString tmptar = GetSettings(2) + casename + ".wfc";
+    //std::cout << "tmptar: " << tmptar.text() << std::endl;
+    FXFile tarfile;
+    bool istarfile = tarfile.open(tmptar, FXIO::Reading, FXIO::OwnerReadWrite);
+    if(istarfile)
+    {
+        FXString oldtmptar = tmptar + ".old";
+        rename(tmptar.text(), oldtmptar.text());
+    }
+    TAR* casehandle;
+    tar_open(&casehandle, tmptar.text(), NULL, O_WRONLY | O_CREAT, 0644, TAR_GNU);
+    tar_append_tree(casehandle, tmppath.text(), FXString("./" + casename).text());
+    tar_close(casehandle);
+    if(istarfile)
+    {
+        FXString oldtmptar = tmptar + ".old";
+        std::remove(oldtmptar.text());
+    }
+    // END TAR METHOD
+    StatusUpdate("Wombat Case File Saved");
+    if(logfile.isOpen())
+        logfile.close();
+    // REMOVE /TMP/WF/CASENAME DIRECTORY
+    std::filesystem::path tpath(tmppath.text());
+    std::uintmax_t removecount = std::filesystem::remove_all(tpath);
+    //std::cout << "removal count: " << removecount << std::endl;
+    homepath = FXString(getenv("HOME")) + "/";
+    StatusUpdate("Case Successfully Closed");
 }
 
 /*

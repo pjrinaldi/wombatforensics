@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <byteswap.h>
 #include <time.h>
+#include <fcntl.h>
 #include "/usr/local/include/fox-1.7/fx.h"
 #include "icons.h"
 #include "managetags.h"
@@ -19,6 +20,9 @@
 #include "common.h"
 #include "settings.h"
 #include "managecarving.h"
+// SHARED LIBRARIES
+#include <tar.h>
+#include <libtar.h>
 
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
@@ -415,6 +419,8 @@ class WombatForensics : public FXMainWindow
         void AddContent(int row, FXString islive, FXString rowid, FXString offlen, FXString type, FXString val, FXString tag);
         void AlignColumn(FXTable* curtable, int row, FXuint justify);
         */
+        FXString GetSettings(int setting);
+        void CloseCurrentCase(void);
         void LogEntry(FXString logstring)
         {
             FXString tmpstr = FXString(GetDateTime(dtbuf)) + " | " + logstring + "\n";
