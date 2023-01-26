@@ -326,6 +326,7 @@ class WombatForensics : public FXMainWindow
 
     protected:
         WombatForensics() {}
+	~WombatForensics();
 
     public:
         enum

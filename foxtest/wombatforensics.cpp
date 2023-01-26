@@ -144,6 +144,11 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     }
 }
 
+WombatForensics::~WombatForensics()
+{
+    CloseCurrentCase();
+}
+
 void WombatForensics::create()
 {
     FXMainWindow::create();
@@ -241,6 +246,41 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
 
 long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
 {
+    if(iscaseopen)
+    {
+        FXuint result = FXMessageBox::question(this, MBOX_YES_NO, "Existing Case Status", "There is a case already open. Are you sure you want to close it?"); // no is 2, yes is 1
+        if(result == 1) // YES
+        {
+            CloseCurrentCase();
+            iscaseopen = false;
+        }
+        else // NO
+            return 1;
+    }
+    FXString casefilename = FXFileDialog::getOpenFilename(this, "Open Wombat Case File", GetSettings(2), "*.wfc");
+    //FXApp::beginWaitCursor();
+    int found = casefilename.rfind("/");
+    int rfound = casefilename.rfind(".");
+    FXString casename = casefilename.mid(found+1, rfound - found - 1);
+    if(!casefilename.empty())
+    {
+	StatusUpdate("Case Opening...");
+	this->setTitle("Wombat Forensics - " + casename);
+        FXDir::create("/tmp/wf/");
+	tmppath = tmppath + "wf/";
+	// BEGIN UNTAR METHOD
+	TAR* tarhandle;
+	tar_open(&tarhandle, casefilename.text(), NULL, O_RDONLY, 0644, TAR_GNU);
+	tar_extract_all(tarhandle, tmppath.text());
+	tar_close(tarhandle);
+	// END UNTAR METHOD
+	iscaseopen = true;
+	tmppath = tmppath + casename + "/";
+	std::cout << tmppath.text() << std::endl;
+	LogEntry("Case was Opened Successfully");
+	StatusUpdate("Ready");
+    }
+    //FXApp::endWaitCursor();
     return 1;
 }
 
@@ -269,13 +309,12 @@ void WombatForensics::CloseCurrentCase()
     }
     // END TAR METHOD
     StatusUpdate("Wombat Case File Saved");
-    if(logfile.isOpen())
-        logfile.close();
     // REMOVE /TMP/WF/CASENAME DIRECTORY
     std::filesystem::path tpath(tmppath.text());
     std::uintmax_t removecount = std::filesystem::remove_all(tpath);
     //std::cout << "removal count: " << removecount << std::endl;
     homepath = FXString(getenv("HOME")) + "/";
+    tmppath = "/tmp/";
     StatusUpdate("Case Successfully Closed");
 }
 
