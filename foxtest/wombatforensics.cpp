@@ -100,6 +100,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tags.clear();
     taggedlist.clear();
     iscaseopen = false;
+    prevevidpath = "";
     homepath = FXString(getenv("HOME")) + "/";
     configpath = homepath + ".wombatforensics/";
     tmppath = "/tmp/";
@@ -318,17 +319,60 @@ void WombatForensics::SaveCurrentCase()
 void WombatForensics::CloseCurrentCase()
 {
     this->setTitle("Wombat Forensics");
-    SaveCurrentCase();
-    StatusUpdate("Wombat Case File Saved");
-    // REMOVE /TMP/WF/CASENAME DIRECTORY
-    std::filesystem::path tpath(tmppath.text());
-    std::uintmax_t removecount = std::filesystem::remove_all(tpath);
-    //std::cout << "removal count: " << removecount << std::endl;
-    homepath = FXString(getenv("HOME")) + "/";
-    tmppath = "/tmp/";
-    StatusUpdate("Case Successfully Closed");
+    if(iscaseopen)
+    {
+	SaveCurrentCase();
+	StatusUpdate("Wombat Case File Saved");
+	// REMOVE /TMP/WF/CASENAME DIRECTORY
+	std::filesystem::path tpath(tmppath.text());
+	std::uintmax_t removecount = std::filesystem::remove_all(tpath);
+	//homepath = FXString(getenv("HOME")) + "/";
+	tmppath = "/tmp/";
+	StatusUpdate("Case Successfully Closed");
+    }
 }
 
+long WombatForensics::AddEvidence(FXObject*, FXSelector, void*)
+{
+    if(prevevidpath.empty())
+	prevevidpath = homepath;
+    FXString evidencefilename = FXFileDialog::getOpenFilename(this, "Add Evidence Item", prevevidpath);
+    if(!evidencefilename.empty())
+    {
+	prevevidpath = evidencefilename;
+	std::cout << evidencefilename.text() << std:endl;
+    }
+    return 1;
+}
+/*
+    extern QList<ForImg*> newforimglist;
+    newforimglist.clear();
+    addevidencedialog = new AddEvidenceDialog(this);
+    addevidencedialog->exec();
+    QDir eviddir = QDir(wombatvariable.tmpmntpath);
+    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::NoSymLinks | QDir::Dirs);
+    ecount = evidfiles.count();
+    for(int i=0; i < newforimglist.count(); i++)
+    {
+        QString evidencepath = wombatvariable.tmpmntpath + newforimglist.at(i)->ImgPath().split("/").last() + "-e" + QString::number(ecount) + "/";
+	QString emntpath = "";
+        QDir dir;
+        dir.mkpath(evidencepath);
+        newforimglist.at(i)->SetMountPath(evidencepath);
+        // need to delete emntpath directories on close for cleanup purposes after unmount...
+        ecount++;
+    }
+    if(newforimglist.count() > 0)
+    {
+        evidrepdatalist.clear();
+        QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessForensicImage);
+        volwatcher.setFuture(tmpfuture);
+        //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
+        //QFuture<void> tmpfuture = QtConcurrent::map(newevid, ProcessVolume);
+        //UpdateStatus();
+    }
+
+ */ 
 /*
 long WombatForensics::TableUpDown(FXObject*, FXSelector, void* ptr)
 {
@@ -930,7 +974,7 @@ long WombatForensics::OpenTagManager(FXObject*, FXSelector, void*)
 
 long  WombatForensics::OpenAboutBox(FXObject*, FXSelector, void*)
 {
-    AboutBox aboutbox(this, "About Wombat Registry Forensics");
+    AboutBox aboutbox(this, "About Wombat Forensics");
     aboutbox.execute(PLACEMENT_OWNER);
     return 1;
 }
