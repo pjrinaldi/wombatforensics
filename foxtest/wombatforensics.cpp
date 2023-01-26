@@ -284,9 +284,14 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
     return 1;
 }
 
-void WombatForensics::CloseCurrentCase()
+long WombatForensics::SaveCase(FXObject*, FXSelector, void*)
 {
-    this->setTitle("Wombat Forensics");
+    SaveCurrentCase();
+    return 1;
+}
+
+void WombatForensics::SaveCurrentCase()
+{
     // BEGIN TAR METHOD
     FXDir::create(GetSettings(2));
     FXString tmptar = GetSettings(2) + casename + ".wfc";
@@ -308,6 +313,12 @@ void WombatForensics::CloseCurrentCase()
         std::remove(oldtmptar.text());
     }
     // END TAR METHOD
+}
+
+void WombatForensics::CloseCurrentCase()
+{
+    this->setTitle("Wombat Forensics");
+    SaveCurrentCase();
     StatusUpdate("Wombat Case File Saved");
     // REMOVE /TMP/WF/CASENAME DIRECTORY
     std::filesystem::path tpath(tmppath.text());

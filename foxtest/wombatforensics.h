@@ -379,6 +379,7 @@ class WombatForensics : public FXMainWindow
         */
         long NewCase(FXObject*, FXSelector, void*);
         long OpenCase(FXObject*, FXSelector, void*);
+        long SaveCase(FXObject*, FXSelector, void*);
         long OpenTagManager(FXObject*, FXSelector, void*);
 	long OpenAboutBox(FXObject*, FXSelector, void*);
         long PreviewReport(FXObject*, FXSelector, void*);
@@ -421,6 +422,7 @@ class WombatForensics : public FXMainWindow
         void AlignColumn(FXTable* curtable, int row, FXuint justify);
         */
         FXString GetSettings(int setting);
+	void SaveCurrentCase(void);
         void CloseCurrentCase(void);
         void LogEntry(FXString logstring)
         {
@@ -440,6 +442,7 @@ class WombatForensics : public FXMainWindow
 FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_NEW, WombatForensics::NewCase),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenCase),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SAVE, WombatForensics::SaveCase),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
