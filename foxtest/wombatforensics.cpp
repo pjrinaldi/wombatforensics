@@ -151,6 +151,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 	carvetypesfile.close();
 	currentcarvetypes = FXString(oldcarvetypes);
     }
+    forimgvector.clear();
     savebutton->disable();
     evidmanbutton->disable();
     imgvidthumbbutton->disable();
@@ -287,7 +288,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
     int found = casefilename.rfind("/");
     int rfound = casefilename.rfind(".");
     casename = casefilename.mid(found+1, rfound - found - 1);
-    std::cout << "open casename: " << casename.text() << std::endl;
+    //std::cout << "open casename: " << casename.text() << std::endl;
     if(!casefilename.empty())
     {
         this->getApp()->beginWaitCursor();
@@ -323,9 +324,9 @@ void WombatForensics::SaveCurrentCase()
 {
     // BEGIN TAR METHOD
     FXDir::create(GetSettings(2));
-    std::cout << "save casename:" << casename.text() << std::endl;
+    //std::cout << "save casename:" << casename.text() << std::endl;
     FXString tmptar = GetSettings(2) + casename + ".wfc";
-    std::cout << "tmptar: " << tmptar.text() << std::endl;
+    //std::cout << "tmptar: " << tmptar.text() << std::endl;
     FXFile tarfile;
     bool istarfile = tarfile.open(tmptar, FXIO::Reading, FXIO::OwnerReadWrite);
     if(istarfile)
@@ -387,6 +388,18 @@ void WombatForensics::LoadCaseState(void)
         evidencefile.readBlock(oldevidence, evidencefile.size());
         evidencefile.close();
         evidencelist = FXString(oldevidence);
+        int found = 0;
+        FXArray<FXint> posarray;
+        posarray.clear();
+        posarray.append(-1);
+        while(found > -1)
+        {
+            found = evidencelist.find('\n', found+1);
+            if(found > -1)
+                posarray.append(found);
+        }
+        for(int i=0; i < posarray.no() - 1; i++)
+            forimgvector.push_back(new ForImg(evidencelist.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text()));
     }
 }
 
@@ -405,6 +418,7 @@ long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
         evidencefile.open(tmppath + "evidence", FXIO::Writing, FXIO::OwnerReadWrite);
         evidencefile.writeBlock(evidencelist.text(), evidencelist.length());
         evidencefile.close();
+        LoadCaseState();
     }
 
     return 1;

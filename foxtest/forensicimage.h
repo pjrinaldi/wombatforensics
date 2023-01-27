@@ -1,37 +1,34 @@
-/*
-class ForImg : public QIODevice
+#ifndef FORENSICIMAGE_H
+#define FORENSICIMAGE_H
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <stdio.h>
+#include <string>
+#include <vector>
+// SHARED LIBRARIES
+#include <libewf.h>
+
+class ForImg 
 {
     public:
-        ForImg(QString imgfile);
+        ForImg(std::string imgfile);
         ~ForImg();
-        QByteArray ReadContent(qint64 pos, qint64 size);
-        qint64 Size();
-        QString ImgPath();
-        QString MountPath();
-        void SetMountPath(QString mountpath);
-	int8_t ImgType();
-
-    protected:
-
-	qint64 readData(char* data, qint64 maxsize)
-	{
-	    return maxsize;
-	};
-	qint64 writeData(const char* data, qint64 maxsize)
-	{
-	    return maxsize;
-	};
-
+        void ReadContent(uint8_t* buf, uint64_t pos, uint64_t size);
+        uint64_t Size();
+        std::string ImagePath();
+        //std::string MountPath();
+        //void SetMountPath(std::string mountpath);
+        int8_t ImgType();
     private:
-
+        std::ifstream imagebuffer;
+        //std::ifstream devicebuffer(devicestring.c_str(), std::ios::in|std::ios::binary);
         off64_t imgsize = 0;
-        qint64 imgoffset = 0;
-        QString imgpath = "";
-        QString mntpath = "";
-        //int imgtype = 15;
+        uint64_t imgoffset  = 0;
+        std::string imgpath = "";
+        //std::string mntpath = "";
         int8_t imgtype = -1;
-        uint8_t hashtype = 0;
-        int blake3hash = 0;
-        QList<qint64> framelist;
 };
-*/
+
+#endif

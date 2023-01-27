@@ -21,6 +21,7 @@
 #include "settings.h"
 #include "managecarving.h"
 #include "evidencemanager.h"
+#include "forensicimage.h"
 // SHARED LIBRARIES
 #include <tar.h>
 #include <libtar.h>
@@ -321,6 +322,8 @@ class WombatForensics : public FXMainWindow
         bool iscaseopen;
         
         Viewer* viewer;
+        ForImg* forimg;
+        std::vector<ForImg*> forimgvector;
 
 
         /*

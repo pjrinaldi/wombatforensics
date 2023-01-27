@@ -1,33 +1,61 @@
-/*
-ForImg::ForImg(QString imgfile)
+#include "forensicimage.h"
+
+ForImg::ForImg(std::string imgfile)
 {
-    qDebug() << "imgfile:" << imgfile;
-    //qDebug() << "is null:" << imgfile.isNull() << "is empty:" << imgfile.isEmpty();
-    if(imgfile.split("/").count() == 0)
-        imgtype = -1;
-    if(imgfile.split("/").last().toLower().endsWith(".e01"))
-        imgtype = 0; // EWF
-    else if(imgfile.split("/").last().toLower().endsWith(".aff"))
-        imgtype = 1; // AFF
-    else if(imgfile.split("/").last().toLower().endsWith(".dd") || imgfile.split("/").last().toLower().endsWith(".raw") || imgfile.split("/").last().toLower().endsWith(".img") || imgfile.split("/").last().toLower().endsWith(".image") || imgfile.split("/").last().toLower().endsWith(".iso"))
-        imgtype = 2; // RAW
-    else if(imgfile.split("/").last().toLower().endsWith(".001") || imgfile.split("/").last().toLower().endsWith(".000") || imgfile.split("/").last().toLower().endsWith("aaa"))
-	imgtype = 3; // SPLIT RAW
-    else if(imgfile.split("/").last().toLower().endsWith(".zmg"))
-        imgtype = 4; // ZMG
-    else if(imgfile.split("/").last().toLower().endsWith(".sfs"))
-	imgtype = 5; // SFS
-    else if(imgfile.split("/").last().toLower().endsWith(".aff4"))
-        imgtype = 6; // AFF4
-    else if(imgfile.split("/").last().toLower().endsWith(".wfi"))
-        imgtype = 7; // WFI
-    else if(imgfile.split("/").last().toLower().endsWith(".wli")) // WLI
-        imgtype = 8;
-    else // any old file..
-        imgtype = 15;
-    //qDebug() << "imgtype:" << imgtype;
+    // SET IMGPATH - PATH TO THE FORENSIC IMAGE
     imgpath = imgfile;
-    qDebug() << "imgtype at beginning of ForensicImage:" << imgtype;
+    int rfound = imgfile.rfind(".");
+    // SET IMGTYPE - DETERMINES HOW READ THE RAW CONTENT
+    std::string imgext = imgfile.substr(rfound+1);
+    if(imgext.compare("dd") == 0 || imgext.compare("DD") == 0) // RAW
+        imgtype = 1;
+    else if(imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
+        imgtype = 2;
+    else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
+        imgtype = 3;
+    else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW
+        imgtype = 4;
+    else if(imgext.compare("wfi") == 0) // WFI
+        imgtype = 5;
+    else if(imgext.compare("wli") == 0) // WLI
+        imgtype = 6;
+    else // ANY OLD FILE
+        imgtype = 0;
+    // SET IMGSIZE - GET THE SIZE OF THE RAW CONTENT
+    if(imgtype == 1) // RAW
+    {
+        imagebuffer.open(imgfile.c_str(), std::ios::in|std::ios::binary);
+        imagebuffer.seekg(0, imagebuffer.beg);
+        imagebuffer.seekg(0, imagebuffer.end);
+        imgsize = imagebuffer.tellg();
+        imagebuffer.close();
+        std::cout << imgfile << " size: " << imgsize << std::endl;
+    }
+    else if(imgtype == 2) // EWF
+    {
+    }
+    else if(imgtype == 3) // AFF4
+    {
+    }
+    else if(imgtype == 4) // SPLIT RAW
+    {
+    }
+    else if(imgtype == 5) // WFI
+    {
+    }
+    else if(imgtype == 6) // WLI
+    {
+    }
+    else // everything else
+    {
+    }
+}
+
+
+
+
+
+/*
     if(imgtype == 0) // EWF
     {
         libewf_handle_t* ewfhandle = NULL;
@@ -514,7 +542,14 @@ int8_t ForImg::ImgType()
 {
     return imgtype;
 }
+*/
 
+std::string ForImg::ImagePath()
+{
+    return imgpath;
+}
+
+/*
 QString ForImg::ImgPath()
 {
     return imgpath;
