@@ -14,6 +14,20 @@
 #include <libsmraw.h>
 #include <aff4/aff4-c.h>
 
+struct wfi_metadata
+{
+    uint32_t skipframeheader; // skippable frame header
+    uint32_t skipframesize; // skippable frame content size (not including header and this size
+    uint16_t sectorsize; // raw forensic image sector size
+    int64_t reserved; // reserved
+    int64_t totalbytes; // raw forensic image total size
+    char casenumber[24]; // 24 character string
+    char evidencenumber[24]; // 24 character string
+    char examiner[24]; // 24 character string
+    char description[128]; // 128 character string
+    uint8_t devhash[32]; // blake3 source hash
+};
+
 class ForImg 
 {
     public:
@@ -33,6 +47,7 @@ class ForImg
         std::string imgpath = "";
         //std::string mntpath = "";
         int8_t imgtype = -1;
+	wfi_metadata wfimd;
 };
 
 #endif

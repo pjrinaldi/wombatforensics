@@ -146,6 +146,25 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 5) // WFI
     {
+	FILE* wfifile = NULL;
+	wfifile = fopen(imgpath.c_str(), "rb");
+	fseek(wfifile, 0, SEEK_END);
+	fseek(wfifile, -264, SEEK_CUR);
+	fread(&wfimd, sizeof(struct wfi_metadata), 1, wfifile);
+	fclose(wfifile);
+	std::cout << imgpath << " size: " << wfimd.totalbytes << std::endl;
+	/*
+	printf("\nwombatinfo v0.1\n\n");
+	printf("Raw Media Size: %llu bytes\n", wfimd.totalbytes);
+	printf("Case Number:\t %s\n", wfimd.casenumber);
+	printf("Examiner:\t %s\n", wfimd.examiner);
+	printf("Evidence Number: %s\n", wfimd.evidencenumber);
+	printf("Description:\t %s\n", wfimd.description);
+	printf("BLAKE3 Hash:\t ");
+	for(size_t i=0; i < 32; i++)
+	    printf("%02x", wfimd.devhash[i]);
+	printf("\n");
+	 */ 
     }
     else if(imgtype == 6) // WLI
     {
@@ -158,38 +177,6 @@ ForImg::ForImg(std::string imgfile)
 }
 
 /*
-    else if(imgtype == 15) // everything else
-    {
-        //QFile efile(imgpath);
-        //if(!efile.isOpen())
-        //    efile.open(QIDevice::ReadOnly);
-        //if(efile.isOpen())
-        //{
-            //hashtype = 0; // MD5
-        QFileInfo efileinfo(imgpath);
-        imgsize = efileinfo.size();
-        //efile.close();
-        //}
-
-    }
-    else if(imgtype = -1)
-    {
-        imgsize = 0;
-    }
-    else
-	imgsize = 0;
-}
-
-ForImg::~ForImg()
-{
-    //if(imgtype == 0) // EWF
-    //{
-        //libewf_handle_close(ewfhandle, &ewferror);
-        //libewf_handle_free(&ewfhandle, &ewferror);
-        //libewf_glob_free(globfiles, globfilecnt, &ewferror);
-    //}
-}
-
 QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 {
     //qDebug() << "pos:" << pos << "size:" << size;
