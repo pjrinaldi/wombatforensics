@@ -33,6 +33,57 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 2) // EWF
     {
+        libewf_handle_t* ewfhandle = NULL;
+        libewf_error_t* ewferror = NULL;
+        char** globfiles = NULL;
+        int globfilecnt = 0;
+	//std::cout << "Image Path: " << imgpath << std::endl;
+	int found = imgpath.rfind(".E");
+	if(found == -1)
+	    found = imgpath.rfind(".e");
+	std::string imgprematch = imgpath.substr(0, found+2);
+	//std::cout << "Image Pre Match: " << imgprematch << std::endl;
+	std::filesystem::path imagepath(imgpath);
+	imagepath.remove_filename();
+	//std::cout << "imagepath: " << imagepath.string() << std::endl;
+	//int filecount = 0;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+		globfilecnt++;
+		//std::cout << "match: " << file.path().string() <<std::endl;
+	}
+	char* filenames[globfilecnt] = {NULL};
+	filenames[0] = (char*)imgpath.c_str();
+	int i = 1;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+	    {
+		if(file.path().string().compare(imgpath) != 0)
+		{
+		    filenames[i] = (char*)file.path().string().c_str();
+		    i++;
+		}
+	    }
+	}
+        int retopen = 0;
+        retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        libewf_handle_get_media_size(ewfhandle, &imgsize, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        libewf_handle_close(ewfhandle, &ewferror);
+        libewf_handle_free(&ewfhandle, &ewferror);
+        libewf_glob_free(globfiles, globfilecnt, &ewferror);
+        std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 3) // AFF4
     {
@@ -51,49 +102,7 @@ ForImg::ForImg(std::string imgfile)
     }
 }
 
-
-
-
-
 /*
-    if(imgtype == 0) // EWF
-    {
-        libewf_handle_t* ewfhandle = NULL;
-        libewf_error_t* ewferror = NULL;
-        char** globfiles = NULL;
-        int globfilecnt = 0;
-        QString efilepath = imgfile.split(imgfile.split("/").last()).first();
-        QDir edir = QDir(imgfile.split(imgfile.split("/").last()).first());
-        QStringList efiles = edir.entryList(QStringList() << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgfile.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
-        char* filenames[efiles.count()] = {NULL};
-        for(int i=0; i < efiles.count(); i++)
-        {
-            filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
-            //printf("filenames[%d] = %s\n", i, filenames[i]);
-        }
-        globfilecnt = efiles.count();
-        //printf("globfilecnt: %d\n", globfilecnt);
-        int retopen = 0;
-
-        retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
-        //else
-        //    printf("libewf glob was successful: %d\n", retopen);
-
-        retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
-        retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
-        //else
-        //    printf("libewf_handle_open was successful %d\n", retopen);
-        libewf_handle_get_media_size(ewfhandle, (size64_t*)&imgsize, &ewferror);
-        libewf_handle_close(ewfhandle, &ewferror);
-        libewf_handle_free(&ewfhandle, &ewferror);
-        libewf_glob_free(globfiles, globfilecnt, &ewferror);
-    }
     else if(imgtype == 1) // AFF
     {
         //char* iname = new char[imgpath.toStdString().size() + 1];
@@ -102,48 +111,6 @@ ForImg::ForImg(std::string imgfile)
         afimage = af_open(imgpath.toStdString().c_str(), O_RDONLY|O_EXCL, 0);
         imgsize = af_get_imagesize(afimage);
         af_close(afimage);
-    }
-    else if(imgtype == 2) // RAW
-    {
-        QFile efile(imgpath);
-        if(!efile.isOpen())
-            efile.open(QIODevice::ReadOnly | QIODevice::Text);
-        if(efile.isOpen())
-        {
-            qint64 imagesize = efile.size();
-            efile.seek(efile.size() - 9);
-            if(QString(efile.read(9)) == "</imglog>")
-            {
-                hashtype = 1; // BLAKE3
-                efile.seek(efile.size() - 1024);
-                QByteArray getlog = efile.read(1024);
-                //QString getlog  QString(efile.read(1024));
-                //qDebug() << "getlog:" << getlog;
-                int sizestart = getlog.indexOf("<size>");
-                int sizeend = getlog.indexOf("</size>");
-                imgsize = getlog.mid(sizestart + 6, sizeend - sizestart - 6).toInt();
-                //qDebug() << getlog.mid(sizestart + 6, sizeend - sizestart- 6);
-                int b3start = getlog.indexOf("<blake3>");
-                int b3end = getlog.indexOf("</blake3>");
-                QString blake3str = getlog.mid(b3start + 8, b3end - b3start - 8);
-                qDebug() << "blake3str:" << blake3str;
-                //blake3hash = blake3str.toInt(nullptr, 16);
-                //qDebug() << "blake3hash:" << blake3hash;
-                //qDebug() << "logstart:" << logstart;
-                //imgsize = efile.size() - logstart;
-                //qDebug() << "imglog size:" << 1024 - logstart;
-                //qDebug() << "imgsize:" << imgsize << "efile size:" << efile.size();
-                //qDebug() << "imglog found!";
-            }
-            else
-            {
-                hashtype = 0; // MD5
-                QFileInfo efileinfo(imgpath);
-                imgsize = efileinfo.size();
-                //qDebug() << "imglog not found!";
-            }
-            efile.close();
-        }
     }
     else if(imgtype == 3) // SPLIT RAW
     {

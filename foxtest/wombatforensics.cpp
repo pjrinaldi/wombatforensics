@@ -230,7 +230,6 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         FXFile::create(tmppath + "msglog", FXIO::OwnerReadWrite);
         LogEntry("Case Structure Created Successfully");
         EnableCaseButtons();
-        LoadCaseState();
         this->getApp()->endWaitCursor();
         StatusUpdate("Ready");
         /*
@@ -380,27 +379,23 @@ void WombatForensics::EnableCaseButtons()
 void WombatForensics::LoadCaseState(void)
 {
     // LOAD EVIDENCE
-    bool isevidfile = evidencefile.open(tmppath + "evidence", FXIO::Reading, FXIO::OwnerReadWrite);
-    if(isevidfile)
+     
+    evidencelist = "";
+    filebuffer.open(FXString(tmppath + "evidence").text(), std::ios::in);
+    if(filebuffer.is_open())
     {
-        evidencefile.open(tmppath + "evidence", FXIO::Reading, FXIO::OwnerReadWrite);
-        char* oldevidence = new char[evidencefile.size()+1];
-        evidencefile.readBlock(oldevidence, evidencefile.size());
-        evidencefile.close();
+	filebuffer.seekg(0, filebuffer.beg);
+	filebuffer.seekg(0, filebuffer.end);
+	uint64_t filesize = filebuffer.tellg();
+	char* oldevidence = new char[filesize+1];
+	filebuffer.seekg(0, filebuffer.beg);
+	filebuffer.read(oldevidence, filesize);
+	filebuffer.close();
+	//std::cout << "old evidence: " << oldevidence << std::endl;
         evidencelist = FXString(oldevidence);
-        int found = 0;
-        FXArray<FXint> posarray;
-        posarray.clear();
-        posarray.append(-1);
-        while(found > -1)
-        {
-            found = evidencelist.find('\n', found+1);
-            if(found > -1)
-                posarray.append(found);
-        }
-        for(int i=0; i < posarray.no() - 1; i++)
-            forimgvector.push_back(new ForImg(evidencelist.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text()));
+	//std::cout << "evidencelist at load: " << evidencelist.text() << std::endl;
     }
+    UpdateForensicImages();
 }
 
 long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
@@ -408,20 +403,42 @@ long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
     if(prevevidpath.empty())
 	prevevidpath = homepath;
     EvidenceManager evidencemanager(this, "Manage Evidence");
+    //std::cout << "eivdence list before: " << evidencelist.text() << std::endl;
     evidencemanager.LoadEvidence(evidencelist);
     bool tosave = evidencemanager.execute(PLACEMENT_OWNER);
     if(tosave)
     {
+	evidencelist = "";
 	evidencelist = evidencemanager.ReturnEvidence();
-        //std::cout << "evidence list:" << evidencelist.text() << std::endl;
+        //std::cout << "evidence list after:" << evidencelist.text() << std::endl;
 	// write evidence to file
-        evidencefile.open(tmppath + "evidence", FXIO::Writing, FXIO::OwnerReadWrite);
-        evidencefile.writeBlock(evidencelist.text(), evidencelist.length());
-        evidencefile.close();
-        LoadCaseState();
+	filewriter.open(FXString(tmppath + "evidence").text(), std::ios::out|std::ios::trunc);
+	if(filewriter.is_open())
+	{
+	    filewriter.write(evidencelist.text(), evidencelist.length());
+	    filewriter.close();
+	}
+	UpdateForensicImages();
     }
 
     return 1;
+}
+
+void WombatForensics::UpdateForensicImages()
+{
+    int found = 0;
+    FXArray<FXint> posarray;
+    posarray.clear();
+    posarray.append(-1);
+    while(found > -1)
+    {
+	found = evidencelist.find('\n', found+1);
+	if(found > -1)
+	    posarray.append(found);
+    }
+    for(int i=0; i < posarray.no() - 1; i++)
+	forimgvector.push_back(new ForImg(evidencelist.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text()));
+
 }
 /*
     extern QList<ForImg*> newforimglist;

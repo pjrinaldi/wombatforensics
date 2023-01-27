@@ -6,7 +6,9 @@
 #include <sstream>
 #include <stdio.h>
 #include <string>
+#include <cstring>
 #include <vector>
+#include <filesystem>
 // SHARED LIBRARIES
 #include <libewf.h>
 #include <libsmraw.h>
@@ -25,7 +27,7 @@ class ForImg
     private:
         std::ifstream imagebuffer;
         //std::ifstream devicebuffer(devicestring.c_str(), std::ios::in|std::ios::binary);
-        off64_t imgsize = 0;
+        size64_t imgsize = 0;
         uint64_t imgoffset  = 0;
         std::string imgpath = "";
         //std::string mntpath = "";

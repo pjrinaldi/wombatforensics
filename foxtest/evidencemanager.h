@@ -25,7 +25,6 @@ class EvidenceManager : public FXDialogBox
         FXButton* cancelbutton;
         FXButton* donebutton;
 
-        FXArray<FXString> evidarray;
         FXString evidliststr;
         FXString prevevidpath;
         bool isexist;

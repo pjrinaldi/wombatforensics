@@ -301,6 +301,7 @@ class WombatForensics : public FXMainWindow
         std::vector<std::string> tags;
         FXArray<FXString> taggedlist;
         std::ifstream filebuffer;
+	std::ofstream filewriter;
         FXArray<FXString> fileuserdata;
         FXString evidencelist;
         FXString curfileuserdata;
@@ -444,6 +445,7 @@ class WombatForensics : public FXMainWindow
         void CloseCurrentCase(void);
         void EnableCaseButtons(void);
         void LoadCaseState(void);
+	void UpdateForensicImages(void);
 
         void LogEntry(FXString logstring)
         {

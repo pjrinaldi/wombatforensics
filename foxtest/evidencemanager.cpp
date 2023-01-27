@@ -24,15 +24,17 @@ EvidenceManager::EvidenceManager(FXWindow* parent, const FXString& title):FXDial
 FXString EvidenceManager::ReturnEvidence()
 {
     evidliststr = "";
-    for(int i=0; i < evidarray.no(); i++)
-        evidliststr += evidarray.at(i) + "\n";
+    for(int i=0; i < evidlist->getNumItems(); i++)
+    {
+	if(!evidlist->getItemText(i).empty())
+	    evidliststr += evidlist->getItemText(i) + "\n";
+    }
 
     return evidliststr;
 }
 
 void EvidenceManager::LoadEvidence(FXString curevidence)
 {
-    evidarray.clear();
     evidlist->clearItems();
     FXArray<FXint> posarray;
     posarray.clear();
@@ -44,10 +46,11 @@ void EvidenceManager::LoadEvidence(FXString curevidence)
         if(found > -1)
             posarray.append(found);
     }
+    //std::cout << "pos array count: " << posarray.no() << std::endl;
     for(int i=0; i < posarray.no() - 1; i++)
     {
         FXString curevidstr = curevidence.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1);
-        evidarray.append(curevidstr);
+	//std::cout << "curevidstr: " << curevidstr.text() << std::endl;
         evidlist->appendItem(new FXListItem(curevidstr));
     }
 
@@ -62,16 +65,13 @@ long EvidenceManager::AddEvidence(FXObject*, FXSelector, void*)
     {
         prevevidpath = evidpathstring;
         isexist = false;
-        for(int i=0; i < evidarray.no(); i++)
-        {
-            if(FXString::compare(evidarray.at(i), evidpathstring) == 0)
-                isexist = true;
-        }
+	for(int i=0; i < evidlist->getNumItems(); i++)
+	{
+	    if(FXString::compare(evidlist->getItemText(i), evidpathstring) == 0)
+		isexist = true;
+	}
         if(!isexist)
-        {
             evidlist->appendItem(new FXListItem(evidpathstring));
-            evidarray.append(evidpathstring);
-        }
     }
 
     return 1;
@@ -87,18 +87,8 @@ long EvidenceManager::EvidenceSelected(FXObject*, FXSelector, void*)
 }
 long EvidenceManager::RemEvidence(FXObject*, FXSelector, void*)
 {
-    int curindex;
     if(evidlist->getCurrentItem() > -1)
-    {
-        FXString selectedevidence = evidlist->getItemText(evidlist->getCurrentItem());
-        for(int i=0; i < evidarray.no(); i++)
-        {
-            if(FXString::compare(evidarray.at(i), selectedevidence) == 0)
-                curindex = i;
-        }
-        evidlist->removeItem(curindex);
-        evidarray.erase(curindex);
-    }
+        evidlist->removeItem(evidlist->getCurrentItem());
 
     return 1;
 }
