@@ -83,6 +83,7 @@ ForImg::ForImg(std::string imgfile)
         libewf_handle_close(ewfhandle, &ewferror);
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
+	libewf_error_free(&ewferror);
         std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 3) // AFF4
@@ -95,6 +96,53 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 4) // SPLIT RAW
     {
+	libsmraw_handle_t* smhandle = NULL;
+	libsmraw_error_t* smerror = NULL;
+	char** globfiles = NULL;
+	int globfilecnt = 0;
+	int found = imgpath.rfind(".0");
+	if(found == -1)
+	    found = imgpath.rfind(".a");
+	std::string imgprematch = imgpath.substr(0, found+2);
+	std::filesystem::path imagepath(imgpath);
+	imagepath.remove_filename();
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+		globfilecnt++;
+	}
+	char* filenames[globfilecnt] = {NULL};
+	filenames[0] = (char*)imgpath.c_str();
+	int i = 1;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+	    {
+		if(file.path().string().compare(imgpath) != 0)
+		{
+		    filenames[i] = (char*)file.path().string().c_str();
+		    i++;
+		}
+	    }
+	}
+	int retopen = 0;
+	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	retopen = libsmraw_handle_initialize(&smhandle, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	retopen = libsmraw_handle_open(smhandle, globfiles, globfilecnt, LIBSMRAW_OPEN_READ, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	libsmraw_handle_get_media_size(smhandle, &imgsize, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	libsmraw_handle_close(smhandle, &smerror);
+	libsmraw_handle_free(&smhandle, &smerror);
+	libsmraw_glob_free(globfiles, globfilecnt, &smerror);
+	libsmraw_error_free(&smerror);
+        std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 5) // WFI
     {
@@ -104,95 +152,12 @@ ForImg::ForImg(std::string imgfile)
     }
     else // everything else
     {
+	std::filesystem::path imagepath(imgpath);
+	std::cout << imgfile << " size: " << std::filesystem::file_size(imgpath) << std::endl;
     }
 }
 
 /*
-    else if(imgtype == 1) // AFF
-    {
-        //char* iname = new char[imgpath.toStdString().size() + 1];
-        //strcpy(iname, imgpath.toStdString().c_str());
-        AFFILE* afimage = NULL;
-        afimage = af_open(imgpath.toStdString().c_str(), O_RDONLY|O_EXCL, 0);
-        imgsize = af_get_imagesize(afimage);
-        af_close(afimage);
-    }
-    else if(imgtype == 3) // SPLIT RAW
-    {
-	QString efilepath = imgfile.split(imgfile.split("/").last()).first();
-	QString fileprefix = "";
-	if(imgfile.toLower().endsWith(".000"))
-	    fileprefix = imgfile.split("/").last().split(".000").first();
-	else if(imgfile.toLower().endsWith(".001"))
-	    fileprefix = imgfile.split("/").last().split(".001").first();
-	else if(imgfile.toLower().endsWith(".aaa"))
-	    fileprefix = imgfile.split("/").last().split(".aaa", Qt::SkipEmptyParts, Qt::CaseInsensitive).first();
-	//qDebug() << "fileprefix:" << fileprefix;
-	//qDebug() << "efilepath:" << efilepath;
-	QDir edir = QDir(efilepath);
-	QStringList efiles = edir.entryList(QStringList() << QString(fileprefix + ".???"), QDir::NoSymLinks | QDir::Files);
-	//qDebug() << "efiles count:" << efiles.count();
-        //qDebug() << "efiles:" << efiles;
-        // SMRAW isn't working, so i'm gonna try to implement it myself...
-        for(int i=0; i < efiles.count(); i++)
-        {
-            QFileInfo segmentfile(efilepath + efiles.at(i));
-            imgsize += segmentfile.size();
-            //qDebug() << "segment size:" << segmentfile.size();
-        }
-        //qDebug() << "final imagesize:" << imgsize;
-    }
-    else if(imgtype == 6) // AFF4
-    {
-        AFF4_init();
-        int aff4handle = AFF4_open(imgfile.toStdString().c_str());
-        imgsize = AFF4_object_size(aff4handle);
-        AFF4_close(aff4handle);
-    }
-    else if(imgtype == 7) // WFI
-    {
-        QFile wfile(imgpath);
-        if(!wfile.isOpen())
-            wfile.open(QIODevice::ReadOnly);
-        QDataStream in(&wfile);
-        if(in.version() != QDataStream::Qt_5_15)
-        {
-            qDebug() << "Wrong Qt Data Stream version:" << in.version();
-        }
-        quint64 header;
-        uint8_t version;
-        quint16 sectorsize;
-        quint32 blocksize;
-        quint64 totalbytes;
-        in >> header >> version >> sectorsize >> blocksize >> totalbytes;
-        imgsize = totalbytes;
-        wfile.seek(0);
-        // HOW TO GET FRAME INDEX LIST OUT OF THE WFI FILE 
-        
-        //QList<qint64> frameindxlist;
-        framelist.clear();
-        FindNextFrame(0, &framelist, &wfile);
-        wfile.close();
-    }
-    else if(imgtype == 8) // WLI
-    {
-        QFile wfile(imgpath);
-        if(!wfile.isOpen())
-            wfile.open(QIODevice::ReadOnly);
-        QDataStream in(&wfile);
-        if(in.version() != QDataStream::Qt_5_15)
-        {
-            qDebug() << "Wrong Qt Data Stream Version:" << in.version();
-        }
-        imgsize = wfile.size();
-        wfile.close();
-        //quint64 header;
-        //quint8 version;
-        //QString casenumber;
-        //QString examiner;
-        //QString description;
-        //in >> header >> version >> casenumber >> examiner >> description;
-    }
     else if(imgtype == 15) // everything else
     {
         //QFile efile(imgpath);
