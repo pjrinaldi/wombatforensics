@@ -12,6 +12,7 @@
 // SHARED LIBRARIES
 #include <libewf.h>
 #include <libsmraw.h>
+#include <aff4/aff4-c.h>
 
 class ForImg 
 {

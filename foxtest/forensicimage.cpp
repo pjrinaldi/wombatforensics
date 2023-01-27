@@ -87,6 +87,11 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 3) // AFF4
     {
+        AFF4_init();
+        int aff4handle = AFF4_open(imgpath.c_str());
+        imgsize = AFF4_object_size(aff4handle);
+        AFF4_close(aff4handle);
+	std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 4) // SPLIT RAW
     {
