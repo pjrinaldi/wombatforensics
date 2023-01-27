@@ -9,6 +9,7 @@
 #include <vector>
 // SHARED LIBRARIES
 #include <libewf.h>
+#include <libsmraw.h>
 
 class ForImg 
 {
