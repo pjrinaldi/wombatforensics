@@ -151,10 +151,23 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 	carvetypesfile.close();
 	currentcarvetypes = FXString(oldcarvetypes);
     }
+    savebutton->disable();
+    evidmanbutton->disable();
+    imgvidthumbbutton->disable();
+    digdeeperbutton->disable();
+    carvingbutton->disable();
+    exportfilesbutton->disable();
+    exportwlibutton->disable();
+    managetagsbutton->disable();
+    managehashbutton->disable();
+    previewbutton->disable();
+    publishbutton->disable();
 }
+
 
 WombatForensics::~WombatForensics()
 {
+    //SaveCurrentCase();
     CloseCurrentCase();
 }
 
@@ -201,6 +214,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
     bool isset = FXInputDialog::getString(casename, this, "Enter Case Name", "New Case");
     if(isset)
     {
+        this->getApp()->beginWaitCursor();
         iscaseopen = true;
         tmppath = "/tmp/wf/" + casename + "/";
         this->setTitle("Wombat Forensics - " + casename);
@@ -214,6 +228,9 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         FXFile::create(tmppath + "tags", FXIO::OwnerReadWrite);
         FXFile::create(tmppath + "msglog", FXIO::OwnerReadWrite);
         LogEntry("Case Structure Created Successfully");
+        EnableCaseButtons();
+        LoadCaseState();
+        this->getApp()->endWaitCursor();
         StatusUpdate("Ready");
         /*
         // CHECK TEST AND IT WORKS WITH ID IN CHECK
@@ -221,12 +238,12 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         tablelist->setItem(0, 0, checkitem);
         tablelist->fitColumnsToContents(0);
         tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
-        */
         // CHECK TEST AND IT WORKS WITHOUT ID IN CHECK
         CheckTableItem* checkitem = new CheckTableItem(tablelist, NULL, NULL, "");
         tablelist->setItem(0, 0, checkitem);
         tablelist->fitColumnsToContents(0);
         tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+        */
     }
     /*
     // create new case here
@@ -267,12 +284,13 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
             return 1;
     }
     FXString casefilename = FXFileDialog::getOpenFilename(this, "Open Wombat Case File", GetSettings(2), "*.wfc");
-    //FXApp::beginWaitCursor();
     int found = casefilename.rfind("/");
     int rfound = casefilename.rfind(".");
-    FXString casename = casefilename.mid(found+1, rfound - found - 1);
+    casename = casefilename.mid(found+1, rfound - found - 1);
+    std::cout << "open casename: " << casename.text() << std::endl;
     if(!casefilename.empty())
     {
+        this->getApp()->beginWaitCursor();
 	StatusUpdate("Case Opening...");
 	this->setTitle("Wombat Forensics - " + casename);
         FXDir::create("/tmp/wf/");
@@ -285,11 +303,13 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
 	// END UNTAR METHOD
 	iscaseopen = true;
 	tmppath = tmppath + casename + "/";
-	std::cout << tmppath.text() << std::endl;
+	//std::cout << tmppath.text() << std::endl;
 	LogEntry("Case was Opened Successfully");
+        EnableCaseButtons();
+        LoadCaseState();
+        this->getApp()->endWaitCursor();
 	StatusUpdate("Ready");
     }
-    //FXApp::endWaitCursor();
     return 1;
 }
 
@@ -303,8 +323,9 @@ void WombatForensics::SaveCurrentCase()
 {
     // BEGIN TAR METHOD
     FXDir::create(GetSettings(2));
+    std::cout << "save casename:" << casename.text() << std::endl;
     FXString tmptar = GetSettings(2) + casename + ".wfc";
-    //std::cout << "tmptar: " << tmptar.text() << std::endl;
+    std::cout << "tmptar: " << tmptar.text() << std::endl;
     FXFile tarfile;
     bool istarfile = tarfile.open(tmptar, FXIO::Reading, FXIO::OwnerReadWrite);
     if(istarfile)
@@ -340,6 +361,35 @@ void WombatForensics::CloseCurrentCase()
     }
 }
 
+void WombatForensics::EnableCaseButtons()
+{   
+    savebutton->enable();
+    evidmanbutton->enable();
+    imgvidthumbbutton->enable();
+    digdeeperbutton->enable();
+    carvingbutton->enable();
+    exportfilesbutton->enable();
+    exportwlibutton->enable();
+    managetagsbutton->enable();
+    managehashbutton->enable();
+    previewbutton->enable();
+    publishbutton->enable();
+}
+
+void WombatForensics::LoadCaseState(void)
+{
+    // LOAD EVIDENCE
+    bool isevidfile = evidencefile.open(tmppath + "evidence", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isevidfile)
+    {
+        evidencefile.open(tmppath + "evidence", FXIO::Reading, FXIO::OwnerReadWrite);
+        char* oldevidence = new char[evidencefile.size()+1];
+        evidencefile.readBlock(oldevidence, evidencefile.size());
+        evidencefile.close();
+        evidencelist = FXString(oldevidence);
+    }
+}
+
 long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
 {
     if(prevevidpath.empty())
@@ -350,10 +400,11 @@ long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
     if(tosave)
     {
 	evidencelist = evidencemanager.ReturnEvidence();
+        //std::cout << "evidence list:" << evidencelist.text() << std::endl;
 	// write evidence to file
-        //settingfile.open(configpath + "settings", FXIO::Writing, FXIO::OwnerReadWrite);
-        //settingfile.writeBlock(currentsettings.text(), currentsettings.length());
-        //settingfile.close();
+        evidencefile.open(tmppath + "evidence", FXIO::Writing, FXIO::OwnerReadWrite);
+        evidencefile.writeBlock(evidencelist.text(), evidencelist.length());
+        evidencefile.close();
     }
 
     return 1;

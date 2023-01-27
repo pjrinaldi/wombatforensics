@@ -315,6 +315,7 @@ class WombatForensics : public FXMainWindow
         FXFile logfile;
         FXFile settingfile;
 	FXFile carvetypesfile;
+        FXFile evidencefile;
         
         char dtbuf[35];
         bool iscaseopen;
@@ -438,6 +439,9 @@ class WombatForensics : public FXMainWindow
         FXString GetSettings(int setting);
 	void SaveCurrentCase(void);
         void CloseCurrentCase(void);
+        void EnableCaseButtons(void);
+        void LoadCaseState(void);
+
         void LogEntry(FXString logstring)
         {
             FXString tmpstr = FXString(GetDateTime(dtbuf)) + " | " + logstring + "\n";

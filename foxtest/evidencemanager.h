@@ -47,11 +47,13 @@ class EvidenceManager : public FXDialogBox
 
         long AddEvidence(FXObject*, FXSelector, void*);
         long RemEvidence(FXObject*, FXSelector, void*);
+        long EvidenceSelected(FXObject*, FXSelector, void*);
 };
 
 FXDEFMAP(EvidenceManager) EvidenceManagerMap[]={
     FXMAPFUNC(SEL_COMMAND, EvidenceManager::ID_ADDEVID, EvidenceManager::AddEvidence),
     FXMAPFUNC(SEL_COMMAND, EvidenceManager::ID_REMEVID, EvidenceManager::RemEvidence),
+    FXMAPFUNC(SEL_SELECTED, EvidenceManager::ID_EVIDLIST, EvidenceManager::EvidenceSelected),
 };
 
 #endif // EVIDENCEMANAGER_H
