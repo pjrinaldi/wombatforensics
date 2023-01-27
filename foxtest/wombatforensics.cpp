@@ -438,7 +438,21 @@ void WombatForensics::UpdateForensicImages()
     }
     for(int i=0; i < posarray.no() - 1; i++)
 	forimgvector.push_back(new ForImg(evidencelist.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text()));
-
+    // TEST READCONTENT FOR EACH FORIMG TYPE
+    for(int i=0; i < forimgvector.size(); i++)
+    {
+        std::cout << "Image: " << forimgvector.at(i)->ImagePath() << std::endl;
+        uint8_t* testbuf = NULL;
+        testbuf = new uint8_t[4];
+        forimgvector.at(i)->ReadContent(testbuf, 0, 4);
+        if(testbuf != NULL)
+        {
+        for(int j=0; j < 4; j++)
+        {
+            std::cout << "j: " << j << " testbuf val: "<< (char)testbuf[j] << std::endl;
+        }
+        }
+    }
 }
 /*
     extern QList<ForImg*> newforimglist;

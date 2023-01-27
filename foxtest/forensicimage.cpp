@@ -37,16 +37,15 @@ ForImg::ForImg(std::string imgfile)
         libewf_error_t* ewferror = NULL;
         char** globfiles = NULL;
         int globfilecnt = 0;
-	//std::cout << "Image Path: " << imgpath << std::endl;
 	int found = imgpath.rfind(".E");
 	if(found == -1)
 	    found = imgpath.rfind(".e");
 	std::string imgprematch = imgpath.substr(0, found+2);
-	//std::cout << "Image Pre Match: " << imgprematch << std::endl;
 	std::filesystem::path imagepath(imgpath);
 	imagepath.remove_filename();
+	//std::cout << "Image Path: " << imgpath << std::endl;
+	//std::cout << "Image Pre Match: " << imgprematch << std::endl;
 	//std::cout << "imagepath: " << imagepath.string() << std::endl;
-	//int filecount = 0;
 	for(const auto &file : std::filesystem::directory_iterator(imagepath))
 	{
 	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
@@ -178,17 +177,88 @@ ForImg::ForImg(std::string imgfile)
     }
 }
 
+void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
+{
+    if(imgtype == 1)
+    {
+    //switch(imgtype)
+    //{
+        //case 1: // RAW
+            imagebuffer.open(imgpath.c_str(), std::ios::in|std::ios::binary);
+            imagebuffer.seekg(pos);
+            imagebuffer.read((char*)buf, size);
+            imagebuffer.close();
+    }
+    else if(imgtype == 2)
+    {
+            //break;
+        //case 2: // EWF
+            libewf_handle_t* ewfhandle = NULL;
+            libewf_error_t* ewferror = NULL;
+            char** globfiles = NULL;
+            int globfilecnt = 0;
+            //if(imgpath == "")
+            //    break;
+            int found = imgpath.rfind(".E");
+            if(found == -1)
+                found = imgpath.rfind(".e");
+            std::string imgprematch = imgpath.substr(0, found+2);
+            std::filesystem::path imagepath(imgpath);
+            imagepath.remove_filename();
+            for(const auto &file : std::filesystem::directory_iterator(imagepath))
+            {
+                if(file.path().string().compare(0, found+2, imgprematch) == 0)
+                    globfilecnt++;
+            }
+            char* filenames[globfilecnt] = {NULL};
+            filenames[0] = (char*)imgpath.c_str();
+            int i = 1;
+            for(const auto &file : std::filesystem::directory_iterator(imagepath))
+            {
+                if(file.path().string().compare(0, found+2, imgprematch) == 0)
+                {
+                    if(file.path().string().compare(imgpath) != 0)
+                    {
+                        filenames[i] = (char*)file.path().string().c_str();
+                        i++;
+                    }
+                }
+            }
+            int retopen = 0;
+            retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
+            if(retopen == -1)
+                libewf_error_fprint(ewferror, stdout);
+            retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
+            if(retopen == -1)
+                libewf_error_fprint(ewferror, stdout);
+            retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+            if(retopen == -1)
+                libewf_error_fprint(ewferror, stdout);
+            uint64_t res = 0;
+            imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
+            res = libewf_handle_read_buffer(ewfhandle, buf, size, &ewferror);
+            //tmparray = QByteArray::fromRawData((const char*)data, size);
+            libewf_handle_close(ewfhandle, &ewferror);
+            libewf_handle_free(&ewfhandle, &ewferror);
+            libewf_glob_free(globfiles, globfilecnt, &ewferror);
+            libewf_error_free(&ewferror);
+    }
+            //break;
+        //case 3: // AFF4
+            //break;
+        //case 4: // SPLIT RAW
+            //break;
+        //case 5: // WFI
+            //break;
+        //case 6: // WLI
+            //break;
+        //case 0: // EVERYTHING ELSE
+            //break;
+    //}
+}
 /*
 QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 {
-    //qDebug() << "pos:" << pos << "size:" << size;
-    //qDebug() << "imgtype in ReadContent:" << imgtype;
-    //char* data = new char[size];
-    QByteArray tmparray;
-    tmparray.clear();
-    int retopen = 0;
-    if(imgtype == 0) // EWF
-    {
         libewf_handle_t* ewfhandle = NULL;
         libewf_error_t* ewferror = NULL;
         char** globfiles = NULL;
@@ -229,33 +299,6 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
         libewf_handle_close(ewfhandle, &ewferror);
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
-    }
-    else if(imgtype == 1) // AFF
-    {
-        char data[size];
-        //char* data = new char[size];
-        AFFILE* afimage = NULL;
-        if(imgpath == "")
-            return tmparray;
-        afimage = af_open(imgpath.toStdString().c_str(), O_RDONLY|O_EXCL, 0);
-        af_seek(afimage, pos, SEEK_SET);
-        qint64 res = 0;
-        res = af_read(afimage, (unsigned char*)data, size);
-        tmparray = QByteArray::fromRawData((const char*)data, size);
-        //delete[] data;
-        af_close(afimage);
-    }
-    else if(imgtype == 2) // RAW
-    {
-	QFile tmpfile(imgpath);
-	if(!tmpfile.isOpen())
-	    tmpfile.open(QIODevice::ReadOnly);
-	if(tmpfile.isOpen())
-	{
-	    tmpfile.seek(pos);
-	    tmparray = tmpfile.read(size);
-	    tmpfile.close();
-	}
     }
     else if(imgtype == 3) // SPLIT RAW
     {
@@ -476,11 +519,6 @@ std::string ForImg::ImagePath()
 }
 
 /*
-QString ForImg::ImgPath()
-{
-    return imgpath;
-}
-
 QString ForImg::MountPath()
 {
     return mntpath;
