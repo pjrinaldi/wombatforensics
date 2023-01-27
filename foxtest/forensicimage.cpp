@@ -179,185 +179,183 @@ ForImg::ForImg(std::string imgfile)
 
 void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
 {
-    if(imgtype == 1)
+    if(imgtype == 1) // RAW
     {
-    //switch(imgtype)
-    //{
-        //case 1: // RAW
-            imagebuffer.open(imgpath.c_str(), std::ios::in|std::ios::binary);
-            imagebuffer.seekg(pos);
-            imagebuffer.read((char*)buf, size);
-            imagebuffer.close();
+        imagebuffer.open(imgpath.c_str(), std::ios::in|std::ios::binary);
+        imagebuffer.seekg(pos);
+        imagebuffer.read((char*)buf, size);
+        imagebuffer.close();
     }
-    else if(imgtype == 2)
+    else if(imgtype == 2) // EWF
     {
-            //break;
-        //case 2: // EWF
-            libewf_handle_t* ewfhandle = NULL;
-            libewf_error_t* ewferror = NULL;
-            char** globfiles = NULL;
-            int globfilecnt = 0;
-            //if(imgpath == "")
-            //    break;
-            int found = imgpath.rfind(".E");
-            if(found == -1)
-                found = imgpath.rfind(".e");
-            std::string imgprematch = imgpath.substr(0, found+2);
-            std::filesystem::path imagepath(imgpath);
-            imagepath.remove_filename();
-            for(const auto &file : std::filesystem::directory_iterator(imagepath))
-            {
-                if(file.path().string().compare(0, found+2, imgprematch) == 0)
-                    globfilecnt++;
-            }
-            char* filenames[globfilecnt] = {NULL};
-            filenames[0] = (char*)imgpath.c_str();
-            int i = 1;
-            for(const auto &file : std::filesystem::directory_iterator(imagepath))
-            {
-                if(file.path().string().compare(0, found+2, imgprematch) == 0)
-                {
-                    if(file.path().string().compare(imgpath) != 0)
-                    {
-                        filenames[i] = (char*)file.path().string().c_str();
-                        i++;
-                    }
-                }
-            }
-            int retopen = 0;
-            retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
-            if(retopen == -1)
-                libewf_error_fprint(ewferror, stdout);
-            retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
-            if(retopen == -1)
-                libewf_error_fprint(ewferror, stdout);
-            retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
-            if(retopen == -1)
-                libewf_error_fprint(ewferror, stdout);
-            uint64_t res = 0;
-            imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
-            res = libewf_handle_read_buffer(ewfhandle, buf, size, &ewferror);
-            //tmparray = QByteArray::fromRawData((const char*)data, size);
-            libewf_handle_close(ewfhandle, &ewferror);
-            libewf_handle_free(&ewfhandle, &ewferror);
-            libewf_glob_free(globfiles, globfilecnt, &ewferror);
-            libewf_error_free(&ewferror);
-    }
-            //break;
-        //case 3: // AFF4
-            //break;
-        //case 4: // SPLIT RAW
-            //break;
-        //case 5: // WFI
-            //break;
-        //case 6: // WLI
-            //break;
-        //case 0: // EVERYTHING ELSE
-            //break;
-    //}
-}
-/*
-QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
-{
         libewf_handle_t* ewfhandle = NULL;
         libewf_error_t* ewferror = NULL;
         char** globfiles = NULL;
         int globfilecnt = 0;
-        if(imgpath == "")
-            return tmparray;
-        QString efilepath = imgpath.split(imgpath.split("/").last()).first();
-        QDir edir = QDir(imgpath.split(imgpath.split("/").last()).first());
-        QStringList efiles = edir.entryList(QStringList() << QString(imgpath.split("/").last().toLower().split(".e01").first() + ".e??") << QString(imgpath.split("/").last().toLower().split(".e01").first() + ".E??"), QDir::NoSymLinks | QDir::Files);
-        char* filenames[efiles.count()] = {NULL};
-        for(int i=0; i < efiles.count(); i++)
+        int found = imgpath.rfind(".E");
+        if(found == -1)
+            found = imgpath.rfind(".e");
+        std::string imgprematch = imgpath.substr(0, found+2);
+        std::filesystem::path imagepath(imgpath);
+        imagepath.remove_filename();
+        for(const auto &file : std::filesystem::directory_iterator(imagepath))
         {
-            filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
-            //printf("filenames[%d] = %s\n", i, filenames[i]);
+            if(file.path().string().compare(0, found+2, imgprematch) == 0)
+                globfilecnt++;
         }
-        globfilecnt = efiles.count();
-        //printf("globfilecnt: %d\n", globfilecnt);
+        char* filenames[globfilecnt] = {NULL};
+        filenames[0] = (char*)imgpath.c_str();
+        int i = 1;
+        for(const auto &file : std::filesystem::directory_iterator(imagepath))
+        {
+            if(file.path().string().compare(0, found+2, imgprematch) == 0)
+            {
+                if(file.path().string().compare(imgpath) != 0)
+                {
+                    filenames[i] = (char*)file.path().string().c_str();
+                    i++;
+                }
+            }
+        }
         int retopen = 0;
-
         retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
-        //else
-        //    printf("libewf glob was successful: %d\n", retopen);
-
-        char data[size];
-        //char bytebuf[sectorsize];
-        //char* data = new char[size];
         retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
         retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
-        qint64 res = 0;
+        uint64_t res = 0;
         imgoffset = libewf_handle_seek_offset(ewfhandle, pos, SEEK_SET, &ewferror);
-        res = libewf_handle_read_buffer(ewfhandle, data, size, &ewferror);
-        tmparray = QByteArray::fromRawData((const char*)data, size);
-        //delete[] data;
+        res = libewf_handle_read_buffer(ewfhandle, buf, size, &ewferror);
         libewf_handle_close(ewfhandle, &ewferror);
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
+        libewf_error_free(&ewferror);
     }
-    else if(imgtype == 3) // SPLIT RAW
+    else if(imgtype == 3) // AFF4
     {
-        //libsmraw_handle_t* smhandle = NULL;
-        //libsmraw_error_t* smerror = NULL;
-
-	QString efilepath = imgpath.split(imgpath.split("/").last()).first();
-	QString fileprefix = "";
-	if(imgpath.toLower().endsWith(".000"))
-	    fileprefix = imgpath.split("/").last().split(".000").first();
-	else if(imgpath.toLower().endsWith(".001"))
-	    fileprefix = imgpath.split("/").last().split(".001").first();
-	else if(imgpath.toLower().endsWith(".aaa"))
-	    fileprefix = imgpath.split("/").last().split(".aaa", Qt::SkipEmptyParts, Qt::CaseInsensitive).first();
-	QDir edir = QDir(efilepath);
-	QStringList efiles = edir.entryList(QStringList() << QString(fileprefix + ".???"), QDir::NoSymLinks | QDir::Files);
-
-        //char* filenames[efiles.count()] = {NULL};
-        //for(int i=0; i < efiles.count(); i++)
-        //    filenames[i] = QString(efilepath + efiles.at(i)).toLatin1().data();
-        //int retopen = 0;
-        //retopen = libsmraw_handle_initialize(&smhandle, &smerror);
-        //if(retopen == -1)
-        //    libsmraw_error_fprint(smerror, stdout);
-        //retopen = libsmraw_handle_open(smhandle, filenames, efiles.count(), LIBSMRAW_OPEN_READ, &smerror);
-        //if(retopen == -1)
-        //    libsmraw_error_fprint(smerror, stdout);
-        //qint64 res = 0;
-        //imgoffset = libsmraw_handle_seek_offset(smhandle, pos, SEEK_SET, &smerror);
-        //if(retopen == -1)
-        //    libsmraw_error_fprint(smerror, stdout);
-        //res = libsmraw_handle_read_buffer(smhandle, data, size, &smerror);
-        //if(retopen == -1)
-        //    libsmraw_error_fprint(smerror, stdout);
-        //tmparray = QByteArray::fromRawData((const char*)data, size);
-        //libsmraw_handle_close(smhandle, &smerror);
-        //libsmraw_handle_free(&smhandle, &smerror);
-        //libsmraw_error_free(&smerror);
-
-        QFileInfo segmentfile(efilepath + efiles.at(0));
-        off64_t segsize = segmentfile.size();
-        uint16_t segstart = pos / segsize;
-        off64_t relpos = pos - segstart * segsize;
-        off64_t relsize = segsize - pos;
-        if(pos + size > (segstart + 1) * segsize)
-        {
-            // will need to figure this out and then account for the extra size for the next segment and add to the tmparray
-            qDebug() << "goes into next segment... and maybe more...";
-        }
-        QFile tmpfile(efilepath + efiles.at(segstart));
-        if(!tmpfile.isOpen())
-            tmpfile.open(QIODevice::ReadOnly);
-        if(tmpfile.isOpen())
-        {
-            tmpfile.seek(relpos);
-            tmparray = tmpfile.read(size);
-            tmpfile.close();
-        }
+        AFF4_init();
+        int aff4handle = AFF4_open(imgpath.c_str());
+        int bytesread = AFF4_read(aff4handle, pos, buf, size);
+        AFF4_close(aff4handle);
     }
+    else if(imgtype == 4) // SPLIT RAW
+    {
+	libsmraw_handle_t* smhandle = NULL;
+	libsmraw_error_t* smerror = NULL;
+	char** globfiles = NULL;
+	int globfilecnt = 0;
+	int found = imgpath.rfind(".0");
+	if(found == -1)
+	    found = imgpath.rfind(".a");
+	std::string imgprematch = imgpath.substr(0, found+2);
+	std::filesystem::path imagepath(imgpath);
+	imagepath.remove_filename();
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+		globfilecnt++;
+	}
+	char* filenames[globfilecnt] = {NULL};
+	filenames[0] = (char*)imgpath.c_str();
+	int i = 1;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+	    {
+		if(file.path().string().compare(imgpath) != 0)
+		{
+		    filenames[i] = (char*)file.path().string().c_str();
+		    i++;
+		}
+	    }
+	}
+	int retopen = 0;
+	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	retopen = libsmraw_handle_initialize(&smhandle, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	retopen = libsmraw_handle_open(smhandle, globfiles, globfilecnt, LIBSMRAW_OPEN_READ, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+        uint64_t res = 0;
+        imgoffset = libsmraw_handle_seek_offset(smhandle, pos, SEEK_SET, &smerror);
+        res = libsmraw_handle_read_buffer(smhandle, buf, size, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	libsmraw_handle_close(smhandle, &smerror);
+	libsmraw_handle_free(&smhandle, &smerror);
+	libsmraw_glob_free(globfiles, globfilecnt, &smerror);
+	libsmraw_error_free(&smerror);
+    }
+    else if(imgtype == 5) // WFI
+    {
+        FILE* fout = NULL;
+        fout = fopen(imgpath.c_str(), "rb");
+        size_t bufinsize = ZSTD_DStreamInSize();
+        void* bufin = malloc(bufinsize);
+        size_t bufoutsize = ZSTD_DStreamOutSize();
+        void* bufout = malloc(bufoutsize);
+        ZSTD_DCtx* dctx = ZSTD_createDCtx();
+        size_t toread = bufinsize;
+        size_t read;
+        size_t lastret = 0;
+        int isempty = 1;
+        uint64_t indxstart = pos / bufoutsize;
+        uint64_t relpos = pos - (indxstart * bufoutsize);
+        uint64_t startingblock = pos / bufoutsize;
+        uint64_t endingblock = (pos + size) / bufoutsize;
+        int posodd = (pos + size) % bufoutsize;
+        if(posodd > 0)
+            endingblock++;
+        size_t tmpbufsize = bufoutsize * (endingblock - startingblock + 1);
+        char* tmpbuffer = (char*)malloc(tmpbufsize);
+        int blkcnt = 0;
+        int bufblkoff = 0;
+        size_t readcount = 0;
+        size_t outcount = 0;
+        while( (read = fread(bufin, 1, toread, fout)) )
+        {
+            readcount = readcount + read;
+            isempty = 0;
+
+            ZSTD_inBuffer input = { bufin, read, 0 };
+            while(input.pos < input.size)
+            {
+                ZSTD_outBuffer output = { bufout, bufoutsize, 0 };
+                size_t ret = ZSTD_decompressStream(dctx, &output, &input);
+                if(blkcnt >= startingblock && blkcnt <= endingblock)
+                {
+                    memcpy(tmpbuffer+(bufblkoff*bufoutsize), bufout, bufoutsize);
+                    bufblkoff++;
+                }
+                outcount = outcount + output.pos;
+                blkcnt++;
+
+                lastret = ret;
+            }
+        }
+        memcpy(buf, tmpbuffer+relpos, size);
+    }
+    else if(imgtype == 6) // WLI
+    {
+    }
+    else // EVERYTHING ELSE
+    {
+        imagebuffer.open(imgpath.c_str(), std::ios::in|std::ios::binary);
+        imagebuffer.seekg(pos);
+        imagebuffer.read((char*)buf, size);
+        imagebuffer.close();
+    }
+}
+/*
+QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
+{
     else if(imgtype == 6) // AFF4
     {
         char* data = new char[size];
