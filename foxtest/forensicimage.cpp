@@ -29,7 +29,7 @@ ForImg::ForImg(std::string imgfile)
         imagebuffer.seekg(0, imagebuffer.end);
         imgsize = imagebuffer.tellg();
         imagebuffer.close();
-        std::cout << imgfile << " size: " << imgsize << std::endl;
+        //std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 2) // EWF
     {
@@ -84,7 +84,7 @@ ForImg::ForImg(std::string imgfile)
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
 	libewf_error_free(&ewferror);
-        std::cout << imgfile << " size: " << imgsize << std::endl;
+        //std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 3) // AFF4
     {
@@ -92,7 +92,7 @@ ForImg::ForImg(std::string imgfile)
         int aff4handle = AFF4_open(imgpath.c_str());
         imgsize = AFF4_object_size(aff4handle);
         AFF4_close(aff4handle);
-	std::cout << imgfile << " size: " << imgsize << std::endl;
+	//std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 4) // SPLIT RAW
     {
@@ -142,7 +142,7 @@ ForImg::ForImg(std::string imgfile)
 	libsmraw_handle_free(&smhandle, &smerror);
 	libsmraw_glob_free(globfiles, globfilecnt, &smerror);
 	libsmraw_error_free(&smerror);
-        std::cout << imgfile << " size: " << imgsize << std::endl;
+        //std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 5) // WFI
     {
@@ -152,7 +152,8 @@ ForImg::ForImg(std::string imgfile)
 	fseek(wfifile, -264, SEEK_CUR);
 	fread(&wfimd, sizeof(struct wfi_metadata), 1, wfifile);
 	fclose(wfifile);
-	std::cout << imgpath << " size: " << wfimd.totalbytes << std::endl;
+        imgsize = wfimd.totalbytes;
+	//std::cout << imgpath << " size: " << wfimd.totalbytes << std::endl;
 	/*
 	printf("\nwombatinfo v0.1\n\n");
 	printf("Raw Media Size: %llu bytes\n", wfimd.totalbytes);
@@ -172,7 +173,8 @@ ForImg::ForImg(std::string imgfile)
     else // everything else
     {
 	std::filesystem::path imagepath(imgpath);
-	std::cout << imgfile << " size: " << std::filesystem::file_size(imgpath) << std::endl;
+        imgsize = std::filesystem::file_size(imgpath);
+	//std::cout << imgfile << " size: " << std::filesystem::file_size(imgpath) << std::endl;
     }
 }
 
@@ -456,8 +458,9 @@ QByteArray ForImg::ReadContent(qint64 pos, qint64 size)
 
     return tmparray;
 }
+*/
 
-qint64 ForImg::Size()
+uint64_t ForImg::Size()
 {
     return imgsize;
 }
@@ -466,7 +469,6 @@ int8_t ForImg::ImgType()
 {
     return imgtype;
 }
-*/
 
 std::string ForImg::ImagePath()
 {
