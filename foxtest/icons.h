@@ -1,4 +1,4 @@
-/*********** Generated on 2023/01/28 21:06:31 by reswrap version 6.0.0 *********/
+/*********** Generated on 2023/01/28 21:30:34 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file resources/folder-open.png */
 extern const unsigned char folderopen[];
@@ -86,4 +86,28 @@ extern const unsigned char evidencemanager[];
 
 /* Created by reswrap from file resources/forimg.png */
 extern const unsigned char forimg[];
+
+/* Created by reswrap from file resources/carvedfile.png */
+extern const unsigned char carvedfile[];
+
+/* Created by reswrap from file resources/defaultfile.png */
+extern const unsigned char defaultfile[];
+
+/* Created by reswrap from file resources/defaultfolder.png */
+extern const unsigned char defaultfolder[];
+
+/* Created by reswrap from file resources/deletedfile.png */
+extern const unsigned char deletedfile[];
+
+/* Created by reswrap from file resources/deletedfolder.png */
+extern const unsigned char deletedfolder[];
+
+/* Created by reswrap from file resources/partition.png */
+extern const unsigned char partition[];
+
+/* Created by reswrap from file resources/virtualfile.png */
+extern const unsigned char virtualfile[];
+
+/* Created by reswrap from file resources/virtualfolder.png */
+extern const unsigned char virtualfolder[];
 
