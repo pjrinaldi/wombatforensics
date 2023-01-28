@@ -457,14 +457,11 @@ void WombatForensics::UpdateForensicImages()
     tablelist->setColumnText(13, "Hash Match");
     for(int i=0; i < forimgvector.size(); i++)
     {
-        //CheckTableItem* checkitem = new CheckTableItem(tablelist, NULL, NULL, "");
-        //tablelist->setItem(0, 0, checkitem);
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemText(i, 1, FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
         tablelist->setItemText(i, 3, FXString(forimgvector.at(i)->ImagePath().c_str()));
         tablelist->setItemText(i, 4, FXString(forimgvector.at(i)->SizeString().c_str()));
-        //tablelist->setItemText(i, 4, FXString::value(forimgvector.at(i)->Size()));
         /*
         std::cout << "Name: " << forimgvector.at(i)->ImageFileName() << std::endl;
         std::cout << "Path: " << forimgvector.at(i)->ImagePath() << std::endl;
@@ -479,26 +476,6 @@ void WombatForensics::UpdateForensicImages()
     AlignColumn(tablelist, 1, FXTableItem::LEFT);
     AlignColumn(tablelist, 2, FXTableItem::LEFT);
     AlignColumn(tablelist, 3, FXTableItem::LEFT);
-    //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessForensicImage);
-    //volwatcher.setFuture(tmpfuture);
-    //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
-    /*
-    // TEST READCONTENT FOR EACH FORIMG TYPE
-    for(int i=0; i < forimgvector.size(); i++)
-    {
-        std::cout << "Image: " << forimgvector.at(i)->ImagePath() << std::endl;
-        uint8_t* testbuf = NULL;
-        testbuf = new uint8_t[4];
-        forimgvector.at(i)->ReadContent(testbuf, 0, 4);
-        if(testbuf != NULL)
-        {
-            for(int j=0; j < 4; j++)
-            {
-                std::cout << "j: " << j << " testbuf val: "<< (char)testbuf[j] << std::endl;
-            }
-        }
-    }
-    */
 }
 
 long WombatForensics::TableUpDown(FXObject*, FXSelector, void* ptr)
