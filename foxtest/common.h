@@ -9,6 +9,8 @@
 #include <cmath>
 #include <bitset>
 
+#include "forensicimage.h"
+
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
 
@@ -27,6 +29,10 @@ void ReturnUint64(uint64_t* tmp64, uint8_t* tmp8);
 void ReadContent(std::ifstream* rawcontent, uint16_t* val, uint64_t offset);
 void ReadContent(std::ifstream* rawcontent, uint32_t* val, uint64_t offset);
 void ReadContent(std::ifstream* rawcontent, uint64_t* val, uint64_t offset);
+
+void ReadForImgContent(ForImg* forimg, uint16_t* val, uint64_t off);
+void ReadForImgContent(ForImg* forimg, uint32_t* val, uint64_t off);
+void ReadForImgContent(ForImg* forimg, uint64_t* val, uint64_t off);
 
 void ReadInteger(uint8_t* arr, int begin, uint16_t* val);
 void ReadInteger(uint8_t* arr, int begin, uint32_t* val);

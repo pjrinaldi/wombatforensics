@@ -336,7 +336,7 @@ class WombatForensics : public FXMainWindow
         bool iscaseopen;
         
         Viewer* viewer;
-        //ForImg* forimg;
+        ForImg* curforimg;
         std::vector<ForImg*> forimgvector;
 
 
@@ -462,6 +462,7 @@ class WombatForensics : public FXMainWindow
         void CloseCurrentCase(void);
         void EnableCaseButtons(void);
         void LoadCaseState(void);
+        void LoadPartitions(ForImg* curforimg);
 	void UpdateForensicImages(void);
 
         void LogEntry(FXString logstring)

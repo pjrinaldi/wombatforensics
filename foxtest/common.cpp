@@ -69,6 +69,30 @@ void ReadContent(std::ifstream* rawcontent, uint64_t* val, uint64_t offset)
     delete[] tmp8;
 }
 
+void ReadForImgContent(ForImg* forimg, uint16_t* val, uint64_t offset)
+{
+    uint8_t* tmp8 = new uint8_t[2];
+    forimg->ReadContent(tmp8, offset, 2);
+    ReturnUint16(val, tmp8);
+    delete[] tmp8;
+}
+
+void ReadForImgContent(ForImg* forimg, uint32_t* val, uint64_t offset)
+{
+    uint8_t* tmp8 = new uint8_t[4];
+    forimg->ReadContent(tmp8, offset, 4);
+    ReturnUint32(val, tmp8);
+    delete[] tmp8;
+}
+
+void ReadForImgContent(ForImg* forimg, uint64_t* val, uint64_t offset)
+{
+    uint8_t* tmp8 = new uint8_t[8];
+    forimg->ReadContent(tmp8, offset, 8);
+    ReturnUint64(val, tmp8);
+    delete[] tmp8;
+}
+
 void ReadInteger(uint8_t* arr, int begin, uint16_t* val)
 {
     uint8_t* tmp8 = new uint8_t[2];

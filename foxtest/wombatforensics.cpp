@@ -486,7 +486,9 @@ void WombatForensics::UpdateForensicImages()
     for(int i=0; i < forimgvector.size(); i++)
     {
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+        tablelist->setItemData(i, 1, forimgvector.at(i));
         tablelist->setItemText(i, 1, FXString::value(i));
+        //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
         tablelist->setItemIcon(i, 2, forimgicon);
         tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
@@ -2065,10 +2067,427 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 
 long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
 {
-    std::cout << "load children here if they exist and add to pathtoolbar" << std::endl;
+    curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 1);
+    LoadPartitions(curforimg);
 
+    //FXString curid = tablelist->getItemText(tablelist->getCurrentRow(), 1);
+    //int ffound = curid.find("-f");
+    //int cfound = curid.find("-c");
+    //int pfound = curid.find("-p");
+    //if(pfound == -1) // evidence image, load partitions
+    //{
+        //curforimg = forimgvector.at(tablelist->getCurrentRow());
+        //std::cout << "cur for img path: " << curforimg->ImagePath() << std::endl;
+        //FXString curevidpath = tablelist->getItemText(tablelist->getCurrentRow(), 3) + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+        //std::cout << "evidence to parse: " << curevidpath.text() << std::endl;
+        //LoadPartitions(curforimg, &curid);
+    //}
+    //std::cout << "curid: " << curid.text() << std::endl;
+    // TEST FUNCTIONING OF WHETHER IT IS CHECKED...
+    //bool iscurchecked = ((CheckTableItem*)tablelist->getItem(tablelist->getCurrentRow(), 0))->getCheck();
+    //std::cout << "is current item checked: " << iscurchecked << std::endl;
     return 1;
 }
+
+void WombatForensics::LoadPartitions(ForImg* curforimg)
+{
+    uint16_t mbrsig = 0;
+    uint16_t applesig  = 0;
+    uint32_t bsdsig = 0;
+    uint16_t sunsig = 0;
+    uint64_t gptsig = 0;
+    ReadForImgContent(curforimg, &mbrsig, 510);
+}
+
+/*
+	qInfo() << "Reading Partition Table...";
+	qint64 wlisig = qFromBigEndian<qint64>(curimg->ReadContent(0, 8));
+	//qDebug() << "wlisig:" << QString::number(wlisig, 16);
+	uint16_t mbrsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(510, 2));
+	uint16_t applesig = qFromLittleEndian<uint16_t>(curimg->ReadContent(0, 2)); // should be in 2nd sector, powerpc mac's not intel mac's
+	uint32_t bsdsig = qFromLittleEndian<uint32_t>(curimg->ReadContent(0, 4)); // can be at start of partition entry of a dos mbr
+	uint16_t sunsig = qFromLittleEndian<uint16_t>(curimg->ReadContent(508, 2)); // worry about it later, i386 sun can be at 2nd sector of partition entry of a dos mbr
+	uint64_t gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(0, 8));
+	if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
+	{
+	    if((uint8_t)qFromLittleEndian<uint8_t>(curimg->ReadContent(450, 1)) == 0xee) // GPT DISK
+	    {
+		gptsig = qFromLittleEndian<uint64_t>(curimg->ReadContent(512, 8));
+		if(gptsig == 0x5452415020494645) // GPT PARTITION TABLE
+		{
+		    qInfo() << "GPT Partition Table Found. Parsing...";
+		    uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
+		    uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
+		    uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
+		    uint8_t ptreecnt = 0; // partition counter to add unallocated in..
+		    QDir dir; // current partition directory
+		    QFile pstatfile; // current statfile
+		    int pcount = 0;
+		    for(int i=0; i < partentrycount; i++)
+		    {
+			int cnt = i*partentrysize;
+			uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+			uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+			if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+			    pcount++;
+		    }
+		    for(int i=0; i < pcount; i++)
+		    {
+			uint32_t sectorcheck = 0;
+			int cnt = i*partentrysize;
+			uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+			uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+			if(i ==0) // INITIAL PARTITION
+			    sectorcheck = 0;
+			else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
+			    sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
+			else if(i == pcount - 1)
+			    sectorcheck = curimg->Size()/512;
+			if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+			{
+			    if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+			    {
+				ParsePartition(curimg, sectorcheck, curstartsector, ptreecnt, 0);
+				ptreecnt++;
+			    }
+			    // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
+			    ParsePartition(curimg, curstartsector, (curendsector - curstartsector + 1), ptreecnt, 1);
+			    ptreecnt++;
+			    if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
+			    {
+				if(curendsector < curimg->Size())
+				    ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
+			    }
+			}
+			else // INVALID PARTITION ENTRY
+			{
+			    // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
+			    // shouldn't need this section so populate later.
+			}
+		    }
+		}
+	    }
+	    else // MBR DISK
+	    {
+		QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
+		QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
+		QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
+		QString bfsstr = QString::fromStdString(curimg->ReadContent(544, 4).toStdString());
+		if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || bfsstr == "1SFB") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 | BFS W/O PARTITION TABLE
+		{
+		    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
+		}
+		else // MBR
+		{
+		    qInfo() << "MBR Partition Table Found. Parsing...";
+		    uint8_t ptreecnt = 0;
+		    uint8_t pcount = 0;
+		    for(int i=0; i < 4; i++)
+		    {
+			if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
+			    pcount++;
+		    }
+		    for(uint8_t i=0; i < pcount; i++)
+		    {
+			//int cnt = i*16;
+			uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + (i*16), 1));
+			uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i*16), 4));
+			uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i*16), 4));
+			qint64 sectorcheck = 0;
+			if(i == 0) // INITIAL PARTITION
+			    sectorcheck = 0;
+			else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
+			    sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
+			else if(i == pcount - 1) // LAST PARTITION
+			    sectorcheck = curimg->Size()/512;
+			if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
+			{
+			    //qDebug() << "unallocated partition before:" << i;
+			    //qDebug() << "unalloc:" << ptreecnt << "curoffset:" << sectorcheck << "curend:" << (curoffset + sectorcheck - 1) << "cursize:" << sectorcheck + curoffset;
+			    ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
+			    ptreecnt++;
+			}
+			if(curparttype == 0x05) // extended partition
+			{
+			    //qDebug() << "extendedpartition:" << curoffset << cursize;
+			    ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
+			    //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
+			    //ParseExtentedPartition(curimg, curoffset, cursize, j);
+			    //ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+			}
+			else if(curparttype == 0x00)
+			{
+			    //qDebug() << "do nothing here cause it is an empty partition...";
+			}
+			else if(curparttype == 0x82) // Sun i386
+			{
+			    // parse sun table here passing pofflist and psizelist
+			}
+			else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
+			{
+			    // parse bsd table here passing pofflist nad psizelist
+			}
+			else
+			{
+			    if(cursize > 0)
+			    {
+				//qDebug() << "ppart:" << ptreecnt << "curoffset:" << curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize;
+				//qDebug() << "begin parse file system information";
+				ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
+				ptreecnt++;
+			    }
+			}
+			if(i == pcount - 1 && curoffset + cursize < curimg->Size()/512 - 1) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
+			{
+			    //qDebug() << "add unallocated partition after last partition" << i;
+			    ParsePartition(curimg, curoffset + cursize, curimg->Size()/512 - (curoffset + cursize), ptreecnt, 0);
+			    //ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
+			    //ptreecnt++;
+			}
+		    }
+		}
+	    }
+	}
+	else if(applesig == 0x504d) // APPLE PARTITION
+	{
+	    qDebug() << "apple sig here...";
+	}
+	else if(bsdsig == 0x82564557) // BSD PARTITION
+	{
+	    qDebug() << "bsd part here...";
+	}
+	else if(sunsig == 0xDABE) // SUN PARTITION
+	{
+	    qDebug() << "determine if sparc or i386 and then process partitions.";
+	}
+	else if(gptsig == 0x5452415020494645) // GPT PARTITION
+	{
+	    qInfo() << "GPT Partition Table Found. Parsing...";
+	    uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
+	    uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
+	    uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
+	    uint8_t ptreecnt = 0; // partition counter to add unallocated in..
+	    QDir dir; // current partition directory
+	    QFile pstatfile; // current statfile
+	    int pcount = 0;
+	    for(int i=0; i < partentrycount; i++)
+	    {
+		int cnt = i*partentrysize;
+		uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+		uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+		if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+		    pcount++;
+	    }
+	    for(int i=0; i < pcount; i++)
+	    {
+		uint32_t sectorcheck = 0;
+		int cnt = i*partentrysize;
+		uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
+		uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
+		if(i ==0) // INITIAL PARTITION
+		    sectorcheck = 0;
+		else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
+		    sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
+		else if(i == pcount - 1)
+		    sectorcheck = curimg->Size()/512;
+		if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+		{
+		    if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+		    {
+			ParsePartition(curimg, sectorcheck, curstartsector, ptreecnt, 0);
+			ptreecnt++;
+		    }
+		    // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
+		    ParsePartition(curimg, curstartsector, (curendsector - curstartsector + 1), ptreecnt, 1);
+		    ptreecnt++;
+		    if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
+		    {
+			if(curendsector < curimg->Size())
+			    ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
+		    }
+		}
+		else // INVALID PARTITION ENTRY
+		{
+		    // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
+		    // shouldn't need this section so populate later.
+		}
+	    }
+	}
+	else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
+	{
+	    qInfo() << "Wombat Logical Image Found. Parsing...";
+	    ParseLogicalImage(curimg);
+	}
+	else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
+	{
+	    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
+	    //qDebug() << "partition signature not found correctly";
+	}
+    }
+    //FindPartitions(curimg, &pofflist, &psizelist);
+}
+
+ */ 
+
+/*
+void DetermineFileSystem(std::string devicestring, int* fstype)
+{
+    std::ifstream devicebuffer(devicestring.c_str(), std::ios::in|std::ios::binary);
+    unsigned char* extsig = new unsigned char[2];
+    unsigned char* winsig = new unsigned char[2];
+    unsigned char* refsig = new unsigned char[8];
+    unsigned char* f2fsig = new unsigned char[4];
+    unsigned char* zfssig = new unsigned char[8];
+    unsigned char* bcfsig = new unsigned char[16];
+    unsigned char* zonsig = new unsigned char[4];
+    char* bfssig = new char[4];
+    char* apfsig = new char[4];
+    char* hfssig = new char[2];
+    char* xfssig = new char[4];
+    char* btrsig = new char[8];
+    char* btlsig = new char[8];
+    char* isosig = new char[5];
+    char* udfsig = new char[5];
+    // get ext2,3,4 signature
+    devicebuffer.seekg(1080);
+    devicebuffer.read((char*)extsig, 2); // 0x53, 0xef
+    // get windows mbr signature (FAT, NTFS, BFS)
+    devicebuffer.seekg(510);
+    devicebuffer.read((char*)winsig, 2); // 0x55, 0xaa
+    // get BFS signature
+    devicebuffer.seekg(544);
+    devicebuffer.read(bfssig, 4);
+    std::string bfsigstr(bfssig);
+    delete[] bfssig;
+    // get apfs signature
+    devicebuffer.seekg(32);
+    devicebuffer.read(apfsig, 4);
+    std::string apfsigstr(apfsig);
+    delete[] apfsig;
+    // get hfs signature
+    devicebuffer.seekg(1024);
+    devicebuffer.read(hfssig, 2);
+    std::string hfssigstr(hfssig);
+    delete[] hfssig;
+    // get xfs signature
+    devicebuffer.seekg(0);
+    devicebuffer.read(xfssig, 4);
+    std::string xfssigstr(xfssig);
+    delete[] xfssig;
+    // get btrfs signature
+    devicebuffer.seekg(65600);
+    devicebuffer.read(btrsig, 8);
+    std::string btrsigstr(btrsig);
+    delete[] btrsig;
+    // get bitlocker signature
+    devicebuffer.seekg(0);
+    devicebuffer.read(btlsig, 8);
+    std::string btlsigstr(btlsig);
+    delete[] btlsig;
+    // get iso signature
+    devicebuffer.seekg(32769);
+    devicebuffer.read(isosig, 5);
+    std::string isosigstr(isosig);
+    delete[] isosig;
+    // get udf signature
+    devicebuffer.seekg(40961);
+    devicebuffer.read(udfsig, 5);
+    std::string udfsigstr(udfsig);
+    delete[] udfsig;
+    // get refs signature
+    devicebuffer.seekg(3);
+    devicebuffer.read((char*)refsig, 8);
+    // get f2fs signature
+    devicebuffer.seekg(1024);
+    devicebuffer.read((char*)f2fsig, 4);
+    // get zfs signature
+    devicebuffer.seekg(135168);
+    devicebuffer.read((char*)zfssig, 4);
+    // get bcachefs signature
+    devicebuffer.seekg(4120);
+    devicebuffer.read((char*)bcfsig, 16);
+    // get zonefs signature
+    devicebuffer.seekg(0);
+    devicebuffer.read((char*)zonsig, 4);
+    //std::cout << "compare:" << bfsigstr.substr(0,4).compare("1SFB") << std::endl;
+    //std::cout << "extsig1 array: " << std::hex << static_cast<int>((unsigned char)extsig[1]) << std::endl;
+    //std::cout << "extsig1 " << std::hex << static_cast<int>((unsigned char)extsig1) << std::endl;
+    if(extsig[0] == 0x53 && extsig[1] == 0xef) // EXT2,3,4 SIGNATURE == 0
+    {
+        *fstype = 0;
+    }
+    else if(winsig[0] == 0x55 && winsig[1] == 0xaa && bfsigstr.find("1SFB") == std::string::npos) // FAT NTFS, BFS SIGNATURE
+    {
+        char* exfatbuf = new char[5];
+        char* fatbuf = new char[5];
+        char* fat32buf = new char[5];
+        devicebuffer.seekg(3);
+        devicebuffer.read(exfatbuf, 5);
+        std::string exfatstr(exfatbuf);
+        delete[] exfatbuf;
+        devicebuffer.seekg(54);
+        devicebuffer.read(fatbuf, 5);
+        std::string fatstr(fatbuf);
+        delete[] fatbuf;
+        devicebuffer.seekg(82);
+        devicebuffer.read(fat32buf, 5);
+        std::string fat32str(fat32buf);
+        delete[] fat32buf;
+        if(fatstr.find("FAT12") != std::string::npos)
+            *fstype = 1;
+        else if(fatstr.find("FAT16") != std::string::npos)
+            *fstype = 2;
+        else if(fat32str.find("FAT32") != std::string::npos)
+            *fstype = 3;
+        else if(exfatstr.find("EXFAT") != std::string::npos)
+            *fstype = 4;
+        else if(exfatstr.find("NTFS") != std::string::npos)
+            *fstype = 5;
+    }
+    else if(apfsigstr.find("NXSB") != std::string::npos) // APFS
+        *fstype = 6;
+    else if(hfssigstr.find("H+") != std::string::npos) // HFS+
+        *fstype = 7;
+    else if(hfssigstr.find("HX") != std::string::npos) // HFSX
+        *fstype = 8;
+    else if(xfssigstr.find("XFSB") != std::string::npos) // XFS
+        *fstype = 9;
+    else if(btrsigstr.find("_BHRfS_M") != std::string::npos) // BTRFS
+        *fstype = 10;
+    else if(btlsigstr.find("-FVE-FS-") != std::string::npos) // BTILOCKER
+        *fstype = 11;
+    else if(bfsigstr.find("1SFB") != std::string::npos) // BFS
+        *fstype = 12;
+    else if(f2fsig[0] == 0x10 && f2fsig[1] == 0x20 && f2fsig[3] == 0xf5 && f2fsig[3] == 0xf2) // F2FS
+        *fstype = 13;
+    else if(isosigstr.find("CD001") != std::string::npos && udfsigstr.find("BEA01") == std::string::npos) // ISO9660
+        *fstype = 14;
+    else if(isosigstr.find("CD001") != std::string::npos && udfsigstr.find("BEA01") != std::string::npos) // UDF
+        *fstype = 15;
+    else if(hfssigstr.find("BD") != std::string::npos) // Legacy HFS
+        *fstype = 16;
+    else if(zfssig[0] == 0x0c && zfssig[1] == 0xb1 && zfssig[2] == 0xba && zfssig[3] == 0x00) // ZFS
+        *fstype = 17;
+    else if(refsig[0] == 0x00 && refsig[1] == 0x00 && refsig[2] == 0x00 && refsig[3] == 0x00 && refsig[4] == 0x53 && refsig[5] == 0x46 && refsig[6] == 0x65 && refsig[7] == 0x52) // ReFS
+        *fstype = 18;
+    else if(f2fsig[0] == 0xe2 && f2fsig[1] == 0xe1 && f2fsig[2] == 0x5e && f2fsig[3] == 0x0f) // EROFS
+        *fstype = 19;
+    else if(bcfsig[0] == 0xc6 && bcfsig[1] == 0x85 && bcfsig[2] == 0x73 && bcfsig[3] == 0xf6 && bcfsig[4] == 0x4e && bcfsig[5] == 0x1a && bcfsig[6] == 0x45 && bcfsig[7] == 0xca && bcfsig[8] == 0x82 && bcfsig[9] == 0x65 && bcfsig[10] == 0xf5 && bcfsig[11] == 0x7f && bcfsig[12] == 0x48 && bcfsig[13] == 0xba && bcfsig[14] == 0x6d && bcfsig[15] == 0x81) // BCACHEFS
+        *fstype = 20;
+    else if(zonsig[0] == 0x5a && zonsig[1] == 0x4f && zonsig[2] == 0x46 && zonsig[3] == 0x53) // ZONEFS
+        *fstype = 21;
+    else // UNKNOWN FILE SYSTEM SO FAR
+        *fstype = 50; 
+    devicebuffer.close();
+    delete[] extsig;
+    delete[] winsig;
+    delete[] refsig;
+    delete[] f2fsig;
+    delete[] zfssig;
+    delete[] bcfsig;
+    delete[] zonsig;
+}
+ */ 
 
 /*
 long WombatForensics::SetTag(FXObject* sender, FXSelector, void*)
