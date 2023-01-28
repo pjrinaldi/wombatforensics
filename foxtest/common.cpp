@@ -28,11 +28,13 @@ char* GetDateTime(char *buff)
     return buff;
 };
 
+/*
 void ReadContent(std::ifstream* rawcontent, uint8_t* tmpbuf, uint64_t offset, uint64_t size)
 {
     rawcontent->seekg(offset);
     rawcontent->read((char*)tmpbuf, size);
 }
+*/
 
 /*
 void ReadContent(std::ifstream* rawcontent, int8_t* tmpbuf, uint64_t offset, uint64_t size)
@@ -42,6 +44,7 @@ void ReadContent(std::ifstream* rawcontent, int8_t* tmpbuf, uint64_t offset, uin
 }
 */
 
+/*
 void ReadContent(std::ifstream* rawcontent, uint16_t* val, uint64_t offset)
 {
     uint8_t* tmp8 = new uint8_t[2];
@@ -68,66 +71,76 @@ void ReadContent(std::ifstream* rawcontent, uint64_t* val, uint64_t offset)
     ReturnUint64(val, tmp8);
     delete[] tmp8;
 }
+*/
 
-void ReadForImgContent(ForImg* forimg, uint16_t* val, uint64_t offset)
+void ReadForImgContent(ForImg* forimg, uint16_t* val, uint64_t offset, bool isbigendian)
 {
     uint8_t* tmp8 = new uint8_t[2];
     forimg->ReadContent(tmp8, offset, 2);
-    ReturnUint16(val, tmp8);
+    ReturnUint16(val, tmp8, isbigendian);
     delete[] tmp8;
 }
 
-void ReadForImgContent(ForImg* forimg, uint32_t* val, uint64_t offset)
+void ReadForImgContent(ForImg* forimg, uint32_t* val, uint64_t offset, bool isbigendian)
 {
     uint8_t* tmp8 = new uint8_t[4];
     forimg->ReadContent(tmp8, offset, 4);
-    ReturnUint32(val, tmp8);
+    ReturnUint32(val, tmp8, isbigendian);
     delete[] tmp8;
 }
 
-void ReadForImgContent(ForImg* forimg, uint64_t* val, uint64_t offset)
+void ReadForImgContent(ForImg* forimg, uint64_t* val, uint64_t offset, bool isbigendian)
 {
     uint8_t* tmp8 = new uint8_t[8];
     forimg->ReadContent(tmp8, offset, 8);
-    ReturnUint64(val, tmp8);
+    ReturnUint64(val, tmp8, isbigendian);
     delete[] tmp8;
 }
 
-void ReadInteger(uint8_t* arr, int begin, uint16_t* val)
+void ReadInteger(uint8_t* arr, int begin, uint16_t* val, bool isbigendian)
 {
     uint8_t* tmp8 = new uint8_t[2];
     tmp8 = substr(arr, begin, 2);
-    ReturnUint16(val, tmp8);
+    ReturnUint16(val, tmp8, isbigendian);
     delete[] tmp8;
 }
 
-void ReadInteger(uint8_t* arr, int begin, uint32_t* val)
+void ReadInteger(uint8_t* arr, int begin, uint32_t* val, bool isbigendian)
 {
     uint8_t* tmp8 = new uint8_t[4];
     tmp8 = substr(arr, begin, 4);
-    ReturnUint32(val, tmp8);
+    ReturnUint32(val, tmp8, isbigendian);
     delete[] tmp8;
 }
-void ReadInteger(uint8_t* arr, int begin, uint64_t* val)
+void ReadInteger(uint8_t* arr, int begin, uint64_t* val, bool isbigendian)
 {
     uint8_t* tmp8 = new uint8_t[8];
     tmp8 = substr(arr, begin, 8);
-    ReturnUint64(val, tmp8);
+    ReturnUint64(val, tmp8, isbigendian);
     delete[] tmp8;
 }
-void ReturnUint32(uint32_t* tmp32, uint8_t* tmp8)
+void ReturnUint32(uint32_t* tmp32, uint8_t* tmp8, bool isbigendian)
 {
-    *tmp32 = __builtin_bswap32((uint32_t)tmp8[0] | (uint32_t)tmp8[1] << 8 | (uint32_t)tmp8[2] << 16 | (uint32_t)tmp8[3] << 24);
+    if(isbigendian)
+        *tmp32 = __builtin_bswap32((uint32_t)tmp8[0] | (uint32_t)tmp8[1] << 8 | (uint32_t)tmp8[2] << 16 | (uint32_t)tmp8[3] << 24);
+    else
+        *tmp32 = (uint32_t)tmp8[0] | (uint32_t)tmp8[1] << 8 | (uint32_t)tmp8[2] << 16 | (uint32_t)tmp8[3] << 24;
 }
 
-void ReturnUint16(uint16_t* tmp16, uint8_t* tmp8)
+void ReturnUint16(uint16_t* tmp16, uint8_t* tmp8, bool isbigendian)
 {
-    *tmp16 = __builtin_bswap16((uint16_t)tmp8[0] | (uint16_t)tmp8[1] << 8);
+    if(isbigendian)
+        *tmp16 = __builtin_bswap16((uint16_t)tmp8[0] | (uint16_t)tmp8[1] << 8);
+    else
+        *tmp16 = (uint16_t)tmp8[0] | (uint16_t)tmp8[1] << 8;
 }
 
-void ReturnUint64(uint64_t* tmp64, uint8_t* tmp8)
+void ReturnUint64(uint64_t* tmp64, uint8_t* tmp8, bool isbigendian)
 {
-    *tmp64 = __builtin_bswap64((uint64_t)tmp8[0] | (uint64_t)tmp8[1] << 8 | (uint64_t)tmp8[2] << 16 | (uint64_t)tmp8[3] << 24 | (uint64_t)tmp8[4] << 32 | (uint64_t)tmp8[5] << 40 | (uint64_t)tmp8[6] << 48 | (uint64_t)tmp8[7] << 56);
+    if(isbigendian)
+        *tmp64 = __builtin_bswap64((uint64_t)tmp8[0] | (uint64_t)tmp8[1] << 8 | (uint64_t)tmp8[2] << 16 | (uint64_t)tmp8[3] << 24 | (uint64_t)tmp8[4] << 32 | (uint64_t)tmp8[5] << 40 | (uint64_t)tmp8[6] << 48 | (uint64_t)tmp8[7] << 56);
+    else
+        *tmp64 = (uint64_t)tmp8[0] | (uint64_t)tmp8[1] << 8 | (uint64_t)tmp8[2] << 16 | (uint64_t)tmp8[3] << 24 | (uint64_t)tmp8[4] << 32 | (uint64_t)tmp8[5] << 40 | (uint64_t)tmp8[6] << 48 | (uint64_t)tmp8[7] << 56;
 }
 
 /*

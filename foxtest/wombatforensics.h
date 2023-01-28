@@ -463,6 +463,7 @@ class WombatForensics : public FXMainWindow
         void EnableCaseButtons(void);
         void LoadCaseState(void);
         void LoadPartitions(ForImg* curforimg);
+        void LoadGptPartitions(ForImg* curforimg);
 	void UpdateForensicImages(void);
 
         void LogEntry(FXString logstring)
