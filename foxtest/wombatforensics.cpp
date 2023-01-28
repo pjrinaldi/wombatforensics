@@ -438,6 +438,51 @@ void WombatForensics::UpdateForensicImages()
     }
     for(int i=0; i < posarray.no() - 1; i++)
 	forimgvector.push_back(new ForImg(evidencelist.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text()));
+
+    tablelist->setTableSize(forimgvector.size(), 14);
+    //tablelist->setTableSize(10, 14);
+    tablelist->setColumnText(0, "");
+    tablelist->setColumnText(1, "ID");
+    tablelist->setColumnText(2, "Name");
+    tablelist->setColumnText(3, "Path");
+    tablelist->setColumnText(4, "Size (bytes)");
+    tablelist->setColumnText(5, "Created");
+    tablelist->setColumnText(6, "Accessed");
+    tablelist->setColumnText(7, "Modified");
+    tablelist->setColumnText(8, "Changed");
+    tablelist->setColumnText(9, "Hash");
+    tablelist->setColumnText(10, "Category");
+    tablelist->setColumnText(11, "Signature");
+    tablelist->setColumnText(12, "Tagged");
+    tablelist->setColumnText(13, "Hash Match");
+    for(int i=0; i < forimgvector.size(); i++)
+    {
+        //CheckTableItem* checkitem = new CheckTableItem(tablelist, NULL, NULL, "");
+        //tablelist->setItem(0, 0, checkitem);
+        tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+        tablelist->setItemText(i, 1, FXString::value(i));
+        tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
+        tablelist->setItemText(i, 3, FXString(forimgvector.at(i)->ImagePath().c_str()));
+        tablelist->setItemText(i, 4, FXString(forimgvector.at(i)->SizeString().c_str()));
+        //tablelist->setItemText(i, 4, FXString::value(forimgvector.at(i)->Size()));
+        /*
+        std::cout << "Name: " << forimgvector.at(i)->ImageFileName() << std::endl;
+        std::cout << "Path: " << forimgvector.at(i)->ImagePath() << std::endl;
+        std::cout << "Size: " << forimgvector.at(i)->Size() << std::endl;
+        */
+    }
+    tablelist->fitColumnsToContents(0);
+    tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+    FitColumnContents(1);
+    FitColumnContents(2);
+    FitColumnContents(4);
+    AlignColumn(tablelist, 1, FXTableItem::LEFT);
+    AlignColumn(tablelist, 2, FXTableItem::LEFT);
+    AlignColumn(tablelist, 3, FXTableItem::LEFT);
+    //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessForensicImage);
+    //volwatcher.setFuture(tmpfuture);
+    //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
+    /*
     // TEST READCONTENT FOR EACH FORIMG TYPE
     for(int i=0; i < forimgvector.size(); i++)
     {
@@ -447,43 +492,15 @@ void WombatForensics::UpdateForensicImages()
         forimgvector.at(i)->ReadContent(testbuf, 0, 4);
         if(testbuf != NULL)
         {
-        for(int j=0; j < 4; j++)
-        {
-            std::cout << "j: " << j << " testbuf val: "<< (char)testbuf[j] << std::endl;
-        }
+            for(int j=0; j < 4; j++)
+            {
+                std::cout << "j: " << j << " testbuf val: "<< (char)testbuf[j] << std::endl;
+            }
         }
     }
+    */
 }
-/*
-    extern QList<ForImg*> newforimglist;
-    newforimglist.clear();
-    addevidencedialog = new AddEvidenceDialog(this);
-    addevidencedialog->exec();
-    QDir eviddir = QDir(wombatvariable.tmpmntpath);
-    QStringList evidfiles = eviddir.entryList(QStringList(QString("*-e*")), QDir::NoSymLinks | QDir::Dirs);
-    ecount = evidfiles.count();
-    for(int i=0; i < newforimglist.count(); i++)
-    {
-        QString evidencepath = wombatvariable.tmpmntpath + newforimglist.at(i)->ImgPath().split("/").last() + "-e" + QString::number(ecount) + "/";
-	QString emntpath = "";
-        QDir dir;
-        dir.mkpath(evidencepath);
-        newforimglist.at(i)->SetMountPath(evidencepath);
-        // need to delete emntpath directories on close for cleanup purposes after unmount...
-        ecount++;
-    }
-    if(newforimglist.count() > 0)
-    {
-        evidrepdatalist.clear();
-        QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessForensicImage);
-        volwatcher.setFuture(tmpfuture);
-        //QFuture<void> tmpfuture = QtConcurrent::map(newforimglist, ProcessVolume);
-        //QFuture<void> tmpfuture = QtConcurrent::map(newevid, ProcessVolume);
-        //UpdateStatus();
-    }
 
- */ 
-/*
 long WombatForensics::TableUpDown(FXObject*, FXSelector, void* ptr)
 {
     int currow = tablelist->getCurrentRow();
@@ -502,6 +519,7 @@ long WombatForensics::TableUpDown(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
+/*
 long WombatForensics::TableUp(FXObject*, FXSelector, void* ptr)
 {
     int currow = proptable->getCurrentRow();
@@ -1987,6 +2005,7 @@ void WombatForensics::ParseRowContents(uint8_t* pagearray, FXArray<uint16_t>* ce
         //qDebug() << "cell content area offset is equal to pagesize - reserved space bytes.";
     }
 }
+*/
 
 void WombatForensics::AlignColumn(FXTable* curtable, int col, FXuint justify)
 {
@@ -1994,6 +2013,13 @@ void WombatForensics::AlignColumn(FXTable* curtable, int col, FXuint justify)
         curtable->setItemJustify(i, col, justify);
 }
 
+void WombatForensics::FitColumnContents(int col)
+{
+    tablelist->fitColumnsToContents(col);
+    tablelist->setColumnWidth(col, tablelist->getColumnWidth(col) + 10);
+}
+
+/*
 long WombatForensics::PropertySelected(FXObject*, FXSelector, void*)
 {
     proptable->selectRow(proptable->getCurrentRow());

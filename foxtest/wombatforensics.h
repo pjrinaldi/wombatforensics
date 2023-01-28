@@ -12,7 +12,9 @@
 #include <byteswap.h>
 #include <time.h>
 #include <fcntl.h>
+// FOX TOOLKIT GUI 
 #include "/usr/local/include/fox-1.7/fx.h"
+// PROJECT INCLUDES
 #include "icons.h"
 #include "managetags.h"
 #include "aboutbox.h"
@@ -403,6 +405,7 @@ class WombatForensics : public FXMainWindow
 	long OpenAboutBox(FXObject*, FXSelector, void*);
         long PreviewReport(FXObject*, FXSelector, void*);
         long TagMenu(FXObject*, FXSelector, void*);
+        long TableUpDown(FXObject*, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
         /*
@@ -438,8 +441,9 @@ class WombatForensics : public FXMainWindow
         void PopulatePropertyTable(FXArray<uint16_t>* celloffsetarray);
         void AddProperty(int row, FXString offlen, FXString val, FXString desc);
         void AddContent(int row, FXString islive, FXString rowid, FXString offlen, FXString type, FXString val, FXString tag);
-        void AlignColumn(FXTable* curtable, int row, FXuint justify);
         */
+        void AlignColumn(FXTable* curtable, int row, FXuint justify);
+        void FitColumnContents(int col);
         FXString GetSettings(int setting);
 	void SaveCurrentCase(void);
         void CloseCurrentCase(void);
@@ -473,6 +477,8 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTINGS, WombatForensics::OpenSettings),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
+    FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_TABLESELECT, WombatForensics::TableUpDown),
+    //FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),

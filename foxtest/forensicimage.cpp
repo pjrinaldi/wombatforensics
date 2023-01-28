@@ -359,14 +359,32 @@ uint64_t ForImg::Size()
     return imgsize;
 }
 
+std::string ForImg::SizeString()
+{
+    std::stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << std::fixed << imgsize;
+    return ss.str();
+}
+
 int8_t ForImg::ImgType()
 {
     return imgtype;
 }
 
-std::string ForImg::ImagePath()
+std::string ForImg::ImageFullPath()
 {
     return imgpath;
+}
+
+std::string ForImg::ImagePath()
+{
+    return std::filesystem::path(imgpath).remove_filename();
+}
+
+std::string ForImg::ImageFileName()
+{
+    return std::filesystem::path(imgpath).filename();
 }
 
 /*

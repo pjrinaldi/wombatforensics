@@ -9,6 +9,7 @@
 #include <cstring>
 #include <vector>
 #include <filesystem>
+#include <locale>
 // SHARED LIBRARIES
 #include <libewf.h>
 #include <libsmraw.h>
@@ -36,7 +37,10 @@ class ForImg
         ~ForImg();
         void ReadContent(uint8_t* buf, uint64_t pos, uint64_t size);
         uint64_t Size();
+        std::string SizeString();
+        std::string ImageFullPath();
         std::string ImagePath();
+        std::string ImageFileName();
         //std::string MountPath();
         //void SetMountPath(std::string mountpath);
         int8_t ImgType();
