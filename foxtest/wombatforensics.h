@@ -406,6 +406,8 @@ class WombatForensics : public FXMainWindow
         long PreviewReport(FXObject*, FXSelector, void*);
         long TagMenu(FXObject*, FXSelector, void*);
         long TableUpDown(FXObject*, FXSelector, void*);
+        long ContentSelected(FXObject*, FXSelector, void*);
+        long LoadChildren(FXObject*, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
         /*
@@ -478,7 +480,8 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
     FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_TABLESELECT, WombatForensics::TableUpDown),
-    //FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
+    FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
+    FXMAPFUNC(SEL_DOUBLECLICKED, WombatForensics::ID_TABLESELECT, WombatForensics::LoadChildren),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),

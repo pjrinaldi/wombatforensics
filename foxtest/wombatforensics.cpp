@@ -440,7 +440,6 @@ void WombatForensics::UpdateForensicImages()
 	forimgvector.push_back(new ForImg(evidencelist.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text()));
 
     tablelist->setTableSize(forimgvector.size(), 14);
-    //tablelist->setTableSize(10, 14);
     tablelist->setColumnText(0, "");
     tablelist->setColumnText(1, "ID");
     tablelist->setColumnText(2, "Name");
@@ -2024,47 +2023,23 @@ long WombatForensics::PropertySelected(FXObject*, FXSelector, void*)
 
     return 1;
 }
+*/
 
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 {
-    //proptable->setCurrentItem(-1, -1, true);
-    proptable->selectRow(-1, true);
     tablelist->selectRow(tablelist->getCurrentRow());
-    if(tablelist->getCurrentRow() > -1 && !tablelist->getItemText(tablelist->getCurrentRow(), 3).empty())
-    {
-        FXString offlen = tablelist->getItemText(tablelist->getCurrentRow(), 3);
-        int found = offlen.find(", ");
-        uint64_t curoffset = offlen.mid(0, found).toULong();
-        uint64_t curlength = offlen.mid(found+1, offlen.length() - found).toULong();
-        //std::cout << "curoffset: " << curoffset << " curlength: " << curlength << std::endl;
-        uint linenumber = curoffset / 16;
-        // SET SCROLLBAR
-        textscrollbar->setPosition(linenumber);
-        // SET OFFSET
-        offsettext->moveCursorRowColumn(linenumber, 0);
-        // SET HEX SELECTION
-        hextext->moveCursor(curoffset*3 + linenumber);
-        hextext->setSelection(curoffset * 3 + linenumber, curlength*3 - 1);
-        //hextext->setAnchorPos(curoffset * 3 + linenumber);
-        //hextext->moveCursorAndSelect(curoffset * 3 + linenumber + curlength * 3 - 1, 1);
-        // SET ASCII HIGHLIGHT
-        if(curoffset > 15)
-        {
-        }
-        else
-        {
-            asciitext->moveCursor(curoffset + linenumber);
-            asciitext->setHighlight(curoffset + linenumber, curlength);
-        }
-        //asciitext->setCursorPos(curoffset + linenumber);
-        StatusUpdate("Offset: 0x" + FXString::value("%05x", curoffset) + " | Length: " + FXString::value(curlength));
-    }
 
     return 1;
 }
 
+long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
+{
+    std::cout << "load children here if they exist and add to pathtoolbar" << std::endl;
 
+    return 1;
+}
 
+/*
 long WombatForensics::SetTag(FXObject* sender, FXSelector, void*)
 {
     / *
