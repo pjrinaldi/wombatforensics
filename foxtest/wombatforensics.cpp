@@ -102,6 +102,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     burrowicon = new FXPNGIcon(this->getApp(), burrow);
     burrowbutton = new FXButton(pathtoolbar, "", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED);
 
+    // ITEM TYPE ICONS
+    forimgicon = new FXPNGIcon(this->getApp(), forimg);
+    forimgicon->create();
+
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
     //sqlitefiles.clear();
@@ -170,6 +174,7 @@ WombatForensics::~WombatForensics()
 {
     //SaveCurrentCase();
     CloseCurrentCase();
+    forimgicon->destroy();
 }
 
 void WombatForensics::create()
@@ -459,6 +464,8 @@ void WombatForensics::UpdateForensicImages()
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemText(i, 1, FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
+        tablelist->setItemIcon(i, 2, forimgicon);
+        tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
         tablelist->setItemText(i, 3, FXString(forimgvector.at(i)->ImagePath().c_str()));
         tablelist->setItemText(i, 4, FXString(forimgvector.at(i)->SizeString().c_str()));
         /*

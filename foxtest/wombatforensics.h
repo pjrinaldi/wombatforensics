@@ -299,6 +299,10 @@ class WombatForensics : public FXMainWindow
         FXIcon* burrowicon;
         FXButton* burrowbutton;
 
+        // ITEM TYPE ICONS
+        FXIcon* forimgicon;
+
+
         //FXArray<FXString> sqlitefiles;
         std::vector<std::string> tags;
         FXArray<FXString> taggedlist;
@@ -325,7 +329,7 @@ class WombatForensics : public FXMainWindow
         bool iscaseopen;
         
         Viewer* viewer;
-        ForImg* forimg;
+        //ForImg* forimg;
         std::vector<ForImg*> forimgvector;
 
 
