@@ -301,7 +301,14 @@ class WombatForensics : public FXMainWindow
 
         // ITEM TYPE ICONS
         FXIcon* forimgicon;
-
+        FXIcon* carvedfileicon;
+        FXIcon* defaultfileicon;
+        FXIcon* defaultfoldericon;
+        FXIcon* deletedfileicon;
+        FXIcon* deletedfoldericon;
+        FXIcon* partitionicon;
+        FXIcon* virtualfileicon;
+        FXIcon* virtualfoldericon;
 
         //FXArray<FXString> sqlitefiles;
         std::vector<std::string> tags;

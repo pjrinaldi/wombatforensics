@@ -105,6 +105,22 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     // ITEM TYPE ICONS
     forimgicon = new FXPNGIcon(this->getApp(), forimg);
     forimgicon->create();
+    carvedfileicon = new FXPNGIcon(this->getApp(), carvedfile);
+    carvedfileicon->create();
+    defaultfileicon = new FXPNGIcon(this->getApp(), defaultfile);
+    defaultfileicon->create();
+    defaultfoldericon = new FXPNGIcon(this->getApp(), defaultfolder);
+    defaultfoldericon->create();
+    deletedfileicon = new FXPNGIcon(this->getApp(), deletedfile);
+    deletedfileicon->create();
+    deletedfoldericon = new FXPNGIcon(this->getApp(), deletedfolder);
+    deletedfoldericon->create();
+    partitionicon = new FXPNGIcon(this->getApp(), partition);
+    partitionicon->create();
+    virtualfileicon = new FXPNGIcon(this->getApp(), virtualfile);
+    virtualfileicon->create();
+    virtualfoldericon = new FXPNGIcon(this->getApp(), virtualfolder);
+    virtualfoldericon->create();
 
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
@@ -175,6 +191,14 @@ WombatForensics::~WombatForensics()
     //SaveCurrentCase();
     CloseCurrentCase();
     forimgicon->destroy();
+    carvedfileicon->destroy();
+    defaultfileicon->destroy();
+    defaultfoldericon->destroy();
+    deletedfileicon->destroy();
+    deletedfoldericon->destroy();
+    partitionicon->destroy();
+    virtualfileicon->destroy();
+    virtualfoldericon->destroy();
 }
 
 void WombatForensics::create()
