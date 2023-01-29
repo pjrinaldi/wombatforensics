@@ -2405,6 +2405,7 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
 		}
 	    }
 	    partitionname += " [EXFAT]";
+	    std::cout << "part name: " << partitionname << std::endl;
             /*  
 				uint8_t* sl = new uint8_t[2];
 				uint16_t singleletter = 0;
