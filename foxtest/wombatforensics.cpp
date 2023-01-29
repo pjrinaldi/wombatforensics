@@ -2350,24 +2350,68 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
         curforimg->ReadContent((uint8_t*)fattype, offset + 3, 5);
         if(FXString(fattype).find("EXFAT") > -1)
         {
+	    uint32_t fatsize = 0;
+	    ReadForImgContent(curforimg, &fatsize, offset + 84);
+	    uint8_t tmp8 = 0;
+	    curforimg->ReadContent(&tmp8, offset + 108, 1);
+	    uint16_t bytespersector = pow(2, (uint)tmp8);
+	    curforimg->ReadContent(&tmp8, offset + 109, 1);
+	    uint16_t sectorspercluster = pow(2, (uint)tmp8);
+	    uint8_t fatcount = 0;
+	    curforimg->ReadContent(&fatcount, offset + 110, 1);
+	    uint32_t fatoff = 0;
+	    ReadForImgContent(curforimg, &fatoff, offset + 80);
+	    uint64_t fatoffset = fatoff + offset;
+	    uint32_t rootdircluster = 0;
+	    ReadForImgContent(curforimg, &rootdircluster, offset + 96);
+	    uint32_t clusterstart = 0;
+	    ReadForImgContent(curforimg, &clusterstart, offset + 88);
+	    uint64_t rootdiroffset = (uint64_t)(offset + (((rootdircluster - 2) * sectorspercluster) + clusterstart) * bytespersector);
+	    FXArray<uint> clusterlist;
+	    clusterlist.clear();
+	    if(rootdircluster >= 2)
+	    {
+		clusterlist.append(rootdircluster);
+		GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
+	    }
             std::cout << "it's exfat..." << std::endl;
+	    FXString rootdirlayout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
+	    for(int i=0; i < clusterlist.no(); i++)
+	    {
+		uint64_t clustersize = sectorspercluster * bytespersector;
+		uint curoffset = 0;
+		while(curoffset < clustersize)
+		{
+		    uint8_t firstbyte = 0;
+		    curforimg->ReadContent(&firstbyte, clusterlist.at(i) + curoffset, 1);
+		    if((uint)firstbyte == 0x83)
+			break;
+		    curoffset += 32;
+		}
+		if(curoffset < clustersize)
+		{
+		    uint8_t secondbyte = 0;
+		    curforimg->ReadContent(&secondbyte, clusterlist.at(i) + curoffset + 1, 1);
+		    if((uint)secondbyte > 0)
+		    {
+			for(uint j=0; j < (uint)secondbyte; j++)
+			{
+			    uint16_t singleletter = 0;
+			    ReadForImgContent(curforimg, &singleletter, clusterlist.at(i) + curoffset + 2 + j*2);
+			    partitionname += (char)singleletter;
+			    //partitionname += 
+			}
+		    }
+		}
+	    }
+	    partitionname += " [EXFAT]";
             /*  
-            uint32_t fatsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4));
-            bytespersector = pow(2, qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 108, 1))); // power of 2 so 2^(bytespersector)
-            sectorspercluster = pow(2, qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 109, 1))); // power of 2 so 2^(sectorspercluster)
-            fatcount = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 110, 1)); // 1 or 2, 2 if TexFAT is in use
-            qulonglong fatoffset = (qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 80, 4)) * bytespersector) + (curstartsector * 512);
-            uint32_t rootdircluster = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 96, 4));
-            uint32_t clusterstart = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 88, 4));
-            qulonglong rootdiroffset = (qulonglong)((curstartsector * 512) + (((rootdircluster - 2) * sectorspercluster) + clusterstart) * bytespersector);
-            QList<uint> clusterlist;
-            clusterlist.clear();
-            if(rootdircluster >= 2)
-            {
-                clusterlist.append(rootdircluster);
-                GetNextCluster(curimg, rootdircluster, 4, fatoffset, &clusterlist);
-            }
-            QString rootdirlayout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
+				uint8_t* sl = new uint8_t[2];
+				uint16_t singleletter = 0;
+				ReadContent(rawcontent, sl, diroffset + (j+k)*32 + m*2, 2);
+				ReturnUint16(&singleletter, sl);
+				delete[] sl;
+				filename += (char)singleletter;
             clusterlist.clear();
             for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
             {
@@ -2467,6 +2511,143 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
         }
     }
     return partitionname;
+}
+
+FXString WombatForensics::ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset)
+{
+    // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
+    //QString rootdirlayout = QString::number(rootdiroffset + ((rootdircluster - 2) * sectorspercluster * bytespersector)) + "," + QString::number(sectorspercluster * bytespersector) + ";";
+    FXString extentstring = "";
+    int blkcnt = 1;
+    uint startvalue = blocklist.at(0);
+    for(int i=1; i < blocklist.no(); i++)
+    {
+        uint oldvalue = blocklist.at(i-1);
+        uint newvalue = blocklist.at(i);
+        if(newvalue - oldvalue == 1)
+            blkcnt++;
+        else
+        {
+            if(rootdiroffset > 0)
+	    {
+                //extentstring += QString::number(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + QString::number(blkcnt * blocksize) + ";";
+                extentstring += FXString::value(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + FXString::value(blkcnt * blocksize) + ";";
+	    }
+            else
+	    {
+                extentstring += FXString::value(startvalue * blocksize) + "," + FXString::value(blkcnt * blocksize) + ";";
+	    }
+            startvalue = blocklist.at(i);
+            blkcnt = 1;
+        }
+        if(i == blocklist.no() - 1)
+        {
+            if(rootdiroffset > 0)
+	    {
+                extentstring += FXString::value(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + FXString::value(blkcnt * blocksize) + ";";
+	    }
+            else
+	    {
+                extentstring += FXString::value(startvalue * blocksize) + "," + FXString::value(blkcnt * blocksize) + ";";
+	    }
+            startvalue = blocklist.at(i);
+            blkcnt = 1;
+        }
+    }
+    if(blocklist.no() == 1)
+    {
+        if(rootdiroffset > 0)
+	{
+            extentstring += FXString::value(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + FXString::value(blkcnt * blocksize) + ";";
+	}
+        else
+	{
+            extentstring += FXString::value(startvalue * blocksize) + "," + FXString::value(blkcnt * blocksize) + ";";
+	}
+    }
+    return extentstring;
+}
+
+void WombatForensics::GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, FXArray<uint>* clusterlist)
+{
+    uint32_t curcluster32 = 0;
+    uint16_t curcluster16 = 0;
+    int fatbyte1 = 0;
+    if((uint)fstype == 1) // FAT12
+    {
+        fatbyte1 = clusternum + (clusternum / 2);
+        if(clusternum & 0x0001) // ODD
+	{
+	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
+	    curcluster16 = curcluster16 >> 4;
+	}
+            //curcluster = (qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2)) >> 4);
+        else // EVEN
+	{
+	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
+	    curcluster16 = curcluster16 & 0x0FFF;
+	}
+            //curcluster = (qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2)) & 0x0FFF);
+        //if(curcluster != 0x0FF7)
+        //    clusterlist->append(curcluster);
+        //if(curcluster < 0x0FF8 && curcluster >= 2)
+        if(curcluster16 < 0x0FF7 && curcluster16 >= 2)
+        {
+            clusterlist->append(curcluster16);
+            GetNextCluster(curimg, curcluster16, fstype, fatoffset, clusterlist);
+        }
+    }
+    else if((uint)fstype == 2) // FAT16
+    {
+        if(clusternum >= 2)
+        {
+            fatbyte1 = clusternum * 2;
+	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
+	    
+            //curcluster = qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2));
+            //if(curcluster != 0xFFF7)
+            //    clusterlist->append(curcluster);
+            //if(curcluster < 0xFFF8 && curcluster >= 2)
+            if(curcluster16 < 0xFFF7 && curcluster16 >= 2)
+            {
+                clusterlist->append(curcluster16);
+                GetNextCluster(curimg, curcluster16, fstype, fatoffset, clusterlist);
+            }
+        }
+    }
+    else if((uint)fstype == 3) // FAT32
+    {
+        if(clusternum >= 2)
+        {
+            fatbyte1 = clusternum * 4;
+	    ReadForImgContent(curimg, &curcluster32, fatoffset + fatbyte1);
+	    curcluster32 = curcluster32 & 0x0FFFFFFF;
+            //curcluster = (qFromLittleEndian<uint32_t>(curimg->ReadContent(fatoffset + fatbyte1, 4)) & 0x0FFFFFFF);
+	    //if(curcluster != 0x0FFFFFF7)
+		//clusterlist->append(curcluster);
+	    if(curcluster32 < 0x0FFFFFF7 && curcluster32 >= 2)
+            {
+                clusterlist->append(curcluster32);
+		GetNextCluster(curimg, curcluster32, fstype, fatoffset, clusterlist);
+            }
+        }
+    }
+    else if((uint)fstype == 4) // EXFAT
+    {
+        if(clusternum >= 2)
+        {
+            fatbyte1 = clusternum * 4;
+	    ReadForImgContent(curimg, &curcluster32, fatoffset + fatbyte1);
+            //curcluster = qFromLittleEndian<uint32_t>(curimg->ReadContent(fatoffset + fatbyte1, 4));
+	    //if(curcluster != 0xFFFFFFF7)
+		//clusterlist->append(curcluster);
+	    if(curcluster32 < 0xFFFFFFF7 && curcluster32 >= 2)
+            {
+                clusterlist->append(curcluster32);
+		GetNextCluster(curimg, curcluster32, fstype, fatoffset, clusterlist);
+            }
+        }
+    }
 }
 
 /*
