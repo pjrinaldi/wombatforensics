@@ -28,6 +28,14 @@ char* GetDateTime(char *buff)
     return buff;
 };
 
+std::string ReturnFormattingSize(uint size)
+{
+    std::stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << std::fixed << size;
+    return ss.str();
+}
+
 /*
 void ReadContent(std::ifstream* rawcontent, uint8_t* tmpbuf, uint64_t offset, uint64_t size)
 {

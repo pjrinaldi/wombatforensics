@@ -2096,66 +2096,8 @@ void WombatForensics::LoadPartitions(ForImg* curforimg)
         if((uint)gptdif == 0xee) // GPT DISK
         {
             ReadForImgContent(curforimg, &gptsig, 512, 8);
-            if(gptsig == 0x5452415020494645) // GUID PARTITION TABLE
-            {
-                // MOVE ALL THE BELOW INTO A LOADGPT FUNCTION
-                uint64_t parttablestart = 0;
-                uint32_t partentrycount = 0;
-                uint32_t partentrysize = 0;
-                ReadForImgContent(curforimg, &parttablestart, 584);
-                ReadForImgContent(curforimg, &partentrycount, 592);
-                ReadForImgContent(curforimg, &partentrysize, 596);
-                int ptreecnt = 0;
-                int pcount = 0;
-                for(int i=0; i < partentrycount; i++)
-                {
-                    int cnt = i * partentrysize;
-                    uint64_t curstartsector = 0;
-                    uint64_t curendsector = 0;
-                    ReadForImgContent(curforimg, &curstartsector, parttablestart * 512 + cnt + 32);
-                    ReadForImgContent(curforimg, &curendsector, parttablestart * 512 + cnt + 40);
-                    if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-                        pcount++;
-                }
-                for(int i=0; i < pcount; i++)
-                {
-                    uint64_t sectorcheck = 0;
-                    int cnt = i * partentrysize;
-                    uint64_t curstartsector = 0;
-                    uint64_t curendsector = 0;
-                    ReadForImgContent(curforimg, &curstartsector, parttablestart * 512 + cnt + 32);
-                    ReadForImgContent(curforimg, &curendsector, parttablestart * 512 + cnt + 40);
-                    if(i == 0) // INITIAL PARTITION
-                        sectorcheck = 0;
-                    else if(i > 0 && i < partentrycount)
-                    {
-                        uint64_t prestart = 0;
-                        uint64_t preend = 0;
-                        ReadForImgContent(curforimg, &prestart, parttablestart * 512 + (i-1) * partentrysize + 32);
-                        ReadForImgContent(curforimg, &preend, parttablestart * 512 + (i-1) * partentrysize + 40);
-                        sectorcheck = prestart + preend;
-                    }
-                    else if(i == pcount - 1)
-                        sectorcheck = curforimg->Size() / 512;
-                    if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-                    {
-                        if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
-                        {
-                            // LOAD UNALLOCATED PARTITON sectorcheck, curstartsector, 0
-                            ptreecnt++;
-                        }
-                        // LOAD ALLOCATED PARTITION READ FROM TABLE curstartsector, (curendsector - curstartsector + 1), 1)
-                        ptreecnt++;
-                        if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
-                        {
-                            if(curendsector < curforimg->Size() / 512)
-                            {
-                                // LOAD UNALLOCATED curendsector+1, curforimg->Size() / 512 - 1 - curendsector, 0)
-                            }
-                        }
-                    }
-                }
-            }
+            if(gptsig == 0x4546492050415254) // GUID PARTITION TABLE
+                LoadGptPartitions(curforimg);
         }
         else // MBR DISK
         {
@@ -2173,14 +2115,113 @@ void WombatForensics::LoadPartitions(ForImg* curforimg)
     {
         std::cout << "determine if sparc or i386 and then process partitions." << std::endl;
     }
-    else if(gptsig == 0x5452415020494645) // GPT PARTITION
+    else if(gptsig == 0x4546492050415254) // GPT PARTITION
         LoadGptPartitions(curforimg);
 }
 
 void WombatForensics::LoadGptPartitions(ForImg* curforimg)
 {
-}
+    uint64_t parttablestart = 0;
+    uint32_t partentrycount = 0;
+    uint32_t partentrysize = 0;
+    ReadForImgContent(curforimg, &parttablestart, 584);
+    ReadForImgContent(curforimg, &partentrycount, 592);
+    ReadForImgContent(curforimg, &partentrysize, 596);
+    int ptreecnt = 0;
+    int pcount = 0;
+    for(int i=0; i < partentrycount; i++)
+    {
+        int cnt = i * partentrysize;
+        uint64_t curstartsector = 0;
+        uint64_t curendsector = 0;
+        ReadForImgContent(curforimg, &curstartsector, parttablestart * 512 + cnt + 32);
+        ReadForImgContent(curforimg, &curendsector, parttablestart * 512 + cnt + 40);
+        if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+            pcount++;
+    }
+    tablelist->setTableSize(pcount * 2 + 1, 14);
+    tablelist->setColumnText(0, "");
+    tablelist->setColumnText(1, "ID");
+    tablelist->setColumnText(2, "Name");
+    tablelist->setColumnText(3, "Path");
+    tablelist->setColumnText(4, "Size (bytes)");
+    tablelist->setColumnText(5, "Created");
+    tablelist->setColumnText(6, "Accessed");
+    tablelist->setColumnText(7, "Modified");
+    tablelist->setColumnText(8, "Changed");
+    tablelist->setColumnText(9, "Hash");
+    tablelist->setColumnText(10, "Category");
+    tablelist->setColumnText(11, "Signature");
+    tablelist->setColumnText(12, "Tagged");
+    tablelist->setColumnText(13, "Hash Match");
+    for(int i=0; i < pcount; i++)
+    {
+        uint64_t sectorcheck = 0;
+        int cnt = i * partentrysize;
+        uint64_t curstartsector = 0;
+        uint64_t curendsector = 0;
+        ReadForImgContent(curforimg, &curstartsector, parttablestart * 512 + cnt + 32);
+        ReadForImgContent(curforimg, &curendsector, parttablestart * 512 + cnt + 40);
+        if(i == 0) // INITIAL PARTITION
+            sectorcheck = 0;
+        else if(i > 0 && i < partentrycount)
+        {
+            uint64_t prestart = 0;
+            uint64_t preend = 0;
+            ReadForImgContent(curforimg, &prestart, parttablestart * 512 + (i-1) * partentrysize + 32);
+            ReadForImgContent(curforimg, &preend, parttablestart * 512 + (i-1) * partentrysize + 40);
+            sectorcheck = prestart + preend;
+        }
+        else if(i == pcount - 1)
+            sectorcheck = curforimg->Size() / 512;
+        if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
+        {
+            if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
+            {
+                tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+                tablelist->setItemData(ptreecnt, 1, curforimg);
+                tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
+                tablelist->setItemText(ptreecnt, 2, "UNALLOCATED");
+                tablelist->setItemIcon(ptreecnt, 2, partitionicon);
+                tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
 
+                tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize(curstartsector*512).c_str()));
+                // LOAD UNALLOCATED PARTITON sectorcheck, curstartsector, 0
+                ptreecnt++;
+            }
+            // LOAD ALLOCATED PARTITION READ FROM TABLE curstartsector, (curendsector - curstartsector + 1), 1)
+            tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+            tablelist->setItemData(ptreecnt, 1, curforimg);
+            tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
+            tablelist->setItemText(ptreecnt, 2, "ALLOCATED");
+            tablelist->setItemIcon(ptreecnt, 2, partitionicon);
+            tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
+            tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curendsector - curstartsector + 1)*512).c_str()));
+            ptreecnt++;
+            if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
+            {
+                if(curendsector < curforimg->Size() / 512)
+                {
+                    // LOAD UNALLOCATED curendsector+1, curforimg->Size() / 512 - 1 - curendsector, 0)
+                    tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+                    tablelist->setItemData(ptreecnt, 1, curforimg);
+                    tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
+                    tablelist->setItemText(ptreecnt, 2, "UNALLOCATED");
+                    tablelist->setItemIcon(ptreecnt, 2, partitionicon);
+                    tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
+                    tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curforimg->Size() / 512 - 1 - curendsector)*512).c_str()));
+                }
+            }
+        }
+    }
+    tablelist->fitColumnsToContents(0);
+    tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+    FitColumnContents(1);
+    FitColumnContents(2);
+    FitColumnContents(4);
+    AlignColumn(tablelist, 1, FXTableItem::LEFT);
+    AlignColumn(tablelist, 2, FXTableItem::LEFT);
+}
 /*
 	if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
 	{
@@ -2279,59 +2320,6 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
 	else if(sunsig == 0xDABE) // SUN PARTITION
 	{
 	    qDebug() << "determine if sparc or i386 and then process partitions.";
-	}
-	else if(gptsig == 0x5452415020494645) // GPT PARTITION
-	{
-	    qInfo() << "GPT Partition Table Found. Parsing...";
-	    uint32_t parttablestart = qFromLittleEndian<uint32_t>(curimg->ReadContent(584, 8));
-	    uint16_t partentrycount = qFromLittleEndian<uint16_t>(curimg->ReadContent(592, 4));
-	    uint16_t partentrysize = qFromLittleEndian<uint16_t>(curimg->ReadContent(596, 4));
-	    uint8_t ptreecnt = 0; // partition counter to add unallocated in..
-	    QDir dir; // current partition directory
-	    QFile pstatfile; // current statfile
-	    int pcount = 0;
-	    for(int i=0; i < partentrycount; i++)
-	    {
-		int cnt = i*partentrysize;
-		uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
-		uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-		if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-		    pcount++;
-	    }
-	    for(int i=0; i < pcount; i++)
-	    {
-		uint32_t sectorcheck = 0;
-		int cnt = i*partentrysize;
-		uint32_t curstartsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 32, 8));
-		uint32_t curendsector = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + cnt + 40, 8));
-		if(i ==0) // INITIAL PARTITION
-		    sectorcheck = 0;
-		else if(i > 0 && i < partentrycount) // MIDDLE PARTITIONS
-		    sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 32, 8)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(parttablestart*512 + (i-1)*partentrysize + 40, 8));
-		else if(i == pcount - 1)
-		    sectorcheck = curimg->Size()/512;
-		if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
-		{
-		    if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
-		    {
-			ParsePartition(curimg, sectorcheck, curstartsector, ptreecnt, 0);
-			ptreecnt++;
-		    }
-		    // NOW ADD THE ALLOCATED PARTITION READ FROM THE PARTITION TABLE
-		    ParsePartition(curimg, curstartsector, (curendsector - curstartsector + 1), ptreecnt, 1);
-		    ptreecnt++;
-		    if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
-		    {
-			if(curendsector < curimg->Size())
-			    ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
-		    }
-		}
-		else // INVALID PARTITION ENTRY
-		{
-		    // ADD UNALLOCATED FROM START TO THE END SECTOR HERE
-		    // shouldn't need this section so populate later.
-		}
-	    }
 	}
 	else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
 	{

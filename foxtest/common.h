@@ -19,6 +19,8 @@
 char* GetDateTime(char *buff);
 uint8_t* substr(uint8_t* arr, int begin, int len);
 
+std::string ReturnFormattingSize(uint size);
+
 //void ReadContent(std::ifstream* rawcontent, uint8_t* tmpbuf, uint64_t offset, uint64_t size);
 
 //void ReadContent(std::ifstream* rawcontent, int8_t* tmpbuf, uint64_t offset, uint64_t size);
