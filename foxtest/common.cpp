@@ -105,6 +105,7 @@ void ReadForImgContent(ForImg* forimg, uint64_t* val, uint64_t offset, bool isbi
     delete[] tmp8;
 }
 
+
 void ReadInteger(uint8_t* arr, int begin, uint16_t* val, bool isbigendian)
 {
     uint8_t* tmp8 = new uint8_t[2];

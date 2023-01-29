@@ -2118,6 +2118,113 @@ void WombatForensics::LoadPartitions(ForImg* curforimg)
     else if(gptsig == 0x4546492050415254) // GPT PARTITION
         LoadGptPartitions(curforimg);
 }
+/*
+	if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
+	{
+            QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
+            QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
+            QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
+            QString bfsstr = QString::fromStdString(curimg->ReadContent(544, 4).toStdString());
+            if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || bfsstr == "1SFB") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 | BFS W/O PARTITION TABLE
+            {
+                ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
+            }
+            else // MBR
+            {
+                qInfo() << "MBR Partition Table Found. Parsing...";
+                uint8_t ptreecnt = 0;
+                uint8_t pcount = 0;
+                for(int i=0; i < 4; i++)
+                {
+                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
+                        pcount++;
+                }
+                for(uint8_t i=0; i < pcount; i++)
+                {
+                    //int cnt = i*16;
+                    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + (i*16), 1));
+                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i*16), 4));
+                    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i*16), 4));
+                    qint64 sectorcheck = 0;
+                    if(i == 0) // INITIAL PARTITION
+                        sectorcheck = 0;
+                    else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
+                        sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
+                    else if(i == pcount - 1) // LAST PARTITION
+                        sectorcheck = curimg->Size()/512;
+                    if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
+                    {
+                        //qDebug() << "unallocated partition before:" << i;
+                        //qDebug() << "unalloc:" << ptreecnt << "curoffset:" << sectorcheck << "curend:" << (curoffset + sectorcheck - 1) << "cursize:" << sectorcheck + curoffset;
+                        ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
+                        ptreecnt++;
+                    }
+                    if(curparttype == 0x05) // extended partition
+                    {
+                        //qDebug() << "extendedpartition:" << curoffset << cursize;
+                        ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
+                        //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
+                        //ParseExtentedPartition(curimg, curoffset, cursize, j);
+                        //ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
+                    }
+                    else if(curparttype == 0x00)
+                    {
+                        //qDebug() << "do nothing here cause it is an empty partition...";
+                    }
+                    else if(curparttype == 0x82) // Sun i386
+                    {
+                        // parse sun table here passing pofflist and psizelist
+                    }
+                    else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
+                    {
+                        // parse bsd table here passing pofflist nad psizelist
+                    }
+                    else
+                    {
+                        if(cursize > 0)
+                        {
+                            //qDebug() << "ppart:" << ptreecnt << "curoffset:" << curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize;
+                            //qDebug() << "begin parse file system information";
+                            ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
+                            ptreecnt++;
+                        }
+                    }
+                    if(i == pcount - 1 && curoffset + cursize < curimg->Size()/512 - 1) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
+                    {
+                        //qDebug() << "add unallocated partition after last partition" << i;
+                        ParsePartition(curimg, curoffset + cursize, curimg->Size()/512 - (curoffset + cursize), ptreecnt, 0);
+                        //ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
+                        //ptreecnt++;
+                    }
+                }
+	    }
+	}
+	else if(applesig == 0x504d) // APPLE PARTITION
+	{
+	    qDebug() << "apple sig here...";
+	}
+	else if(bsdsig == 0x82564557) // BSD PARTITION
+	{
+	    qDebug() << "bsd part here...";
+	}
+	else if(sunsig == 0xDABE) // SUN PARTITION
+	{
+	    qDebug() << "determine if sparc or i386 and then process partitions.";
+	}
+	else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
+	{
+	    qInfo() << "Wombat Logical Image Found. Parsing...";
+	    ParseLogicalImage(curimg);
+	}
+	else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
+	{
+	    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
+	    //qDebug() << "partition signature not found correctly";
+	}
+    }
+    //FindPartitions(curimg, &pofflist, &psizelist);
+}
+ */ 
 
 void WombatForensics::LoadGptPartitions(ForImg* curforimg)
 {
@@ -2193,7 +2300,7 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
             tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
             tablelist->setItemData(ptreecnt, 1, curforimg);
             tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
-            tablelist->setItemText(ptreecnt, 2, "ALLOCATED");
+            tablelist->setItemText(ptreecnt, 2, GetFileSystemName(curforimg, curstartsector*512));
             tablelist->setItemIcon(ptreecnt, 2, partitionicon);
             tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
             tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curendsector - curstartsector + 1)*512).c_str()));
@@ -2222,140 +2329,149 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
     AlignColumn(tablelist, 1, FXTableItem::LEFT);
     AlignColumn(tablelist, 2, FXTableItem::LEFT);
 }
-/*
-	if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
-	{
-	    if((uint8_t)qFromLittleEndian<uint8_t>(curimg->ReadContent(450, 1)) == 0xee) // GPT DISK
-	    {
-	    }
-	    else // MBR DISK
-	    {
-		QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
-		QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
-		QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
-		QString bfsstr = QString::fromStdString(curimg->ReadContent(544, 4).toStdString());
-		if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || bfsstr == "1SFB") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 | BFS W/O PARTITION TABLE
-		{
-		    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
-		}
-		else // MBR
-		{
-		    qInfo() << "MBR Partition Table Found. Parsing...";
-		    uint8_t ptreecnt = 0;
-		    uint8_t pcount = 0;
-		    for(int i=0; i < 4; i++)
-		    {
-			if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
-			    pcount++;
-		    }
-		    for(uint8_t i=0; i < pcount; i++)
-		    {
-			//int cnt = i*16;
-			uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + (i*16), 1));
-			uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i*16), 4));
-			uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i*16), 4));
-			qint64 sectorcheck = 0;
-			if(i == 0) // INITIAL PARTITION
-			    sectorcheck = 0;
-			else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
-			    sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
-			else if(i == pcount - 1) // LAST PARTITION
-			    sectorcheck = curimg->Size()/512;
-			if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
-			{
-			    //qDebug() << "unallocated partition before:" << i;
-			    //qDebug() << "unalloc:" << ptreecnt << "curoffset:" << sectorcheck << "curend:" << (curoffset + sectorcheck - 1) << "cursize:" << sectorcheck + curoffset;
-			    ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
-			    ptreecnt++;
-			}
-			if(curparttype == 0x05) // extended partition
-			{
-			    //qDebug() << "extendedpartition:" << curoffset << cursize;
-			    ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
-			    //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
-			    //ParseExtentedPartition(curimg, curoffset, cursize, j);
-			    //ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
-			}
-			else if(curparttype == 0x00)
-			{
-			    //qDebug() << "do nothing here cause it is an empty partition...";
-			}
-			else if(curparttype == 0x82) // Sun i386
-			{
-			    // parse sun table here passing pofflist and psizelist
-			}
-			else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
-			{
-			    // parse bsd table here passing pofflist nad psizelist
-			}
-			else
-			{
-			    if(cursize > 0)
-			    {
-				//qDebug() << "ppart:" << ptreecnt << "curoffset:" << curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize;
-				//qDebug() << "begin parse file system information";
-				ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
-				ptreecnt++;
-			    }
-			}
-			if(i == pcount - 1 && curoffset + cursize < curimg->Size()/512 - 1) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
-			{
-			    //qDebug() << "add unallocated partition after last partition" << i;
-			    ParsePartition(curimg, curoffset + cursize, curimg->Size()/512 - (curoffset + cursize), ptreecnt, 0);
-			    //ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
-			    //ptreecnt++;
-			}
-		    }
-		}
-	    }
-	}
-	else if(applesig == 0x504d) // APPLE PARTITION
-	{
-	    qDebug() << "apple sig here...";
-	}
-	else if(bsdsig == 0x82564557) // BSD PARTITION
-	{
-	    qDebug() << "bsd part here...";
-	}
-	else if(sunsig == 0xDABE) // SUN PARTITION
-	{
-	    qDebug() << "determine if sparc or i386 and then process partitions.";
-	}
-	else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
-	{
-	    qInfo() << "Wombat Logical Image Found. Parsing...";
-	    ParseLogicalImage(curimg);
-	}
-	else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
-	{
-	    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
-	    //qDebug() << "partition signature not found correctly";
-	}
-    }
-    //FindPartitions(curimg, &pofflist, &psizelist);
-}
 
- */ 
+FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
+{
+    FXString partitionname = "";
+    uint16_t sig16 = 0;
+    uint32_t sig32 = 0;
+    uint64_t sig64 = 0;
+    ReadForImgContent(curforimg, &sig32, offset + 544); // BFS1
+    ReadForImgContent(curforimg, &sig16, offset + 510); // FAT, NTFS, or BFS
+    if(sig32 == 0x42465331) // BFS1 - BeFS
+    {
+        char* bfsname = new char[32];
+        curforimg->ReadContent((uint8_t*)bfsname, offset + 512, 32);
+        partitionname = FXString(bfsname) + " [BFS]";
+    }
+    if(sig16 == 0xaa55) // FAT12, FAT16, FAT32, EXFAT, or NTFS
+    {
+        char* fattype = new char[5];
+        curforimg->ReadContent((uint8_t*)fattype, offset + 3, 5);
+        if(FXString(fattype).find("EXFAT") > -1)
+        {
+            std::cout << "it's exfat..." << std::endl;
+            /*  
+            uint32_t fatsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 84, 4));
+            bytespersector = pow(2, qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 108, 1))); // power of 2 so 2^(bytespersector)
+            sectorspercluster = pow(2, qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 109, 1))); // power of 2 so 2^(sectorspercluster)
+            fatcount = qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 110, 1)); // 1 or 2, 2 if TexFAT is in use
+            qulonglong fatoffset = (qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 80, 4)) * bytespersector) + (curstartsector * 512);
+            uint32_t rootdircluster = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 96, 4));
+            uint32_t clusterstart = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 88, 4));
+            qulonglong rootdiroffset = (qulonglong)((curstartsector * 512) + (((rootdircluster - 2) * sectorspercluster) + clusterstart) * bytespersector);
+            QList<uint> clusterlist;
+            clusterlist.clear();
+            if(rootdircluster >= 2)
+            {
+                clusterlist.append(rootdircluster);
+                GetNextCluster(curimg, rootdircluster, 4, fatoffset, &clusterlist);
+            }
+            QString rootdirlayout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
+            clusterlist.clear();
+            for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
+            {
+                uint curoffset = 0;
+                qDebug() << "i:" << i << "rootdiroffset:" << rootdirlayout.split(";").at(i).split(",").at(0) << "rootdirlength:" << rootdirlayout.split(";").at(i).split(",").at(1);
+                while(curoffset < rootdirlayout.split(";").at(i).split(",").at(1).toUInt())
+                {
+                    if(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdirlayout.split(";").at(i).split(",").at(0).toULongLong() + curoffset, 1)) == 0x83)
+                        break;
+                    curoffset += 32;
+                }
+                qDebug() << "curoffset:" << curoffset;
+                if(curoffset < rootdirlayout.split(";").at(i).split(",").at(1))
+                {
+                    if(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdirlayout.split(";").at(i).split(",").at(0).toULongLong() + curoffset + 1, 1)) > 0)
+                    {
+                        for(int j=0; j < qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdirlayout.split(";").at(i).split(",").at(0).toULongLong() + curoffset + 1, 1)); j++)
+                            partitionname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdirlayout.split(";").at(i).split(",").at(0).toULongLong() + curoffset + 2 + j*2, 2))));
+                        qDebug() << "partitionname:" << partitionname;
+                        out << "Volume Label|" << partitionname << "|Label for the file system volume." << Qt::endl;
+                    }
+                }
+            }
+             */
+        }
+        else if(FXString(fattype).find("NTFS") > -1)
+        {
+            std::cout << "it's ntfs..." << std::endl;
+            /*
+            uint bytespercluster = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1));
+            qint64 mftoffset = curstartsector*512 + qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 48, 8)) * bytespercluster;
+            // GET THE MFT LAYOUT TO WRITE TO PROP FILE
+            if(QString::fromStdString(curimg->ReadContent(mftoffset, 4).toStdString()) == "FILE") // a proper MFT entry
+            {
+                int curoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 20, 2)); // mft offset + offset to first attribute
+                for(int i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 40, 2)); i++) // loop over attributes until hit attribute before the next attribute id
+                {
+                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + curoffset, 4)) == 0x80 && qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset + 9, 1)) == 0) // attrtype | namelength > default$DATA attribute to parse
+                        break;
+                    curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + curoffset + 4, 4)); // attribute length
+                }
+                QString runliststr = "";
+                quint64 mftsize = 0;
+                GetRunListLayout(curimg, curstartsector, bytespercluster, 1024, mftoffset + curoffset, &runliststr);
+                //qDebug() << "runliststr for MFT Layout:" << runliststr;
+		for(int j=0; j < runliststr.split(";", Qt::SkipEmptyParts).count(); j++)
+		{
+		    mftsize += runliststr.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
+		}
+                //qDebug() << "runliststr for MFT Layout:" << runliststr << "mft size:" << mftsize;
+	        out << "MFT Layout|" << runliststr << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
+                out << "Max MFT Entries|" << QString::number((mftsize)/1024) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
+                runliststr = "";
+                mftsize = 0;
+            }
+            // GET VOLUME LABEL FROM THE $VOLUME_NAME SYSTEM FILE
+            if(QString::fromStdString(curimg->ReadContent(mftoffset + 3 * 1024, 4).toStdString()) == "FILE") // a proper MFT entry
+            {
+                int curoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 20, 2)); // offset to first attribute
+                for(uint i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 40, 2)); i++) // loop over attributes until get to next attribute id
+                {
+                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset, 4)) == 0x60) // $VOLUME_NAME attribute to parse (always resident)
+                        break;
+                    curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 4, 4));
+                }
+                for(uint k=0; k < qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4))/2; k++)
+                    partitionname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2)) + k*2, 2))));
+                out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
+                partitionname += " [NTFS]";
+            }
+             */ 
+        }
+        else
+        {
+            char* pname = NULL;
+            pname = new char[11];
+            curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
+            if(FXString(fattype).find("FAT12") > -1)
+            {
+                curforimg->ReadContent((uint8_t*)pname, offset + 43, 11);
+                partitionname = FXString(pname) + " [FAT12]";
+            }
+            else if(FXString(fattype).find("FAT16") > -1)
+            {
+                curforimg->ReadContent((uint8_t*)pname, offset + 43, 11);
+                partitionname = FXString(pname) + " [FAT16]";
+            }
+            else
+            {
+                curforimg->ReadContent((uint8_t*)fattype, offset + 82, 5);
+                if(FXString(fattype).find("FAT32") > -1)
+                {
+                    curforimg->ReadContent((uint8_t*)pname, offset + 71, 11);
+                    partitionname = FXString(pname) + " [FAT32]";
+                }
+            }
+        }
+    }
+    return partitionname;
+}
 
 /*
 void DetermineFileSystem(std::string devicestring, int* fstype)
 {
-    std::ifstream devicebuffer(devicestring.c_str(), std::ios::in|std::ios::binary);
-    unsigned char* extsig = new unsigned char[2];
-    unsigned char* winsig = new unsigned char[2];
-    unsigned char* refsig = new unsigned char[8];
-    unsigned char* f2fsig = new unsigned char[4];
-    unsigned char* zfssig = new unsigned char[8];
-    unsigned char* bcfsig = new unsigned char[16];
-    unsigned char* zonsig = new unsigned char[4];
-    char* bfssig = new char[4];
-    char* apfsig = new char[4];
-    char* hfssig = new char[2];
-    char* xfssig = new char[4];
-    char* btrsig = new char[8];
-    char* btlsig = new char[8];
-    char* isosig = new char[5];
-    char* udfsig = new char[5];
     // get ext2,3,4 signature
     devicebuffer.seekg(1080);
     devicebuffer.read((char*)extsig, 2); // 0x53, 0xef

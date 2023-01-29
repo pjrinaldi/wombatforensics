@@ -464,6 +464,7 @@ class WombatForensics : public FXMainWindow
         void LoadCaseState(void);
         void LoadPartitions(ForImg* curforimg);
         void LoadGptPartitions(ForImg* curforimg);
+        FXString GetFileSystemName(ForImg* curforimg, uint64_t offset);
 	void UpdateForensicImages(void);
 
         void LogEntry(FXString logstring)
