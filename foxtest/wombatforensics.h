@@ -41,91 +41,6 @@ struct EvidenceItem
     FXString evidencepath; // may not need these
 };
 
-/*
-struct WalHeader
-{
-    uint32_t header; // = qFromBigEndian<uint32_t>(pageheader->mid(0, 4));
-    uint32_t fileversion; // = qFromBigEndian<uint32_t>(pageheader->mid(4, 4));
-    uint32_t pagesize; // = qFromBigEndian<uint32_t>(pageheader->mid(8, 4));
-    uint32_t checkptseqnum; // = qFromBigEndian<uint32_t>(pageheader->mid(12, 4));
-    uint32_t salt1; // = qFromBigEndian<uint32_t>(pageheader->mid(16, 4));
-    uint32_t salt2; // = qFromBigEndian<uint32_t>(pageheader->mid(20, 4));
-    uint32_t checksum1; // = qFromBigEndian<uint32_t>(pageheader->mid(24, 4));
-    uint32_t checksum2; // = qFromBigEndian<uint32_t>(pageheader->mid(28, 4));
-};
-
-struct JournalHeader
-{
-    uint64_t header; //= qFromBigEndian<uint64_t>(pageheader->mid(0, 8));
-    uint32_t pagecnt; // = qFromBigEndian<uint32_t>(pageheader->mid(8, 4));
-    uint32_t randomnonce; // = qFromBigEndian<uint32_t>(pageheader->mid(12, 4));
-    uint32_t initsize; // = qFromBigEndian<uint32_t>(pageheader->mid(16, 4));
-    uint32_t sectorsize; // = qFromBigEndian<uint32_t>(pageheader->mid(20, 4));
-    uint32_t pagesize; // = qFromBigEndian<uint32_t>(pageheader->mid(24, 4));
-};
-
-struct SqliteHeader
-{
-    FXString header; // = FXString::fromStdString(pageheader->mid(0, 16).toStdString());
-    uint16_t pagesize; // = qFromBigEndian<uint16_t>(pageheader->mid(16, 2));
-    uint8_t writeversion; // = qFromBigEndian<uint8_t>(pageheader->mid(18, 1));
-    uint8_t readversion; // = qFromBigEndian<uint8_t>(pageheader->mid(19, 1));
-    uint8_t unusedpagespace; // = qFromBigEndian<uint8_t>(pageheader->mid(20, 1));
-    uint32_t pagecount; // = qFromBigEndian<uint32_t>(pageheader->mid(28, 4));
-    uint32_t firstfreepagenum; // = qFromBigEndian<uint32_t>(pageheader->mid(32, 4));
-    uint32_t freepagescount; // 36, 4
-    uint32_t schemacookie; // 40, 4
-    uint32_t schemaformat; // 44, 4 - 1,2,3,4
-    uint32_t pagecachesize; // 48, 4
-    uint32_t largestrootbtreepagenumber; // 52, 4 - or zero
-    uint32_t textencoding; // 56, 4 - 1 utf-8, 2 utf-16le, 3 utf-16be
-    uint32_t userversion; // 60, 4
-    uint32_t incrementalvacuummodebool; // 64, 4 - 0 = false, otherwise true
-    uint32_t appid; // 68, 4
-    char reserved[20]; // 72, 20
-    uint32_t versionvalidfornum; // 92, 4
-    uint32_t version; // 96, 4
-};
-
-struct PageHeader
-{
-    uint8_t type; // page type 0x02 - index interior (12) | 0x05 - table interior (12) | 0x0a - index leaf (8) | 0x0d - table leaf (8) [0,1]
-    uint16_t firstfreeblock; // start of first free block on hte page or zero for no free blocks [1, 2]
-    uint16_t cellcount; // number of cells on the page [3, 2]
-    uint16_t cellcontentstart; // start of cell content area, zero represents 65536 [5, 2]
-    uint8_t fragmentedfreebytescount; // number of fragmented free bytes within cell content area [7, 1]
-    uint32_t rightmostpagenumber; // largest page number, right most pointer, interior page only [8, 4]
-};
-
-struct FrameHeader
-{
-    uint32_t pagenumber; // pagenumber
-    uint32_t pagecount; // size of db file in pages for commits or zero
-    uint32_t salt1; // salt-1 from the wal header
-    uint32_t salt2; // salt-2 from the wal header
-    uint32_t checksum1; // checksum-1 cumulative checksum up through and including this page
-    uint32_t checksum2; // checksum-2 second half of cumulative checksum
-};
-*/
-/*
-class FXAPI FXComboTableItem : public FXTableItem {
-FXDECLARE(FXComboTableItem)
-protected:
-    FXString selections;
-private:
-    FXComboTableItem(const FXComboTableItem&);
-    FXComboTableItem& operator=(const FXComboTableItem&);
-protected:
-    FXComboTableItem(){}
-public:
-    FXComboTableItem(const FXString& text,FXIcon* ic=nullptr,void* ptr=nullptr);
-    virtual FXWindow *getControlFor(FXTable* table);
-    virtual void setFromControl(FXWindow *control);
-    void setSelections(const FXString& strings);
-    const FXString& getSelections() const { return selections; }
-};
- */ 
-
 //---------------------------------------------------------------
 //
 //  Derived checkbox table item
@@ -241,12 +156,6 @@ class WombatForensics : public FXMainWindow
 
 	FXIcon* evidmanicon;
 	FXButton* evidmanbutton;
-	/*
-        FXIcon* listaddicon;
-        FXButton* listaddbutton;
-        FXIcon* listremicon;
-        FXButton* listrembutton;
-	*/
 
         FXIcon* jumptohexicon;
         FXButton* jumptohexbutton;
@@ -310,7 +219,6 @@ class WombatForensics : public FXMainWindow
         FXIcon* virtualfileicon;
         FXIcon* virtualfoldericon;
 
-        //FXArray<FXString> sqlitefiles;
         std::vector<std::string> tags;
         FXArray<FXString> taggedlist;
         std::ifstream filebuffer;
@@ -339,21 +247,6 @@ class WombatForensics : public FXMainWindow
         ForImg* curforimg;
         std::vector<ForImg*> forimgvector;
 
-
-        /*
-        uint8_t filetype = 0;
-        uint64_t filesize = 0;
-        uint64_t pagecount = 0;
-        uint32_t pagesize = 0;
-        uint64_t curpage = 0;
-        int proptablerowcnt = 0;
-        JournalHeader journalheader;
-        WalHeader walheader;
-        SqliteHeader sqliteheader;
-        PageHeader pageheader;
-        FrameHeader frameheader;
-        */
-
     protected:
         WombatForensics() {}
 	~WombatForensics();
@@ -366,8 +259,6 @@ class WombatForensics : public FXMainWindow
             ID_OPEN = 100,
             ID_SAVE = 98,
 	    ID_EVIDMANAGE = 97,
-            //ID_ADDEVID = 97,
-            //ID_REMEVID = 96,
             ID_SETTINGS = 95,
             ID_VIEWMANAGE = 94,
             ID_MSGLOG = 93,
@@ -405,9 +296,6 @@ class WombatForensics : public FXMainWindow
             ID_LAST
         };
         WombatForensics(FXApp* a);
-        /*
-        long OpenSqliteFile(FXObject*, FXSelector, void*);
-        */
         long NewCase(FXObject*, FXSelector, void*);
         long OpenCase(FXObject*, FXSelector, void*);
         long SaveCase(FXObject*, FXSelector, void*);

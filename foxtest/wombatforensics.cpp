@@ -2426,12 +2426,18 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
 	    uint64_t mftstartingcluster = 0;
 	    ReadForImgContent(curforimg, &mftstartingcluster, offset + 48);
 	    //std::cout << "mft starting cluster: " << mftstartingcluster << std::endl;
-	    uint8_t mftentrysize = 0;
-	    curforimg->ReadContent(&mftentrysize, offset + 64, 1);
-	    uint64_t mftentrybytesize = (uint)mftentrysize * sectorspercluster * bytespersector;
-	    std::cout << "mftentrysize: " << (uint)mftentrysize << std::endl;
-	    std::cout << "mftentrybytesize: " << mftentrybytesize << std::endl;
-	    mftentrybytesize = 1024;
+	    //uint16_t bytespersector = pow(2, (uint)tmp8);
+	    int8_t mftentrysize = 0;
+	    curforimg->ReadContent((uint8_t*)&mftentrysize, offset + 64, 1);
+            uint64_t mftentrybytesize = 0;
+            if((int)mftentrysize == -10)
+                mftentrybytesize = pow(2, abs((int)mftentrysize));
+            else
+                mftentrybytesize = (int)mftentrysize * sectorspercluster * bytespersector;
+	    //uint64_t mftentrybytesize = (uint)mftentrysize * sectorspercluster * bytespersector;
+	    //std::cout << "mftentrysize: " << (int)mftentrysize << std::endl;
+	    //std::cout << "mftentrybytesize: " << mftentrybytesize << std::endl;
+	    //mftentrybytesize = 1024;
 	    uint64_t mftoffset = offset + mftstartingcluster * sectorspercluster * bytespersector;
 	    //std::cout << "mft offset: " << mftoffset << std::endl;
 	    char* mftsig = new char[4];
