@@ -2101,6 +2101,14 @@ void WombatForensics::LoadPartitions(ForImg* curforimg)
         }
         else // MBR DISK
         {
+            /*
+            FXString partitionname = "";
+            uint16_t sig16 = 0;
+            uint32_t sig32 = 0;
+            uint64_t sig64 = 0;
+            ReadForImgContent(curforimg, &sig32, offset + 544); // BFS1
+            ReadForImgContent(curforimg, &sig16, offset + 510); // FAT, NTFS, or BFS
+            */
         }
     }
     else if(applesig == 0x504d) // APPLE PARTITION
@@ -2198,18 +2206,6 @@ void WombatForensics::LoadPartitions(ForImg* curforimg)
                     }
                 }
 	    }
-	}
-	else if(applesig == 0x504d) // APPLE PARTITION
-	{
-	    qDebug() << "apple sig here...";
-	}
-	else if(bsdsig == 0x82564557) // BSD PARTITION
-	{
-	    qDebug() << "bsd part here...";
-	}
-	else if(sunsig == 0xDABE) // SUN PARTITION
-	{
-	    qDebug() << "determine if sparc or i386 and then process partitions.";
 	}
 	else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
 	{
