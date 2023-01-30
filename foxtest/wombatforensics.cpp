@@ -2366,7 +2366,9 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
 	    ReadForImgContent(curforimg, &rootdircluster, offset + 96);
 	    uint32_t clusterstart = 0;
 	    ReadForImgContent(curforimg, &clusterstart, offset + 88);
+	    //std::cout << "cluster start: " << clusterstart << std::endl;
 	    uint64_t rootdiroffset = (uint64_t)(offset + (((rootdircluster - 2) * sectorspercluster) + clusterstart) * bytespersector);
+	    //std::cout << "root dir offset: " << rootdiroffset << std::endl;
 	    FXArray<uint> clusterlist;
 	    clusterlist.clear();
 	    if(rootdircluster >= 2)
@@ -2374,30 +2376,39 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
 		clusterlist.append(rootdircluster);
 		GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
 	    }
-            std::cout << "it's exfat..." << std::endl;
+            //std::cout << "it's exfat..." << std::endl;
 	    FXString rootdirlayout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
+	    //std::cout << "rootdirlayout: " << rootdirlayout.text() << std::endl;
 	    for(int i=0; i < clusterlist.no(); i++)
 	    {
+		//std::cout << "cluster: " << i << " | " << clusterlist.at(i) << std::endl;
 		uint64_t clustersize = sectorspercluster * bytespersector;
+		//std::cout << "clustersize: " << clustersize << std::endl;
 		uint curoffset = 0;
 		while(curoffset < clustersize)
 		{
+		    uint64_t clusteroffset = (((clusterlist.at(i) - 2) * sectorspercluster) + clusterstart) * bytespersector;
+		    //std::cout << "clusteroffset: " << clusteroffset << std::endl;
 		    uint8_t firstbyte = 0;
-		    curforimg->ReadContent(&firstbyte, clusterlist.at(i) + curoffset, 1);
+		    curforimg->ReadContent(&firstbyte, rootdiroffset + curoffset, 1);
+		    //std::cout  << "firstbyte: " << std::hex << (uint)firstbyte << std::endl;
 		    if((uint)firstbyte == 0x83)
 			break;
 		    curoffset += 32;
 		}
+		//std::cout << "curoffset: " << curoffset << std::endl;
 		if(curoffset < clustersize)
 		{
 		    uint8_t secondbyte = 0;
-		    curforimg->ReadContent(&secondbyte, clusterlist.at(i) + curoffset + 1, 1);
+		    curforimg->ReadContent(&secondbyte, rootdiroffset + curoffset + 1, 1);
+		    //std::cout << "second byte: " << (uint)secondbyte << std::endl;
 		    if((uint)secondbyte > 0)
 		    {
 			for(uint j=0; j < (uint)secondbyte; j++)
 			{
 			    uint16_t singleletter = 0;
-			    ReadForImgContent(curforimg, &singleletter, clusterlist.at(i) + curoffset + 2 + j*2);
+			    ReadForImgContent(curforimg, &singleletter, rootdiroffset + curoffset + 2 + j*2);
+			    //std::cout << "singleletter: " << (char)singleletter << std::endl;
 			    partitionname += (char)singleletter;
 			    //partitionname += 
 			}
@@ -2405,38 +2416,7 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
 		}
 	    }
 	    partitionname += " [EXFAT]";
-	    std::cout << "part name: " << partitionname << std::endl;
-            /*  
-				uint8_t* sl = new uint8_t[2];
-				uint16_t singleletter = 0;
-				ReadContent(rawcontent, sl, diroffset + (j+k)*32 + m*2, 2);
-				ReturnUint16(&singleletter, sl);
-				delete[] sl;
-				filename += (char)singleletter;
-            clusterlist.clear();
-            for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
-            {
-                uint curoffset = 0;
-                qDebug() << "i:" << i << "rootdiroffset:" << rootdirlayout.split(";").at(i).split(",").at(0) << "rootdirlength:" << rootdirlayout.split(";").at(i).split(",").at(1);
-                while(curoffset < rootdirlayout.split(";").at(i).split(",").at(1).toUInt())
-                {
-                    if(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdirlayout.split(";").at(i).split(",").at(0).toULongLong() + curoffset, 1)) == 0x83)
-                        break;
-                    curoffset += 32;
-                }
-                qDebug() << "curoffset:" << curoffset;
-                if(curoffset < rootdirlayout.split(";").at(i).split(",").at(1))
-                {
-                    if(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdirlayout.split(";").at(i).split(",").at(0).toULongLong() + curoffset + 1, 1)) > 0)
-                    {
-                        for(int j=0; j < qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdirlayout.split(";").at(i).split(",").at(0).toULongLong() + curoffset + 1, 1)); j++)
-                            partitionname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdirlayout.split(";").at(i).split(",").at(0).toULongLong() + curoffset + 2 + j*2, 2))));
-                        qDebug() << "partitionname:" << partitionname;
-                        out << "Volume Label|" << partitionname << "|Label for the file system volume." << Qt::endl;
-                    }
-                }
-            }
-             */
+	    //std::cout << "part name: " << partitionname.text() << std::endl;
         }
         else if(FXString(fattype).find("NTFS") > -1)
         {
