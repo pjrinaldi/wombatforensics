@@ -2075,7 +2075,16 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
 {
     std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
     curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
-    LoadPartitions(curforimg);
+    if(itemtype == 1)
+    {
+        LoadPartitions(curforimg);
+    }
+    else if(itemtype == 2)
+    {
+        std::cout << "need to load the root directory for the partition selected here." << std::endl;
+    }
+    else
+        std::cout << "not a forensic image, so need to load something else here." << std::endl;
 
     // TEST FUNCTIONING OF WHETHER IT IS CHECKED...
     //bool iscurchecked = ((CheckTableItem*)tablelist->getItem(tablelist->getCurrentRow(), 0))->getCheck();
