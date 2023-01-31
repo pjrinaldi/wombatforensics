@@ -33,13 +33,6 @@
 #define NSEC_BTWN_1904_1970	(uint32_t) 2082844800U
 
 // may not need this structure, if i just in time load the table items.
-struct EvidenceItem
-{
-    int id;
-    FXString fullpath;
-    FXString evidencename; // may not need these
-    FXString evidencepath; // may not need these
-};
 
 //---------------------------------------------------------------
 //
@@ -245,6 +238,7 @@ class WombatForensics : public FXMainWindow
         
         Viewer* viewer;
         ForImg* curforimg;
+        int itemtype;
         std::vector<ForImg*> forimgvector;
 
     protected:

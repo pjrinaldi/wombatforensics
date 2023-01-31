@@ -149,6 +149,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
         settingfile.open(configpath + "settings", FXIO::Reading, FXIO::OwnerReadWrite);
         char* oldsettings = new char[settingfile.size()+1];
         settingfile.readBlock(oldsettings, settingfile.size());
+        oldsettings[settingfile.size()] = 0;
         settingfile.close();
         currentsettings = FXString(oldsettings);
     }
@@ -168,6 +169,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 	carvetypesfile.open(configpath + "carvetypes", FXIO::Reading, FXIO::OwnerReadWrite);
 	char* oldcarvetypes = new char[carvetypesfile.size()+1];
 	carvetypesfile.readBlock(oldcarvetypes, carvetypesfile.size());
+        oldcarvetypes[carvetypesfile.size()] = 0;
 	carvetypesfile.close();
 	currentcarvetypes = FXString(oldcarvetypes);
     }
@@ -420,6 +422,7 @@ void WombatForensics::LoadCaseState(void)
 	filebuffer.seekg(0, filebuffer.beg);
 	filebuffer.read(oldevidence, filesize);
 	filebuffer.close();
+        oldevidence[filesize] = 0;
 	//std::cout << "old evidence: " << oldevidence << std::endl;
         evidencelist = FXString(oldevidence);
 	//std::cout << "evidencelist at load: " << evidencelist.text() << std::endl;
@@ -486,8 +489,10 @@ void WombatForensics::UpdateForensicImages()
     tablelist->setColumnText(13, "Hash Match");
     for(int i=0; i < forimgvector.size(); i++)
     {
+        itemtype = 1;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-        tablelist->setItemData(i, 1, forimgvector.at(i));
+        tablelist->setItemData(i, 1, &itemtype);
+        tablelist->setItemData(i, 2, forimgvector.at(i));
         tablelist->setItemText(i, 1, FXString::value(i));
         //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
@@ -2068,7 +2073,8 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 
 long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
 {
-    curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 1);
+    std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
+    curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
     LoadPartitions(curforimg);
 
     // TEST FUNCTIONING OF WHETHER IT IS CHECKED...
@@ -2101,14 +2107,89 @@ void WombatForensics::LoadPartitions(ForImg* curforimg)
         }
         else // MBR DISK
         {
-            /*
-            FXString partitionname = "";
-            uint16_t sig16 = 0;
-            uint32_t sig32 = 0;
-            uint64_t sig64 = 0;
-            ReadForImgContent(curforimg, &sig32, offset + 544); // BFS1
-            ReadForImgContent(curforimg, &sig16, offset + 510); // FAT, NTFS, or BFS
-            */
+            char* exfattype = new char[6];
+            curforimg->ReadContent((uint8_t*)exfattype, 3, 5);
+            exfattype[5] = 0;
+            char* fattype = new char[6];
+            curforimg->ReadContent((uint8_t*)fattype, 54, 5);
+            fattype[5] = 0;
+            char* fat32type = new char[6];
+            curforimg->ReadContent((uint8_t*)fat32type, 82, 5);
+            fat32type[5] = 0;
+            char* ntfstype = new char[5];
+            curforimg->ReadContent((uint8_t*)ntfstype, 3, 4);
+            ntfstype[4] = 0;
+            char* bfstype = new char[5];
+            curforimg->ReadContent((uint8_t*)bfstype, 544, 4);
+            bfstype[4] = 0;
+            if(strcmp(exfattype, "EXFAT") == 0 || strcmp(fattype, "FAT12") == 0 || strcmp(fattype, "FAT16") == 0 || strcmp(fattype, "FAT32") == 0 || strcmp(ntfstype, "NTFS") == 0 || strcmp(bfstype, "1SFB") == 0) // EXFAT | FAT12 | FAT16 | FAT32 | NTFS | BFS W/O PARTITION TABLE
+            {
+                std::cout << "parse fs here.." << std::endl;
+                // parse partition(curofrimg, 0, curforimg->Size/512, 0, 1);
+            }
+            uint8_t ptreecnt = 0;
+            int pcount = 0;
+            for(int i=0; i < 4; i++)
+            {
+                uint32_t partsize = 0;
+                ReadForImgContent(curforimg, &partsize, 458 + i*16);
+                if(partsize > 0)
+                    pcount++;
+            }
+            for(int i=0; i < pcount; i++)
+            {
+                uint8_t curparttype = 0;
+                curforimg->ReadContent(&curparttype, 450 + i*16, 1);
+                uint32_t curoffset = 0;
+                ReadForImgContent(curforimg, &curoffset, 454 + i*16);
+                uint32_t cursize = 0;
+                ReadForImgContent(curforimg, &cursize, 458 + i*16);
+                uint64_t sectorcheck = 0;
+                if(i == 0)
+                    sectorcheck = 0;
+                else if(i > 0 && i < pcount - 1)
+                {
+                    uint32_t prevoffset = 0;
+                    ReadForImgContent(curforimg, &prevoffset, 454 + (i-1) * 16);
+                    uint32_t prevsize = 0;
+                    ReadForImgContent(curforimg, &prevsize, 458 + (i-1) * 16);
+                    sectorcheck = prevoffset + prevsize;
+                }
+                else if(i == pcount - 1)
+                    sectorcheck = curforimg->Size() / 512;
+                if(curoffset > sectorcheck) // add unallocated partition
+                {
+                    // Parse Partition(curforimg, sectorcheck, curoffset, ptreecnt, 0);
+                }
+                if((uint)curparttype == 0x05) // extended partition
+                {
+                    // ptreecnt = Parse Extended Partition(curforimg, curoffset, cursize, ptreecnt);
+                }
+                else if((uint)curparttype == 0x00)
+                {
+                    // do nothing here cause it's an empty partition
+                }
+                else if((uint)curparttype == 0x82) // Sun i386
+                {
+                    // parse sun table here passing pofflist nad psizelist
+                }
+                else if((uint)curparttype == 0xa5 || (uint)curparttype == 0xa6 || (uint)curparttype == 0xa9) // BSD
+                {
+                    // parse BSD table here passing pofflist and psizelist
+                }
+                else
+                {
+                    if(cursize > 0)
+                    {
+                        // Parse Partition(curforimg, curoffset, cursize, ptreecnt, 1);
+                    }
+                }
+                if( i == pcount - 1 && curoffset + cursize < curforimg->Size() / 512 - 1) // ADD UNALLOCATED AT END
+                {
+                    // parse partition(curforimg, curoffset + cursize, curimg->Size / 512 - (curoffset + cursize), ptreecnt, 0);
+                }
+                    
+            }
         }
     }
     else if(applesig == 0x504d) // APPLE PARTITION
@@ -2125,102 +2206,47 @@ void WombatForensics::LoadPartitions(ForImg* curforimg)
     }
     else if(gptsig == 0x4546492050415254) // GPT PARTITION
         LoadGptPartitions(curforimg);
-}
-/*
-	if(mbrsig == 0xaa55) // POSSIBLY MBR OR GPT
-	{
-            QString exfatstr = QString::fromStdString(curimg->ReadContent(3, 5).toStdString());
-            QString fatstr = QString::fromStdString(curimg->ReadContent(54, 5).toStdString());
-            QString fat32str = QString::fromStdString(curimg->ReadContent(82, 5).toStdString());
-            QString bfsstr = QString::fromStdString(curimg->ReadContent(544, 4).toStdString());
-            if(exfatstr.startsWith("NTFS") || exfatstr == "EXFAT" || fatstr == "FAT12" || fatstr == "FAT16" || fat32str == "FAT32" || bfsstr == "1SFB") // NTFS | EXFAT | FAT12 | FAT16 | FAT32 | BFS W/O PARTITION TABLE
-            {
-                ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
-            }
-            else // MBR
-            {
-                qInfo() << "MBR Partition Table Found. Parsing...";
-                uint8_t ptreecnt = 0;
-                uint8_t pcount = 0;
-                for(int i=0; i < 4; i++)
-                {
-                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + i*16, 4)) > 0)
-                        pcount++;
-                }
-                for(uint8_t i=0; i < pcount; i++)
-                {
-                    //int cnt = i*16;
-                    uint8_t curparttype = qFromLittleEndian<uint8_t>(curimg->ReadContent(450 + (i*16), 1));
-                    uint32_t curoffset = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i*16), 4));
-                    uint32_t cursize = qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i*16), 4));
-                    qint64 sectorcheck = 0;
-                    if(i == 0) // INITIAL PARTITION
-                        sectorcheck = 0;
-                    else if(i > 0 && i < pcount - 1) // MIDDLE PARTITIONS
-                        sectorcheck = qFromLittleEndian<uint32_t>(curimg->ReadContent(454 + (i-1)*16, 4)) + qFromLittleEndian<uint32_t>(curimg->ReadContent(458 + (i-1)*16, 4));
-                    else if(i == pcount - 1) // LAST PARTITION
-                        sectorcheck = curimg->Size()/512;
-                    if(curoffset > sectorcheck) // ADD UNALLOCATED PARTITION
-                    {
-                        //qDebug() << "unallocated partition before:" << i;
-                        //qDebug() << "unalloc:" << ptreecnt << "curoffset:" << sectorcheck << "curend:" << (curoffset + sectorcheck - 1) << "cursize:" << sectorcheck + curoffset;
-                        ParsePartition(curimg, sectorcheck, curoffset, ptreecnt, 0);
-                        ptreecnt++;
-                    }
-                    if(curparttype == 0x05) // extended partition
-                    {
-                        //qDebug() << "extendedpartition:" << curoffset << cursize;
-                        ptreecnt = ParseExtendedPartition(curimg, curoffset, cursize, ptreecnt);
-                        //qDebug() << "extended partition offset:" << curoffset << "size:" << cursize;
-                        //ParseExtentedPartition(curimg, curoffset, cursize, j);
-                        //ParseExtendedPartition(curimg, curoffset, curoffset, cursize, pofflist, psizelist, fsinfolist); // add fsinfolist here as well...
-                    }
-                    else if(curparttype == 0x00)
-                    {
-                        //qDebug() << "do nothing here cause it is an empty partition...";
-                    }
-                    else if(curparttype == 0x82) // Sun i386
-                    {
-                        // parse sun table here passing pofflist and psizelist
-                    }
-                    else if(curparttype == 0xa5 || curparttype == 0xa6 || curparttype == 0xa9) // BSD
-                    {
-                        // parse bsd table here passing pofflist nad psizelist
-                    }
-                    else
-                    {
-                        if(cursize > 0)
-                        {
-                            //qDebug() << "ppart:" << ptreecnt << "curoffset:" << curoffset << "curend:" << (curoffset + cursize - 1) << "cursize:" << cursize;
-                            //qDebug() << "begin parse file system information";
-                            ParsePartition(curimg, curoffset, cursize, ptreecnt, 1);
-                            ptreecnt++;
-                        }
-                    }
-                    if(i == pcount - 1 && curoffset + cursize < curimg->Size()/512 - 1) // ADD UNALLOCATED PARTITION AFTER ALL OTHER PARTITIONS
-                    {
-                        //qDebug() << "add unallocated partition after last partition" << i;
-                        ParsePartition(curimg, curoffset + cursize, curimg->Size()/512 - (curoffset + cursize), ptreecnt, 0);
-                        //ParsePartition(curimg, curendsector+1, curimg->Size()/512 - 1 - curendsector, ptreecnt, 0);
-                        //ptreecnt++;
-                    }
-                }
-	    }
-	}
-	else if(wlisig == 0x776f6d6261746c69) // wombatli - wombat logical image signature (8 bytes)
-	{
-	    qInfo() << "Wombat Logical Image Found. Parsing...";
-	    ParseLogicalImage(curimg);
-	}
-	else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
-	{
-	    ParsePartition(curimg, 0, curimg->Size()/512, 0, 1);
-	    //qDebug() << "partition signature not found correctly";
-	}
+    else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
+    {
+        // table initialization
+        tablelist->setTableSize(1, 14);
+        tablelist->setColumnText(0, "");
+        tablelist->setColumnText(1, "ID");
+        tablelist->setColumnText(2, "Name");
+        tablelist->setColumnText(3, "Path");
+        tablelist->setColumnText(4, "Size (bytes)");
+        tablelist->setColumnText(5, "Created");
+        tablelist->setColumnText(6, "Accessed");
+        tablelist->setColumnText(7, "Modified");
+        tablelist->setColumnText(8, "Changed");
+        tablelist->setColumnText(9, "Hash");
+        tablelist->setColumnText(10, "Category");
+        tablelist->setColumnText(11, "Signature");
+        tablelist->setColumnText(12, "Tagged");
+        tablelist->setColumnText(13, "Hash Match");
+
+        // partition information
+        itemtype = 2;
+        tablelist->setItem(0, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+        tablelist->setItemData(0, 1, &itemtype);
+        tablelist->setItemText(0, 1, FXString::value(0));
+        tablelist->setItemData(0, 2, curforimg);
+        tablelist->setItemText(0, 2, GetFileSystemName(curforimg, 0));
+        tablelist->setItemIcon(0, 2, partitionicon);
+        tablelist->setItemIconPosition(0, 2, FXTableItem::BEFORE);
+        tablelist->setItemText(0, 4, FXString(ReturnFormattingSize(curforimg->Size()).c_str()));
+
+        // ParsePartition(curforimg, 0, curimg->Size()/512, 0 (part id), 1 (allocated));
+        // table formatting
+        tablelist->fitColumnsToContents(0);
+        tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+        FitColumnContents(1);
+        FitColumnContents(2);
+        FitColumnContents(4);
+        AlignColumn(tablelist, 1, FXTableItem::LEFT);
+        AlignColumn(tablelist, 2, FXTableItem::LEFT);
     }
-    //FindPartitions(curimg, &pofflist, &psizelist);
 }
- */ 
 
 void WombatForensics::LoadGptPartitions(ForImg* curforimg)
 {
@@ -2259,6 +2285,7 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
     tablelist->setColumnText(13, "Hash Match");
     for(int i=0; i < pcount; i++)
     {
+        itemtype = 2;
         uint64_t sectorcheck = 0;
         int cnt = i * partentrysize;
         uint64_t curstartsector = 0;
@@ -2282,9 +2309,10 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
             if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
             {
                 tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-                tablelist->setItemData(ptreecnt, 1, curforimg);
+                tablelist->setItemData(ptreecnt, 1, &itemtype);
                 tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
                 tablelist->setItemText(ptreecnt, 2, "UNALLOCATED");
+                tablelist->setItemData(ptreecnt, 2, curforimg);
                 tablelist->setItemIcon(ptreecnt, 2, partitionicon);
                 tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
 
@@ -2294,9 +2322,10 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
             }
             // LOAD ALLOCATED PARTITION READ FROM TABLE curstartsector, (curendsector - curstartsector + 1), 1)
             tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-            tablelist->setItemData(ptreecnt, 1, curforimg);
+            tablelist->setItemData(ptreecnt, 1, &itemtype);
             tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
             tablelist->setItemText(ptreecnt, 2, GetFileSystemName(curforimg, curstartsector*512));
+            tablelist->setItemData(ptreecnt, 2, curforimg);
             tablelist->setItemIcon(ptreecnt, 2, partitionicon);
             tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
             tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curendsector - curstartsector + 1)*512).c_str()));
@@ -2307,9 +2336,10 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
                 {
                     // LOAD UNALLOCATED curendsector+1, curforimg->Size() / 512 - 1 - curendsector, 0)
                     tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-                    tablelist->setItemData(ptreecnt, 1, curforimg);
+                    tablelist->setItemData(ptreecnt, 1, &itemtype);
                     tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
                     tablelist->setItemText(ptreecnt, 2, "UNALLOCATED");
+                    tablelist->setItemData(ptreecnt, 2, curforimg);
                     tablelist->setItemIcon(ptreecnt, 2, partitionicon);
                     tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
                     tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curforimg->Size() / 512 - 1 - curendsector)*512).c_str()));
@@ -2336,15 +2366,17 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
     ReadForImgContent(curforimg, &sig16, offset + 510); // FAT, NTFS, or BFS
     if(sig32 == 0x42465331) // BFS1 - BeFS
     {
-        char* bfsname = new char[32];
+        char* bfsname = new char[33];
         curforimg->ReadContent((uint8_t*)bfsname, offset + 512, 32);
+        bfsname[32] = 0;
         partitionname = FXString(bfsname) + " [BFS]";
     }
     if(sig16 == 0xaa55) // FAT12, FAT16, FAT32, EXFAT, or NTFS
     {
-        char* fattype = new char[5];
+        char* fattype = new char[6];
         curforimg->ReadContent((uint8_t*)fattype, offset + 3, 5);
-        if(FXString(fattype).find("EXFAT") > -1)
+        fattype[5] = 0;
+        if(strcmp(fattype, "EXFAT") == 0)
         {
 	    uint32_t fatsize = 0;
 	    ReadForImgContent(curforimg, &fatsize, offset + 84);
@@ -2436,10 +2468,12 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
 	    //mftentrybytesize = 1024;
 	    uint64_t mftoffset = offset + mftstartingcluster * sectorspercluster * bytespersector;
 	    //std::cout << "mft offset: " << mftoffset << std::endl;
-	    char* mftsig = new char[4];
+	    char* mftsig = new char[5];
 	    curforimg->ReadContent((uint8_t*)mftsig, mftoffset + 3 * mftentrybytesize, 4);
+            mftsig[4] = 0;
 	    //std::cout << "mftsig: |" << mftsig << "|" << std::endl;
-	    if(FXString(mftsig).find("FILE") > -1) // proper mft entry
+	    //if(FXString(mftsig).find("FILE") > -1) // proper mft entry
+	    if(strcmp(mftsig, "FILE") == 0) // proper mft entry
 	    {
 		uint16_t curoffset = 0;
 		ReadForImgContent(curforimg, &curoffset, mftoffset + 3*mftentrybytesize + 20);
@@ -2475,114 +2509,31 @@ FXString WombatForensics::GetFileSystemName(ForImg* curforimg, uint64_t offset)
 		partitionname += " [NTFS]";
 		//std::cout << "partition name: " << partitionname.text() << std::endl;
 	    }
-	    /*
-	    if(QString::fromStdString(curimg->ReadContent(mftoffset + 3 * 1024, 4).toStdString()) == "FILE") // a proper MFT entry
-            {
-                int curoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 20, 2)); // offset to first attribute
-                for(uint i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 40, 2)); i++) // loop over attributes until get to next attribute id
-                {
-                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset, 4)) == 0x60) // $VOLUME_NAME attribute to parse (always resident)
-                        break;
-                    curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 4, 4));
-                }
-                for(uint k=0; k < qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4))/2; k++)
-                    partitionname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2)) + k*2, 2))));
-                out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
-                partitionname += " [NTFS]";
-            }
-             */ 
-
-	    /*
-    //std::cout << "MFT Starting Cluster|Offset: " << mftstartingcluster << " | " << mftstartingcluster * sectorspercluster * bytespersector << std::endl;
-    // MFT ENTRY SIZE
-    //std::cout << "MFT Entry Size (cluster, bytes): " << (int)mftentrysize << ", " << mftentrysize * sectorspercluster * bytespersector << std::endl;
-    // MFT LAYOUT
-    uint64_t mftoffset = mftstartingcluster * sectorspercluster * bytespersector;
-    std::string mftlayout = GetDataAttributeLayout(rawcontent, curnt, mftoffset);
-    //curnt->mftlayout = mftlayout;
-    std::vector<std::string> mftlayoutlist;
-    mftlayoutlist.clear();
-    std::istringstream mll(mftlayout);
-    std::string mls;
-    uint64_t mftsize = 0;
-    while(getline(mll, mls, ';'))
-        mftlayoutlist.push_back(mls);
-    for(int i=0; i < mftlayoutlist.size(); i++)
-    {
-        std::size_t layoutsplit = mftlayoutlist.at(i).find(",");
-        mftsize += std::stoull(mftlayoutlist.at(i).substr(layoutsplit+1));
-    }
-    //std::cout << "MFT Size: " << mftsize << std::endl;
-    uint64_t maxmftentrycount = mftsize / (curnt->mftentrysize * curnt->sectorspercluster * curnt->bytespersector);
-    curnt->maxmftentrycount = maxmftentrycount;
-    //std::cout << "Max MFT Entry Count: " << maxmftentrycount << std::endl;
-	     */ 
-            //std::cout << "it's ntfs..." << std::endl;
-            /*
-            uint bytespercluster = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector*512 + 11, 2)) * qFromLittleEndian<uint8_t>(curimg->ReadContent(curstartsector*512 + 13, 1));
-            qint64 mftoffset = curstartsector*512 + qFromLittleEndian<qulonglong>(curimg->ReadContent(curstartsector*512 + 48, 8)) * bytespercluster;
-            // GET THE MFT LAYOUT TO WRITE TO PROP FILE
-            if(QString::fromStdString(curimg->ReadContent(mftoffset, 4).toStdString()) == "FILE") // a proper MFT entry
-            {
-                int curoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 20, 2)); // mft offset + offset to first attribute
-                for(int i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 40, 2)); i++) // loop over attributes until hit attribute before the next attribute id
-                {
-                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + curoffset, 4)) == 0x80 && qFromLittleEndian<uint8_t>(curimg->ReadContent(mftoffset + curoffset + 9, 1)) == 0) // attrtype | namelength > default$DATA attribute to parse
-                        break;
-                    curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + curoffset + 4, 4)); // attribute length
-                }
-                QString runliststr = "";
-                quint64 mftsize = 0;
-                GetRunListLayout(curimg, curstartsector, bytespercluster, 1024, mftoffset + curoffset, &runliststr);
-                //qDebug() << "runliststr for MFT Layout:" << runliststr;
-		for(int j=0; j < runliststr.split(";", Qt::SkipEmptyParts).count(); j++)
-		{
-		    mftsize += runliststr.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
-		}
-                //qDebug() << "runliststr for MFT Layout:" << runliststr << "mft size:" << mftsize;
-	        out << "MFT Layout|" << runliststr << "|Layout for the MFT in starting offset, size; format" << Qt::endl;
-                out << "Max MFT Entries|" << QString::number((mftsize)/1024) << "|Max MFT Entries allowed in the MFT" << Qt::endl;
-                runliststr = "";
-                mftsize = 0;
-            }
-            // GET VOLUME LABEL FROM THE $VOLUME_NAME SYSTEM FILE
-            if(QString::fromStdString(curimg->ReadContent(mftoffset + 3 * 1024, 4).toStdString()) == "FILE") // a proper MFT entry
-            {
-                int curoffset = qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 20, 2)); // offset to first attribute
-                for(uint i=0; i < qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + 40, 2)); i++) // loop over attributes until get to next attribute id
-                {
-                    if(qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset, 4)) == 0x60) // $VOLUME_NAME attribute to parse (always resident)
-                        break;
-                    curoffset += qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 4, 4));
-                }
-                for(uint k=0; k < qFromLittleEndian<uint32_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 16, 4))/2; k++)
-                    partitionname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + qFromLittleEndian<uint16_t>(curimg->ReadContent(mftoffset + 3*1024 + curoffset + 20, 2)) + k*2, 2))));
-                out << "Volume Label|" << partitionname << "|Volume Label for the file system." << Qt::endl;
-                partitionname += " [NTFS]";
-            }
-             */ 
         }
         else
         {
-            char* pname = NULL;
-            pname = new char[11];
+            char* pname = new char[12];
             curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
-            if(FXString(fattype).find("FAT12") > -1)
+            if(strcmp(fattype, "FAT12") == 0)
             {
                 curforimg->ReadContent((uint8_t*)pname, offset + 43, 11);
+                pname[11] = 0;
                 partitionname = FXString(pname) + " [FAT12]";
             }
-            else if(FXString(fattype).find("FAT16") > -1)
+            else if(strcmp(fattype, "FAT16") == 0)
             {
                 curforimg->ReadContent((uint8_t*)pname, offset + 43, 11);
+                pname[11] = 0;
                 partitionname = FXString(pname) + " [FAT16]";
             }
             else
             {
                 curforimg->ReadContent((uint8_t*)fattype, offset + 82, 5);
-                if(FXString(fattype).find("FAT32") > -1)
+                fattype[5] = 0;
+                if(strcmp(fattype, "FAT32") == 0)
                 {
                     curforimg->ReadContent((uint8_t*)pname, offset + 71, 11);
+                    pname[11] = 0;
                     partitionname = FXString(pname) + " [FAT32]";
                 }
             }
