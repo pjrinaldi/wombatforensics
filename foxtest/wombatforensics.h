@@ -126,6 +126,14 @@ long CheckTableItem::onCheck(FXObject *, FXSelector, void *vp)
     return 1;
 }
 
+// MAY NEED A STRUCTURE THAT CONTAINS ITEM TYPE, CURFORIMG INDEX, PARENTID, CHILDID OR SOME SUCH
+struct CurrentItem
+{
+    int itemtype = 0;
+    int forimgindex = 0;
+    int parentindx = 0;
+    int childindx = 0;
+};
 
 class WombatForensics : public FXMainWindow
 {
@@ -246,6 +254,7 @@ class WombatForensics : public FXMainWindow
         
         Viewer* viewer;
         ForImg* curforimg;
+	CurrentItem currentitem;
         int itemtype;
         std::vector<ForImg*> forimgvector;
         std::vector<std::string> volnames;
@@ -317,6 +326,7 @@ class WombatForensics : public FXMainWindow
         long ContentSelected(FXObject*, FXSelector, void*);
         long LoadForensicImages(FXObject*, FXSelector, void*);
         long LoadChildren(FXObject*, FXSelector, void*);
+        long LoadCurrent(FXObject*, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
         /*
@@ -393,6 +403,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTINGS, WombatForensics::OpenSettings),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HOME, WombatForensics::LoadForensicImages),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CURRENT, WombatForensics::LoadCurrent),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
     FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_TABLESELECT, WombatForensics::TableUpDown),
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),

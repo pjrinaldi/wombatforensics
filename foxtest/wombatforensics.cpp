@@ -110,7 +110,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     backbutton->setIconPosition(ICON_BEFORE_TEXT);
     // PATH TOOLBAR CURRENT ICON
     curicon = new FXPNGIcon(this->getApp(), current);
-    curbutton = new FXButton(pathtoolbar, "CURRENT", curicon, this, ID_FRWD, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    curbutton = new FXButton(pathtoolbar, "CURRENT", curicon, this, ID_CURRENT, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
     curbutton->setIconPosition(ICON_BEFORE_TEXT);
     // PATH TOOLBAR FORWARD ICON
     frwdicon = new FXPNGIcon(this->getApp(), frwd);
@@ -427,7 +427,7 @@ void WombatForensics::EnableCaseButtons()
     burrowbutton->enable();
     //backbutton->enable();
     //frwdbutton->enable();
-    //curbutton->enable();
+    curbutton->enable();
 }
 
 void WombatForensics::LoadCaseState(void)
@@ -2101,15 +2101,32 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
     return 1;
 }
 
+long WombatForensics::LoadCurrent(FXObject* sender, FXSelector, void*)
+{
+    CurrentItem* curitm = ((CurrentItem*)(((FXButton*)sender)->getUserData()));
+    std::cout << "item text: " << ((FXButton*)sender)->getText().text() << std::endl;
+    std::cout << curitm->itemtype << std::endl;
+    std::cout << curitm->forimgindex << std::endl;
+    //FXString tagstr = ((FXMenuCommand*)sender)->getText();
+
+    return 1;
+}
+
 long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 {
     //std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
     itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
     curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
     FXString itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2);
-    std::cout << "item text: " << itemtext.text() << std::endl;
+    //std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1)
     {
+	currentitem.itemtype = 1;
+	currentitem.forimgindex = tablelist->getCurrentRow();
+	currentitem.parentindx = 0;
+	currentitem.childindx = 0;
+	curbutton->setText(itemtext);
+	curbutton->setUserData(&currentitem);
 	//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
 	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
         volnames.clear();
