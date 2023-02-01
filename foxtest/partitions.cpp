@@ -250,7 +250,7 @@ void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsiz
         if(curoffset > sectorcheck) // add unallocated partition
         {
             volnames->push_back("UNALLOCATED");
-            volsizes->push_back(curoffset*512);
+            volsizes->push_back((curoffset - sectorcheck)*512);
             voloffsets->push_back(epoffset + sectorcheck*512);
         }
         if((uint)curparttype == 0x05) // extended partition
@@ -274,16 +274,16 @@ void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsiz
             if(cursize > 0)
             {
                 // Parse Partition(curforimg, curoffset, cursize, ptreecnt, 1);
-                volnames->push_back(GetFileSystemName(curforimg, curoffset*512));
+                volnames->push_back(GetFileSystemName(curforimg, epoffset + curoffset*512));
                 volsizes->push_back(cursize*512);
-                voloffsets->push_back(curoffset*512);
+                voloffsets->push_back(epoffset + curoffset*512);
             }
         }
-        if( i == pcount - 1 && curoffset + cursize < epsize / 512 - 1) // ADD UNALLOCATED AT END
+        if( i == pcount - 1 && (epoffset / 512 + curoffset + cursize) < epsize / 512 - 1) // ADD UNALLOCATED AT END
         {
             volnames->push_back("UNALLOCATED");
             volsizes->push_back((epsize / 512 - (curoffset + cursize)) * 512);
-            voloffsets->push_back((curoffset + cursize) * 512);
+            voloffsets->push_back(epoffset + (curoffset + cursize) * 512);
             // parse partition(curforimg, curoffset + cursize, curimg->Size / 512 - (curoffset + cursize), ptreecnt, 0);
         }
     }
