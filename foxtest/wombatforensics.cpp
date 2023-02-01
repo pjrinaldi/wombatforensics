@@ -103,7 +103,6 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     burrowicon = new FXPNGIcon(this->getApp(), burrow);
     burrowicon->create();
     burrowbutton = new FXButton(pathtoolbar, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
-    //burrowbutton->setTipText("Home");
     burrowbutton->setIconPosition(ICON_BEFORE_TEXT);
 
     // ITEM TYPE ICONS
@@ -2096,9 +2095,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1)
     {
-	//burrowbutton = new FXButton(pathtoolbar, "HOME", NULL, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
-        //new FXMenuCommand(&tagmenu, "Create New Tag", new FXPNGIcon(this->getApp(), bookmarknew), this, ID_NEWTAG);
-	new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
+	//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
 	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
         volnames.clear();
         volsizes.clear();
