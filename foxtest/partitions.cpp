@@ -82,9 +82,13 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                 if(curoffset > sectorcheck) // add unallocated partition
                 {
                     // Parse Partition(curforimg, sectorcheck, curoffset, ptreecnt, 0);
+                    volnames->push_back("UNALLOCATED");
+                    volsizes->push_back(curoffset*512);
+                    voloffsets->push_back(sectorcheck*512);
                 }
                 if((uint)curparttype == 0x05) // extended partition
                 {
+                    LoadExtendedPartitions(curforimg, curoffset * 512, cursize * 512, volnames, volsizes, voloffsets);
                     // ptreecnt = Parse Extended Partition(curforimg, curoffset, cursize, ptreecnt);
                 }
                 else if((uint)curparttype == 0x00)
@@ -104,10 +108,16 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                     if(cursize > 0)
                     {
                         // Parse Partition(curforimg, curoffset, cursize, ptreecnt, 1);
+                        volnames->push_back(GetFileSystemName(curforimg, curoffset*512));
+                        volsizes->push_back(cursize*512);
+                        voloffsets->push_back(curoffset*512);
                     }
                 }
                 if( i == pcount - 1 && curoffset + cursize < curforimg->Size() / 512 - 1) // ADD UNALLOCATED AT END
                 {
+                    volnames->push_back("UNALLOCATED");
+                    volsizes->push_back((curforimg->Size() / 512 - (curoffset + cursize)) * 512);
+                    voloffsets->push_back((curoffset + cursize) * 512);
                     // parse partition(curforimg, curoffset + cursize, curimg->Size / 512 - (curoffset + cursize), ptreecnt, 0);
                 }
                     
@@ -158,23 +168,6 @@ void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, st
         if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
             pcount++;
     }
-    /*
-    tablelist->setTableSize(pcount * 2 + 1, 14);
-    tablelist->setColumnText(0, "");
-    tablelist->setColumnText(1, "ID");
-    tablelist->setColumnText(2, "Name");
-    tablelist->setColumnText(3, "Path");
-    tablelist->setColumnText(4, "Size (bytes)");
-    tablelist->setColumnText(5, "Created");
-    tablelist->setColumnText(6, "Accessed");
-    tablelist->setColumnText(7, "Modified");
-    tablelist->setColumnText(8, "Changed");
-    tablelist->setColumnText(9, "Hash");
-    tablelist->setColumnText(10, "Category");
-    tablelist->setColumnText(11, "Signature");
-    tablelist->setColumnText(12, "Tagged");
-    tablelist->setColumnText(13, "Hash Match");
-    */
     for(int i=0; i < pcount; i++)
     {
         //itemtype = 2;
@@ -203,35 +196,12 @@ void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, st
                 volnames->push_back("UNALLOCATED");
                 volsizes->push_back(curstartsector*512);
                 voloffsets->push_back(sectorcheck);
-                /*
-                tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-                tablelist->setItemData(ptreecnt, 1, &itemtype);
-                tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
-                tablelist->setItemText(ptreecnt, 2, "UNALLOCATED");
-                tablelist->setItemData(ptreecnt, 2, curforimg);
-                tablelist->setItemIcon(ptreecnt, 2, partitionicon);
-                tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
-
-                tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize(curstartsector*512).c_str()));
-                */
                 // LOAD UNALLOCATED PARTITON sectorcheck, curstartsector, 0
-                //ptreecnt++;
             }
             // LOAD ALLOCATED PARTITION READ FROM TABLE curstartsector, (curendsector - curstartsector + 1), 1)
             volnames->push_back(GetFileSystemName(curforimg, curstartsector*512));
             volsizes->push_back((curendsector - curstartsector + 1)*512);
             voloffsets->push_back(curstartsector*512);
-            /*
-            tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-            tablelist->setItemData(ptreecnt, 1, &itemtype);
-            tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
-            tablelist->setItemText(ptreecnt, 2, GetFileSystemName(curforimg, curstartsector*512));
-            tablelist->setItemData(ptreecnt, 2, curforimg);
-            tablelist->setItemIcon(ptreecnt, 2, partitionicon);
-            tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
-            tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curendsector - curstartsector + 1)*512).c_str()));
-            */
-            //ptreecnt++;
             if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
             {
                 if(curendsector < curforimg->Size() / 512)
@@ -240,30 +210,85 @@ void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, st
                     volnames->push_back("UNALLOCATED");
                     volsizes->push_back((curforimg->Size() / 512 - 1 - curendsector) * 512);
                     voloffsets->push_back((curendsector + 1) * 512);
-                    /*
-                    tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-                    tablelist->setItemData(ptreecnt, 1, &itemtype);
-                    tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
-                    tablelist->setItemText(ptreecnt, 2, "UNALLOCATED");
-                    tablelist->setItemData(ptreecnt, 2, curforimg);
-                    tablelist->setItemIcon(ptreecnt, 2, partitionicon);
-                    tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
-                    tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curforimg->Size() / 512 - 1 - curendsector)*512).c_str()));
-                    */
                 }
             }
         }
     }
-    /*
-    tablelist->fitColumnsToContents(0);
-    tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
-    FitColumnContents(1);
-    FitColumnContents(2);
-    FitColumnContents(4);
-    AlignColumn(tablelist, 1, FXTableItem::LEFT);
-    AlignColumn(tablelist, 2, FXTableItem::LEFT);
-    */
 }
+
+void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsize, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets)
+{
+    int pcount = 0;
+    for(int i=0; i < 4; i++)
+    {
+        uint32_t partsize = 0;
+        ReadForImgContent(curforimg, &partsize, epoffset + 458 + i*16);
+        if(partsize > 0)
+            pcount++;
+    }
+    for(int i=0; i < pcount; i++)
+    {
+        uint8_t curparttype = 0;
+        curforimg->ReadContent(&curparttype, epoffset + 450 + i*16, 1);
+        uint32_t curoffset = 0;
+        ReadForImgContent(curforimg, &curoffset, epoffset + 454 + i*16);
+        uint32_t cursize = 0;
+        ReadForImgContent(curforimg, &cursize, epoffset + 458 + i*16);
+        uint64_t sectorcheck = 0;
+	if(i == 0) // ADD INITIAL UNALLOCATED PARTITION
+            sectorcheck = 0;
+        else if(i > 0 && i < pcount - 1)
+        {
+            uint32_t prevoffset = 0;
+            ReadForImgContent(curforimg, &prevoffset, epoffset + 454 + (i-1) * 16);
+            uint32_t prevsize = 0;
+            ReadForImgContent(curforimg, &prevsize, epoffset + 458 + (i-1) * 16);
+            sectorcheck = prevoffset + prevsize;
+        }
+        else if(i == pcount - 1)
+            sectorcheck = epsize / 512;
+        if(curoffset > sectorcheck) // add unallocated partition
+        {
+            volnames->push_back("UNALLOCATED");
+            volsizes->push_back(curoffset*512);
+            voloffsets->push_back(sectorcheck*512);
+        }
+        if((uint)curparttype == 0x05) // extended partition
+        {
+            LoadExtendedPartitions(curforimg, epoffset + curoffset * 512, cursize * 512, volnames, volsizes, voloffsets);
+        }
+        else if((uint)curparttype == 0x00)
+        {
+            // do nothing here cause it's an empty partition
+        }
+        else if((uint)curparttype == 0x82) // Sun i386
+        {
+            // parse sun table here passing pofflist nad psizelist
+        }
+        else if((uint)curparttype == 0xa5 || (uint)curparttype == 0xa6 || (uint)curparttype == 0xa9) // BSD
+        {
+            // parse BSD table here passing pofflist and psizelist
+        }
+        else
+        {
+            if(cursize > 0)
+            {
+                // Parse Partition(curforimg, curoffset, cursize, ptreecnt, 1);
+                volnames->push_back(GetFileSystemName(curforimg, curoffset*512));
+                volsizes->push_back(cursize*512);
+                voloffsets->push_back(curoffset*512);
+            }
+        }
+        if( i == pcount - 1 && curoffset + cursize < epsize / 512 - 1) // ADD UNALLOCATED AT END
+        {
+            volnames->push_back("UNALLOCATED");
+            volsizes->push_back((epsize / 512 - (curoffset + cursize)) * 512);
+            voloffsets->push_back((curoffset + cursize) * 512);
+            // parse partition(curforimg, curoffset + cursize, curimg->Size / 512 - (curoffset + cursize), ptreecnt, 0);
+        }
+    }
+}
+
 
 std::string GetFileSystemName(ForImg* curforimg, uint64_t offset)
 {
@@ -450,6 +475,151 @@ std::string GetFileSystemName(ForImg* curforimg, uint64_t offset)
     }
     return partitionname;
 }
+
+
+/*
+void DetermineFileSystem(std::string devicestring, int* fstype)
+{
+    // get ext2,3,4 signature
+    devicebuffer.seekg(1080);
+    devicebuffer.read((char*)extsig, 2); // 0x53, 0xef
+    // get windows mbr signature (FAT, NTFS, BFS)
+    devicebuffer.seekg(510);
+    devicebuffer.read((char*)winsig, 2); // 0x55, 0xaa
+    // get BFS signature
+    devicebuffer.seekg(544);
+    devicebuffer.read(bfssig, 4);
+    std::string bfsigstr(bfssig);
+    delete[] bfssig;
+    // get apfs signature
+    devicebuffer.seekg(32);
+    devicebuffer.read(apfsig, 4);
+    std::string apfsigstr(apfsig);
+    delete[] apfsig;
+    // get hfs signature
+    devicebuffer.seekg(1024);
+    devicebuffer.read(hfssig, 2);
+    std::string hfssigstr(hfssig);
+    delete[] hfssig;
+    // get xfs signature
+    devicebuffer.seekg(0);
+    devicebuffer.read(xfssig, 4);
+    std::string xfssigstr(xfssig);
+    delete[] xfssig;
+    // get btrfs signature
+    devicebuffer.seekg(65600);
+    devicebuffer.read(btrsig, 8);
+    std::string btrsigstr(btrsig);
+    delete[] btrsig;
+    // get bitlocker signature
+    devicebuffer.seekg(0);
+    devicebuffer.read(btlsig, 8);
+    std::string btlsigstr(btlsig);
+    delete[] btlsig;
+    // get iso signature
+    devicebuffer.seekg(32769);
+    devicebuffer.read(isosig, 5);
+    std::string isosigstr(isosig);
+    delete[] isosig;
+    // get udf signature
+    devicebuffer.seekg(40961);
+    devicebuffer.read(udfsig, 5);
+    std::string udfsigstr(udfsig);
+    delete[] udfsig;
+    // get refs signature
+    devicebuffer.seekg(3);
+    devicebuffer.read((char*)refsig, 8);
+    // get f2fs signature
+    devicebuffer.seekg(1024);
+    devicebuffer.read((char*)f2fsig, 4);
+    // get zfs signature
+    devicebuffer.seekg(135168);
+    devicebuffer.read((char*)zfssig, 4);
+    // get bcachefs signature
+    devicebuffer.seekg(4120);
+    devicebuffer.read((char*)bcfsig, 16);
+    // get zonefs signature
+    devicebuffer.seekg(0);
+    devicebuffer.read((char*)zonsig, 4);
+    //std::cout << "compare:" << bfsigstr.substr(0,4).compare("1SFB") << std::endl;
+    //std::cout << "extsig1 array: " << std::hex << static_cast<int>((unsigned char)extsig[1]) << std::endl;
+    //std::cout << "extsig1 " << std::hex << static_cast<int>((unsigned char)extsig1) << std::endl;
+    if(extsig[0] == 0x53 && extsig[1] == 0xef) // EXT2,3,4 SIGNATURE == 0
+    {
+        *fstype = 0;
+    }
+    else if(winsig[0] == 0x55 && winsig[1] == 0xaa && bfsigstr.find("1SFB") == std::string::npos) // FAT NTFS, BFS SIGNATURE
+    {
+        char* exfatbuf = new char[5];
+        char* fatbuf = new char[5];
+        char* fat32buf = new char[5];
+        devicebuffer.seekg(3);
+        devicebuffer.read(exfatbuf, 5);
+        std::string exfatstr(exfatbuf);
+        delete[] exfatbuf;
+        devicebuffer.seekg(54);
+        devicebuffer.read(fatbuf, 5);
+        std::string fatstr(fatbuf);
+        delete[] fatbuf;
+        devicebuffer.seekg(82);
+        devicebuffer.read(fat32buf, 5);
+        std::string fat32str(fat32buf);
+        delete[] fat32buf;
+        if(fatstr.find("FAT12") != std::string::npos)
+            *fstype = 1;
+        else if(fatstr.find("FAT16") != std::string::npos)
+            *fstype = 2;
+        else if(fat32str.find("FAT32") != std::string::npos)
+            *fstype = 3;
+        else if(exfatstr.find("EXFAT") != std::string::npos)
+            *fstype = 4;
+        else if(exfatstr.find("NTFS") != std::string::npos)
+            *fstype = 5;
+    }
+    else if(apfsigstr.find("NXSB") != std::string::npos) // APFS
+        *fstype = 6;
+    else if(hfssigstr.find("H+") != std::string::npos) // HFS+
+        *fstype = 7;
+    else if(hfssigstr.find("HX") != std::string::npos) // HFSX
+        *fstype = 8;
+    else if(xfssigstr.find("XFSB") != std::string::npos) // XFS
+        *fstype = 9;
+    else if(btrsigstr.find("_BHRfS_M") != std::string::npos) // BTRFS
+        *fstype = 10;
+    else if(btlsigstr.find("-FVE-FS-") != std::string::npos) // BTILOCKER
+        *fstype = 11;
+    else if(bfsigstr.find("1SFB") != std::string::npos) // BFS
+        *fstype = 12;
+    else if(f2fsig[0] == 0x10 && f2fsig[1] == 0x20 && f2fsig[3] == 0xf5 && f2fsig[3] == 0xf2) // F2FS
+        *fstype = 13;
+    else if(isosigstr.find("CD001") != std::string::npos && udfsigstr.find("BEA01") == std::string::npos) // ISO9660
+        *fstype = 14;
+    else if(isosigstr.find("CD001") != std::string::npos && udfsigstr.find("BEA01") != std::string::npos) // UDF
+        *fstype = 15;
+    else if(hfssigstr.find("BD") != std::string::npos) // Legacy HFS
+        *fstype = 16;
+    else if(zfssig[0] == 0x0c && zfssig[1] == 0xb1 && zfssig[2] == 0xba && zfssig[3] == 0x00) // ZFS
+        *fstype = 17;
+    else if(refsig[0] == 0x00 && refsig[1] == 0x00 && refsig[2] == 0x00 && refsig[3] == 0x00 && refsig[4] == 0x53 && refsig[5] == 0x46 && refsig[6] == 0x65 && refsig[7] == 0x52) // ReFS
+        *fstype = 18;
+    else if(f2fsig[0] == 0xe2 && f2fsig[1] == 0xe1 && f2fsig[2] == 0x5e && f2fsig[3] == 0x0f) // EROFS
+        *fstype = 19;
+    else if(bcfsig[0] == 0xc6 && bcfsig[1] == 0x85 && bcfsig[2] == 0x73 && bcfsig[3] == 0xf6 && bcfsig[4] == 0x4e && bcfsig[5] == 0x1a && bcfsig[6] == 0x45 && bcfsig[7] == 0xca && bcfsig[8] == 0x82 && bcfsig[9] == 0x65 && bcfsig[10] == 0xf5 && bcfsig[11] == 0x7f && bcfsig[12] == 0x48 && bcfsig[13] == 0xba && bcfsig[14] == 0x6d && bcfsig[15] == 0x81) // BCACHEFS
+        *fstype = 20;
+    else if(zonsig[0] == 0x5a && zonsig[1] == 0x4f && zonsig[2] == 0x46 && zonsig[3] == 0x53) // ZONEFS
+        *fstype = 21;
+    else // UNKNOWN FILE SYSTEM SO FAR
+        *fstype = 50; 
+    devicebuffer.close();
+    delete[] extsig;
+    delete[] winsig;
+    delete[] refsig;
+    delete[] f2fsig;
+    delete[] zfssig;
+    delete[] bcfsig;
+    delete[] zonsig;
+}
+ */ 
 
 /*
 FXString WombatForensics::ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset)
