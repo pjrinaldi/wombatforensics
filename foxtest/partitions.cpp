@@ -2,7 +2,8 @@
 
 
 
-void LoadPartitions(ForImg* curforimg, std::string* volname, uint64_t* partsize)
+//void LoadPartitions(ForImg* curforimg, std::string* volname, uint64_t* partsize)
+void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets)
 {
     uint16_t mbrsig = 0;
     uint16_t applesig  = 0;
@@ -45,49 +46,11 @@ void LoadPartitions(ForImg* curforimg, std::string* volname, uint64_t* partsize)
             bfstype[4] = 0;
             if(strcmp(exfattype, "EXFAT") == 0 || strcmp(fattype, "FAT12") == 0 || strcmp(fattype, "FAT16") == 0 || strcmp(fattype, "FAT32") == 0 || strcmp(ntfstype, "NTFS") == 0 || strcmp(bfstype, "1SFB") == 0) // EXFAT | FAT12 | FAT16 | FAT32 | NTFS | BFS W/O PARTITION TABLE
             {
-                *volname = GetFileSystemName(curforimg, 0);
-                std::cout << *volname << std::endl;
-                /*
-                // table initialization
-                tablelist->setTableSize(1, 14);
-                tablelist->setColumnText(0, "");
-                tablelist->setColumnText(1, "ID");
-                tablelist->setColumnText(2, "Name");
-                tablelist->setColumnText(3, "Path");
-                tablelist->setColumnText(4, "Size (bytes)");
-                tablelist->setColumnText(5, "Created");
-                tablelist->setColumnText(6, "Accessed");
-                tablelist->setColumnText(7, "Modified");
-                tablelist->setColumnText(8, "Changed");
-                tablelist->setColumnText(9, "Hash");
-                tablelist->setColumnText(10, "Category");
-                tablelist->setColumnText(11, "Signature");
-                tablelist->setColumnText(12, "Tagged");
-                tablelist->setColumnText(13, "Hash Match");
-
-                // partition information
-                itemtype = 2;
-                tablelist->setItem(0, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-                tablelist->setItemData(0, 1, &itemtype);
-                tablelist->setItemText(0, 1, FXString::value(0));
-                tablelist->setItemData(0, 2, curforimg);
-                tablelist->setItemText(0, 2, GetFileSystemName(curforimg, 0));
-                tablelist->setItemIcon(0, 2, partitionicon);
-                tablelist->setItemIconPosition(0, 2, FXTableItem::BEFORE);
-                tablelist->setItemText(0, 4, FXString(ReturnFormattingSize(curforimg->Size()).c_str()));
-
-                // table formatting
-                tablelist->fitColumnsToContents(0);
-                tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
-                FitColumnContents(1);
-                FitColumnContents(2);
-                FitColumnContents(4);
-                AlignColumn(tablelist, 1, FXTableItem::LEFT);
-                AlignColumn(tablelist, 2, FXTableItem::LEFT);
-                */
-
-                //std::cout << "parse fs here.." << std::endl;
-                // parse partition(curofrimg, 0, curforimg->Size/512, 0, 1);
+                volnames->push_back(GetFileSystemName(curforimg, 0));
+                volsizes->push_back(curforimg->Size());
+                voloffsets->push_back(0);
+                //*volname = GetFileSystemName(curforimg, 0);
+                //*partsize = curforimg->Size();
             }
             uint8_t ptreecnt = 0;
             int pcount = 0;
@@ -172,47 +135,11 @@ void LoadPartitions(ForImg* curforimg, std::string* volname, uint64_t* partsize)
     }
     else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
     {
-        *volname = GetFileSystemName(curforimg, 0);
-        std::cout << *volname << std::endl;
-        /*
-        // table initialization
-        tablelist->setTableSize(1, 14);
-        tablelist->setColumnText(0, "");
-        tablelist->setColumnText(1, "ID");
-        tablelist->setColumnText(2, "Name");
-        tablelist->setColumnText(3, "Path");
-        tablelist->setColumnText(4, "Size (bytes)");
-        tablelist->setColumnText(5, "Created");
-        tablelist->setColumnText(6, "Accessed");
-        tablelist->setColumnText(7, "Modified");
-        tablelist->setColumnText(8, "Changed");
-        tablelist->setColumnText(9, "Hash");
-        tablelist->setColumnText(10, "Category");
-        tablelist->setColumnText(11, "Signature");
-        tablelist->setColumnText(12, "Tagged");
-        tablelist->setColumnText(13, "Hash Match");
-
-        // partition information
-        itemtype = 2;
-        tablelist->setItem(0, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-        tablelist->setItemData(0, 1, &itemtype);
-        tablelist->setItemText(0, 1, FXString::value(0));
-        tablelist->setItemData(0, 2, curforimg);
-        tablelist->setItemText(0, 2, GetFileSystemName(curforimg, 0));
-        tablelist->setItemIcon(0, 2, partitionicon);
-        tablelist->setItemIconPosition(0, 2, FXTableItem::BEFORE);
-        tablelist->setItemText(0, 4, FXString(ReturnFormattingSize(curforimg->Size()).c_str()));
-
-        // ParsePartition(curforimg, 0, curimg->Size()/512, 0 (part id), 1 (allocated));
-        // table formatting
-        tablelist->fitColumnsToContents(0);
-        tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
-        FitColumnContents(1);
-        FitColumnContents(2);
-        FitColumnContents(4);
-        AlignColumn(tablelist, 1, FXTableItem::LEFT);
-        AlignColumn(tablelist, 2, FXTableItem::LEFT);
-        */
+        volnames->push_back(GetFileSystemName(curforimg, 0));
+        volsizes->push_back(curforimg->Size());
+        voloffsets->push_back(0);
+        //*volname = GetFileSystemName(curforimg, 0);
+        //*partsize = curforimg->Size();
     }
 }
 
@@ -582,16 +509,11 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
 	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
 	    curcluster16 = curcluster16 >> 4;
 	}
-            //curcluster = (qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2)) >> 4);
         else // EVEN
 	{
 	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
 	    curcluster16 = curcluster16 & 0x0FFF;
 	}
-            //curcluster = (qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2)) & 0x0FFF);
-        //if(curcluster != 0x0FF7)
-        //    clusterlist->append(curcluster);
-        //if(curcluster < 0x0FF8 && curcluster >= 2)
         if(curcluster16 < 0x0FF7 && curcluster16 >= 2)
         {
             clusterlist->push_back(curcluster16);
@@ -605,10 +527,6 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
             fatbyte1 = clusternum * 2;
 	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
 	    
-            //curcluster = qFromLittleEndian<uint16_t>(curimg->ReadContent(fatoffset + fatbyte1, 2));
-            //if(curcluster != 0xFFF7)
-            //    clusterlist->append(curcluster);
-            //if(curcluster < 0xFFF8 && curcluster >= 2)
             if(curcluster16 < 0xFFF7 && curcluster16 >= 2)
             {
                 clusterlist->push_back(curcluster16);
@@ -623,9 +541,6 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
             fatbyte1 = clusternum * 4;
 	    ReadForImgContent(curimg, &curcluster32, fatoffset + fatbyte1);
 	    curcluster32 = curcluster32 & 0x0FFFFFFF;
-            //curcluster = (qFromLittleEndian<uint32_t>(curimg->ReadContent(fatoffset + fatbyte1, 4)) & 0x0FFFFFFF);
-	    //if(curcluster != 0x0FFFFFF7)
-		//clusterlist->append(curcluster);
 	    if(curcluster32 < 0x0FFFFFF7 && curcluster32 >= 2)
             {
                 clusterlist->push_back(curcluster32);
@@ -639,9 +554,6 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
         {
             fatbyte1 = clusternum * 4;
 	    ReadForImgContent(curimg, &curcluster32, fatoffset + fatbyte1);
-            //curcluster = qFromLittleEndian<uint32_t>(curimg->ReadContent(fatoffset + fatbyte1, 4));
-	    //if(curcluster != 0xFFFFFFF7)
-		//clusterlist->append(curcluster);
 	    if(curcluster32 < 0xFFFFFFF7 && curcluster32 >= 2)
             {
                 clusterlist->push_back(curcluster32);
@@ -650,165 +562,3 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
         }
     }
 }
-
-
-
-
-
-/*
-std::string ConvertUnixTimeToHuman(uint32_t unixtime)
-{
-    time_t timet = (time_t)unixtime;
-    struct tm* tmtime = gmtime(&timet);
-    char hchar[100];
-    strftime(hchar, 100, "%m/%d/%Y %I:%M:%S %p UTC", tmtime);
-    
-    return std::string(hchar);
-}
-
-uint8_t* substr(uint8_t* arr, int begin, int len)
-{
-    uint8_t* res = new uint8_t[len + 1];
-    for (int i = 0; i < len; i++)
-        res[i] = *(arr + begin + i);
-    res[len] = 0;
-    return res;
-}
-
-char* GetDateTime(char *buff)
-{
-    time_t t = time(0);
-    strftime(buff, DTTMSZ, DTTMFMT, localtime(&t));
-    return buff;
-};
-
-std::string ReturnFormattingSize(uint size)
-{
-    std::stringstream ss;
-    ss.imbue(std::locale(""));
-    ss << std::fixed << size;
-    return ss.str();
-}
-
-void ReadContent(std::ifstream* rawcontent, uint8_t* tmpbuf, uint64_t offset, uint64_t size)
-{
-    rawcontent->seekg(offset);
-    rawcontent->read((char*)tmpbuf, size);
-}
-
-void ReadContent(std::ifstream* rawcontent, int8_t* tmpbuf, uint64_t offset, uint64_t size)
-{
-    rawcontent->seekg(offset);
-    rawcontent->read((char*)tmpbuf, size);
-}
-
-void ReadContent(std::ifstream* rawcontent, uint16_t* val, uint64_t offset)
-{
-    uint8_t* tmp8 = new uint8_t[2];
-    rawcontent->seekg(offset);
-    rawcontent->read((char*)tmp8, 2);
-    ReturnUint16(val, tmp8);
-    delete[] tmp8;
-}
-
-void ReadContent(std::ifstream* rawcontent, uint32_t* val, uint64_t offset)
-{
-    uint8_t* tmp8 = new uint8_t[4];
-    rawcontent->seekg(offset);
-    rawcontent->read((char*)tmp8, 4);
-    ReturnUint32(val, tmp8);
-    delete[] tmp8;
-}
-
-void ReadContent(std::ifstream* rawcontent, uint64_t* val, uint64_t offset)
-{
-    uint8_t* tmp8 = new uint8_t[8];
-    rawcontent->seekg(offset);
-    rawcontent->read((char*)tmp8, 8);
-    ReturnUint64(val, tmp8);
-    delete[] tmp8;
-}
-
-void ReadForImgContent(ForImg* forimg, uint16_t* val, uint64_t offset, bool isbigendian)
-{
-    uint8_t* tmp8 = new uint8_t[2];
-    forimg->ReadContent(tmp8, offset, 2);
-    ReturnUint16(val, tmp8, isbigendian);
-    delete[] tmp8;
-}
-
-void ReadForImgContent(ForImg* forimg, uint32_t* val, uint64_t offset, bool isbigendian)
-{
-    uint8_t* tmp8 = new uint8_t[4];
-    forimg->ReadContent(tmp8, offset, 4);
-    ReturnUint32(val, tmp8, isbigendian);
-    delete[] tmp8;
-}
-
-void ReadForImgContent(ForImg* forimg, uint64_t* val, uint64_t offset, bool isbigendian)
-{
-    uint8_t* tmp8 = new uint8_t[8];
-    forimg->ReadContent(tmp8, offset, 8);
-    ReturnUint64(val, tmp8, isbigendian);
-    delete[] tmp8;
-}
-
-
-void ReadInteger(uint8_t* arr, int begin, uint16_t* val, bool isbigendian)
-{
-    uint8_t* tmp8 = new uint8_t[2];
-    tmp8 = substr(arr, begin, 2);
-    ReturnUint16(val, tmp8, isbigendian);
-    delete[] tmp8;
-}
-
-void ReadInteger(uint8_t* arr, int begin, uint32_t* val, bool isbigendian)
-{
-    uint8_t* tmp8 = new uint8_t[4];
-    tmp8 = substr(arr, begin, 4);
-    ReturnUint32(val, tmp8, isbigendian);
-    delete[] tmp8;
-}
-void ReadInteger(uint8_t* arr, int begin, uint64_t* val, bool isbigendian)
-{
-    uint8_t* tmp8 = new uint8_t[8];
-    tmp8 = substr(arr, begin, 8);
-    ReturnUint64(val, tmp8, isbigendian);
-    delete[] tmp8;
-}
-void ReturnUint32(uint32_t* tmp32, uint8_t* tmp8, bool isbigendian)
-{
-    if(isbigendian)
-        *tmp32 = __builtin_bswap32((uint32_t)tmp8[0] | (uint32_t)tmp8[1] << 8 | (uint32_t)tmp8[2] << 16 | (uint32_t)tmp8[3] << 24);
-    else
-        *tmp32 = (uint32_t)tmp8[0] | (uint32_t)tmp8[1] << 8 | (uint32_t)tmp8[2] << 16 | (uint32_t)tmp8[3] << 24;
-}
-
-void ReturnUint16(uint16_t* tmp16, uint8_t* tmp8, bool isbigendian)
-{
-    if(isbigendian)
-        *tmp16 = __builtin_bswap16((uint16_t)tmp8[0] | (uint16_t)tmp8[1] << 8);
-    else
-        *tmp16 = (uint16_t)tmp8[0] | (uint16_t)tmp8[1] << 8;
-}
-
-void ReturnUint64(uint64_t* tmp64, uint8_t* tmp8, bool isbigendian)
-{
-    if(isbigendian)
-        *tmp64 = __builtin_bswap64((uint64_t)tmp8[0] | (uint64_t)tmp8[1] << 8 | (uint64_t)tmp8[2] << 16 | (uint64_t)tmp8[3] << 24 | (uint64_t)tmp8[4] << 32 | (uint64_t)tmp8[5] << 40 | (uint64_t)tmp8[6] << 48 | (uint64_t)tmp8[7] << 56);
-    else
-        *tmp64 = (uint64_t)tmp8[0] | (uint64_t)tmp8[1] << 8 | (uint64_t)tmp8[2] << 16 | (uint64_t)tmp8[3] << 24 | (uint64_t)tmp8[4] << 32 | (uint64_t)tmp8[5] << 40 | (uint64_t)tmp8[6] << 48 | (uint64_t)tmp8[7] << 56;
-}
-
-void ReturnUint(uint64_t* tmp, uint8_t* tmp8, unsigned int length)
-{
-    for(unsigned int i=0; i < length; i++)
-        *tmp |= (uint64_t)tmp8[i] << i * 8;
-}
-
-void ReturnInt(int64_t* tmp, int8_t* tmp8, unsigned int length)
-{
-    for(unsigned int i=0; i < length; i++)
-        *tmp |= (int64_t)tmp8[i] << i * 8;
-}
-*/

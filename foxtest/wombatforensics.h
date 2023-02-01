@@ -241,6 +241,9 @@ class WombatForensics : public FXMainWindow
         ForImg* curforimg;
         int itemtype;
         std::vector<ForImg*> forimgvector;
+        std::vector<std::string> volnames;
+        std::vector<uint64_t> volsizes;
+        std::vector<uint64_t> voloffsets;
 
     protected:
         WombatForensics() {}

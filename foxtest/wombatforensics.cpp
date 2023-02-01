@@ -2077,9 +2077,18 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
     curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
     if(itemtype == 1)
     {
-        std::string volname = "";
-        uint64_t partitionsize = 0;
-        LoadPartitions(curforimg, &volname, &partitionsize);
+        volnames.clear();
+        volsizes.clear();
+        voloffsets.clear();
+        //std::string volname = "";
+        //uint64_t partitionsize = 0;
+        LoadPartitions(curforimg, &volnames, &volsizes, &voloffsets);
+        //LoadPartitions(curforimg, &volname, &partitionsize);
+        //std::cout << "volname: " << volname << " partition size: " << partitionsize << std::endl;
+        for(int i=0; i < volnames.size(); i++)
+        {
+            std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
+        }
     }
     else if(itemtype == 2)
     {
