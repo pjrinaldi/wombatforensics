@@ -2,7 +2,6 @@
 
 
 
-//void LoadPartitions(ForImg* curforimg, std::string* volname, uint64_t* partsize)
 void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets)
 {
     uint16_t mbrsig = 0;
@@ -25,7 +24,6 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
             if(gptsig == 0x4546492050415254) // GUID PARTITION TABLE
             {
                 LoadGptPartitions(curforimg, volnames, volsizes, voloffsets);
-                //LoadGptPartitions(curforimg);
             }
         }
         else // MBR DISK
@@ -50,8 +48,6 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                 volnames->push_back(GetFileSystemName(curforimg, 0));
                 volsizes->push_back(curforimg->Size());
                 voloffsets->push_back(0);
-                //*volname = GetFileSystemName(curforimg, 0);
-                //*partsize = curforimg->Size();
             }
             //uint8_t ptreecnt = 0;
             int pcount = 0;
@@ -133,19 +129,15 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     else if(gptsig == 0x4546492050415254) // GPT PARTITION
     {
         LoadGptPartitions(curforimg, volnames, volsizes, voloffsets);
-        //LoadGptPartitions(curforimg);
     }
     else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
     {
         volnames->push_back(GetFileSystemName(curforimg, 0));
         volsizes->push_back(curforimg->Size());
         voloffsets->push_back(0);
-        //*volname = GetFileSystemName(curforimg, 0);
-        //*partsize = curforimg->Size();
     }
 }
 
-//void WombatForensics::LoadGptPartitions(ForImg* curforimg)
 void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets)
 {
     uint64_t parttablestart = 0;

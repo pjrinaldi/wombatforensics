@@ -2081,12 +2081,50 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
         volnames.clear();
         volsizes.clear();
         voloffsets.clear();
+        this->getApp()->beginWaitCursor();
         LoadPartitions(curforimg, &volnames, &volsizes, &voloffsets);
         // PLACE TABLE PRE/PARTS/POST HERE
+        // table initialization
+        tablelist->setTableSize(volnames.size(), 14);
+        tablelist->setColumnText(0, "");
+        tablelist->setColumnText(1, "ID");
+        tablelist->setColumnText(2, "Name");
+        tablelist->setColumnText(3, "Path");
+        tablelist->setColumnText(4, "Size (bytes)");
+        tablelist->setColumnText(5, "Created");
+        tablelist->setColumnText(6, "Accessed");
+        tablelist->setColumnText(7, "Modified");
+        tablelist->setColumnText(8, "Changed");
+        tablelist->setColumnText(9, "Hash");
+        tablelist->setColumnText(10, "Category");
+        tablelist->setColumnText(11, "Signature");
+        tablelist->setColumnText(12, "Tagged");
+        tablelist->setColumnText(13, "Hash Match");
+        // partition information
         for(int i=0; i < volnames.size(); i++)
         {
-            std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
+            itemtype = 2;
+            tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+            tablelist->setItemData(i, 1, &itemtype);
+            tablelist->setItemText(i, 1, FXString::value(i));
+            tablelist->setItemData(i, 2, curforimg);
+            tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
+            tablelist->setItemIcon(i, 2, partitionicon);
+            tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
+            tablelist->setItemData(i, 4, &(voloffsets.at(i)));
+            tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
+            //std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
         }
+        // table formatting
+        tablelist->fitColumnsToContents(0);
+        tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+        FitColumnContents(1);
+        FitColumnContents(2);
+        FitColumnContents(4);
+        AlignColumn(tablelist, 1, FXTableItem::LEFT);
+        AlignColumn(tablelist, 2, FXTableItem::LEFT);
+
+        this->getApp()->endWaitCursor();
     }
     else if(itemtype == 2)
     {
