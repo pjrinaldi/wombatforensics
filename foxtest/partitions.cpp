@@ -251,7 +251,7 @@ void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsiz
         {
             volnames->push_back("UNALLOCATED");
             volsizes->push_back(curoffset*512);
-            voloffsets->push_back(sectorcheck*512);
+            voloffsets->push_back(epoffset + sectorcheck*512);
         }
         if((uint)curparttype == 0x05) // extended partition
         {
