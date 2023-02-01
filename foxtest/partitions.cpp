@@ -290,6 +290,7 @@ void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsiz
 }
 
 
+
 std::string GetFileSystemName(ForImg* curforimg, uint64_t offset)
 {
     std::string partitionname = "";
@@ -473,153 +474,156 @@ std::string GetFileSystemName(ForImg* curforimg, uint64_t offset)
             }
         }
     }
+    ReadForImgContent(curforimg, &sig16, offset + 1080); // EXT2/3/4
+    if(sig16 == 0xef53) // EXT2/3/4
+    {
+	char* volname = new char[17];
+	curforimg->ReadContent((uint8_t*)volname, offset + 1144, 16);
+	volname[16] = 0;
+	uint32_t compatflags = 0;
+	uint32_t incompatflags = 0;
+	uint32_t readonlyflags = 0;
+	ReadForImgContent(curforimg, &compatflags, offset + 1116);
+	ReadForImgContent(curforimg, &incompatflags, offset + 1120);
+	ReadForImgContent(curforimg, &readonlyflags, offset + 1124);
+	std::string format = " [EXT2]";
+        if(((compatflags & 0x00000200UL) != 0) || ((incompatflags & 0x0001f7c0UL) != 0) || ((readonlyflags & 0x00000378UL) != 0))
+	    format = " [EXT4]";
+        else if(((compatflags & 0x00000004UL) != 0) || ((incompatflags & 0x0000000cUL) != 0))
+	    format = " [EXT3]";
+	partitionname = std::string(volname) + format;
+    }
+    char* apfssig = new char[5];
+    curforimg->ReadContent((uint8_t*)apfssig, offset + 32, 4);
+    apfssig[4] = 0;
+    if(strcmp(apfssig, "NXSB") == 0) // APFS
+	partitionname = "APFS Container [APFS]";
+    char* hfssig = new char[3];
+    curforimg->ReadContent((uint8_t*)hfssig, offset + 1024, 2);
+    hfssig[2] = 0;
+    if(strcmp(hfssig, "H+") == 0 || strcmp(hfssig, "HX") == 0) // HFS+/X
+    {
+	uint32_t catalogstartoffset = 0;
+	ReadForImgContent(curforimg, &catalogstartoffset, offset + 1312, true);
+	uint32_t catalogstartinbytes = catalogstartoffset * 4096 + 4096;
+	uint16_t keydatalength = 0;
+	ReadForImgContent(curforimg, &keydatalength, catalogstartinbytes + 20, true);
+	for(uint16_t i=0; i < keydatalength; i++)
+	{
+	    uint16_t singleletter = 0;
+	    ReadForImgContent(curforimg, &singleletter, catalogstartinbytes + 22 + i*2, true);
+	    partitionname += (char)singleletter;
+	    //std::cout << "singleletter: " << (char)singleletter << std::endl;
+	}
+	if(strcmp(hfssig, "H+") == 0)
+	    partitionname += " [HFS+]";
+	else if(strcmp(hfssig, "HX") == 0)
+	    partitionname += " [HFSX]";
+    }
+    else if(strcmp(hfssig, "BD") == 0) // LEGACY HFS
+    {
+	uint8_t volnamelength = 0;
+	curforimg->ReadContent(&volnamelength, offset + 1060, 1);
+	char* volname = new char[(uint)volnamelength + 1];
+	curforimg->ReadContent((uint8_t*)volname, offset + 1061, (uint)volnamelength);
+	volname[(uint)volnamelength] = 0;
+	partitionname = std::string(volname) + " [HFS]";
+    }
+    char* xfssig = new char[5];
+    curforimg->ReadContent((uint8_t*)xfssig, offset, 4);
+    xfssig[4] = 0;
+    if(strcmp(xfssig, "XFSB") == 0)
+    {
+	char* volname = new char[13];
+	curforimg->ReadContent((uint8_t*)volname, offset + 108, 12);
+	volname[12] = 0;
+	partitionname = std::string(volname) + " [XFS]";
+    }
+    char* btrsig = new char[9];
+    curforimg->ReadContent((uint8_t*)btrsig, offset + 65600, 8);
+    btrsig[8] = 0;
+    if(strcmp(btrsig, "_BHRfS_M") == 0)
+    {
+	char* volname = new char[101];
+	curforimg->ReadContent((uint8_t*)volname, offset + 65536 + 0x12b, 100);
+	volname[100] = 0;
+	partitionname = std::string(volname) + " [BTRFS]";
+    }
+    char* bitlocksig = new char[9];
+    curforimg->ReadContent((uint8_t*)bitlocksig, offset, 8);
+    bitlocksig[8] = 0;
+    if(strcmp(bitlocksig, "-FVE-FS-") == 0)
+    {
+	uint16_t vollength = 0;
+	ReadForImgContent(curforimg, &vollength, offset + 112);
+	vollength = vollength - 8;
+	char* volname = new char[vollength + 1];
+	curforimg->ReadContent((uint8_t*)volname, offset + 118, vollength);
+	volname[vollength] = 0;
+	partitionname = std::string(volname) + " [BITLOCKER]";
+    }
+    ReadForImgContent(curforimg, &sig32, offset + 1024);
+    if(sig32 == 0xf2f52010) // F2FS
+    {
+	partitionname = " [F2FS]";
+    }
+    else if(sig32 == 0xe0f5e1e2) // EROFS
+    {
+	partitionname = " [EROFS]";
+    }
+    ReadForImgContent(curforimg, &sig32, offset);
+    if(sig32 == 0x5a4f4653)
+    {
+	partitionname = " [ZONEFS]";
+    }
+    char* isosig = new char[6];
+    char* udfsig = new char[6];
+    curforimg->ReadContent((uint8_t*)isosig, offset + 32769, 5);
+    isosig[5] = 0;
+    curforimg->ReadContent((uint8_t*)udfsig, offset + 40961, 5);
+    udfsig[5] = 0;
+    if(strcmp(isosig, "CD001") == 0 && strcmp(udfsig, "BEA01") != 0) // ISO9660
+    {
+	for(int i=16; i < (curforimg->Size() / 2048) - 15; i++)
+	{
+	    uint64_t curoffset = offset + 2048*i;
+	    uint8_t voldesctype = 0;
+	    curforimg->ReadContent(&voldesctype, curoffset, 1);
+	    if((uint)voldesctype == 0x01) // PRIMARY VOLUME DESCRIPTOR
+	    {
+		// Primary Volume Descriptor
+		char* volname = new char[32];
+		curforimg->ReadContent((uint8_t*)volname, curoffset + 40, 31);
+		volname[31] = 0;
+		partitionname = std::string(volname) + " [ISO9660]";
+	    }
+	}
+
+    }
+    else if(strcmp(isosig, "CD001") == 0 && strcmp(udfsig, "BEA01") == 0) // UDF
+    {
+	partitionname = " [UDF]";
+    }
     return partitionname;
+    ReadForImgContent(curforimg, &sig64, offset + 135168);
+    if(sig64 == 0x00bab10c) // ZFS
+    {
+	partitionname = " [ZFS]";
+    }
+    ReadForImgContent(curforimg, &sig64, offset + 3);
+    if(sig64 == 0x5265465300000000) // ReFS
+    {
+	partitionname = " [REFS]";
+    }
+    ReadForImgContent(curforimg, &sig64, offset + 4120, true);
+    uint64_t bcfsig = 0;
+    ReadForImgContent(curforimg, &bcfsig, offset + 4128, true);
+    if(sig64 == 0xc68573f64e1a45ca && bcfsig == 0x8265f57f48ba6d81) // BCACHEFS
+    {
+	partitionname = " [BCACHEFS]";
+    }
 }
 
-
-/*
-void DetermineFileSystem(std::string devicestring, int* fstype)
-{
-    // get ext2,3,4 signature
-    devicebuffer.seekg(1080);
-    devicebuffer.read((char*)extsig, 2); // 0x53, 0xef
-    // get windows mbr signature (FAT, NTFS, BFS)
-    devicebuffer.seekg(510);
-    devicebuffer.read((char*)winsig, 2); // 0x55, 0xaa
-    // get BFS signature
-    devicebuffer.seekg(544);
-    devicebuffer.read(bfssig, 4);
-    std::string bfsigstr(bfssig);
-    delete[] bfssig;
-    // get apfs signature
-    devicebuffer.seekg(32);
-    devicebuffer.read(apfsig, 4);
-    std::string apfsigstr(apfsig);
-    delete[] apfsig;
-    // get hfs signature
-    devicebuffer.seekg(1024);
-    devicebuffer.read(hfssig, 2);
-    std::string hfssigstr(hfssig);
-    delete[] hfssig;
-    // get xfs signature
-    devicebuffer.seekg(0);
-    devicebuffer.read(xfssig, 4);
-    std::string xfssigstr(xfssig);
-    delete[] xfssig;
-    // get btrfs signature
-    devicebuffer.seekg(65600);
-    devicebuffer.read(btrsig, 8);
-    std::string btrsigstr(btrsig);
-    delete[] btrsig;
-    // get bitlocker signature
-    devicebuffer.seekg(0);
-    devicebuffer.read(btlsig, 8);
-    std::string btlsigstr(btlsig);
-    delete[] btlsig;
-    // get iso signature
-    devicebuffer.seekg(32769);
-    devicebuffer.read(isosig, 5);
-    std::string isosigstr(isosig);
-    delete[] isosig;
-    // get udf signature
-    devicebuffer.seekg(40961);
-    devicebuffer.read(udfsig, 5);
-    std::string udfsigstr(udfsig);
-    delete[] udfsig;
-    // get refs signature
-    devicebuffer.seekg(3);
-    devicebuffer.read((char*)refsig, 8);
-    // get f2fs signature
-    devicebuffer.seekg(1024);
-    devicebuffer.read((char*)f2fsig, 4);
-    // get zfs signature
-    devicebuffer.seekg(135168);
-    devicebuffer.read((char*)zfssig, 4);
-    // get bcachefs signature
-    devicebuffer.seekg(4120);
-    devicebuffer.read((char*)bcfsig, 16);
-    // get zonefs signature
-    devicebuffer.seekg(0);
-    devicebuffer.read((char*)zonsig, 4);
-    //std::cout << "compare:" << bfsigstr.substr(0,4).compare("1SFB") << std::endl;
-    //std::cout << "extsig1 array: " << std::hex << static_cast<int>((unsigned char)extsig[1]) << std::endl;
-    //std::cout << "extsig1 " << std::hex << static_cast<int>((unsigned char)extsig1) << std::endl;
-    if(extsig[0] == 0x53 && extsig[1] == 0xef) // EXT2,3,4 SIGNATURE == 0
-    {
-        *fstype = 0;
-    }
-    else if(winsig[0] == 0x55 && winsig[1] == 0xaa && bfsigstr.find("1SFB") == std::string::npos) // FAT NTFS, BFS SIGNATURE
-    {
-        char* exfatbuf = new char[5];
-        char* fatbuf = new char[5];
-        char* fat32buf = new char[5];
-        devicebuffer.seekg(3);
-        devicebuffer.read(exfatbuf, 5);
-        std::string exfatstr(exfatbuf);
-        delete[] exfatbuf;
-        devicebuffer.seekg(54);
-        devicebuffer.read(fatbuf, 5);
-        std::string fatstr(fatbuf);
-        delete[] fatbuf;
-        devicebuffer.seekg(82);
-        devicebuffer.read(fat32buf, 5);
-        std::string fat32str(fat32buf);
-        delete[] fat32buf;
-        if(fatstr.find("FAT12") != std::string::npos)
-            *fstype = 1;
-        else if(fatstr.find("FAT16") != std::string::npos)
-            *fstype = 2;
-        else if(fat32str.find("FAT32") != std::string::npos)
-            *fstype = 3;
-        else if(exfatstr.find("EXFAT") != std::string::npos)
-            *fstype = 4;
-        else if(exfatstr.find("NTFS") != std::string::npos)
-            *fstype = 5;
-    }
-    else if(apfsigstr.find("NXSB") != std::string::npos) // APFS
-        *fstype = 6;
-    else if(hfssigstr.find("H+") != std::string::npos) // HFS+
-        *fstype = 7;
-    else if(hfssigstr.find("HX") != std::string::npos) // HFSX
-        *fstype = 8;
-    else if(xfssigstr.find("XFSB") != std::string::npos) // XFS
-        *fstype = 9;
-    else if(btrsigstr.find("_BHRfS_M") != std::string::npos) // BTRFS
-        *fstype = 10;
-    else if(btlsigstr.find("-FVE-FS-") != std::string::npos) // BTILOCKER
-        *fstype = 11;
-    else if(bfsigstr.find("1SFB") != std::string::npos) // BFS
-        *fstype = 12;
-    else if(f2fsig[0] == 0x10 && f2fsig[1] == 0x20 && f2fsig[3] == 0xf5 && f2fsig[3] == 0xf2) // F2FS
-        *fstype = 13;
-    else if(isosigstr.find("CD001") != std::string::npos && udfsigstr.find("BEA01") == std::string::npos) // ISO9660
-        *fstype = 14;
-    else if(isosigstr.find("CD001") != std::string::npos && udfsigstr.find("BEA01") != std::string::npos) // UDF
-        *fstype = 15;
-    else if(hfssigstr.find("BD") != std::string::npos) // Legacy HFS
-        *fstype = 16;
-    else if(zfssig[0] == 0x0c && zfssig[1] == 0xb1 && zfssig[2] == 0xba && zfssig[3] == 0x00) // ZFS
-        *fstype = 17;
-    else if(refsig[0] == 0x00 && refsig[1] == 0x00 && refsig[2] == 0x00 && refsig[3] == 0x00 && refsig[4] == 0x53 && refsig[5] == 0x46 && refsig[6] == 0x65 && refsig[7] == 0x52) // ReFS
-        *fstype = 18;
-    else if(f2fsig[0] == 0xe2 && f2fsig[1] == 0xe1 && f2fsig[2] == 0x5e && f2fsig[3] == 0x0f) // EROFS
-        *fstype = 19;
-    else if(bcfsig[0] == 0xc6 && bcfsig[1] == 0x85 && bcfsig[2] == 0x73 && bcfsig[3] == 0xf6 && bcfsig[4] == 0x4e && bcfsig[5] == 0x1a && bcfsig[6] == 0x45 && bcfsig[7] == 0xca && bcfsig[8] == 0x82 && bcfsig[9] == 0x65 && bcfsig[10] == 0xf5 && bcfsig[11] == 0x7f && bcfsig[12] == 0x48 && bcfsig[13] == 0xba && bcfsig[14] == 0x6d && bcfsig[15] == 0x81) // BCACHEFS
-        *fstype = 20;
-    else if(zonsig[0] == 0x5a && zonsig[1] == 0x4f && zonsig[2] == 0x46 && zonsig[3] == 0x53) // ZONEFS
-        *fstype = 21;
-    else // UNKNOWN FILE SYSTEM SO FAR
-        *fstype = 50; 
-    devicebuffer.close();
-    delete[] extsig;
-    delete[] winsig;
-    delete[] refsig;
-    delete[] f2fsig;
-    delete[] zfssig;
-    delete[] bcfsig;
-    delete[] zonsig;
-}
- */ 
 
 /*
 FXString WombatForensics::ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset)
