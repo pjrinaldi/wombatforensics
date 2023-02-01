@@ -202,6 +202,12 @@ class WombatForensics : public FXMainWindow
 
         FXIcon* burrowicon;
         FXButton* burrowbutton;
+	FXIcon* backicon;
+	FXButton* backbutton;
+	FXIcon* frwdicon;
+	FXButton* frwdbutton;
+	FXIcon* curicon;
+	FXButton* curbutton;
 
         // ITEM TYPE ICONS
         FXIcon* forimgicon;
@@ -293,6 +299,9 @@ class WombatForensics : public FXMainWindow
             ID_SCROLLBAR = 117,
             ID_HOME = 118,
 	    ID_PARTITION = 119,
+	    ID_BACK = 120,
+	    ID_FRWD = 121,
+	    ID_CURRENT = 122,
             ID_LAST
         };
         WombatForensics(FXApp* a);
