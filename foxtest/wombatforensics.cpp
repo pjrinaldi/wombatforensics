@@ -2085,9 +2085,6 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 
 long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 {
-    //burrowbutton = new FXButton(pathtoolbar, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
-    //burrowbutton->setIconPosition(ICON_BEFORE_TEXT);
-
     //std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
     itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
     curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
