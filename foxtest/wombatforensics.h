@@ -135,6 +135,7 @@ class WombatForensics : public FXMainWindow
         FXVerticalFrame* mainframe;
         FXToolBar* toolbar;
         FXToolBar* pathtoolbar;
+	//FXMenuBar* pathmenubar;
         FXSplitter* hsplitter;
         FXTable* tablelist;
         FXStatusBar* statusbar;
@@ -291,6 +292,7 @@ class WombatForensics : public FXMainWindow
             ID_ASCTEXT = 116,
             ID_SCROLLBAR = 117,
             ID_HOME = 118,
+	    ID_PARTITION = 119,
             ID_LAST
         };
         WombatForensics(FXApp* a);
@@ -304,6 +306,7 @@ class WombatForensics : public FXMainWindow
         long TagMenu(FXObject*, FXSelector, void*);
         long TableUpDown(FXObject*, FXSelector, void*);
         long ContentSelected(FXObject*, FXSelector, void*);
+        long LoadForensicImages(FXObject*, FXSelector, void*);
         long LoadChildren(FXObject*, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
@@ -380,6 +383,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTINGS, WombatForensics::OpenSettings),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HOME, WombatForensics::LoadForensicImages),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
     FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_TABLESELECT, WombatForensics::TableUpDown),
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),

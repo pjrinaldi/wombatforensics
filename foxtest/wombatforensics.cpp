@@ -6,7 +6,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
-    pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
+    pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
+    //pathmenubar = new FXMenuBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     hsplitter = new FXSplitter(mainframe, SPLITTER_VERTICAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     tablelist = new FXTable(hsplitter, this, ID_TABLESELECT, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     tablelist->setTableSize(10, 14);
@@ -100,7 +101,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     aboutbutton = new FXButton(toolbar, "", abouticon, this, ID_ABOUT, BUTTON_TOOLBAR|FRAME_RAISED);
     // PATH TOOLBAR HOME ICON
     burrowicon = new FXPNGIcon(this->getApp(), burrow);
-    burrowbutton = new FXButton(pathtoolbar, "", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED);
+    burrowicon->create();
+    burrowbutton = new FXButton(pathtoolbar, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    //burrowbutton->setTipText("Home");
+    burrowbutton->setIconPosition(ICON_BEFORE_TEXT);
 
     // ITEM TYPE ICONS
     forimgicon = new FXPNGIcon(this->getApp(), forimg);
@@ -185,6 +189,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     managehashbutton->disable();
     previewbutton->disable();
     publishbutton->disable();
+    burrowbutton->disable();
 }
 
 
@@ -405,6 +410,7 @@ void WombatForensics::EnableCaseButtons()
     managehashbutton->enable();
     previewbutton->enable();
     publishbutton->enable();
+    burrowbutton->enable();
 }
 
 void WombatForensics::LoadCaseState(void)
@@ -453,6 +459,13 @@ long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
 	UpdateForensicImages();
     }
 
+    return 1;
+}
+
+long WombatForensics::LoadForensicImages(FXObject*, FXSelector, void*)
+{
+    UpdateForensicImages();
+    
     return 1;
 }
 
@@ -2071,13 +2084,22 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
     return 1;
 }
 
-long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
+long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 {
+    //burrowbutton = new FXButton(pathtoolbar, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    //burrowbutton->setIconPosition(ICON_BEFORE_TEXT);
+
     //std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
     itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
     curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
+    FXString itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2);
+    std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1)
     {
+	//burrowbutton = new FXButton(pathtoolbar, "HOME", NULL, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+        //new FXMenuCommand(&tagmenu, "Create New Tag", new FXPNGIcon(this->getApp(), bookmarknew), this, ID_NEWTAG);
+	new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
+	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
         volnames.clear();
         volsizes.clear();
         voloffsets.clear();
@@ -2123,10 +2145,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
         AlignColumn(tablelist, 1, FXTableItem::LEFT);
         AlignColumn(tablelist, 2, FXTableItem::LEFT);
 
+
         this->getApp()->endWaitCursor();
     }
     else if(itemtype == 2)
     {
+	// need to implement path toolbar here for the burrow and the partition and 
         std::cout << "need to load the root directory for the partition selected here." << std::endl;
     }
     else
