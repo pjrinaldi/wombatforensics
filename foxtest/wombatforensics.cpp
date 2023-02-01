@@ -2073,11 +2073,13 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 
 long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
 {
-    std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
+    //std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
     curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
     if(itemtype == 1)
     {
-        LoadPartitions(curforimg);
+        std::string volname = "";
+        uint64_t partitionsize = 0;
+        LoadPartitions(curforimg, &volname, &partitionsize);
     }
     else if(itemtype == 2)
     {
@@ -2092,6 +2094,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector, void*)
     return 1;
 }
 
+/*
 void WombatForensics::LoadPartitions(ForImg* curforimg)
 {
     uint16_t mbrsig = 0;
@@ -2133,7 +2136,44 @@ void WombatForensics::LoadPartitions(ForImg* curforimg)
             bfstype[4] = 0;
             if(strcmp(exfattype, "EXFAT") == 0 || strcmp(fattype, "FAT12") == 0 || strcmp(fattype, "FAT16") == 0 || strcmp(fattype, "FAT32") == 0 || strcmp(ntfstype, "NTFS") == 0 || strcmp(bfstype, "1SFB") == 0) // EXFAT | FAT12 | FAT16 | FAT32 | NTFS | BFS W/O PARTITION TABLE
             {
-                std::cout << "parse fs here.." << std::endl;
+                // table initialization
+                tablelist->setTableSize(1, 14);
+                tablelist->setColumnText(0, "");
+                tablelist->setColumnText(1, "ID");
+                tablelist->setColumnText(2, "Name");
+                tablelist->setColumnText(3, "Path");
+                tablelist->setColumnText(4, "Size (bytes)");
+                tablelist->setColumnText(5, "Created");
+                tablelist->setColumnText(6, "Accessed");
+                tablelist->setColumnText(7, "Modified");
+                tablelist->setColumnText(8, "Changed");
+                tablelist->setColumnText(9, "Hash");
+                tablelist->setColumnText(10, "Category");
+                tablelist->setColumnText(11, "Signature");
+                tablelist->setColumnText(12, "Tagged");
+                tablelist->setColumnText(13, "Hash Match");
+
+                // partition information
+                itemtype = 2;
+                tablelist->setItem(0, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+                tablelist->setItemData(0, 1, &itemtype);
+                tablelist->setItemText(0, 1, FXString::value(0));
+                tablelist->setItemData(0, 2, curforimg);
+                tablelist->setItemText(0, 2, GetFileSystemName(curforimg, 0));
+                tablelist->setItemIcon(0, 2, partitionicon);
+                tablelist->setItemIconPosition(0, 2, FXTableItem::BEFORE);
+                tablelist->setItemText(0, 4, FXString(ReturnFormattingSize(curforimg->Size()).c_str()));
+
+                // table formatting
+                tablelist->fitColumnsToContents(0);
+                tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+                FitColumnContents(1);
+                FitColumnContents(2);
+                FitColumnContents(4);
+                AlignColumn(tablelist, 1, FXTableItem::LEFT);
+                AlignColumn(tablelist, 2, FXTableItem::LEFT);
+
+                //std::cout << "parse fs here.." << std::endl;
                 // parse partition(curofrimg, 0, curforimg->Size/512, 0, 1);
             }
             uint8_t ptreecnt = 0;
@@ -2687,6 +2727,7 @@ void WombatForensics::GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_
         }
     }
 }
+*/
 
 /*
 void DetermineFileSystem(std::string devicestring, int* fstype)
