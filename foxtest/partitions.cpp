@@ -24,6 +24,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
             ReadForImgContent(curforimg, &gptsig, 512, 8);
             if(gptsig == 0x4546492050415254) // GUID PARTITION TABLE
             {
+                LoadGptPartitions(curforimg, volnames, volsizes, voloffsets);
                 //LoadGptPartitions(curforimg);
             }
         }
@@ -52,7 +53,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                 //*volname = GetFileSystemName(curforimg, 0);
                 //*partsize = curforimg->Size();
             }
-            uint8_t ptreecnt = 0;
+            //uint8_t ptreecnt = 0;
             int pcount = 0;
             for(int i=0; i < 4; i++)
             {
@@ -131,6 +132,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     }
     else if(gptsig == 0x4546492050415254) // GPT PARTITION
     {
+        LoadGptPartitions(curforimg, volnames, volsizes, voloffsets);
         //LoadGptPartitions(curforimg);
     }
     else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
@@ -143,8 +145,8 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     }
 }
 
-/*
-void WombatForensics::LoadGptPartitions(ForImg* curforimg)
+//void WombatForensics::LoadGptPartitions(ForImg* curforimg)
+void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets)
 {
     uint64_t parttablestart = 0;
     uint32_t partentrycount = 0;
@@ -152,7 +154,7 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
     ReadForImgContent(curforimg, &parttablestart, 584);
     ReadForImgContent(curforimg, &partentrycount, 592);
     ReadForImgContent(curforimg, &partentrysize, 596);
-    int ptreecnt = 0;
+    //int ptreecnt = 0;
     int pcount = 0;
     for(int i=0; i < partentrycount; i++)
     {
@@ -164,6 +166,7 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
         if(curendsector - curstartsector > 0) // PARTITION VALUES MAKE SENSE
             pcount++;
     }
+    /*
     tablelist->setTableSize(pcount * 2 + 1, 14);
     tablelist->setColumnText(0, "");
     tablelist->setColumnText(1, "ID");
@@ -179,9 +182,10 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
     tablelist->setColumnText(11, "Signature");
     tablelist->setColumnText(12, "Tagged");
     tablelist->setColumnText(13, "Hash Match");
+    */
     for(int i=0; i < pcount; i++)
     {
-        itemtype = 2;
+        //itemtype = 2;
         uint64_t sectorcheck = 0;
         int cnt = i * partentrysize;
         uint64_t curstartsector = 0;
@@ -204,6 +208,10 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
         {
             if(curstartsector > sectorcheck) // UNALLOCATED PARTITION BEFORE THE FIRST PARTITION
             {
+                volnames->push_back("UNALLOCATED");
+                volsizes->push_back(curstartsector*512);
+                voloffsets->push_back(sectorcheck);
+                /*
                 tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
                 tablelist->setItemData(ptreecnt, 1, &itemtype);
                 tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
@@ -213,10 +221,15 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
                 tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
 
                 tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize(curstartsector*512).c_str()));
+                */
                 // LOAD UNALLOCATED PARTITON sectorcheck, curstartsector, 0
-                ptreecnt++;
+                //ptreecnt++;
             }
             // LOAD ALLOCATED PARTITION READ FROM TABLE curstartsector, (curendsector - curstartsector + 1), 1)
+            volnames->push_back(GetFileSystemName(curforimg, curstartsector*512));
+            volsizes->push_back((curendsector - curstartsector + 1)*512);
+            voloffsets->push_back(curstartsector*512);
+            /*
             tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
             tablelist->setItemData(ptreecnt, 1, &itemtype);
             tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
@@ -225,12 +238,17 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
             tablelist->setItemIcon(ptreecnt, 2, partitionicon);
             tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
             tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curendsector - curstartsector + 1)*512).c_str()));
-            ptreecnt++;
+            */
+            //ptreecnt++;
             if(i == pcount - 1) // ADD UNALLOCATED AFTER LAST VALID PARTITION IF EXISTS
             {
                 if(curendsector < curforimg->Size() / 512)
                 {
                     // LOAD UNALLOCATED curendsector+1, curforimg->Size() / 512 - 1 - curendsector, 0)
+                    volnames->push_back("UNALLOCATED");
+                    volsizes->push_back((curforimg->Size() / 512 - 1 - curendsector) * 512);
+                    voloffsets->push_back((curendsector + 1) * 512);
+                    /*
                     tablelist->setItem(ptreecnt, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
                     tablelist->setItemData(ptreecnt, 1, &itemtype);
                     tablelist->setItemText(ptreecnt, 1, FXString::value(ptreecnt));
@@ -239,10 +257,12 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
                     tablelist->setItemIcon(ptreecnt, 2, partitionicon);
                     tablelist->setItemIconPosition(ptreecnt, 2, FXTableItem::BEFORE);
                     tablelist->setItemText(ptreecnt, 4, FXString(ReturnFormattingSize((curforimg->Size() / 512 - 1 - curendsector)*512).c_str()));
+                    */
                 }
             }
         }
     }
+    /*
     tablelist->fitColumnsToContents(0);
     tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
     FitColumnContents(1);
@@ -250,8 +270,8 @@ void WombatForensics::LoadGptPartitions(ForImg* curforimg)
     FitColumnContents(4);
     AlignColumn(tablelist, 1, FXTableItem::LEFT);
     AlignColumn(tablelist, 2, FXTableItem::LEFT);
+    */
 }
-*/
 
 std::string GetFileSystemName(ForImg* curforimg, uint64_t offset)
 {
@@ -342,7 +362,7 @@ std::string GetFileSystemName(ForImg* curforimg, uint64_t offset)
 	    partitionname += " [EXFAT]";
 	    //std::cout << "part name: " << partitionname.text() << std::endl;
         }
-        else if(std::string(fattype).find("NTFS") > -1)
+        else if(std::string(fattype).find("NTFS") != std::string::npos)
         {
 	    uint16_t bytespersector = 0;
 	    ReadForImgContent(curforimg, &bytespersector, offset + 11);
