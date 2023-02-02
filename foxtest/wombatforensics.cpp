@@ -143,6 +143,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tags.clear();
     taggedlist.clear();
     iscaseopen = false;
+    isfrompath = false;
     prevevidpath = "";
     homepath = FXString(getenv("HOME")) + "/";
     configpath = homepath + ".wombatforensics/";
@@ -2103,29 +2104,49 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 
 long WombatForensics::LoadCurrent(FXObject* sender, FXSelector, void*)
 {
-    CurrentItem* curitm = ((CurrentItem*)(((FXButton*)sender)->getUserData()));
-    std::cout << "item text: " << ((FXButton*)sender)->getText().text() << std::endl;
-    std::cout << curitm->itemtype << std::endl;
-    std::cout << curitm->forimgindex << std::endl;
-    //FXString tagstr = ((FXMenuCommand*)sender)->getText();
+    //std::cout << "item text: " << ((FXButton*)sender)->getText().text() << std::endl;
+    currentitem = *((CurrentItem*)(((FXButton*)sender)->getUserData()));
+    isfrompath = true;
+    //std::cout << curitm->itemtype << std::endl;
+    //std::cout << curitm->forimgindex << std::endl;
+    //std::cout << forimgvector.at(curitm->forimgindex)->ImagePath() << std::endl;
+    //sender->handle(this, shown()?FXSEL(SEL_
+    long ret = LoadChildren(NULL, 0, NULL);
 
     return 1;
 }
 
 long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 {
+    // MIGHT WANT TO MOVE THE ACTUAL LOADING OF CONTENT TO ANOTHER FUNCTION, SO I CAN GET THE CONTENT
+    // POPULATED EITHER THROUGH THE TABLE OR THE PATH BUTTONS
     //std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
-    itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
-    curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
-    FXString itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2);
+    FXString itemtext = "";
+    if(!isfrompath) // selection from table
+    {
+	currentitem.itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
+	currentitem.forimgindex = tablelist->getCurrentRow();
+	currentitem.itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2).text();
+	//curforimg = forimgvector.at(currentitem.forimgindex);
+	//itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
+	//curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
+    }
+    else // selection from path
+    {
+	tablelist->setCurrentItem(currentitem.forimgindex, 0, true);
+	tablelist->selectRow(currentitem.forimgindex, true);
+    }
+    curforimg = forimgvector.at(currentitem.forimgindex);
+    isfrompath = false;
     //std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1)
     {
 	currentitem.itemtype = 1;
 	currentitem.forimgindex = tablelist->getCurrentRow();
-	currentitem.parentindx = 0;
-	currentitem.childindx = 0;
-	curbutton->setText(itemtext);
+	currentitem.parentindex = 0;
+	currentitem.childindex = 0;
+	currentitem.currentindex = 0;
+	curbutton->setText(FXString(currentitem.itemtext.c_str()));
 	curbutton->setUserData(&currentitem);
 	//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
 	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);

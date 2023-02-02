@@ -131,8 +131,10 @@ struct CurrentItem
 {
     int itemtype = 0;
     int forimgindex = 0;
-    int parentindx = 0;
-    int childindx = 0;
+    int parentindex = 0;
+    int childindex = 0;
+    int currentindex = 0;
+    std::string itemtext = "";
 };
 
 class WombatForensics : public FXMainWindow
@@ -251,6 +253,7 @@ class WombatForensics : public FXMainWindow
         
         char dtbuf[35];
         bool iscaseopen;
+	bool isfrompath;
         
         Viewer* viewer;
         ForImg* curforimg;
