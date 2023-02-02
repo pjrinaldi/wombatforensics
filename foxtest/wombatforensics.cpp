@@ -104,14 +104,14 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     burrowicon->create();
     burrowbutton = new FXButton(pathtoolbar, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
     burrowbutton->setIconPosition(ICON_BEFORE_TEXT);
-    // PATH TOOLBAR BACK ICON
-    backicon = new FXPNGIcon(this->getApp(), back);
-    backbutton = new FXButton(pathtoolbar, "BACK", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
-    backbutton->setIconPosition(ICON_BEFORE_TEXT);
     // PATH TOOLBAR CURRENT ICON
     curicon = new FXPNGIcon(this->getApp(), current);
     curbutton = new FXButton(pathtoolbar, "CURRENT", curicon, this, ID_CURRENT, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
     curbutton->setIconPosition(ICON_BEFORE_TEXT);
+    // PATH TOOLBAR BACK ICON
+    backicon = new FXPNGIcon(this->getApp(), back);
+    backbutton = new FXButton(pathtoolbar, "BACK", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    backbutton->setIconPosition(ICON_BEFORE_TEXT);
     // PATH TOOLBAR FORWARD ICON
     frwdicon = new FXPNGIcon(this->getApp(), frwd);
     frwdbutton = new FXButton(pathtoolbar, "FORWARD", frwdicon, this, ID_FRWD, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
