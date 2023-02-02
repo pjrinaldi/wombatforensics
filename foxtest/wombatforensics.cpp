@@ -4,6 +4,7 @@ FXIMPLEMENT(WombatForensics,FXMainWindow,WombatForensicsMap,ARRAYNUMBER(WombatFo
 
 WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", new FXICOIcon(a, wombat_32), new FXICOIcon(a, wombat_32), DECOR_ALL, 0, 0, 1640, 768)
 {
+    new FXToolTip(this->getApp(), TOOLTIP_PERMANENT);
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
     pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
