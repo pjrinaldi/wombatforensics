@@ -25,6 +25,7 @@
 #include "evidencemanager.h"
 #include "forensicimage.h"
 #include "partitions.h"
+#include "directories.h"
 // SHARED LIBRARIES
 #include <tar.h>
 #include <libtar.h>
@@ -126,6 +127,7 @@ long CheckTableItem::onCheck(FXObject *, FXSelector, void *vp)
     return 1;
 }
 
+/*
 // MAY NEED A STRUCTURE THAT CONTAINS ITEM TYPE, CURFORIMG INDEX, PARENTID, CHILDID OR SOME SUCH
 struct CurrentItem
 {
@@ -136,6 +138,7 @@ struct CurrentItem
     int currentindex = 0;
     std::string itemtext = "";
 };
+*/
 
 class WombatForensics : public FXMainWindow
 {

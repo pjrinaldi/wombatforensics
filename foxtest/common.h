@@ -14,6 +14,19 @@
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
 
+// MAY NEED A STRUCTURE THAT CONTAINS ITEM TYPE, CURFORIMG INDEX, PARENTID, CHILDID OR SOME SUCH
+struct CurrentItem
+{
+    //int forimgindex = 0;
+    //int parentindex = 0;
+    //int childindex = 0;
+    int itemtype = 0;
+    int inode = 0;
+    //int currentindex = 0;
+    ForImg* forimg = NULL;
+    std::string itemtext = "";
+};
+
 //std::string ConvertUnixTimeToHuman(uint32_t unixtime);
 
 char* GetDateTime(char *buff);
@@ -42,5 +55,7 @@ void ReadInteger(uint8_t* arr, int begin, uint64_t* val, bool isbigendian=false)
 
 //void ReturnUint(uint64_t* tmp, uint8_t* tmp8, unsigned int length);
 //void ReturnInt(int64_t* tmp, int8_t* tmp8, unsigned int length);
+
+void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
 
 #endif
