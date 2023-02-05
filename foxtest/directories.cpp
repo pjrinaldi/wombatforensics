@@ -419,313 +419,152 @@ void LoadFatDirectory(CurrentItem* currentitem, uint64_t curinode)
                     break;
                 else
                 {
+                    uint8_t fileattr = 0;
+                    currentitem->forimg->ReadContent(&fileattr, diroffset + i*32 + 11, 1);
+                    std::cout << "file attr: " << std::hex << (uint)fileattr << std::endl;
                     std::cout << "first char: " << std::hex << (uint)firstchar << std::endl;
+                    if((uint)fileattr == 0x0f || (uint)fileattr == 0x3f) // long directory name
+                    {
+                        uint lsn = ((int)firstchar & 0x0f);
+                        if(lsn <= 20)
+                        {
+                            std::string longname = "";
+                            int arr[13] = {1, 3, 5, 7, 9, 14, 16, 18, 20, 22, 24, 28, 30};
+                            for(int j=0; j < 13; j++)
+                            {
+                                uint16_t longletter = 0;
+                                ReadForImgContent(currentitem->forimg, &longletter, diroffset + i*32 + arr[j]);
+                                if(longletter < 0xFFFF)
+                                    longname += (char)longletter;
+                            }
+                            longnamestring.insert(0, longname);
+                        }
+                    }
+                    else
+                    {
+                        bool isdeleted = 0;
+                        if((uint)firstchar == 0x05 || (uint)firstchar == 0xe5)
+                            isdeleted = 1;
+                        std::cout << "is deleted: " << isdeleted << std::endl;
+                        std::string filename = "";
+                        if(!longnamestring.empty())
+                        {
+                            filename = longnamestring;
+                        }
+                        else
+                        {
+                            char* rname = new char[8];
+                            currentitem->forimg->ReadContent((uint8_t*)rname, diroffset + i*32 + 1, 7);
+                            rname[7] = 0;
+                            std::string restname(rname);
+                            char* ename = new char[4];
+                            currentitem->forimg->ReadContent((uint8_t*)ename, diroffset + i*32 + 8, 3);
+                            ename[3] = 0;
+                            std::string extname(ename);
+                            while(extname.size() > 0)
+                            {
+                                std::size_t findempty = extname.find(" ", 0);
+                                if(findempty != std::string::npos)
+                                    extname.erase(findempty, 1);
+                                else
+                                    break;
+                            }
+                            restname.erase(std::remove_if(restname.begin(), restname.end(), isspace), restname.end());
+                            if(isdeleted)
+                                filename = std::string(1, '_') + restname;
+                            else
+                                filename = std::string(1, (char)firstchar) + restname;
+                            if(extname.size() > 0)
+                                filename += "." + extname;
+                        }
+                        std::cout << "file name: " << filename << std::endl;
+                        longnamestring = "";
+                    }
                 }
             }
         }
     }
 }
 /*
-	for(unsigned int j=0; j < direntrycount; j++)
-	{
-            if(firstchar == 0xe5) // deleted entry, skip
-            {
-            }
-            else if(firstchar == 0x00) // entry is free and all remaining are free
-                break;
-	    else if(firstchar == 0x85) // EXFAT File/Dir Directory Entry
-	    {
-		uint8_t* sc = new uint8_t[1];
-		uint8_t secondarycount = 0;
-		ReadContent(rawcontent, sc, diroffset + j*32 + 1, 1);
-		secondarycount = (uint8_t)sc[0];
-		delete[] sc;
-		//std::cout << "secondary count: " << secondarycount << std::endl;
-		// FILE ATTRIBUTE
-		uint8_t* fa = new uint8_t[1];
-		uint8_t fileattr = 0;
-		ReadContent(rawcontent, fa, diroffset + j*32 + 4, 1);
-		fileattr = (uint8_t)fa[0];
-		delete[] fa;
-		//std::cout << "file attr: " << (int)fileattr << std::endl;
-		if(fileattr & 0x10) // Sub Directory
-		{
-		    int fatchain = 0;
-		    uint8_t namelength = 0;
-		    uint8_t curlength = 0;
-		    for(uint8_t k=1; k <= secondarycount; k++)
-		    {
-			uint8_t* set = new uint8_t[1];
-			uint8_t subentrytype = 0;
-			ReadContent(rawcontent, set, diroffset + j*32 + k*32, 1);
-			subentrytype = (uint8_t)set[0];
-			delete[] set;
-			//std::cout << "Sub entry type: 0x" << std::hex << (int)subentrytype << std::endl;
-			if(subentrytype == 0xc0) // Stream Extension Directory Entry
+			// GET FILE PROPERTIES
+			fileforensics += "Attributes|";
+			if(fileattr & 0x01)
+			    fileforensics += "Read Only,";
+			if(fileattr & 0x02)
+			    fileforensics += "Hidden File,";
+			if(fileattr & 0x04)
+			    fileforensics += "System File,";
+			if(fileattr & 0x08)
+			    fileforensics += "Volume ID,";
+			if(fileattr & 0x10)
+			    fileforensics += "Sub Directory,";
+			if(fileattr & 0x20)
+			    fileforensics += "Archive File,";
+			fileforensics += "\n";
+			// GET LOGICAL FILE SIZE
+			uint8_t* ls = new uint8_t[4];
+			uint32_t logicalsize = 0;
+			ReadContent(rawcontent, ls, diroffset + j*32 + 28, 4);
+			ReturnUint32(&logicalsize, ls);
+			delete[] ls;
+			fileforensics += "Logical Size|" + std::to_string(logicalsize) + " bytes\n";
+			// GET PHYSICAL FILE SIZE (SHOULD BE LAYOUT)
+			uint8_t* hcn = new uint8_t[2];
+			uint16_t hiclusternum = 0;
+			ReadContent(rawcontent, hcn, diroffset + j*32 + 20, 2); // always zero for fat12/16
+			ReturnUint16(&hiclusternum, hcn);
+			delete[] hcn;
+			uint8_t* lcn = new uint8_t[2];
+			uint16_t loclusternum = 0;
+			ReadContent(rawcontent, lcn, diroffset + j*32 + 26, 2);
+			ReturnUint16(&loclusternum, lcn);
+			delete[] lcn;
+			uint32_t clusternum = ((uint32_t)hiclusternum >> 16) + loclusternum;
+			std::vector<uint32_t> clusterlist;
+			clusterlist.clear();
+			//std::cout << "first cluster: " << clusternum << std::endl;
+			if(clusternum >= 2)
 			{
-			    // NAME LENGTH
-			    uint8_t* nl = new uint8_t[1];
-			    ReadContent(rawcontent, nl, diroffset + (j+k)*32 + 3, 1);
-			    namelength = (uint8_t)nl[0];
-			    delete[] nl;
-			    // FLAGS
-			    uint8_t* ff = new uint8_t[1];
-			    ReadContent(rawcontent, ff, diroffset + (j+k)*32 + 1, 1);
-			    std::bitset<8> flagbits{(uint8_t)ff[0]};
-			    delete[] ff;
-			    //std::cout << "flagbits: " << flagbits << std::endl;
-			    // FAT CHAIN
-			    int fatchain = flagbits[1];
-			    //std::cout << "fatchain: " << fatchain << std::endl;
-			    // CLUSTER NUM
-			    uint8_t* cn = new uint8_t[4];
-			    //uint32_t clusternum = 0;
-			    ReadContent(rawcontent, cn, diroffset + (j+k)*32 + 20, 4);
-			    ReturnUint32(&clusternum, cn);
-			    delete[] cn;
-			    //std::cout << "Cluster Number: " << clusternum << std::endl;
-			    // PHYSICAL SIZE
-			    uint8_t* ps = new uint8_t[8];
-			    //uint64_t physicalsize = 0;
-			    ReadContent(rawcontent, ps, diroffset + (j+k)*32 + 24, 8);
-			    ReturnUint64(&physicalsize, ps);
-			    delete[] ps;
-			    //std::cout << "Physical Size: " << physicalsize << std::endl;
-			}
-			else if(subentrytype == 0xc1) // File Name Directory Entry
-			{
-			    // GET FILE NAME
-			    curlength += 15;
-			    if(curlength <= namelength)
-			    {
-				for(int m=1; m < 16; m++)
-				{
-				    uint8_t* sl = new uint8_t[2];
-				    uint16_t singleletter = 0;
-				    ReadContent(rawcontent, sl, diroffset + (j+k)*32 + m*2, 2);
-				    ReturnUint16(&singleletter, sl);
-				    delete[] sl;
-				    filename += (char)singleletter;
-				}
-			    }
-			    else
-			    {
-				int remaining = namelength + 16 - curlength;
-				for(int m=1; m < remaining; m++)
-				{
-				    uint8_t* sl = new uint8_t[2];
-				    uint16_t singleletter = 0;
-				    ReadContent(rawcontent, sl, diroffset + (j+k)*32 + m*2, 2);
-				    ReturnUint16(&singleletter, sl);
-				    delete[] sl;
-				    filename += (char)singleletter;
-				}
-			    }
-			}
-		    }
-		    if(filename.find(childpath) != std::string::npos)
-		    {
-			std::string layout = "";
-			//std::cout << "cur file name: " << filename << std::endl;
-			// GET DIRECTORY LAYOUT
-			if(fatchain == 0 && clusternum > 1)
-			{
-			    std::vector<uint32_t> clusterlist;
-			    clusterlist.clear();
 			    clusterlist.push_back(clusternum);
 			    GetNextCluster(rawcontent, clusternum, curfat, &clusterlist);
+			}
+			std::string layout = "";
+			if(clusterlist.size() > 0)
+			{
 			    layout = ConvertClustersToExtents(&clusterlist, curfat);
-			    clusterlist.clear();
 			}
-			else if(fatchain == 1)
-			{
-			    uint clustercout = (uint)ceil((float)physicalsize / (curfat->bytespersector * curfat->sectorspercluster));
-			    layout = std::to_string(curfat->clusterareastart * curfat->bytespersector + ((clusternum - 2) * curfat->bytespersector * curfat->sectorspercluster)) + "," + std::to_string(clustercout * curfat->bytespersector * curfat->sectorspercluster) + ";";
-			}
-			
-			return layout;
-		    }
-		}
-	    }
-            else
-            {
-                uint8_t* fa = new uint8_t[1];
-                uint8_t fileattr = 0;
-                ReadContent(rawcontent, fa, diroffset + j*32 + 11, 1);
-                fileattr = (uint8_t)fa[0];
-                delete[] fa;
-                if(fileattr == 0x0f || fileattr == 0x3f) // Long Directory Name
-                {
-                    unsigned int lsn = ((int)firstchar & 0x0f);
-                    if(lsn <= 20)
-                    {
-                        // process long file name part here... then add to the long file name...
-                        std::string longname = "";
-                        int arr[13] = {1, 3, 5, 7, 9, 14, 16, 18, 20, 22, 24, 28, 30};
-                        for(int k=0; k < 13; k++)
-                        {
-                            uint16_t longletter = 0;
-                            uint8_t* ll = new uint8_t[3];
-                            ReadContent(rawcontent, ll, diroffset + j*32 + arr[k], 2);
-                            ReturnUint16(&longletter, ll);
-                            delete[] ll;
-                            if(longletter < 0xFFFF)
-                            {
-                                longname += (char)longletter;
-                            }
-                        }
-                        longnamestring.insert(0, longname);
-                    }
-                }
-		else
-		{
-		    if(fileattr == 0x10)
-		    {
-			//std::cout << "long name: " << longnamestring << "|" << std::endl;
-			if(longnamestring.find(childpath) != std::string::npos)
-			{
-			    uint8_t* hcn = new uint8_t[2];
-			    uint16_t hiclusternum = 0;
-			    ReadContent(rawcontent, hcn, diroffset + j*32 + 20, 2); // always zero for fat12/16
-			    ReturnUint16(&hiclusternum, hcn);
-			    delete[] hcn;
-			    uint8_t* lcn = new uint8_t[2];
-			    uint16_t loclusternum = 0;
-			    ReadContent(rawcontent, lcn, diroffset + j*32 + 26, 2);
-			    ReturnUint16(&loclusternum, lcn);
-			    delete[] lcn;
-			    uint32_t clusternum = ((uint32_t)hiclusternum >> 16) + loclusternum;
-			    std::vector<uint32_t> clusterlist;
-			    clusterlist.clear();
-			    //std::cout << "first cluster: " << clusternum << std::endl;
-			    if(clusternum >= 2)
-			    {
-				clusterlist.push_back(clusternum);
-				GetNextCluster(rawcontent, clusternum, curfat, &clusterlist);
-			    }
-			    std::string layout = "";
-			    if(clusterlist.size() > 0)
-			    {
-				layout = ConvertClustersToExtents(&clusterlist, curfat);
-			    }
-			    clusterlist.clear();
-			    //std::cout << "layout: " << layout << std::endl;
-			    return layout;
-			}
-		    }
-		    longnamestring = "";
-		}
-            }
-	}
-*/ 
+			clusterlist.clear();
+			fileforensics += "Physical Layout|" + layout + " (offset,size;) [bytes]\n";
+			//std::cout << "layout: " << layout << std::endl;
+			// GET DATE/TIME's
+			uint8_t* cd = new uint8_t[2];
+			uint16_t createdate = 0;
+			ReadContent(rawcontent, cd, diroffset + j*32 + 16, 2);
+			ReturnUint16(&createdate, cd);
+			delete[] cd;
+			uint8_t* ct = new uint8_t[2];
+			uint16_t createtime = 0;
+			ReadContent(rawcontent, ct, diroffset + j*32 + 14, 2);
+			ReturnUint16(&createtime, ct);
+			fileforensics += "Create Date|" + ConvertDosTimeToHuman(&createdate, &createtime) + "\n";
+			uint8_t* ad = new uint8_t[2];
+			uint16_t accessdate = 0;
+			ReadContent(rawcontent, ad, diroffset + j*32 + 18, 2);
+			ReturnUint16(&accessdate, ad);
+			delete[] ad;
+			fileforensics += "Access Date|" + ConvertDosTimeToHuman(&accessdate, NULL) + "\n";
+			uint8_t* md = new uint8_t[2];
+			uint16_t modifydate = 0;
+			ReadContent(rawcontent, md, diroffset + j*32 + 24, 2);
+			ReturnUint16(&modifydate, md);
+			delete[] md;
+			uint8_t* mt = new uint8_t[2];
+			uint16_t modifytime = 0;
+			ReadContent(rawcontent, mt, diroffset + j*32 + 22, 2);
+			ReturnUint16(&modifytime, mt);
+			delete[] mt;
+			fileforensics += "Modify Date|" + ConvertDosTimeToHuman(&modifydate, &modifytime) + "\n";
 
-/*
- qulonglong ParseFatDirectory(ForImg* curimg, uint32_t curstartsector, uint8_t ptreecnt, qulonglong parinode, QString parfilename, QString dirlayout)
-{
-    qulonglong inodecnt = 0;
-    //uint32_t fatsize = 0;
-    qulonglong fatoffset = 0;
-    uint16_t bytespersector = 0;
-    uint8_t sectorspercluster = 0;
-    uint8_t fstype = 0;
-    qulonglong clusterareastart = 0;
-    QString rootdirlayout = "";
-    QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
-    if(!propfile.isOpen())
-	propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(propfile.isOpen())
-    {
-        while(!propfile.atEnd())
-        {
-            QString line = propfile.readLine();
-            if(line.startsWith("Bytes Per Sector|"))
-                bytespersector = line.split("|").at(1).toUInt();
-            else if(line.startsWith("Sectors Per Cluster|"))
-                sectorspercluster = line.split("|").at(1).toUInt();
-            else if(line.startsWith("Root Directory Layout|"))
-                rootdirlayout = line.split("|").at(1);
-            else if(line.startsWith("FAT Offset|"))
-                fatoffset = line.split("|").at(1).toULongLong();
-            //else if(line.startsWith("FAT Size|"))
-            //    fatsize = line.split("|").at(1).toUInt();
-            else if(line.startsWith("Cluster Area Start|"))
-                clusterareastart = line.split("|").at(1).toULongLong();
-	    else if(line.startsWith("File System Type Int|"))
-		fstype = line.split("|").at(1).toUInt();
-        }
-        propfile.close();
-    }
-    if(!dirlayout.isEmpty())
-	rootdirlayout = dirlayout;
-    //qDebug() << "rootdirlayout:" << rootdirlayout;
-    //qDebug() << "bps:" << bytespersector << "fo:" << fatoffset << "fs:" << fatsize << "rdl:" << rootdirlayout;
-    for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
-    {
-        //qDebug() << "root dir entry:" << i;
-	qulonglong rootdiroffset = 0;
-	qulonglong rootdirsize = 0;
-	if(i == 0)
-	{
-	    if(dirlayout.isEmpty()) // root directory
-	    {
-	        rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
-		rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
-	    }
-	    else // sub directory
-	    {
-		rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong() + 64; // skip . and .. directories
-		rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong() - 64; // adjust read size for the 64 byte skip
-	    }
-	}
-        uint rootdirentrycount = rootdirsize / 32;
-        //qDebug() << "current rootdirentrycount:" << rootdirentrycount;
-	if(parinode == 0)
-	    inodecnt = 0;
-	else
-	    inodecnt = parinode + 1;
-	//qDebug() << "inodecnt at start of parent comparison:" << inodecnt;
-        QString longnamestring = "";
-        for(uint j=0; j < rootdirentrycount; j++)
-        {
-	    QString longname = "";
-            QTextStream out;
-            QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
-            if(!fileprop.isOpen())
-                fileprop.open(QIODevice::Append | QIODevice::Text);
-            out.setDevice(&fileprop);
-
-            uint8_t firstchar = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32, 1));
-            if(firstchar == 0x00) // entry is free and all remaining are free
-                break;
-            uint8_t fileattr = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 11, 1));
-            //qDebug() << "firstchar:" << QString::number(firstchar, 16) << "fileattr:" << QString::number(fileattr, 16);
-            if(fileattr != 0x0f && fileattr != 0x00 && fileattr != 0x3f) // need to process differently // 0x3f is ATTR_LONG_NAME_MASK which is a long name entry sub component
-            {
-                if(!longnamestring.isEmpty())
-                {
-                    out << "Long Name|" << longnamestring << "|Long name for the file." << Qt::endl;
-		    longname = longnamestring;
-                    longnamestring = "";
-                }
-                else
-                    out << "Long Name| |Long name for the file." << Qt::endl;
-                out << "File Attributes|";
-                if(fileattr & 0x01)
-                    out << "Read Only,";
-                if(fileattr & 0x02)
-                    out << "Hidden File,";
-                if(fileattr & 0x04)
-                    out << "System File,";
-                if(fileattr & 0x08)
-                    out << "Volume ID,";
-                if(fileattr & 0x10)
-                    out << "SubDirectory,";
-                if(fileattr & 0x20)
-                    out << "Archive File,";
-                out << "|File attributes." << Qt::endl;
-                uint8_t isdeleted = 0;
-                if(firstchar == 0xe5 || firstchar == 0x05) // was allocated but now free
-                    isdeleted = 1;
                 QString restname = QString::fromStdString(curimg->ReadContent(rootdiroffset + j*32 + 1, 7).toStdString()).replace(" ", "");
                 QString extname = QString::fromStdString(curimg->ReadContent(rootdiroffset + j*32 + 8, 3).toStdString()).replace(" ", "");
                 QString aliasname = QString(char(firstchar));
@@ -940,3 +779,194 @@ void LoadFatDirectory(CurrentItem* currentitem, uint64_t curinode)
     return inodecnt;
 }
  */ 
+/*
+*
+	for(unsigned int j=0; j < direntrycount; j++)
+	{
+	    else if(firstchar == 0x85) // EXFAT File/Dir Directory Entry
+	    {
+		uint8_t* sc = new uint8_t[1];
+		uint8_t secondarycount = 0;
+		ReadContent(rawcontent, sc, diroffset + j*32 + 1, 1);
+		secondarycount = (uint8_t)sc[0];
+		delete[] sc;
+		//std::cout << "secondary count: " << secondarycount << std::endl;
+		// FILE ATTRIBUTE
+		uint8_t* fa = new uint8_t[1];
+		uint8_t fileattr = 0;
+		ReadContent(rawcontent, fa, diroffset + j*32 + 4, 1);
+		fileattr = (uint8_t)fa[0];
+		delete[] fa;
+		//std::cout << "file attr: " << (int)fileattr << std::endl;
+		if(fileattr & 0x10) // Sub Directory
+		{
+		    int fatchain = 0;
+		    uint8_t namelength = 0;
+		    uint8_t curlength = 0;
+		    for(uint8_t k=1; k <= secondarycount; k++)
+		    {
+			uint8_t* set = new uint8_t[1];
+			uint8_t subentrytype = 0;
+			ReadContent(rawcontent, set, diroffset + j*32 + k*32, 1);
+			subentrytype = (uint8_t)set[0];
+			delete[] set;
+			//std::cout << "Sub entry type: 0x" << std::hex << (int)subentrytype << std::endl;
+			if(subentrytype == 0xc0) // Stream Extension Directory Entry
+			{
+			    // NAME LENGTH
+			    uint8_t* nl = new uint8_t[1];
+			    ReadContent(rawcontent, nl, diroffset + (j+k)*32 + 3, 1);
+			    namelength = (uint8_t)nl[0];
+			    delete[] nl;
+			    // FLAGS
+			    uint8_t* ff = new uint8_t[1];
+			    ReadContent(rawcontent, ff, diroffset + (j+k)*32 + 1, 1);
+			    std::bitset<8> flagbits{(uint8_t)ff[0]};
+			    delete[] ff;
+			    //std::cout << "flagbits: " << flagbits << std::endl;
+			    // FAT CHAIN
+			    int fatchain = flagbits[1];
+			    //std::cout << "fatchain: " << fatchain << std::endl;
+			    // CLUSTER NUM
+			    uint8_t* cn = new uint8_t[4];
+			    //uint32_t clusternum = 0;
+			    ReadContent(rawcontent, cn, diroffset + (j+k)*32 + 20, 4);
+			    ReturnUint32(&clusternum, cn);
+			    delete[] cn;
+			    //std::cout << "Cluster Number: " << clusternum << std::endl;
+			    // PHYSICAL SIZE
+			    uint8_t* ps = new uint8_t[8];
+			    //uint64_t physicalsize = 0;
+			    ReadContent(rawcontent, ps, diroffset + (j+k)*32 + 24, 8);
+			    ReturnUint64(&physicalsize, ps);
+			    delete[] ps;
+			    //std::cout << "Physical Size: " << physicalsize << std::endl;
+			}
+			else if(subentrytype == 0xc1) // File Name Directory Entry
+			{
+			    // GET FILE NAME
+			    curlength += 15;
+			    if(curlength <= namelength)
+			    {
+				for(int m=1; m < 16; m++)
+				{
+				    uint8_t* sl = new uint8_t[2];
+				    uint16_t singleletter = 0;
+				    ReadContent(rawcontent, sl, diroffset + (j+k)*32 + m*2, 2);
+				    ReturnUint16(&singleletter, sl);
+				    delete[] sl;
+				    filename += (char)singleletter;
+				}
+			    }
+			    else
+			    {
+				int remaining = namelength + 16 - curlength;
+				for(int m=1; m < remaining; m++)
+				{
+				    uint8_t* sl = new uint8_t[2];
+				    uint16_t singleletter = 0;
+				    ReadContent(rawcontent, sl, diroffset + (j+k)*32 + m*2, 2);
+				    ReturnUint16(&singleletter, sl);
+				    delete[] sl;
+				    filename += (char)singleletter;
+				}
+			    }
+			}
+		    }
+		    if(filename.find(childpath) != std::string::npos)
+		    {
+			std::string layout = "";
+			//std::cout << "cur file name: " << filename << std::endl;
+			// GET DIRECTORY LAYOUT
+			if(fatchain == 0 && clusternum > 1)
+			{
+			    std::vector<uint32_t> clusterlist;
+			    clusterlist.clear();
+			    clusterlist.push_back(clusternum);
+			    GetNextCluster(rawcontent, clusternum, curfat, &clusterlist);
+			    layout = ConvertClustersToExtents(&clusterlist, curfat);
+			    clusterlist.clear();
+			}
+			else if(fatchain == 1)
+			{
+			    uint clustercout = (uint)ceil((float)physicalsize / (curfat->bytespersector * curfat->sectorspercluster));
+			    layout = std::to_string(curfat->clusterareastart * curfat->bytespersector + ((clusternum - 2) * curfat->bytespersector * curfat->sectorspercluster)) + "," + std::to_string(clustercout * curfat->bytespersector * curfat->sectorspercluster) + ";";
+			}
+			
+			return layout;
+		    }
+		}
+	    }
+            else
+            {
+                uint8_t* fa = new uint8_t[1];
+                uint8_t fileattr = 0;
+                ReadContent(rawcontent, fa, diroffset + j*32 + 11, 1);
+                fileattr = (uint8_t)fa[0];
+                delete[] fa;
+                if(fileattr == 0x0f || fileattr == 0x3f) // Long Directory Name
+                {
+                    unsigned int lsn = ((int)firstchar & 0x0f);
+                    if(lsn <= 20)
+                    {
+                        // process long file name part here... then add to the long file name...
+                        std::string longname = "";
+                        int arr[13] = {1, 3, 5, 7, 9, 14, 16, 18, 20, 22, 24, 28, 30};
+                        for(int k=0; k < 13; k++)
+                        {
+                            uint16_t longletter = 0;
+                            uint8_t* ll = new uint8_t[3];
+                            ReadContent(rawcontent, ll, diroffset + j*32 + arr[k], 2);
+                            ReturnUint16(&longletter, ll);
+                            delete[] ll;
+                            if(longletter < 0xFFFF)
+                            {
+                                longname += (char)longletter;
+                            }
+                        }
+                        longnamestring.insert(0, longname);
+                    }
+                }
+		else
+		{
+		    if(fileattr == 0x10)
+		    {
+			//std::cout << "long name: " << longnamestring << "|" << std::endl;
+			if(longnamestring.find(childpath) != std::string::npos)
+			{
+			    uint8_t* hcn = new uint8_t[2];
+			    uint16_t hiclusternum = 0;
+			    ReadContent(rawcontent, hcn, diroffset + j*32 + 20, 2); // always zero for fat12/16
+			    ReturnUint16(&hiclusternum, hcn);
+			    delete[] hcn;
+			    uint8_t* lcn = new uint8_t[2];
+			    uint16_t loclusternum = 0;
+			    ReadContent(rawcontent, lcn, diroffset + j*32 + 26, 2);
+			    ReturnUint16(&loclusternum, lcn);
+			    delete[] lcn;
+			    uint32_t clusternum = ((uint32_t)hiclusternum >> 16) + loclusternum;
+			    std::vector<uint32_t> clusterlist;
+			    clusterlist.clear();
+			    //std::cout << "first cluster: " << clusternum << std::endl;
+			    if(clusternum >= 2)
+			    {
+				clusterlist.push_back(clusternum);
+				GetNextCluster(rawcontent, clusternum, curfat, &clusterlist);
+			    }
+			    std::string layout = "";
+			    if(clusterlist.size() > 0)
+			    {
+				layout = ConvertClustersToExtents(&clusterlist, curfat);
+			    }
+			    clusterlist.clear();
+			    //std::cout << "layout: " << layout << std::endl;
+			    return layout;
+			}
+		    }
+		    longnamestring = "";
+		}
+            }
+	}
+*/ 
+
+
