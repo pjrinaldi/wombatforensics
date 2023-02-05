@@ -543,8 +543,8 @@ void WombatForensics::UpdateForensicImages()
     tablelist->setColumnText(13, "Hash Match");
     for(int i=0; i < forimgvector.size(); i++)
     {
-        currentitem.itemtype = 1;
-        currentitem.forimg = forimgvector.at(i);
+        //currentitem.itemtype = 1;
+        //currentitem.forimg = forimgvector.at(i);
         /*
     int itemtype = 0;
     int currentindex = 0;
@@ -553,10 +553,10 @@ void WombatForensics::UpdateForensicImages()
          */ 
         itemtype = 1;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-        //tablelist->setItemData(i, 1, &itemtype);
-        //tablelist->setItemData(i, 2, forimgvector.at(i));
+        tablelist->setItemData(i, 1, &itemtype);
+        tablelist->setItemData(i, 2, forimgvector.at(i));
         tablelist->setItemText(i, 1, FXString::value(i));
-        tablelist->setItemData(i, 1, &currentitem);
+        //tablelist->setItemData(i, 1, &currentitem);
         //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
         tablelist->setItemIcon(i, 2, forimgicon);
@@ -2136,8 +2136,9 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 
 long WombatForensics::LoadCurrent(FXObject* sender, FXSelector, void*)
 {
+    itemtext = ((FXButton*)sender)->getText();
     //std::cout << "item text: " << ((FXButton*)sender)->getText().text() << std::endl;
-    currentitem = *((CurrentItem*)(((FXButton*)sender)->getUserData()));
+    //currentitem = *((CurrentItem*)(((FXButton*)sender)->getUserData()));
     isfrompath = true;
     //std::cout << curitm->itemtype << std::endl;
     //std::cout << curitm->forimgindex << std::endl;
@@ -2155,18 +2156,25 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     //std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
 
     // NEED TO FIX THIS, SO BOTH THE BUTTON AND THE TABLE STORE THE SAME INFORMATION
-    FXString itemtext = "";
+    //FXString itemtext = "";
     if(!isfrompath) // selection from table
     {
-	currentitem.itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
-	//currentitem.forimgindex = tablelist->getCurrentRow();
-	currentitem.itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2).text();
-	//curforimg = forimgvector.at(currentitem.forimgindex);
-	//itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
-	//curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
+        if(tablelist->getCurrentRow() > -1)
+        {
+            //currentitem.itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
+            //currentitem.forimgindex = tablelist->getCurrentRow();
+            //currentitem.itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2).text();
+            //curforimg = forimgvector.at(currentitem.forimgindex);
+            itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
+            curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
+            itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2).text();
+            //currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
+        }
     }
     else // selection from path
     {
+        itemtype = 1;
+        //itemtext = 
 	//tablelist->setCurrentItem(currentitem.forimgindex, 0, true);
 	//tablelist->selectRow(currentitem.forimgindex, true);
     }
@@ -2176,14 +2184,15 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     //std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1)
     {
-	currentitem.itemtype = 1;
+	//currentitem.itemtype = 1;
 	//currentitem.forimgindex = tablelist->getCurrentRow();
-        currentitem.forimg = curforimg;
+        //currentitem.forimg = curforimg;
 	//currentitem.parentindex = 0;
 	//currentitem.childindex = 0;
 	//currentitem.currentindex = 0;
-	curbutton->setText(FXString(currentitem.itemtext.c_str()));
-	curbutton->setUserData(&currentitem);
+        curbutton->setText(itemtext);
+	//curbutton->setText(FXString(currentitem.itemtext.c_str()));
+	//curbutton->setUserData(&currentitem);
 	//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
 	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
         volnames.clear();
@@ -2210,20 +2219,22 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         // partition information
         for(int i=0; i < volnames.size(); i++)
         {
-            currentitem.itemtype = 2;
-            currentitem.forimg = curforimg;
+            itemtype = 2;
+            //currentitem.itemtype = 2;
+            //currentitem.forimg = curforimg;
             //currentitem.forimgindex = tablelist->getCurrentRow();
-            currentitem.itemtext = volnames.at(i);
+            //currentitem.itemtext = volnames.at(i);
             tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-            tablelist->setItemData(i, 1, &currentitem);
-            //tablelist->setItemData(i, 1, &itemtype);
+            //tablelist->setItemData(i, 1, &currentitem);
+            tablelist->setItemData(i, 1, &itemtype);
             tablelist->setItemText(i, 1, FXString::value(i));
-            //tablelist->setItemData(i, 2, curforimg);
+            tablelist->setItemData(i, 2, curforimg);
             tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
             tablelist->setItemIcon(i, 2, partitionicon);
             tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
-            //tablelist->setItemData(i, 4, &(voloffsets.at(i)));
+            tablelist->setItemData(i, 4, &(voloffsets.at(i)));
             tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
+            //currentitem.voloffset = voloffsets.at(i);
             //std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
         }
         // table formatting
@@ -2240,6 +2251,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     }
     else if(itemtype == 2)
     {
+        //currentitem.itemtype = 2;
+        currentitem.forimg = curforimg;
+        currentitem.itemtext = std::string(itemtext.text());
+        currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
         LoadDirectory(&currentitem);
 	// need to implement path toolbar here for the burrow and the partition and 
         //std::cout << "need to load the root directory for the partition selected here." << std::endl;

@@ -247,6 +247,7 @@ class WombatForensics : public FXMainWindow
         FXString currentsettings;
 	FXString currentcarvetypes;
 	FXString prevevidpath;
+        FXString itemtext;
         
         FXFile tagsfile;
         FXFile logfile;

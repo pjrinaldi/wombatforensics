@@ -3,6 +3,9 @@
 
 void LoadDirectory(CurrentItem* currentitem)
 {
+    std::cout << "currentitem text: " << currentitem->itemtext << std::endl;
+    std::cout << "currentitem voloffset: " << currentitem->voloffset << std::endl;
+    std::cout << "currentitem inode: " << currentitem->inode << std::endl;
     ForImg* curforimg = currentitem->forimg;
     uint16_t sig16 = 0;
     uint32_t sig32 = 0;

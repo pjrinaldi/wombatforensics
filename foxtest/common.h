@@ -20,10 +20,11 @@ struct CurrentItem
     //int forimgindex = 0;
     //int parentindex = 0;
     //int childindex = 0;
-    int itemtype = 0;
+    //int itemtype = 0;
     int inode = 0;
     //int currentindex = 0;
     ForImg* forimg = NULL;
+    uint64_t voloffset = 0;
     std::string itemtext = "";
 };
 
