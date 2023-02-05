@@ -267,6 +267,7 @@ class WombatForensics : public FXMainWindow
         std::vector<std::string> volnames;
         std::vector<uint64_t> volsizes;
         std::vector<uint64_t> voloffsets;
+        std::vector<FileItem> fileitemvector;
 
     protected:
         WombatForensics() {}

@@ -17,15 +17,21 @@
 // MAY NEED A STRUCTURE THAT CONTAINS ITEM TYPE, CURFORIMG INDEX, PARENTID, CHILDID OR SOME SUCH
 struct CurrentItem
 {
-    //int forimgindex = 0;
-    //int parentindex = 0;
-    //int childindex = 0;
-    //int itemtype = 0;
     int inode = 0;
-    //int currentindex = 0;
     ForImg* forimg = NULL;
     uint64_t voloffset = 0;
     std::string itemtext = "";
+};
+
+struct FileItem
+{
+    bool isdeleted = false;
+    bool isdirectory = false;
+    uint64_t size = 0;
+    std::string name = "";
+    std::string create = "";
+    std::string access = "";
+    std::string modify = "";
 };
 
 //std::string ConvertUnixTimeToHuman(uint32_t unixtime);

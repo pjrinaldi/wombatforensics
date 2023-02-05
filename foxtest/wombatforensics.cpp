@@ -2252,10 +2252,15 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     else if(itemtype == 2)
     {
         //currentitem.itemtype = 2;
+        fileitemvector.clear();
         currentitem.forimg = curforimg;
         currentitem.itemtext = std::string(itemtext.text());
         currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
-        LoadDirectory(&currentitem);
+        LoadDirectory(&currentitem, &fileitemvector);
+        for(int i=0; i < fileitemvector.size(); i++)
+        {
+            std::cout << "name: " << fileitemvector.at(i).name << std::endl;
+        }
 	// need to implement path toolbar here for the burrow and the partition and 
         //std::cout << "need to load the root directory for the partition selected here." << std::endl;
     }

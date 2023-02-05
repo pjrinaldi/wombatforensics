@@ -13,7 +13,10 @@
 #include "common.h"
 #include "forensicimage.h"
 
-void LoadDirectory(CurrentItem* currentitem);
-void LoadFatDirectory(CurrentItem* currentitem, uint64_t curinode);
+std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime);
+//void LoadDirectory(CurrentItem* currentitem);
+void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector);
+//void LoadFatDirectory(CurrentItem* currentitem, uint64_t curinode);
+void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, uint64_t curinode);
 
 #endif
