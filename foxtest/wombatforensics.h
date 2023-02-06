@@ -264,6 +264,7 @@ class WombatForensics : public FXMainWindow
         std::vector<ForImg*> forimgvector;
 
         uint64_t globalid;
+        uint64_t lastid;
 
 	CurrentItem currentitem;
         

@@ -291,6 +291,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
     {
         this->getApp()->beginWaitCursor();
         globalid = 1;
+        lastid = globalid;
         iscaseopen = true;
         tmppath = "/tmp/wf/" + casename + "/";
         this->setTitle("Wombat Forensics - " + casename);
@@ -390,6 +391,8 @@ long WombatForensics::SaveCase(FXObject*, FXSelector, void*)
 
 void WombatForensics::SaveCurrentCase()
 {
+    // SAVE LAST ID TO FILE
+
     // BEGIN TAR METHOD
     FXDir::create(GetSettings(2));
     //std::cout << "save casename:" << casename.text() << std::endl;
@@ -556,6 +559,7 @@ void WombatForensics::UpdateForensicImages()
             FXString idval = FXString::value(globalid);
             evidfile.writeBlock(idval.text(), idval.length());
             evidfile.close();
+            globalid = lastid;
         }
         itemtype = 1;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
@@ -563,6 +567,7 @@ void WombatForensics::UpdateForensicImages()
         tablelist->setItemData(i, 2, forimgvector.at(i));
         tablelist->setItemText(i, 1, FXString::value(globalid));
         globalid++;
+        lastid = globalid;
         //tablelist->setItemText(i, 1, FXString::value(i));
         //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
@@ -2236,6 +2241,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setItemData(i, 1, &itemtype);
             tablelist->setItemText(i, 1, FXString::value(globalid));
             globalid++;
+            lastid = globalid;
             //tablelist->setItemText(i, 1, FXString::value(i));
             tablelist->setItemData(i, 2, curforimg);
             tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
