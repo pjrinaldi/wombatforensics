@@ -235,6 +235,7 @@ WombatForensics::~WombatForensics()
 {
     //SaveCurrentCase();
     CloseCurrentCase();
+    burrowicon->destroy();
     forimgicon->destroy();
     carvedfileicon->destroy();
     defaultfileicon->destroy();
@@ -361,7 +362,6 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
         this->getApp()->beginWaitCursor();
 	StatusUpdate("Case Opening...");
         // will have to get the global id, either from the latest file or a latestid text file.
-        globalid = 1;
 	this->setTitle("Wombat Forensics - " + casename);
         FXDir::create("/tmp/wf/");
 	tmppath = tmppath + "wf/";
@@ -373,6 +373,23 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
 	// END UNTAR METHOD
 	iscaseopen = true;
 	tmppath = tmppath + casename + "/";
+        // GET LASTID FOR GLOBALID
+        FXFile lastidfile;
+        bool islastopen = lastidfile.open(tmppath + "burrow/lastid", FXIO::Reading, FXIO::OwnerReadWrite);
+        if(islastopen)
+        {
+            char* lchar = new char[lastidfile.size()+1];
+            lastidfile.readBlock(lchar, lastidfile.size());
+            lchar[lastidfile.size()] = 0;
+            lastidfile.close();
+            lastid = FXString(lchar).toULong();
+            globalid = lastid;
+        }
+        else
+        {
+            globalid = 1;
+            lastid = globalid;
+        }
 	//std::cout << tmppath.text() << std::endl;
 	LogEntry("Case was Opened Successfully");
         EnableCaseButtons();
@@ -392,7 +409,15 @@ long WombatForensics::SaveCase(FXObject*, FXSelector, void*)
 void WombatForensics::SaveCurrentCase()
 {
     // SAVE LAST ID TO FILE
-
+    FXFile lastidfile;
+    bool islastexist = lastidfile.open(tmppath + "burrow/lastid", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(!islastexist)
+        FXFile::create(tmppath + "burrow/lastid", FXIO::OwnerReadWrite);
+    lastidfile.close();
+    lastidfile.open(tmppath + "burrow/lastid", FXIO::Writing, FXIO::OwnerReadWrite);
+    FXString lastidval = FXString::value(lastid);
+    lastidfile.writeBlock(lastidval.text(), lastidval.length());
+    lastidfile.close();
     // BEGIN TAR METHOD
     FXDir::create(GetSettings(2));
     //std::cout << "save casename:" << casename.text() << std::endl;
