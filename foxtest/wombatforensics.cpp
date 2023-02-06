@@ -296,6 +296,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         this->setTitle("Wombat Forensics - " + casename);
         FXDir::create("/tmp/wf/");
         FXDir::create(tmppath);
+        FXDir::create(tmppath + "burrow/");
         FXDir::create(tmppath + "carved/");
         FXDir::create(tmppath + "archives/");
         FXDir::create(tmppath + "hashlists/");
@@ -359,7 +360,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
         this->getApp()->beginWaitCursor();
 	StatusUpdate("Case Opening...");
         // will have to get the global id, either from the latest file or a latestid text file.
-        //globalid = 1;
+        globalid = 1;
 	this->setTitle("Wombat Forensics - " + casename);
         FXDir::create("/tmp/wf/");
 	tmppath = tmppath + "wf/";
@@ -549,7 +550,9 @@ void WombatForensics::UpdateForensicImages()
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemData(i, 1, &itemtype);
         tablelist->setItemData(i, 2, forimgvector.at(i));
-        tablelist->setItemText(i, 1, FXString::value(i));
+        tablelist->setItemText(i, 1, FXString::value(globalid));
+        globalid++;
+        //tablelist->setItemText(i, 1, FXString::value(i));
         //tablelist->setItemData(i, 1, &currentitem);
         //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
@@ -2221,7 +2224,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
             //tablelist->setItemData(i, 1, &currentitem);
             tablelist->setItemData(i, 1, &itemtype);
-            tablelist->setItemText(i, 1, FXString::value(i));
+            tablelist->setItemText(i, 1, FXString::value(globalid));
+            globalid++;
+            //tablelist->setItemText(i, 1, FXString::value(i));
             tablelist->setItemData(i, 2, curforimg);
             tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
             tablelist->setItemIcon(i, 2, partitionicon);
