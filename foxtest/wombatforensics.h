@@ -261,9 +261,13 @@ class WombatForensics : public FXMainWindow
         
         Viewer* viewer;
         ForImg* curforimg;
-	CurrentItem currentitem;
-        int itemtype;
         std::vector<ForImg*> forimgvector;
+
+        uint64_t globalid;
+
+	CurrentItem currentitem;
+        
+        int itemtype;
         std::vector<std::string> volnames;
         std::vector<uint64_t> volsizes;
         std::vector<uint64_t> voloffsets;

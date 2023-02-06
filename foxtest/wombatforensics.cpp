@@ -290,6 +290,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
     if(isset)
     {
         this->getApp()->beginWaitCursor();
+        globalid = 1;
         iscaseopen = true;
         tmppath = "/tmp/wf/" + casename + "/";
         this->setTitle("Wombat Forensics - " + casename);
@@ -321,7 +322,6 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
     }
     /*
     // create new case here
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         qInfo() << "Bookmarks File Created";
         ReadBookmarks();
         ReadHashLists();
@@ -329,15 +329,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         qInfo() << "Log File Created";
         //LogMessage("Log File Created");
         InitializeCheckState();
-        ui->actionAdd_Evidence->setEnabled(true);
-        ui->actionpreviewreport->setEnabled(true);
-        ui->actionBookmark_Manager->setEnabled(true);
-        ui->actionpublishresults->setEnabled(true);
-
-        ui->actionHashListManager->setEnabled(true);
         qInfo() << "Case was Created";
-        //LogMessage("Case was Created");
-        QApplication::restoreOverrideCursor();
         StatusUpdate("Ready");
         autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
      */ 
@@ -366,6 +358,8 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
     {
         this->getApp()->beginWaitCursor();
 	StatusUpdate("Case Opening...");
+        // will have to get the global id, either from the latest file or a latestid text file.
+        //globalid = 1;
 	this->setTitle("Wombat Forensics - " + casename);
         FXDir::create("/tmp/wf/");
 	tmppath = tmppath + "wf/";
