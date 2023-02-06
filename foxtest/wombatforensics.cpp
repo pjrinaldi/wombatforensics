@@ -538,14 +538,25 @@ void WombatForensics::UpdateForensicImages()
     tablelist->setColumnText(13, "Hash Match");
     for(int i=0; i < forimgvector.size(); i++)
     {
-        //currentitem.itemtype = 1;
-        //currentitem.forimg = forimgvector.at(i);
-        /*
-    int itemtype = 0;
-    int currentindex = 0;
-    ForImg* forimg = NULL;
-    std::string itemtext = "";
-         */ 
+        FXFile evidfile;
+        bool isevidexist = evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Reading, FXIO::OwnerReadWrite);
+        if(isevidexist == true)
+        {
+            char* gichar = new char[evidfile.size()+1];
+            evidfile.readBlock(gichar, evidfile.size());
+            gichar[evidfile.size()] = 0;
+            evidfile.close();
+            globalid = FXString(gichar).toULong();
+        }
+        else
+        {
+            evidfile.close();
+            FXFile::create(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::OwnerReadWrite);
+            evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
+            FXString idval = FXString::value(globalid);
+            evidfile.writeBlock(idval.text(), idval.length());
+            evidfile.close();
+        }
         itemtype = 1;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemData(i, 1, &itemtype);
@@ -553,7 +564,6 @@ void WombatForensics::UpdateForensicImages()
         tablelist->setItemText(i, 1, FXString::value(globalid));
         globalid++;
         //tablelist->setItemText(i, 1, FXString::value(i));
-        //tablelist->setItemData(i, 1, &currentitem);
         //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
         tablelist->setItemIcon(i, 2, forimgicon);
