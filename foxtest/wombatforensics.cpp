@@ -566,33 +566,38 @@ void WombatForensics::UpdateForensicImages()
     tablelist->setColumnText(13, "Hash Match");
     for(int i=0; i < forimgvector.size(); i++)
     {
+        uint64_t curid;
         FXFile evidfile;
         bool isevidexist = evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Reading, FXIO::OwnerReadWrite);
         if(isevidexist == true)
         {
+            std::cout << "evid exists, get id from it's file" << std::endl;
             char* gichar = new char[evidfile.size()+1];
             evidfile.readBlock(gichar, evidfile.size());
             gichar[evidfile.size()] = 0;
             evidfile.close();
-            globalid = FXString(gichar).toULong();
+            curid = FXString(gichar).toULong();
         }
         else
         {
+            curid = lastid++;
             evidfile.close();
             FXFile::create(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::OwnerReadWrite);
             evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
-            FXString idval = FXString::value(globalid);
+            FXString idval = FXString::value(curid);
             evidfile.writeBlock(idval.text(), idval.length());
             evidfile.close();
-            globalid = lastid;
+            //curid = lastid++;
+            //globalid = lastid++;
         }
         itemtype = 1;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemData(i, 1, &itemtype);
         tablelist->setItemData(i, 2, forimgvector.at(i));
-        tablelist->setItemText(i, 1, FXString::value(globalid));
-        globalid++;
-        lastid = globalid;
+        tablelist->setItemText(i, 1, FXString::value(curid));
+        //globalid++;
+        //lastid++;
+        //lastid = globalid;
         //tablelist->setItemText(i, 1, FXString::value(i));
         //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
@@ -2266,7 +2271,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setItemData(i, 1, &itemtype);
             tablelist->setItemText(i, 1, FXString::value(globalid));
             globalid++;
-            lastid = globalid;
+            //lastid = globalid;
             //tablelist->setItemText(i, 1, FXString::value(i));
             tablelist->setItemData(i, 2, curforimg);
             tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
