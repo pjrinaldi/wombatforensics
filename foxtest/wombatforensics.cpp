@@ -352,7 +352,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
         else // NO
             return 1;
     }
-    FXString casefilename = FXFileDialog::getOpenFilename(this, "Open Wombat Case File", GetSettings(2), "*.wfc");
+    FXString casefilename = FXFileDialog::getOpenFilename(this, "Open Wombat Case File", GetSettings(2), "*.wcf");
     int found = casefilename.rfind("/");
     int rfound = casefilename.rfind(".");
     casename = casefilename.mid(found+1, rfound - found - 1);
@@ -417,7 +417,7 @@ void WombatForensics::SaveCurrentCase()
         FXFile::create(tmppath + "burrow/lastid", FXIO::OwnerReadWrite);
     lastidfile.close();
     lastidfile.open(tmppath + "burrow/lastid", FXIO::Writing, FXIO::OwnerReadWrite);
-    FXString lastidval = FXString::value(globalid);
+    FXString lastidval = FXString::value(globalid++);
     //FXString lastidval = FXString::value(lastid);
     lastidfile.writeBlock(lastidval.text(), lastidval.length());
     lastidfile.close();
@@ -425,7 +425,7 @@ void WombatForensics::SaveCurrentCase()
     // BEGIN TAR METHOD
     FXDir::create(GetSettings(2));
     //std::cout << "save casename:" << casename.text() << std::endl;
-    FXString tmptar = GetSettings(2) + casename + ".wfc";
+    FXString tmptar = GetSettings(2) + casename + ".wcf";
     //std::cout << "tmptar: " << tmptar.text() << std::endl;
     FXFile tarfile;
     bool istarfile = tarfile.open(tmptar, FXIO::Reading, FXIO::OwnerReadWrite);
