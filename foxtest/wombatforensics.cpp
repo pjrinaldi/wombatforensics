@@ -292,7 +292,6 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
     {
         this->getApp()->beginWaitCursor();
         globalid = 1;
-        //lastid = globalid;
         iscaseopen = true;
         tmppath = "/tmp/wf/" + casename + "/";
         this->setTitle("Wombat Forensics - " + casename);
@@ -323,19 +322,6 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
         */
     }
-    /*
-    // create new case here
-        qInfo() << "Bookmarks File Created";
-        ReadBookmarks();
-        ReadHashLists();
-        msglog->clear();
-        qInfo() << "Log File Created";
-        //LogMessage("Log File Created");
-        InitializeCheckState();
-        qInfo() << "Case was Created";
-        StatusUpdate("Ready");
-        autosavetimer->start(autosave * 60000); // 10 minutes in milliseconds for a general setting for real.
-     */ 
     return 1;
 }
 
@@ -383,13 +369,10 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
             lchar[lastidfile.size()] = 0;
             lastidfile.close();
             globalid = FXString(lchar).toULong();
-            //lastid = FXString(lchar).toULong();
-            //globalid = lastid;
         }
         else
         {
             globalid = 1;
-            //lastid = globalid;
         }
         std::cout << "global id from case opening: " << globalid << std::endl;
 	//std::cout << tmppath.text() << std::endl;
@@ -418,10 +401,9 @@ void WombatForensics::SaveCurrentCase()
     lastidfile.close();
     lastidfile.open(tmppath + "burrow/lastid", FXIO::Writing, FXIO::OwnerReadWrite);
     FXString lastidval = FXString::value(globalid);
-    //FXString lastidval = FXString::value(lastid);
     lastidfile.writeBlock(lastidval.text(), lastidval.length());
     lastidfile.close();
-    //std::cout << "global id when case saved: " << globalid << " " << lastidval.text() << std::endl;
+    std::cout << "global id when case saved: " << globalid << " " << lastidval.text() << std::endl;
     // BEGIN TAR METHOD
     FXDir::create(GetSettings(2));
     //std::cout << "save casename:" << casename.text() << std::endl;
@@ -575,42 +557,31 @@ void WombatForensics::UpdateForensicImages()
         bool isevidexist = evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Reading, FXIO::OwnerReadWrite);
         if(isevidexist == true)
         {
-            std::cout << "evid exists, get id from it's file" << std::endl;
+            //std::cout << "evid exists, get id from it's file" << std::endl;
             char* gichar = new char[evidfile.size()+1];
             evidfile.readBlock(gichar, evidfile.size());
             gichar[evidfile.size()] = 0;
             evidfile.close();
             globalid = FXString(gichar).toULong();
-            //curid = FXString(gichar).toULong();
             std::cout << "globalid when existing evidence added: " << globalid << std::endl;
         }
         else
         {
-            globalid++;
-            std::cout << "global id when new evidence added: " << globalid << std::endl;
             //globalid++;
-            //curid = globalid++;
-            //curid = lastid++;
+            std::cout << "global id when new evidence added: " << globalid << std::endl;
             evidfile.close();
             FXFile::create(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::OwnerReadWrite);
             evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
-            //FXString idval = FXString::value(curid);
             FXString idval = FXString::value(globalid);
             evidfile.writeBlock(idval.text(), idval.length());
             evidfile.close();
-            //curid = lastid++;
-            //globalid = lastid++;
         }
         itemtype = 1;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemData(i, 1, &itemtype);
         tablelist->setItemData(i, 2, forimgvector.at(i));
-        //tablelist->setItemText(i, 1, FXString::value(curid));
         tablelist->setItemText(i, 1, FXString::value(globalid));
-        //globalid++;
-        //lastid++;
-        //lastid = globalid;
-        //tablelist->setItemText(i, 1, FXString::value(i));
+        globalid++;
         //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
         tablelist->setItemIcon(i, 2, forimgicon);
@@ -2274,7 +2245,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         for(int i=0; i < volnames.size(); i++)
         {
             FXFile volfile;
-            FXString volfilestr = tmppath + "/burrow/" + FXString::value(tablelist->getCurrentRow()) + "." + FXString(volnames.at(i).c_str());
+            FXString volfilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(voloffsets.at(i));
             bool isvolexist = volfile.open(volfilestr, FXIO::Reading, FXIO::OwnerReadWrite);
             if(isvolexist == true)
             {
@@ -2305,9 +2276,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setItemData(i, 1, &itemtype);
             tablelist->setItemText(i, 1, FXString::value(globalid));
             globalid++;
-            //globalid++;
-            //lastid = globalid;
-            //tablelist->setItemText(i, 1, FXString::value(i));
             tablelist->setItemData(i, 2, curforimg);
             tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
             tablelist->setItemIcon(i, 2, partitionicon);
