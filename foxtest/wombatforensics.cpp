@@ -292,6 +292,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
     {
         this->getApp()->beginWaitCursor();
         globalid = 1;
+        curid = 1;
         iscaseopen = true;
         tmppath = "/tmp/wf/" + casename + "/";
         this->setTitle("Wombat Forensics - " + casename);
@@ -369,10 +370,12 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
             lchar[lastidfile.size()] = 0;
             lastidfile.close();
             globalid = FXString(lchar).toULong();
+            curid = globalid;
         }
         else
         {
             globalid = 1;
+            curid = 1;
         }
         std::cout << "global id from case opening: " << globalid << std::endl;
 	//std::cout << tmppath.text() << std::endl;
@@ -552,25 +555,21 @@ void WombatForensics::UpdateForensicImages()
     tablelist->setColumnText(13, "Hash Match");
     for(int i=0; i < forimgvector.size(); i++)
     {
-        uint64_t curid;
         FXFile evidfile;
         bool isevidexist = evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Reading, FXIO::OwnerReadWrite);
         if(isevidexist == true)
         {
-            //std::cout << "evid exists, get id from it's file" << std::endl;
             char* gichar = new char[evidfile.size()+1];
             evidfile.readBlock(gichar, evidfile.size());
             gichar[evidfile.size()] = 0;
             evidfile.close();
-            curid = FXString(gichar).toULong();
-            IncrementGlobalId(&globalid, curid);
-            //globalid = FXString(gichar).toULong();
-            std::cout << "globalid when existing evidence added: " << globalid << std::endl;
+            globalid = FXString(gichar).toULong();
+            IncrementGlobalId(&globalid, &curid);
+            //std::cout << "globalid when existing evidence added: " << globalid << std::endl;
         }
         else
         {
-            //IncrementGlobalId(&globalid, 0);
-            curid = globalid;
+            IncrementGlobalId(&globalid, &curid);
             std::cout << "global id when new evidence added: " << globalid << std::endl;
             evidfile.close();
             FXFile::create(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::OwnerReadWrite);
@@ -583,9 +582,8 @@ void WombatForensics::UpdateForensicImages()
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemData(i, 1, &itemtype);
         tablelist->setItemData(i, 2, forimgvector.at(i));
-        tablelist->setItemText(i, 1, FXString::value(curid));
-        //tablelist->setItemText(i, 1, FXString::value(globalid));
-        globalid++;
+        tablelist->setItemText(i, 1, FXString::value(globalid));
+        globalid = curid;
         //tablelist->setItemText(i, 1, "e" + FXString::value(i));
         tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
         tablelist->setItemIcon(i, 2, forimgicon);
@@ -2156,11 +2154,16 @@ long WombatForensics::PropertySelected(FXObject*, FXSelector, void*)
 }
 */
 
-void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t curid)
+void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t* currentid)
 {
-    std::cout << "globalid: " << *globalid << " curid: " << curid << std::endl;
-    if(*globalid < curid)
-        *globalid = curid;
+    uint64_t curid = *currentid;
+    //std::cout << "globalid: " << *globalid << " curid: " << curid << std::endl;
+    if(*globalid == curid)
+    {
+        *globalid = curid++;
+        *currentid = curid;
+    }
+    //std::cout << "globalid: " << *globalid << " curid: " << curid << std::endl;
 }
 
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
@@ -2255,7 +2258,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         // partition information
         for(int i=0; i < volnames.size(); i++)
         {
-            uint64_t curid = 0;
             FXFile volfile;
             FXString volfilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(voloffsets.at(i));
             bool isvolexist = volfile.open(volfilestr, FXIO::Reading, FXIO::OwnerReadWrite);
@@ -2265,15 +2267,14 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 volfile.readBlock(gichar, volfile.size());
                 gichar[volfile.size()] = 0;
                 volfile.close();
-                curid = FXString(gichar).toULong();
-                IncrementGlobalId(&globalid, curid);
-                //globalid = FXString(gichar).toULong();
-                std::cout << "global id when existing fs opened: " << globalid << std::endl;
+                globalid = FXString(gichar).toULong();
+                IncrementGlobalId(&globalid, &curid);
+                //std::cout << "global id when existing fs opened: " << globalid << std::endl;
             }
             else
             {
-                //IncrementGlobalId(&globalid, 0);
-                curid = globalid;
+                IncrementGlobalId(&globalid, &curid);
+                //std::cout << "new vol globalid: " << globalid << " curid: " << curid << std::endl;
                 volfile.close();
                 FXFile::create(volfilestr, FXIO::OwnerReadWrite);
                 volfile.open(volfilestr, FXIO::Writing, FXIO::OwnerReadWrite);
@@ -2290,9 +2291,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
             //tablelist->setItemData(i, 1, &currentitem);
             tablelist->setItemData(i, 1, &itemtype);
-            tablelist->setItemText(i, 1, FXString::value(curid));
-            //tablelist->setItemText(i, 1, FXString::value(globalid));
-            globalid++;
+            tablelist->setItemText(i, 1, FXString::value(globalid));
+            globalid = curid;
             tablelist->setItemData(i, 2, curforimg);
             tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
             tablelist->setItemIcon(i, 2, partitionicon);
