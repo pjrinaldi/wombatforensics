@@ -272,6 +272,25 @@ FXString WombatForensics::GetSettings(int setting)
         return "";
 }
 
+FXString WombatForensics::GetFileItem(FXString* filecontents, int item)
+{
+    FXArray<FXint> posarray;
+    posarray.clear();
+    int found = 0;
+    posarray.append(-1);
+    while(found > -1)
+    {
+        found = filecontents->find("|", found+1);
+        if(found > -1)
+            posarray.append(found);
+    }
+    posarray.append(filecontents->length());
+    if(item < posarray.no())
+        return filecontents->mid(posarray.at(item)+1, posarray.at(item+1) - posarray.at(item) - 1);
+    else
+        return "";
+}
+
 long WombatForensics::NewCase(FXObject*, FXSelector, void*)
 {
     if(iscaseopen)
@@ -377,7 +396,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
             globalid = 1;
             curid = 1;
         }
-        std::cout << "global id from case opening: " << globalid << std::endl;
+        //std::cout << "global id from case opening: " << globalid << std::endl;
 	//std::cout << tmppath.text() << std::endl;
 	LogEntry("Case was Opened Successfully");
         EnableCaseButtons();
@@ -406,7 +425,7 @@ void WombatForensics::SaveCurrentCase()
     FXString lastidval = FXString::value(globalid);
     lastidfile.writeBlock(lastidval.text(), lastidval.length());
     lastidfile.close();
-    std::cout << "global id when case saved: " << globalid << " " << lastidval.text() << std::endl;
+    //std::cout << "global id when case saved: " << globalid << " " << lastidval.text() << std::endl;
     // BEGIN TAR METHOD
     FXDir::create(GetSettings(2));
     //std::cout << "save casename:" << casename.text() << std::endl;
@@ -570,7 +589,7 @@ void WombatForensics::UpdateForensicImages()
         else
         {
             IncrementGlobalId(&globalid, &curid);
-            std::cout << "global id when new evidence added: " << globalid << std::endl;
+            //std::cout << "global id when new evidence added: " << globalid << std::endl;
             evidfile.close();
             FXFile::create(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::OwnerReadWrite);
             evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
@@ -2255,7 +2274,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         tablelist->setColumnText(11, "Signature");
         tablelist->setColumnText(12, "Tagged");
         tablelist->setColumnText(13, "Hash Match");
-        // partition information
+        // partiti/on information
         for(int i=0; i < volnames.size(); i++)
         {
             FXFile volfile;
@@ -2281,7 +2300,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 FXString idval = FXString::value(globalid);
                 volfile.writeBlock(idval.text(), idval.length());
                 volfile.close();
-                std::cout << "global id when not existing fs opened: " << globalid << std::endl;
+                //std::cout << "global id when not existing fs opened: " << globalid << std::endl;
             }
             itemtype = 2;
             //currentitem.itemtype = 2;
@@ -2321,9 +2340,47 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         currentitem.forimg = curforimg;
         currentitem.itemtext = std::string(itemtext.text());
         currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
-        LoadDirectory(&currentitem, &fileitemvector);
+        FXString* filearray;
+        //filearray.clear();
+        FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + ".*.*");
+        std::cout << "file count: " << filecount << std::endl;
+        if(filecount == 0)
+            LoadDirectory(&currentitem, &fileitemvector);
+        else
+        {
+            std::cout << "read from files list to populate fileitemvector here..." << std::endl;
+            for(int i=0; i < filecount; i++)
+            {
+                FXFile filefile;
+                filefile.open(tmppath + "burrow/" + filearray[i], FXIO::Reading, FXIO::OwnerReadWrite);
+                char* filechar = new char[filefile.size() + 1];
+                filefile.readBlock(filechar, filefile.size());
+                filechar[filefile.size()] = 0;
+                filefile.close();
+                FXString filecontent = FXString(filechar);
+                FileItem tmpitem;
+                uint64_t tmpid = GetFileItem(&filecontent, 0).toULong();
+                tmpitem.isdeleted = GetFileItem(&filecontent, 1).toUInt();
+                tmpitem.isdirectory = GetFileItem(&filecontent, 2).toUInt();
+                tmpitem.size = GetFileItem(&filecontent, 3).toULong();
+                tmpitem.name = GetFileItem(&filecontent, 4).text();
+                tmpitem.create = GetFileItem(&filecontent, 5).text();
+                tmpitem.access = GetFileItem(&filecontent, 6).text();
+                tmpitem.modify = GetFileItem(&filecontent, 7).text();
+                std::cout << "File item Values: " << std::endl;
+                std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
+                std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
+                std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
+            }
+        }
         for(int i=0; i < fileitemvector.size(); i++)
         {
+            if(filecount == 0)
+            {
+                std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
+                std::cout << "global id at start of writing file contents to file: " << globalid << std::endl;
+                std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
+            }
             std::cout << "name: " << fileitemvector.at(i).name << std::endl;
         }
 	// need to implement path toolbar here for the burrow and the partition and 
