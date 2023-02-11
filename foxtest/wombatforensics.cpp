@@ -168,6 +168,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     iscaseopen = false;
     isfrompath = false;
     prevevidpath = "";
+    curforimg = NULL;
+    itemtext = "";
     homepath = FXString(getenv("HOME")) + "/";
     configpath = homepath + ".wombatforensics/";
     tmppath = "/tmp/";
@@ -2187,7 +2189,8 @@ void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t* currentid)
 
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 {
-    tablelist->selectRow(tablelist->getCurrentRow());
+    if(tablelist->getCurrentRow() > -1)
+        tablelist->selectRow(tablelist->getCurrentRow());
 
     return 1;
 }
@@ -2240,7 +2243,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     //currentitem.forimg = forimgvector.at(currentitem.forimgindex);
     isfrompath = false;
     //std::cout << "item text: " << itemtext.text() << std::endl;
-    if(itemtype == 1)
+    if(itemtype == 1 && curforimg != NULL && !itemtext.empty())
     {
 	//currentitem.itemtype = 1;
 	//currentitem.forimgindex = tablelist->getCurrentRow();
@@ -2335,56 +2338,59 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     }
     else if(itemtype == 2)
     {
-        //currentitem.itemtype = 2;
-        fileitemvector.clear();
-        currentitem.forimg = curforimg;
-        currentitem.itemtext = std::string(itemtext.text());
-        currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
-        FXString* filearray;
-        //filearray.clear();
-        FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + ".*.*");
-        std::cout << "file count: " << filecount << std::endl;
-        if(filecount == 0)
-            LoadDirectory(&currentitem, &fileitemvector);
-        else
+        if(tablelist->getCurrentRow() > -1)
         {
-            std::cout << "read from files list to populate fileitemvector here..." << std::endl;
-            for(int i=0; i < filecount; i++)
-            {
-                FXFile filefile;
-                filefile.open(tmppath + "burrow/" + filearray[i], FXIO::Reading, FXIO::OwnerReadWrite);
-                char* filechar = new char[filefile.size() + 1];
-                filefile.readBlock(filechar, filefile.size());
-                filechar[filefile.size()] = 0;
-                filefile.close();
-                FXString filecontent = FXString(filechar);
-                FileItem tmpitem;
-                uint64_t tmpid = GetFileItem(&filecontent, 0).toULong();
-                tmpitem.isdeleted = GetFileItem(&filecontent, 1).toUInt();
-                tmpitem.isdirectory = GetFileItem(&filecontent, 2).toUInt();
-                tmpitem.size = GetFileItem(&filecontent, 3).toULong();
-                tmpitem.name = GetFileItem(&filecontent, 4).text();
-                tmpitem.create = GetFileItem(&filecontent, 5).text();
-                tmpitem.access = GetFileItem(&filecontent, 6).text();
-                tmpitem.modify = GetFileItem(&filecontent, 7).text();
-                std::cout << "File item Values: " << std::endl;
-                std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
-                std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
-                std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
-            }
-        }
-        for(int i=0; i < fileitemvector.size(); i++)
-        {
+            //currentitem.itemtype = 2;
+            fileitemvector.clear();
+            currentitem.forimg = curforimg;
+            currentitem.itemtext = std::string(itemtext.text());
+            currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
+            FXString* filearray;
+            //filearray.clear();
+            FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + ".*.*");
+            std::cout << "file count: " << filecount << std::endl;
             if(filecount == 0)
+                LoadDirectory(&currentitem, &fileitemvector);
+            else
             {
-                std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
-                std::cout << "global id at start of writing file contents to file: " << globalid << std::endl;
-                std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
+                std::cout << "read from files list to populate fileitemvector here..." << std::endl;
+                for(int i=0; i < filecount; i++)
+                {
+                    FXFile filefile;
+                    filefile.open(tmppath + "burrow/" + filearray[i], FXIO::Reading, FXIO::OwnerReadWrite);
+                    char* filechar = new char[filefile.size() + 1];
+                    filefile.readBlock(filechar, filefile.size());
+                    filechar[filefile.size()] = 0;
+                    filefile.close();
+                    FXString filecontent = FXString(filechar);
+                    FileItem tmpitem;
+                    uint64_t tmpid = GetFileItem(&filecontent, 0).toULong();
+                    tmpitem.isdeleted = GetFileItem(&filecontent, 1).toUInt();
+                    tmpitem.isdirectory = GetFileItem(&filecontent, 2).toUInt();
+                    tmpitem.size = GetFileItem(&filecontent, 3).toULong();
+                    tmpitem.name = GetFileItem(&filecontent, 4).text();
+                    tmpitem.create = GetFileItem(&filecontent, 5).text();
+                    tmpitem.access = GetFileItem(&filecontent, 6).text();
+                    tmpitem.modify = GetFileItem(&filecontent, 7).text();
+                    std::cout << "File item Values: " << std::endl;
+                    std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
+                    std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
+                    std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
+                }
             }
-            std::cout << "name: " << fileitemvector.at(i).name << std::endl;
+            for(int i=0; i < fileitemvector.size(); i++)
+            {
+                if(filecount == 0)
+                {
+                    std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
+                    std::cout << "global id at start of writing file contents to file: " << globalid << std::endl;
+                    std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
+                }
+                std::cout << "name: " << fileitemvector.at(i).name << std::endl;
+            }
+            // need to implement path toolbar here for the burrow and the partition and 
+            //std::cout << "need to load the root directory for the partition selected here." << std::endl;
         }
-	// need to implement path toolbar here for the burrow and the partition and 
-        //std::cout << "need to load the root directory for the partition selected here." << std::endl;
     }
     else
         std::cout << "not a forensic image, so need to load something else here." << std::endl;
