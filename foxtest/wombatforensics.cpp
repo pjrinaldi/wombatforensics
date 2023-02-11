@@ -2340,6 +2340,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     {
         if(tablelist->getCurrentRow() > -1)
         {
+            // NEED TO DETERMINE WHICH VOLUME IT IS, SO I CAN SEARCH FOR THE CORRECT EVID.VOL#.* FILES
             //currentitem.itemtype = 2;
             fileitemvector.clear();
             currentitem.forimg = curforimg;
@@ -2347,7 +2348,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
             FXString* filearray;
             //filearray.clear();
-            FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + ".*.*");
+            FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".*");
             std::cout << "file count: " << filecount << std::endl;
             if(filecount == 0)
                 LoadDirectory(&currentitem, &fileitemvector);
@@ -2376,12 +2377,20 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
                     std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
                     std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
+                    fileitemvector.push_back(tmpitem);
                 }
             }
             for(int i=0; i < fileitemvector.size(); i++)
             {
                 if(filecount == 0)
                 {
+                    /*
+                    FXFile::create(volfilestr, FXIO::OwnerReadWrite);
+                    volfile.open(volfilestr, FXIO::Writing, FXIO::OwnerReadWrite);
+                    FXString idval = FXString::value(globalid);
+                    volfile.writeBlock(idval.text(), idval.length());
+                    volfile.close();
+                     */ 
                     std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
                     std::cout << "global id at start of writing file contents to file: " << globalid << std::endl;
                     std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
