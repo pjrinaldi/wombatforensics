@@ -25,13 +25,16 @@ struct CurrentItem
 
 struct FileItem
 {
+    uint64_t gid = 0;
     bool isdeleted = false;
     bool isdirectory = false;
     uint64_t size = 0;
     std::string name = "";
+    std::string path = "";
     std::string create = "";
     std::string access = "";
     std::string modify = "";
+    std::string layout = "";
 };
 
 //std::string ConvertUnixTimeToHuman(uint32_t unixtime);

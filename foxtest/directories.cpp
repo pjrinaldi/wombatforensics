@@ -520,6 +520,7 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                             if(extname.size() > 0)
                                 tmpitem.name += "." + extname;
                         }
+                        tmpitem.path = "/";
                         //std::cout << "file name: " << filename << std::endl;
                         longnamestring = "";
                         // LOGICAL FILE SIZE

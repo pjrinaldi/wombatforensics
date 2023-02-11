@@ -2340,7 +2340,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     {
         if(tablelist->getCurrentRow() > -1)
         {
-            // NEED TO DETERMINE WHICH VOLUME IT IS, SO I CAN SEARCH FOR THE CORRECT EVID.VOL#.* FILES
+            this->getApp()->beginWaitCursor();
             //currentitem.itemtype = 2;
             fileitemvector.clear();
             currentitem.forimg = curforimg;
@@ -2348,6 +2348,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
             FXString* filearray;
             //filearray.clear();
+            FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
             FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".*");
             std::cout << "file count: " << filecount << std::endl;
             if(filecount == 0)
@@ -2365,40 +2366,115 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     filefile.close();
                     FXString filecontent = FXString(filechar);
                     FileItem tmpitem;
-                    uint64_t tmpid = GetFileItem(&filecontent, 0).toULong();
+                    tmpitem.gid = GetFileItem(&filecontent, 0).toULong();
                     tmpitem.isdeleted = GetFileItem(&filecontent, 1).toUInt();
                     tmpitem.isdirectory = GetFileItem(&filecontent, 2).toUInt();
                     tmpitem.size = GetFileItem(&filecontent, 3).toULong();
                     tmpitem.name = GetFileItem(&filecontent, 4).text();
-                    tmpitem.create = GetFileItem(&filecontent, 5).text();
-                    tmpitem.access = GetFileItem(&filecontent, 6).text();
-                    tmpitem.modify = GetFileItem(&filecontent, 7).text();
-                    std::cout << "File item Values: " << std::endl;
-                    std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
-                    std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
-                    std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
+                    tmpitem.path = GetFileItem(&filecontent, 5).text();
+                    tmpitem.create = GetFileItem(&filecontent, 6).text();
+                    tmpitem.access = GetFileItem(&filecontent, 7).text();
+                    tmpitem.modify = GetFileItem(&filecontent, 8).text();
+                    //std::cout << "File item Values: " << std::endl;
+                    //std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
+                    //std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
+                    //std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
                     fileitemvector.push_back(tmpitem);
                 }
             }
+            // table initialization
+            tablelist->setTableSize(fileitemvector.size(), 14);
+            tablelist->setColumnText(0, "");
+            tablelist->setColumnText(1, "ID");
+            tablelist->setColumnText(2, "Name");
+            tablelist->setColumnText(3, "Path");
+            tablelist->setColumnText(4, "Size (bytes)");
+            tablelist->setColumnText(5, "Created");
+            tablelist->setColumnText(6, "Accessed");
+            tablelist->setColumnText(7, "Modified");
+            tablelist->setColumnText(8, "Changed");
+            tablelist->setColumnText(9, "Hash");
+            tablelist->setColumnText(10, "Category");
+            tablelist->setColumnText(11, "Signature");
+            tablelist->setColumnText(12, "Tagged");
+            tablelist->setColumnText(13, "Hash Match");
             for(int i=0; i < fileitemvector.size(); i++)
             {
                 if(filecount == 0)
                 {
-                    /*
-                    FXFile::create(volfilestr, FXIO::OwnerReadWrite);
-                    volfile.open(volfilestr, FXIO::Writing, FXIO::OwnerReadWrite);
-                    FXString idval = FXString::value(globalid);
-                    volfile.writeBlock(idval.text(), idval.length());
-                    volfile.close();
-                     */ 
-                    std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
-                    std::cout << "global id at start of writing file contents to file: " << globalid << std::endl;
-                    std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
+                    IncrementGlobalId(&globalid, &curid);
+                    FXFile filefile;
+                    FXFile::create(filefilestr + FXString::value(globalid), FXIO::OwnerReadWrite);
+                    filefile.open(filefilestr + FXString::value(globalid), FXIO::Writing, FXIO::OwnerReadWrite);
+                    FXString fileval = "";
+                    //if(fileitemvector.at(i).gid == 0)
+                    fileval += FXString::value(globalid) + "|";
+                    //else
+                    //    fileval += FXString::value(fileitemvector.at(i).gid) + "|";
+                    fileval += FXString::value(fileitemvector.at(i).isdeleted) + "|";
+                    fileval += FXString::value(fileitemvector.at(i).isdirectory) + "|";
+                    fileval += FXString::value(fileitemvector.at(i).size) + "|";
+                    fileval += FXString(fileitemvector.at(i).name.c_str()) + "|";
+                    fileval += FXString(fileitemvector.at(i).path.c_str()) + "|";
+                    fileval += FXString(fileitemvector.at(i).create.c_str()) + "|";
+                    fileval += FXString(fileitemvector.at(i).access.c_str()) + "|";
+                    fileval += FXString(fileitemvector.at(i).modify.c_str());
+                    filefile.writeBlock(fileval.text(), fileval.length());
+                    filefile.close();
+                    //std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
+                    //std::cout << "global id at start of writing file contents to file: " << globalid << std::endl;
+                    //std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
                 }
-                std::cout << "name: " << fileitemvector.at(i).name << std::endl;
+                //std::cout << "name: " << fileitemvector.at(i).name << std::endl;
+                itemtype = 3;
+                tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+                tablelist->setItemData(i, 1, &itemtype);
+                if(fileitemvector.at(i).gid == 0)
+                    tablelist->setItemText(i, 1, FXString::value(globalid));
+                else
+                    tablelist->setItemText(i, 1, FXString::value(fileitemvector.at(i).gid));
+                globalid = curid;
+                tablelist->setItemData(i, 2, curforimg);
+                tablelist->setItemText(i, 2, FXString(fileitemvector.at(i).name.c_str()));
+                if(fileitemvector.at(i).isdeleted)
+                {
+                    if(fileitemvector.at(i).isdirectory)
+                        tablelist->setItemIcon(i, 2, deletedfoldericon);
+                    else
+                        tablelist->setItemIcon(i, 2, deletedfileicon);
+                }
+                else
+                {
+                    if(fileitemvector.at(i).isdirectory)
+                        tablelist->setItemIcon(i, 2, defaultfoldericon);
+                    else
+                        tablelist->setItemIcon(i, 2, defaultfileicon);
+                }
+                tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
+                tablelist->setItemText(i, 3, FXString(fileitemvector.at(i).path.c_str()));
+                //tablelist->setItemData(i, 4, &(fileitemvector.at(i).layout.c_str()));
+                tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(fileitemvector.at(i).size).c_str()));
+                //tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
+                tablelist->setItemText(i, 5, FXString(fileitemvector.at(i).create.c_str()));
+                tablelist->setItemText(i, 6, FXString(fileitemvector.at(i).access.c_str()));
+                tablelist->setItemText(i, 7, FXString(fileitemvector.at(i).modify.c_str()));
             }
+            // table formatting
+            tablelist->fitColumnsToContents(0);
+            tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+            FitColumnContents(1);
+            FitColumnContents(2);
+            FitColumnContents(4);
+            AlignColumn(tablelist, 1, FXTableItem::LEFT);
+            AlignColumn(tablelist, 2, FXTableItem::LEFT);
+            AlignColumn(tablelist, 3, FXTableItem::LEFT);
+            AlignColumn(tablelist, 4, FXTableItem::LEFT);
+            AlignColumn(tablelist, 5, FXTableItem::LEFT);
+            AlignColumn(tablelist, 6, FXTableItem::LEFT);
+            AlignColumn(tablelist, 7, FXTableItem::LEFT);
             // need to implement path toolbar here for the burrow and the partition and 
             //std::cout << "need to load the root directory for the partition selected here." << std::endl;
+            this->getApp()->endWaitCursor();
         }
     }
     else
