@@ -67,5 +67,6 @@ void ReadInteger(uint8_t* arr, int begin, uint64_t* val, bool isbigendian=false)
 //void ReturnInt(int64_t* tmp, int8_t* tmp8, unsigned int length);
 
 void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
+std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocksize, uint64_t rootdiroffset);
 
 #endif

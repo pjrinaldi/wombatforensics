@@ -232,3 +232,43 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
         }
     }
 }
+
+std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocksize, uint64_t rootdiroffset)
+{
+    std::string layout = "";
+    int blkcnt = 1;
+    uint startvalue = blocklist->at(0);
+    for(int i=1; i < blocklist->size(); i++)
+    {
+        uint oldvalue = blocklist->at(i-1);
+        uint newvalue = blocklist->at(i);
+        if(newvalue - oldvalue == 1)
+            blkcnt++;
+        else
+        {
+            if(rootdiroffset > 0)
+                layout += std::to_string(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + std::to_string(blkcnt * blocksize) + ";";
+            else
+                layout += std::to_string(startvalue * blocksize) + "," + std::to_string(blkcnt * blocksize) + ";";
+            startvalue = blocklist->at(i);
+        }
+        if(i == blocklist->size() - 1)
+        {
+            if(rootdiroffset > 0)
+                layout += std::to_string(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + std::to_string(blkcnt * blocksize) + ";";
+            else
+                layout += std::to_string(startvalue * blocksize) + "," + std::to_string(blkcnt * blocksize) + ";";
+            startvalue = blocklist->at(i);
+            blkcnt = 1;
+        }
+    }
+    if(blocklist->size() == 1)
+    {
+        if(rootdiroffset > 0)
+            layout += std::to_string(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + std::to_string(blkcnt * blocksize) + ";";
+        else
+            layout += std::to_string(startvalue * blocksize) + "," + std::to_string(blkcnt * blocksize) + ";";
+    }
+
+    return layout;
+}

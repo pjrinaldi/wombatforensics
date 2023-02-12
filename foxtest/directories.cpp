@@ -29,7 +29,7 @@ std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime)
             humanstring += "0";
 	humanstring += std::to_string(((*dostime & 0x1f) >> 0) * 2); // SECOND
     }
-    humanstring += " (UTC)";
+    //humanstring += " (UTC)";
     
     return humanstring;
 }
@@ -435,6 +435,9 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
         // DIRECTORY SIZE
         uint64_t dirsize = rootdirmaxfiles * 32 + bytespersector - 1;
         //std::cout << "dir size: " << dirsize << std::endl;
+        // ROOT DIRECTORY LAYOUT
+        std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
+        std::cout << "root dir layout: " << rootdirlayout << std::endl;
         if(curinode == 0) // root directory
         {
             uint direntrycount = dirsize / 32;
@@ -547,6 +550,46 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                         ReadForImgContent(currentitem->forimg, &modifytime, diroffset + i*32 + 22);
                         tmpitem.modify = ConvertDosTimeToHuman(&modifydate, &modifytime);
                         //std::cout << "Modified Date: " << datemodified << std::endl;
+                        uint16_t hiclusternum = 0;
+                        ReadForImgContent(currentitem->forimg, &hiclusternum, diroffset + i*32 + 20); // always 0 for FAT12/16
+                        uint16_t loclusternum = 0;
+                        ReadForImgContent(currentitem->forimg, &loclusternum, diroffset + i*32 + 26);
+                        uint32_t clusternum = ((uint32_t)hiclusternum >> 16) + loclusternum;
+                        std::vector<uint> clusterlist;
+                        clusterlist.clear();
+                        if(clusternum >= 2)
+                        {
+                            clusterlist.push_back(clusternum);
+                            if(currentitem->itemtext.find("[FAT12]") != std::string::npos)
+                                GetNextCluster(currentitem->forimg, clusternum, 1, bytespersector, &clusterlist);
+                            else if(currentitem->itemtext.find("[FAT16]") != std::string::npos)
+                                GetNextCluster(currentitem->forimg, clusternum, 2, bytespersector, &clusterlist);
+		            //GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
+//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
+                        }
+                        for(int i=0; i < clusterlist.size(); i++)
+                            std::cout << "cluster " << i << ": " << clusterlist.at(i) << std::endl;
+                        if(clusterlist.size() > 0)
+                            tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
+                        std::cout << "tmpitem layout: " << tmpitem.layout << std::endl;
+                        /*
+                        uint16_t hiclusternum = qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 20, 2)); // always zero for fat12/16
+                        uint16_t loclusternum = qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 26, 2));
+                        uint32_t clusternum = ((uint32_t)hiclusternum >> 16) + loclusternum;
+                        QList<uint> clusterlist;
+                        clusterlist.clear();
+                        if(clusternum >= 2)
+                        {
+                            clusterlist.append(clusternum);
+                            GetNextCluster(curimg, clusternum, fstype, fatoffset, &clusterlist);
+                        }
+                        QString layout = "";
+                        if(clusterlist.count() > 0)
+                            layout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
+                        out << "Layout|" << layout << "|File offset,size; layout in bytes." << Qt::endl;
+                        qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
+                        out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
+                         */ 
                         filevector->push_back(tmpitem);
                     }
                 }

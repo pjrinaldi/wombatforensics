@@ -18,10 +18,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tablelist->setColumnText(2, "Name");
     tablelist->setColumnText(3, "Path");
     tablelist->setColumnText(4, "Size (bytes)");
-    tablelist->setColumnText(5, "Created");
-    tablelist->setColumnText(6, "Accessed");
-    tablelist->setColumnText(7, "Modified");
-    tablelist->setColumnText(8, "Changed");
+    tablelist->setColumnText(5, "Created (UTC)");
+    tablelist->setColumnText(6, "Accessed (UTC)");
+    tablelist->setColumnText(7, "Modified (UTC)");
+    tablelist->setColumnText(8, "Changed (UTC)");
     tablelist->setColumnText(9, "Hash");
     tablelist->setColumnText(10, "Category");
     tablelist->setColumnText(11, "Signature");
@@ -565,10 +565,10 @@ void WombatForensics::UpdateForensicImages()
     tablelist->setColumnText(2, "Name");
     tablelist->setColumnText(3, "Path");
     tablelist->setColumnText(4, "Size (bytes)");
-    tablelist->setColumnText(5, "Created");
-    tablelist->setColumnText(6, "Accessed");
-    tablelist->setColumnText(7, "Modified");
-    tablelist->setColumnText(8, "Changed");
+    tablelist->setColumnText(5, "Created (UTC)");
+    tablelist->setColumnText(6, "Accessed (UTC)");
+    tablelist->setColumnText(7, "Modified (UTC)");
+    tablelist->setColumnText(8, "Changed (UTC)");
     tablelist->setColumnText(9, "Hash");
     tablelist->setColumnText(10, "Category");
     tablelist->setColumnText(11, "Signature");
@@ -2268,10 +2268,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         tablelist->setColumnText(2, "Name");
         tablelist->setColumnText(3, "Path");
         tablelist->setColumnText(4, "Size (bytes)");
-        tablelist->setColumnText(5, "Created");
-        tablelist->setColumnText(6, "Accessed");
-        tablelist->setColumnText(7, "Modified");
-        tablelist->setColumnText(8, "Changed");
+        tablelist->setColumnText(5, "Created (UTC)");
+        tablelist->setColumnText(6, "Accessed (UTC)");
+        tablelist->setColumnText(7, "Modified (UTC)");
+        tablelist->setColumnText(8, "Changed (UTC)");
         tablelist->setColumnText(9, "Hash");
         tablelist->setColumnText(10, "Category");
         tablelist->setColumnText(11, "Signature");
@@ -2375,6 +2375,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     tmpitem.create = GetFileItem(&filecontent, 6).text();
                     tmpitem.access = GetFileItem(&filecontent, 7).text();
                     tmpitem.modify = GetFileItem(&filecontent, 8).text();
+                    tmpitem.layout = GetFileItem(&filecontent, 9).text();
                     //std::cout << "File item Values: " << std::endl;
                     //std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
                     //std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
@@ -2389,10 +2390,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setColumnText(2, "Name");
             tablelist->setColumnText(3, "Path");
             tablelist->setColumnText(4, "Size (bytes)");
-            tablelist->setColumnText(5, "Created");
-            tablelist->setColumnText(6, "Accessed");
-            tablelist->setColumnText(7, "Modified");
-            tablelist->setColumnText(8, "Changed");
+            tablelist->setColumnText(5, "Created (UTC)");
+            tablelist->setColumnText(6, "Accessed (UTC)");
+            tablelist->setColumnText(7, "Modified (UTC)");
+            tablelist->setColumnText(8, "Changed (UTC)");
             tablelist->setColumnText(9, "Hash");
             tablelist->setColumnText(10, "Category");
             tablelist->setColumnText(11, "Signature");
@@ -2410,7 +2411,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     //if(fileitemvector.at(i).gid == 0)
                     fileval += FXString::value(globalid) + "|";
                     //else
-                    //    fileval += FXString::value(fileitemvector.at(i).gid) + "|";
+                        //fileval += FXString::value(fileitemvector.at(i).gid) + "|";
                     fileval += FXString::value(fileitemvector.at(i).isdeleted) + "|";
                     fileval += FXString::value(fileitemvector.at(i).isdirectory) + "|";
                     fileval += FXString::value(fileitemvector.at(i).size) + "|";
@@ -2418,7 +2419,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     fileval += FXString(fileitemvector.at(i).path.c_str()) + "|";
                     fileval += FXString(fileitemvector.at(i).create.c_str()) + "|";
                     fileval += FXString(fileitemvector.at(i).access.c_str()) + "|";
-                    fileval += FXString(fileitemvector.at(i).modify.c_str());
+                    fileval += FXString(fileitemvector.at(i).modify.c_str()) + "|";
+                    fileval += FXString(fileitemvector.at(i).layout.c_str());
                     filefile.writeBlock(fileval.text(), fileval.length());
                     filefile.close();
                     //std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
@@ -2452,8 +2454,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
                 tablelist->setItemText(i, 3, FXString(fileitemvector.at(i).path.c_str()));
-                //tablelist->setItemData(i, 4, &(fileitemvector.at(i).layout.c_str()));
+                tablelist->setItemData(i, 3, &(fileitemvector.at(i).layout));
                 tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(fileitemvector.at(i).size).c_str()));
+                tablelist->setItemData(i, 4, &(currentitem.voloffset));
                 //tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
                 tablelist->setItemText(i, 5, FXString(fileitemvector.at(i).create.c_str()));
                 tablelist->setItemText(i, 6, FXString(fileitemvector.at(i).access.c_str()));
@@ -2474,6 +2477,20 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             AlignColumn(tablelist, 7, FXTableItem::LEFT);
             // need to implement path toolbar here for the burrow and the partition and 
             //std::cout << "need to load the root directory for the partition selected here." << std::endl;
+            this->getApp()->endWaitCursor();
+        }
+    }
+    else if(itemtype == 3)
+    {
+        if(tablelist->getCurrentRow() > -1)
+        {
+            this->getApp()->beginWaitCursor();
+            // I CAN GET THE CURRENT LAYOUT AND VALUES..., THEN I CAN DETERMINE IF IT'S A DIRECTORY AND THEN PARSE OR DO SOMETHING
+            // AS A FILE... could determine if it's a directory or not by opening it's file, which would also get us the layout and path and file name to make the new path | this might be a better option, since i know it's been written to a file and can access it
+            std::string curlayout = (*((FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 3))).text();
+            std::cout << "vol offset: " << *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4)) << std::endl;
+            //itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
+            std::cout << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << " cur layout: " << curlayout << std::endl;
             this->getApp()->endWaitCursor();
         }
     }
