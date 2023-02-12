@@ -2487,6 +2487,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             this->getApp()->beginWaitCursor();
             // I CAN GET THE CURRENT LAYOUT AND VALUES..., THEN I CAN DETERMINE IF IT'S A DIRECTORY AND THEN PARSE OR DO SOMETHING
             // AS A FILE... could determine if it's a directory or not by opening it's file, which would also get us the layout and path and file name to make the new path | this might be a better option, since i know it's been written to a file and can access it
+            std::cout << "forimg file name: " << curforimg->ImageFileName() << std::endl;
+            std::cout << "cur global id: " << tablelist->getItemText(tablelist->getCurrentRow(), 1).toULong() << std::endl;
             std::string curlayout = (*((FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 3))).text();
             std::cout << "vol offset: " << *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4)) << std::endl;
             //itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
