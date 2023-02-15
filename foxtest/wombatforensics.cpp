@@ -2433,7 +2433,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setColumnText(11, "Signature");
             tablelist->setColumnText(12, "Tagged");
             tablelist->setColumnText(13, "Hash Match");
-	    SortFileTable(&fileitemvector, sortindex, sortasc);
+	    SortFileTable(&fileitemvector, filefilestr, filecount, sortindex, sortasc);
+            /*
             for(int i=0; i < fileitemvector.size(); i++)
             {
                 if(filecount == 0)
@@ -2497,6 +2498,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 tablelist->setItemText(i, 6, FXString(fileitemvector.at(i).access.c_str()));
                 tablelist->setItemText(i, 7, FXString(fileitemvector.at(i).modify.c_str()));
             }
+            */
             // table formatting
             tablelist->fitColumnsToContents(0);
             tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
@@ -2510,11 +2512,15 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             AlignColumn(tablelist, 5, FXTableItem::LEFT);
             AlignColumn(tablelist, 6, FXTableItem::LEFT);
             AlignColumn(tablelist, 7, FXTableItem::LEFT);
+            /*
             if(sortasc == 1 && sortindex == 1)
                 tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
             else if(sortasc == 0 && sortindex == 1)
                 tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
             tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 10);
+            */
+            if(sortindex == 1)
+                tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
             // need to implement path toolbar here for the burrow and the partition and 
             //std::cout << "need to load the root directory for the partition selected here." << std::endl;
             this->getApp()->endWaitCursor();
@@ -2545,7 +2551,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     return 1;
 }
 
-void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, int itemindex, bool asc)
+void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex, bool asc)
 {
     std::vector<std::string> namelist;
     //std::cout << "file item count: " << fileitems->size() << std::endl;
@@ -2589,7 +2595,11 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, int itemin
         }
         //std::cout << std::endl;
         fileitems->swap(tmpfileitems);
-
+        tmpfileitems.clear();
+        if(asc)
+            tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
+        else
+            tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
     }
     else if(itemindex == 2) // is deleted
     {
@@ -2615,6 +2625,80 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, int itemin
     else if(itemindex == 9) // modify
     {
     }
+    for(int i=0; i < fileitems->size(); i++)
+    {
+        if(filecount == 0)
+        {
+            IncrementGlobalId(&globalid, &curid);
+            FXFile filefile;
+            FXFile::create(filestr + FXString::value(globalid), FXIO::OwnerReadWrite);
+            filefile.open(filestr + FXString::value(globalid), FXIO::Writing, FXIO::OwnerReadWrite);
+            FXString fileval = "";
+            //if(fileitems->at(i).gid == 0)
+            fileval += FXString::value(globalid) + "|";
+            //else
+                //fileval += FXString::value(fileitemvector.at(i).gid) + "|";
+            fileval += FXString::value(fileitems->at(i).isdeleted) + "|";
+            fileval += FXString::value(fileitems->at(i).isdirectory) + "|";
+            fileval += FXString::value(fileitems->at(i).size) + "|";
+            fileval += FXString(fileitems->at(i).name.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).path.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).create.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).access.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).modify.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).layout.c_str());
+            filefile.writeBlock(fileval.text(), fileval.length());
+            filefile.close();
+            //std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
+            //std::cout << "global id at start of writing file contents to file: " << globalid << std::endl;
+            //std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
+        }
+        //std::cout << "name: " << fileitems->at(i).name << std::endl;
+        itemtype = 3;
+        tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+        tablelist->setItemData(i, 1, &itemtype);
+        if(fileitems->at(i).gid == 0)
+            tablelist->setItemText(i, 1, FXString::value(globalid));
+        else
+            tablelist->setItemText(i, 1, FXString::value(fileitems->at(i).gid));
+        globalid = curid;
+        tablelist->setItemData(i, 2, curforimg);
+        tablelist->setItemText(i, 2, FXString(fileitems->at(i).name.c_str()));
+        if(fileitemvector.at(i).isdeleted)
+        {
+            if(fileitems->at(i).isdirectory)
+                tablelist->setItemIcon(i, 2, deletedfoldericon);
+            else
+                tablelist->setItemIcon(i, 2, deletedfileicon);
+        }
+        else
+        {
+            if(fileitems->at(i).isdirectory)
+                tablelist->setItemIcon(i, 2, defaultfoldericon);
+            else
+                tablelist->setItemIcon(i, 2, defaultfileicon);
+        }
+        tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
+        tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()));
+        tablelist->setItemData(i, 3, &(fileitems->at(i).layout));
+        tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(fileitems->at(i).size).c_str()));
+        tablelist->setItemData(i, 4, &(currentitem.voloffset));
+        //tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
+        tablelist->setItemText(i, 5, FXString(fileitems->at(i).create.c_str()));
+        tablelist->setItemText(i, 6, FXString(fileitems->at(i).access.c_str()));
+        tablelist->setItemText(i, 7, FXString(fileitems->at(i).modify.c_str()));
+    }
+    //if(itemindex == 1)
+    //    tablelist->setColumnWidth(1, tablelist->getColumnWidth(itemindex) + 30);
+    /*
+    // table formatting
+    
+    if(sortasc == 1 && sortindex == 1)
+        tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
+    else if(sortasc == 0 && sortindex == 1)
+        tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
+    tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 10);
+    */
 }
 
 /*
