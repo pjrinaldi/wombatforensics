@@ -2434,71 +2434,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setColumnText(12, "Tagged");
             tablelist->setColumnText(13, "Hash Match");
 	    SortFileTable(&fileitemvector, filefilestr, filecount, sortindex, sortasc);
-            /*
-            for(int i=0; i < fileitemvector.size(); i++)
-            {
-                if(filecount == 0)
-                {
-                    IncrementGlobalId(&globalid, &curid);
-                    FXFile filefile;
-                    FXFile::create(filefilestr + FXString::value(globalid), FXIO::OwnerReadWrite);
-                    filefile.open(filefilestr + FXString::value(globalid), FXIO::Writing, FXIO::OwnerReadWrite);
-                    FXString fileval = "";
-                    //if(fileitemvector.at(i).gid == 0)
-                    fileval += FXString::value(globalid) + "|";
-                    //else
-                        //fileval += FXString::value(fileitemvector.at(i).gid) + "|";
-                    fileval += FXString::value(fileitemvector.at(i).isdeleted) + "|";
-                    fileval += FXString::value(fileitemvector.at(i).isdirectory) + "|";
-                    fileval += FXString::value(fileitemvector.at(i).size) + "|";
-                    fileval += FXString(fileitemvector.at(i).name.c_str()) + "|";
-                    fileval += FXString(fileitemvector.at(i).path.c_str()) + "|";
-                    fileval += FXString(fileitemvector.at(i).create.c_str()) + "|";
-                    fileval += FXString(fileitemvector.at(i).access.c_str()) + "|";
-                    fileval += FXString(fileitemvector.at(i).modify.c_str()) + "|";
-                    fileval += FXString(fileitemvector.at(i).layout.c_str());
-                    filefile.writeBlock(fileval.text(), fileval.length());
-                    filefile.close();
-                    //std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
-                    //std::cout << "global id at start of writing file contents to file: " << globalid << std::endl;
-                    //std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
-                }
-                //std::cout << "name: " << fileitemvector.at(i).name << std::endl;
-                itemtype = 3;
-                tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-                tablelist->setItemData(i, 1, &itemtype);
-                if(fileitemvector.at(i).gid == 0)
-                    tablelist->setItemText(i, 1, FXString::value(globalid));
-                else
-                    tablelist->setItemText(i, 1, FXString::value(fileitemvector.at(i).gid));
-                globalid = curid;
-                tablelist->setItemData(i, 2, curforimg);
-                tablelist->setItemText(i, 2, FXString(fileitemvector.at(i).name.c_str()));
-                if(fileitemvector.at(i).isdeleted)
-                {
-                    if(fileitemvector.at(i).isdirectory)
-                        tablelist->setItemIcon(i, 2, deletedfoldericon);
-                    else
-                        tablelist->setItemIcon(i, 2, deletedfileicon);
-                }
-                else
-                {
-                    if(fileitemvector.at(i).isdirectory)
-                        tablelist->setItemIcon(i, 2, defaultfoldericon);
-                    else
-                        tablelist->setItemIcon(i, 2, defaultfileicon);
-                }
-                tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
-                tablelist->setItemText(i, 3, FXString(fileitemvector.at(i).path.c_str()));
-                tablelist->setItemData(i, 3, &(fileitemvector.at(i).layout));
-                tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(fileitemvector.at(i).size).c_str()));
-                tablelist->setItemData(i, 4, &(currentitem.voloffset));
-                //tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
-                tablelist->setItemText(i, 5, FXString(fileitemvector.at(i).create.c_str()));
-                tablelist->setItemText(i, 6, FXString(fileitemvector.at(i).access.c_str()));
-                tablelist->setItemText(i, 7, FXString(fileitemvector.at(i).modify.c_str()));
-            }
-            */
             // table formatting
             tablelist->fitColumnsToContents(0);
             tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
@@ -2512,13 +2447,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             AlignColumn(tablelist, 5, FXTableItem::LEFT);
             AlignColumn(tablelist, 6, FXTableItem::LEFT);
             AlignColumn(tablelist, 7, FXTableItem::LEFT);
-            /*
-            if(sortasc == 1 && sortindex == 1)
-                tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
-            else if(sortasc == 0 && sortindex == 1)
-                tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
-            tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 10);
-            */
             if(sortindex == 1)
                 tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
             // need to implement path toolbar here for the burrow and the partition and 
@@ -2688,17 +2616,6 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         tablelist->setItemText(i, 6, FXString(fileitems->at(i).access.c_str()));
         tablelist->setItemText(i, 7, FXString(fileitems->at(i).modify.c_str()));
     }
-    //if(itemindex == 1)
-    //    tablelist->setColumnWidth(1, tablelist->getColumnWidth(itemindex) + 30);
-    /*
-    // table formatting
-    
-    if(sortasc == 1 && sortindex == 1)
-        tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
-    else if(sortasc == 0 && sortindex == 1)
-        tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
-    tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 10);
-    */
 }
 
 /*
