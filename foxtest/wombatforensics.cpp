@@ -2384,12 +2384,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             //filearray.clear();
             FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
             FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".*");
-            std::cout << "file count: " << filecount << std::endl;
+            //std::cout << "file count: " << filecount << std::endl;
             if(filecount == 0)
                 LoadDirectory(&currentitem, &fileitemvector);
             else
             {
-                std::cout << "read from files list to populate fileitemvector here..." << std::endl;
+                //std::cout << "read from files list to populate fileitemvector here..." << std::endl;
                 for(int i=0; i < filecount; i++)
                 {
                     FXFile filefile;
@@ -2433,7 +2433,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setColumnText(11, "Signature");
             tablelist->setColumnText(12, "Tagged");
             tablelist->setColumnText(13, "Hash Match");
-	    SortFileTable(&fileitemvector);
+	    SortFileTable(&fileitemvector, sortindex, sortasc);
             for(int i=0; i < fileitemvector.size(); i++)
             {
                 if(filecount == 0)
@@ -2510,6 +2510,11 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             AlignColumn(tablelist, 5, FXTableItem::LEFT);
             AlignColumn(tablelist, 6, FXTableItem::LEFT);
             AlignColumn(tablelist, 7, FXTableItem::LEFT);
+            if(sortasc == 1 && sortindex == 1)
+                tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
+            else if(sortasc == 0 && sortindex == 1)
+                tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
+            tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 10);
             // need to implement path toolbar here for the burrow and the partition and 
             //std::cout << "need to load the root directory for the partition selected here." << std::endl;
             this->getApp()->endWaitCursor();
@@ -2540,13 +2545,51 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     return 1;
 }
 
-void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, int itemindex)
+void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, int itemindex, bool asc)
 {
+    std::vector<std::string> namelist;
+    //std::cout << "file item count: " << fileitems->size() << std::endl;
     if(itemindex == 0) // is checked
     {
     }
     else if(itemindex == 1) // global id
     {
+        std::vector<uint64_t> gidlist;
+        gidlist.clear();
+        //std::cout << "fileitem globalid: ";
+        for(int i=0; i < fileitems->size(); i++)
+        {
+            //std::cout << fileitems->at(i).gid << " ";
+            gidlist.push_back(fileitems->at(i).gid);
+        }
+        //std::cout << std::endl;
+        if(asc) // ascending
+            std::sort(gidlist.begin(), gidlist.end());
+        else // descending
+            std::sort(gidlist.begin(), gidlist.end(), std::greater());
+        /*
+        std::cout << "gidlist: ";
+        for(int i=0; i < gidlist.size(); i++)
+            std::cout << gidlist.at(i) << " ";
+        std::cout << std::endl;
+        */
+        std::vector<FileItem> tmpfileitems;
+        tmpfileitems.clear();
+        //std::cout << "tmp fileitem globalid: ";
+        for(int i=0; i < gidlist.size(); i++)
+        {
+            for(int j=0; j < fileitems->size(); j++)
+            {
+                if(gidlist.at(i) == fileitems->at(j).gid)
+                {
+                    tmpfileitems.push_back(fileitems->at(j));
+                    //std::cout << fileitems->at(j).gid << " ";
+                }
+            }
+        }
+        //std::cout << std::endl;
+        fileitems->swap(tmpfileitems);
+
     }
     else if(itemindex == 2) // is deleted
     {
@@ -2572,7 +2615,6 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, int itemin
     else if(itemindex == 9) // modify
     {
     }
-    std::cout << "item index: " << itemindex << std::endl;
 }
 
 /*

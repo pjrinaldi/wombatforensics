@@ -437,7 +437,7 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
         //std::cout << "dir size: " << dirsize << std::endl;
         // ROOT DIRECTORY LAYOUT
         std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
-        std::cout << "root dir layout: " << rootdirlayout << std::endl;
+        //std::cout << "root dir layout: " << rootdirlayout << std::endl;
         if(curinode == 0) // root directory
         {
             uint direntrycount = dirsize / 32;
@@ -567,11 +567,11 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 		            //GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
 //void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
                         }
-                        for(int i=0; i < clusterlist.size(); i++)
-                            std::cout << "cluster " << i << ": " << clusterlist.at(i) << std::endl;
+                        //for(int i=0; i < clusterlist.size(); i++)
+                        //    std::cout << "cluster " << i << ": " << clusterlist.at(i) << std::endl;
                         if(clusterlist.size() > 0)
                             tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
-                        std::cout << "tmpitem layout: " << tmpitem.layout << std::endl;
+                        //std::cout << "tmpitem layout: " << tmpitem.layout << std::endl;
                         /*
                         uint16_t hiclusternum = qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 20, 2)); // always zero for fat12/16
                         uint16_t loclusternum = qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 26, 2));
@@ -590,7 +590,8 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                         qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
                         out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
                          */ 
-                        filevector->push_back(tmpitem);
+                        if(!tmpitem.layout.empty())
+                            filevector->push_back(tmpitem);
                     }
                 }
             }

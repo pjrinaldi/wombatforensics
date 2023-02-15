@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <vector>
+#include <algorithm>
 #include <string.h>
 #include <filesystem>
 #include <byteswap.h>
@@ -273,6 +274,8 @@ class WombatForensics : public FXMainWindow
 
 	CurrentItem currentitem;
         
+        int sortindex = 1;
+        int sortasc = 1;
         int itemtype;
         std::vector<std::string> volnames;
         std::vector<uint64_t> volsizes;
@@ -391,7 +394,7 @@ class WombatForensics : public FXMainWindow
         void EnableCaseButtons(void);
         void LoadCaseState(void);
         void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
-	void SortFileTable(std::vector<FileItem>* fileitems, int itemindex=1);
+	void SortFileTable(std::vector<FileItem>* fileitems, int itemindex=1, bool asc=true);
         //void LoadPartitions(ForImg* curforimg);
         //void LoadGptPartitions(ForImg* curforimg);
         //FXString GetFileSystemName(ForImg* curforimg, uint64_t offset);
