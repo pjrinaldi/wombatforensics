@@ -215,6 +215,17 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 	carvetypesfile.close();
 	currentcarvetypes = FXString(oldcarvetypes);
     }
+    bool isbinaries = binariesfile.open(configpath + "binaries", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isbinaries == false)
+        FXFile::create(configpath + "binaries", FXIO::OwnerReadWrite);
+    else
+    {
+        char* curbinaries = new char[binariesfile.size()+1];
+        binariesfile.readBlock(curbinaries, binariesfile.size());
+        curbinaries[binariesfile.size()] = 0;
+        currentviewers = FXString(curbinaries);
+    }
+    binariesfile.close();
     forimgvector.clear();
     savebutton->disable();
     evidmanbutton->disable();
@@ -1222,12 +1233,18 @@ FXchar WombatForensics::Rot13Char(FXchar curchar)
 long WombatForensics::OpenViewerManager(FXObject*, FXSelector, void*)
 {
     ManageViewer viewmanager(this, "Manage External Viewers");
-    viewmanager.LoadViewers(currentviewers);
     viewmanager.SetBinList(&binaries);
+    viewmanager.LoadViewers(currentviewers);
     bool tosave = viewmanager.execute(PLACEMENT_OWNER);
     if(tosave == 1)
     {
-        currentviewers = viewmanager.ReturnViewers();
+        currentviewers = "";
+        for(int i=0; i < binaries.size(); i++)
+        {
+            currentviewers += FXString(binaries.at(i).c_str());
+            if(i < binaries.size() - 1)
+                currentviewers += "|";
+        }
         binariesfile.open(configpath + "binaries", FXIO::Writing, FXIO::OwnerReadWrite);
         binariesfile.writeBlock(currentviewers.text(), currentviewers.length());
         binariesfile.close();
