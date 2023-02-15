@@ -391,6 +391,7 @@ class WombatForensics : public FXMainWindow
         void EnableCaseButtons(void);
         void LoadCaseState(void);
         void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
+	void SortFileTable(std::vector<FileItem>* fileitems, int itemindex=1);
         //void LoadPartitions(ForImg* curforimg);
         //void LoadGptPartitions(ForImg* curforimg);
         //FXString GetFileSystemName(ForImg* curforimg, uint64_t offset);

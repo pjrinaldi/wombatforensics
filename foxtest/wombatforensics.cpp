@@ -2433,6 +2433,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setColumnText(11, "Signature");
             tablelist->setColumnText(12, "Tagged");
             tablelist->setColumnText(13, "Hash Match");
+	    SortFileTable(&fileitemvector);
             for(int i=0; i < fileitemvector.size(); i++)
             {
                 if(filecount == 0)
@@ -2539,6 +2540,40 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     return 1;
 }
 
+void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, int itemindex)
+{
+    if(itemindex == 0) // is checked
+    {
+    }
+    else if(itemindex == 1) // global id
+    {
+    }
+    else if(itemindex == 2) // is deleted
+    {
+    }
+    else if(itemindex == 3) // is directory
+    {
+    }
+    else if(itemindex == 4) // size
+    {
+    }
+    else if(itemindex == 5) // name
+    {
+    }
+    else if(itemindex == 6) // path
+    {
+    }
+    else if(itemindex == 7) // create
+    {
+    }
+    else if(itemindex == 8) // access
+    {
+    }
+    else if(itemindex == 9) // modify
+    {
+    }
+    std::cout << "item index: " << itemindex << std::endl;
+}
 
 /*
 long WombatForensics::SetTag(FXObject* sender, FXSelector, void*)
