@@ -165,6 +165,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     //sqlitefiles.clear();
     tags.clear();
     taggedlist.clear();
+    binaries.clear();
     iscaseopen = false;
     isfrompath = false;
     prevevidpath = "";
@@ -1217,6 +1218,22 @@ FXchar WombatForensics::Rot13Char(FXchar curchar)
     return rot13char;
 }
 */
+
+long WombatForensics::OpenViewerManager(FXObject*, FXSelector, void*)
+{
+    ManageViewer viewmanager(this, "Manage External Viewers");
+    viewmanager.LoadViewers(currentviewers);
+    viewmanager.SetBinList(&binaries);
+    bool tosave = viewmanager.execute(PLACEMENT_OWNER);
+    if(tosave == 1)
+    {
+        currentviewers = viewmanager.ReturnViewers();
+        binariesfile.open(configpath + "binaries", FXIO::Writing, FXIO::OwnerReadWrite);
+        binariesfile.writeBlock(currentviewers.text(), currentviewers.length());
+        binariesfile.close();
+    }
+    return 1;
+}
 
 long WombatForensics::OpenTagManager(FXObject*, FXSelector, void*)
 {

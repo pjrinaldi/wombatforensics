@@ -26,6 +26,7 @@
 #include "forensicimage.h"
 #include "partitions.h"
 #include "directories.h"
+#include "manageviewer.h"
 // SHARED LIBRARIES
 #include <tar.h>
 #include <libtar.h>
@@ -234,6 +235,7 @@ class WombatForensics : public FXMainWindow
         FXIcon* virtualfoldericon;
 
         std::vector<std::string> tags;
+        std::vector<std::string> binaries;
         FXArray<FXString> taggedlist;
         std::ifstream filebuffer;
 	std::ofstream filewriter;
@@ -248,12 +250,14 @@ class WombatForensics : public FXMainWindow
 	FXString currentcarvetypes;
 	FXString prevevidpath;
         FXString itemtext;
+        FXString currentviewers;
         
         FXFile tagsfile;
         FXFile logfile;
         FXFile settingfile;
 	FXFile carvetypesfile;
         FXFile evidencefile;
+        FXFile binariesfile;
         
         char dtbuf[35];
         bool iscaseopen;
@@ -343,6 +347,7 @@ class WombatForensics : public FXMainWindow
         long LoadCurrent(FXObject*, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
+        long OpenViewerManager(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -420,6 +425,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HOME, WombatForensics::LoadForensicImages),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CURRENT, WombatForensics::LoadCurrent),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_VIEWMANAGE, WombatForensics::OpenViewerManager),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
     FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_TABLESELECT, WombatForensics::TableUpDown),
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
