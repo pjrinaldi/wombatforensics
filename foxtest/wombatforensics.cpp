@@ -2502,32 +2502,29 @@ long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
     std::stringstream strm;
     strm << colid;
     std::string str = strm.str();
-    if(str.find("0x1") != std::string::npos)
+    FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+    if(str.find("0x1") != std::string::npos) // global id sort
     {
         uint arrowdir = tableheader->getArrowDir(1);
+        std::cout << "arrowdir: " << arrowdir << std::endl;
         if(arrowdir == 1)
-        {
             sortasc = 2;
-            long ret = LoadChildren(NULL, 0, NULL);
-            //SortFileTable
-            //tableitem->setArrowDir(1, 2);
-            //long ret = LoadChildren(NULL, 0, NULL);
-            //SortFileTable(
+        else if(arrowdir == 2)
+            sortasc = 1;
+        else if(arrowdir == 0)
+        {
+            sortasc = 1;
+            sortindex = 1;
         }
-        std::cout << "match colid: " << colid << " " << str << std::endl;
+	SortFileTable(&fileitemvector, filefilestr, fileitemvector.size(), sortindex, sortasc);
     }
     else
         std::cout << "no match colid: " << colid << " " << str << std::endl;
-    //uint arrowdir = tableheader->getArrowDir(*((int*)colid));
-    //tableheader->setArrowDir(1, FXHeaderItem::ARROW_UP);
-    //std::cout << "sort column clicked, so switch direction here." << std::endl;
-    //FXString colstr = ((FXHeader*)sender)->getItemText(1);
-    //std::cout << "col str: " << colstr.text() << std::endl;
 
     return 1;
 }
 
-void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex, bool asc)
+void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex, int asc)
 {
     std::vector<std::string> namelist;
     //std::cout << "file item count: " << fileitems->size() << std::endl;
@@ -2572,6 +2569,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         //std::cout << std::endl;
         fileitems->swap(tmpfileitems);
         tmpfileitems.clear();
+        //std::cout << "asc: " << asc << std::endl;
         if(asc == 1)
         {
             tableheader->setArrowDir(1, 1);

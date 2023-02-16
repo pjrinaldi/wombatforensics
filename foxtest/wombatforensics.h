@@ -397,7 +397,7 @@ class WombatForensics : public FXMainWindow
         void EnableCaseButtons(void);
         void LoadCaseState(void);
         void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
-	void SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex=1, bool asc=true);
+	void SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex=1, int asc=1);
         //void LoadPartitions(ForImg* curforimg);
         //void LoadGptPartitions(ForImg* curforimg);
         //FXString GetFileSystemName(ForImg* curforimg, uint64_t offset);
@@ -438,7 +438,6 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
     FXMAPFUNC(SEL_DOUBLECLICKED, WombatForensics::ID_TABLESELECT, WombatForensics::LoadChildren),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLEHEADER, WombatForensics::SortColumn),
-    //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLESELECT, WombatForensics::SortColumn),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),
