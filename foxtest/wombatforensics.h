@@ -276,7 +276,7 @@ class WombatForensics : public FXMainWindow
 	CurrentItem currentitem;
         
         int sortindex = 1;
-        int sortasc = 1;
+        uint sortasc = 1;
         int itemtype;
         std::vector<std::string> volnames;
         std::vector<uint64_t> volsizes;
@@ -438,6 +438,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
     FXMAPFUNC(SEL_DOUBLECLICKED, WombatForensics::ID_TABLESELECT, WombatForensics::LoadChildren),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLEHEADER, WombatForensics::SortColumn),
+    //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLESELECT, WombatForensics::SortColumn),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),

@@ -32,6 +32,22 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tablelist->setHeight(this->getHeight() / 2);
     tableheader = tablelist->getColumnHeader();
     tableheader->setSelector(ID_TABLEHEADER);
+    tableheader->setTarget(this);
+    tableheader->setArrowDir(0, 0);
+    tableheader->setArrowDir(0, 1);
+    tableheader->setArrowDir(0, 2);
+    tableheader->setArrowDir(0, 3);
+    tableheader->setArrowDir(0, 4);
+    tableheader->setArrowDir(0, 5);
+    tableheader->setArrowDir(0, 6);
+    tableheader->setArrowDir(0, 7);
+    tableheader->setArrowDir(0, 8);
+    tableheader->setArrowDir(0, 9);
+    tableheader->setArrowDir(0, 10);
+    tableheader->setArrowDir(0, 11);
+    tableheader->setArrowDir(0, 12);
+    tableheader->setArrowDir(0, 13);
+    //tableheader->setHeaderStyle(HEADER_NORMAL|HEADER_TRACKING);
     plainfont = new FXFont(a, "monospace");
     plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
@@ -2483,11 +2499,30 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 
 long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
 {
-    FXString colstr = ((FXHeader*)sender)->getItemText(1);
-    std::cout << "colid: " << sel << std::endl;
-    std::cout << "col str: " << colstr.text() << std::endl;
-    //FXString tagstr = ((FXMenuCommand*)sender)->getText();
-    std::cout << "colid: " << *((int*)colid) << std::endl;
+    std::stringstream strm;
+    strm << colid;
+    std::string str = strm.str();
+    if(str.find("0x1") != std::string::npos)
+    {
+        uint arrowdir = tableheader->getArrowDir(1);
+        if(arrowdir == 1)
+        {
+            sortasc = 2;
+            long ret = LoadChildren(NULL, 0, NULL);
+            //SortFileTable
+            //tableitem->setArrowDir(1, 2);
+            //long ret = LoadChildren(NULL, 0, NULL);
+            //SortFileTable(
+        }
+        std::cout << "match colid: " << colid << " " << str << std::endl;
+    }
+    else
+        std::cout << "no match colid: " << colid << " " << str << std::endl;
+    //uint arrowdir = tableheader->getArrowDir(*((int*)colid));
+    //tableheader->setArrowDir(1, FXHeaderItem::ARROW_UP);
+    //std::cout << "sort column clicked, so switch direction here." << std::endl;
+    //FXString colstr = ((FXHeader*)sender)->getItemText(1);
+    //std::cout << "col str: " << colstr.text() << std::endl;
 
     return 1;
 }
@@ -2510,9 +2545,9 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             gidlist.push_back(fileitems->at(i).gid);
         }
         //std::cout << std::endl;
-        if(asc) // ascending
+        if(asc == 1) // ascending
             std::sort(gidlist.begin(), gidlist.end());
-        else // descending
+        else if(asc == 2) // descending
             std::sort(gidlist.begin(), gidlist.end(), std::greater());
         /*
         std::cout << "gidlist: ";
@@ -2537,16 +2572,18 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         //std::cout << std::endl;
         fileitems->swap(tmpfileitems);
         tmpfileitems.clear();
-        if(asc)
+        if(asc == 1)
         {
-            tableheader->setArrowDir(1, FXHeaderItem::ARROW_UP);
+            tableheader->setArrowDir(1, 1);
             //tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
         }
-        else
+        else if(asc == 2)
         {
-            tableheader->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
+            tableheader->setArrowDir(1, 2);
             //tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
         }
+        else if(asc == 0)
+            tableheader->setArrowDir(1, 0);
     }
     else if(itemindex == 2) // is deleted
     {
