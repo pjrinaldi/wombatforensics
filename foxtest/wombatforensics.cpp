@@ -30,6 +30,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tablelist->setColumnHeaderHeight(tablelist->getColumnHeaderHeight() + 5);
     tablelist->setRowHeaderWidth(0);
     tablelist->setHeight(this->getHeight() / 2);
+    tableheader = tablelist->getColumnHeader();
+    tableheader->setSelector(ID_TABLEHEADER);
     plainfont = new FXFont(a, "monospace");
     plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
@@ -2479,6 +2481,17 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     return 1;
 }
 
+long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
+{
+    FXString colstr = ((FXHeader*)sender)->getItemText(1);
+    std::cout << "colid: " << sel << std::endl;
+    std::cout << "col str: " << colstr.text() << std::endl;
+    //FXString tagstr = ((FXMenuCommand*)sender)->getText();
+    std::cout << "colid: " << *((int*)colid) << std::endl;
+
+    return 1;
+}
+
 void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex, bool asc)
 {
     std::vector<std::string> namelist;
@@ -2525,9 +2538,15 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         fileitems->swap(tmpfileitems);
         tmpfileitems.clear();
         if(asc)
-            tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
+        {
+            tableheader->setArrowDir(1, FXHeaderItem::ARROW_UP);
+            //tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
+        }
         else
-            tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
+        {
+            tableheader->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
+            //tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
+        }
     }
     else if(itemindex == 2) // is deleted
     {

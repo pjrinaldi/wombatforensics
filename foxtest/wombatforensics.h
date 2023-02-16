@@ -153,6 +153,7 @@ class WombatForensics : public FXMainWindow
 	//FXMenuBar* pathmenubar;
         FXSplitter* hsplitter;
         FXTable* tablelist;
+        FXHeader* tableheader;
         FXStatusBar* statusbar;
         FXFont* plainfont;
         FXText* plaintext;
@@ -332,6 +333,7 @@ class WombatForensics : public FXMainWindow
 	    ID_BACK = 120,
 	    ID_FRWD = 121,
 	    ID_CURRENT = 122,
+            ID_TABLEHEADER = 123,
             ID_LAST
         };
         WombatForensics(FXApp* a);
@@ -351,6 +353,7 @@ class WombatForensics : public FXMainWindow
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
         long OpenViewerManager(FXObject*, FXSelector, void*);
+        long SortColumn(FXObject* sender, FXSelector sel, void* colid);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -434,6 +437,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_TABLESELECT, WombatForensics::TableUpDown),
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
     FXMAPFUNC(SEL_DOUBLECLICKED, WombatForensics::ID_TABLESELECT, WombatForensics::LoadChildren),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLEHEADER, WombatForensics::SortColumn),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),
