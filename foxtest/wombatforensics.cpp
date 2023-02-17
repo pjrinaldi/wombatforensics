@@ -1248,6 +1248,16 @@ FXchar WombatForensics::Rot13Char(FXchar curchar)
 }
 */
 
+long WombatForensics::OpenMessageLog(FXObject*, FXSelector, void*)
+{
+    MessageLog* msglog = new MessageLog(this, "Message Log");
+    //msglog.execute(PLACEMENT_OWNER);
+    msglog->create();
+    msglog->show(PLACEMENT_CURSOR);
+
+    return 1;
+}
+
 long WombatForensics::OpenViewerManager(FXObject*, FXSelector, void*)
 {
     ManageViewer viewmanager(this, "Manage External Viewers");
