@@ -19,23 +19,11 @@ class AboutBox : public FXDialogBox
 	FXPNGImage* mainimage;
 	FXImageFrame* imgframe;
         FXLabel* mainlabel;
-        std::vector<std::string>* tags = NULL;
 
     protected:
         AboutBox() {}
 
-        long onSomeCommand(FXObject* sender, FXSelector sel, void* ptr);
-
     public:
-        enum
-        {
-            ID_TREELIST = 1,
-            ID_LISTSELECT = 100,
-            ID_NEWTAG = 101,
-            ID_EDITTAG = 102,
-            ID_REMTAG = 103,
-            ID_LAST
-        };
         AboutBox(FXWindow* parent, const FXString& title);
 };
 

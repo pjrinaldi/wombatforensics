@@ -53,6 +53,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
+    msglog = new MessageLog(this, "Message Log");
     // TOOLBAR ICONS
     // WOMBAT CASE FILE ICONS
     newicon = new FXPNGIcon(this->getApp(), documentnew);
@@ -358,6 +359,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         FXFile::create(tmppath + "tags", FXIO::OwnerReadWrite);
         FXFile::create(tmppath + "msglog", FXIO::OwnerReadWrite);
         LogEntry("Case Structure Created Successfully");
+        msglog->AddMsg("Case Structure Created Successfully.");
         EnableCaseButtons();
         this->getApp()->endWaitCursor();
         StatusUpdate("Ready");
@@ -431,7 +433,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
         //std::cout << "global id from case opening: " << globalid << std::endl;
 	//std::cout << tmppath.text() << std::endl;
 	LogEntry("Case was Opened Successfully");
-        msglog->AddMsg("Case was opened successfully");
+        msglog->AddMsg("Case was opened successfully.");
         EnableCaseButtons();
         LoadCaseState();
         this->getApp()->endWaitCursor();
@@ -656,6 +658,7 @@ void WombatForensics::UpdateForensicImages()
     AlignColumn(tablelist, 1, FXTableItem::LEFT);
     AlignColumn(tablelist, 2, FXTableItem::LEFT);
     AlignColumn(tablelist, 3, FXTableItem::LEFT);
+    msglog->AddMsg("Evidence Loaded Successfully.");
 }
 
 long WombatForensics::TableUpDown(FXObject*, FXSelector, void* ptr)
@@ -1249,11 +1252,18 @@ FXchar WombatForensics::Rot13Char(FXchar curchar)
 }
 */
 
+long WombatForensics::OpenXChomp(FXObject*, FXSelector, void*)
+{
+    std::system("./xchomp");
+    //pid_t pid = fork()
+    //int ret = execl("xchomp", NULL);
+
+    return 1;
+}
+
 long WombatForensics::OpenMessageLog(FXObject*, FXSelector, void*)
 {
-    msglog = new MessageLog(this, "Message Log");
     //msglog.execute(PLACEMENT_OWNER);
-    msglog->create();
     msglog->show(PLACEMENT_CURSOR);
 
     return 1;
@@ -2517,7 +2527,7 @@ long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
     if(str.find("0x1") != std::string::npos) // global id sort
     {
         uint arrowdir = tableheader->getArrowDir(1);
-        std::cout << "arrowdir: " << arrowdir << std::endl;
+        //std::cout << "arrowdir: " << arrowdir << std::endl;
         if(arrowdir == 1)
             sortasc = 2;
         else if(arrowdir == 2)

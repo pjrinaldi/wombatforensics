@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-//#include "icons.h"
+#include "common.h"
 
 #include "/usr/local/include/fox-1.7/fx.h"
 
@@ -16,12 +16,13 @@ class MessageLog : public FXDialogBox
 
     private:
         FXVerticalFrame* mainframe;
-        //FXConsole* msglog;
         FXText* msglog;
         FXFont* plainfont;
+        char dtbuf[35];
 
     protected:
         MessageLog() {}
+        ~MessageLog();
 
     public:
         enum

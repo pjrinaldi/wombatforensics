@@ -10,14 +10,14 @@ MessageLog::MessageLog(FXWindow* parent, const FXString& title):FXDialogBox(pare
     msglog->setFont(plainfont);
     msglog->setEditable(false);
     msglog->setScrollStyle(VSCROLLER_ALWAYS);
-    //hextext->setScrollStyle(VSCROLLER_NEVER|HSCROLLER_NEVER);
-    /*
-    msglog = new FXConsole(mainframe, this, ID_LOG, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    msglog->setBackColor(FX::colorFromName("white"));
-    //msglog->drawTextFragment(this, 0, 0, 100, 1, "Test", 1, STYLE_TEXT);
-    */
 }
 void MessageLog::AddMsg(FXString msg)
 {
-    msglog->appendText(msg);
+    FXString fullmsg = FXString(GetDateTime(dtbuf)) + " | " + msg + "\n";
+    msglog->appendText(fullmsg);
+}
+
+MessageLog::~MessageLog()
+{
+    this->hide();
 }
