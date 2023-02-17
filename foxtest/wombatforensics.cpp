@@ -7,8 +7,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     new FXToolTip(this->getApp(), TOOLTIP_PERMANENT);
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
-    mainframe->setBackColor(FXRGB(224,224,224));
-    toolbar->setBackColor(FXRGB(224,224,224));
+    //mainframe->setBackColor(FXRGB(224,224,224));
+    //toolbar->setBackColor(FXRGB(224,224,224));
     pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     //pathmenubar = new FXMenuBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     hsplitter = new FXSplitter(mainframe, SPLITTER_VERTICAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
@@ -33,7 +33,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tablelist->setRowHeaderWidth(0);
     tablelist->setHeight(this->getHeight() / 2);
     tableheader = tablelist->getColumnHeader();
-    tableheader->setBackColor(FXRGB(224,224,224));
+    //tableheader->setBackColor(FXRGB(224,224,224));
     tableheader->setSelector(ID_TABLEHEADER);
     tableheader->setTarget(this);
     tableheader->setArrowDir(0, 0);
@@ -62,7 +62,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     newicon = new FXPNGIcon(this->getApp(), documentnew);
     newbutton = new FXButton(toolbar, "", newicon, this, ID_NEW, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     newbutton->setTipText("Create New Case");
-    newbutton->setBackColor(FXRGB(224,224,224));
+    //newbutton->setBackColor(FXRGB(224,224,224));
     openicon = new FXPNGIcon(this->getApp(), folderopen);
     openbutton = new FXButton(toolbar, "", openicon, this, ID_OPEN, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     openbutton->setTipText("Open Case");
@@ -138,7 +138,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     xchompicon = new FXPNGIcon(this->getApp(), xchomp);
     xchompbutton = new FXButton(toolbar, "", xchompicon, this, ID_XCHOMP, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     xchompbutton->setTipText("Play XChomp");
-    xchompbutton->setBackColor(FXRGB(224,224,224));
+    //xchompbutton->setBackColor(FXRGB(224,224,224));
     abouticon = new FXPNGIcon(this->getApp(), helpcontents);
     aboutbutton = new FXButton(toolbar, "", abouticon, this, ID_ABOUT, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     aboutbutton->setTipText("About Wombat Forensics");
