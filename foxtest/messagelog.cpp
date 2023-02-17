@@ -6,6 +6,7 @@ MessageLog::MessageLog(FXWindow* parent, const FXString& title):FXDialogBox(pare
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     msglog = new FXConsole(mainframe, this, ID_LOG, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    msglog->setBackColor(FX::colorFromName("white"));
     /*
     mainimage = new FXPNGImage(this->getApp(), aboutwombat);
     imgframe = new FXImageFrame(mainframe, mainimage, FRAME_NONE);
