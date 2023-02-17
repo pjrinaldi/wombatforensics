@@ -431,6 +431,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
         //std::cout << "global id from case opening: " << globalid << std::endl;
 	//std::cout << tmppath.text() << std::endl;
 	LogEntry("Case was Opened Successfully");
+        msglog->AddMsg("Case was opened successfully");
         EnableCaseButtons();
         LoadCaseState();
         this->getApp()->endWaitCursor();
@@ -1250,7 +1251,7 @@ FXchar WombatForensics::Rot13Char(FXchar curchar)
 
 long WombatForensics::OpenMessageLog(FXObject*, FXSelector, void*)
 {
-    MessageLog* msglog = new MessageLog(this, "Message Log");
+    msglog = new MessageLog(this, "Message Log");
     //msglog.execute(PLACEMENT_OWNER);
     msglog->create();
     msglog->show(PLACEMENT_CURSOR);

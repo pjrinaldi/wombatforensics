@@ -269,6 +269,7 @@ class WombatForensics : public FXMainWindow
         Viewer* viewer;
         ForImg* curforimg;
         std::vector<ForImg*> forimgvector;
+        MessageLog* msglog;
 
         uint64_t globalid;
         uint64_t curid;

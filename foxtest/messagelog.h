@@ -16,16 +16,12 @@ class MessageLog : public FXDialogBox
 
     private:
         FXVerticalFrame* mainframe;
-        FXConsole* msglog;
-	//FXPNGImage* mainimage;
-	//FXImageFrame* imgframe;
-        //FXLabel* mainlabel;
-        //std::vector<std::string>* tags = NULL;
+        //FXConsole* msglog;
+        FXText* msglog;
+        FXFont* plainfont;
 
     protected:
         MessageLog() {}
-
-        //long onSomeCommand(FXObject* sender, FXSelector sel, void* ptr);
 
     public:
         enum
@@ -34,6 +30,7 @@ class MessageLog : public FXDialogBox
             ID_LAST
         };
         MessageLog(FXWindow* parent, const FXString& title);
+        void AddMsg(FXString msg);
 };
 
 #endif // MESSAGELOG_H
