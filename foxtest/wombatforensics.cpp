@@ -7,6 +7,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     new FXToolTip(this->getApp(), TOOLTIP_PERMANENT);
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
+    mainframe->setBackColor(FXRGB(224,224,224));
+    toolbar->setBackColor(FXRGB(224,224,224));
     pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     //pathmenubar = new FXMenuBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     hsplitter = new FXSplitter(mainframe, SPLITTER_VERTICAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
@@ -31,22 +33,23 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tablelist->setRowHeaderWidth(0);
     tablelist->setHeight(this->getHeight() / 2);
     tableheader = tablelist->getColumnHeader();
+    tableheader->setBackColor(FXRGB(224,224,224));
     tableheader->setSelector(ID_TABLEHEADER);
     tableheader->setTarget(this);
     tableheader->setArrowDir(0, 0);
-    tableheader->setArrowDir(0, 1);
-    tableheader->setArrowDir(0, 2);
-    tableheader->setArrowDir(0, 3);
-    tableheader->setArrowDir(0, 4);
-    tableheader->setArrowDir(0, 5);
-    tableheader->setArrowDir(0, 6);
-    tableheader->setArrowDir(0, 7);
-    tableheader->setArrowDir(0, 8);
-    tableheader->setArrowDir(0, 9);
-    tableheader->setArrowDir(0, 10);
-    tableheader->setArrowDir(0, 11);
-    tableheader->setArrowDir(0, 12);
-    tableheader->setArrowDir(0, 13);
+    tableheader->setArrowDir(1, 1);
+    tableheader->setArrowDir(2, 0);
+    tableheader->setArrowDir(3, 0);
+    tableheader->setArrowDir(4, 0);
+    tableheader->setArrowDir(5, 0);
+    tableheader->setArrowDir(6, 0);
+    tableheader->setArrowDir(7, 0);
+    tableheader->setArrowDir(8, 0);
+    tableheader->setArrowDir(9, 0);
+    tableheader->setArrowDir(10, 0);
+    tableheader->setArrowDir(11, 0);
+    tableheader->setArrowDir(12, 0);
+    tableheader->setArrowDir(13, 0);
     //tableheader->setHeaderStyle(HEADER_NORMAL|HEADER_TRACKING);
     plainfont = new FXFont(a, "monospace");
     plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
@@ -57,18 +60,19 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     // TOOLBAR ICONS
     // WOMBAT CASE FILE ICONS
     newicon = new FXPNGIcon(this->getApp(), documentnew);
-    newbutton = new FXButton(toolbar, "", newicon, this, ID_NEW, BUTTON_TOOLBAR|FRAME_RAISED);
+    newbutton = new FXButton(toolbar, "", newicon, this, ID_NEW, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     newbutton->setTipText("Create New Case");
+    newbutton->setBackColor(FXRGB(224,224,224));
     openicon = new FXPNGIcon(this->getApp(), folderopen);
-    openbutton = new FXButton(toolbar, "", openicon, this, ID_OPEN, BUTTON_TOOLBAR|FRAME_RAISED);
+    openbutton = new FXButton(toolbar, "", openicon, this, ID_OPEN, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     openbutton->setTipText("Open Case");
     saveicon = new FXPNGIcon(this->getApp(), documentsave);
-    savebutton = new FXButton(toolbar, "", saveicon, this, ID_SAVE, BUTTON_TOOLBAR|FRAME_RAISED);
+    savebutton = new FXButton(toolbar, "", saveicon, this, ID_SAVE, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     savebutton->setTipText("Save Case");
     new FXVerticalSeparator(toolbar);
     // EVIDENCE ICONS
     evidmanicon = new FXPNGIcon(this->getApp(), evidencemanager);
-    evidmanbutton = new FXButton(toolbar, "", evidmanicon, this, ID_EVIDMANAGE, BUTTON_TOOLBAR|FRAME_RAISED);
+    evidmanbutton = new FXButton(toolbar, "", evidmanicon, this, ID_EVIDMANAGE, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     evidmanbutton->setTipText("Manage Evidence");
     /*
     listaddicon = new FXPNGIcon(this->getApp(), listadd);
@@ -79,47 +83,47 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     new FXVerticalSeparator(toolbar);
     // WOMBAT FORENSIC APP ICONS
     settingsicon = new FXPNGIcon(this->getApp(), settings);
-    settingsbutton = new FXButton(toolbar, "", settingsicon, this, ID_SETTINGS, BUTTON_TOOLBAR|FRAME_RAISED);
+    settingsbutton = new FXButton(toolbar, "", settingsicon, this, ID_SETTINGS, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     settingsbutton->setTipText("Settings");
     managecarvedicon = new FXPNGIcon(this->getApp(), managecarved);
-    managecarvedbutton = new FXButton(toolbar, "", managecarvedicon, this, ID_MANAGECARVED, BUTTON_TOOLBAR|FRAME_RAISED);
+    managecarvedbutton = new FXButton(toolbar, "", managecarvedicon, this, ID_MANAGECARVED, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     managecarvedbutton->setTipText("Manage Carved Types");
     viewmanageicon = new FXPNGIcon(this->getApp(), viewmanage);
-    viewmanagebutton = new FXButton(toolbar, "", viewmanageicon, this, ID_VIEWMANAGE, BUTTON_TOOLBAR|FRAME_RAISED);
+    viewmanagebutton = new FXButton(toolbar, "", viewmanageicon, this, ID_VIEWMANAGE, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     viewmanagebutton->setTipText("External Viewers");
     messagelogicon = new FXPNGIcon(this->getApp(), messagelog);
-    messagelogbutton = new FXButton(toolbar, "", messagelogicon, this, ID_MSGLOG, BUTTON_TOOLBAR|FRAME_RAISED);
+    messagelogbutton = new FXButton(toolbar, "", messagelogicon, this, ID_MSGLOG, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     messagelogbutton->setTipText("Message Log");
     new FXVerticalSeparator(toolbar);
     // ARTIFACT ICONS
     imgvidthumbicon = new FXPNGIcon(this->getApp(), imgvidthumbs);
-    imgvidthumbbutton = new FXButton(toolbar, "", imgvidthumbicon, this, ID_IMGVIDTHUMB, BUTTON_TOOLBAR|FRAME_RAISED);
+    imgvidthumbbutton = new FXButton(toolbar, "", imgvidthumbicon, this, ID_IMGVIDTHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     imgvidthumbbutton->setTipText("Thumbnail Viewer");
     digdeepericon = new FXPNGIcon(this->getApp(), digdeeper);
-    digdeeperbutton = new FXButton(toolbar, "", digdeepericon, this, ID_DIGDEEPER, BUTTON_TOOLBAR|FRAME_RAISED);
+    digdeeperbutton = new FXButton(toolbar, "", digdeepericon, this, ID_DIGDEEPER, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     digdeeperbutton->setTipText("Dig Deeper");
     carvingicon = new FXPNGIcon(this->getApp(), carving);
-    carvingbutton = new FXButton(toolbar, "", carvingicon, this, ID_CARVING, BUTTON_TOOLBAR|FRAME_RAISED);
+    carvingbutton = new FXButton(toolbar, "", carvingicon, this, ID_CARVING, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     carvingbutton->setTipText("Carve");
     exportfilesicon = new FXPNGIcon(this->getApp(), exportfiles);
-    exportfilesbutton = new FXButton(toolbar, "", exportfilesicon, this, ID_EXPORTFILES, BUTTON_TOOLBAR|FRAME_RAISED);
+    exportfilesbutton = new FXButton(toolbar, "", exportfilesicon, this, ID_EXPORTFILES, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     exportfilesbutton->setTipText("Export Files");
     exportwliicon = new FXPNGIcon(this->getApp(), exportwli);
-    exportwlibutton = new FXButton(toolbar, "", exportwliicon, this, ID_EXPORTWLI, BUTTON_TOOLBAR|FRAME_RAISED);
+    exportwlibutton = new FXButton(toolbar, "", exportwliicon, this, ID_EXPORTWLI, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     exportfilesbutton->setTipText("Export to WLI");
     new FXVerticalSeparator(toolbar);
     // REPORTING ICONS
     managetagsicon = new FXPNGIcon(this->getApp(), managetags);
-    managetagsbutton = new FXButton(toolbar, "", managetagsicon, this, ID_MANAGETAGS, BUTTON_TOOLBAR|FRAME_RAISED);
+    managetagsbutton = new FXButton(toolbar, "", managetagsicon, this, ID_MANAGETAGS, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     managetagsbutton->setTipText("Manage Tags");
     managehashicon = new FXPNGIcon(this->getApp(), hashlist);
-    managehashbutton = new FXButton(toolbar, "", managehashicon, this, ID_MANAGEHASH, BUTTON_TOOLBAR|FRAME_RAISED);
+    managehashbutton = new FXButton(toolbar, "", managehashicon, this, ID_MANAGEHASH, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     managehashbutton->setTipText("Hash List Manager");
     previewicon = new FXPNGIcon(this->getApp(), reportpreview1);
-    previewbutton = new FXButton(toolbar, "", previewicon, this, ID_PREVIEW, BUTTON_TOOLBAR|FRAME_RAISED);
+    previewbutton = new FXButton(toolbar, "", previewicon, this, ID_PREVIEW, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     previewbutton->setTipText("Report Preview");
     publishicon = new FXPNGIcon(this->getApp(), paperairplane2);
-    publishbutton = new FXButton(toolbar, "", publishicon, this, ID_PUBLISH, BUTTON_TOOLBAR|FRAME_RAISED);
+    publishbutton = new FXButton(toolbar, "", publishicon, this, ID_PUBLISH, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     publishbutton->setTipText("Publish Report");
     new FXVerticalSeparator(toolbar);
     // IMAGING ICONS
@@ -132,30 +136,31 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     */
     // ABOUT ICONS
     xchompicon = new FXPNGIcon(this->getApp(), xchomp);
-    xchompbutton = new FXButton(toolbar, "", xchompicon, this, ID_XCHOMP, BUTTON_TOOLBAR|FRAME_RAISED);
+    xchompbutton = new FXButton(toolbar, "", xchompicon, this, ID_XCHOMP, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     xchompbutton->setTipText("Play XChomp");
+    xchompbutton->setBackColor(FXRGB(224,224,224));
     abouticon = new FXPNGIcon(this->getApp(), helpcontents);
-    aboutbutton = new FXButton(toolbar, "", abouticon, this, ID_ABOUT, BUTTON_TOOLBAR|FRAME_RAISED);
+    aboutbutton = new FXButton(toolbar, "", abouticon, this, ID_ABOUT, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     aboutbutton->setTipText("About Wombat Forensics");
     // PATH TOOLBAR HOME ICON
     burrowicon = new FXPNGIcon(this->getApp(), burrow);
     burrowicon->create();
-    burrowbutton = new FXButton(pathtoolbar, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    burrowbutton = new FXButton(pathtoolbar, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     burrowbutton->setIconPosition(ICON_BEFORE_TEXT);
     burrowbutton->setTipText("Burrow");
     // PATH TOOLBAR CURRENT ICON
     curicon = new FXPNGIcon(this->getApp(), partitionpath);
-    curbutton = new FXButton(pathtoolbar, "PARTITION", curicon, this, ID_CURRENT, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    curbutton = new FXButton(pathtoolbar, "PARTITION", curicon, this, ID_CURRENT, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     curbutton->setIconPosition(ICON_BEFORE_TEXT);
     curbutton->setTipText("Current Partition");
     // PATH TOOLBAR BACK ICON
     backicon = new FXPNGIcon(this->getApp(), folderpath);
-    backbutton = new FXButton(pathtoolbar, "FOLDER", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    backbutton = new FXButton(pathtoolbar, "FOLDER", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     backbutton->setIconPosition(ICON_BEFORE_TEXT);
     backbutton->setTipText("Current Folder");
     // PATH TOOLBAR FORWARD ICON
     frwdicon = new FXPNGIcon(this->getApp(), filepath);
-    frwdbutton = new FXButton(pathtoolbar, "FILE", frwdicon, this, ID_FRWD, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    frwdbutton = new FXButton(pathtoolbar, "FILE", frwdicon, this, ID_FRWD, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     frwdbutton->setIconPosition(ICON_BEFORE_TEXT);
     frwdbutton->setTipText("Current File");
 
@@ -2553,28 +2558,30 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 
 long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
 {
-    std::stringstream strm;
-    strm << colid;
-    std::string str = strm.str();
-    FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
-    if(str.find("0x1") != std::string::npos) // global id sort
+    if(curforimg != NULL)
     {
-        uint arrowdir = tableheader->getArrowDir(1);
-        //std::cout << "arrowdir: " << arrowdir << std::endl;
-        if(arrowdir == 1)
-            sortasc = 2;
-        else if(arrowdir == 2)
-            sortasc = 1;
-        else if(arrowdir == 0)
-        {
-            sortasc = 1;
-            sortindex = 1;
-        }
-	SortFileTable(&fileitemvector, filefilestr, fileitemvector.size(), sortindex, sortasc);
+	std::stringstream strm;
+	strm << colid;
+	std::string str = strm.str();
+	FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+	if(str.find("0x1") != std::string::npos) // global id sort
+	{
+	    uint arrowdir = tableheader->getArrowDir(1);
+	    //std::cout << "arrowdir: " << arrowdir << std::endl;
+	    if(arrowdir == 1)
+		sortasc = 2;
+	    else if(arrowdir == 2)
+		sortasc = 1;
+	    else if(arrowdir == 0)
+	    {
+		sortasc = 1;
+		sortindex = 1;
+	    }
+	    SortFileTable(&fileitemvector, filefilestr, fileitemvector.size(), sortindex, sortasc);
+	}
+	else
+	    std::cout << "no match colid: " << colid << " " << str << std::endl;
     }
-    else
-        std::cout << "no match colid: " << colid << " " << str << std::endl;
-
     return 1;
 }
 
