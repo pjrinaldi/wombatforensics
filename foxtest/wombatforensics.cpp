@@ -144,20 +144,20 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     burrowbutton->setIconPosition(ICON_BEFORE_TEXT);
     burrowbutton->setTipText("Burrow");
     // PATH TOOLBAR CURRENT ICON
-    curicon = new FXPNGIcon(this->getApp(), current);
-    curbutton = new FXButton(pathtoolbar, "CURRENT", curicon, this, ID_CURRENT, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    curicon = new FXPNGIcon(this->getApp(), partitionpath);
+    curbutton = new FXButton(pathtoolbar, "PARTITION", curicon, this, ID_CURRENT, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
     curbutton->setIconPosition(ICON_BEFORE_TEXT);
-    curbutton->setTipText("Current");
+    curbutton->setTipText("Current Partition");
     // PATH TOOLBAR BACK ICON
-    backicon = new FXPNGIcon(this->getApp(), back);
-    backbutton = new FXButton(pathtoolbar, "BACK", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    backicon = new FXPNGIcon(this->getApp(), folderpath);
+    backbutton = new FXButton(pathtoolbar, "FOLDER", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
     backbutton->setIconPosition(ICON_BEFORE_TEXT);
-    backbutton->setTipText("Back");
+    backbutton->setTipText("Current Folder");
     // PATH TOOLBAR FORWARD ICON
-    frwdicon = new FXPNGIcon(this->getApp(), frwd);
-    frwdbutton = new FXButton(pathtoolbar, "FORWARD", frwdicon, this, ID_FRWD, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
+    frwdicon = new FXPNGIcon(this->getApp(), filepath);
+    frwdbutton = new FXButton(pathtoolbar, "FILE", frwdicon, this, ID_FRWD, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 10,10);
     frwdbutton->setIconPosition(ICON_BEFORE_TEXT);
-    frwdbutton->setTipText("Forward");
+    frwdbutton->setTipText("Current File");
 
     // ITEM TYPE ICONS
     forimgicon = new FXPNGIcon(this->getApp(), forimg);
@@ -190,6 +190,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     prevevidpath = "";
     curforimg = NULL;
     itemtext = "";
+    pathtext = "";
+    filetext = "";
     homepath = FXString(getenv("HOME")) + "/";
     configpath = homepath + ".wombatforensics/";
     tmppath = "/tmp/";
@@ -515,7 +517,7 @@ void WombatForensics::EnableCaseButtons()
     previewbutton->enable();
     publishbutton->enable();
     burrowbutton->enable();
-    //backbutton->enable();
+    backbutton->enable();
     //frwdbutton->enable();
     curbutton->enable();
 }
@@ -2268,12 +2270,39 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
     return 1;
 }
 
+long WombatForensics::LoadCurrentPath(FXObject* sender, FXSelector, void*)
+{
+    if(itemtype < 3)
+    {
+        pathtext = ((FXButton*)sender)->getText();
+        isfrompath = true;
+        itemtype = 2;
+        //std::cout << "curvol offset: " << currentitem.voloffset << std::endl;
+        long ret = LoadChildren(NULL, 0, NULL);
+    }
+
+    return 1;
+}
+
+long WombatForensics::LoadCurrentFile(FXObject* sender, FXSelector, void*)
+{
+    /*
+    filetext = ((FXButton*)sender)->getText();
+    isfrompath = true;
+    itemtype = 3;
+    long ret = LoadChildren(NULL, 0, NULL);
+    */
+
+    return 1;
+}
+
 long WombatForensics::LoadCurrent(FXObject* sender, FXSelector, void*)
 {
     itemtext = ((FXButton*)sender)->getText();
     //std::cout << "item text: " << ((FXButton*)sender)->getText().text() << std::endl;
     //currentitem = *((CurrentItem*)(((FXButton*)sender)->getUserData()));
     isfrompath = true;
+    itemtype = 1;
     //std::cout << curitm->itemtype << std::endl;
     //std::cout << curitm->forimgindex << std::endl;
     //std::cout << forimgvector.at(curitm->forimgindex)->ImagePath() << std::endl;
@@ -2307,7 +2336,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     }
     else // selection from path
     {
-        itemtype = 1;
+        //itemtype = 1;
         //itemtext = 
 	//tablelist->setCurrentItem(currentitem.forimgindex, 0, true);
 	//tablelist->selectRow(currentitem.forimgindex, true);
@@ -2413,90 +2442,94 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     {
         if(tablelist->getCurrentRow() > -1)
         {
-            this->getApp()->beginWaitCursor();
-            //currentitem.itemtype = 2;
-            fileitemvector.clear();
-            currentitem.forimg = curforimg;
-            currentitem.itemtext = std::string(itemtext.text());
             currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
-            FXString* filearray;
-            //filearray.clear();
-            FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
-            FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".*");
-            //std::cout << "file count: " << filecount << std::endl;
-            if(filecount == 0)
-                LoadDirectory(&currentitem, &fileitemvector);
-            else
-            {
-                //std::cout << "read from files list to populate fileitemvector here..." << std::endl;
-                for(int i=0; i < filecount; i++)
-                {
-                    FXFile filefile;
-                    filefile.open(tmppath + "burrow/" + filearray[i], FXIO::Reading, FXIO::OwnerReadWrite);
-                    char* filechar = new char[filefile.size() + 1];
-                    filefile.readBlock(filechar, filefile.size());
-                    filechar[filefile.size()] = 0;
-                    filefile.close();
-                    FXString filecontent = FXString(filechar);
-                    FileItem tmpitem;
-                    tmpitem.gid = GetFileItem(&filecontent, 0).toULong();
-                    tmpitem.isdeleted = GetFileItem(&filecontent, 1).toUInt();
-                    tmpitem.isdirectory = GetFileItem(&filecontent, 2).toUInt();
-                    tmpitem.size = GetFileItem(&filecontent, 3).toULong();
-                    tmpitem.name = GetFileItem(&filecontent, 4).text();
-                    tmpitem.path = GetFileItem(&filecontent, 5).text();
-                    tmpitem.create = GetFileItem(&filecontent, 6).text();
-                    tmpitem.access = GetFileItem(&filecontent, 7).text();
-                    tmpitem.modify = GetFileItem(&filecontent, 8).text();
-                    tmpitem.layout = GetFileItem(&filecontent, 9).text();
-                    //std::cout << "File item Values: " << std::endl;
-                    //std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
-                    //std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
-                    //std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
-                    fileitemvector.push_back(tmpitem);
-                }
-            }
-            // table initialization
-            tablelist->setTableSize(fileitemvector.size(), 14);
-            tablelist->setColumnText(0, "");
-            tablelist->setColumnText(1, "ID");
-            tablelist->setColumnText(2, "Name");
-            tablelist->setColumnText(3, "Path");
-            tablelist->setColumnText(4, "Size (bytes)");
-            tablelist->setColumnText(5, "Created (UTC)");
-            tablelist->setColumnText(6, "Accessed (UTC)");
-            tablelist->setColumnText(7, "Modified (UTC)");
-            tablelist->setColumnText(8, "Changed (UTC)");
-            tablelist->setColumnText(9, "Hash");
-            tablelist->setColumnText(10, "Category");
-            tablelist->setColumnText(11, "Signature");
-            tablelist->setColumnText(12, "Tagged");
-            tablelist->setColumnText(13, "Hash Match");
-	    SortFileTable(&fileitemvector, filefilestr, filecount, sortindex, sortasc);
-            // table formatting
-            tablelist->fitColumnsToContents(0);
-            tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
-            FitColumnContents(1);
-            FitColumnContents(2);
-            FitColumnContents(4);
-            AlignColumn(tablelist, 1, FXTableItem::LEFT);
-            AlignColumn(tablelist, 2, FXTableItem::LEFT);
-            AlignColumn(tablelist, 3, FXTableItem::LEFT);
-            AlignColumn(tablelist, 4, FXTableItem::LEFT);
-            AlignColumn(tablelist, 5, FXTableItem::LEFT);
-            AlignColumn(tablelist, 6, FXTableItem::LEFT);
-            AlignColumn(tablelist, 7, FXTableItem::LEFT);
-            if(sortindex == 1)
-                tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
-            // need to implement path toolbar here for the burrow and the partition and 
-            //std::cout << "need to load the root directory for the partition selected here." << std::endl;
-            this->getApp()->endWaitCursor();
         }
+        // THIS WILL BE THE PATH TO WHATEVER FOLDER FILE WE ARE IN AS I BUILD IT.
+        backbutton->setText("ROOT");
+        this->getApp()->beginWaitCursor();
+        //currentitem.itemtype = 2;
+        fileitemvector.clear();
+        currentitem.forimg = curforimg;
+        currentitem.itemtext = std::string(itemtext.text());
+        FXString* filearray;
+        //filearray.clear();
+        FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+        FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".*");
+        std::cout << "file count: " << filecount << std::endl;
+        if(filecount == 0)
+            LoadDirectory(&currentitem, &fileitemvector);
+        else
+        {
+            //std::cout << "read from files list to populate fileitemvector here..." << std::endl;
+            for(int i=0; i < filecount; i++)
+            {
+                FXFile filefile;
+                filefile.open(tmppath + "burrow/" + filearray[i], FXIO::Reading, FXIO::OwnerReadWrite);
+                char* filechar = new char[filefile.size() + 1];
+                filefile.readBlock(filechar, filefile.size());
+                filechar[filefile.size()] = 0;
+                filefile.close();
+                FXString filecontent = FXString(filechar);
+                FileItem tmpitem;
+                tmpitem.gid = GetFileItem(&filecontent, 0).toULong();
+                tmpitem.isdeleted = GetFileItem(&filecontent, 1).toUInt();
+                tmpitem.isdirectory = GetFileItem(&filecontent, 2).toUInt();
+                tmpitem.size = GetFileItem(&filecontent, 3).toULong();
+                tmpitem.name = GetFileItem(&filecontent, 4).text();
+                tmpitem.path = GetFileItem(&filecontent, 5).text();
+                tmpitem.create = GetFileItem(&filecontent, 6).text();
+                tmpitem.access = GetFileItem(&filecontent, 7).text();
+                tmpitem.modify = GetFileItem(&filecontent, 8).text();
+                tmpitem.layout = GetFileItem(&filecontent, 9).text();
+                //std::cout << "File item Values: " << std::endl;
+                //std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
+                //std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
+                //std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
+                fileitemvector.push_back(tmpitem);
+            }
+        }
+        // table initialization
+        tablelist->setTableSize(fileitemvector.size(), 14);
+        tablelist->setColumnText(0, "");
+        tablelist->setColumnText(1, "ID");
+        tablelist->setColumnText(2, "Name");
+        tablelist->setColumnText(3, "Path");
+        tablelist->setColumnText(4, "Size (bytes)");
+        tablelist->setColumnText(5, "Created (UTC)");
+        tablelist->setColumnText(6, "Accessed (UTC)");
+        tablelist->setColumnText(7, "Modified (UTC)");
+        tablelist->setColumnText(8, "Changed (UTC)");
+        tablelist->setColumnText(9, "Hash");
+        tablelist->setColumnText(10, "Category");
+        tablelist->setColumnText(11, "Signature");
+        tablelist->setColumnText(12, "Tagged");
+        tablelist->setColumnText(13, "Hash Match");
+        SortFileTable(&fileitemvector, filefilestr, filecount, sortindex, sortasc);
+        // table formatting
+        tablelist->fitColumnsToContents(0);
+        tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+        FitColumnContents(1);
+        FitColumnContents(2);
+        FitColumnContents(4);
+        AlignColumn(tablelist, 1, FXTableItem::LEFT);
+        AlignColumn(tablelist, 2, FXTableItem::LEFT);
+        AlignColumn(tablelist, 3, FXTableItem::LEFT);
+        AlignColumn(tablelist, 4, FXTableItem::LEFT);
+        AlignColumn(tablelist, 5, FXTableItem::LEFT);
+        AlignColumn(tablelist, 6, FXTableItem::LEFT);
+        AlignColumn(tablelist, 7, FXTableItem::LEFT);
+        if(sortindex == 1)
+            tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
+        // need to implement path toolbar here for the burrow and the partition and 
+        //std::cout << "need to load the root directory for the partition selected here." << std::endl;
+        this->getApp()->endWaitCursor();
+        //}
     }
     else if(itemtype == 3)
     {
         if(tablelist->getCurrentRow() > -1)
         {
+            //frwdbutton->setText("file name");
             this->getApp()->beginWaitCursor();
             // I CAN GET THE CURRENT LAYOUT AND VALUES..., THEN I CAN DETERMINE IF IT'S A DIRECTORY AND THEN PARSE OR DO SOMETHING
             // AS A FILE... could determine if it's a directory or not by opening it's file, which would also get us the layout and path and file name to make the new path | this might be a better option, since i know it's been written to a file and can access it

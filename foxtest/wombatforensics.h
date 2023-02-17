@@ -253,6 +253,8 @@ class WombatForensics : public FXMainWindow
 	FXString currentcarvetypes;
 	FXString prevevidpath;
         FXString itemtext;
+        FXString pathtext;
+        FXString filetext;
         FXString currentviewers;
         
         FXFile tagsfile;
@@ -352,6 +354,8 @@ class WombatForensics : public FXMainWindow
         long LoadForensicImages(FXObject*, FXSelector, void*);
         long LoadChildren(FXObject*, FXSelector, void*);
         long LoadCurrent(FXObject*, FXSelector, void*);
+        long LoadCurrentPath(FXObject*, FXSelector, void*);
+        long LoadCurrentFile(FXObject*, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
         long OpenViewerManager(FXObject*, FXSelector, void*);
@@ -436,6 +440,8 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HOME, WombatForensics::LoadForensicImages),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CURRENT, WombatForensics::LoadCurrent),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_BACK, WombatForensics::LoadCurrentPath),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_FRWD, WombatForensics::LoadCurrentFile),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_VIEWMANAGE, WombatForensics::OpenViewerManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MSGLOG, WombatForensics::OpenMessageLog),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_XCHOMP, WombatForensics::OpenXChomp),
