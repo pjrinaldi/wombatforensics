@@ -2467,8 +2467,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
                 pathtext += FXString(currentfileitem.name.c_str()) + "/";
             }
-
         }
+        std::cout << currentfileitem.name << " " << currentfileitem.gid << std::endl;
         // THIS WILL BE THE PATH TO WHATEVER FOLDER FILE WE ARE IN AS I BUILD IT.
         backbutton->setText(pathtext);
         //backbutton->setData("globalid"); - someway to load the right directory - maybe the curfileitem pointer...
@@ -2484,9 +2484,11 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             filecount = ReadDirectory(&currentitem, &fileitemvector, NULL);
         else
             filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+        std::cout << "fileitem.gid after readdirectory: " << currentfileitem.name << " " << currentfileitem.gid << std::endl;
         FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
         if(currentfileitem.gid > 0)
-            filefilestr + currentfileitem.gid + ".";
+            filefilestr += FXString::value(currentfileitem.gid) + ".";
+        std::cout << "filefilestr after readdirectory: " << filefilestr.text() << std::endl;
         // table initialization
         tablelist->setTableSize(fileitemvector.size(), 14);
         tablelist->setColumnText(0, "");

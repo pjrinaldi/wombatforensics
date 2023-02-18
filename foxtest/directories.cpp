@@ -105,7 +105,7 @@ int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, F
         if(filefilestr.compare(entry.path().stem()) == 0)
         {
             filearray.push_back(entry.path().string());
-            //std::cout << "child file match: " << entry.path().string() << std::endl;
+            std::cout << "child file match: " << entry.path().string() << std::endl;
         }
         //std::cout << entry.path().root_path() << " " << entry.path().stem() << " " << entry.path().extension() << std::endl;
         //std::cout << filefilestr << std::endl;
