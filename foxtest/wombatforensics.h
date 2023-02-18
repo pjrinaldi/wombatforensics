@@ -400,7 +400,7 @@ class WombatForensics : public FXMainWindow
         void AlignColumn(FXTable* curtable, int row, FXuint justify);
         void FitColumnContents(int col);
         FXString GetSettings(int setting);
-        FXString GetFileItem(FXString* filecontents, int item);
+        //FXString GetFileItem(FXString* filecontents, int item);
 	void SaveCurrentCase(void);
         void CloseCurrentCase(void);
         void EnableCaseButtons(void);

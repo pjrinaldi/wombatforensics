@@ -312,6 +312,7 @@ FXString WombatForensics::GetSettings(int setting)
         return "";
 }
 
+/*
 FXString WombatForensics::GetFileItem(FXString* filecontents, int item)
 {
     FXArray<FXint> posarray;
@@ -330,6 +331,7 @@ FXString WombatForensics::GetFileItem(FXString* filecontents, int item)
     else
         return "";
 }
+*/
 
 long WombatForensics::NewCase(FXObject*, FXSelector, void*)
 {
@@ -2464,11 +2466,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         else
             ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
         // NEED TO MOVE THIS CODE TO A REPEATABLE FUNCTION, MAYBE ReadDirectory()
+        FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+        if(currentfileitem.gid > 0)
+            filefilestr + currentfileitem.gid + ".";
         /*
-         */
         FXString* filearray;
         //filearray.clear();
-        FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
         if(currentfileitem.gid == 0)
             std::cout << "root directory" << std::endl;
         else
@@ -2512,7 +2515,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 fileitemvector.push_back(tmpitem);
             }
         }
-        /*
         */
 
         // table initialization
@@ -2531,7 +2533,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         tablelist->setColumnText(11, "Signature");
         tablelist->setColumnText(12, "Tagged");
         tablelist->setColumnText(13, "Hash Match");
-        SortFileTable(&fileitemvector, filefilestr, filecount, sortindex, sortasc);
+        SortFileTable(&fileitemvector, filefilestr, fileitemvector.size(), sortindex, sortasc);
         // table formatting
         tablelist->fitColumnsToContents(0);
         tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);

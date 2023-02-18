@@ -33,10 +33,67 @@ std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime)
     
     return humanstring;
 }
+/*
+FXString WombatForensics::GetFileItem(FXString* filecontents, int item)
+{
+    FXArray<FXint> posarray;
+    posarray.clear();
+    int found = 0;
+    posarray.append(-1);
+    while(found > -1)
+    {
+        found = filecontents->find("|", found+1);
+        if(found > -1)
+            posarray.append(found);
+    }
+    posarray.append(filecontents->length());
+    if(item < posarray.no())
+        return filecontents->mid(posarray.at(item)+1, posarray.at(item+1) - posarray.at(item) - 1);
+    else
+        return "";
+}
+*/ 
+
+std::string GetFileItem(std::string* filecontents, int item)
+{
+    std::vector<std::string> contentlist;
+    contentlist.clear();
+    std::istringstream contents(*filecontents);
+    std::string itemcontent;
+    while(getline(contents, itemcontent, '|'))
+        contentlist.push_back(itemcontent);
+    if(item < contentlist.size())
+        return contentlist.at(item);
+    else
+        return "";
+    
+    /*
+    std::istringstream input("abc|def|gh");
+    std::vector<std::array<char, 4>> v;
+ 
+    // note: the following loop terminates when std::ios_base::operator bool()
+    // on the stream returned from getline() returns false
+    for (std::array<char, 4> a; input.getline(&a[0], 4, '|'); ) {
+        v.push_back(a);
+    }
+ 
+    for (auto& a : v) {
+        std::cout << &a[0] << '\n';
+    }
+
+    std::vector<std::string> dirlayoutlist;
+    dirlayoutlist.clear();
+    std::istringstream rdll(curfat->curdirlayout);
+    std::string rdls;
+    while(getline(rdll, rdls, ';'))
+	dirlayoutlist.push_back(rdls);
+    */
+}
 
 void ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
-    //FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+    std::vector<std::string> filearray;
+    filearray.clear();
     std::string pathstr = currentitem->tmppath + "burrow/";
     std::string filefilestr = currentitem->forimg->ImageFileName() + "." + std::to_string(currentitem->voloffset);
     if(curfileitem != NULL)
@@ -45,11 +102,51 @@ void ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
     for (const auto & entry : std::filesystem::directory_iterator(pathstr))
     {
         if(filefilestr.compare(entry.path().stem()) == 0)
-            std::cout << "child file match: " << entry.path().string() << std::endl;
+        {
+            filearray.push_back(entry.path().string());
+            //std::cout << "child file match: " << entry.path().string() << std::endl;
+        }
         //std::cout << entry.path().root_path() << " " << entry.path().stem() << " " << entry.path().extension() << std::endl;
         //std::cout << filefilestr << std::endl;
     }
-
+    if(filearray.size() == 0)
+    {
+        if(curfileitem == NULL)
+            LoadDirectory(currentitem, filevector, NULL);
+        else
+            LoadDirectory(currentitem, filevector, curfileitem);
+    }
+    else
+    {
+        for(int i=0; i < filearray.size(); i++)
+        {
+            //std::cout << "filestr " << i << ": " << filearray.at(i) << std::endl;
+            std::ifstream filestream;
+            filestream.open(std::string(filearray.at(i)).c_str(), std::ios::in | std::ios::ate);
+            auto readsize = filestream.tellg();
+            std::string filecontent(readsize, '\0');
+            filestream.seekg(0);
+            filestream.read(&filecontent[0], readsize);
+            filestream.close();
+            FileItem tmpitem;
+            tmpitem.gid = std::stoull(GetFileItem(&filecontent, 0).c_str());
+            tmpitem.isdeleted = std::stoi(GetFileItem(&filecontent, 1).c_str());
+            tmpitem.isdirectory = std::stoi(GetFileItem(&filecontent, 2).c_str());
+            tmpitem.size = std::stoull(GetFileItem(&filecontent, 3).c_str());
+            tmpitem.name = GetFileItem(&filecontent, 4);
+            tmpitem.path = GetFileItem(&filecontent, 5);
+            tmpitem.create = GetFileItem(&filecontent, 6);
+            tmpitem.access = GetFileItem(&filecontent, 7);
+            tmpitem.modify = GetFileItem(&filecontent, 8);
+            tmpitem.layout = GetFileItem(&filecontent, 9);
+            //std::cout << "File item Values: " << std::endl;
+            //std::cout << "filecontent:" << filecontent << std::endl;
+            //std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
+            //std::cout << tmpitem.size << " " << tmpitem.name << std::endl;
+            //std::cout << tmpitem.create << " " << tmpitem.access << " " << tmpitem.modify << std::endl;
+            filevector->push_back(tmpitem);
+        }
+    }
 }
 
 //void LoadDirectory(CurrentItem* currentitem)
