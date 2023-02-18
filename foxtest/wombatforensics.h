@@ -256,6 +256,7 @@ class WombatForensics : public FXMainWindow
         FXString pathtext;
         FXString filetext;
         FXString currentviewers;
+        FXString pname;
         
         FXFile tagsfile;
         FXFile logfile;

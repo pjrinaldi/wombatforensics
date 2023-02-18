@@ -111,12 +111,16 @@ int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, F
         //std::cout << filefilestr << std::endl;
     }
     filecount = filearray.size();
+    //std::cout << "filecount: " << filecount << std::endl;
     if(filearray.size() == 0)
     {
         if(curfileitem == NULL)
             LoadDirectory(currentitem, filevector, NULL);
         else
+        {
+            //std::cout << "load sub dir..." << std::endl;
             LoadDirectory(currentitem, filevector, curfileitem);
+        }
     }
     else
     {
@@ -521,6 +525,8 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
 //void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, uint64_t curinode)
 void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
+    //if(curfileitem != NULL)
+    //    std::cout << "curfileitem name: " << curfileitem->name << std::endl;
     // BYTES PER SECTOR
     uint16_t bytespersector = 0;
     ReadForImgContent(currentitem->forimg, &bytespersector, currentitem->voloffset + 11);
@@ -569,6 +575,7 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
         {
             curdirlayout = curfileitem->layout;
         }
+        //std::cout << "cur dir layout: " << curdirlayout << std::endl;
         std::vector<std::string> dirlayoutlist;
         dirlayoutlist.clear();
         std::istringstream dirlayoutstream(curdirlayout);
