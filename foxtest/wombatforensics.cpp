@@ -195,7 +195,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     prevevidpath = "";
     curforimg = NULL;
     itemtext = "";
-    pathtext = "";
+    pathtext = "/";
     filetext = "";
     homepath = FXString(getenv("HOME")) + "/";
     configpath = homepath + ".wombatforensics/";
@@ -2449,11 +2449,32 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     {
         if(tablelist->getCurrentRow() > -1)
         {
+            currentitem.voloffset = *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4));
             // this is wrong.
-            currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
+            //currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
+            
+            if(fileitemvector.size() > 0)
+            {
+                currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+                pathtext += FXString(currentfileitem.name.c_str()) + "/";
+            }
+
+            std::cout << "file item vector size: " << fileitemvector.size() << std::endl;
+            /*
+            currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+            if(currentfileitem.isdirectory)
+            {
+                std::cout << "this should never occur under new functionality..." << std::endl;
+                std::cout << "yup, this never occurs..." << std::endl;
+                //currentitem.itemtype = 2;
+                //itemtype = 2;
+                std::cout << "it's a directory, do the load/read from file here..." << std::endl;
+                int filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+            */
+
         }
         // THIS WILL BE THE PATH TO WHATEVER FOLDER FILE WE ARE IN AS I BUILD IT.
-        backbutton->setText("/");
+        backbutton->setText(pathtext);
         //backbutton->setData("globalid"); - someway to load the right directory - maybe the curfileitem pointer...
         // will worry about this later...
         this->getApp()->beginWaitCursor();
@@ -2531,6 +2552,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             if(currentfileitem.isdirectory)
             {
                 std::cout << "this should never occur under new functionality..." << std::endl;
+                std::cout << "yup, this never occurs..." << std::endl;
                 //currentitem.itemtype = 2;
                 //itemtype = 2;
                 std::cout << "it's a directory, do the load/read from file here..." << std::endl;
