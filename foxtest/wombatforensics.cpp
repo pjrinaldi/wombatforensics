@@ -2607,7 +2607,7 @@ long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
 
 void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex, int asc)
 {
-    //std::cout << "filestr to create file/dir table entries:" << filestr.text() << std::endl;
+    std::cout << "filestr to create file/dir table entries:" << filestr.text() << std::endl;
     std::vector<std::string> namelist;
     //std::cout << "file item count: " << filecount << " fileitems.size: " << fileitems->size() << std::endl;
     if(itemindex == 0) // is checked
