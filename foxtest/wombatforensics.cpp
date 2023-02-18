@@ -2350,7 +2350,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     //currentitem.forimg = forimgvector.at(currentitem.forimgindex);
     isfrompath = false;
     //std::cout << "item text: " << itemtext.text() << std::endl;
-    if(itemtype == 1 && curforimg != NULL && !itemtext.empty())
+    if(itemtype == 1 && curforimg != NULL && !itemtext.empty()) // LOAD PARTITIONS
     {
 	//currentitem.itemtype = 1;
 	//currentitem.forimgindex = tablelist->getCurrentRow();
@@ -2443,14 +2443,14 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 
         this->getApp()->endWaitCursor();
     }
-    else if(itemtype == 2)
+    else if(itemtype == 2) // LOAD CURRENT DIRECTORY
     {
         if(tablelist->getCurrentRow() > -1)
         {
             currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
         }
         // THIS WILL BE THE PATH TO WHATEVER FOLDER FILE WE ARE IN AS I BUILD IT.
-        backbutton->setText("ROOT");
+        backbutton->setText("/");
         this->getApp()->beginWaitCursor();
         //currentitem.itemtype = 2;
         fileitemvector.clear();
@@ -2460,7 +2460,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         //filearray.clear();
         FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
         FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".*");
-        std::cout << "file count: " << filecount << std::endl;
+        //std::cout << "file count: " << filecount << std::endl;
         if(filecount == 0)
             LoadDirectory(&currentitem, &fileitemvector);
         else
@@ -2530,7 +2530,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         this->getApp()->endWaitCursor();
         //}
     }
-    else if(itemtype == 3)
+    else if(itemtype == 3) // LOAD FILE CHILDREN ??? OR IMPLEMENT FUNCTIONALITY WHEN 
     {
         if(tablelist->getCurrentRow() > -1)
         {
@@ -2539,11 +2539,17 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             // I CAN GET THE CURRENT LAYOUT AND VALUES..., THEN I CAN DETERMINE IF IT'S A DIRECTORY AND THEN PARSE OR DO SOMETHING
             // AS A FILE... could determine if it's a directory or not by opening it's file, which would also get us the layout and path and file name to make the new path | this might be a better option, since i know it's been written to a file and can access it
             std::cout << "forimg file name: " << curforimg->ImageFileName() << std::endl;
-            std::cout << "cur global id: " << tablelist->getItemText(tablelist->getCurrentRow(), 1).toULong() << std::endl;
+            std::cout << "curitem.inode = cur global id: " << tablelist->getItemText(tablelist->getCurrentRow(), 1).toULong() << std::endl;
             std::string curlayout = (*((FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 3))).text();
-            std::cout << "vol offset: " << *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4)) << std::endl;
+            std::cout << "curitem.voloffset = vol offset: " << *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4)) << std::endl;
+            std::cout << "curitem.itempath = cur path: " << tablelist->getItemText(tablelist->getCurrentRow(), 3).text() << std::endl;
+            //std::cout << "curitem.forimg: " << curforimg << std::endl;
+            std::cout << "curitem.itemtext: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
             //itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
             std::cout << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << " cur layout: " << curlayout << std::endl;
+            //std::cout << "icon class name: " << tablelist->getItemIcon(tablelist->getCurrentRow(), 2)->getClassName() << std::endl;
+            //how to determine if it's a directory???, can read file content or get the fileitemvector
+            std::cout << "is dir: " << fileitemvector.at(tablelist->getCurrentRow()).isdirectory << std::endl;
             this->getApp()->endWaitCursor();
         }
     }

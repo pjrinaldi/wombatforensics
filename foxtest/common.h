@@ -21,6 +21,7 @@ struct CurrentItem
     ForImg* forimg = NULL;
     uint64_t voloffset = 0;
     std::string itemtext = "";
+    std::string itempath = "/";
 };
 
 struct FileItem
