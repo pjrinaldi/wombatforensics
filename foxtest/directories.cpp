@@ -90,8 +90,9 @@ std::string GetFileItem(std::string* filecontents, int item)
     */
 }
 
-void ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
+int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
+    int filecount = 0;
     std::vector<std::string> filearray;
     filearray.clear();
     std::string pathstr = currentitem->tmppath + "burrow/";
@@ -109,6 +110,7 @@ void ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
         //std::cout << entry.path().root_path() << " " << entry.path().stem() << " " << entry.path().extension() << std::endl;
         //std::cout << filefilestr << std::endl;
     }
+    filecount = filearray.size();
     if(filearray.size() == 0)
     {
         if(curfileitem == NULL)
@@ -147,6 +149,7 @@ void ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
             filevector->push_back(tmpitem);
         }
     }
+    return filecount;
 }
 
 //void LoadDirectory(CurrentItem* currentitem)
@@ -553,81 +556,37 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
         // DIRECTORY SIZE
         uint64_t dirsize = rootdirmaxfiles * 32 + bytespersector - 1;
         //std::cout << "dir size: " << dirsize << std::endl;
+        std::string curdirlayout = "";
         // ROOT DIRECTORY LAYOUT
         std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
         //std::cout << "root dir layout: " << rootdirlayout << std::endl;
         //if(curinode == 0) // root directory
         if(curfileitem == NULL) // root directory
         {
-            // SET dirsize, dirlayout here, the rest should be the same...
-            // then the CODE DOESN"T REPEAT
-            /*
-            uint8_t isrootdir = 0;
-            // NEED TO DETERMINE IF IT'S ROOT DIRECTORY OR NOT AND HANDLE ACCORDINGLY
-            if(curfat->curdirlayout.compare(curfat->rootdirlayout) == 0)
+            curdirlayout = rootdirlayout;
+        }
+        else // sub directory
+        {
+            curdirlayout = curfileitem->layout;
+        }
+        std::vector<std::string> dirlayoutlist;
+        dirlayoutlist.clear();
+        std::istringstream dirlayoutstream(curdirlayout);
+        std::string curlayout;
+        while(getline(dirlayoutstream, curlayout, ';'))
+            dirlayoutlist.push_back(curlayout);
+        for(int k=0; k < dirlayoutlist.size(); k++)
+        {
+            diroffset = 0;
+            dirsize = 0;
+            std::size_t layoutsplit = dirlayoutlist.at(k).find(",");
+            diroffset = std::stoull(dirlayoutlist.at(k).substr(0, layoutsplit));
+            dirsize = std::stoull(dirlayoutlist.at(k).substr(layoutsplit+1));
+            if(k == 0 && curfileitem != NULL) // first dirlayout entry and not root directory
             {
-                isrootdir = 1;
-                //std::cout << "root dir layout matches curdirlayout" << std::endl;
+                diroffset = diroffset + 64; // skip . and .. directories
+                dirsize = dirsize - 64; // adjust read size for the 64 byte skip
             }
-            else
-            {
-                isrootdir = 0;
-                //std::cout << "curdirlayout is not rootdirlayout" << std::endl;
-            }
-
-            //std::cout << "child path to find: " << childpath << std::endl;
-            // GET THE DIRECTORY CONTENT OFFSETS/LENGTHS AND THEN LOOP OVER THEM
-            std::vector<std::string> dirlayoutlist;
-            dirlayoutlist.clear();
-            std::istringstream rdll(curfat->curdirlayout);
-            std::string rdls;
-            while(getline(rdll, rdls, ';'))
-                dirlayoutlist.push_back(rdls);
-            for(int i=0; i < dirlayoutlist.size(); i++)
-            {
-                uint64_t diroffset = 0;
-                uint64_t dirlength = 0;
-                std::size_t layoutsplit = dirlayoutlist.at(i).find(",");
-                if(i == 0)
-                {
-                    diroffset = std::stoull(dirlayoutlist.at(i).substr(0, layoutsplit));
-                    dirlength = std::stoull(dirlayoutlist.at(i).substr(layoutsplit+1));
-                    if(isrootdir == 0) // sub directory
-                    {
-                        diroffset = diroffset + 64; // skip . and .. directories
-                        dirlength = dirlength - 64; // adjust read size for the 64 byte skip
-                    }
-                }
-             */ 
-
-            /*
-            uint16_t hiclusternum = 0;
-            ReadContent(rawcontent, hcn, diroffset + j*32 + 20, 2); // always zero for fat12/16
-            ReturnUint16(&hiclusternum, hcn);
-            delete[] hcn;
-            uint8_t* lcn = new uint8_t[2];
-            uint16_t loclusternum = 0;
-            ReadContent(rawcontent, lcn, diroffset + j*32 + 26, 2);
-            ReturnUint16(&loclusternum, lcn);
-            delete[] lcn;
-            uint32_t clusternum = ((uint32_t)hiclusternum >> 16) + loclusternum;
-            std::vector<uint32_t> clusterlist;
-            clusterlist.clear();
-            //std::cout << "first cluster: " << clusternum << std::endl;
-            if(clusternum >= 2)
-            {
-                clusterlist.push_back(clusternum);
-                GetNextCluster(rawcontent, clusternum, curfat, &clusterlist);
-            }
-            std::string layout = "";
-            if(clusterlist.size() > 0)
-            {
-                layout = ConvertClustersToExtents(&clusterlist, curfat);
-            }
-            clusterlist.clear();
-            //std::cout << "layout: " << layout << std::endl;
-            return layout;
-             */ 
             uint direntrycount = dirsize / 32;
             //std::cout << "dir entry count: " << direntrycount << std::endl;
 	    // PARSE DIRECTORY ENTRIES
@@ -783,9 +742,6 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                     }
                 }
             }
-        }
-        else // NOT ROOT DIRECTORY
-        {
         }
     }
     else // FAT32, EXFAT

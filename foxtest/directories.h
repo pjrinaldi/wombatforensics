@@ -15,7 +15,7 @@
 
 std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime);
 std::string GetFileItem(std::vector<std::string>*, int item);
-void ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
+int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
 void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
 //void LoadFatDirectory(CurrentItem* currentitem, uint64_t curinode);
 void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
