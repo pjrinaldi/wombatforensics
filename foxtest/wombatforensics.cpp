@@ -155,7 +155,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     curbutton->setTipText("Current Partition");
     // PATH TOOLBAR BACK ICON
     backicon = new FXPNGIcon(this->getApp(), folderpath);
-    backbutton = new FXButton(pathtoolbar, "FOLDER", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
+    backbutton = new FXButton(pathtoolbar, "/", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     backbutton->setIconPosition(ICON_BEFORE_TEXT);
     backbutton->setTipText("Current Folder");
     // PATH TOOLBAR FORWARD ICON
@@ -2451,18 +2451,37 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         }
         // THIS WILL BE THE PATH TO WHATEVER FOLDER FILE WE ARE IN AS I BUILD IT.
         backbutton->setText("/");
+        //backbutton->setData("globalid"); - someway to load the right directory - maybe the curfileitem pointer...
+        // will worry about this later...
         this->getApp()->beginWaitCursor();
         //currentitem.itemtype = 2;
         fileitemvector.clear();
         currentitem.forimg = curforimg;
+        currentitem.tmppath = tmppath.text();
         currentitem.itemtext = std::string(itemtext.text());
+        if(currentfileitem.gid == 0)
+            ReadDirectory(&currentitem, &fileitemvector, NULL);
+        else
+            ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+        // NEED TO MOVE THIS CODE TO A REPEATABLE FUNCTION, MAYBE ReadDirectory()
+        /*
+         */
         FXString* filearray;
         //filearray.clear();
         FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+        if(currentfileitem.gid == 0)
+            std::cout << "root directory" << std::endl;
+        else
+            std::cout << FXString(filefilestr + currentfileitem.gid + ".").text() << std::endl;
         FXint filecount = FXDir::listFiles(filearray, tmppath + "burrow/", FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".*");
         //std::cout << "file count: " << filecount << std::endl;
         if(filecount == 0)
-            LoadDirectory(&currentitem, &fileitemvector);
+        {
+            if(currentfileitem.gid == 0)
+                LoadDirectory(&currentitem, &fileitemvector, NULL);
+            else
+                LoadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+        }
         else
         {
             //std::cout << "read from files list to populate fileitemvector here..." << std::endl;
@@ -2493,6 +2512,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 fileitemvector.push_back(tmpitem);
             }
         }
+        /*
+        */
+
         // table initialization
         tablelist->setTableSize(fileitemvector.size(), 14);
         tablelist->setColumnText(0, "");
@@ -2528,7 +2550,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         // need to implement path toolbar here for the burrow and the partition and 
         //std::cout << "need to load the root directory for the partition selected here." << std::endl;
         this->getApp()->endWaitCursor();
-        //}
     }
     else if(itemtype == 3) // LOAD FILE CHILDREN ??? OR IMPLEMENT FUNCTIONALITY WHEN 
     {
@@ -2538,8 +2559,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             this->getApp()->beginWaitCursor();
             // I CAN GET THE CURRENT LAYOUT AND VALUES..., THEN I CAN DETERMINE IF IT'S A DIRECTORY AND THEN PARSE OR DO SOMETHING
             // AS A FILE... could determine if it's a directory or not by opening it's file, which would also get us the layout and path and file name to make the new path | this might be a better option, since i know it's been written to a file and can access it
-            std::cout << "forimg file name: " << curforimg->ImageFileName() << std::endl;
-            std::cout << "curitem.inode = cur global id: " << tablelist->getItemText(tablelist->getCurrentRow(), 1).toULong() << std::endl;
+            //std::cout << "forimg file name: " << curforimg->ImageFileName() << std::endl;
+            //std::cout << "curitem.inode = cur global id: " << tablelist->getItemText(tablelist->getCurrentRow(), 1).toULong() << std::endl;
             std::string curlayout = (*((FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 3))).text();
             std::cout << "curitem.voloffset = vol offset: " << *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4)) << std::endl;
             std::cout << "curitem.itempath = cur path: " << tablelist->getItemText(tablelist->getCurrentRow(), 3).text() << std::endl;
@@ -2550,6 +2571,15 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             //std::cout << "icon class name: " << tablelist->getItemIcon(tablelist->getCurrentRow(), 2)->getClassName() << std::endl;
             //how to determine if it's a directory???, can read file content or get the fileitemvector
             std::cout << "is dir: " << fileitemvector.at(tablelist->getCurrentRow()).isdirectory << std::endl;
+            //FileItem curfileitem = fileitemvector.at(tablelist->getCurrentRow());
+            currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+            if(currentfileitem.isdirectory)
+            {
+                std::cout << "it's a directory, do the load/read from file here..." << std::endl;
+                ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+            }
+            else
+                std::cout << "launch internal/external viewer for files here..." << std::endl;
             this->getApp()->endWaitCursor();
         }
     }

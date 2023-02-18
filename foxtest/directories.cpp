@@ -34,8 +34,26 @@ std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime)
     return humanstring;
 }
 
+void ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
+{
+    //FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+    std::string pathstr = currentitem->tmppath + "burrow/";
+    std::string filefilestr = currentitem->forimg->ImageFileName() + "." + std::to_string(currentitem->voloffset);
+    if(curfileitem != NULL)
+        filefilestr += "." + std::to_string(curfileitem->gid);
+    std::cout << "file file string to match: " << filefilestr << std::endl;
+    for (const auto & entry : std::filesystem::directory_iterator(pathstr))
+    {
+        if(filefilestr.compare(entry.path().stem()) == 0)
+            std::cout << "child file match: " << entry.path().string() << std::endl;
+        //std::cout << entry.path().root_path() << " " << entry.path().stem() << " " << entry.path().extension() << std::endl;
+        //std::cout << filefilestr << std::endl;
+    }
+
+}
+
 //void LoadDirectory(CurrentItem* currentitem)
-void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector)
+void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
     //std::cout << "currentitem text: " << currentitem->itemtext << std::endl;
     //std::cout << "currentitem voloffset: " << currentitem->voloffset << std::endl;
@@ -211,11 +229,13 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector)
             curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
             if(strcmp(fattype, "FAT12") == 0)
             {
-                LoadFatDirectory(currentitem, filevector, 0);
+                //LoadFatDirectory(currentitem, filevector, 0);
+                LoadFatDirectory(currentitem, filevector, curfileitem);
             }
             else if(strcmp(fattype, "FAT16") == 0)
             {
-                LoadFatDirectory(currentitem, filevector, 0);
+                //LoadFatDirectory(currentitem, filevector, 0);
+                LoadFatDirectory(currentitem, filevector, curfileitem);
             }
             else
             {
@@ -398,7 +418,8 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector)
     //return partitionname;
 }
 
-void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, uint64_t curinode)
+//void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, uint64_t curinode)
+void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
     // BYTES PER SECTOR
     uint16_t bytespersector = 0;
@@ -438,8 +459,11 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
         // ROOT DIRECTORY LAYOUT
         std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
         //std::cout << "root dir layout: " << rootdirlayout << std::endl;
-        if(curinode == 0) // root directory
+        //if(curinode == 0) // root directory
+        if(curfileitem == NULL) // root directory
         {
+            // SET dirsize, dirlayout here, the rest should be the same...
+            // then the CODE DOESN"T REPEAT
             uint direntrycount = dirsize / 32;
             //std::cout << "dir entry count: " << direntrycount << std::endl;
 	    // PARSE DIRECTORY ENTRIES

@@ -278,6 +278,7 @@ class WombatForensics : public FXMainWindow
         uint64_t lastid;
 
 	CurrentItem currentitem;
+        FileItem currentfileitem;
         
         int sortindex = 1;
         uint sortasc = 1;

@@ -14,9 +14,10 @@
 #include "forensicimage.h"
 
 std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime);
-//void LoadDirectory(CurrentItem* currentitem);
-void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector);
+void ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
+void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
 //void LoadFatDirectory(CurrentItem* currentitem, uint64_t curinode);
-void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, uint64_t curinode);
+void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
+//void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, uint64_t curinode);
 
 #endif
