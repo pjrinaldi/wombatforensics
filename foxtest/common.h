@@ -22,7 +22,6 @@ struct CurrentItem
     uint64_t voloffset = 0;
     std::string itemtext = "";
     std::string tmppath = "";
-    //std::string itempath = "/";
 };
 
 struct FileItem

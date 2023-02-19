@@ -130,19 +130,6 @@ long CheckTableItem::onCheck(FXObject *, FXSelector, void *vp)
     return 1;
 }
 
-/*
-// MAY NEED A STRUCTURE THAT CONTAINS ITEM TYPE, CURFORIMG INDEX, PARENTID, CHILDID OR SOME SUCH
-struct CurrentItem
-{
-    int itemtype = 0;
-    int forimgindex = 0;
-    int parentindex = 0;
-    int childindex = 0;
-    int currentindex = 0;
-    std::string itemtext = "";
-};
-*/
-
 class WombatForensics : public FXMainWindow
 {
     FXDECLARE(WombatForensics)

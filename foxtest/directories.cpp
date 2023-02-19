@@ -114,7 +114,6 @@ int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, F
     return filecount;
 }
 
-//void LoadDirectory(CurrentItem* currentitem)
 void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
     //std::cout << "currentitem text: " << currentitem->itemtext << std::endl;
@@ -285,18 +284,15 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
         }
         else
         {
-	    //curinode = ParseFatDirectory(curimg, curstartsector, ptreecnt, 0, "", "");
 	    //curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
             char* pname = new char[12];
             curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
             if(strcmp(fattype, "FAT12") == 0)
             {
-                //LoadFatDirectory(currentitem, filevector, 0);
                 LoadFatDirectory(currentitem, filevector, curfileitem);
             }
             else if(strcmp(fattype, "FAT16") == 0)
             {
-                //LoadFatDirectory(currentitem, filevector, 0);
                 LoadFatDirectory(currentitem, filevector, curfileitem);
             }
             else
@@ -480,7 +476,6 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
     //return partitionname;
 }
 
-//void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, uint64_t curinode)
 void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
     //if(curfileitem != NULL)

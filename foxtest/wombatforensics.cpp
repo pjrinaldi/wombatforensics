@@ -2286,7 +2286,6 @@ long WombatForensics::LoadCurrentPath(FXObject* sender, FXSelector, void*)
         //std::cout << "item text: " << itemtext.text() << std::endl;
         isfrompath = true;
         itemtype = 2;
-        //std::cout << "curvol offset: " << currentitem.voloffset << std::endl;
         long ret = LoadChildren(NULL, 0, NULL);
     }
 
@@ -2309,14 +2308,9 @@ long WombatForensics::LoadCurrent(FXObject* sender, FXSelector, void*)
 {
     itemtext = ((FXButton*)sender)->getText();
     //std::cout << "item text: " << itemtext.text() << std::endl;
-    //currentitem = *((CurrentItem*)(((FXButton*)sender)->getUserData()));
     isfrompath = true;
     itemtype = 1;
     fileitemvector.clear();
-    //std::cout << curitm->itemtype << std::endl;
-    //std::cout << curitm->forimgindex << std::endl;
-    //std::cout << forimgvector.at(curitm->forimgindex)->ImagePath() << std::endl;
-    //sender->handle(this, shown()?FXSEL(SEL_
     long ret = LoadChildren(NULL, 0, NULL);
 
     return 1;
@@ -2324,28 +2318,13 @@ long WombatForensics::LoadCurrent(FXObject* sender, FXSelector, void*)
 
 long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 {
-    // MIGHT WANT TO MOVE THE ACTUAL LOADING OF CONTENT TO ANOTHER FUNCTION, SO I CAN GET THE CONTENT
-    // POPULATED EITHER THROUGH THE TABLE OR THE PATH BUTTONS
-    //std::cout << *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1)) << std::endl;
-
-    // NEED TO FIX THIS, SO BOTH THE BUTTON AND THE TABLE STORE THE SAME INFORMATION
-    //FXString itemtext = "";
     if(!isfrompath) // selection from table
     {
         if(tablelist->getCurrentRow() > -1)
         {
-            //currentitem.itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
-            //currentitem.forimgindex = tablelist->getCurrentRow();
-            //currentitem.itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2).text();
-            //curforimg = forimgvector.at(currentitem.forimgindex);
             itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
             curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
             //std::cout << "itemtype on double click: " << itemtype << std::endl;;
-            // THIS IS CORRECT FOR PARTITION, BUT WRONG FOR SUB DIRECTORY
-            //if(itemtype > 1)
-            //    itemtext = *((FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0));
-            //itemtext = tablelist->getItemText(tablelist->getCurrentRow(), 2).text();
-            //currentitem.voloffset = voloffsets.at(tablelist->getCurrentRow());
         }
     }
     else // selection from path
@@ -2356,20 +2335,11 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	//tablelist->selectRow(currentitem.forimgindex, true);
     }
     //curforimg = forimgvector.at(currentitem.forimgindex);
-    //currentitem.forimg = forimgvector.at(currentitem.forimgindex);
     isfrompath = false;
     //std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1 && curforimg != NULL) // LOAD PARTITIONS
     {
-	//currentitem.itemtype = 1;
-	//currentitem.forimgindex = tablelist->getCurrentRow();
-        //currentitem.forimg = curforimg;
-	//currentitem.parentindex = 0;
-	//currentitem.childindex = 0;
-	//currentitem.currentindex = 0;
         curbutton->setText(FXString(curforimg->ImageFileName().c_str()));
-	//curbutton->setText(FXString(currentitem.itemtext.c_str()));
-	//curbutton->setUserData(&currentitem);
 	//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
 	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
         currentfileitem.clear();
@@ -2423,16 +2393,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 //std::cout << "global id when not existing fs opened: " << globalid << std::endl;
             }
             itemtype = 2;
-            //currentitem.itemtype = 2;
-            //currentitem.forimg = curforimg;
-            //currentitem.forimgindex = tablelist->getCurrentRow();
-            //currentitem.itemtext = volnames.at(i);
             pname = FXString(volnames.at(i).c_str());
             //std::cout << "pname: " << pname.text() << std::endl;
-            //currentitem.itemtext = volnames.at(i);
-            //currentitem.itemtext = pname.text();
             tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-            //tablelist->setItemData(i, 1, &currentitem);
             tablelist->setItemData(i, 1, &itemtype);
             tablelist->setItemText(i, 1, FXString::value(globalid));
             globalid = curid;
@@ -2443,7 +2406,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
             tablelist->setItemData(i, 4, &(voloffsets.at(i)));
             tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
-            //currentitem.voloffset = voloffsets.at(i);
             //std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
         }
         // table formatting
@@ -2466,7 +2428,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             currentitem.voloffset = *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4));
             FXString* tmpstr = (FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0);
             currentitem.itemtext = std::string(tmpstr->text());
-            //currentitem.itemtext = *((FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0))->text();
             
             if(fileitemvector.size() > 0)
             {
@@ -2483,11 +2444,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         //backbutton->setData("globalid"); - someway to load the right directory - maybe the curfileitem pointer...
         // will worry about this later...
         this->getApp()->beginWaitCursor();
-        //currentitem.itemtype = 2;
         fileitemvector.clear();
         currentitem.forimg = curforimg;
         currentitem.tmppath = tmppath.text();
-        //currentitem.itemtext = std::string(itemtext.text());
         int filecount = 0;
         if(currentfileitem.gid == 0)
             filecount = ReadDirectory(&currentitem, &fileitemvector, NULL);
@@ -2556,19 +2515,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             //std::cout << "is dir: " << fileitemvector.at(tablelist->getCurrentRow()).isdirectory << std::endl;
             //FileItem curfileitem = fileitemvector.at(tablelist->getCurrentRow());
             currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-            /*
-            if(currentfileitem.isdirectory)
-            {
-                std::cout << "this should never occur under new functionality..." << std::endl;
-                std::cout << "yup, this never occurs..." << std::endl;
-                //currentitem.itemtype = 2;
-                //itemtype = 2;
-                std::cout << "it's a directory, do the load/read from file here..." << std::endl;
-                int filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
-            }
-            else
-                std::cout << "launch internal/external viewer for files here..." << std::endl;
-            */
             if(!currentfileitem.isdirectory)
                 std::cout << "launch internal/external viewer for files here..." << std::endl;
             this->getApp()->endWaitCursor();
@@ -2672,12 +2618,10 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         if(asc == 1)
         {
             tableheader->setArrowDir(1, 1);
-            //tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_UP);
         }
         else if(asc == 2)
         {
             tableheader->setArrowDir(1, 2);
-            //tablelist->getColumnHeader()->setArrowDir(1, FXHeaderItem::ARROW_DOWN);
         }
         else if(asc == 0)
             tableheader->setArrowDir(1, 0);
@@ -2715,10 +2659,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             FXFile::create(filestr + FXString::value(globalid), FXIO::OwnerReadWrite);
             filefile.open(filestr + FXString::value(globalid), FXIO::Writing, FXIO::OwnerReadWrite);
             FXString fileval = "";
-            //if(fileitems->at(i).gid == 0)
             fileval += FXString::value(globalid) + "|";
-            //else
-                //fileval += FXString::value(fileitemvector.at(i).gid) + "|";
             fileval += FXString::value(fileitems->at(i).isdeleted) + "|";
             fileval += FXString::value(fileitems->at(i).isdirectory) + "|";
             fileval += FXString::value(fileitems->at(i).size) + "|";
