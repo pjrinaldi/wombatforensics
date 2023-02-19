@@ -33,26 +33,6 @@ std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime)
     
     return humanstring;
 }
-/*
-FXString WombatForensics::GetFileItem(FXString* filecontents, int item)
-{
-    FXArray<FXint> posarray;
-    posarray.clear();
-    int found = 0;
-    posarray.append(-1);
-    while(found > -1)
-    {
-        found = filecontents->find("|", found+1);
-        if(found > -1)
-            posarray.append(found);
-    }
-    posarray.append(filecontents->length());
-    if(item < posarray.no())
-        return filecontents->mid(posarray.at(item)+1, posarray.at(item+1) - posarray.at(item) - 1);
-    else
-        return "";
-}
-*/ 
 
 std::string GetFileItem(std::string* filecontents, int item)
 {
@@ -66,28 +46,6 @@ std::string GetFileItem(std::string* filecontents, int item)
         return contentlist.at(item);
     else
         return "";
-    
-    /*
-    std::istringstream input("abc|def|gh");
-    std::vector<std::array<char, 4>> v;
- 
-    // note: the following loop terminates when std::ios_base::operator bool()
-    // on the stream returned from getline() returns false
-    for (std::array<char, 4> a; input.getline(&a[0], 4, '|'); ) {
-        v.push_back(a);
-    }
- 
-    for (auto& a : v) {
-        std::cout << &a[0] << '\n';
-    }
-
-    std::vector<std::string> dirlayoutlist;
-    dirlayoutlist.clear();
-    std::istringstream rdll(curfat->curdirlayout);
-    std::string rdls;
-    while(getline(rdll, rdls, ';'))
-	dirlayoutlist.push_back(rdls);
-    */
 }
 
 int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
@@ -99,13 +57,13 @@ int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, F
     std::string filefilestr = currentitem->forimg->ImageFileName() + "." + std::to_string(currentitem->voloffset);
     if(curfileitem != NULL)
         filefilestr += "." + std::to_string(curfileitem->gid);
-    std::cout << "file file string to match: " << filefilestr << std::endl;
+    //std::cout << "file file string to match: " << filefilestr << std::endl;
     for (const auto & entry : std::filesystem::directory_iterator(pathstr))
     {
         if(filefilestr.compare(entry.path().stem()) == 0)
         {
             filearray.push_back(entry.path().string());
-            std::cout << "child file match: " << entry.path().string() << std::endl;
+            //std::cout << "child file match: " << entry.path().string() << std::endl;
         }
         //std::cout << entry.path().root_path() << " " << entry.path().stem() << " " << entry.path().extension() << std::endl;
         //std::cout << filefilestr << std::endl;

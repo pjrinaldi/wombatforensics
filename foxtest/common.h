@@ -37,6 +37,19 @@ struct FileItem
     std::string access = "";
     std::string modify = "";
     std::string layout = "";
+    void clear(void)
+    {
+        gid = 0;
+        isdeleted = false;
+        isdirectory = false;
+        size = 0;
+        name = "";
+        path = "";
+        create = "";
+        access = "";
+        modify = "";
+        layout = "";
+    };
 };
 
 //std::string ConvertUnixTimeToHuman(uint32_t unixtime);
