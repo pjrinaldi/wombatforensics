@@ -2303,7 +2303,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         {
             itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
             curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
-            //std::cout << "itemtype on double click: " << itemtype << std::endl;;
         }
     }
     else // selection from path
@@ -2313,6 +2312,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	//tablelist->setCurrentItem(currentitem.forimgindex, 0, true);
 	//tablelist->selectRow(currentitem.forimgindex, true);
     }
+    std::cout << "name: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
+    //std::cout << "icon id: " << tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id() << std::endl;
     std::cout << "itemtype on doubleclick: " << itemtype << std::endl;
     //curforimg = forimgvector.at(currentitem.forimgindex);
     isfrompath = false;
@@ -2666,6 +2667,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         //std::cout << "sort name: " << fileitems->at(i).name << " isdirectory: " << fileitems->at(i).isdirectory << std::endl;
         if(fileitems->at(i).isdirectory)
             itemtype = 2;
+        std::cout << "sort itemtype: " << itemtype << std::endl;
         //std::cout << "currentitem.itemtext: " << currentitem.itemtext << std::endl;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemData(i, 0, &(currentitem.itemtext));
