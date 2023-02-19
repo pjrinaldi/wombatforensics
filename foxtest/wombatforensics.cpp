@@ -312,27 +312,6 @@ FXString WombatForensics::GetSettings(int setting)
         return "";
 }
 
-/*
-FXString WombatForensics::GetFileItem(FXString* filecontents, int item)
-{
-    FXArray<FXint> posarray;
-    posarray.clear();
-    int found = 0;
-    posarray.append(-1);
-    while(found > -1)
-    {
-        found = filecontents->find("|", found+1);
-        if(found > -1)
-            posarray.append(found);
-    }
-    posarray.append(filecontents->length());
-    if(item < posarray.no())
-        return filecontents->mid(posarray.at(item)+1, posarray.at(item+1) - posarray.at(item) - 1);
-    else
-        return "";
-}
-*/
-
 long WombatForensics::NewCase(FXObject*, FXSelector, void*)
 {
     if(iscaseopen)
@@ -2334,6 +2313,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	//tablelist->setCurrentItem(currentitem.forimgindex, 0, true);
 	//tablelist->selectRow(currentitem.forimgindex, true);
     }
+    std::cout << "itemtype on doubleclick: " << itemtype << std::endl;
     //curforimg = forimgvector.at(currentitem.forimgindex);
     isfrompath = false;
     //std::cout << "item text: " << itemtext.text() << std::endl;
@@ -2509,7 +2489,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             //std::cout << "curitem.forimg: " << curforimg << std::endl;
             //std::cout << "curitem.itemtext: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
             //itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
-            std::cout << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << " cur layout: " << curlayout << std::endl;
+            //std::cout << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << " cur layout: " << curlayout << std::endl;
             //std::cout << "icon class name: " << tablelist->getItemIcon(tablelist->getCurrentRow(), 2)->getClassName() << std::endl;
             //how to determine if it's a directory???, can read file content or get the fileitemvector
             //std::cout << "is dir: " << fileitemvector.at(tablelist->getCurrentRow()).isdirectory << std::endl;
@@ -2668,7 +2648,13 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             fileval += FXString(fileitems->at(i).create.c_str()) + "|";
             fileval += FXString(fileitems->at(i).access.c_str()) + "|";
             fileval += FXString(fileitems->at(i).modify.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).layout.c_str());
+            fileval += FXString(fileitems->at(i).layout.c_str()) + "|";
+            fileval += FXString::value(fileitems->at(i).isvirtual); + "|";
+            fileval += FXString(fileitems->at(i).hash.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).cat.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).sig.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).tag.c_str()) + "|";
+            fileval += FXString(fileitems->at(i).match.c_str()) + "|";
             filefile.writeBlock(fileval.text(), fileval.length());
             filefile.close();
             //std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
@@ -2677,6 +2663,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         }
         //std::cout << "name: " << fileitems->at(i).name << std::endl;
         itemtype = 3;
+        //std::cout << "sort name: " << fileitems->at(i).name << " isdirectory: " << fileitems->at(i).isdirectory << std::endl;
         if(fileitems->at(i).isdirectory)
             itemtype = 2;
         //std::cout << "currentitem.itemtext: " << currentitem.itemtext << std::endl;
@@ -2690,7 +2677,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         globalid = curid;
         tablelist->setItemData(i, 2, curforimg);
         tablelist->setItemText(i, 2, FXString(fileitems->at(i).name.c_str()));
-        if(fileitemvector.at(i).isdeleted)
+        if(fileitems->at(i).isdeleted)
         {
             if(fileitems->at(i).isdirectory)
                 tablelist->setItemIcon(i, 2, deletedfoldericon);
@@ -2699,10 +2686,20 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         }
         else
         {
-            if(fileitems->at(i).isdirectory)
-                tablelist->setItemIcon(i, 2, defaultfoldericon);
+            if(fileitems->at(i).isvirtual)
+            {
+                if(fileitems->at(i).isdirectory)
+                    tablelist->setItemIcon(i, 2, virtualfoldericon);
+                else
+                    tablelist->setItemIcon(i, 2, virtualfileicon);
+            }
             else
-                tablelist->setItemIcon(i, 2, defaultfileicon);
+            {
+                if(fileitems->at(i).isdirectory)
+                    tablelist->setItemIcon(i, 2, defaultfoldericon);
+                else
+                    tablelist->setItemIcon(i, 2, defaultfileicon);
+            }
         }
         tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
         tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()));

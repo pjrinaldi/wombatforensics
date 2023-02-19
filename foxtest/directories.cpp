@@ -98,11 +98,18 @@ int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, F
             tmpitem.isdirectory = std::stoi(GetFileItem(&filecontent, 2).c_str());
             tmpitem.size = std::stoull(GetFileItem(&filecontent, 3).c_str());
             tmpitem.name = GetFileItem(&filecontent, 4);
+            //std::cout << "read file name: " << tmpitem.name << " isdirectory: " << tmpitem.isdirectory << std::endl;
             tmpitem.path = GetFileItem(&filecontent, 5);
             tmpitem.create = GetFileItem(&filecontent, 6);
             tmpitem.access = GetFileItem(&filecontent, 7);
             tmpitem.modify = GetFileItem(&filecontent, 8);
             tmpitem.layout = GetFileItem(&filecontent, 9);
+            tmpitem.isvirtual = std::stoi(GetFileItem(&filecontent, 10).c_str());
+            tmpitem.hash = GetFileItem(&filecontent, 11);
+            tmpitem.cat = GetFileItem(&filecontent, 12);
+            tmpitem.sig = GetFileItem(&filecontent, 13);
+            tmpitem.tag = GetFileItem(&filecontent, 14);
+            tmpitem.match = GetFileItem(&filecontent, 15);
             //std::cout << "File item Values: " << std::endl;
             //std::cout << "filecontent:" << filecontent << std::endl;
             //std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;
@@ -284,7 +291,6 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
         }
         else
         {
-	    //curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
             char* pname = new char[12];
             curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
             if(strcmp(fattype, "FAT12") == 0)
@@ -701,6 +707,31 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                             filevector->push_back(tmpitem);
                     }
                 }
+            }
+        }
+        if(curfileitem == NULL) // root directory - add virtual files
+        {
+	    //curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
+            FileItem tmpitem;
+            tmpitem.size = bytespersector;
+            tmpitem.name = "$MBR";
+            tmpitem.path = "/";
+            tmpitem.layout = std::to_string(currentitem->voloffset) + "," + std::to_string(bytespersector) + ";";
+            tmpitem.isvirtual = true;
+            tmpitem.cat = "System File";
+            tmpitem.sig = "Master Boot Record";
+            filevector->push_back(tmpitem);
+            for(int i=0; i < fatcount; i++)
+            {
+                tmpitem.clear();
+                tmpitem.size = fatsize * bytespersector;
+                tmpitem.name = "$FAT" + std::to_string(i+1);
+                tmpitem.path = "/";
+                tmpitem.layout = std::to_string(currentitem->voloffset + reservedareasize * bytespersector + fatsize * i * bytespersector) + "," + std::to_string(fatsize * bytespersector) + ";";
+                tmpitem.isvirtual = true;
+                tmpitem.cat = "System File";
+                tmpitem.sig = "Master Boot Record";
+                filevector->push_back(tmpitem);
             }
         }
     }

@@ -26,16 +26,22 @@ struct CurrentItem
 
 struct FileItem
 {
-    uint64_t gid = 0;
-    bool isdeleted = false;
-    bool isdirectory = false;
-    uint64_t size = 0;
-    std::string name = "";
-    std::string path = "";
-    std::string create = "";
-    std::string access = "";
-    std::string modify = "";
-    std::string layout = "";
+    uint64_t gid = 0;           //  0
+    bool isdeleted = false;     //  1
+    bool isdirectory = false;   //  2
+    uint64_t size = 0;          //  3
+    std::string name = "";      //  4
+    std::string path = "";      //  5
+    std::string create = "";    //  6
+    std::string access = "";    //  7
+    std::string modify = "";    //  8
+    std::string layout = "";    //  9
+    bool isvirtual = false;     // 10
+    std::string hash = "";      // 11
+    std::string cat = "";       // 12
+    std::string sig = "";       // 13
+    std::string tag = "";       // 14
+    std::string match = "";     // 15
     void clear(void)
     {
         gid = 0;
@@ -48,6 +54,12 @@ struct FileItem
         access = "";
         modify = "";
         layout = "";
+        isvirtual = false;
+        hash = "";
+        cat = "";
+        sig = "";
+        tag = "";
+        match = "";
     };
 };
 
