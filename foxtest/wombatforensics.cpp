@@ -733,19 +733,22 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
     {
         if(!event->moved)
         {
-            FXMenuPane tagmenu(this, POPUP_SHRINKWRAP);
-            new FXMenuCommand(&tagmenu, "Create New Tag", new FXPNGIcon(this->getApp(), bookmarknew), this, ID_NEWTAG);
-            new FXMenuSeparator(&tagmenu);
+            FXMenuPane rightmenu(this, POPUP_SHRINKWRAP);
+            FXMenuPane* tagmenu = new FXMenuPane(this, POPUP_SHRINKWRAP);
+
+            new FXMenuCommand(tagmenu, "Create New Tag", new FXPNGIcon(this->getApp(), bookmarknew), this, ID_NEWTAG);
+            new FXMenuSeparator(tagmenu);
             for(int i=0; i < tags.size(); i++)
             {
-                new FXMenuCommand(&tagmenu, FXString(tags.at(i).c_str()), new FXPNGIcon(this->getApp(), bookmark), this, ID_SETTAG);
+                new FXMenuCommand(tagmenu, FXString(tags.at(i).c_str()), new FXPNGIcon(this->getApp(), bookmark), this, ID_SETTAG);
             }
-            new FXMenuSeparator(&tagmenu);
-            new FXMenuCommand(&tagmenu, "Remove Tag", new FXPNGIcon(this->getApp(), bookmarkrem), this, ID_REMTAG);
-            tagmenu.forceRefresh();
-            tagmenu.create();
-            tagmenu.popup(nullptr, event->root_x, event->root_y);
-            getApp()->runModalWhileShown(&tagmenu);
+            new FXMenuSeparator(tagmenu);
+            new FXMenuCommand(tagmenu, "Remove Tag", new FXPNGIcon(this->getApp(), bookmarkrem), this, ID_REMTAG);
+            new FXMenuCascade(&rightmenu, FXString("Tag Selected As"), new FXPNGIcon(this->getApp(), bookmarknew), tagmenu);
+            rightmenu.forceRefresh();
+            rightmenu.create();
+            rightmenu.popup(nullptr, event->root_x, event->root_y);
+            getApp()->runModalWhileShown(this);
         }
     }
     return 1;
