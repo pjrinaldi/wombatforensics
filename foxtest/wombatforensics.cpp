@@ -735,6 +735,11 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
         {
             FXMenuPane rightmenu(this, POPUP_SHRINKWRAP);
             FXMenuPane* tagmenu = new FXMenuPane(this, POPUP_SHRINKWRAP);
+            FXMenuPane* binarymenu = new FXMenuPane(this, POPUP_SHRINKWRAP);
+            for(int i=0; i < binaries.size(); i++)
+            {
+                new FXMenuCommand(binarymenu, FXString(binaries.at(i).c_str()), NULL, this, ID_BINARY);
+            }
 
             new FXMenuCommand(tagmenu, "Create New Tag", new FXPNGIcon(this->getApp(), bookmarknew), this, ID_NEWTAG);
             new FXMenuSeparator(tagmenu);
@@ -744,6 +749,8 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
             }
             new FXMenuSeparator(tagmenu);
             new FXMenuCommand(tagmenu, "Remove Tag", new FXPNGIcon(this->getApp(), bookmarkrem), this, ID_REMTAG);
+            new FXMenuCascade(&rightmenu, "View With", new FXPNGIcon(this->getApp(), binmenu), binarymenu);
+            new FXMenuSeparator(&rightmenu);
             new FXMenuCascade(&rightmenu, FXString("Tag Selected As"), new FXPNGIcon(this->getApp(), bookmarknew), tagmenu);
             rightmenu.forceRefresh();
             rightmenu.create();

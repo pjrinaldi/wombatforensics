@@ -328,6 +328,7 @@ class WombatForensics : public FXMainWindow
 	    ID_FRWD = 121,
 	    ID_CURRENT = 122,
             ID_TABLEHEADER = 123,
+            ID_BINARY = 124,
             ID_LAST
         };
         WombatForensics(FXApp* a);
