@@ -2305,11 +2305,11 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         if(tablelist->getCurrentRow() > -1)
         {
             curiconid = tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id();
-            if(curiconid == 4194358)
+            if(curiconid == forimgicon->id())
                 itemtype = 1;
-            else if(curiconid == 4194373 || curiconid == 4194388)
+            else if(curiconid == partitionicon->id() || curiconid == defaultfoldericon->id())
                 itemtype = 2;
-            else
+            else // everything else unless i get to a distinguishment i need later on
                 itemtype = 3;
             //itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
             curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
