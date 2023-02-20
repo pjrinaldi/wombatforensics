@@ -740,7 +740,6 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
             {
                 new FXMenuCommand(binarymenu, FXString(binaries.at(i).c_str()), NULL, this, ID_BINARY);
             }
-
             new FXMenuCommand(tagmenu, "Create New Tag", new FXPNGIcon(this->getApp(), bookmarknew), this, ID_NEWTAG);
             new FXMenuSeparator(tagmenu);
             for(int i=0; i < tags.size(); i++)
