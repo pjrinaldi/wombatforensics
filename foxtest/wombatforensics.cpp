@@ -167,18 +167,21 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     // ITEM TYPE ICONS
     forimgicon = new FXPNGIcon(this->getApp(), forimg);
     forimgicon->create();
+    //std::cout << "default forimg icon id: " << forimgicon->id() << std::endl;
     carvedfileicon = new FXPNGIcon(this->getApp(), carvedfile);
     carvedfileicon->create();
     defaultfileicon = new FXPNGIcon(this->getApp(), defaultfile);
     defaultfileicon->create();
     defaultfoldericon = new FXPNGIcon(this->getApp(), defaultfolder);
     defaultfoldericon->create();
+    //std::cout << "default folder icon id: " << defaultfoldericon->id() << std::endl;
     deletedfileicon = new FXPNGIcon(this->getApp(), deletedfile);
     deletedfileicon->create();
     deletedfoldericon = new FXPNGIcon(this->getApp(), deletedfolder);
     deletedfoldericon->create();
     partitionicon = new FXPNGIcon(this->getApp(), partition);
     partitionicon->create();
+    //std::cout << "default partition icon id: " << partitionicon->id() << std::endl;
     virtualfileicon = new FXPNGIcon(this->getApp(), virtualfile);
     virtualfileicon->create();
     virtualfoldericon = new FXPNGIcon(this->getApp(), virtualfolder);
@@ -622,7 +625,7 @@ void WombatForensics::UpdateForensicImages()
         }
         itemtype = 1;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-        tablelist->setItemData(i, 1, &itemtype);
+        //tablelist->setItemData(i, 1, &itemtype);
         tablelist->setItemData(i, 2, forimgvector.at(i));
         tablelist->setItemText(i, 1, FXString::value(globalid));
         globalid = curid;
@@ -2301,7 +2304,14 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     {
         if(tablelist->getCurrentRow() > -1)
         {
-            itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
+            curiconid = tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id();
+            if(curiconid == 4194358)
+                itemtype = 1;
+            else if(curiconid == 4194373 || curiconid == 4194388)
+                itemtype = 2;
+            else
+                itemtype = 3;
+            //itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
             curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
         }
     }
@@ -2312,9 +2322,11 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	//tablelist->setCurrentItem(currentitem.forimgindex, 0, true);
 	//tablelist->selectRow(currentitem.forimgindex, true);
     }
-    std::cout << "name: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
+    //if(tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id() == 4194373) // is directory icon
+        //itemtype = 2;
+    //std::cout << "name: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
     //std::cout << "icon id: " << tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id() << std::endl;
-    std::cout << "itemtype on doubleclick: " << itemtype << std::endl;
+    //std::cout << "itemtype on doubleclick: " << itemtype << std::endl;
     //curforimg = forimgvector.at(currentitem.forimgindex);
     isfrompath = false;
     //std::cout << "item text: " << itemtext.text() << std::endl;
@@ -2377,7 +2389,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             pname = FXString(volnames.at(i).c_str());
             //std::cout << "pname: " << pname.text() << std::endl;
             tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-            tablelist->setItemData(i, 1, &itemtype);
+            //tablelist->setItemData(i, 1, &itemtype);
             tablelist->setItemText(i, 1, FXString::value(globalid));
             globalid = curid;
             tablelist->setItemData(i, 2, curforimg);
@@ -2667,11 +2679,11 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         //std::cout << "sort name: " << fileitems->at(i).name << " isdirectory: " << fileitems->at(i).isdirectory << std::endl;
         if(fileitems->at(i).isdirectory)
             itemtype = 2;
-        std::cout << "sort itemtype: " << itemtype << std::endl;
+        //std::cout << "sort itemtype: " << itemtype << std::endl;
         //std::cout << "currentitem.itemtext: " << currentitem.itemtext << std::endl;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         tablelist->setItemData(i, 0, &(currentitem.itemtext));
-        tablelist->setItemData(i, 1, &itemtype);
+        //tablelist->setItemData(i, 1, &itemtype);
         if(fileitems->at(i).gid == 0)
             tablelist->setItemText(i, 1, FXString::value(globalid));
         else

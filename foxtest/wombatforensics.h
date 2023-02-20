@@ -270,7 +270,8 @@ class WombatForensics : public FXMainWindow
         
         int sortindex = 1;
         uint sortasc = 1;
-        int itemtype;
+        int itemtype = 0;
+        int curiconid = 0;
         std::vector<std::string> volnames;
         std::vector<uint64_t> volsizes;
         std::vector<uint64_t> voloffsets;
