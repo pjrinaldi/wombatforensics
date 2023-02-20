@@ -253,9 +253,29 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
         binariesfile.readBlock(curbinaries, binariesfile.size());
         curbinaries[binariesfile.size()] = 0;
         currentviewers = FXString(curbinaries);
+        // INITIALIZE BINARIES VECTOR FOR "OPEN WITH" MENU
+        FXArray<FXint> posarray;
+        int found = 0;
+        posarray.append(-1);
+        while(found > -1)
+        {
+            found = currentviewers.find("|", found+1);
+            if(found > -1)
+                posarray.append(found);
+        }
+        posarray.append(currentviewers.length());
+        if(posarray.no() > 1)
+        {
+            binaries.clear();
+            for(int i=0; i < posarray.no() - 1; i++)
+                binaries.push_back(currentviewers.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text());
+        }
+        if(currentviewers.length() > 0 && posarray.no() == 1)
+            binaries.push_back(currentviewers.text());
     }
     binariesfile.close();
     forimgvector.clear();
+
     savebutton->disable();
     evidmanbutton->disable();
     imgvidthumbbutton->disable();
@@ -748,9 +768,14 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
             }
             new FXMenuSeparator(tagmenu);
             new FXMenuCommand(tagmenu, "Remove Tag", new FXPNGIcon(this->getApp(), bookmarkrem), this, ID_REMTAG);
+
+            new FXMenuCommand(&rightmenu, "View Contents", NULL, this, ID_CONTENTS);
+            new FXMenuCommand(&rightmenu, "View Properties", NULL, this, ID_PROPERTIES);
             new FXMenuCascade(&rightmenu, "View With", new FXPNGIcon(this->getApp(), binmenu), binarymenu);
             new FXMenuSeparator(&rightmenu);
-            new FXMenuCascade(&rightmenu, FXString("Tag Selected As"), new FXPNGIcon(this->getApp(), bookmarknew), tagmenu);
+            new FXMenuCommand(&rightmenu, "Check Selected", new FXPNGIcon(this->getApp(), check), this, ID_CHECKIT);
+            new FXMenuSeparator(&rightmenu);
+            new FXMenuCascade(&rightmenu, "Tag Selected As", new FXPNGIcon(this->getApp(), bookmarknew), tagmenu);
             rightmenu.forceRefresh();
             rightmenu.create();
             rightmenu.popup(nullptr, event->root_x, event->root_y);

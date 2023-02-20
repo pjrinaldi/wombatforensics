@@ -329,6 +329,10 @@ class WombatForensics : public FXMainWindow
 	    ID_CURRENT = 122,
             ID_TABLEHEADER = 123,
             ID_BINARY = 124,
+            ID_CONTENTS = 125,
+            ID_PROPERTIES = 126,
+            ID_CHECKIT = 127,
+            ID_UNCHECKALL = 128,
             ID_LAST
         };
         WombatForensics(FXApp* a);
@@ -440,6 +444,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
     FXMAPFUNC(SEL_DOUBLECLICKED, WombatForensics::ID_TABLESELECT, WombatForensics::LoadChildren),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLEHEADER, WombatForensics::SortColumn),
+    //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHECKIT, CheckTableItem::onCheck),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),
