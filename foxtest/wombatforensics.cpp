@@ -186,6 +186,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     virtualfileicon->create();
     virtualfoldericon = new FXPNGIcon(this->getApp(), virtualfolder);
     virtualfoldericon->create();
+    filtericon = new FXPNGIcon(this->getApp(), filter);
+    filtericon->create();
 
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
@@ -308,6 +310,7 @@ WombatForensics::~WombatForensics()
     partitionicon->destroy();
     virtualfileicon->destroy();
     virtualfoldericon->destroy();
+    filtericon->destroy();
 }
 
 void WombatForensics::create()
@@ -2579,6 +2582,7 @@ long WombatForensics::FilterColumn(FXObject* sender, FXSelector sel, void* colid
         int colindex = tableheader->getItemAt(event->last_x);
         // POPUP RESPECTIVE FILTER WINDOW HERE
         Filters* colfilter = new Filters(this, "");
+        colfilter->SetIndex(colindex);
         if(colindex == 0) // popup check filter
         {
             /*
@@ -2594,7 +2598,7 @@ long WombatForensics::FilterColumn(FXObject* sender, FXSelector sel, void* colid
         else if(colindex == 1) // ID FILTER
         {
             colfilter->setTitle("Filter by ID");
-            //colfilter->SetIndex(1);
+            colfilter->SetRange(globalid - 1);
         }
         else if(colindex == 2) // NAME FILTER
         {
@@ -2635,13 +2639,49 @@ long WombatForensics::FilterColumn(FXObject* sender, FXSelector sel, void* colid
         bool tofilter = colfilter->execute(PLACEMENT_CURSOR);
         if(tofilter)
         {
-            std::cout << "apply filter: " << std::endl;
+            //std::cout << "apply filter: " << std::endl;
+            std::string filterstring = colfilter->ReturnFilter();
+            ApplyFilter(colindex, filterstring);
         }
+        //else
+        //    std::cout << "filer not applied" << std::endl;
         //std::cout << "header item: " << tableheader->getItemAt(event->last_x) << std::endl;
         //std::cout << tableheader->getItemText(tableheader->getItemAt(event->last_x)).text() << std::endl;
     }
 
     return 1;
+}
+
+void WombatForensics::ApplyFilter(int colindex, std::string filterstring)
+{
+    //std::cout << "set filter for: " << colindex << " with: " << filterstring << std::endl;
+    tablelist->setColumnIcon(colindex, filtericon);
+    tablelist->setColumnIconPosition(colindex, FXHeaderItem::BEFORE);
+    tablelist->setColumnWidth(colindex, tablelist->getColumnWidth(colindex) + 25);
+    std::vector<int> delids;
+    for(int i=0; i < tablelist->getNumRows(); i++)
+    {
+        //std::cout << "column string: " << tablelist->getItemText(i, colindex).text() << std::endl;
+        //std::cout << filterstring.compare(tablelist->getItemText(i, colindex).text()) << std::endl;
+        if(filterstring.compare(tablelist->getItemText(i, colindex).text()) != 0)
+        {
+            std::cout << "remove row: " << i << std::endl;
+            delids.push_back(i);
+            //tablelist->removeRows(i);
+            // this is for the whole table, not just newly drawn stuff...
+            //tablelist->setTextColor(FXRGB(0,0,255));
+            //tablelist->setItemText(i, colindex, FXString(filterstring.c_str()));
+            //tablelist->setItemText(i, colindex, tablelist->getItemText(i, colindex));
+            //tablelist->setTextColor(FXRGB(0,0,0));
+            //((FXLabel*)tablelist->getItem(i, colindex))->setTextColor(FXRGB(224,224,224));
+            //tablelist->setCellColor(i, colindex, FXRGB(224,224,224));
+            //tablelist->getItem(i, colindex)->setTextColor(FXRGB(224, 224, 224));
+            //mainframe->setBackColor(FXRGB(224,224,224));
+            //std::cout << "the id is a match at row " << i << " ... " << filterstring << std::endl;
+        }
+    }
+    for(int i=(delids.size() - 1); i >= 0; i--)
+        tablelist->removeRows(delids.at(i));
 }
 
 long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)

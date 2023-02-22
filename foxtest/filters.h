@@ -16,9 +16,14 @@ class Filters : public FXDialogBox
 
     private:
         FXVerticalFrame* mainframe;
-        FXText* msglog;
-        FXFont* plainfont;
-        char dtbuf[35];
+        FXLabel* sortlabel;
+        FXSpinner* idspinner;
+        FXButton* okbutton;
+        //FXText* msglog;
+        //FXFont* plainfont;
+        //char dtbuf[35];
+
+        int columnindex = 0;
 
     protected:
         Filters() {}
@@ -27,11 +32,15 @@ class Filters : public FXDialogBox
     public:
         enum
         {
-            ID_LOG = 1,
+            //ID_SPINID = 100,
+            //ID_LOG = 1,
             ID_LAST
         };
         Filters(FXWindow* parent, const FXString& title);
-        void AddMsg(FXString msg);
+        //void AddMsg(FXString msg);
+        void SetIndex(int colindex);
+        void SetRange(int maxindex);
+        std::string ReturnFilter(void);
 };
 
 #endif // FILTERS_H

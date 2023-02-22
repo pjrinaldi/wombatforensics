@@ -1,4 +1,4 @@
-/*********** Generated on 2023/02/20 17:59:03 by reswrap version 6.0.0 *********/
+/*********** Generated on 2023/02/22 03:07:20 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file resources/folder-open.png */
 extern const unsigned char folderopen[];
@@ -128,4 +128,7 @@ extern const unsigned char check[];
 
 /* Created by reswrap from file resources/uncheck.png */
 extern const unsigned char uncheck[];
+
+/* Created by reswrap from file resources/filter.png */
+extern const unsigned char filter[];
 
