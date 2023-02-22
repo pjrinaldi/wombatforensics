@@ -357,6 +357,7 @@ class WombatForensics : public FXMainWindow
         long OpenMessageLog(FXObject*, FXSelector, void*);
         long OpenXChomp(FXObject*, FXSelector, void*);
         long SortColumn(FXObject* sender, FXSelector sel, void* colid);
+        long CheckSelected(FXObject* sender, FXSelector sel, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -444,6 +445,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
     FXMAPFUNC(SEL_DOUBLECLICKED, WombatForensics::ID_TABLESELECT, WombatForensics::LoadChildren),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLEHEADER, WombatForensics::SortColumn),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHECKIT, WombatForensics::CheckSelected),
     //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHECKIT, CheckTableItem::onCheck),
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),

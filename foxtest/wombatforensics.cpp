@@ -690,6 +690,17 @@ long WombatForensics::TableUpDown(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
+long WombatForensics::CheckSelected(FXObject* sender, FXSelector sel, void*)
+{
+    FXString curtext = ((FXMenuCommand*)sender)->getText();
+    if(curtext.left(2) == "Un")
+        ((CheckTableItem*)tablelist->getItem(tablelist->getCurrentRow(), 0))->setCheck(false);
+    else
+        ((CheckTableItem*)tablelist->getItem(tablelist->getCurrentRow(), 0))->setCheck();
+
+    return 1;
+}
+
 /*
 long WombatForensics::TableUp(FXObject*, FXSelector, void* ptr)
 {
@@ -751,6 +762,7 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
     FXEvent* event = (FXEvent*)ptr;
     if(tablelist->getCurrentRow() > -1 && !tablelist->getItemText(tablelist->getCurrentRow(), 1).empty())
     {
+        bool iscurchecked = ((CheckTableItem*)tablelist->getItem(tablelist->getCurrentRow(), 0))->getCheck();
         if(!event->moved)
         {
             FXMenuPane rightmenu(this, POPUP_SHRINKWRAP);
@@ -773,7 +785,10 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
             new FXMenuCommand(&rightmenu, "View Properties", NULL, this, ID_PROPERTIES);
             new FXMenuCascade(&rightmenu, "View With", new FXPNGIcon(this->getApp(), binmenu), binarymenu);
             new FXMenuSeparator(&rightmenu);
-            new FXMenuCommand(&rightmenu, "Check Selected", new FXPNGIcon(this->getApp(), check), this, ID_CHECKIT);
+            if(iscurchecked)
+                new FXMenuCommand(&rightmenu, "UnCheck Selected", new FXPNGIcon(this->getApp(), uncheck), this, ID_CHECKIT);
+            else
+                new FXMenuCommand(&rightmenu, "Check Selected", new FXPNGIcon(this->getApp(), check), this, ID_CHECKIT);
             new FXMenuSeparator(&rightmenu);
             new FXMenuCascade(&rightmenu, "Tag Selected As", new FXPNGIcon(this->getApp(), bookmarknew), tagmenu);
             rightmenu.forceRefresh();
