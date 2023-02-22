@@ -29,6 +29,7 @@
 #include "directories.h"
 #include "manageviewer.h"
 #include "messagelog.h"
+#include "filters.h"
 // SHARED LIBRARIES
 #include <tar.h>
 #include <libtar.h>
@@ -357,6 +358,7 @@ class WombatForensics : public FXMainWindow
         long OpenMessageLog(FXObject*, FXSelector, void*);
         long OpenXChomp(FXObject*, FXSelector, void*);
         long SortColumn(FXObject* sender, FXSelector sel, void* colid);
+        long FilterColumn(FXObject* sender, FXSelector sel, void* colid);
         long CheckSelected(FXObject* sender, FXSelector sel, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
@@ -446,7 +448,8 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_DOUBLECLICKED, WombatForensics::ID_TABLESELECT, WombatForensics::LoadChildren),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLEHEADER, WombatForensics::SortColumn),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHECKIT, WombatForensics::CheckSelected),
-    //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHECKIT, CheckTableItem::onCheck),
+    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLEHEADER, WombatForensics::FilterColumn),
+
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),

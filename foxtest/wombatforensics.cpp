@@ -2571,6 +2571,79 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     return 1;
 }
 
+long WombatForensics::FilterColumn(FXObject* sender, FXSelector sel, void* colid)
+{
+    if(curforimg != NULL)
+    {
+        FXEvent* event = (FXEvent*)colid;
+        int colindex = tableheader->getItemAt(event->last_x);
+        // POPUP RESPECTIVE FILTER WINDOW HERE
+        Filters* colfilter = new Filters(this, "");
+        if(colindex == 0) // popup check filter
+        {
+            /*
+            ManageViewer viewmanager(this, "Manage External Viewers");
+            viewmanager.SetBinList(&binaries);
+            viewmanager.LoadViewers(currentviewers);
+            bool tosave = viewmanager.execute(PLACEMENT_OWNER);
+            if(tosave == 1)
+            {
+            //msglog->show(PLACEMENT_CURSOR);
+            */
+        }
+        else if(colindex == 1) // ID FILTER
+        {
+            colfilter->setTitle("Filter by ID");
+            //colfilter->SetIndex(1);
+        }
+        else if(colindex == 2) // NAME FILTER
+        {
+        }
+        else if(colindex == 3) // PATH FILTER
+        {
+        }
+        else if(colindex == 4) // SIZE
+        {
+        }
+        else if(colindex == 5) // CREATED
+        {
+        }
+        else if(colindex == 6)
+        {
+        }
+        else if(colindex == 7)
+        {
+        }
+        else if(colindex == 8)
+        {
+        }
+        else if(colindex == 9)
+        {
+        }
+        else if(colindex == 10)
+        {
+        }
+        else if(colindex == 11)
+        {
+        }
+        else if(colindex == 12)
+        {
+        }
+        else if(colindex == 13)
+        {
+        }
+        bool tofilter = colfilter->execute(PLACEMENT_CURSOR);
+        if(tofilter)
+        {
+            std::cout << "apply filter: " << std::endl;
+        }
+        //std::cout << "header item: " << tableheader->getItemAt(event->last_x) << std::endl;
+        //std::cout << tableheader->getItemText(tableheader->getItemAt(event->last_x)).text() << std::endl;
+    }
+
+    return 1;
+}
+
 long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
 {
     if(curforimg != NULL)
@@ -2583,6 +2656,13 @@ long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
             filefilestr + currentfileitem.gid + ".";
         int filecount = 0;
         // NEED TO DETERMINE FILE COUNT HERE...
+        filecount = fileitemvector.size();
+        /*
+        if(currentfileitem.gid == 0)
+            filecount = ReadDirectory(&currentitem, &fileitemvector, NULL);
+        else
+            filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+        */
 	if(str.find("0x1") != std::string::npos) // global id sort
 	{
 	    uint arrowdir = tableheader->getArrowDir(1);
