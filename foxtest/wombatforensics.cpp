@@ -2585,15 +2585,6 @@ long WombatForensics::FilterColumn(FXObject* sender, FXSelector sel, void* colid
         colfilter->SetIndex(colindex);
         if(colindex == 0) // popup check filter
         {
-            /*
-            ManageViewer viewmanager(this, "Manage External Viewers");
-            viewmanager.SetBinList(&binaries);
-            viewmanager.LoadViewers(currentviewers);
-            bool tosave = viewmanager.execute(PLACEMENT_OWNER);
-            if(tosave == 1)
-            {
-            //msglog->show(PLACEMENT_CURSOR);
-            */
         }
         else if(colindex == 1) // ID FILTER
         {
@@ -2641,7 +2632,11 @@ long WombatForensics::FilterColumn(FXObject* sender, FXSelector sel, void* colid
         {
             //std::cout << "apply filter: " << std::endl;
             std::string filterstring = colfilter->ReturnFilter();
-            ApplyFilter(colindex, filterstring);
+            std::cout << "filter string: " << filterstring << std::endl;
+            FilterView* filterview = new FilterView(this, "Filtered Items");
+            filterview->ApplyFilter(&currentitem, colindex, filterstring);
+            filterview->execute(PLACEMENT_OWNER);
+            //ApplyFilter(colindex, filterstring);
         }
         //else
         //    std::cout << "filer not applied" << std::endl;
@@ -2652,6 +2647,7 @@ long WombatForensics::FilterColumn(FXObject* sender, FXSelector sel, void* colid
     return 1;
 }
 
+/*
 void WombatForensics::ApplyFilter(int colindex, std::string filterstring)
 {
     //std::cout << "set filter for: " << colindex << " with: " << filterstring << std::endl;
@@ -2683,6 +2679,7 @@ void WombatForensics::ApplyFilter(int colindex, std::string filterstring)
     for(int i=(delids.size() - 1); i >= 0; i--)
         tablelist->removeRows(delids.at(i));
 }
+*/
 
 long WombatForensics::SortColumn(FXObject* sender, FXSelector sel, void* colid)
 {

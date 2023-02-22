@@ -30,6 +30,7 @@
 #include "manageviewer.h"
 #include "messagelog.h"
 #include "filters.h"
+#include "filterview.h"
 // SHARED LIBRARIES
 #include <tar.h>
 #include <libtar.h>
@@ -404,7 +405,7 @@ class WombatForensics : public FXMainWindow
         void LoadCaseState(void);
         void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
 	void SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex=1, int asc=1);
-        void ApplyFilter(int colindex, std::string filterstring);
+        //void ApplyFilter(int colindex, std::string filterstring);
         //void LoadPartitions(ForImg* curforimg);
         //void LoadGptPartitions(ForImg* curforimg);
         //FXString GetFileSystemName(ForImg* curforimg, uint64_t offset);
