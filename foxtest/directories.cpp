@@ -691,7 +691,7 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                         }
                         else
                         {
-                            GenerateCategorySignature(currentitem, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+                            GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
                         }
                         //std::cout << "tmpitem layout: " << tmpitem.layout << std::endl;
                         /*
@@ -739,7 +739,7 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                 tmpitem.layout = std::to_string(currentitem->voloffset + reservedareasize * bytespersector + fatsize * i * bytespersector) + "," + std::to_string(fatsize * bytespersector) + ";";
                 tmpitem.isvirtual = true;
                 tmpitem.cat = "System File";
-                tmpitem.sig = "Master Boot Record";
+                tmpitem.sig = "File Allocation Table";
                 filevector->push_back(tmpitem);
             }
         }

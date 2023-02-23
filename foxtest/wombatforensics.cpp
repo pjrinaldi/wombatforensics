@@ -2526,6 +2526,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         FitColumnContents(1);
         FitColumnContents(2);
         FitColumnContents(4);
+        FitColumnContents(10);
+        FitColumnContents(11);
         AlignColumn(tablelist, 1, FXTableItem::LEFT);
         AlignColumn(tablelist, 2, FXTableItem::LEFT);
         AlignColumn(tablelist, 3, FXTableItem::LEFT);
@@ -2533,6 +2535,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         AlignColumn(tablelist, 5, FXTableItem::LEFT);
         AlignColumn(tablelist, 6, FXTableItem::LEFT);
         AlignColumn(tablelist, 7, FXTableItem::LEFT);
+        AlignColumn(tablelist, 10, FXTableItem::LEFT);
+        AlignColumn(tablelist, 11, FXTableItem::LEFT);
         if(sortindex == 1)
             tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
         // need to implement path toolbar here for the burrow and the partition and 

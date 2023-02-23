@@ -273,95 +273,141 @@ std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocks
     return layout;
 }
 
-void GenerateCategorySignature(CurrentItem* currentitem, std::string* layout, std::string* cat, std::string* sig)
+void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig)
 {
     int found = layout->find(";");
-    std::cout << "; found at: " << found;
+    //std::cout << "; found at: " << found;
     std::string curlayout = layout->substr(0, found);
-    std::cout << "cur layout: " << curlayout << std::endl;
-    // SPLIT LAYOUT INTO THE OFFSET AND SIZE, AND USE FOR UINT8_T SIZE:
-    uint8_t* sigbuf = new uint8_t[1025];
-    //currentitem->forimg->ReadContent(sigbuf, offset, 
-}
-
-/*
-            diroffset = 0;
-            dirsize = 0;
-            std::size_t layoutsplit = dirlayoutlist.at(k).find(",");
-            diroffset = std::stoull(dirlayoutlist.at(k).substr(0, layoutsplit));
-            dirsize = std::stoull(dirlayoutlist.at(k).substr(layoutsplit+1));
-
-char* rname = new char[8];
-currentitem->forimg->ReadContent((uint8_t*)rname, diroffset + i*32 + 1, 7);
-rname[7] = 0;
-*/
-
-/*
-	// NON-QT WAY USING LIBMAGIC
-	QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
-	magic_t magical;
-	const char* catsig;
-	//magical = magic_open(MAGIC_NONE);
-	magical = magic_open(MAGIC_MIME_TYPE);
-	magic_load(magical, NULL);
-	catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
-	std::string catsigstr(catsig);
-	mimestr = QString::fromStdString(catsigstr);
-	magic_close(magical);
-	for(int i=0; i < mimestr.count(); i++)
-	{
-	    if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
-		mimestr[i] = mimestr[i].toUpper();
-	}
-	//qDebug() << "filename:" << filename << "mimestr:" << mimestr;
-	if(mimestr.contains("Application/Octet-Stream"))
-	{
-	    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
-		mimestr = "Windows System/Shortcut";
-	    else if(strcmp(filename.toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
-		mimestr = "Windows System/Recycler";
-	    else if(filename.startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
-		mimestr = "Windows System/Recycle.Bin";
-	    else if(filename.endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
-		mimestr = "Windows System/Prefetch";
-	    else if(filename.endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
-		mimestr = "Windows System/Prefetch";
-	    else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
-		mimestr = "Windows System/Registry";
-	}
-        else if(mimestr.contains("Text/"))
+    std::size_t layoutsplit = curlayout.find(",");
+    uint64_t curoffset = std::stoull(curlayout.substr(0, layoutsplit));
+    uint64_t cursize = std::stoull(curlayout.substr(layoutsplit+1));
+    uint64_t bufsize = 1024;
+    if(cursize < 1024)
+        bufsize = cursize;
+    uint8_t* sigbuf = new uint8_t[bufsize + 1];
+    currentitem->forimg->ReadContent(sigbuf, curoffset, bufsize);
+    sigbuf[bufsize] = 0;
+    magic_t magical;
+    const char* catsig;
+    magical = magic_open(MAGIC_MIME_TYPE);
+    magic_load(magical, NULL);
+    catsig = magic_buffer(magical, sigbuf, bufsize);
+    std::string catsigstr(catsig);
+    magic_close(magical);
+    //std::cout << "cat/sig: " << catsigstr << std::endl;
+    // CONVERT THE CAT/SIG TO CAPITALS
+    for(int i=0; i < catsigstr.size(); i++)
+    {
+        if(i == 0 || catsigstr.at(i-1) == ' ' || catsigstr.at(i-1) == '-' || catsigstr.at(i-1) == '/')
+            catsigstr[i] = std::toupper(catsigstr[i]);
+    }
+    std::size_t split = catsigstr.find("/");
+    std::string tmpcat = catsigstr.substr(0, split);
+    std::string tmpsig = catsigstr.substr(split+1);
+    if(catsigstr.compare("Application/Octet-Stream") == 0)
+    {
+        if(sigbuf[0] == 0x72 && sigbuf[1] == 0x65 && sigbuf[2] == 0x67 && sigbuf[3] == 0x66) // 72 65 67 66 | regf
         {
-            if(filename.endsWith(".mbox"))
+            *cat = "Windows System";
+            *sig = "Registry";
+        }
+        else if(sigbuf[0] == 0x4c && sigbuf[1] == 0x00 && sigbuf[2] == 0x00 && sigbuf[3] == 0x00 && sigbuf[4] == 0x01 && sigbuf[5] == 0x14 && sigbuf[6] == 0x02 && sigbuf[7] == 0x00) // LNK file
+        {
+            *cat = "Windows System";
+            *sig = "Shortcut";
+        }
+        else if(filename->compare("INFO2") == 0 && (sigbuf[0] == 0x04 || sigbuf[0] == 0x05))
+        {
+            *cat = "Windows System";
+            *sig = "Recycler";
+        }
+        else if(filename->find("$I") != std::string::npos && (sigbuf[0] = 0x01 || sigbuf[0] == 0x02))
+        {
+            *cat = "Windows System";
+            *sig = "Recycle.Bin";
+        }
+        else if(filename->find(".pf") != std::string::npos && sigbuf[4] == 0x53 && sigbuf[5] == 0x43 && sigbuf[6] == 0x43 && sigbuf[7] == 0x41)
+        {
+            *cat = "Windows System";
+            *sig = "Prefetch";
+        }
+        else if(filename->find(".pf") != std::string::npos & sigbuf[0] == 0x4d && sigbuf[1] == 0x41 && sigbuf[2] == 0x4d)
+        {
+            *cat = "Windows System";
+            *sig = "Prefetch";
+        }
+        else
+        {
+            *cat = "Application";
+            *sig = "Octet-Stream";
+        }
+    }
+    else if(catsigstr.find("Text/") != std::string::npos)
+    {
+        if(filename->find(".mbox") != std::string::npos)
+        {
+            *cat = "Email";
+            *sig = "MBox";
+        }
+        else
+        {
+            *cat = tmpcat;
+            *sig = tmpsig;
+        }
+
+    }
+    else if(catsigstr.find("/Zip") != std::string::npos)
+    {
+        bool isoffice = false;
+        int officesize = 4096;
+        if(cursize < officesize)
+            officesize = cursize;
+        uint8_t* officecheck = new uint8_t[officesize + 1];
+        currentitem->forimg->ReadContent(officecheck, curoffset, officesize);
+        officecheck[officesize] = 0;
+        for(int i=4; i < officesize; i++)
+        {
+            if(officecheck[i-4] == 0x77 && officecheck[i-3] == 0x6f && officecheck[i-2] == 0x72 && officecheck[i-1] == 0x64 && officecheck[i] == 0x2f) // word/ (.docx)
             {
-                mimestr = "Email/MBox";
+                isoffice = true;
+                *cat = "Office Document";
+                *sig = "Microsoft Word 2007+";
+                break;
+            }
+            else if(officecheck[i-4] == 0x78 && officecheck[i-3] == 0x6c && officecheck[i-2] == 0x2f) // "xl/" (.xlsx)
+            {
+                isoffice = true;
+                *cat = "Office Document";
+                *sig = "Microsoft Excel 2007+";
+                break;
+            }
+            else if(officecheck[i-4] == 0x70 && officecheck[i-3] == 0x70 && officecheck[i-2] == 0x74 && officecheck[i-1] == 0x2f) // "ppt/" (.pptx)
+            {
+                isoffice = true;
+                *cat = "Office Document";
+                *sig = "Microsoft Powerpoint 2007+";
+                break;
             }
         }
-        else if(mimestr.contains("/Zip"))
+        if(!isoffice)
         {
-	    //qDebug() << "filename:" << filename << "mimestr:" << mimestr;
-	    QByteArray officecheck = curimg->ReadContent(fileoffset, 4096);
-	    //qDebug() << QString(officecheck.toHex());
-	    if(officecheck.toHex().contains(QString("776f72642f").toStdString().c_str())) // "word/" (.docx)
-	    {
-		mimestr = "Office Document/Microsoft Word 2007+";
-		//qDebug() << "it's a word document...";
-	    }
-	    else if(officecheck.toHex().contains(QString("786c2f").toStdString().c_str())) // "xl/" (.xlsx)
-	    {
-		mimestr = "Office Document/Microsoft Excel 2007+";
-	    }
-	    else if(officecheck.toHex().contains(QString("7070742f").toStdString().c_str())) // "ppt/" (.pptx)
-	    {
-		mimestr = "Office Document/Microsoft PowerPoint 2007+";
-	    }
-	}
-	else if(mimestr.contains("/Vnd.oasis.opendocument.text"))
-	{
-	    mimestr = "Office Document/Open Document Text";
-	}
-
-	    //else
-		//qDebug() << "something went wrong...";
+            *cat = "Archive";
+            *sig = "Zip";
+        }
+    }
+    else if(catsigstr.find("/Vnd.oasis.opendocument.text") != std::string::npos)
+    {
+        *cat = "Office Document";
+        *sig = "Open Document Text";
+    }
+    else
+    {
+        *cat = tmpcat;
+        *sig = tmpsig;
+    }
+    //std::cout << "cat/sig: " << catsigstr << std::endl;
+}
+/*
 
 	    // might not need the full contents, just need more hex and see if it has the:
 	    // word/ folder (0x776f72642f) for .docx
