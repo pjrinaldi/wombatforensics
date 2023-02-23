@@ -2461,6 +2461,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         FitColumnContents(4);
         AlignColumn(tablelist, 1, FXTableItem::LEFT);
         AlignColumn(tablelist, 2, FXTableItem::LEFT);
+
         backbutton->setText("/");
 
 
@@ -2889,6 +2890,8 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         tablelist->setItemText(i, 5, FXString(fileitems->at(i).create.c_str()));
         tablelist->setItemText(i, 6, FXString(fileitems->at(i).access.c_str()));
         tablelist->setItemText(i, 7, FXString(fileitems->at(i).modify.c_str()));
+        tablelist->setItemText(i, 10, FXString(fileitems->at(i).cat.c_str()));
+        tablelist->setItemText(i, 11, FXString(fileitems->at(i).sig.c_str()));
     }
 }
 

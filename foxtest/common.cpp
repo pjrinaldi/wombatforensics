@@ -272,3 +272,212 @@ std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocks
 
     return layout;
 }
+
+void GenerateCategorySignature(CurrentItem* currentitem, std::string* layout, std::string* cat, std::string* sig)
+{
+    int found = layout->find(";");
+    std::cout << "; found at: " << found;
+    std::string curlayout = layout->substr(0, found);
+    std::cout << "cur layout: " << curlayout << std::endl;
+    // SPLIT LAYOUT INTO THE OFFSET AND SIZE, AND USE FOR UINT8_T SIZE:
+    uint8_t* sigbuf = new uint8_t[1025];
+    //currentitem->forimg->ReadContent(sigbuf, offset, 
+}
+
+/*
+            diroffset = 0;
+            dirsize = 0;
+            std::size_t layoutsplit = dirlayoutlist.at(k).find(",");
+            diroffset = std::stoull(dirlayoutlist.at(k).substr(0, layoutsplit));
+            dirsize = std::stoull(dirlayoutlist.at(k).substr(layoutsplit+1));
+
+char* rname = new char[8];
+currentitem->forimg->ReadContent((uint8_t*)rname, diroffset + i*32 + 1, 7);
+rname[7] = 0;
+*/
+
+/*
+	// NON-QT WAY USING LIBMAGIC
+	QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
+	magic_t magical;
+	const char* catsig;
+	//magical = magic_open(MAGIC_NONE);
+	magical = magic_open(MAGIC_MIME_TYPE);
+	magic_load(magical, NULL);
+	catsig = magic_buffer(magical, sigbuf.data(), sigbuf.count());
+	std::string catsigstr(catsig);
+	mimestr = QString::fromStdString(catsigstr);
+	magic_close(magical);
+	for(int i=0; i < mimestr.count(); i++)
+	{
+	    if(i == 0 || mimestr.at(i-1) == ' ' || mimestr.at(i-1) == '-' || mimestr.at(i-1) == '/')
+		mimestr[i] = mimestr[i].toUpper();
+	}
+	//qDebug() << "filename:" << filename << "mimestr:" << mimestr;
+	if(mimestr.contains("Application/Octet-Stream"))
+	{
+	    if(sigbuf.at(0) == '\x4c' && sigbuf.at(1) == '\x00' && sigbuf.at(2) == '\x00' && sigbuf.at(3) == '\x00' && sigbuf.at(4) == '\x01' && sigbuf.at(5) == '\x14' && sigbuf.at(6) == '\x02' && sigbuf.at(7) == '\x00') // LNK File
+		mimestr = "Windows System/Shortcut";
+	    else if(strcmp(filename.toStdString().c_str(), "INFO2") == 0 && (sigbuf.at(0) == 0x04 || sigbuf.at(0) == 0x05))
+		mimestr = "Windows System/Recycler";
+	    else if(filename.startsWith("$I") && (sigbuf.at(0) == 0x01 || sigbuf.at(0) == 0x02))
+		mimestr = "Windows System/Recycle.Bin";
+	    else if(filename.endsWith(".pf") && sigbuf.at(4) == 0x53 && sigbuf.at(5) == 0x43 && sigbuf.at(6) == 0x43 && sigbuf.at(7) == 0x41)
+		mimestr = "Windows System/Prefetch";
+	    else if(filename.endsWith(".pf") && sigbuf.at(0) == 0x4d && sigbuf.at(1) == 0x41 && sigbuf.at(2) == 0x4d)
+		mimestr = "Windows System/Prefetch";
+	    else if(sigbuf.at(0) == '\x72' && sigbuf.at(1) == '\x65' && sigbuf.at(2) == '\x67' && sigbuf.at(3) == '\x66') // 72 65 67 66 | regf
+		mimestr = "Windows System/Registry";
+	}
+        else if(mimestr.contains("Text/"))
+        {
+            if(filename.endsWith(".mbox"))
+            {
+                mimestr = "Email/MBox";
+            }
+        }
+        else if(mimestr.contains("/Zip"))
+        {
+	    //qDebug() << "filename:" << filename << "mimestr:" << mimestr;
+	    QByteArray officecheck = curimg->ReadContent(fileoffset, 4096);
+	    //qDebug() << QString(officecheck.toHex());
+	    if(officecheck.toHex().contains(QString("776f72642f").toStdString().c_str())) // "word/" (.docx)
+	    {
+		mimestr = "Office Document/Microsoft Word 2007+";
+		//qDebug() << "it's a word document...";
+	    }
+	    else if(officecheck.toHex().contains(QString("786c2f").toStdString().c_str())) // "xl/" (.xlsx)
+	    {
+		mimestr = "Office Document/Microsoft Excel 2007+";
+	    }
+	    else if(officecheck.toHex().contains(QString("7070742f").toStdString().c_str())) // "ppt/" (.pptx)
+	    {
+		mimestr = "Office Document/Microsoft PowerPoint 2007+";
+	    }
+	}
+	else if(mimestr.contains("/Vnd.oasis.opendocument.text"))
+	{
+	    mimestr = "Office Document/Open Document Text";
+	}
+
+	    //else
+		//qDebug() << "something went wrong...";
+
+	    // might not need the full contents, just need more hex and see if it has the:
+	    // word/ folder (0x776f72642f) for .docx
+	    // xl/ folder (0x786c2f) for .xlsx
+	    // ppt/ folder (0x7070742f) for .pptx
+
+    //else if(filename.startsWith("$INDEX_ROOT:") || filename.startsWith("$DATA:") || filename.startWith("$INDEX_ALLOCATION:"))
+
+    return mimestr;
+    //return QString(mimecategory + "/" + mimesignature);
+    // WILL NEED TO REIMPLEMENT ALL THE BELOW BASED ON THE NEW LIBMAGIC STUFF
+    //if(mimesignature.contains("text"))
+//	mimecategory = "Text";
+//    else
+//	mimecategory = "Unknown";
+
+//    if(mimestr.isEmpty())
+//        return QString(mimecategory + "/" + mimesignature);
+//    else
+//        return mimestr;
+
+    QString mimestr = "";
+    // maybe a problem with file size requested being larger than the actual file size..
+    QByteArray sigbuf = curimg->ReadContent(fileoffset, 1024);
+    qDebug() << filename << QString::fromStdString(sigbuf.left(6).toStdString());
+    QMimeDatabase mimedb;
+    const QMimeType mimetype = mimedb.mimeTypeForData(sigbuf);
+    QString geniconstr = mimetype.genericIconName();
+    QString mimesignature = mimetype.comment();
+    //qDebug() << "filename:" << filename << "mimesignature:" << mimesignature;
+    QString mimecategory = "";
+    if(geniconstr.contains("document")) // Document
+        mimecategory = "Document";
+    else if(geniconstr.contains("video")) // Video
+        if(mimesignature.contains("WPL"))
+            mimecategory = "HTML";
+        else
+            mimecategory = "Video";
+    else if(geniconstr.contains("image")) // Image
+        mimecategory = "Image";
+    else if(geniconstr.contains("package")) // Archive
+        mimecategory = "Archive";
+    else if(geniconstr.contains("font")) // Font
+        mimecategory = "Font";
+    else if(geniconstr.contains("text")) // Text
+        if(mimesignature.contains("email") || mimesignature.contains("mail") || mimesignature.contains("reference to remote file"))
+            mimecategory = "Email";
+        else if(mimesignature.contains("html", Qt::CaseInsensitive))
+            mimecategory = "HTML";
+        else
+            mimecategory = "Text";
+    else if(geniconstr.contains("audio")) // Audio
+        mimecategory = "Audio";
+    else if(geniconstr.contains("spreadsheet")) // Office Spreadsheet
+        mimecategory = "Spreadsheet";
+    else if(geniconstr.contains("presentation")) // Office Presentation
+        mimecategory = "Presentation";
+    else if(geniconstr.contains("multipart")) // MultiPart
+        mimecategory = "MultiPart";
+    else if(geniconstr.contains("inode")) // Inode
+        mimecategory = "Inode";
+    else if(geniconstr.contains("model")) // Binary
+        mimecategory = "Binary";
+    else if(geniconstr.contains("application-x")) // Try iconName() database, java, document, text, image, executable, certificate, bytecode, library, Data, Trash, zerosize, 
+    {
+       if(mimesignature.contains("certificate") || mimesignature.contains("private key") || mimesignature.contains("keystore")) 
+            mimecategory = "Certificate";
+       else if(mimesignature.contains("Metafile") || mimesignature.contains("profile"))
+            mimecategory = "Metafile";
+       else if(mimesignature.contains("video"))
+           mimecategory = "Video";
+       else if(mimesignature.contains("TNEF message") || mimesignature.contains("email"))
+           mimecategory = "Email";
+       else if(mimesignature.contains("Microsoft Word Document") || mimesignature.contains("OpenDocument Master Document Template") || mimesignature.contains("MIF"))
+           mimecategory = "Document";
+       else if(mimesignature.contains("ROM") || mimesignature.contains("Atari") || mimesignature.contains("Thomson"))
+           mimecategory = "ROM";
+       else if(mimesignature.contains("database") || mimesignature.contains("Database") || mimesignature.contains("SQL"))
+           mimecategory = "Database";
+       else if(mimesignature.contains("filesystem") || mimesignature.contains("disk image") || mimesignature.contains("AppImage") || mimesignature.contains("WiiWare"))
+           mimecategory = "Disk Image";
+       else if(mimesignature.contains("executable") || mimesignature.contains("Windows Intaller") || mimesignature.contains("library"))
+           mimecategory = "Executable";
+       else if(mimesignature.contains("Internet shortcut") || mimesignature.contains("backup file") || mimesignature.contains("VBScript") || mimesignature.contains("RDF") || mimesignature.contains("Streaming playlist") || mimesignature.contains("cache file") || mimesignature.contains("Remmina") || mimesignature.contains("GML") || mimesignature.contains("GPX") || mimesignature.contains("MathML") || mimesignature.contains("Metalink") || mimesignature.contains("XML") || mimesignature.contains("RDF") || mimesignature.contains("KML") || mimesignature.contains("FictionBook") || mimesignature.contains("NewzBin"))
+           mimecategory = "Text";
+       else if(mimesignature.contains("Windows animated cursor"))
+           mimecategory = "Image";
+       else if(mimesignature.contains("SPSS") || mimesignature.contains("MHTML"))
+           mimecategory = "Archive";
+       else if(mimesignature.contains("empty"))
+           mimecategory = "Empty File";
+       else
+           mimecategory = "Binary";
+    }
+    else if(geniconstr.contains("x-content-x-generic")) 
+    {
+        if(mimesignature.contains("audio"))
+            mimecategory = "Audio";
+        else if(mimesignature.contains("blank"))
+            mimecategory = "Disk Image";
+        else if(mimesignature.contains("e-book"))
+            mimecategory = "Document";
+        else if(mimesignature.contains("photos") || mimesignature.contains("Picture"))
+            mimecategory = "Image";
+        else if(mimesignature.contains("software"))
+            mimecategory = "Executable";
+        else if(mimesignature.contains("video") || mimesignature.contains("Video"))
+            mimecategory = "Video";
+    }
+    //if(orphanlist->at(j).value("itemtype").toUInt() == 2)
+    //    mimestr = "Directory/Directory";
+		    //else if(sigbuf.left(4) == "FILE")
+			//mimestr = "Windows System/MFT File Entry";
+    if(mimestr.isEmpty())
+        return QString(mimecategory + "/" + mimesignature);
+    else
+        return mimestr;
+}
+*/ 

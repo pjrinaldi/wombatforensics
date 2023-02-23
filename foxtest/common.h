@@ -9,6 +9,8 @@
 #include <cmath>
 #include <bitset>
 
+#include <magic.h>
+
 #include "forensicimage.h"
 
 #define DTTMFMT "%F %T %z"
@@ -95,5 +97,7 @@ void ReadInteger(uint8_t* arr, int begin, uint64_t* val, bool isbigendian=false)
 
 void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
 std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocksize, uint64_t rootdiroffset);
+
+void GenerateCategorySignature(CurrentItem* currentitem, std::string* layout, std::string* cat, std::string* sig);
 
 #endif

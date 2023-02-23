@@ -684,6 +684,15 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                         //    std::cout << "cluster " << i << ": " << clusterlist.at(i) << std::endl;
                         if(clusterlist.size() > 0)
                             tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
+                        if(tmpitem.isdirectory)
+                        {
+                            tmpitem.cat = "Directory";
+                            tmpitem.sig = "Directory";
+                        }
+                        else
+                        {
+                            GenerateCategorySignature(currentitem, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+                        }
                         //std::cout << "tmpitem layout: " << tmpitem.layout << std::endl;
                         /*
                         uint16_t hiclusternum = qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 20, 2)); // always zero for fat12/16
