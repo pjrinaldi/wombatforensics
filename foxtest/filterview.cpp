@@ -5,8 +5,11 @@ FXIMPLEMENT(FilterView,FXDialogBox,FilterViewMap,ARRAYNUMBER(FilterViewMap))
 FilterView::FilterView(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_RESIZE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 680, 400, 0,0,0,0, 10, 10)
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    filteredlist = new FXTable(mainframe, this, 0, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    filteredlist = new FXTable(mainframe, this, ID_FTABLE, TABLE_COL_SIZABLE|LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    filteredlist->setTableSize(5,14);
     filteredlist->setRowHeaderWidth(0);
+    filteredlist->setColumnText(1, "ID");
+    filteredlist->setColumnHeaderHeight(filteredlist->getColumnHeaderHeight() + 5);
     filtericon = new FXPNGIcon(this->getApp(), filter);
     filtericon->create();
     /*
@@ -70,7 +73,7 @@ void FilterView::ApplyFilter(CurrentItem* currentitem, int colindex, std::string
     }
     // table initialization
     filteredlist->setTableSize(filearray.size(), 14);
-    filteredlist->setColumnText(0, "");
+    filteredlist->setColumnText(0, "ROW");
     filteredlist->setColumnText(1, "ID");
     filteredlist->setColumnText(2, "Name");
     filteredlist->setColumnText(3, "Path");
@@ -94,12 +97,24 @@ void FilterView::ApplyFilter(CurrentItem* currentitem, int colindex, std::string
         filestream.seekg(0);
         filestream.read(&filecontent[0], readsize);
         filestream.close();
+        filteredlist->setItemText(i, 0, FXString::value(i+1));
         filteredlist->setItemText(i, 1, GetFileItem(&filecontent, 0).c_str());
         filteredlist->setItemText(i, 2, GetFileItem(&filecontent, 4).c_str());
+        filteredlist->setItemText(i, 3, GetFileItem(&filecontent, 5).c_str());
+        filteredlist->setItemText(i, 4, ReturnFormattingSize(std::stoull(GetFileItem(&filecontent, 3).c_str())).c_str());
+        filteredlist->setItemText(i, 5, GetFileItem(&filecontent, 6).c_str());
+        filteredlist->setItemText(i, 6, GetFileItem(&filecontent, 7).c_str());
+        filteredlist->setItemText(i, 7, GetFileItem(&filecontent, 8).c_str());
+        //filteredlist->setItemText(i, 8, GetFileItem(&filecontent, 16).c_str());
+        //filteredlist->setItemText(i, 9, GetFileItem(&filecontent, 11).c_str());
+        //filteredlist->setItemText(i, 10, GetFileItem(&filecontent, 12).c_str());
+        //filteredlist->setItemText(i, 11, GetFileItem(&filecontent, 13).c_str());
+        //filteredlist->setItemText(i, 12, GetFileItem(&filecontent, 14).c_str());
+        //filteredlist->setItemText(i, 13, GetFileItem(&filecontent, 15).c_str());
     }
     // table formatting
     filteredlist->fitColumnsToContents(0);
-    //filteredlist->setColumnWidth(0, filteredlist->getColumnWidth(0) + 25);
+    filteredlist->setColumnWidth(0, filteredlist->getColumnWidth(0) + 25);
     FitColumnContents(1);
     FitColumnContents(2);
     FitColumnContents(4);
@@ -110,7 +125,7 @@ void FilterView::ApplyFilter(CurrentItem* currentitem, int colindex, std::string
     AlignColumn(filteredlist, 5, FXTableItem::LEFT);
     AlignColumn(filteredlist, 6, FXTableItem::LEFT);
     AlignColumn(filteredlist, 7, FXTableItem::LEFT);
-
+    
     /*
             //std::cout << "filestr " << i << ": " << filearray.at(i) << std::endl;
             FileItem tmpitem;
@@ -119,6 +134,7 @@ void FilterView::ApplyFilter(CurrentItem* currentitem, int colindex, std::string
             tmpitem.isdirectory = std::stoi(GetFileItem(&filecontent, 2).c_str());
             tmpitem.size = std::stoull(GetFileItem(&filecontent, 3).c_str());
             tmpitem.name = GetFileItem(&filecontent, 4);
+            filteredlist->setItemText(i, 4, FXString(ReturnFormattingSize(fileitems->at(i).size).c_str()));
             //std::cout << "read file name: " << tmpitem.name << " isdirectory: " << tmpitem.isdirectory << std::endl;
             tmpitem.path = GetFileItem(&filecontent, 5);
             tmpitem.create = GetFileItem(&filecontent, 6);

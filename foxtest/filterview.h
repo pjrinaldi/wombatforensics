@@ -36,6 +36,7 @@ class FilterView : public FXDialogBox
     public:
         enum
         {
+            ID_FTABLE = 101,
             //ID_MANAGE = 103,
 	    //ID_ADDROW = 104,
 	    //ID_FTTABLE = 106,
