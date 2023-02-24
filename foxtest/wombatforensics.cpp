@@ -2296,6 +2296,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         //tmpfile.open(
         //FXFile;
     }
+    uint64_t curpos = 0;
     for(int i=0; i < layoutlist.size(); i++)
     {
         std::size_t layoutsplit = layoutlist.at(i).find(",");
@@ -2305,17 +2306,21 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         if(curlogicalsize <= curfileitem->size)
         {
             // NEED TO ADJUST THE POSITION OF TMPBUFFER SO I'M NOT OVERWRITING THE DATA
+            //position (FXlong offset, FXuint from=FXIO::Begin)
             if(inmemory)
             {
                 uint8_t* inbuf = new uint8_t[cursize];
                 curforimg->ReadContent(inbuf, curoffset, cursize);
-                tmpbuffer.writeBlock(inbuf, cursize);
+                int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize);
+                curpos = curpos + byteswritten;
+                tmpbuffer.position(curpos);
             }
             else
             {
                 uint8_t* inbuf = new uint8_t[cursize - (curlogicalsize - curfileitem->size)];
                 curforimg->ReadContent(inbuf, curoffset, cursize - (curlogicalsize - curfileitem->size));
-                tmpbuffer.writeBlock(inbuf, cursize - (curlogicalsize - curfileitem->size));
+                int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize - (curlogicalsize - curfileitem->size));
+                curpos = curpos + byteswritten;
             }
         }
         else
