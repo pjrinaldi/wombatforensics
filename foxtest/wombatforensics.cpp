@@ -2263,12 +2263,136 @@ void WombatForensics::FitColumnContents(int col)
 
 void WombatForensics::PlainView(FileItem* curfileitem)
 {
+    bool inmemory = true;
+    uint64_t memlimit = 4294967296; // 4GB
     std::cout << "name: " << curfileitem->name << std::endl;
     std::cout << "layout: " << curfileitem->layout << std::endl;
+    std::cout << "size: " << curfileitem->size << std::endl;
     std::cout << "sig: " << curfileitem->sig << std::endl;
+    std::cout << "curforimg: " << curforimg->ImageFileName() << std::endl;
+
+    if(curfileitem->size > memlimit)
+        inmemory = false;
+    std::vector<std::string> layoutlist;
+    layoutlist.clear();
+    std::istringstream layoutstream(curfileitem->layout);
+    std::string curlayout;
+    while(getline(layoutstream, curlayout, ';'))
+        layoutlist.push_back(curlayout);
+    FXIOBuffer tmpbuffer;
+    FXFile tmpfile;
+    uint64_t curlogicalsize = 0;
+    uint8_t* tmpbuf = NULL;
+    if(inmemory) // store in memory
+    {
+        tmpbuf = new uint8_t[curfileitem->size+1];
+        tmpbuffer.open(tmpbuf, curfileitem->size+1, FXIO::ReadWrite);
+    }
+    else // write to tmp file
+    {
+        std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+        //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
+        tmpbuf = new uint8_t[65536];
+        //tmpfile.open(
+        //FXFile;
+    }
+    for(int i=0; i < layoutlist.size(); i++)
+    {
+        std::size_t layoutsplit = layoutlist.at(i).find(",");
+        uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
+        uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
+        curlogicalsize += cursize;
+        if(curlogicalsize <= curfileitem->size)
+        {
+            // NEED TO ADJUST THE POSITION OF TMPBUFFER SO I'M NOT OVERWRITING THE DATA
+            if(inmemory)
+            {
+                uint8_t* inbuf = new uint8_t[cursize];
+                curforimg->ReadContent(inbuf, curoffset, cursize);
+                tmpbuffer.writeBlock(inbuf, cursize);
+            }
+            else
+            {
+                uint8_t* inbuf = new uint8_t[cursize - (curlogicalsize - curfileitem->size)];
+                curforimg->ReadContent(inbuf, curoffset, cursize - (curlogicalsize - curfileitem->size));
+                tmpbuffer.writeBlock(inbuf, cursize - (curlogicalsize - curfileitem->size));
+            }
+        }
+        else
+        {
+        }
+    }
+    if(inmemory)
+        tmpbuffer.close();
+    else
+        tmpfile.close();
     // HERE IS WHERE I NEED TO WRITE THE CONTENT INTO A TMP FILE AND THEN LOAD IT INTO FXText based on the signature
     // and what i need to do to parse it.
 }
+/*
+QString ReturnFileContent(ForImg* curimg, QString objectid)
+{
+        for(int i=1; i <= layoutlist.count(); i++)
+        {
+            //QByteArray filecontent;
+            //filecontent.clear();
+            quint64 curoffset = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
+            quint64 cursize = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
+            //qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
+            curlogsize += cursize;
+            if(curlogsize <= logicalsize)
+            {
+                tmpfile.write(curimg->ReadContent(curoffset, cursize));
+                //filecontent.append(curimg->ReadContent(curoffset, cursize));
+            }
+            else
+            {
+		tmpfile.write(curimg->ReadContent(curoffset, (cursize - (curlogsize - logicalsize))));
+                //tmpfile.write(curimg->ReadContent(curoffset,  (logicalsize - ((i-1) * cursize))));
+                //filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((i-1) * cursize))));
+            }
+            //tmpfile.write(filecontent);
+        }
+        //qDebug() << "tmpfile size:" << tmpfile.size();
+        tmpfile.close();
+
+
+    //return filecontent;
+
+    return layout;
+
+}
+ */ 
+
+/*
+void HashFile(std::string filename, std::string whlfile)
+{
+    std::ifstream fin(filename.c_str());
+    char tmpchar[65536];
+    blake3_hasher hasher;
+    blake3_hasher_init(&hasher);
+    while(fin)
+    {
+	fin.read(tmpchar, 65536);
+	size_t cnt = fin.gcount();
+	blake3_hasher_update(&hasher, tmpchar, cnt);
+	if(!cnt)
+	    break;
+    }
+    uint8_t output[BLAKE3_OUT_LEN];
+    blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
+    std::stringstream ss;
+    for(int i=0; i < BLAKE3_OUT_LEN; i++)
+        ss << std::hex << (int)output[i]; 
+    std::string srcmd5 = ss.str();
+    std::string whlstr = srcmd5 + "," + filename + "\n";
+    FILE* whlptr = NULL;
+    whlptr = fopen(whlfile.c_str(), "a");
+    fwrite(whlstr.c_str(), strlen(whlstr.c_str()), 1, whlptr);
+    fclose(whlptr);
+}
+ */ 
+
 /*
 long WombatForensics::PropertySelected(FXObject*, FXSelector, void*)
 {
