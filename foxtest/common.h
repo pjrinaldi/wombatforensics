@@ -39,9 +39,9 @@ struct FileItem
     std::string modify = "";    //  8
     std::string layout = "";    //  9
     bool isvirtual = false;     // 10
-    std::string hash = "";      // 11
-    std::string cat = "";       // 12
-    std::string sig = "";       // 13
+    std::string cat = "";       // 11
+    std::string sig = "";       // 12
+    std::string hash = "";      // 13
     std::string tag = "";       // 14
     std::string match = "";     // 15
     std::string change = "";    // 16

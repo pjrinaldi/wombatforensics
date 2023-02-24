@@ -105,9 +105,9 @@ int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, F
             tmpitem.modify = GetFileItem(&filecontent, 8);
             tmpitem.layout = GetFileItem(&filecontent, 9);
             tmpitem.isvirtual = std::stoi(GetFileItem(&filecontent, 10).c_str());
-            tmpitem.hash = GetFileItem(&filecontent, 11);
-            tmpitem.cat = GetFileItem(&filecontent, 12);
-            tmpitem.sig = GetFileItem(&filecontent, 13);
+            tmpitem.cat = GetFileItem(&filecontent, 11);
+            tmpitem.sig = GetFileItem(&filecontent, 12);
+            tmpitem.hash = GetFileItem(&filecontent, 13);
             tmpitem.tag = GetFileItem(&filecontent, 14);
             tmpitem.match = GetFileItem(&filecontent, 15);
             //std::cout << "File item Values: " << std::endl;
@@ -692,6 +692,7 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                         else
                         {
                             GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+                            //std::cout << "cat/sig: " << tmpitem.cat << " " << tmpitem.sig << std::endl;
                         }
                         //std::cout << "tmpitem layout: " << tmpitem.layout << std::endl;
                         /*

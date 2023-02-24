@@ -2261,6 +2261,12 @@ void WombatForensics::FitColumnContents(int col)
     tablelist->setColumnWidth(col, tablelist->getColumnWidth(col) + 10);
 }
 
+void WombatForensics::PlainView(FileItem* curfileitem)
+{
+    std::cout << "name: " << curfileitem->name << std::endl;
+    std::cout << "layout: " << curfileitem->layout << std::endl;
+    std::cout << "sig: " << curfileitem->sig << std::endl;
+}
 /*
 long WombatForensics::PropertySelected(FXObject*, FXSelector, void*)
 {
@@ -2566,7 +2572,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             //FileItem curfileitem = fileitemvector.at(tablelist->getCurrentRow());
             currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
             if(!currentfileitem.isdirectory)
+            {
                 std::cout << "launch internal/external viewer for files here..." << std::endl;
+                PlainView(&currentfileitem);
+            }
             this->getApp()->endWaitCursor();
         }
     }
@@ -2823,22 +2832,22 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             FXFile::create(filestr + FXString::value(globalid), FXIO::OwnerReadWrite);
             filefile.open(filestr + FXString::value(globalid), FXIO::Writing, FXIO::OwnerReadWrite);
             FXString fileval = "";
-            fileval += FXString::value(globalid) + "|";
-            fileval += FXString::value(fileitems->at(i).isdeleted) + "|";
-            fileval += FXString::value(fileitems->at(i).isdirectory) + "|";
-            fileval += FXString::value(fileitems->at(i).size) + "|";
-            fileval += FXString(fileitems->at(i).name.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).path.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).create.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).access.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).modify.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).layout.c_str()) + "|";
-            fileval += FXString::value(fileitems->at(i).isvirtual); + "|";
-            fileval += FXString(fileitems->at(i).hash.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).cat.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).sig.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).tag.c_str()) + "|";
-            fileval += FXString(fileitems->at(i).match.c_str()) + "|";
+            fileval += FXString::value(globalid) + "|"; //                      0
+            fileval += FXString::value(fileitems->at(i).isdeleted) + "|"; //    1
+            fileval += FXString::value(fileitems->at(i).isdirectory) + "|"; //  2
+            fileval += FXString::value(fileitems->at(i).size) + "|"; //         3
+            fileval += FXString(fileitems->at(i).name.c_str()) + "|"; //        4
+            fileval += FXString(fileitems->at(i).path.c_str()) + "|"; //        5
+            fileval += FXString(fileitems->at(i).create.c_str()) + "|"; //      6
+            fileval += FXString(fileitems->at(i).access.c_str()) + "|"; //      7
+            fileval += FXString(fileitems->at(i).modify.c_str()) + "|"; //      8
+            fileval += FXString(fileitems->at(i).layout.c_str()) + "|"; //      9
+            fileval += FXString::value(fileitems->at(i).isvirtual) + "|"; //   10
+            fileval += FXString(fileitems->at(i).cat.c_str()) + "|"; //         11
+            fileval += FXString(fileitems->at(i).sig.c_str()) + "|"; //         12
+            fileval += FXString(fileitems->at(i).hash.c_str()) + "|"; //        13
+            fileval += FXString(fileitems->at(i).tag.c_str()) + "|"; //         14
+            fileval += FXString(fileitems->at(i).match.c_str()) + "|"; //       15
             filefile.writeBlock(fileval.text(), fileval.length());
             filefile.close();
             //std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
