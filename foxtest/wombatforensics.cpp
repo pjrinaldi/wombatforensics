@@ -2266,6 +2266,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     std::cout << "name: " << curfileitem->name << std::endl;
     std::cout << "layout: " << curfileitem->layout << std::endl;
     std::cout << "sig: " << curfileitem->sig << std::endl;
+    // HERE IS WHERE I NEED TO WRITE THE CONTENT INTO A TMP FILE AND THEN LOAD IT INTO FXText based on the signature
+    // and what i need to do to parse it.
 }
 /*
 long WombatForensics::PropertySelected(FXObject*, FXSelector, void*)
