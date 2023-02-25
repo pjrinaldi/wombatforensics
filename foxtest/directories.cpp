@@ -668,6 +668,7 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                         uint16_t loclusternum = 0;
                         ReadForImgContent(currentitem->forimg, &loclusternum, diroffset + i*32 + 26);
                         uint32_t clusternum = ((uint32_t)hiclusternum >> 16) + loclusternum;
+                        std::cout << "clusternum: " << clusternum << std::endl;
                         std::vector<uint> clusterlist;
                         clusterlist.clear();
                         if(clusternum >= 2)

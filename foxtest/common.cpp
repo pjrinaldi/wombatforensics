@@ -235,6 +235,7 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
 
 std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocksize, uint64_t rootdiroffset)
 {
+    std::cout << "blocklist count: " << blocklist->size() << std::endl;
     std::string layout = "";
     int blkcnt = 1;
     uint startvalue = blocklist->at(0);
