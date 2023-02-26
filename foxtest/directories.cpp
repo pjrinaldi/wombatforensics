@@ -673,6 +673,7 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                         clusterlist.clear();
                         if(clusternum >= 2)
                         {
+                            std::cout << "currentitem itemtext: " << currentitem->itemtext << std::endl;
                             clusterlist.push_back(clusternum);
                             if(currentitem->itemtext.find("[FAT12]") != std::string::npos)
                                 GetNextCluster(currentitem->forimg, clusternum, 1, bytespersector, &clusterlist);
