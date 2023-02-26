@@ -194,9 +194,10 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
     {
         if(clusternum >= 2)
         {
+            curcluster16 = 0;
             fatbyte1 = clusternum * 2;
 	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
-            std::cout << "next cluster: " << std::hex << curcluster16 << std::dec << std::endl;
+            std::cout << "next cluster: " << curcluster16 << std::dec << std::endl;
 	    
             if(curcluster16 < 0xFFF7 && curcluster16 >= 2)
             {

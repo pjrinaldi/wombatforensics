@@ -673,14 +673,16 @@ void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
                         clusterlist.clear();
                         if(clusternum >= 2)
                         {
-                            std::cout << "currentitem itemtext: " << currentitem->itemtext << std::endl;
+                            //std::cout << "currentitem itemtext: " << currentitem->itemtext << std::endl;
                             clusterlist.push_back(clusternum);
                             if(currentitem->itemtext.find("[FAT12]") != std::string::npos)
-                                GetNextCluster(currentitem->forimg, clusternum, 1, bytespersector, &clusterlist);
+                                GetNextCluster(currentitem->forimg, clusternum, 1, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
                             else if(currentitem->itemtext.find("[FAT16]") != std::string::npos)
-                                GetNextCluster(currentitem->forimg, clusternum, 2, bytespersector, &clusterlist);
+                                GetNextCluster(currentitem->forimg, clusternum, 2, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
 		            //GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
 //void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
+                            //QString::number((qulonglong)(curstartsector*512 + reservedareasize * bytespersector))
+                            //currentitem->voloffset + reservedareasize * bytespersector
                         }
                         //for(int i=0; i < clusterlist.size(); i++)
                         //    std::cout << "cluster " << i << ": " << clusterlist.at(i) << std::endl;
