@@ -2303,10 +2303,25 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
         uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
         // THE GOOD NEWS IS THE MEMORY MAPPED FILE IS WORKING!!!!
+        uint8_t* inbuf = NULL;
+        if(cursize > curfileitem->size)
+        {
+            inbuf = new uint8_t[curfileitem->size];
+            curforimg->ReadContent(inbuf, curoffset, curfileitem->size)
+        }
+        else
+        {
+            inbuf = new uint8_t[cursize];
+            curforimg->ReadContent(inbuf, curoffset, cursize);
+            curlogicalsize += cursize;
+        }
+
+
         // THIS WON'T WORK EITHER... I NEED TO IMPLEMENT A COMBINATION OF THE BELOW...
         // NEED TO FIGURE IT OUT
         //curlogicalsize += cursize;
         //std::cout << "curlogicalsize: " << curlogicalsize << std::endl;
+        /*
         if(inmemory) // can load all at once...
         {
             uint8_t* inbuf = new uint8_t[curfileitem->size];
@@ -2320,6 +2335,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         else
         {
         }
+        */
         /*
         if(curlogicalsize <= curfileitem->size)
         {
