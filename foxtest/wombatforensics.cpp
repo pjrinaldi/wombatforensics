@@ -2302,7 +2302,25 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         std::size_t layoutsplit = layoutlist.at(i).find(",");
         uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
         uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
-        curlogicalsize += cursize;
+        // THE GOOD NEWS IS THE MEMORY MAPPED FILE IS WORKING!!!!
+        // THIS WON'T WORK EITHER... I NEED TO IMPLEMENT A COMBINATION OF THE BELOW...
+        // NEED TO FIGURE IT OUT
+        //curlogicalsize += cursize;
+        //std::cout << "curlogicalsize: " << curlogicalsize << std::endl;
+        if(inmemory) // can load all at once...
+        {
+            uint8_t* inbuf = new uint8_t[curfileitem->size];
+            curforimg->ReadContent(inbuf, curoffset, curfileitem->size);
+            std::cout << "5 from buffer: ";
+            for(int i=0; i < 5; i++)
+                std::cout << (char)inbuf[i];
+            std::cout << std::endl;
+            int64_t byteswritten = tmpbuffer.writeBlock(inbuf, curfileitem->size);
+        }
+        else
+        {
+        }
+        /*
         if(curlogicalsize <= curfileitem->size)
         {
             // NEED TO ADJUST THE POSITION OF TMPBUFFER SO I'M NOT OVERWRITING THE DATA
@@ -2311,6 +2329,11 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             {
                 uint8_t* inbuf = new uint8_t[cursize];
                 curforimg->ReadContent(inbuf, curoffset, cursize);
+                std::cout << std::endl;
+                std::cout << "5 from buffer: ";
+                for(int i=0; i < 6; i++)
+                    std::cout << (char)inbuf[i];
+                std::cout << std::endl;
                 int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize);
                 curpos = curpos + byteswritten;
                 tmpbuffer.position(curpos);
@@ -2326,7 +2349,17 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         else
         {
         }
+        */
     }
+    std::cout << std::endl << "5 characters from buffer: ";
+    for(int i=0; i < 6; i++)
+    {
+        tmpbuffer.position(i, FXIO::Begin);
+        char curchar;
+        tmpbuffer.readChar(curchar);
+        std::cout << curchar;
+    }
+    std::cout << std::endl;
     if(inmemory)
         tmpbuffer.close();
     else

@@ -197,8 +197,6 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
             curcluster16 = 0;
             fatbyte1 = clusternum * 2;
 	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
-            std::cout << "next cluster: " << curcluster16 << std::dec << std::endl;
-	    
             if(curcluster16 < 0xFFF7 && curcluster16 >= 2)
             {
                 clusterlist->push_back(curcluster16);
@@ -237,7 +235,6 @@ void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_
 
 std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocksize, uint64_t rootdiroffset)
 {
-    std::cout << "blocklist count: " << blocklist->size() << std::endl;
     std::string layout = "";
     int blkcnt = 1;
     uint startvalue = blocklist->at(0);
