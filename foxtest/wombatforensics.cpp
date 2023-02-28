@@ -2285,8 +2285,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     uint8_t* tmpbuf = NULL;
     if(inmemory) // store in memory
     {
-        tmpbuf = new uint8_t[curfileitem->size+1];
-        tmpbuffer.open(tmpbuf, curfileitem->size+1, FXIO::ReadWrite);
+        tmpbuf = new uint8_t[curfileitem->size];
+        tmpbuffer.open(tmpbuf, curfileitem->size, FXIO::ReadWrite);
     }
     else // write to tmp file
     {
@@ -2302,72 +2302,41 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         std::size_t layoutsplit = layoutlist.at(i).find(",");
         uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
         uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
+        //std::cout << "curoffset: " << curoffset << " cursize: " << cursize << std::endl;
         // THE GOOD NEWS IS THE MEMORY MAPPED FILE IS WORKING!!!!
+
         uint8_t* inbuf = NULL;
-        if(cursize > curfileitem->size)
-        {
-            inbuf = new uint8_t[curfileitem->size];
-            curforimg->ReadContent(inbuf, curoffset, curfileitem->size)
-        }
-        else
-        {
-            inbuf = new uint8_t[cursize];
-            curforimg->ReadContent(inbuf, curoffset, cursize);
-            curlogicalsize += cursize;
-        }
-
-
-        // THIS WON'T WORK EITHER... I NEED TO IMPLEMENT A COMBINATION OF THE BELOW...
-        // NEED TO FIGURE IT OUT
-        //curlogicalsize += cursize;
-        //std::cout << "curlogicalsize: " << curlogicalsize << std::endl;
-        /*
-        if(inmemory) // can load all at once...
-        {
-            uint8_t* inbuf = new uint8_t[curfileitem->size];
-            curforimg->ReadContent(inbuf, curoffset, curfileitem->size);
-            std::cout << "5 from buffer: ";
-            for(int i=0; i < 5; i++)
-                std::cout << (char)inbuf[i];
-            std::cout << std::endl;
-            int64_t byteswritten = tmpbuffer.writeBlock(inbuf, curfileitem->size);
-        }
-        else
-        {
-        }
-        */
-        /*
+        curlogicalsize += cursize;
+        //std::cout << "curlogicalsize: " << curlogicalsize << "|" << cursize << " :cursize" << std::endl;
         if(curlogicalsize <= curfileitem->size)
         {
-            // NEED TO ADJUST THE POSITION OF TMPBUFFER SO I'M NOT OVERWRITING THE DATA
-            //position (FXlong offset, FXuint from=FXIO::Begin)
             if(inmemory)
             {
-                uint8_t* inbuf = new uint8_t[cursize];
+                inbuf = new uint8_t[cursize];
                 curforimg->ReadContent(inbuf, curoffset, cursize);
-                std::cout << std::endl;
-                std::cout << "5 from buffer: ";
-                for(int i=0; i < 6; i++)
-                    std::cout << (char)inbuf[i];
-                std::cout << std::endl;
-                int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize);
-                curpos = curpos + byteswritten;
                 tmpbuffer.position(curpos);
-            }
-            else
-            {
-                uint8_t* inbuf = new uint8_t[cursize - (curlogicalsize - curfileitem->size)];
-                curforimg->ReadContent(inbuf, curoffset, cursize - (curlogicalsize - curfileitem->size));
-                int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize - (curlogicalsize - curfileitem->size));
-                curpos = curpos + byteswritten;
+                int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize);
+                //std::cout << "bytes written: " << byteswritten << std::endl;
+                curpos += byteswritten;
             }
         }
         else
         {
+            //std::cout << "reduction size: " << cursize - (curlogicalsize - curfileitem->size) << std::endl;
+            inbuf = new uint8_t[(cursize - (curlogicalsize - curfileitem->size))];
+            curforimg->ReadContent(inbuf, curoffset, (cursize - (curlogicalsize - curfileitem->size)));
+            //std::cout << "inbuf head: " << (char)inbuf[0] << (char)inbuf[1] << std::endl;
+            tmpbuffer.position(curpos);
+            //std::cout << "tmpbuf pos: " << tmpbuffer.position() << std::endl;
+            int64_t byteswritten = tmpbuffer.writeBlock(inbuf, (cursize - (curlogicalsize - curfileitem->size)));
+            //std::cout << "bytes written: "<< byteswritten << std::endl;
+            curpos += byteswritten;
         }
-        */
+
+
     }
-    std::cout << std::endl << "5 characters from buffer: ";
+    /*
+    std::cout << std::endl << "5 characters from buffer: |";
     for(int i=0; i < 6; i++)
     {
         tmpbuffer.position(i, FXIO::Begin);
@@ -2375,48 +2344,16 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         tmpbuffer.readChar(curchar);
         std::cout << curchar;
     }
-    std::cout << std::endl;
+    std::cout << "|" << std::endl;
+    */
+
+    // HERE IS WHERE I NEED TO PROCESS THE CONTENT TO DISPLAY IN FXTEXT
+
     if(inmemory)
         tmpbuffer.close();
     else
         tmpfile.close();
-    // HERE IS WHERE I NEED TO WRITE THE CONTENT INTO A TMP FILE AND THEN LOAD IT INTO FXText based on the signature
-    // and what i need to do to parse it.
 }
-/*
-QString ReturnFileContent(ForImg* curimg, QString objectid)
-{
-        for(int i=1; i <= layoutlist.count(); i++)
-        {
-            //QByteArray filecontent;
-            //filecontent.clear();
-            quint64 curoffset = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(0).toULongLong();
-            quint64 cursize = layoutlist.at(i-1).split(",", Qt::SkipEmptyParts).at(1).toULongLong();
-            //qDebug() << "i:" << i << "curoffset:" << curoffset << "cursize:" << cursize;
-            curlogsize += cursize;
-            if(curlogsize <= logicalsize)
-            {
-                tmpfile.write(curimg->ReadContent(curoffset, cursize));
-                //filecontent.append(curimg->ReadContent(curoffset, cursize));
-            }
-            else
-            {
-		tmpfile.write(curimg->ReadContent(curoffset, (cursize - (curlogsize - logicalsize))));
-                //tmpfile.write(curimg->ReadContent(curoffset,  (logicalsize - ((i-1) * cursize))));
-                //filecontent.append(curimg->ReadContent(curoffset, (logicalsize - ((i-1) * cursize))));
-            }
-            //tmpfile.write(filecontent);
-        }
-        //qDebug() << "tmpfile size:" << tmpfile.size();
-        tmpfile.close();
-
-
-    //return filecontent;
-
-    return layout;
-
-}
- */ 
 
 /*
 void HashFile(std::string filename, std::string whlfile)
@@ -2446,6 +2383,7 @@ void HashFile(std::string filename, std::string whlfile)
     fclose(whlptr);
 }
  */ 
+
 
 /*
 long WombatForensics::PropertySelected(FXObject*, FXSelector, void*)
