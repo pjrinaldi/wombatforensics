@@ -2356,13 +2356,56 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         zip_t* curzip = NULL;
         char* zipbuf = new char[tmpbuffer.size()];
         tmpbuffer.readBlock(zipbuf, tmpbuffer.size());
-        std::cout << "zipbuf 2 char: " << zipbuf[0] << zipbuf[1] << std::endl;
+        //std::cout << "zipbuf 2 char: " << zipbuf[0] << zipbuf[1] << std::endl;
         zip_source_t* zipsrc = zip_source_buffer_create(zipbuf, tmpbuffer.size(), 1, &err);
         curzip = zip_open_from_source(zipsrc, ZIP_RDONLY, &err);
         int64_t zipentrycnt = zip_get_num_entries(curzip, 0);
-        std::cout << "zip entries count: " << zipentrycnt << std::endl;
+        //std::cout << "zip entries count: " << zipentrycnt << std::endl;
+        struct zip_stat zipstat;
+        zip_stat_init(&zipstat);
+        for(int i=0; i < zipentrycnt; i++)
+        {
+            zip_stat_index(curzip, i, 0, &zipstat);
+            if(strcmp(zipstat.name, "word/document.xml") == 0)
+            {
+                zipfileid = i;
+                zipfilename = zipstat.name;
+                zipfilesize = zipstat.size;
+            }
+        }
+        zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
+        char zipfilebuf[zipfilesize+1];
+        zip_int64_t bytesread = zip_fread(docxml, zipfilebuf, zipfilesize);
+        zipfilebuf[zipfilesize] = 0;
+        int interr = zip_fclose(docxml);
+
+        rapidxml::xml_document<> worddoc;
+        worddoc.parse<0>(zipfilebuf);
+        std::cout << worddoc.first_node()->name() << " " << worddoc.first_node()->type() << std::endl;
+        /*
         pugi::xml_document worddoc;
-        std::cout << "attempt pugi here" << std::endl;
+        pugi::xml_parse_result result = worddoc.load_buffer_inplace(&zipfilebuf, zipfilesize, pugi::parse_default, pugi::encoding_auto);
+        pugi::xml_node rootnode = worddoc.root();
+        std::cout << "root node: " << rootnode.name() << std::endl;
+        */
+        /*
+        simple_walker walker;
+        worddoc.traverse(walker);
+        */
+        
+        /*
+        pugi::xml_document worddoc;
+        pugi::xml_parse_result result = worddoc.load_buffer_inplace(&zipfilebuf, zipfilesize, pugi::parse_default, pugi::encoding_auto);
+        if(result)
+        {
+            std::cout << "pos result: " << worddoc.child("node").attribute("attr").value() << std::endl;
+        }
+        else
+        {
+            std::cout << "neg result: " << worddoc.child("node").attribute("attr").value() << std::endl;
+        }
+        //std::cout << "attempt pugi here" << std::endl;
+        */
     }
 
     if(inmemory)
@@ -2372,15 +2415,6 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 }
 
 /*
-    QString docxstr = "<html><body style='" + ReturnCssString(0) + "'>";
-    //qDebug() << "xmlid:" << xmlid << "xml name:" << xmlname;
-    int err = 0;
-    int zipfileid = 0;
-    QString zipfilename = "";
-    zip_uint64_t zipfilesize = 0;
-    QString docxfilestr = wombatvariable.tmpfilepath + xmlid + "-fhex";
-    zip* curzip = zip_open(docxfilestr.toStdString().c_str(), ZIP_RDONLY, &err);
-    qint64 zipentrycnt = zip_get_num_entries(curzip, 0);
     struct zip_stat zipstat;
     zip_stat_init(&zipstat);
     for(int i=0; i < zipentrycnt; i++)
@@ -2395,10 +2429,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         }
     }
     //qDebug() << "zipfileid:" << zipfileid << "zipfilename:" << zipfilename << "zipfilesize:" << zipfilesize;
-    //zip_file_t* docxml = NULL;
     zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
     char zipbuf[zipfilesize];
-    //void* zipbuf = NULL;
     zip_int64_t bytesread = zip_fread(docxml, zipbuf, zipfilesize);
     err = zip_fclose(docxml);
     //qDebug() << "bytesread:" << bytesread;
