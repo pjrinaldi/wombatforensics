@@ -2393,6 +2393,15 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         else
             std::cout << "none of the above" << std::endl;
         /*
+xml_node<> *curNode = ... // e. g. parentNode->first_node();
+while (curNode) {
+    string start = curNode->first_attribute("start")->value();
+    string numStaff = curNode->first_attribute("numStaff")->value();
+    cout << start << "\t" << numStaff << endl;
+    curNode = curNode->next_sibling();
+}
+         */ 
+        /*
 void ParseWithAtrribute()
 {
     std::string str("<?xml version=\"1.0\" encoding=\"utf-8\"?> <protocol version=\"1.5\"> <srvResponse> <dateTime>2016-10-18T08:51:50.657+01:00</dateTime> <responseFrom ag=\"1\"/> <idMessage>0</idMessage> <rejectionCode>0</rejectionCode> </srvResponse> </protocol>");
