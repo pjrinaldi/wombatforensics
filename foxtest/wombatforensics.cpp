@@ -2382,6 +2382,53 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         rapidxml::xml_document<> worddoc;
         worddoc.parse<0>(zipfilebuf);
         std::cout << worddoc.first_node()->name() << " " << worddoc.first_node()->type() << std::endl;
+        if(worddoc.first_node()->type() == rapidxml::node_data)
+            std::cout << "data node" << std::endl;
+        else if(worddoc.first_node()->type() == rapidxml::node_cdata)
+            std::cout << "cdata node" << std::endl;
+        else if(worddoc.first_node()->type() == rapidxml::node_comment)
+            std::cout << "comment node" << std::endl;
+        else if(worddoc.first_node()->type() == rapidxml::node_doctype)
+            std::cout << "doctype node" << std::endl;
+        else
+            std::cout << "none of the above" << std::endl;
+        /*
+void ParseWithAtrribute()
+{
+    std::string str("<?xml version=\"1.0\" encoding=\"utf-8\"?> <protocol version=\"1.5\"> <srvResponse> <dateTime>2016-10-18T08:51:50.657+01:00</dateTime> <responseFrom ag=\"1\"/> <idMessage>0</idMessage> <rejectionCode>0</rejectionCode> </srvResponse> </protocol>");
+    rapidxml::xml_document<> doc;
+    doc.parse<0>((char *)(str.c_str()));
+
+    rapidxml::xml_node<> *pRootNode = doc.first_node();
+    if (pRootNode != NULL)
+    {
+        std::cout << pRootNode->name() << " " << pRootNode->value() << std::endl; // protocol
+        rapidxml::xml_attribute<> *pAttr = pRootNode->first_attribute();
+        if (pAttr != NULL)
+        {
+            std::cout << pAttr->name() << " " << pAttr->value() << std::endl; // version
+        }
+
+        rapidxml::xml_node<> *pChildNode = pRootNode->first_node();
+        if (pChildNode != NULL)
+        {
+            std::cout << pChildNode->name() << " " << pChildNode->value() << std::endl;
+            rapidxml::xml_node<> * pSonNode = pChildNode->first_node();
+            for (; pSonNode != NULL; pSonNode = pSonNode->next_sibling())
+            {
+                std::cout << pSonNode->name() << " " << pSonNode->value() << std::endl;
+                rapidxml::xml_attribute<> *pSonAttr = pSonNode->first_attribute();
+                if (pSonAttr != NULL)
+                {
+                    std::cout << "  " << pSonAttr->name() << ":" << pSonAttr->value() << std::endl;
+                }
+            }
+        }
+    }
+}
+         */
+
+
         /*
         pugi::xml_document worddoc;
         pugi::xml_parse_result result = worddoc.load_buffer_inplace(&zipfilebuf, zipfilesize, pugi::parse_default, pugi::encoding_auto);
