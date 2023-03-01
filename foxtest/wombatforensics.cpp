@@ -2332,8 +2332,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             //std::cout << "bytes written: "<< byteswritten << std::endl;
             curpos += byteswritten;
         }
-
-
+        delete[] inbuf;
     }
     /*
     std::cout << std::endl << "5 characters from buffer: |";
@@ -2348,12 +2347,79 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     */
 
     // HERE IS WHERE I NEED TO PROCESS THE CONTENT TO DISPLAY IN FXTEXT
+    if(curfileitem->sig.compare("Microsoft Word 2007+") == 0) // word document
+    {
+        zip_error_t err;
+        int zipfileid = 0;
+        std::string zipfilename = "";
+        zip_uint64_t zipfilesize = 0;
+        zip_t* curzip = NULL;
+        char* zipbuf = new char[tmpbuffer.size()];
+        tmpbuffer.readBlock(zipbuf, tmpbuffer.size());
+        std::cout << "zipbuf 2 char: " << zipbuf[0] << zipbuf[1] << std::endl;
+        zip_source_t* zipsrc = zip_source_buffer_create(zipbuf, tmpbuffer.size(), 1, &err);
+        curzip = zip_open_from_source(zipsrc, ZIP_RDONLY, &err);
+        int64_t zipentrycnt = zip_get_num_entries(curzip, 0);
+        std::cout << "zip entries count: " << zipentrycnt << std::endl;
+        pugi::xml_document worddoc;
+        std::cout << "attempt pugi here" << std::endl;
+    }
 
     if(inmemory)
         tmpbuffer.close();
     else
         tmpfile.close();
 }
+
+/*
+    QString docxstr = "<html><body style='" + ReturnCssString(0) + "'>";
+    //qDebug() << "xmlid:" << xmlid << "xml name:" << xmlname;
+    int err = 0;
+    int zipfileid = 0;
+    QString zipfilename = "";
+    zip_uint64_t zipfilesize = 0;
+    QString docxfilestr = wombatvariable.tmpfilepath + xmlid + "-fhex";
+    zip* curzip = zip_open(docxfilestr.toStdString().c_str(), ZIP_RDONLY, &err);
+    qint64 zipentrycnt = zip_get_num_entries(curzip, 0);
+    struct zip_stat zipstat;
+    zip_stat_init(&zipstat);
+    for(int i=0; i < zipentrycnt; i++)
+    {
+        zip_stat_index(curzip, i, 0, &zipstat);
+        //if(zipstat.name = "document.xml")
+        if(zipstat.name == xmlcontent)
+        {
+            zipfileid = i;
+            zipfilename = zipstat.name;
+            zipfilesize = zipstat.size;
+        }
+    }
+    //qDebug() << "zipfileid:" << zipfileid << "zipfilename:" << zipfilename << "zipfilesize:" << zipfilesize;
+    //zip_file_t* docxml = NULL;
+    zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
+    char zipbuf[zipfilesize];
+    //void* zipbuf = NULL;
+    zip_int64_t bytesread = zip_fread(docxml, zipbuf, zipfilesize);
+    err = zip_fclose(docxml);
+    //qDebug() << "bytesread:" << bytesread;
+    QByteArray filearray = QByteArray::fromRawData(zipbuf, zipfilesize);
+    //qDebug() << "document.xml:" << filearray.left(5);
+    QXmlStreamReader xmlreader;
+    xmlreader.addData(filearray);
+    while(!xmlreader.atEnd())
+    {
+        xmlreader.readNext();
+        if(xmlreader.isCharacters() || xmlreader.isDTD() || xmlreader.isEntityReference() || xmlreader.isComment())
+        {
+            docxstr += "<p>";
+            docxstr += xmlreader.text();
+            //docxstr += "\n";
+            docxstr += "</p>";
+            //qDebug() << "Text:" << xmlreader.text();
+        }
+    }
+    xmlreader.clear();
+ */ 
 
 /*
 void HashFile(std::string filename, std::string whlfile)

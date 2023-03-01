@@ -9,6 +9,6 @@ icons: $(ICONS) icons.h
 # Link it all together
 
 wombatforensics: $(OBJECTS)
-	g++ -O3 -o wombatforensics $(OBJECTS) -lX11 -lXext -lXft -lfontconfig -lfreetype -lXcursor -lXrender -lXrandr -lXfixes -lXi -lGLU -lGL -ldl -lpthread -ljpeg -lrt -lpng -ltiff -lz -lbz2 -ltar -lewf -laff4 -lsmraw -lzstd -lmagic libFOX-1.7.a
+	g++ -O3 -o wombatforensics $(OBJECTS) -lX11 -lXext -lXft -lfontconfig -lfreetype -lXcursor -lXrender -lXrandr -lXfixes -lXi -lGLU -lGL -ldl -lpthread -ljpeg -lrt -lpng -ltiff -lz -lbz2 -ltar -lewf -laff4 -lsmraw -lzstd -lmagic -lzip -lpugixml libFOX-1.7.a
 
 wombatforensics.o: wombatforensics.cpp icons.cpp managetags.cpp aboutbox.cpp viewer.cpp common.cpp settings.cpp managecarving.cpp evidencemanager.cpp forensicimage.cpp partitions.cpp directories.cpp manageviewer.cpp messagelog.cpp filters.cpp filterview.cpp

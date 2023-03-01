@@ -32,8 +32,10 @@
 #include "filters.h"
 #include "filterview.h"
 // SHARED LIBRARIES
-#include <tar.h>
-#include <libtar.h>
+#include <tar.h> // TAR FOR WCF
+#include <libtar.h> // TAR FOR WCF
+#include <pugixml.hpp> // XML PARSING
+#include <zip.h> // ZIP PARSING
 
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
