@@ -2373,6 +2373,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
                 zipfilesize = zipstat.size;
             }
         }
+        std::cout << "zipfileid: " << zipfileid << std::endl;
         zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
         char zipfilebuf[zipfilesize+1];
         zip_int64_t bytesread = zip_fread(docxml, zipfilebuf, zipfilesize);
@@ -2381,93 +2382,32 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 
         rapidxml::xml_document<> worddoc;
         worddoc.parse<0>(zipfilebuf);
-        std::cout << worddoc.first_node()->name() << " " << worddoc.first_node()->type() << std::endl;
-        if(worddoc.first_node()->type() == rapidxml::node_data)
-            std::cout << "data node" << std::endl;
-        else if(worddoc.first_node()->type() == rapidxml::node_cdata)
-            std::cout << "cdata node" << std::endl;
-        else if(worddoc.first_node()->type() == rapidxml::node_comment)
-            std::cout << "comment node" << std::endl;
-        else if(worddoc.first_node()->type() == rapidxml::node_doctype)
-            std::cout << "doctype node" << std::endl;
-        else
-            std::cout << "none of the above" << std::endl;
-        /*
-xml_node<> *curNode = ... // e. g. parentNode->first_node();
-while (curNode) {
-    string start = curNode->first_attribute("start")->value();
-    string numStaff = curNode->first_attribute("numStaff")->value();
-    cout << start << "\t" << numStaff << endl;
-    curNode = curNode->next_sibling();
-}
-         */ 
-        /*
-void ParseWithAtrribute()
-{
-    std::string str("<?xml version=\"1.0\" encoding=\"utf-8\"?> <protocol version=\"1.5\"> <srvResponse> <dateTime>2016-10-18T08:51:50.657+01:00</dateTime> <responseFrom ag=\"1\"/> <idMessage>0</idMessage> <rejectionCode>0</rejectionCode> </srvResponse> </protocol>");
-    rapidxml::xml_document<> doc;
-    doc.parse<0>((char *)(str.c_str()));
-
-    rapidxml::xml_node<> *pRootNode = doc.first_node();
-    if (pRootNode != NULL)
-    {
-        std::cout << pRootNode->name() << " " << pRootNode->value() << std::endl; // protocol
-        rapidxml::xml_attribute<> *pAttr = pRootNode->first_attribute();
-        if (pAttr != NULL)
-        {
-            std::cout << pAttr->name() << " " << pAttr->value() << std::endl; // version
-        }
-
-        rapidxml::xml_node<> *pChildNode = pRootNode->first_node();
-        if (pChildNode != NULL)
-        {
-            std::cout << pChildNode->name() << " " << pChildNode->value() << std::endl;
-            rapidxml::xml_node<> * pSonNode = pChildNode->first_node();
-            for (; pSonNode != NULL; pSonNode = pSonNode->next_sibling())
-            {
-                std::cout << pSonNode->name() << " " << pSonNode->value() << std::endl;
-                rapidxml::xml_attribute<> *pSonAttr = pSonNode->first_attribute();
-                if (pSonAttr != NULL)
-                {
-                    std::cout << "  " << pSonAttr->name() << ":" << pSonAttr->value() << std::endl;
-                }
-            }
-        }
-    }
-}
-         */
-
-
-        /*
-        pugi::xml_document worddoc;
-        pugi::xml_parse_result result = worddoc.load_buffer_inplace(&zipfilebuf, zipfilesize, pugi::parse_default, pugi::encoding_auto);
-        pugi::xml_node rootnode = worddoc.root();
-        std::cout << "root node: " << rootnode.name() << std::endl;
-        */
-        /*
-        simple_walker walker;
-        worddoc.traverse(walker);
-        */
-        
-        /*
-        pugi::xml_document worddoc;
-        pugi::xml_parse_result result = worddoc.load_buffer_inplace(&zipfilebuf, zipfilesize, pugi::parse_default, pugi::encoding_auto);
-        if(result)
-        {
-            std::cout << "pos result: " << worddoc.child("node").attribute("attr").value() << std::endl;
-        }
-        else
-        {
-            std::cout << "neg result: " << worddoc.child("node").attribute("attr").value() << std::endl;
-        }
-        //std::cout << "attempt pugi here" << std::endl;
-        */
+        std::string filecontents = "";
+        rapidxml::xml_node<>* rootnode = worddoc.first_node();
+        GetXmlText(rootnode, &filecontents);
+        //std::cout << filecontents << std::endl;
+        plaintext->setText(FXString(filecontents.c_str()));
     }
 
     if(inmemory)
         tmpbuffer.close();
     else
         tmpfile.close();
+}
+
+void WombatForensics::GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents)
+{
+    if(curnode->type() == rapidxml::node_data || curnode->type() == rapidxml::node_cdata || curnode->type() == rapidxml::node_comment || curnode->type() == rapidxml::node_doctype)
+    {
+        contents->append(curnode->value());
+        contents->append("\n");
+    }
+    rapidxml::xml_node<>* curchild = curnode->first_node();
+    while(curchild != NULL)
+    {
+        GetXmlText(curchild, contents);
+        curchild = curchild->next_sibling();
+    }
 }
 
 /*

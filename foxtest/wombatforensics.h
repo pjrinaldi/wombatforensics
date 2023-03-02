@@ -34,15 +34,8 @@
 // SHARED LIBRARIES
 #include <tar.h> // TAR FOR WCF
 #include <libtar.h> // TAR FOR WCF
-#include <pugixml.hpp> // XML PARSING
-#include "rapidxml.hpp"
-//#include "rapidxml_utils.hpp"
-//#include "rapidxml_iterators.hpp"
-//#include "rapidxml_print.hpp"
+#include "rapidxml.hpp" // XML PARSING
 #include <zip.h> // ZIP PARSING
-//#include <libxml2/libxml/parser.h> // XML PARSING
-//#include <libxml2/libxml/tree.h> // XML PARSING
-//#include <libxml2/libxml/xmlversion.h>
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
 #define NSEC_BTWN_1904_1970	(uint32_t) 2082844800U
@@ -139,23 +132,6 @@ long CheckTableItem::onCheck(FXObject *, FXSelector, void *vp)
     }
     return 1;
 }
-
-const char* node_types[] =
-{
-    "null", "document", "element", "pcdata", "cdata", "comment", "pi", "declaration"
-};
-
-struct simple_walker: pugi::xml_tree_walker
-{
-    virtual bool for_each(pugi::xml_node& node)
-    {
-        for (int i = 0; i < depth(); ++i) std::cout << "  "; // indentation
-
-        std::cout << node_types[node.type()] << ": name='" << node.name() << "', value='" << node.value() << "'\n";
-
-        return true; // continue traversal
-    }
-}; 
 
 class WombatForensics : public FXMainWindow
 {
@@ -431,6 +407,7 @@ class WombatForensics : public FXMainWindow
         void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
 	void SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex=1, int asc=1);
         void PlainView(FileItem* curfileitem);
+        void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents);
         //void ApplyFilter(int colindex, std::string filterstring);
         //void LoadPartitions(ForImg* curforimg);
         //void LoadGptPartitions(ForImg* curforimg);
