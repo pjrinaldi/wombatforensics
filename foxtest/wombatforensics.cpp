@@ -2279,14 +2279,14 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     std::string curlayout;
     while(getline(layoutstream, curlayout, ';'))
         layoutlist.push_back(curlayout);
-    FXIOBuffer tmpbuffer;
+    //FXIOBuffer tmpbuffer;
     FXFile tmpfile;
     uint64_t curlogicalsize = 0;
     uint8_t* tmpbuf = NULL;
     if(inmemory) // store in memory
     {
         tmpbuf = new uint8_t[curfileitem->size];
-        tmpbuffer.open(tmpbuf, curfileitem->size, FXIO::ReadWrite);
+        //tmpbuffer.open(tmpbuf, curfileitem->size, FXIO::ReadWrite);
     }
     else // write to tmp file
     {
@@ -2314,10 +2314,12 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             {
                 inbuf = new uint8_t[cursize];
                 curforimg->ReadContent(inbuf, curoffset, cursize);
-                tmpbuffer.position(curpos);
-                int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize);
+                memcpy(&tmpbuf[curpos], inbuf, cursize);
+                //tmpbuffer.position(curpos);
+                //int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize);
                 //std::cout << "bytes written: " << byteswritten << std::endl;
-                curpos += byteswritten;
+                curpos += cursize;
+                //curpos += byteswritten;
             }
         }
         else
@@ -2326,11 +2328,13 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             inbuf = new uint8_t[(cursize - (curlogicalsize - curfileitem->size))];
             curforimg->ReadContent(inbuf, curoffset, (cursize - (curlogicalsize - curfileitem->size)));
             //std::cout << "inbuf head: " << (char)inbuf[0] << (char)inbuf[1] << std::endl;
-            tmpbuffer.position(curpos);
+            memcpy(&tmpbuf[curpos], inbuf, (cursize - (curlogicalsize - curfileitem->size)));
+            //tmpbuffer.position(curpos);
             //std::cout << "tmpbuf pos: " << tmpbuffer.position() << std::endl;
-            int64_t byteswritten = tmpbuffer.writeBlock(inbuf, (cursize - (curlogicalsize - curfileitem->size)));
+            //int64_t byteswritten = tmpbuffer.writeBlock(inbuf, (cursize - (curlogicalsize - curfileitem->size)));
             //std::cout << "bytes written: "<< byteswritten << std::endl;
-            curpos += byteswritten;
+            //curpos += byteswritten;
+            curpos += cursize - (curlogicalsize - curfileitem->size);
         }
         delete[] inbuf;
     }
@@ -2354,10 +2358,11 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         std::string zipfilename = "";
         zip_uint64_t zipfilesize = 0;
         zip_t* curzip = NULL;
-        char* zipbuf = new char[tmpbuffer.size()];
-        tmpbuffer.readBlock(zipbuf, tmpbuffer.size());
+        zip_source_t* zipsrc = zip_source_buffer_create(tmpbuf, curfileitem->size, 1, &err);
+        //char* zipbuf = new char[tmpbuffer.size()];
+        //tmpbuffer.readBlock(zipbuf, tmpbuffer.size());
         //std::cout << "zipbuf 2 char: " << zipbuf[0] << zipbuf[1] << std::endl;
-        zip_source_t* zipsrc = zip_source_buffer_create(zipbuf, tmpbuffer.size(), 1, &err);
+        //zip_source_t* zipsrc = zip_source_buffer_create(zipbuf, tmpbuffer.size(), 1, &err);
         curzip = zip_open_from_source(zipsrc, ZIP_RDONLY, &err);
         int64_t zipentrycnt = zip_get_num_entries(curzip, 0);
         //std::cout << "zip entries count: " << zipentrycnt << std::endl;
@@ -2390,9 +2395,12 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     }
 
     if(inmemory)
-        tmpbuffer.close();
+    {
+        //tmpbuffer.close();
+    }
     else
         tmpfile.close();
+    delete[] tmpbuf;
 }
 
 void WombatForensics::GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents)
