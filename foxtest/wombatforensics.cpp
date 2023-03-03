@@ -1323,6 +1323,18 @@ long WombatForensics::OpenMessageLog(FXObject*, FXSelector, void*)
     return 1;
 }
 
+long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
+{
+    DigDeeper digdeeper(this, "Dig Deeper");
+    bool toprocess = digdeeper.execute(PLACEMENT_OWNER);
+    if(toprocess == 1)
+    {
+	std::cout << "get what to process here..." << std::endl;
+    }
+
+    return 1;
+}
+
 long WombatForensics::OpenViewerManager(FXObject*, FXSelector, void*)
 {
     ManageViewer viewmanager(this, "Manage External Viewers");
