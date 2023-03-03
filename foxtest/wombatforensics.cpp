@@ -300,6 +300,7 @@ WombatForensics::~WombatForensics()
 {
     //SaveCurrentCase();
     CloseCurrentCase();
+    DeleteTmpFiles();
     burrowicon->destroy();
     forimgicon->destroy();
     carvedfileicon->destroy();
@@ -311,6 +312,12 @@ WombatForensics::~WombatForensics()
     virtualfileicon->destroy();
     virtualfoldericon->destroy();
     filtericon->destroy();
+}
+
+void WombatForensics::DeleteTmpFiles()
+{
+    for (const auto & entry : std::filesystem::directory_iterator("/tmp/wf/"))
+        std::filesystem::remove(entry.path());
 }
 
 void WombatForensics::create()

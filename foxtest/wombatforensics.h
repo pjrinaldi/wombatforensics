@@ -402,6 +402,7 @@ class WombatForensics : public FXMainWindow
         FXString GetSettings(int setting);
 	void SaveCurrentCase(void);
         void CloseCurrentCase(void);
+        void DeleteTmpFiles(void);
         void EnableCaseButtons(void);
         void LoadCaseState(void);
         void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
