@@ -32,6 +32,7 @@
 #include "filters.h"
 #include "filterview.h"
 #include "digdeeper.h"
+#include "managehashlist.h"
 // SHARED LIBRARIES
 #include <tar.h> // TAR FOR WCF
 #include <libtar.h> // TAR FOR WCF
