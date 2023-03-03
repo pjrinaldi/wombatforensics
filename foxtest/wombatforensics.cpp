@@ -2265,6 +2265,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 {
     bool inmemory = true;
     uint64_t memlimit = 4294967296; // 4GB
+    //uint64_t memlimit = 1; // 1 byte for testing
     std::cout << "name: " << curfileitem->name << std::endl;
     std::cout << "layout: " << curfileitem->layout << std::endl;
     std::cout << "size: " << curfileitem->size << std::endl;
@@ -2279,22 +2280,17 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     std::string curlayout;
     while(getline(layoutstream, curlayout, ';'))
         layoutlist.push_back(curlayout);
-    //FXIOBuffer tmpbuffer;
     FXFile tmpfile;
     uint64_t curlogicalsize = 0;
     uint8_t* tmpbuf = NULL;
+    std::string tmpfilestr = "";
     if(inmemory) // store in memory
-    {
         tmpbuf = new uint8_t[curfileitem->size];
-        //tmpbuffer.open(tmpbuf, curfileitem->size, FXIO::ReadWrite);
-    }
     else // write to tmp file
     {
-        std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+        tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
         //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
-        tmpbuf = new uint8_t[65536];
-        //tmpfile.open(
-        //FXFile;
+        tmpfile.open(FXString(tmpfilestr.c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
     }
     uint64_t curpos = 0;
     for(int i=0; i < layoutlist.size(); i++)
@@ -2310,30 +2306,24 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         //std::cout << "curlogicalsize: " << curlogicalsize << "|" << cursize << " :cursize" << std::endl;
         if(curlogicalsize <= curfileitem->size)
         {
+            inbuf = new uint8_t[cursize];
+            curforimg->ReadContent(inbuf, curoffset, cursize);
             if(inmemory)
-            {
-                inbuf = new uint8_t[cursize];
-                curforimg->ReadContent(inbuf, curoffset, cursize);
                 memcpy(&tmpbuf[curpos], inbuf, cursize);
-                //tmpbuffer.position(curpos);
-                //int64_t byteswritten = tmpbuffer.writeBlock(inbuf, cursize);
-                //std::cout << "bytes written: " << byteswritten << std::endl;
-                curpos += cursize;
-                //curpos += byteswritten;
-            }
+            else
+                tmpfile.writeBlock(inbuf, cursize);
+            curpos += cursize;
         }
         else
         {
-            //std::cout << "reduction size: " << cursize - (curlogicalsize - curfileitem->size) << std::endl;
             inbuf = new uint8_t[(cursize - (curlogicalsize - curfileitem->size))];
             curforimg->ReadContent(inbuf, curoffset, (cursize - (curlogicalsize - curfileitem->size)));
+            //std::cout << "reduction size: " << cursize - (curlogicalsize - curfileitem->size) << std::endl;
             //std::cout << "inbuf head: " << (char)inbuf[0] << (char)inbuf[1] << std::endl;
-            memcpy(&tmpbuf[curpos], inbuf, (cursize - (curlogicalsize - curfileitem->size)));
-            //tmpbuffer.position(curpos);
-            //std::cout << "tmpbuf pos: " << tmpbuffer.position() << std::endl;
-            //int64_t byteswritten = tmpbuffer.writeBlock(inbuf, (cursize - (curlogicalsize - curfileitem->size)));
-            //std::cout << "bytes written: "<< byteswritten << std::endl;
-            //curpos += byteswritten;
+            if(inmemory)
+                memcpy(&tmpbuf[curpos], inbuf, (cursize - (curlogicalsize - curfileitem->size)));
+            else
+                tmpfile.writeBlock(inbuf, (cursize - (curlogicalsize - curfileitem->size)));
             curpos += cursize - (curlogicalsize - curfileitem->size);
         }
         delete[] inbuf;
@@ -2354,16 +2344,20 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     if(curfileitem->sig.compare("Microsoft Word 2007+") == 0) // word document
     {
         zip_error_t err;
+        int interr = 0;
         int zipfileid = 0;
         std::string zipfilename = "";
         zip_uint64_t zipfilesize = 0;
         zip_t* curzip = NULL;
-        zip_source_t* zipsrc = zip_source_buffer_create(tmpbuf, curfileitem->size, 1, &err);
-        //char* zipbuf = new char[tmpbuffer.size()];
-        //tmpbuffer.readBlock(zipbuf, tmpbuffer.size());
-        //std::cout << "zipbuf 2 char: " << zipbuf[0] << zipbuf[1] << std::endl;
-        //zip_source_t* zipsrc = zip_source_buffer_create(zipbuf, tmpbuffer.size(), 1, &err);
-        curzip = zip_open_from_source(zipsrc, ZIP_RDONLY, &err);
+        if(inmemory)
+        {
+            zip_source_t* zipsrc = zip_source_buffer_create(tmpbuf, curfileitem->size, 1, &err);
+            curzip = zip_open_from_source(zipsrc, ZIP_RDONLY, &err);
+        }
+        else
+        {
+            curzip = zip_open(tmpfilestr.c_str(), ZIP_RDONLY, &interr);
+        }
         int64_t zipentrycnt = zip_get_num_entries(curzip, 0);
         //std::cout << "zip entries count: " << zipentrycnt << std::endl;
         struct zip_stat zipstat;
@@ -2383,7 +2377,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         char zipfilebuf[zipfilesize+1];
         zip_int64_t bytesread = zip_fread(docxml, zipfilebuf, zipfilesize);
         zipfilebuf[zipfilesize] = 0;
-        int interr = zip_fclose(docxml);
+        interr = zip_fclose(docxml);
 
         rapidxml::xml_document<> worddoc;
         worddoc.parse<0>(zipfilebuf);
@@ -2394,11 +2388,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         plaintext->setText(FXString(filecontents.c_str()));
     }
 
-    if(inmemory)
-    {
-        //tmpbuffer.close();
-    }
-    else
+    if(!inmemory)
         tmpfile.close();
     delete[] tmpbuf;
 }
@@ -2417,45 +2407,6 @@ void WombatForensics::GetXmlText(rapidxml::xml_node<>* curnode, std::string* con
         curchild = curchild->next_sibling();
     }
 }
-
-/*
-    struct zip_stat zipstat;
-    zip_stat_init(&zipstat);
-    for(int i=0; i < zipentrycnt; i++)
-    {
-        zip_stat_index(curzip, i, 0, &zipstat);
-        //if(zipstat.name = "document.xml")
-        if(zipstat.name == xmlcontent)
-        {
-            zipfileid = i;
-            zipfilename = zipstat.name;
-            zipfilesize = zipstat.size;
-        }
-    }
-    //qDebug() << "zipfileid:" << zipfileid << "zipfilename:" << zipfilename << "zipfilesize:" << zipfilesize;
-    zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
-    char zipbuf[zipfilesize];
-    zip_int64_t bytesread = zip_fread(docxml, zipbuf, zipfilesize);
-    err = zip_fclose(docxml);
-    //qDebug() << "bytesread:" << bytesread;
-    QByteArray filearray = QByteArray::fromRawData(zipbuf, zipfilesize);
-    //qDebug() << "document.xml:" << filearray.left(5);
-    QXmlStreamReader xmlreader;
-    xmlreader.addData(filearray);
-    while(!xmlreader.atEnd())
-    {
-        xmlreader.readNext();
-        if(xmlreader.isCharacters() || xmlreader.isDTD() || xmlreader.isEntityReference() || xmlreader.isComment())
-        {
-            docxstr += "<p>";
-            docxstr += xmlreader.text();
-            //docxstr += "\n";
-            docxstr += "</p>";
-            //qDebug() << "Text:" << xmlreader.text();
-        }
-    }
-    xmlreader.clear();
- */ 
 
 /*
 void HashFile(std::string filename, std::string whlfile)
