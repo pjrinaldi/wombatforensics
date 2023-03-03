@@ -230,6 +230,8 @@ class WombatForensics : public FXMainWindow
         FXIcon* virtualfileicon;
         FXIcon* virtualfoldericon;
         FXIcon* filtericon;
+        //FXIcon* filepropicon;
+        //FXIcon* filehexicon;
 
         std::vector<std::string> tags;
         std::vector<std::string> binaries;

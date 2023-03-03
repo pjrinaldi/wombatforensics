@@ -188,6 +188,12 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     virtualfoldericon->create();
     filtericon = new FXPNGIcon(this->getApp(), filter);
     filtericon->create();
+    /*
+    filepropicon = new FXPNGIcon(this->getApp(), fileprop);
+    filepropicon->create();
+    filehexicon = new FXPNGIcon(this->getApp(), filehex);
+    filehexicon->create();
+    */
 
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
@@ -313,6 +319,8 @@ WombatForensics::~WombatForensics()
     virtualfileicon->destroy();
     virtualfoldericon->destroy();
     filtericon->destroy();
+    //filepropicon->destroy();
+    //filehexicon->destroy();
 }
 
 void WombatForensics::DeleteTmpFiles()
@@ -792,9 +800,9 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
             new FXMenuSeparator(tagmenu);
             new FXMenuCommand(tagmenu, "Remove Tag", new FXPNGIcon(this->getApp(), bookmarkrem), this, ID_REMTAG);
 
-            new FXMenuCommand(&rightmenu, "View Contents", NULL, this, ID_CONTENTS);
-            new FXMenuCommand(&rightmenu, "View Hex Contents", NULL, this, ID_HEXCONTENTS);
-            new FXMenuCommand(&rightmenu, "View Properties", NULL, this, ID_PROPERTIES);
+            //new FXMenuCommand(&rightmenu, "View Contents", NULL, this, ID_CONTENTS);
+            new FXMenuCommand(&rightmenu, "View Hex Contents", new FXPNGIcon(this->getApp(), filehex), this, ID_HEXCONTENTS);
+            new FXMenuCommand(&rightmenu, "View Properties", new FXPNGIcon(this->getApp(), fileprop), this, ID_PROPERTIES);
             new FXMenuCascade(&rightmenu, "View With", new FXPNGIcon(this->getApp(), binmenu), binarymenu);
             new FXMenuSeparator(&rightmenu);
             if(iscurchecked)
