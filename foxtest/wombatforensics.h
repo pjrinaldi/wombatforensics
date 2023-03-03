@@ -33,6 +33,7 @@
 #include "filterview.h"
 #include "digdeeper.h"
 #include "managehashlist.h"
+#include "hexviewer.h"
 // SHARED LIBRARIES
 #include <tar.h> // TAR FOR WCF
 #include <libtar.h> // TAR FOR WCF
@@ -339,6 +340,7 @@ class WombatForensics : public FXMainWindow
             ID_PROPERTIES = 126,
             ID_CHECKIT = 127,
             ID_UNCHECKALL = 128,
+            ID_HEXCONTENTS = 129,
             ID_LAST
         };
         WombatForensics(FXApp* a);
@@ -367,6 +369,7 @@ class WombatForensics : public FXMainWindow
         long SortColumn(FXObject* sender, FXSelector sel, void* colid);
         long FilterColumn(FXObject* sender, FXSelector sel, void* colid);
         long CheckSelected(FXObject* sender, FXSelector sel, void*);
+        long OpenHexViewer(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -462,6 +465,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLEHEADER, WombatForensics::SortColumn),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHECKIT, WombatForensics::CheckSelected),
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLEHEADER, WombatForensics::FilterColumn),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HEXCONTENTS, WombatForensics::OpenHexViewer),
 
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),

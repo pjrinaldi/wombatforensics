@@ -793,6 +793,7 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
             new FXMenuCommand(tagmenu, "Remove Tag", new FXPNGIcon(this->getApp(), bookmarkrem), this, ID_REMTAG);
 
             new FXMenuCommand(&rightmenu, "View Contents", NULL, this, ID_CONTENTS);
+            new FXMenuCommand(&rightmenu, "View Hex Contents", NULL, this, ID_HEXCONTENTS);
             new FXMenuCommand(&rightmenu, "View Properties", NULL, this, ID_PROPERTIES);
             new FXMenuCascade(&rightmenu, "View With", new FXPNGIcon(this->getApp(), binmenu), binarymenu);
             new FXMenuSeparator(&rightmenu);
@@ -811,6 +812,16 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
     return 1;
 }
 
+long WombatForensics::OpenHexViewer(FXObject*, FXSelector, void*)
+{
+    FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+    HexViewer* hexview = new HexViewer(this, fileitemstr);
+    //hexview->execute(PLACEMENT_OWNER);
+    hexview->create();
+    hexview->show(PLACEMENT_CURSOR);
+
+    return 1;
+}
 /*
 long WombatForensics::CreateNewTag(FXObject*, FXSelector, void*)
 {
