@@ -362,6 +362,7 @@ class WombatForensics : public FXMainWindow
         long OpenViewerManager(FXObject*, FXSelector, void*);
         long OpenMessageLog(FXObject*, FXSelector, void*);
 	long OpenDigDeeper(FXObject*, FXSelector, void*);
+	long OpenManageHashList(FXObject*, FXSelector, void*);
         long OpenXChomp(FXObject*, FXSelector, void*);
         long SortColumn(FXObject* sender, FXSelector sel, void* colid);
         long FilterColumn(FXObject* sender, FXSelector sel, void* colid);
@@ -446,6 +447,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTINGS, WombatForensics::OpenSettings),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_DIGDEEPER, WombatForensics::OpenDigDeeper),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGEHASH, WombatForensics::OpenManageHashList),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HOME, WombatForensics::LoadForensicImages),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CURRENT, WombatForensics::LoadCurrent),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_BACK, WombatForensics::LoadCurrentPath),

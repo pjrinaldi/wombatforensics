@@ -16,12 +16,14 @@ class ManageHashList : public FXDialogBox
 
     private:
         FXVerticalFrame* mainframe;
-        FXHorizontalFrame* buttonframe;
+        FXVerticalFrame* buttonframe;
+        FXHorizontalFrame* subframe;
         FXLabel* mainlabel;
         FXList* binarylist;
         FXLabel* binlabel;
         FXButton* browsebutton;
         FXString binstring;
+	FXButton* emptybutton;
         FXButton* rembutton;
         FXButton* savebutton;
 
@@ -37,6 +39,7 @@ class ManageHashList : public FXDialogBox
         {
             //ID_TREELIST = 1,
             ID_LISTSELECT = 100,
+	    ID_EMPTY = 101,
             ID_BROWSE = 102,
             ID_REMBIN = 103,
             ID_LAST

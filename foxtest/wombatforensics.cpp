@@ -1335,6 +1335,13 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
     return 1;
 }
 
+long WombatForensics::OpenManageHashList(FXObject*, FXSelector, void*)
+{
+    ManageHashList hashlistmanager(this, "Manage Hash Lists");
+    hashlistmanager.execute(PLACEMENT_OWNER);
+    return 1;
+}
+
 long WombatForensics::OpenViewerManager(FXObject*, FXSelector, void*)
 {
     ManageViewer viewmanager(this, "Manage External Viewers");

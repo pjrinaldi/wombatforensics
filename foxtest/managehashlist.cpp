@@ -2,16 +2,18 @@
 
 FXIMPLEMENT(ManageHashList,FXDialogBox,ManageHashListMap,ARRAYNUMBER(ManageHashListMap))
 
-ManageHashList::ManageHashList(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE, 0, 0, 320, 260, 0,0,0,0, 4, 4)
+ManageHashList::ManageHashList(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE|DECOR_CLOSE, 0, 0, 640, 475, 0,0,0,0, 4, 4)
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     mainlabel = new FXLabel(mainframe, "Hash Lists");
-    binarylist = new FXList(mainframe, this, ID_LISTSELECT, LIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    buttonframe = new FXHorizontalFrame(mainframe, LAYOUT_BOTTOM|LAYOUT_FILL_X);
-    browsebutton = new FXButton(buttonframe, "Browse", NULL, this, ID_BROWSE, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20, 20);
-    rembutton = new FXButton(buttonframe, "Remove Binary", NULL, this, ID_REMBIN, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20, 20);
+    subframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    binarylist = new FXList(subframe, this, ID_LISTSELECT, LIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    buttonframe = new FXVerticalFrame(subframe, LAYOUT_TOP|LAYOUT_FILL_Y|JUSTIFY_RIGHT);
+    browsebutton = new FXButton(buttonframe, "Import Hash List", NULL, this, ID_BROWSE, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20, 20);
+    emptybutton = new FXButton(buttonframe, "Create Empty List", NULL, this, ID_EMPTY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20, 20);
+    rembutton = new FXButton(buttonframe, "Delete Selected", NULL, this, ID_REMBIN, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20, 20);
     rembutton->disable();
-    savebutton = new FXButton(buttonframe, "Save", NULL, this, FXDialogBox::ID_ACCEPT, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    savebutton = new FXButton(buttonframe, "Close", NULL, this, FXDialogBox::ID_ACCEPT, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
 }
 
 void ManageHashList::SetBinList(std::vector<std::string>* binlist)
