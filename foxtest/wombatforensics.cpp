@@ -204,7 +204,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     filetext = "";
     homepath = FXString(getenv("HOME")) + "/";
     configpath = homepath + ".wombatforensics/";
-    tmppath = "/tmp/";
+    tmppath = "/tmp/wf/";
+    FXDir::create("/tmp/wf/");
     FXDir::create(configpath);
     bool issettings = settingfile.open(configpath + "settings", FXIO::Reading, FXIO::OwnerReadWrite);
     if(issettings == false)
@@ -369,7 +370,7 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         iscaseopen = true;
         tmppath = "/tmp/wf/" + casename + "/";
         this->setTitle("Wombat Forensics - " + casename);
-        FXDir::create("/tmp/wf/");
+        //FXDir::create("/tmp/wf/");
         FXDir::create(tmppath);
         FXDir::create(tmppath + "burrow/");
         FXDir::create(tmppath + "carved/");
@@ -424,7 +425,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
 	StatusUpdate("Case Opening...");
         // will have to get the global id, either from the latest file or a latestid text file.
 	this->setTitle("Wombat Forensics - " + casename);
-        FXDir::create("/tmp/wf/");
+        //FXDir::create("/tmp/wf/");
 	tmppath = tmppath + "wf/";
 	// BEGIN UNTAR METHOD
 	TAR* tarhandle;
@@ -1304,9 +1305,12 @@ FXchar WombatForensics::Rot13Char(FXchar curchar)
 
 long WombatForensics::OpenXChomp(FXObject*, FXSelector, void*)
 {
-    std::system("./xchomp");
-    //pid_t pid = fork()
-    //int ret = execl("xchomp", NULL);
+    std::string apppath = std::string(this->getApp()->getArgv()[0]);
+    int found = apppath.find_last_of("/");
+    std::string xchomppath = apppath.substr(0, found);
+    xchomppath += "/xchomp";
+    //std::cout << xchomppath << std::endl;
+    std::system(xchomppath.c_str());
 
     return 1;
 }
