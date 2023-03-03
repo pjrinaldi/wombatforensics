@@ -62,14 +62,14 @@ class DigDeeper : public FXDialogBox
         //FXString ReturnDigDeeper(void);
         //void LoadDigDeeper(FXString cursettings);
 
+	long SetFilesRadioState(FXObject* sender, FXSelector, void*);
         //long SetCasePath(FXObject*, FXSelector, void*);
         //long SetReportPath(FXObject*, FXSelector, void*);
 };
 
-/*
 FXDEFMAP(DigDeeper) DigDeeperMap[]={
+    FXMAPFUNC(SEL_COMMAND, DigDeeper::ID_FILES, DigDeeper::SetFilesRadioState),
     //FXMAPFUNC(SEL_COMMAND, DigDeeper::ID_CASEPATH, DigDeeper::SetCasePath),
     //FXMAPFUNC(SEL_COMMAND, DigDeeper::ID_REPORTPATH, DigDeeper::SetReportPath),
 };
-*/
 #endif // DIGDEEPER_H

@@ -1,7 +1,7 @@
 #include "digdeeper.h"
 
-//FXIMPLEMENT(DigDeeper,FXDialogBox,DigDeeperMap,ARRAYNUMBER(DigDeeperMap))
-FXIMPLEMENT(DigDeeper,FXDialogBox,NULL,0)
+FXIMPLEMENT(DigDeeper,FXDialogBox,DigDeeperMap,ARRAYNUMBER(DigDeeperMap))
+//FXIMPLEMENT(DigDeeper,FXDialogBox,NULL,0)
 
 DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 480, 260, 0,0,0,0, 10, 10)
 {
@@ -80,7 +80,26 @@ void DigDeeper::LoadDigDeeper(FXString cursettings)
     reporttzcombo->setCurrentItem(cursettings.mid(found4+1, found5 - found4 - 1).toUInt());
     autosavespinner->setValue(cursettings.mid(found5+1, cursettings.length() - found5 - 1).toUInt());
 }
+*/
 
+long DigDeeper::SetFilesRadioState(FXObject* sender, FXSelector, void*)
+{
+    FXString curtext = ((FXRadioButton*)sender)->getText();
+    //std::cout << "curtext: "<< curtext.text() << std::endl;
+    selectedradio->setCheck(false);
+    checkedradio->setCheck(false);
+    allradio->setCheck(false);
+    if(curtext.left(1) == "S")
+	selectedradio->setCheck(true);
+    else if(curtext.left(1) == "C")
+	checkedradio->setCheck(true);
+    else if(curtext.left(1) == "A")
+	allradio->setCheck(true);
+
+    return 1;
+}
+
+/*
 long DigDeeper::SetCasePath(FXObject*, FXSelector, void*)
 {
     FXString casepathstring = FXDirDialog::getOpenDirectory(this, "Select the Directory to store Wombat Case Files", casepathtextfield->getText());
