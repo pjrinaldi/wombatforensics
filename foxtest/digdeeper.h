@@ -21,27 +21,17 @@ class DigDeeper : public FXDialogBox
 	FXRadioButton* selectedradio;
 	FXRadioButton* checkedradio;
 	FXRadioButton* allradio;
-	/*
-        FXLabel* thumbsizelabel;
-        FXSpinner* thumbsizespinner;
-        FXHorizontalFrame* hframe2;
-        FXLabel* vidthumblabel;
-        FXSpinner* vidthumbspinner;
-        FXHorizontalFrame* hframe3;
-        FXLabel* casepathlabel;
-        FXTextField* casepathtextfield;
-        FXButton* casepathbutton;
-        FXHorizontalFrame* hframe4;
-        FXLabel* reportpathlabel;
-        FXTextField* reportpathtextfield;
-        FXButton* reportpathbutton;
-        FXHorizontalFrame* hframe5;
-        FXLabel* reporttzlabel;
-        FXComboBox* reporttzcombo;
-        FXHorizontalFrame* hframe6;
-        FXLabel* autosavelabel;
-        FXSpinner* autosavespinner;
-	*/
+	FXGroupBox* optionsgroup;
+	FXVerticalFrame* vframe1;
+	FXCheckButton* expandarchives;
+	FXCheckButton* expandemail;
+	FXCheckButton* imagethumbnails;
+	FXCheckButton* videothumbnails;
+	FXCheckButton* hashfiles;
+	FXHorizontalFrame* hframe2;
+	FXCheckButton* hashcomparison;
+	FXList* hashlist;
+
         FXHorizontalFrame* hframe8;
         FXButton* cancelbutton;
         FXButton* savebutton;

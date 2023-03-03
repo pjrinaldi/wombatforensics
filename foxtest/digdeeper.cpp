@@ -3,7 +3,7 @@
 FXIMPLEMENT(DigDeeper,FXDialogBox,DigDeeperMap,ARRAYNUMBER(DigDeeperMap))
 //FXIMPLEMENT(DigDeeper,FXDialogBox,NULL,0)
 
-DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 480, 260, 0,0,0,0, 10, 10)
+DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE|DECOR_RESIZE, 0, 0, 500, 392, 0,0,0,0, 10, 10)
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 10, 10, 10, 10);
     filesgroup = new FXGroupBox(mainframe, "Process the Following File(s)", GROUPBOX_NORMAL|FRAME_THICK|LAYOUT_FILL_X);
@@ -13,40 +13,17 @@ DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent
     checkedradio = new FXRadioButton(hframe1, "Checked (0)", this, ID_FILES, RADIOBUTTON_NORMAL|LAYOUT_FILL_X);
     new FXSpring(hframe1);
     allradio = new FXRadioButton(hframe1, "All (0)", this, ID_FILES, RADIOBUTTON_NORMAL|LAYOUT_FILL_X);
-    /*
-    thumbsizelabel = new FXLabel(hframe1, "Thumbnail Size (pixels):", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe1);
-    thumbsizespinner = new FXSpinner(hframe1, 5);
-    thumbsizespinner->setRange(64, 384);
-    thumbsizespinner->setIncrement(64);
-    hframe2 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    vidthumblabel = new FXLabel(hframe2, "Generate Video Thumbnail Every (%): ", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe2);
-    vidthumbspinner = new FXSpinner(hframe2, 5);
-    vidthumbspinner->setRange(10, 100);
-    vidthumbspinner->setIncrement(5);
-    hframe3 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    casepathlabel = new FXLabel(hframe3, "Set Case Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe3);
-    casepathtextfield = new FXTextField(hframe3, 40);
-    //casepathbutton = new FXButton(hframe3, "Browse", NULL, this, ID_CASEPATH, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
-    hframe4 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    reportpathlabel = new FXLabel(hframe4, "Set Report Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe4);
-    reportpathtextfield = new FXTextField(hframe4, 40);
-    //reportpathbutton = new FXButton(hframe4, "Browse", NULL, this, ID_REPORTPATH, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
-    hframe5 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    reporttzlabel = new FXLabel(hframe5, "Report TimeZone:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    reporttzcombo = new FXComboBox(hframe5, 45);
-    reporttzcombo->fillItems(timezones);
-    reporttzcombo->setNumVisible(10);
-    hframe6 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
-    autosavelabel = new FXLabel(hframe6, "Set Autosave Interval (minutes):", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
-    new FXSpring(hframe6);
-    autosavespinner = new FXSpinner(hframe6, 5);
-    autosavespinner->setRange(1, 120);
-    autosavespinner->setIncrement(1);
-    */
+    optionsgroup = new FXGroupBox(mainframe, "For the Following Option(s)", GROUPBOX_NORMAL|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    vframe1 = new FXVerticalFrame(optionsgroup, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    expandarchives = new FXCheckButton(vframe1, "Expand Archives (zip)", NULL, 0, CHECKBUTTON_NORMAL);
+    expandemail = new FXCheckButton(vframe1, "Expand Mailboxes (mbox)");
+    imagethumbnails = new FXCheckButton(vframe1, "Generate Thumbnails for Images");
+    videothumbnails = new FXCheckButton(vframe1, "Generate Thumbnails for Videos");
+    hashfiles = new FXCheckButton(vframe1, "Calculate BLAKE3 Hash");
+    hframe2 = new FXHorizontalFrame(vframe1, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
+    hashcomparison = new FXCheckButton(hframe2, "Compare Files to Selected Hash Lists:");
+    hashlist = new FXList(hframe2, NULL, 0, FRAME_SUNKEN|FRAME_THICK|LIST_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    
     hframe8 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     new FXLabel(hframe8, "", NULL, LAYOUT_FILL_X);
     new FXSpring(hframe8);
