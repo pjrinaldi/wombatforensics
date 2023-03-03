@@ -7,7 +7,7 @@ ManageHashList::ManageHashList(FXWindow* parent, const FXString& title):FXDialog
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     mainlabel = new FXLabel(mainframe, "Hash Lists");
     subframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    binarylist = new FXList(subframe, this, ID_LISTSELECT, LIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    whllist = new FXList(subframe, this, ID_LISTSELECT, LIST_SINGLESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     buttonframe = new FXVerticalFrame(subframe, LAYOUT_TOP|LAYOUT_FILL_Y|JUSTIFY_RIGHT);
     browsebutton = new FXButton(buttonframe, "Import Hash List", NULL, this, ID_BROWSE, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20, 20);
     emptybutton = new FXButton(buttonframe, "Create Empty List", NULL, this, ID_EMPTY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20, 20);
@@ -16,40 +16,41 @@ ManageHashList::ManageHashList(FXWindow* parent, const FXString& title):FXDialog
     savebutton = new FXButton(buttonframe, "Close", NULL, this, FXDialogBox::ID_ACCEPT, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
 }
 
-void ManageHashList::SetBinList(std::vector<std::string>* binlist)
+void ManageHashList::SetHashList(std::vector<std::string>* hashlist)
 {
-    binaries = binlist;
-    if(binaries != NULL)
+    hashlists = hashlist;
+    if(hashlists != NULL)
         UpdateList();
 }
 
 void ManageHashList::UpdateList()
 {
-    binarylist->clearItems();
-    if(binaries != NULL)
+    whllist->clearItems();
+    if(hashlists != NULL)
     {
-        for(int i=0; i < binaries->size(); i++)
-            binarylist->appendItem(new FXListItem(FXString(binaries->at(i).c_str())));
+        for(int i=0; i < hashlists->size(); i++)
+            whllist->appendItem(new FXListItem(FXString(hashlists->at(i).c_str())));
     }
 }
 
-long ManageHashList::SetBinPath(FXObject*, FXSelector, void*)
+long ManageHashList::SetHashPath(FXObject*, FXSelector, void*)
 {
-    binstring = FXFileDialog::getOpenFilename(this, "Select the Binary to add", "/usr/bin/");
+    FXString hstr = FXString(getenv("HOME")) + "/";
+    binstring = FXFileDialog::getOpenFilename(this, "Select the Hash List to add", hstr, "Wombat Hash Lists (*.whl)");
     if(!binstring.empty())
     {
-        binaries->push_back(binstring.text());
+        hashlists->push_back(binstring.text());
         UpdateList();
     }
 
     return 1;
 }
 
-long ManageHashList::RemoveBin(FXObject*, FXSelector, void*)
+long ManageHashList::RemoveWhl(FXObject*, FXSelector, void*)
 {
-    int curitem = binarylist->getCurrentItem();
-    std::string curtext = binaries->at(curitem);
-    binaries->erase(binaries->begin() + curitem);
+    int curitem = whllist->getCurrentItem();
+    std::string curtext = hashlists->at(curitem);
+    hashlists->erase(hashlists->begin() + curitem);
     rembutton->disable();
     UpdateList();
 
@@ -60,6 +61,12 @@ long ManageHashList::ListSelection(FXObject*, FXSelector, void*)
 {
     rembutton->enable();
 
+    return 1;
+}
+
+long ManageHashList::CreateEmptyList(FXObject*, FXSelector, void*)
+{
+    std::cout << "create empty list here" << std::endl;
     return 1;
 }
 
@@ -75,14 +82,14 @@ void ManageHashList::LoadViewers(FXString curviewers)
             posarray.append(found);
     }
     posarray.append(curviewers.length());
-    if(posarray.no() > 1 && binaries != NULL)
+    if(posarray.no() > 1 && hashlists != NULL)
     {
-        binaries->clear();
+        hashlists->clear();
         for(int i=0; i < posarray.no() - 1; i++)
-            binaries->push_back(curviewers.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text());
+            hashlists->push_back(curviewers.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text());
     }
     if(curviewers.length() > 0 && posarray.no() == 1)
-        binaries->push_back(curviewers.text());
-    if(binaries != NULL)
+        hashlists->push_back(curviewers.text());
+    if(hashlists != NULL)
         UpdateList();
 }

@@ -19,7 +19,7 @@ class ManageHashList : public FXDialogBox
         FXVerticalFrame* buttonframe;
         FXHorizontalFrame* subframe;
         FXLabel* mainlabel;
-        FXList* binarylist;
+        FXList* whllist;
         FXLabel* binlabel;
         FXButton* browsebutton;
         FXString binstring;
@@ -27,7 +27,7 @@ class ManageHashList : public FXDialogBox
         FXButton* rembutton;
         FXButton* savebutton;
 
-        std::vector<std::string>* binaries = NULL;
+        std::vector<std::string>* hashlists = NULL;
 
     protected:
         ManageHashList() {}
@@ -45,18 +45,20 @@ class ManageHashList : public FXDialogBox
             ID_LAST
         };
         ManageHashList(FXWindow* parent, const FXString& title);
-        void SetBinList(std::vector<std::string>* binlist);
+        void SetHashList(std::vector<std::string>* hashlist);
         void LoadViewers(FXString curviewers);
         void UpdateList();
-        long RemoveBin(FXObject*, FXSelector, void*);
+        long RemoveWhl(FXObject*, FXSelector, void*);
         long ListSelection(FXObject*, FXSelector, void*);
-        long SetBinPath(FXObject*, FXSelector, void*);
+        long SetHashPath(FXObject*, FXSelector, void*);
+	long CreateEmptyList(FXObject*, FXSelector, void*);
 
 };
 
 FXDEFMAP(ManageHashList) ManageHashListMap[]={
-    FXMAPFUNC(SEL_COMMAND, ManageHashList::ID_REMBIN, ManageHashList::RemoveBin),
-    FXMAPFUNC(SEL_COMMAND, ManageHashList::ID_BROWSE, ManageHashList::SetBinPath),
+    FXMAPFUNC(SEL_COMMAND, ManageHashList::ID_REMBIN, ManageHashList::RemoveWhl),
+    FXMAPFUNC(SEL_COMMAND, ManageHashList::ID_BROWSE, ManageHashList::SetHashPath),
+    FXMAPFUNC(SEL_COMMAND, ManageHashList::ID_EMPTY, ManageHashList::CreateEmptyList),
     FXMAPFUNC(SEL_CLICKED, ManageHashList::ID_LISTSELECT, ManageHashList::ListSelection),
 };
 
