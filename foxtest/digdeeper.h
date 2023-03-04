@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 #include "icons.h"
 
@@ -35,6 +36,7 @@ class DigDeeper : public FXDialogBox
         FXHorizontalFrame* hframe8;
         FXButton* cancelbutton;
         FXButton* savebutton;
+        FXString casename = "";
         //FXString timezones = "America/New_York\nAmerica/Chicago\n";
 
     protected:
@@ -44,12 +46,13 @@ class DigDeeper : public FXDialogBox
         enum
         {
 	    ID_FILES = 100,
-            //ID_CASEPATH = 1,
-            //ID_REPORTPATH = 2,
             ID_LAST
         };
         DigDeeper(FXWindow* parent, const FXString& title);
-        //FXString ReturnDigDeeper(void);
+        void ReturnDigging(std::vector<std::string>* digginglist);
+        void SetCaseName(FXString cname);
+        void LoadHashLists(void);
+        void LoadFileCounts(void);
         //void LoadDigDeeper(FXString cursettings);
 
 	long SetFilesRadioState(FXObject* sender, FXSelector, void*);

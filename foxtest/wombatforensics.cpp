@@ -1337,10 +1337,17 @@ long WombatForensics::OpenMessageLog(FXObject*, FXSelector, void*)
 long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
 {
     DigDeeper digdeeper(this, "Dig Deeper");
+    digdeeper.SetCaseName(casename);
+    digdeeper.LoadFileCounts();
+    digdeeper.LoadHashLists();
     bool toprocess = digdeeper.execute(PLACEMENT_OWNER);
     if(toprocess == 1)
     {
-	std::cout << "get what to process here..." << std::endl;
+        std::vector<std::string> diglist;
+        diglist.clear();
+        digdeeper.ReturnDigging(&diglist);
+        for(int i=0; i < diglist.size(); i++)
+            std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;
     }
 
     return 1;

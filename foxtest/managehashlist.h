@@ -39,7 +39,6 @@ class ManageHashList : public FXDialogBox
     public:
         enum
         {
-            //ID_TREELIST = 1,
             ID_LISTSELECT = 100,
 	    ID_EMPTY = 101,
             ID_BROWSE = 102,

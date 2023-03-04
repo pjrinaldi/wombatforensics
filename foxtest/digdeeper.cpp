@@ -3,7 +3,7 @@
 FXIMPLEMENT(DigDeeper,FXDialogBox,DigDeeperMap,ARRAYNUMBER(DigDeeperMap))
 //FXIMPLEMENT(DigDeeper,FXDialogBox,NULL,0)
 
-DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE|DECOR_RESIZE, 0, 0, 500, 392, 0,0,0,0, 10, 10)
+DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE|DECOR_RESIZE, 0, 0, 550, 392, 0,0,0,0, 10, 10)
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 10, 10, 10, 10);
     filesgroup = new FXGroupBox(mainframe, "Process the Following File(s)", GROUPBOX_NORMAL|FRAME_THICK|LAYOUT_FILL_X);
@@ -12,7 +12,7 @@ DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent
     new FXSpring(hframe1);
     checkedradio = new FXRadioButton(hframe1, "Checked (0)", this, ID_FILES, RADIOBUTTON_NORMAL|LAYOUT_FILL_X);
     new FXSpring(hframe1);
-    allradio = new FXRadioButton(hframe1, "All (0)", this, ID_FILES, RADIOBUTTON_NORMAL|LAYOUT_FILL_X);
+    allradio = new FXRadioButton(hframe1, "All Processed (0)", this, ID_FILES, RADIOBUTTON_NORMAL|LAYOUT_FILL_X);
     optionsgroup = new FXGroupBox(mainframe, "For the Following Option(s)", GROUPBOX_NORMAL|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     vframe1 = new FXVerticalFrame(optionsgroup, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     expandarchives = new FXCheckButton(vframe1, "Expand Archives (zip)", NULL, 0, CHECKBUTTON_NORMAL);
@@ -29,6 +29,64 @@ DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent
     new FXSpring(hframe8);
     cancelbutton = new FXButton(hframe8, "Cancel", NULL, this, FXDialogBox::ID_CANCEL, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
     savebutton = new FXButton(hframe8, "Process", NULL, this, FXDialogBox::ID_ACCEPT, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+}
+
+void DigDeeper::SetCaseName(FXString cname)
+{
+    casename = cname;
+}
+
+void DigDeeper::LoadHashLists()
+{
+    hashlist->clearItems();
+    std::string dirstring = "/tmp/wf/" + std::string(casename.text()) + "/hashlists/";
+    for (const auto & entry : std::filesystem::directory_iterator(dirstring))
+        hashlist->appendItem(FXString(entry.path().c_str()));
+}
+
+void DigDeeper::ReturnDigging(std::vector<std::string>* digginglist)
+{
+    // WHAT TO DIG - 0
+    std::string digfiles = "";
+    if(selectedradio->getCheck())
+        digfiles = "0|0";
+    else if(checkedradio->getCheck())
+        digfiles = "1|0";
+    else if(allradio->getCheck())
+        digfiles = "2|0";
+    digginglist->push_back(digfiles);
+    // EXPAND ARCHIVES - 1
+    if(expandarchives->getCheck())
+        digginglist->push_back("1");
+    // EXPAND MAILBOXES - 2
+    if(expandemail->getCheck())
+        digginglist->push_back("2");
+    // THUMBNAIL IMAGES - 3
+    if(imagethumbnails->getCheck())
+        digginglist->push_back("3");
+    // THUMBNAIL VIDEOS - 4
+    if(videothumbnails->getCheck())
+        digginglist->push_back("4");
+    // HASH FILES - 5
+    if(hashfiles->getCheck())
+        digginglist->push_back("5");
+    // HASH COMPARE - 6
+    if(hashcomparison->getCheck())
+    {
+        std::string hashstr = "";
+        for(int i=0; i < hashlist->getNumItems(); i++)
+        {
+            if(hashlist->isItemSelected(i))
+                hashstr += std::string(hashlist->getItemText(i).text()) + "|";
+        }
+        hashstr += "6";
+        digginglist->push_back(hashstr);
+    }
+}
+
+void DigDeeper::LoadFileCounts(void)
+{
+    std::cout << "this is where i need to get the check count and all processed count." << std::endl;
 }
 
 /*
