@@ -2342,8 +2342,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     bool inmemory = true;
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-    std::ifstream tmpfile;
-    GetFileContent(curforimg, curfileitem, &inmemory, tmpbuf, &tmpfile);
+    FILE* tmpfile;
+    GetFileContent(curforimg, curfileitem, &inmemory, tmpbuf, tmpfile);
     /*
     bool inmemory = true;
     uint64_t memlimit = 4294967296; // 4GB
@@ -2473,7 +2473,10 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     }
 
     if(!inmemory)
-        tmpfile.close();
+    {
+	fclose(tmpfile);
+        //tmpfile.close();
+    }
     delete[] tmpbuf;
 }
 
