@@ -15,5 +15,5 @@ Makefile.Release
 *.Debug
 *.Release
 Makefile.*
-foxtest/wombatforensics
-foxtest/reference
+wombatforensics
+reference

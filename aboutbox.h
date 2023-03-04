@@ -1,34 +1,30 @@
-#ifndef ABOUTBOX_H 
+#ifndef ABOUTBOX_H
 #define ABOUTBOX_H
 
-// Copyright 2013-2022 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2
+#include <iostream>
+#include <stdio.h>
+#include <string>
+#include <vector>
 
-#include "wombatinclude.h"
-#include "globals.h"
-#include "wombatfunctions.h"
-#include "ui_aboutbox.h"
+#include "icons.h"
 
-namespace Ui
+#include "/usr/local/include/fox-1.7/fx.h"
+
+class AboutBox : public FXDialogBox
 {
-    class AboutBox;
-}
+    FXDECLARE(AboutBox)
 
-class AboutBox : public QDialog
-{
-    Q_OBJECT
+    private:
+        FXVerticalFrame* mainframe;
+	FXPNGImage* mainimage;
+	FXImageFrame* imgframe;
+        FXLabel* mainlabel;
 
-public:
-    AboutBox(QWidget* parent = 0);
-    ~AboutBox();
-private slots:
-    void HideClicked();
-    void ShowAbout();
-private:
-    Ui::AboutBox* ui;
-protected:
-    void mousePressEvent(QMouseEvent* event);
+    protected:
+        AboutBox() {}
+
+    public:
+        AboutBox(FXWindow* parent, const FXString& title);
 };
 
-Q_DECLARE_METATYPE(AboutBox*)
 #endif // ABOUTBOX_H

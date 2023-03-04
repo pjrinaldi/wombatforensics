@@ -1,429 +1,490 @@
 #ifndef WOMBATFORENSICS_H
 #define WOMBATFORENSICS_H
 
-// Copyright 2013-2020 Pasquale J. Rinaldi, Jr.
-// Distrubted under the terms of the GNU General Public License version 2
-
-#include <QtEndian>
-#include "wombatinclude.h"
-#include "wombatvariable.h"
-#include "wombatfunctions.h"
-#include "carving.h"
-#include "artifactparser.h"
-#include "reporting.h"
-#include "digging.h"
-#include "ui_wombatforensics.h"
-#include "propertieswindow.h"
-#include "exportdialog.h"
-#include "fileviewer.h"
-#include "globals.h"
-#include "filterviews.h"
-#include "imageviewer.h"
-#include "videoviewer.h"
-#include "viewermanager.h"
-#include "textviewer.h"
-#include "htmlviewer.h"
-#include "messageviewer.h"
-#include "byteconverter.h"
-#include "digdeeperdialog.h"
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <stdio.h>
+#include <unistd.h>
+#include <vector>
+#include <algorithm>
+#include <string.h>
+#include <filesystem>
+#include <byteswap.h>
+#include <time.h>
+#include <fcntl.h>
+// FOX TOOLKIT GUI 
+#include "/usr/local/include/fox-1.7/fx.h"
+// PROJECT INCLUDES
+#include "icons.h"
+#include "managetags.h"
 #include "aboutbox.h"
-#include "settingsdialog.h"
-#include "addevidencedialog.h"
-#include "remevidencedialog.h"
-#include "tagmanager.h"
-#include "searchdialog.h"
-#include "carvedialog.h"
-#include "filecarvingdialog.h"
-#include "pdfviewer.h"
-#include "artifactparser.h"
-#include "digging.h"
-#include "carving.h"
-#include "exporting.h"
-#include "newcase.h"
-#include "opencase.h"
-#include "registryviewer.h"
-#include "newforimg.h"
-#include "verevidencedialog.h"
-#include "hashlistmanager.h"
-#include "mboxviewer.h"
-#include "docxviewer.h"
+#include "viewer.h"
+#include "common.h"
+#include "settings.h"
+#include "managecarving.h"
+#include "evidencemanager.h"
+#include "forensicimage.h"
+#include "partitions.h"
+#include "directories.h"
+#include "manageviewer.h"
+#include "messagelog.h"
+#include "filters.h"
+#include "filterview.h"
+#include "digdeeper.h"
+#include "managehashlist.h"
+#include "hexviewer.h"
+// SHARED LIBRARIES
+#include <tar.h> // TAR FOR WCF
+#include <libtar.h> // TAR FOR WCF
+#include "rapidxml.hpp" // XML PARSING
+#include <zip.h> // ZIP PARSING
+#define TICKS_PER_SECOND 10000000
+#define EPOCH_DIFFERENCE 11644473600LL
+#define NSEC_BTWN_1904_1970	(uint32_t) 2082844800U
 
-class StatusLabel : public QLabel
+// may not need this structure, if i just in time load the table items.
+
+//---------------------------------------------------------------
+//
+//  Derived checkbox table item
+//
+//---------------------------------------------------------------
+class CheckTableItem : public FXTableItem
 {
-    Q_OBJECT
+    FXDECLARE(CheckTableItem)
 
-    public:
+  protected:
 
-    protected:
-        void mousePressEvent(QMouseEvent* e)
-        {
-            emit clicked();
-            e->accept();
-        }
+    CheckTableItem() {}
 
-    signals:
-        void clicked();
+  private:
+
+    FXTable	    *Table;
+    FXObject	    *Target;
+    FXSelector	    Selector;
+
+    FXCheckButton   *check;
+
+    virtual void drawContent(const FXTable* table,FXDC& dc,FXint
+x,FXint y,FXint w,FXint h) const;
+
+  public:
+
+    long onCheck(FXObject *, FXSelector, void *);
+
+    enum {
+	ID_CHECK = 1,
+	ID_LAST
+    };
+
+  public:
+
+    CheckTableItem(FXTable *table, FXIcon *ic=NULL, void *ptr=NULL, FXString str=FXString::null);
+    virtual ~CheckTableItem(void) { delete check; }
+
+    void setCheck(FXbool state=true, FXbool notify=false) {
+check->setCheck(state, notify); }
+    FXbool getCheck() const { return check->getCheck(); }
 };
 
-class PathTreeView : public QTreeView
-{
-    Q_OBJECT
 
-    public:
-
-    protected:
-        void mousePressEvent(QMouseEvent* e)
-        {
-            QModelIndex index = this->indexAt(e->pos());
-            //qDebug() << "single click:" << e->button();
-            if(e->button() == Qt::LeftButton)
-            {
-                //qDebug() << "left clicked";
-                this->setCurrentIndex(index);
-            }
-            else if(e->button() == Qt::MiddleButton)
-            {
-                TreeNode* itemcheck = static_cast<TreeNode*>(index.internalPointer());
-                if(!itemcheck->IsChecked())
-                {
-                    itemcheck->SetChecked(true);
-                    checkhash.insert(itemcheck->Data("id").toString(), true); // used to be 0
-                }
-                else
-                {
-                    itemcheck->SetChecked(false);
-                    checkhash.insert(itemcheck->Data("id").toString(), false); // used to be 0
-                }
-                //treenodemodel->setData(index, 
-		emit treenodemodel->dataChanged(index, index);
-                emit treenodemodel->CheckedNodesChanged();
-                //qDebug() << "call show file here ... middle button clicked";
-            }
-            else if(e->button() == Qt::RightButton)
-            {
-                //qDebug() << "right button clicked";
-            }
-            e->accept();
-        }
-        void mouseDoubleClickEvent(QMouseEvent* e)
-        {
-            //qDebug() << "double click:" << e->button();
-            if(e->button() == Qt::LeftButton)
-            {
-                QModelIndex index = this->indexAt(e->pos());
-                if(treenodemodel->rowCount(index.sibling(index.row(), 0)) > 0)
-                    this->setRootIndex(index.sibling(index.row(), 0));
-                else
-                    emit LaunchFile(index);
-                //qDebug() << "left clicked";
-            }
-            else if(e->button() == Qt::MiddleButton)
-            {
-            }
-            else if(e->button() == Qt::RightButton)
-            {
-            }
-            //e->ignore();
-        }
-
-    signals:
-        void LaunchFile(const QModelIndex &index);
+//---------------------------------------------------------------
+//	CheckTableItem
+//---------------------------------------------------------------
+FXDEFMAP(CheckTableItem) CheckTableItemMap[] = {
+  FXMAPFUNC(SEL_COMMAND, CheckTableItem::ID_CHECK, CheckTableItem::onCheck),
 };
 
-namespace Ui {
-class WombatForensics;
+FXIMPLEMENT(CheckTableItem, FXTableItem, CheckTableItemMap,
+ARRAYNUMBER(CheckTableItemMap))
+
+// Construct new table item
+CheckTableItem::CheckTableItem(FXTable *table, FXIcon *ic, void *ptr, FXString str):
+    FXTableItem(str,ic,ptr)
+{
+    Table = table;
+    Target = table->getTarget();
+    Selector = table->getSelector();
+    check = new FXCheckButton(table, str, this, ID_CHECK);
+    check->setBackColor(table->getBackColor());
+    check->create();
 }
 
-class WombatForensics : public QMainWindow
+//
+//	drawContent - override
+//
+void CheckTableItem::drawContent(const FXTable *table, FXDC &dc,
+    FXint x, FXint y, FXint w, FXint h) const
 {
-    Q_OBJECT
+    check->position(x+1,y+1,w-2,h-2);
+    return;
+}
 
-public:
-    explicit WombatForensics(QWidget *parent = 0);
-    ~WombatForensics();
-    PropertiesWindow* propertywindow;
-    ExportDialog* exportdialog;
-    DigDeeperDialog* digdeeperdialog;
-    FileViewer* fileviewer;
-    SearchDialog* searchdialog;
-    QMenu* viewmenu;
-    QMenu* treemenu;
-    QMenu* selectionmenu;
-    QMenu* bookmarkmenu;
-    QMenu* tagcheckedmenu;
-    QMenu* hashlistmenu;
-    QMenu* hashcheckedmenu;
-    QMenu* headermenu;
-    QAction* remtagaction; // remove selected tag
-    QAction* remtagaction1; // remove checked tag
-    QAction* remcheckedaction; // remove all checked tags
-    IdFilter* idfilterview;
-    JumpHex* jumpfilterview;
-    NameFilter* namefilterview;
-    PathFilter* pathfilterview;
-    SizeFilter* sizefilterview;
-    CreatedDateFilter* createfilterview;
-    AccessedDateFilter* accessfilterview;
-    ModifiedDateFilter* modifyfilterview;
-    ChangedDateFilter* changefilterview;
-    FileTypeFilter* filetypefilterview;
-    FileCategoryFilter* filecategoryfilterview;
-    HashFilter* hashfilterview;
-    TagFilter* tagfilterview;
-    HashMatchFilter* hashmatchfilterview;
-    ImageViewer* imagewindow;
-    ImageWindow* imageviewer;
-    VideoViewer* videowindow;
-    ViewerManager* viewmanage;
-    TextViewer* textviewer;
-    HtmlViewer* htmlviewer;
-    HtmlViewer* previewreport;
-    MessageViewer* msgviewer;
-    ByteConverter* byteviewer;
-    AboutBox* aboutbox;
-    SettingsDialog* settingsdialog;
-    AddEvidenceDialog* addevidencedialog;
-    RemEvidenceDialog* remevidencedialog;
-    TagManager* tagmanage;
-    CarveDialog* carvedialog;
-    FileCarvingDialog* filecarvedialog;
-    PdfViewer* pdfviewer;
-    RegistryDialog* regviewer;
-    ForImgDialog* forimgdialog;
-    VerEvidenceDialog* verevidencedialog;
-    HashListManager* hashlistmanager;
-    MBoxDialog* mboxviewer;
-    DocxViewer* docxviewer;
+//
+//	onCheck
+//
+long CheckTableItem::onCheck(FXObject *, FXSelector, void *vp)
+{
+    if (Target) {
+	FXTableRange tablerange;
+	tablerange.fm.row = tablerange.to.row = Table->rowAtY(check->getY());
+	tablerange.fm.col = tablerange.to.col = Table->colAtX(check->getX());
+        //fxmessage("[%d,%d] = %p\n", tablerange.fm.row, tablerange.fm.col, vp);
+	Target->handle(this, FXSEL(SEL_REPLACED,Selector), &tablerange);
+    }
+    return 1;
+}
 
-signals:
-    void CancelCurrentThread();
-    //void DigType(int dtype);
+class WombatForensics : public FXMainWindow
+{
+    FXDECLARE(WombatForensics)
 
-private slots:
-    void AddEvidence();
-    void RemEvidence();
-    void VerEvidence(bool checked);
-    //void VerEvidence();
-    void RemoveEvidence(QStringList remlist);
-    //void VerifyEvidence(QStringList verlist);
-    void VerProgChange(int progval);
-    void ExportEvidence();
-    void on_actionNew_Case_triggered();
-    void on_actionOpen_Case_triggered();
-    void on_actionSaveState_triggered();
-    void on_actionCheck_triggered();
-    void on_actionExport_triggered();
-    void on_actionDigDeeper_triggered();
-    void on_actionCarve_triggered();
-    void on_actionView_Properties_triggered(bool checked);
-    void on_actionView_File_triggered(bool checked);
-    void on_actionView_Image_Gallery_triggered(bool checked);
-    void on_actionViewerManager_triggered();
-    void on_actionBookmark_Manager_triggered();
-    void on_actionpreviewreport_triggered(bool checked);
-    void on_actionTextViewer_triggered(bool checked);
-    void on_actionViewMessageLog_triggered(bool checked);
-    void on_actionByteConverter_triggered(bool checked);
-    void on_actionExpandAll_triggered();
-    void on_actionCollapseAll_triggered();
-    void on_actionAbout_triggered();
-    void on_actionSettings_triggered();
-    void on_actionJumpToHex_triggered();
-    void on_actionHashListManager_triggered();
-    void UpdateProgress(qint64 count);
-    void UpdateExport(void);
-    void UpdateDig(int digstateid, int digcount);
-    //void UpdateCarve(QString partid, int carvecount);
-    void OpenUpdate(void);
-    void UpdateCheckCount(void);
-    void PathSelectionChanged(const QItemSelection &selitem, const QItemSelection &deselitem);
-    void HideImageWindow(bool checkstate);
-    void HideViewerManager(void);
-    void HideHashListManager(void);
-    void HideTagManager(void);
-    void HideSettingsWindow(void);
-    void HideMessageViewer(bool checkstate);
-    void HideByteViewer(bool checkstate);
-    void HidePreviewReport(bool checkstate);
-    void ShowExternalViewer();
-    void ShowForImgDialog();
-    void HideVerifyWindow(bool checkstate);
-    void DisplayError(QString errorNumber, QString errorType, QString errorValue);
-    void ResizeColumns(void);
-    void ResizeViewColumns(const QModelIndex &index)
-    {
-        if(index.isValid())
-            ResizeColumns();
-    };
-    void ExportFiles(int exporttype, bool originalpath, QString exportpath);
-    //void ExportToForensicImage(int exporttype, bool originalpath, QString exportpath);
-    void ExportForensicImage(void);
-    //void VerifyForensicImage(void);
-    void DigFiles(int digtype, QVector<int> digoptions);
-    //void GetHashComparisons(QStringList whlfiles);
-    void StartCarving(QStringList plist, QStringList flist);
-    void SetOffsetLabel(qint64 pos);
-    void HexSelectionChanged(void);
-    void UpdateSelectValue(void);
-    void UpdateDataTable(void);
-    void UpdateStatus(void);
-    void FinishExport(void);
-    void FinishCarve(void);
-    void FinishDigging(void);
-    void FinishPreDigging(void);
-    void ThashFinish(void);
-    void ThashSaveFinish(void);
-    void ThreadCancelled(void);
-    void ReadXMountOut(void);
-    void ReadXMountErr(void);
-    void StatusUpdate(QString tmptext)
-    {
-        statuslabel->setText(tmptext);
-    };
-    void TreeContextMenu(const QPoint &point);
-    void HeaderContextMenu(const QPoint &point);
-    void ImgHexMenu(const QPoint &point);
-    void SetFilter(int headercolumn);
-    void FilterApplied()
-    {
-        UpdateFilterCount();
-        emit pathtreeview->header()->geometriesChanged();
-        emit treenodemodel->layoutChanged(); // this messes with the row height and cuts off icons...
-    };
-    void NextItem();
-    void PreviousItem();
-    void ShowItem();
-    void SetSelectedFromImageViewer(QString selectedid);
-    void ShowFile(const QModelIndex &index);
-    void AddSection(void);
-    //void AddTextSection(void);
-    void CarveFile(void);
-    void PublishResults(void);
-    void AutoSaveState(void);
-    //void RotateDig(void);
-    //void RotateCarve(void);
-    void OpenCaseMountFinished(int exitcode, QProcess::ExitStatus exitstatus);
-    void SetHexOffset(void);
-    void CreateNewTag(void);
-    void CreateEmptyHashList(void);
-    void AddExistingHashList(void);
-    void SetBookmark(void);
-    void RemoveTag(void);
-    void UnCheckChecked(void);
-    void ReadSettings(void);
-    void ReadBookmarks(void);
-    void ReadHashLists(void);
-    void ShowSearchDialog(void);
-    void TagSection(QString ctitle, QString ctag);
-    void LaunchChomp(void);
-    void UpdateTimeZone(QString newtz);
-    void FinishWombatCaseFile(void);
-    //void FinishVerify(void);
-    void ShowHideColumn(void);
-    //void VerifyUpdate(qint64 size);
+    private:
+        FXVerticalFrame* mainframe;
+        FXToolBar* toolbar;
+        FXToolBar* pathtoolbar;
+	//FXMenuBar* pathmenubar;
+        FXSplitter* hsplitter;
+        FXTable* tablelist;
+        FXHeader* tableheader;
+        FXStatusBar* statusbar;
+        FXFont* plainfont;
+        FXText* plaintext;
 
-    void SetRootIndex(void);
+        FXIcon* newicon;
+        FXButton* newbutton;
+	FXIcon* openicon;
+        FXButton* openbutton;
+        FXIcon* saveicon;
+        FXButton* savebutton;
 
-protected:
-    void closeEvent(QCloseEvent* event);
-    void mouseDoubleClickEvent(QMouseEvent* event);
-    //void mousePressEvent(QMouseEvent* event);
-private:
-    Ui::WombatForensics *ui;
+	FXIcon* evidmanicon;
+	FXButton* evidmanbutton;
 
-    void SetupHexPage(void);
-    void InitializeAppStructure(void);
-    void InitializeCaseStructure(void);
-    void InitializeOpenCase(void);
-    void InitializePreviewReport(void);
-    void CloseCurrentCase(void);
-    void UpdateProperties(void);
-    void PopulateHexContents(void);
-    void GenerateHexFile(const QModelIndex index);
-    QStringList GetFileLists(int filelisttype);
-    void ProcessDig(QString curid);
-    void UpdateFilterCount(void);
-    void SaveState(void);
-    void RemoveTmpFiles(void);
-    void UpdateCheckState(void);
-    void InitializeCheckState(void);
-    void UpdateSelectedState(QString id);
-    void TagFile(QModelIndex curindex, QString tagname);
-    static void PopulateModel(const QModelIndex index);
-    void SaveTreeModel(void);
-    void PrintTree(int level, const QModelIndex& index, QTextStream& stream);
-    QString InitializeSelectedState(void);
-    QModelIndex selectedindex;
-    QModelIndex oldselectedindex;
+        FXIcon* jumptohexicon;
+        FXButton* jumptohexbutton;
+        FXIcon* searchhexicon;
+        FXButton* searchhexbutton;
+        FXIcon* byteconvertericon;
+        FXButton* byteconverterbutton;
 
-    //QFuture<void> sqlfuture;
-    QFutureWatcher<void> volwatcher;
-    //QFutureWatcher<void> sqlwatcher;
-    QFuture<void> digfuture;
-    QFutureWatcher<void> digwatcher;
-    QFuture<void> predigfuture;
-    QFutureWatcher<void> predigwatcher;
-    QFutureWatcher<void> carvewatcher;
-    QFutureWatcher<void> thashwatcher;
-    QFutureWatcher<void> thashsavewatcher;
-    QFutureWatcher<void> exportwatcher;
-    QFuture<void> openfuture;
-    QFutureWatcher<void> openwatcher;
-    QFutureWatcher<void> savewcfwatcher;
-    QFutureWatcher<void> hashmatchwatcher;
-    //QFuture<std::string> verfuture;
-    //QFutureWatcher<std::string> verifywatcher;
+        FXIcon* settingsicon;
+        FXButton* settingsbutton;
+        FXIcon* managecarvedicon;
+        FXButton* managecarvedbutton;
+        FXIcon* viewmanageicon;
+        FXButton* viewmanagebutton;
+        FXIcon* messagelogicon;
+        FXButton* messagelogbutton;
 
-    QProcess* xmntprocess;
+        FXIcon* imgvidthumbicon;
+        FXButton* imgvidthumbbutton;
+        FXIcon* digdeepericon;
+        FXButton* digdeeperbutton;
+        FXIcon* carvingicon;
+        FXButton* carvingbutton;
+        FXIcon* exportfilesicon;
+        FXButton* exportfilesbutton;
+        FXIcon* exportwliicon;
+        FXButton* exportwlibutton;
 
-    QFile casedatafile;
-    // QFile carvingfiletypesfile; maybe do or don't need here, I might get this from a resource
-    off_t offset() const;
-    QPushButton* lineup;
-    QPushButton* linedown;
-    QPushButton* pageup;
-    QPushButton* pagedown;
-    QLabel* selectedoffset;
-    QLabel* selectedhex;
-    QLabel* filecountlabel;
-    QLabel* filtercountlabel;
-    QLabel* checkedcountlabel;
-    QLabel* digcountlabel;
-    QLabel* carvestatuslabel;
-    StatusLabel* statuslabel;
-    PathTreeView* pathtreeview;
-    QFrame* vline1;
-    QFrame* vline2;
-    QFrame* vline3;
-    int exporttype;
-    int digtype;
-    int digtimercounter = 0;
-    //int carvetimercounter = 0;
-    bool isvidthumb = false;
-    bool isimgthumb = false;
-    bool isreport = false;
-    QVector<int> digoptions;
-    QShortcut* jumpforward;
-    QShortcut* jumpbackward;
-    QShortcut* showitem;
-    QTimer* autosavetimer;
-    //QTimer* digrotatetimer; 
-    //QTimer* carverotatetimer;
-    TreeNode* actionitem;
-    QWidget* cancelwidget;
-    qint64 digimgthumbtotal = 0;
-    qint64 digvidthumbtotal = 0;
-    qint64 dighashtotal = 0;
-    qint64 digarchivetotal = 0;
-    qint64 digtotalcount = 0;
-    QString digimgcountstring = "";
-    QString digvidcountstring = "";
-    QString dighashcountstring = "";
-    QString digarchivecountstring = "";
-    QString digtotalcountstring = "";
-    QString currentreportpath = "";
-    QHash<QString, int>carvecounthash;
-    //QStringList whlcomparisonlist;
+	FXIcon* managetagsicon;
+	FXButton* managetagsbutton;
+        FXIcon* managehashicon;
+        FXButton* managehashbutton;
+	FXIcon* previewicon;
+	FXButton* previewbutton;
+	FXIcon* publishicon;
+	FXButton* publishbutton;
+
+	/*
+        FXIcon* createwfiicon;
+        FXButton* createwfibutton;
+        FXIcon* verifywfiicon;
+        FXButton* verifywfibutton;
+	*/
+
+        FXIcon* xchompicon;
+        FXButton* xchompbutton;
+	FXIcon* abouticon;
+	FXButton* aboutbutton;
+
+        FXIcon* burrowicon;
+        FXButton* burrowbutton;
+	FXIcon* backicon;
+	FXButton* backbutton;
+	FXIcon* frwdicon;
+	FXButton* frwdbutton;
+	FXIcon* curicon;
+	FXButton* curbutton;
+
+        // ITEM TYPE ICONS
+        FXIcon* forimgicon;
+        FXIcon* carvedfileicon;
+        FXIcon* defaultfileicon;
+        FXIcon* defaultfoldericon;
+        FXIcon* deletedfileicon;
+        FXIcon* deletedfoldericon;
+        FXIcon* partitionicon;
+        FXIcon* virtualfileicon;
+        FXIcon* virtualfoldericon;
+        FXIcon* filtericon;
+
+        std::vector<std::string> tags;
+        std::vector<std::string> binaries;
+        std::vector<std::string> whlfiles;
+        FXArray<FXString> taggedlist;
+        std::ifstream filebuffer;
+	std::ofstream filewriter;
+        FXArray<FXString> fileuserdata;
+        FXString evidencelist;
+        FXString curfileuserdata;
+        FXString homepath;
+        FXString tmppath;
+        FXString casename;
+        FXString configpath;
+        FXString currentsettings;
+	FXString currentcarvetypes;
+	FXString prevevidpath;
+        FXString itemtext;
+        FXString pathtext;
+        FXString filetext;
+        FXString currentviewers;
+        FXString pname;
+        
+        FXFile tagsfile;
+        FXFile logfile;
+        FXFile settingfile;
+	FXFile carvetypesfile;
+        FXFile evidencefile;
+        FXFile binariesfile;
+        
+        char dtbuf[35];
+        bool iscaseopen;
+	bool isfrompath;
+        
+        Viewer* viewer;
+        ForImg* curforimg;
+        std::vector<ForImg*> forimgvector;
+        MessageLog* msglog;
+
+        uint64_t globalid;
+        uint64_t curid;
+        uint64_t lastid;
+
+	CurrentItem currentitem;
+        FileItem currentfileitem;
+        
+        int sortindex = 1;
+        uint sortasc = 1;
+        int itemtype = 0;
+        int curiconid = 0;
+        std::vector<std::string> volnames;
+        std::vector<uint64_t> volsizes;
+        std::vector<uint64_t> voloffsets;
+        std::vector<FileItem> fileitemvector;
+
+    protected:
+        WombatForensics() {}
+	~WombatForensics();
+
+    public:
+        enum
+        {
+            ID_TREELIST = 1,
+            ID_NEW = 99,
+            ID_OPEN = 100,
+            ID_SAVE = 98,
+	    ID_EVIDMANAGE = 97,
+            ID_SETTINGS = 95,
+            ID_VIEWMANAGE = 94,
+            ID_MSGLOG = 93,
+            ID_JUMPHEX = 92,
+            ID_SEARCHHEX = 91,
+            ID_BYTECONV = 90,
+            ID_IMGVIDTHUMB = 89,
+            ID_DIGDEEPER = 88,
+            ID_CARVING = 87,
+            ID_EXPORTFILES = 86,
+            ID_EXPORTWLI = 85,
+            ID_MANAGEHASH = 84,
+            ID_CREATEWFI = 83,
+            ID_VERIFYWFI = 82,
+            ID_XCHOMP = 81,
+            ID_MANAGECARVED = 80,
+            ID_TREESELECT = 101,
+	    ID_MANAGETAGS = 102,
+	    ID_PREVIEW = 103,
+	    ID_PUBLISH = 104,
+	    ID_ABOUT = 105,
+	    ID_TABLESELECT = 106,
+            ID_TAGMENU = 107,
+            ID_NEWTAG = 108,
+            ID_SETTAG = 109,
+            ID_REMTAG = 110,
+            ID_PAGESPIN = 111,
+            ID_SQLLIST = 112,
+            ID_PROPTABLE = 113,
+            ID_OFFTEXT = 114,
+            ID_HEXTEXT = 115,
+            ID_ASCTEXT = 116,
+            ID_SCROLLBAR = 117,
+            ID_HOME = 118,
+	    ID_PARTITION = 119,
+	    ID_BACK = 120,
+	    ID_FRWD = 121,
+	    ID_CURRENT = 122,
+            ID_TABLEHEADER = 123,
+            ID_BINARY = 124,
+            ID_CONTENTS = 125,
+            ID_PROPERTIES = 126,
+            ID_CHECKIT = 127,
+            ID_UNCHECKALL = 128,
+            ID_HEXCONTENTS = 129,
+            ID_LAST
+        };
+        WombatForensics(FXApp* a);
+        long NewCase(FXObject*, FXSelector, void*);
+        long OpenCase(FXObject*, FXSelector, void*);
+        long SaveCase(FXObject*, FXSelector, void*);
+	long ManageEvidence(FXObject*, FXSelector, void*);
+        long OpenTagManager(FXObject*, FXSelector, void*);
+	long OpenAboutBox(FXObject*, FXSelector, void*);
+        long PreviewReport(FXObject*, FXSelector, void*);
+        long TagMenu(FXObject*, FXSelector, void*);
+        long TableUpDown(FXObject*, FXSelector, void*);
+        long ContentSelected(FXObject*, FXSelector, void*);
+        long LoadForensicImages(FXObject*, FXSelector, void*);
+        long LoadChildren(FXObject*, FXSelector, void*);
+        long LoadCurrent(FXObject*, FXSelector, void*);
+        long LoadCurrentPath(FXObject*, FXSelector, void*);
+        long LoadCurrentFile(FXObject*, FXSelector, void*);
+        long OpenSettings(FXObject*, FXSelector, void*);
+        long OpenManageCarved(FXObject*, FXSelector, void*);
+        long OpenViewerManager(FXObject*, FXSelector, void*);
+        long OpenMessageLog(FXObject*, FXSelector, void*);
+	long OpenDigDeeper(FXObject*, FXSelector, void*);
+	long OpenManageHashList(FXObject*, FXSelector, void*);
+        long OpenXChomp(FXObject*, FXSelector, void*);
+        long SortColumn(FXObject* sender, FXSelector sel, void* colid);
+        long FilterColumn(FXObject* sender, FXSelector sel, void* colid);
+        long CheckSelected(FXObject* sender, FXSelector sel, void*);
+        long OpenHexViewer(FXObject*, FXSelector, void*);
+        /*
+        long KeySelected(FXObject*, FXSelector, void*);
+	long ValueSelected(FXObject*, FXSelector, void*);
+        long SetTag(FXObject* sender, FXSelector, void*);
+        long CreateNewTag(FXObject*, FXSelector, void*);
+        long RemoveTag(FXObject*, FXSelector, void*);
+        long PublishReport(FXObject*, FXSelector, void*);
+        long FileSelected(FXObject*, FXSelector, void*);
+        long PropertySelected(FXObject*, FXSelector, void*);
+        long TableUp(FXObject*, FXSelector, void*);
+        long ContentSelected(FXObject*, FXSelector, void*);
+        long TableUpDown(FXObject*, FXSelector, void*);
+        long PageChanged(FXObject*, FXSelector, void*);
+        long ScrollChanged(FXObject*, FXSelector, void*);
+	//void PopulateChildKeys(libregf_key_t* curkey, FXTreeItem* curitem, libregf_error_t* regerr);
+	void GetRootString(FXTreeItem* curitem, FXString* rootstring);
+	FXString ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
+        FXString ConvertUnixTimeToString(uint32_t input);
+        FXString DecryptRot13(FXString encstr);
+        FXchar Rot13Char(FXchar curchar);
+        uint GetVarIntLength(uint8_t* pagearray, uint64_t pageoffset);
+        uint GetVarInt(uint8_t* pagearray, uint64_t pageoffset, uint varintlength);
+        uint64_t GetSerialType(uint64_t contentoffset, FXString* tmptype, FXString* tmpval, FXString* tmpofflen, uint8_t* pagearray, int serialtype);
+        void LoadPage(void);
+        void PopulatePageContent(uint8_t* pagearray);
+        void ParseFileHeader(uint8_t* pageheader);
+        void PopulateFileHeader(void);
+        void ParsePageHeader(uint8_t* pagearray, uint8_t fileheader, uint64_t curpage);
+        void PopulatePageHeader(FXArray<uint16_t>* celloffsetarray);
+        void ParseRowContents(uint8_t* pagearray, FXArray<uint16_t>* celloffsetarray);
+        void PopulatePropertyTable(FXArray<uint16_t>* celloffsetarray);
+        void AddProperty(int row, FXString offlen, FXString val, FXString desc);
+        void AddContent(int row, FXString islive, FXString rowid, FXString offlen, FXString type, FXString val, FXString tag);
+        */
+        void AlignColumn(FXTable* curtable, int row, FXuint justify);
+        void FitColumnContents(int col);
+        FXString GetSettings(int setting);
+	void SaveCurrentCase(void);
+        void CloseCurrentCase(void);
+        void DeleteTmpFiles(void);
+        void EnableCaseButtons(void);
+        void LoadCaseState(void);
+        void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
+	void SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex=1, int asc=1);
+        void PlainView(FileItem* curfileitem);
+        void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents);
+        //void ApplyFilter(int colindex, std::string filterstring);
+        //void LoadPartitions(ForImg* curforimg);
+        //void LoadGptPartitions(ForImg* curforimg);
+        //FXString GetFileSystemName(ForImg* curforimg, uint64_t offset);
+	//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, FXArray<uint>* clusterlist);
+	//FXString ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset);
+	void UpdateForensicImages(void);
+
+        void LogEntry(FXString logstring)
+        {
+            FXString tmpstr = FXString(GetDateTime(dtbuf)) + " | " + logstring + "\n";
+            FXFile* logfile = new FXFile(tmppath + "msglog", FXIO::ReadWrite|FXIO::Append, FXIO::OwnerReadWrite);
+            int wrerr = logfile->writeBlock(tmpstr.text(), tmpstr.length());
+            logfile->close();
+        };
+	void StatusUpdate(FXString tmptext)
+	{
+	    statusbar->getStatusLine()->setNormalText(tmptext);
+	};
+        virtual void create();
+
 };
 
-#endif // WOMBATFORENSICS_H
+FXDEFMAP(WombatForensics) WombatForensicsMap[]={
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_NEW, WombatForensics::NewCase),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenCase),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SAVE, WombatForensics::SaveCase),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_EVIDMANAGE, WombatForensics::ManageEvidence),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PREVIEW, WombatForensics::PreviewReport),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTINGS, WombatForensics::OpenSettings),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGECARVED, WombatForensics::OpenManageCarved),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_DIGDEEPER, WombatForensics::OpenDigDeeper),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGEHASH, WombatForensics::OpenManageHashList),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HOME, WombatForensics::LoadForensicImages),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CURRENT, WombatForensics::LoadCurrent),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_BACK, WombatForensics::LoadCurrentPath),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_FRWD, WombatForensics::LoadCurrentFile),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_VIEWMANAGE, WombatForensics::OpenViewerManager),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MSGLOG, WombatForensics::OpenMessageLog),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_XCHOMP, WombatForensics::OpenXChomp),
+    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLESELECT, WombatForensics::TagMenu),
+    FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_TABLESELECT, WombatForensics::TableUpDown),
+    FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
+    FXMAPFUNC(SEL_DOUBLECLICKED, WombatForensics::ID_TABLESELECT, WombatForensics::LoadChildren),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_TABLEHEADER, WombatForensics::SortColumn),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHECKIT, WombatForensics::CheckSelected),
+    FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLEHEADER, WombatForensics::FilterColumn),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HEXCONTENTS, WombatForensics::OpenHexViewer),
+
+    /*
+    //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_OPEN, WombatForensics::OpenSqliteFile),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGETAGS, WombatForensics::OpenTagManager),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ABOUT, WombatForensics::OpenAboutBox),
+    //FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ValueSelected),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_NEWTAG, WombatForensics::CreateNewTag),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_SETTAG, WombatForensics::SetTag),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_REMTAG, WombatForensics::RemoveTag),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PUBLISH, WombatForensics::PublishReport),
+    FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_SQLLIST, WombatForensics::FileSelected),
+    FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_PROPTABLE, WombatForensics::PropertySelected),
+    FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_PROPTABLE, WombatForensics::TableUp),
+    FXMAPFUNC(SEL_KEYPRESS, WombatForensics::ID_TABLESELECT, WombatForensics::TableUpDown),
+    FXMAPFUNC(SEL_SELECTED, WombatForensics::ID_TABLESELECT, WombatForensics::ContentSelected),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PAGESPIN, WombatForensics::PageChanged),
+    FXMAPFUNC(SEL_CHANGED, WombatForensics::ID_SCROLLBAR, WombatForensics::ScrollChanged),
+    */
+};
+#endif // WOMBATSQLITE_H
