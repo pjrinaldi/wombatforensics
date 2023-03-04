@@ -66,6 +66,7 @@ long ManageHashList::RemoveWhl(FXObject*, FXSelector, void*)
     int curitem = whllist->getCurrentItem();
     std::string curtext = hashlists->at(curitem);
     hashlists->erase(hashlists->begin() + curitem);
+    FXFile::remove(whllist->getItem(whllist->getCurrentItem())->getText());
     rembutton->disable();
     UpdateList();
 
@@ -87,27 +88,8 @@ long ManageHashList::CreateEmptyList(FXObject*, FXSelector, void*)
 
 void ManageHashList::LoadHashList()
 {
-    std::cout << "load hashlists here before proceeding. " << std::endl;
-    /*
-    FXArray<FXint> posarray;
-    int found = 0;
-    posarray.append(-1);
-    while(found > -1)
-    {
-        found = curviewers.find("|", found+1);
-        if(found > -1)
-            posarray.append(found);
-    }
-    posarray.append(curviewers.length());
-    if(posarray.no() > 1 && hashlists != NULL)
-    {
-        hashlists->clear();
-        for(int i=0; i < posarray.no() - 1; i++)
-            hashlists->push_back(curviewers.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text());
-    }
-    if(curviewers.length() > 0 && posarray.no() == 1)
-        hashlists->push_back(curviewers.text());
-    if(hashlists != NULL)
-        UpdateList();
-    */
+    std::string dirstring = "/tmp/wf/" + std::string(casename.text()) + "/hashlists/";
+    for (const auto & entry : std::filesystem::directory_iterator(dirstring))
+        hashlists->push_back(entry.path());
+    UpdateList();
 }

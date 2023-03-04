@@ -1351,6 +1351,7 @@ long WombatForensics::OpenManageHashList(FXObject*, FXSelector, void*)
     ManageHashList hashlistmanager(this, "Manage Hash Lists");
     hashlistmanager.SetCaseName(casename);
     hashlistmanager.SetHashList(&whlfiles);
+    hashlistmanager.LoadHashList();
     hashlistmanager.execute(PLACEMENT_OWNER);
     return 1;
 }
