@@ -188,12 +188,6 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     virtualfoldericon->create();
     filtericon = new FXPNGIcon(this->getApp(), filter);
     filtericon->create();
-    /*
-    filepropicon = new FXPNGIcon(this->getApp(), fileprop);
-    filepropicon->create();
-    filehexicon = new FXPNGIcon(this->getApp(), filehex);
-    filehexicon->create();
-    */
 
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
@@ -319,8 +313,6 @@ WombatForensics::~WombatForensics()
     virtualfileicon->destroy();
     virtualfoldericon->destroy();
     filtericon->destroy();
-    //filepropicon->destroy();
-    //filehexicon->destroy();
 }
 
 void WombatForensics::DeleteTmpFiles()
@@ -434,7 +426,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
         // will have to get the global id, either from the latest file or a latestid text file.
 	this->setTitle("Wombat Forensics - " + casename);
         //FXDir::create("/tmp/wf/");
-	tmppath = tmppath + "wf/";
+	//tmppath = tmppath + "wf/";
 	// BEGIN UNTAR METHOD
 	TAR* tarhandle;
 	tar_open(&tarhandle, casefilename.text(), NULL, O_RDONLY, 0644, TAR_GNU);
@@ -1357,6 +1349,8 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
 long WombatForensics::OpenManageHashList(FXObject*, FXSelector, void*)
 {
     ManageHashList hashlistmanager(this, "Manage Hash Lists");
+    hashlistmanager.SetCaseName(casename);
+    hashlistmanager.SetHashList(&whlfiles);
     hashlistmanager.execute(PLACEMENT_OWNER);
     return 1;
 }

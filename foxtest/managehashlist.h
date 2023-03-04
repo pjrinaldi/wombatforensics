@@ -22,7 +22,8 @@ class ManageHashList : public FXDialogBox
         FXList* whllist;
         FXLabel* binlabel;
         FXButton* browsebutton;
-        FXString binstring;
+        FXString hashstring;
+        FXString casename;
 	FXButton* emptybutton;
         FXButton* rembutton;
         FXButton* savebutton;
@@ -46,7 +47,8 @@ class ManageHashList : public FXDialogBox
         };
         ManageHashList(FXWindow* parent, const FXString& title);
         void SetHashList(std::vector<std::string>* hashlist);
-        void LoadViewers(FXString curviewers);
+        void SetCaseName(FXString casename);
+        void LoadHashList(void);
         void UpdateList();
         long RemoveWhl(FXObject*, FXSelector, void*);
         long ListSelection(FXObject*, FXSelector, void*);

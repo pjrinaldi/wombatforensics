@@ -23,6 +23,11 @@ void ManageHashList::SetHashList(std::vector<std::string>* hashlist)
         UpdateList();
 }
 
+void ManageHashList::SetCaseName(FXString cname)
+{
+    casename = cname;
+}
+
 void ManageHashList::UpdateList()
 {
     whllist->clearItems();
@@ -36,11 +41,21 @@ void ManageHashList::UpdateList()
 long ManageHashList::SetHashPath(FXObject*, FXSelector, void*)
 {
     FXString hstr = FXString(getenv("HOME")) + "/";
-    binstring = FXFileDialog::getOpenFilename(this, "Select the Hash List to add", hstr, "Wombat Hash Lists (*.whl)");
-    if(!binstring.empty())
+    hashstring = FXFileDialog::getOpenFilename(this, "Select the Hash List to Import", hstr, "Wombat Hash Lists (*.whl)");
+    if(!hashstring.empty())
     {
-        hashlists->push_back(binstring.text());
-        UpdateList();
+        int found = hashstring.find_last_of("/");
+        FXString localstring = "/tmp/wf/" + casename + "/" + "hashlists/" + hashstring.mid(found+1, hashstring.length() - found);
+        //std::cout << "localstring: " << localstring.text() << std::endl;
+        bool filecopied = FXFile::copy(hashstring, localstring, true);
+        if(filecopied)
+        {
+            hashlists->push_back(localstring.text());
+            UpdateList();
+        }
+        //else
+        //    FXuint result = FXMessageBox::question(this, MBOX_YES_NO, "Existing Case Status", "There is a case already open. Are you sure you want to close it?"); // no is 2, yes is 1
+            //std::cout << "file already existed, not copied." << std::endl;
     }
 
     return 1;
@@ -70,8 +85,10 @@ long ManageHashList::CreateEmptyList(FXObject*, FXSelector, void*)
     return 1;
 }
 
-void ManageHashList::LoadViewers(FXString curviewers)
+void ManageHashList::LoadHashList()
 {
+    std::cout << "load hashlists here before proceeding. " << std::endl;
+    /*
     FXArray<FXint> posarray;
     int found = 0;
     posarray.append(-1);
@@ -92,4 +109,5 @@ void ManageHashList::LoadViewers(FXString curviewers)
         hashlists->push_back(curviewers.text());
     if(hashlists != NULL)
         UpdateList();
+    */
 }
