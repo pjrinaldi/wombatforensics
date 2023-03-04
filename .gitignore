@@ -17,3 +17,4 @@ Makefile.Release
 Makefile.*
 wombatforensics
 reference
+blake3/libblake3.a

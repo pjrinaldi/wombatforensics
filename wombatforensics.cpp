@@ -1343,11 +1343,36 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
     bool toprocess = digdeeper.execute(PLACEMENT_OWNER);
     if(toprocess == 1)
     {
+        std::vector<FileItem> digfilelist;
+        digfilelist.clear();
         std::vector<std::string> diglist;
         diglist.clear();
         digdeeper.ReturnDigging(&diglist);
-        for(int i=0; i < diglist.size(); i++)
-            std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;
+        int filestodig = std::stoi(diglist.at(0).substr(0, 1));
+        if(filestodig == 0) // selected
+        {
+            digfilelist.push_back(fileitemvector.at(tablelist->getCurrentRow()));
+            //currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+            std::cout << "selected" << std::endl;
+        }
+        else if(filestodig == 1) // checked
+        {
+            std::cout << "checked" << std::endl;
+        }
+        else if(filestodig == 2) // all processed/total/listed/maybe not at all???
+        {
+            std::cout << "all processed" << std::endl;
+        }
+        for(int i=1; i < diglist.size(); i++)
+        {
+            if(std::stoi(diglist.at(i)) == 5) // HASH FILE
+            {
+                for(int i=0; i < digfilelist.size(); i++)
+                    HashFile(&(digfilelist.at(i)));
+                //HashFile(&digfilelist);
+            }
+            //std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;
+        }
     }
 
     return 1;
@@ -2315,6 +2340,12 @@ void WombatForensics::FitColumnContents(int col)
 void WombatForensics::PlainView(FileItem* curfileitem)
 {
     bool inmemory = true;
+    uint8_t* tmpbuf = NULL;
+    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    std::ifstream tmpfile;
+    GetFileContent(curforimg, curfileitem, &inmemory, tmpbuf, &tmpfile);
+    /*
+    bool inmemory = true;
     uint64_t memlimit = 4294967296; // 4GB
     //uint64_t memlimit = 1; // 1 byte for testing
     std::cout << "name: " << curfileitem->name << std::endl;
@@ -2379,6 +2410,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         }
         delete[] inbuf;
     }
+    */
+
     /*
     std::cout << std::endl << "5 characters from buffer: |";
     for(int i=0; i < 6; i++)

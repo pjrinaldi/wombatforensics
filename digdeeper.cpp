@@ -29,6 +29,10 @@ DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent
     new FXSpring(hframe8);
     cancelbutton = new FXButton(hframe8, "Cancel", NULL, this, FXDialogBox::ID_CANCEL, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
     savebutton = new FXButton(hframe8, "Process", NULL, this, FXDialogBox::ID_ACCEPT, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+
+    checkedradio->disable();
+    allradio->disable();
+    selectedradio->setCheck(true);
 }
 
 void DigDeeper::SetCaseName(FXString cname)

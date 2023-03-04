@@ -15,6 +15,8 @@
 #include <fcntl.h>
 // FOX TOOLKIT GUI 
 #include "/usr/local/include/fox-1.7/fx.h"
+// BLAKE3 HASH
+#include "blake3/blake3.h"
 // PROJECT INCLUDES
 #include "icons.h"
 #include "managetags.h"
