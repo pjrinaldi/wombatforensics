@@ -82,7 +82,17 @@ long ManageHashList::ListSelection(FXObject*, FXSelector, void*)
 
 long ManageHashList::CreateEmptyList(FXObject*, FXSelector, void*)
 {
-    std::cout << "create empty list here" << std::endl;
+    FXString emptywhlstring = "/tmp/wf/" + casename + "/hashlists/";
+    FXString whlfilename = "";
+    bool isset = FXInputDialog::getString(whlfilename, this, "New Wombat Hash List", "Enter Wombat Hash List Name (w/o extension):");
+    if(isset)
+    {
+        emptywhlstring += whlfilename + ".whl";
+        FXFile::create(emptywhlstring, FXIO::OwnerReadWrite);
+        hashlists->push_back(emptywhlstring.text());
+        UpdateList();
+    }
+
     return 1;
 }
 
