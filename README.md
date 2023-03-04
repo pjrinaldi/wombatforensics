@@ -1,9 +1,11 @@
 # Wombat Forensics
 
-Wombat Forensics is a new Forensic Analysis tool built entirely in C and C++. The GUI is built using Qt5, so it may one day work on Windows, Linux and Macintosh systems. The current design is Linux specific, but if there ever is a need I can eventually implement various IF's to make it work on the Windows and Mac. The application is designed to be user friendly, fast, and always maintain GUI responsiveness. Having used AD Lab, X-Ways, Encase and Autopsy, I found various things that would bother me or were slow and unresponsive. I decided for a resource intensive application, using C/C++ was important.
+Wombat Forensics is a new Forensic Analysis tool built entirely in C and C++. The GUI is built using the FOX-Toolkit, so it may one day work on Windows, Linux and Macintosh systems. The current design is Linux specific, but if there ever is a need I can eventually implement various IF's to make it work on the Windows and Mac. The application is designed to be user friendly, fast, and always maintain GUI responsiveness. Having used AD Lab, X-Ways, Encase, Axiom, and Autopsy, I found various things that would bother me or were slow and unresponsive. I decided for a resource intensive application, using C/C++ was important.
 
 Current Features
 -----------------
+* The goal is to implement all these features in the redone fox-toolkit version prior to the next release (v0.5), this will take a while, but I'll get it there in the end.
+
 * Tagging - You can Tag (bookmark) files by simply right clicking on a file and selecting the tag to apply. (v0.2)
 * Report Preview - This feature generates the report in a preview window as you add evidence or tag files to different sections. If thumbnailing has been done, then thumbnails will display properly in the preview report. (v0.2+)
 * Publish Report - Publish a report and export/link files to the HTML Report. Places the report in the reporting directory set by the user from the settings dialog and in a unique sub folder based on date/time. (v0.2+)
@@ -21,6 +23,7 @@ Current Features
 
 Current Viewers
 --
+* The goal is to implement all these viewers in the redone fox-toolkit version prior to the next release (v0.5), which will take a while, but I'll get it there in the end.
 * Image (v0.1+)
 * Video (v0.1+)
 * Text  (v0.1+)
@@ -36,12 +39,12 @@ Comparison with Other Forensic Suites
 Reasoning
 --
 
-I wanted to learn improve my general forensic knowledge and understanding of what the existing tools are doing as well as learn more about specific artifacts. One way to do that is to build a forensic tool. This will give me better knowledge of how the black box tools are working. I didn't want to reinvent the wheel, so I am making use of as many open source libraries and tools as possible, to include the libaff, libewf, liblnk, libmagick, and so on.
+I wanted to improve my general forensic knowledge and understanding of what the existing tools are doing as well as learn more about specific artifacts. One way to do that is to build a forensic tool. This will give me better knowledge of how the black box tools are working. I didn't want to reinvent the wheel, so I am making use of as many open source libraries and tools as possible, to include the libsmraw, libewf, liblnk, libmagick, and so on.
 
 Why is user friendly so important?
 -
 
-When I started this project, there were no GUI forensic tools for linux, and so I would be working with the major GUI forensic tools in Windows. I don't like Windows very much, and all the existing GUI forensic tools have issues that bothered me. They would experience GUI freezes or GUI tearing and redrawing issues which is annoying and interrupts my workflow and train of thought. Some of the tools have too m any ways to do the same thing or options that are very confusing and not explained very well or intuitive as to their meaning. I shouldn't have 3 ways to do the same thing, it is overkill and poor design. A program can be robust, but provide a sensible set of features/options to a user.
+When I started this project, there were no GUI forensic tools for linux, and so I would be working with the major GUI forensic tools in Windows. I don't like Windows at all, and all the existing GUI forensic tools have issues that bothered me. They would experience GUI freezes or GUI tearing and redrawing issues which is annoying and interrupts my workflow and train of thought. Some of the tools have too many ways to do the same thing or options that are very confusing and not explained very well or intuitive as to their meaning. I shouldn't have 3 ways to do the same thing, it is overkill and poor design. A program can be robust, but provide a sensible set of features/options to a user.
 
 Wombat Forensics is user oriented in its design. You can select an item or check multiple items. The program is multithreaded. The GUI is always responsive because resource intensive tasks are done on different threads. Large files will not slow down the application. The hex viewer was designed to load portions of a file at a time, therefore it is always fast to view and does not eat up RAM.
 
