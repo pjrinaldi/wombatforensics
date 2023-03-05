@@ -48,6 +48,22 @@ std::string GetFileItem(std::string* filecontents, int item)
         return "";
 }
 
+void SetFileItem(std::string* filecontents, int item, std::string value)
+{
+    std::vector<std::string> contentlist;
+    contentlist.clear();
+    std::istringstream contents(*filecontents);
+    std::string itemcontent;
+    while(getline(contents, itemcontent, '|'))
+        contentlist.push_back(itemcontent);
+    if(item < contentlist.size())
+        contentlist[item] = value;
+    std::string newcontents = "";
+    for(int i=0; i < contentlist.size(); i++)
+        newcontents += contentlist.at(i) + "|";
+
+}
+
 int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
     int filecount = 0;

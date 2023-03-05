@@ -1369,12 +1369,15 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
             {
                 for(int i=0; i < digfilelist.size(); i++)
                 {
-                    std::cout << "curhash before: " << digfilelist.at(i).hash << std::endl;
-                    HashFile(&(digfilelist.at(i)), curforimg);
+                    //std::cout << "curhash before: " << digfilelist.at(i).hash << std::endl;
+                    if(digfilelist.at(i).hash.empty())
+                        HashFile(&(digfilelist.at(i)), curforimg);
                     std::cout << "curhash after: " << digfilelist.at(i).hash << std::endl;
                     // NEED TO UPDATE TABLELIST HASH COLUMN FOR THE FILE AND ALSO UPDATE THE TEXT FILE CONTAINING IT.
                     tablelist->setItemText(tablelist->getCurrentRow(), 9, FXString(digfilelist.at(i).hash.c_str()));
-                    AlignColumn(tablellist, 9, FXTableItem::LEFT);
+                    AlignColumn(tablelist, 9, FXTableItem::LEFT);
+                    // ISSUE HERE IS THIS DOESN'T ACCOUNT FOR CHILDREN... SO HOW DO I GET THE FILE PATH TO READ....
+                    std::cout << std::string(tmppath.text()) + "burrow/" + curforimg->ImageFileName() + "." + std::to_string(currentitem.voloffset) + "." + std::to_string(digfilelist.at(i).gid) << std::endl;
                 }
                 //HashFile(&digfilelist);
             }
