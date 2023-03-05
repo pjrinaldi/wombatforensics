@@ -1372,6 +1372,7 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                     std::cout << "curhash before: " << digfilelist.at(i).hash << std::endl;
                     HashFile(&(digfilelist.at(i)), curforimg);
                     std::cout << "curhash after: " << digfilelist.at(i).hash << std::endl;
+                    // NEED TO UPDATE TABLELIST HASH COLUMN FOR THE FILE AND ALSO UPDATE THE TEXT FILE CONTAINING IT.
                 }
                 //HashFile(&digfilelist);
             }
@@ -2419,36 +2420,6 @@ void WombatForensics::GetXmlText(rapidxml::xml_node<>* curnode, std::string* con
         curchild = curchild->next_sibling();
     }
 }
-
-/*
-void HashFile(std::string filename, std::string whlfile)
-{
-    std::ifstream fin(filename.c_str());
-    char tmpchar[65536];
-    blake3_hasher hasher;
-    blake3_hasher_init(&hasher);
-    while(fin)
-    {
-	fin.read(tmpchar, 65536);
-	size_t cnt = fin.gcount();
-	blake3_hasher_update(&hasher, tmpchar, cnt);
-	if(!cnt)
-	    break;
-    }
-    uint8_t output[BLAKE3_OUT_LEN];
-    blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
-    std::stringstream ss;
-    for(int i=0; i < BLAKE3_OUT_LEN; i++)
-        ss << std::hex << (int)output[i]; 
-    std::string srcmd5 = ss.str();
-    std::string whlstr = srcmd5 + "," + filename + "\n";
-    FILE* whlptr = NULL;
-    whlptr = fopen(whlfile.c_str(), "a");
-    fwrite(whlstr.c_str(), strlen(whlstr.c_str()), 1, whlptr);
-    fclose(whlptr);
-}
- */ 
-
 
 /*
 long WombatForensics::PropertySelected(FXObject*, FXSelector, void*)
