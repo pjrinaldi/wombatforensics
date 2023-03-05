@@ -48,7 +48,7 @@ std::string GetFileItem(std::string* filecontents, int item)
         return "";
 }
 
-void SetFileItem(std::string* filecontents, int item, std::string value)
+std::string SetFileItem(std::string* filecontents, int item, std::string value)
 {
     std::vector<std::string> contentlist;
     contentlist.clear();
@@ -62,6 +62,7 @@ void SetFileItem(std::string* filecontents, int item, std::string value)
     for(int i=0; i < contentlist.size(); i++)
         newcontents += contentlist.at(i) + "|";
 
+    return newcontents;
 }
 
 int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
@@ -126,6 +127,7 @@ int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, F
             tmpitem.hash = GetFileItem(&filecontent, 13);
             tmpitem.tag = GetFileItem(&filecontent, 14);
             tmpitem.match = GetFileItem(&filecontent, 15);
+            tmpitem.filename = GetFileItem(&filecontent, 16);
             //std::cout << "File item Values: " << std::endl;
             //std::cout << "filecontent:" << filecontent << std::endl;
             //std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;

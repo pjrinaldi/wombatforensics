@@ -1372,14 +1372,23 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                     //std::cout << "curhash before: " << digfilelist.at(i).hash << std::endl;
                     if(digfilelist.at(i).hash.empty())
                         HashFile(&(digfilelist.at(i)), curforimg);
-                    std::cout << "curhash after: " << digfilelist.at(i).hash << std::endl;
-                    // NEED TO UPDATE TABLELIST HASH COLUMN FOR THE FILE AND ALSO UPDATE THE TEXT FILE CONTAINING IT.
+                    //std::cout << "curhash after: " << digfilelist.at(i).hash << std::endl;
                     tablelist->setItemText(tablelist->getCurrentRow(), 9, FXString(digfilelist.at(i).hash.c_str()));
-                    AlignColumn(tablelist, 9, FXTableItem::LEFT);
-                    // ISSUE HERE IS THIS DOESN'T ACCOUNT FOR CHILDREN... SO HOW DO I GET THE FILE PATH TO READ....
-                    std::cout << std::string(tmppath.text()) + "burrow/" + curforimg->ImageFileName() + "." + std::to_string(currentitem.voloffset) + "." + std::to_string(digfilelist.at(i).gid) << std::endl;
+                    //std::cout << "filename: " << digfilelist.at(i).filename << std::endl;
+                    FXFile curfile;
+                    curfile.open(FXString(digfilelist.at(i).filename.c_str()), FXIO::Reading, FXIO::OwnerReadWrite);
+                    char* curcontents = new char[curfile.size() + 1];
+                    curfile.readBlock(curcontents, curfile.size());
+                    curcontents[curfile.size()] = 0;
+                    curfile.close();
+                    std::string curstring = std::string(curcontents);
+                    std::string newcontents = SetFileItem(&curstring, 13, digfilelist.at(i).hash);
+                    //std::cout << "newcontents: " << newcontents << std::endl;
+                    curfile.open(FXString(digfilelist.at(i).filename.c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
+                    FXString newstr(newcontents.c_str());
+                    curfile.writeBlock(newstr.text(), newstr.length());
+                    curfile.close();
                 }
-                //HashFile(&digfilelist);
             }
             //std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;
         }
@@ -2635,6 +2644,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         AlignColumn(tablelist, 5, FXTableItem::LEFT);
         AlignColumn(tablelist, 6, FXTableItem::LEFT);
         AlignColumn(tablelist, 7, FXTableItem::LEFT);
+        AlignColumn(tablelist, 8, FXTableItem::LEFT);
+        AlignColumn(tablelist, 9, FXTableItem::LEFT);
         AlignColumn(tablelist, 10, FXTableItem::LEFT);
         AlignColumn(tablelist, 11, FXTableItem::LEFT);
         if(sortindex == 1)
@@ -2939,6 +2950,8 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             fileval += FXString(fileitems->at(i).hash.c_str()) + "|"; //        13
             fileval += FXString(fileitems->at(i).tag.c_str()) + "|"; //         14
             fileval += FXString(fileitems->at(i).match.c_str()) + "|"; //       15
+            fileval += filestr + FXString::value(globalid) + "|"; //    16       
+            fileitems->at(i).filename = std::string(filestr.text()) + std::to_string(globalid);
             filefile.writeBlock(fileval.text(), fileval.length());
             filefile.close();
             //std::cout << "write fileitemvector.at(i) to text file using i for file and globalid for 1st entry" << std::endl;
@@ -2994,6 +3007,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         tablelist->setItemText(i, 5, FXString(fileitems->at(i).create.c_str()));
         tablelist->setItemText(i, 6, FXString(fileitems->at(i).access.c_str()));
         tablelist->setItemText(i, 7, FXString(fileitems->at(i).modify.c_str()));
+        tablelist->setItemText(i, 9, FXString(fileitems->at(i).hash.c_str()));
         tablelist->setItemText(i, 10, FXString(fileitems->at(i).cat.c_str()));
         tablelist->setItemText(i, 11, FXString(fileitems->at(i).sig.c_str()));
     }

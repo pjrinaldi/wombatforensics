@@ -47,6 +47,7 @@ struct FileItem
     std::string tag = "";       // 14
     std::string match = "";     // 15
     std::string change = "";    // 16
+    std::string filename = "";  // 17
     void clear(void)
     {
         gid = 0;
@@ -65,6 +66,8 @@ struct FileItem
         sig = "";
         tag = "";
         match = "";
+        change = "";
+        filename = "";
     };
 };
 
