@@ -1373,6 +1373,8 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                     HashFile(&(digfilelist.at(i)), curforimg);
                     std::cout << "curhash after: " << digfilelist.at(i).hash << std::endl;
                     // NEED TO UPDATE TABLELIST HASH COLUMN FOR THE FILE AND ALSO UPDATE THE TEXT FILE CONTAINING IT.
+                    tablelist->setItemText(tablelist->getCurrentRow(), 9, FXString(digfilelist.at(i).hash.c_str()));
+                    AlignColumn(tablellist, 9, FXTableItem::LEFT);
                 }
                 //HashFile(&digfilelist);
             }
