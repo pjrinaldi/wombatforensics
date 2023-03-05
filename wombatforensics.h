@@ -36,11 +36,12 @@
 #include "digdeeper.h"
 #include "managehashlist.h"
 #include "hexviewer.h"
+#include "artifactparser.h"
 // SHARED LIBRARIES
 #include <tar.h> // TAR FOR WCF
 #include <libtar.h> // TAR FOR WCF
-#include "rapidxml.hpp" // XML PARSING
-#include <zip.h> // ZIP PARSING
+//#include "rapidxml.hpp" // XML PARSING
+//#include <zip.h> // ZIP PARSING
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
 #define NSEC_BTWN_1904_1970	(uint32_t) 2082844800U
@@ -418,7 +419,6 @@ class WombatForensics : public FXMainWindow
         void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
 	void SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex=1, int asc=1);
         void PlainView(FileItem* curfileitem);
-        void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents);
         //void ApplyFilter(int colindex, std::string filterstring);
         //void LoadPartitions(ForImg* curforimg);
         //void LoadGptPartitions(ForImg* curforimg);
