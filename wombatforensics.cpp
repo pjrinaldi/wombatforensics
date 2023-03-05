@@ -2352,10 +2352,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     ParseArtifact(curforimg, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
     plaintext->setText(FXString(filecontents.c_str()));
     if(!inmemory)
-    {
 	fclose(tmpfile);
-        //tmpfile.close();
-    }
     delete[] tmpbuf;
 }
 

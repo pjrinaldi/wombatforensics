@@ -11,6 +11,7 @@
 
 #include <magic.h>
 
+// BLAKE3 HASH
 #include "blake3/blake3.h"
 #include "forensicimage.h"
 

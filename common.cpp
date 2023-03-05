@@ -311,7 +311,6 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
         uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
         uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
         //std::cout << "curoffset: " << curoffset << " cursize: " << cursize << std::endl;
-        // THE GOOD NEWS IS THE MEMORY MAPPED FILE IS WORKING!!!!
 
         uint8_t* inbuf = NULL;
         curlogicalsize += cursize;
@@ -321,13 +320,9 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
             inbuf = new uint8_t[cursize];
             curforimg->ReadContent(inbuf, curoffset, cursize);
             if(*inmemory)
-            {
                 memcpy(&tmpbuf[curpos], inbuf, cursize);
-            }
             else
-            {
                 fwrite(inbuf, 1, cursize, tmpfile);
-            }
             curpos += cursize;
         }
         else
@@ -339,9 +334,7 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
             if(*inmemory)
                 memcpy(&tmpbuf[curpos], inbuf, (cursize - (curlogicalsize - curfileitem->size)));
             else
-            {
                 fwrite(inbuf, 1, (cursize - (curlogicalsize - curfileitem->size)), tmpfile);
-            }
             curpos += cursize - (curlogicalsize - curfileitem->size);
         }
         delete[] inbuf;

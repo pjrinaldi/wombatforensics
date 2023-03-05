@@ -15,8 +15,6 @@
 #include <fcntl.h>
 // FOX TOOLKIT GUI 
 #include "/usr/local/include/fox-1.7/fx.h"
-// BLAKE3 HASH
-#include "blake3/blake3.h"
 // PROJECT INCLUDES
 #include "icons.h"
 #include "managetags.h"
@@ -40,13 +38,9 @@
 // SHARED LIBRARIES
 #include <tar.h> // TAR FOR WCF
 #include <libtar.h> // TAR FOR WCF
-//#include "rapidxml.hpp" // XML PARSING
-//#include <zip.h> // ZIP PARSING
 #define TICKS_PER_SECOND 10000000
 #define EPOCH_DIFFERENCE 11644473600LL
 #define NSEC_BTWN_1904_1970	(uint32_t) 2082844800U
-
-// may not need this structure, if i just in time load the table items.
 
 //---------------------------------------------------------------
 //
