@@ -273,8 +273,7 @@ std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocks
     return layout;
 }
 
-//void GetFileContent(FileItem* curfileitem)
-void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile)
+void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t** tmpbuffer, FILE* tmpfile)
 {
     uint64_t memlimit = 4294967296; // 4GB
     /*
@@ -295,18 +294,15 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
     std::string curlayout;
     while(getline(layoutstream, curlayout, ';'))
         layoutlist.push_back(curlayout);
-    //FXFile tmpfile;
     uint64_t curlogicalsize = 0;
-    //uint8_t* tmpbuf = NULL;
+    uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "";
     if(*inmemory) // store in memory
         tmpbuf = new uint8_t[curfileitem->size];
-    else // write to tmp file
+    if(!*inmemory)
     {
-        //filelog = fopen(logpath.c_str(), "w+");
-        //tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+        tmpfile = fopen(tmpfilestr.c_str(), "w+");
         //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
-        //tmpfile.open(FXString(tmpfilestr.c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
     }
     uint64_t curpos = 0;
     for(int i=0; i < layoutlist.size(); i++)
@@ -325,21 +321,12 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
             inbuf = new uint8_t[cursize];
             curforimg->ReadContent(inbuf, curoffset, cursize);
             if(*inmemory)
+            {
                 memcpy(&tmpbuf[curpos], inbuf, cursize);
+            }
             else
             {
-		//fwrite_orDie(bufout, output.pos, fout);
-                //tmpfile.writeBlock(inbuf, cursize);
-/*
-HEADER_FUNCTION size_t fwrite_orDie(const void* buffer, size_t sizeToWrite, FILE* file)
-{
-    size_t const writtenSize = fwrite(buffer, 1, sizeToWrite, file);
-    if (writtenSize == sizeToWrite) return sizeToWrite;   // good
-    // error
-    perror("fwrite");
-    exit(ERROR_fwrite);
-}
-*/
+                fwrite(inbuf, 1, cursize, tmpfile);
             }
             curpos += cursize;
         }
@@ -353,43 +340,37 @@ HEADER_FUNCTION size_t fwrite_orDie(const void* buffer, size_t sizeToWrite, FILE
                 memcpy(&tmpbuf[curpos], inbuf, (cursize - (curlogicalsize - curfileitem->size)));
             else
             {
-                //tmpfile.writeBlock(inbuf, (cursize - (curlogicalsize - curfileitem->size)));
+                fwrite(inbuf, 1, (cursize - (curlogicalsize - curfileitem->size)), tmpfile);
             }
             curpos += cursize - (curlogicalsize - curfileitem->size);
         }
         delete[] inbuf;
     }
+    //std::cout << "tmpbuf in function: " << tmpbuf[0] << tmpbuf[1] << std::endl;
+    *tmpbuffer = tmpbuf;
 }
 
-void HashFile(FileItem* curfileitem)
+void HashFile(FileItem* curfileitem, ForImg* curforimg)
 {
-    std::cout << "curfileitem layout: " << curfileitem->layout << std::endl;
-    // move get file content to a function...
-    /*
-    std::ifstream fin(filename.c_str());
-    char tmpchar[65536];
+    //std::cout << "hash it here..." << std::endl;
+    //std::cout << "curfileitem layout: " << curfileitem->layout << std::endl;
+
+    bool inmemory = true;
+    uint8_t* tmpbuf = NULL;
+    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    FILE* tmpfile;
+    GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+
     blake3_hasher hasher;
     blake3_hasher_init(&hasher);
-    while(fin)
-    {
-	fin.read(tmpchar, 65536);
-	size_t cnt = fin.gcount();
-	blake3_hasher_update(&hasher, tmpchar, cnt);
-	if(!cnt)
-	    break;
-    }
+    blake3_hasher_update(&hasher, (char*)tmpbuf, curfileitem->size);
     uint8_t output[BLAKE3_OUT_LEN];
     blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
     std::stringstream ss;
     for(int i=0; i < BLAKE3_OUT_LEN; i++)
-        ss << std::hex << (int)output[i]; 
-    std::string srcmd5 = ss.str();
-    std::string whlstr = srcmd5 + "," + filename + "\n";
-    FILE* whlptr = NULL;
-    whlptr = fopen(whlfile.c_str(), "a");
-    fwrite(whlstr.c_str(), strlen(whlstr.c_str()), 1, whlptr);
-    fclose(whlptr);
-    */ 
+        ss << std::hex << (int)output[i];
+    curfileitem->hash = ss.str();
+    delete[] tmpbuf;
 }
 
 void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig)

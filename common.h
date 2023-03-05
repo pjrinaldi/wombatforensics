@@ -11,6 +11,7 @@
 
 #include <magic.h>
 
+#include "blake3/blake3.h"
 #include "forensicimage.h"
 
 #define DTTMFMT "%F %T %z"
@@ -100,7 +101,7 @@ std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocks
 
 void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig);
 
-void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile);
-void HashFile(FileItem* curfileitem);
+void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t** tmpbuf, FILE* tmpfile);
+void HashFile(FileItem* curfileitem, ForImg* curforimg);
 
 #endif

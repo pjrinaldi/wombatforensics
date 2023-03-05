@@ -1368,7 +1368,11 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
             if(std::stoi(diglist.at(i)) == 5) // HASH FILE
             {
                 for(int i=0; i < digfilelist.size(); i++)
-                    HashFile(&(digfilelist.at(i)));
+                {
+                    std::cout << "curhash before: " << digfilelist.at(i).hash << std::endl;
+                    HashFile(&(digfilelist.at(i)), curforimg);
+                    std::cout << "curhash after: " << digfilelist.at(i).hash << std::endl;
+                }
                 //HashFile(&digfilelist);
             }
             //std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;
@@ -2343,86 +2347,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     FILE* tmpfile;
-    GetFileContent(curforimg, curfileitem, &inmemory, tmpbuf, tmpfile);
-    /*
-    bool inmemory = true;
-    uint64_t memlimit = 4294967296; // 4GB
-    //uint64_t memlimit = 1; // 1 byte for testing
-    std::cout << "name: " << curfileitem->name << std::endl;
-    std::cout << "layout: " << curfileitem->layout << std::endl;
-    std::cout << "size: " << curfileitem->size << std::endl;
-    std::cout << "sig: " << curfileitem->sig << std::endl;
-    std::cout << "curforimg: " << curforimg->ImageFileName() << std::endl;
-
-    if(curfileitem->size > memlimit)
-        inmemory = false;
-    std::vector<std::string> layoutlist;
-    layoutlist.clear();
-    std::istringstream layoutstream(curfileitem->layout);
-    std::string curlayout;
-    while(getline(layoutstream, curlayout, ';'))
-        layoutlist.push_back(curlayout);
-    FXFile tmpfile;
-    uint64_t curlogicalsize = 0;
-    uint8_t* tmpbuf = NULL;
-    std::string tmpfilestr = "";
-    if(inmemory) // store in memory
-        tmpbuf = new uint8_t[curfileitem->size];
-    else // write to tmp file
-    {
-        tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-        //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
-        tmpfile.open(FXString(tmpfilestr.c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
-    }
-    uint64_t curpos = 0;
-    for(int i=0; i < layoutlist.size(); i++)
-    {
-        std::size_t layoutsplit = layoutlist.at(i).find(",");
-        uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
-        uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
-        //std::cout << "curoffset: " << curoffset << " cursize: " << cursize << std::endl;
-        // THE GOOD NEWS IS THE MEMORY MAPPED FILE IS WORKING!!!!
-
-        uint8_t* inbuf = NULL;
-        curlogicalsize += cursize;
-        //std::cout << "curlogicalsize: " << curlogicalsize << "|" << cursize << " :cursize" << std::endl;
-        if(curlogicalsize <= curfileitem->size)
-        {
-            inbuf = new uint8_t[cursize];
-            curforimg->ReadContent(inbuf, curoffset, cursize);
-            if(inmemory)
-                memcpy(&tmpbuf[curpos], inbuf, cursize);
-            else
-                tmpfile.writeBlock(inbuf, cursize);
-            curpos += cursize;
-        }
-        else
-        {
-            inbuf = new uint8_t[(cursize - (curlogicalsize - curfileitem->size))];
-            curforimg->ReadContent(inbuf, curoffset, (cursize - (curlogicalsize - curfileitem->size)));
-            //std::cout << "reduction size: " << cursize - (curlogicalsize - curfileitem->size) << std::endl;
-            //std::cout << "inbuf head: " << (char)inbuf[0] << (char)inbuf[1] << std::endl;
-            if(inmemory)
-                memcpy(&tmpbuf[curpos], inbuf, (cursize - (curlogicalsize - curfileitem->size)));
-            else
-                tmpfile.writeBlock(inbuf, (cursize - (curlogicalsize - curfileitem->size)));
-            curpos += cursize - (curlogicalsize - curfileitem->size);
-        }
-        delete[] inbuf;
-    }
-    */
-
-    /*
-    std::cout << std::endl << "5 characters from buffer: |";
-    for(int i=0; i < 6; i++)
-    {
-        tmpbuffer.position(i, FXIO::Begin);
-        char curchar;
-        tmpbuffer.readChar(curchar);
-        std::cout << curchar;
-    }
-    std::cout << "|" << std::endl;
-    */
+    GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
 
     // HERE IS WHERE I NEED TO PROCESS THE CONTENT TO DISPLAY IN FXTEXT
     if(curfileitem->sig.compare("Microsoft Word 2007+") == 0) // word document
@@ -2456,7 +2381,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
                 zipfilesize = zipstat.size;
             }
         }
-        std::cout << "zipfileid: " << zipfileid << std::endl;
+        //std::cout << "zipfileid: " << zipfileid << std::endl;
         zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
         char zipfilebuf[zipfilesize+1];
         zip_int64_t bytesread = zip_fread(docxml, zipfilebuf, zipfilesize);
