@@ -69,6 +69,11 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         uint64_t created = 0;
         uint64_t modified = 0;
         uint64_t accessed = 0;
+        uint32_t filesize = 0;
+        uint32_t volstructurelength = 0;
+        uint32_t voltype = 0;
+        uint32_t volserial = 0;
+        uint32_t volumenameoffset = 0;
         if(inmemory)
         {
             ReadInteger(tmpbuf, 0x14, &flags);
@@ -79,8 +84,9 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             //std::cout << "Created: " << ConvertWindowsTimeToUnixTimeUTC(created) << std::endl;
             ReadInteger(tmpbuf, 0x24, &modified);
             ReadInteger(tmpbuf, 0x2c, &accessed);
+            ReadInteger(tmpbuf, 0x34, &filesize);
         }
-        else
+        else // this should never occur, i don't think LNK files are every going to be bigger than 4GB.
         {
             tmpfile = fopen(tmpfilestr.c_str(), "rb");
             fseek(tmpfile, 0x14, SEEK_SET);
@@ -94,13 +100,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         filecontents->clear();
         filecontents->append("LNK File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")\n");
         filecontents->append("-------------\n");
-
-        //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
         /*
-        if(liblnk_check_file_signature(lnkfile.toStdString().c_str(), &error))
-        {
-            if(liblnk_file_link_refers_to_file(lnkobj, &error))
-            {
                 uint64_t gettime = 0;
                 uint32_t tmpuint32 = 0;
                 size_t tmpsize = 0;
