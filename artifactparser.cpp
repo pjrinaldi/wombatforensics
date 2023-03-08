@@ -64,19 +64,39 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
     }
     else if(curfileitem->sig.compare("Shortcut") == 0) // lnk file
     {
-        *filecontents = "LNK File Analysis for " + curfileitem->name + " (" + curfileitem->gid + ")\n";
+        uint32_t flags = 0;
+        uint32_t attributes = 0;
+        uint64_t created = 0;
+        uint64_t modified = 0;
+        uint64_t accessed = 0;
+        if(inmemory)
+        {
+            ReadInteger(tmpbuf, 0x14, &flags);
+            //std::cout << "flags: " << std::hex << flags << std::dec << std::endl;
+            ReadInteger(tmpbuf, 0x18, &attributes);
+            //std::cout << "attributes: " << std::hex << attributes << std::dec << std::endl;
+            ReadInteger(tmpbuf, 0x1c, &created);
+            //std::cout << "Created: " << ConvertWindowsTimeToUnixTimeUTC(created) << std::endl;
+            ReadInteger(tmpbuf, 0x24, &modified);
+            ReadInteger(tmpbuf, 0x2c, &accessed);
+        }
+        else
+        {
+            tmpfile = fopen(tmpfilestr.c_str(), "rb");
+            fseek(tmpfile, 0x14, SEEK_SET);
+            uint8_t* fbuf = new uint8_t[4];
+            fread(fbuf, 1, 4, tmpfile);
+            ReadInteger(fbuf, 0, &flags);
+            delete[] fbuf;
+            //std::cout << "flags: " << std::hex << flags << std::dec << std::endl;
+            fclose(tmpfile);
+        }
+        filecontents->clear();
+        filecontents->append("LNK File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")\n");
+        filecontents->append("-------------\n");
 
         //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-        std::cout << "parse lnk file here...";
         /*
-        QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
-        htmlstr += "<div style='" + ReturnCssString(1) + "'>LNK File Analysis for " + lnkname + " (" + lnkid + ")</div><br/>";
-        htmlstr += "<table width='100%' style='" + ReturnCssString(2) + "'><tr><th style='" + ReturnCssString(6) + "'>NAME</th><th style='" + ReturnCssString(6) + "'>Value</th></tr>";
-        QString lnkfile = wombatvariable.tmpfilepath + lnkid + "-fhex";
-        liblnk_error_t* error = NULL;
-        liblnk_file_t* lnkobj = NULL;
-        liblnk_file_initialize(&lnkobj, &error);
-        liblnk_file_open(lnkobj, lnkfile.toStdString().c_str(), liblnk_get_access_flags_read(), &error);
         if(liblnk_check_file_signature(lnkfile.toStdString().c_str(), &error))
         {
             if(liblnk_file_link_refers_to_file(lnkobj, &error))
@@ -179,10 +199,6 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                 htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Working Directory:</td><td>" + QString::fromUtf8(reinterpret_cast<char*>(workdir)) + "</td></tr>";
             }
         }
-        liblnk_file_close(lnkobj, &error);
-        liblnk_file_free(&lnkobj, &error);
-        liblnk_error_free(&error);
-        htmlstr += "</table></body></html>";
          */ 
     }
     else

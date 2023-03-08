@@ -11,6 +11,19 @@ std::string ConvertUnixTimeToHuman(uint32_t unixtime)
     return std::string(hchar);
 }
 */
+std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
+{
+    uint64_t temp;
+    temp = input / TICKS_PER_SECOND; //convert from 100ns intervals to seconds;
+    temp = temp - EPOCH_DIFFERENCE;  //subtract number of seconds between epochs
+    time_t crtimet = (time_t)temp;
+    struct tm* dt;
+    dt = gmtime(&crtimet);
+    char timestr[30];
+    strftime(timestr, sizeof(timestr), "%m/%d/%Y %I:%M:%S %p UTC", dt);
+
+    return timestr;
+}
 
 uint8_t* substr(uint8_t* arr, int begin, int len)
 {
@@ -434,6 +447,11 @@ void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, 
             *cat = "Application";
             *sig = "Octet-Stream";
         }
+    }
+    else if(catsigstr.compare("Application/X-Ms-Shortcut") == 0)
+    {
+        *cat = "Windows System";
+        *sig = "Shortcut";
     }
     else if(catsigstr.find("Text/") != std::string::npos)
     {

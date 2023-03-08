@@ -17,6 +17,9 @@
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
+#define TICKS_PER_SECOND 10000000
+#define EPOCH_DIFFERENCE 11644473600LL
+#define NSEC_BTWN_1904_1970	(uint32_t) 2082844800U
 
 // MAY NEED A STRUCTURE THAT CONTAINS ITEM TYPE, CURFORIMG INDEX, PARENTID, CHILDID OR SOME SUCH
 struct CurrentItem
@@ -74,6 +77,7 @@ struct FileItem
 //std::string ConvertUnixTimeToHuman(uint32_t unixtime);
 
 char* GetDateTime(char *buff);
+std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
 uint8_t* substr(uint8_t* arr, int begin, int len);
 
 std::string ReturnFormattingSize(uint size);
