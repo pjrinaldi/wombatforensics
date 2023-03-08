@@ -70,14 +70,21 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         uint64_t modified = 0;
         uint64_t accessed = 0;
         uint32_t filesize = 0;
+        uint16_t shellstructurelength = 0;
+        uint32_t voloffset = 0;
         uint32_t volstructurelength = 0;
         uint32_t voltype = 0;
         uint32_t volserial = 0;
-        uint32_t volumenameoffset = 0;
+        uint32_t volnameoffset = 0;
+        uint32_t basepathoffset = 0;
+        uint32_t networkvoloffset = 0;
+        uint32_t remainingpathoffset = 0;
         if(inmemory)
         {
             ReadInteger(tmpbuf, 0x14, &flags);
             //std::cout << "flags: " << std::hex << flags << std::dec << std::endl;
+            std::bitset<8> flagbits(flags); // values are reversed
+            //std::cout << "flagbits: " << flagbits << std::endl;
             ReadInteger(tmpbuf, 0x18, &attributes);
             //std::cout << "attributes: " << std::hex << attributes << std::dec << std::endl;
             ReadInteger(tmpbuf, 0x1c, &created);
@@ -85,6 +92,80 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             ReadInteger(tmpbuf, 0x24, &modified);
             ReadInteger(tmpbuf, 0x2c, &accessed);
             ReadInteger(tmpbuf, 0x34, &filesize);
+            if(flagbits[0] == 1) // SHELL ITEM ID LIST IS PRESENT
+            {
+                ReadInteger(tmpbuf, 0x4c, &shellstructurelength);
+                std::cout << "shell structure length: " << shellstructurelength << std::endl;
+                // SKIP FOR NOW
+                std::cout << "shell id is present" << std::endl;
+            }
+            int curoffset = 0x4c + shellstructurelength + 2;
+            std::cout << "curoffset: " << curoffset << std::endl;
+            if(flagbits[1] == 1)
+            {
+                // GET structure offsets
+                uint32_t totalstructurelength = 0;
+                ReadInteger(tmpbuf, curoffset, &totalstructurelength);
+                std::cout << "total structure length: " << totalstructurelength << std::endl;
+                uint32_t nextoffset = 0;
+                ReadInteger(tmpbuf, curoffset + 4, &nextoffset);
+                std::cout << "next offset after this: " << nextoffset << std::endl;
+                uint32_t fileflags = 0;
+                ReadInteger(tmpbuf, curoffset + 8, &fileflags);
+                std::cout << "file flags: " << fileflags << std::endl;
+                std::bitset<8> volflagbits(fileflags);
+                std::cout  << "volflagbits: " << volflagbits << std::endl;
+                if(volflagbits[0] == 1)
+                {
+                    ReadInteger(tmpbuf, curoffset + 12, &voloffset);
+                    ReadInteger(tmpbuf, curoffset + 16, &basepathoffset);
+                    std::cout << "voloffset: " << voloffset << std::endl;
+                    std::cout << " basepathoffset: " << basepathoffset << std::endl;
+                    ReadInteger(tmpbuf, curoffset + voloffset, &volstructurelength);
+                    ReadInteger(tmpbuf, curoffset + voloffset + 4, &voltype);
+                    std::cout << "voltype: " << voltype << std::endl;
+                    ReadInteger(tmpbuf, curoffset + voloffset + 8, &volserial);
+                    std::cout << "vol serial: 0x" << std::hex << volserial << std::dec << std::endl;
+                    ReadInteger(tmpbuf, curoffset + voloffset + 12, &volnameoffset);
+                    std::cout << "name length: " << volstructurelength << " " << volnameoffset << std::endl;
+                    std::cout << "vol name length: " << volstructurelength - volnameoffset << std::endl;
+                    uint8_t* volname = new uint8_t[volstructurelength - volnameoffset +1];
+                    volname = substr(tmpbuf, curoffset + voloffset + volnameoffset, volstructurelength - volnameoffset);
+                    volname[volstructurelength - volnameoffset] = 0;
+                    std::cout << "volname: " << (char*)volname << std::endl;
+                    std::cout << "basepath global offset: " << curoffset + basepathoffset << std::endl;
+                    std::cout << "next offset: " << curoffset + voloffset + volnameoffset + volstructurelength - volnameoffset + 1 << std::endl;
+
+                }
+                if(volflagbits[1] == 1)
+                {
+                    ReadInteger(tmpbuf, curoffset + 20, &networkvoloffset);
+                    std::cout << "networkvoloffset: " << networkvoloffset << std::endl;
+                }
+                ReadInteger(tmpbuf, curoffset + 24, &remainingpathoffset);
+                std::cout << "remainingpathoffset: " << remainingpathoffset << std::endl;
+                std::cout << "file or directory" << std::endl;
+            }
+            if(flagbits[2] == 1)
+            {
+                std::cout << "has a descriptive string" << std::endl;
+            }
+            if(flagbits[3] == 1)
+            {
+                std::cout << "has a relative path string" << std::endl;
+            }
+            if(flagbits[4] == 1)
+            {
+                std::cout << "has a working directory" << std::endl;
+            }
+            if(flagbits[5] == 1)
+            {
+                std::cout << "has command line arguments" << std::endl;
+            }
+            if(flagbits[6] == 1)
+            {
+                std::cout << "has a custom icon" << std::endl;
+            }
         }
         else // this should never occur, i don't think LNK files are every going to be bigger than 4GB.
         {
@@ -95,6 +176,14 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             ReadInteger(fbuf, 0, &flags);
             delete[] fbuf;
             //std::cout << "flags: " << std::hex << flags << std::dec << std::endl;
+            /*
+            // FLAGS
+            uint8_t* ff = new uint8_t[1];
+            ReadContent(rawcontent, ff, diroffset + (j+k)*32 + 1, 1);
+            std::bitset<8> flagbits{(uint8_t)ff[0]};
+	    //std::cout << "flagbits: " << flagbits << std::endl;
+            delete[] ff;
+            */
             fclose(tmpfile);
         }
         filecontents->clear();
