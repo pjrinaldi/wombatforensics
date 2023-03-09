@@ -2415,7 +2415,15 @@ void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t* currentid)
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 {
     if(tablelist->getCurrentRow() > -1)
+    {
         tablelist->selectRow(tablelist->getCurrentRow());
+	if(fileitemvector.size() > 0)
+	{
+	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+	    if(!currentfileitem.isdirectory)
+		PlainView(&currentfileitem);
+	}
+    }
 
     return 1;
 }
@@ -2675,9 +2683,13 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             //how to determine if it's a directory???, can read file content or get the fileitemvector
             //std::cout << "is dir: " << fileitemvector.at(tablelist->getCurrentRow()).isdirectory << std::endl;
             //FileItem curfileitem = fileitemvector.at(tablelist->getCurrentRow());
+
+	    // THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
+	    /*
             currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
             if(!currentfileitem.isdirectory)
                 PlainView(&currentfileitem);
+	    */
             this->getApp()->endWaitCursor();
         }
     }
