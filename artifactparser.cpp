@@ -154,6 +154,17 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         if(flagbits[0] == 1) // SHELL ITEM ID LIST IS PRESENT
         {
             ReadInteger(tmpbuf, 76, &shellstructurelength);
+	    libfwsi_item_list_t* itemlist = NULL;
+	    libfwsi_error_t* itemerror = NULL;
+	    int ret = libfwsi_item_list_initialize(&itemlist, &itemerror);
+	    uint8_t* itemstream = new uint8_t[shellstructurelength];
+	    itemstream = substr(tmpbuf, 78, shellstructurelength);
+	    ret = libfwsi_item_list_copy_from_byte_stream(itemlist, itemstream, shellstructurelength, LIBFWSI_CODEPAGE_ASCII, &itemerror);
+	    int itemlistcount = 0;
+	    ret = libfwsi_item_list_get_number_of_items(itemlist, &itemlistcount, &itemerror);
+	    libfwsi_item_list_free(&itemlist, &itemerror);
+	    libfwsi_error_free(&itemerror);
+	    std::cout << "number of list items: " << itemlistcount << std::endl;
             // PARSE SHELL ID LIST HERE
             //std::cout << "shell structure length: " << shellstructurelength << std::endl;
             // SKIP FOR NOW
