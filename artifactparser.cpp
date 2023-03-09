@@ -79,9 +79,17 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         uint32_t basepathoffset = 0;
         uint32_t networkvoloffset = 0;
         uint32_t remainingpathoffset = 0;
+        uint32_t totalstructurelength = 0;
+        std::string descstring = "";
+        std::string relpathstr = "";
+        std::string workingdirectory  = "";
+        std::string commandstring = "";
+        std::string iconstring = "";
         if(inmemory)
         {
             ReadInteger(tmpbuf, 0x14, &flags);
+            if(flags & 0x80)
+                std::cout << "data strings are unicode rather than ascii." << std::endl;
             //std::cout << "flags: " << std::hex << flags << std::dec << std::endl;
             std::bitset<8> flagbits(flags); // values are reversed
             //std::cout << "flagbits: " << flagbits << std::endl;
@@ -104,7 +112,6 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             if(flagbits[1] == 1)
             {
                 // GET structure offsets
-                uint32_t totalstructurelength = 0;
                 ReadInteger(tmpbuf, curoffset, &totalstructurelength);
                 std::cout << "total structure length: " << totalstructurelength << std::endl;
                 uint32_t nextoffset = 0;
@@ -135,7 +142,11 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                     std::cout << "volname: " << (char*)volname << std::endl;
                     std::cout << "basepath global offset: " << curoffset + basepathoffset << std::endl;
                     std::cout << "next offset: " << curoffset + voloffset + volnameoffset + volstructurelength - volnameoffset + 1 << std::endl;
-
+                    std::cout << "basepath length: " << totalstructurelength - basepathoffset - 1 << std::endl;
+                    uint8_t* basepathname = new uint8_t[totalstructurelength - basepathoffset];
+                    basepathname = substr(tmpbuf, curoffset + basepathoffset, totalstructurelength - basepathoffset - 1);
+                    basepathname[totalstructurelength - basepathoffset] = 0;
+                    std::cout << "base path name: " << (char*)basepathname << std::endl;
                 }
                 if(volflagbits[1] == 1)
                 {
@@ -146,26 +157,143 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                 std::cout << "remainingpathoffset: " << remainingpathoffset << std::endl;
                 std::cout << "file or directory" << std::endl;
             }
+            std::cout << "on to different strings: " << curoffset + totalstructurelength << std::endl;
+            curoffset = curoffset + totalstructurelength;
             if(flagbits[2] == 1)
             {
                 std::cout << "has a descriptive string" << std::endl;
+                uint16_t desclength = 0;
+                ReadInteger(tmpbuf, curoffset, &desclength);
+                std::cout << "desclength: " << desclength << std::endl;
+                if(flags & 0x80) // utf-16 unicode
+                {
+                    for(int i=0; i < desclength; i++)
+                    {
+                        uint16_t singleletter = 0;
+                        ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                        descstring += (char)singleletter;
+                    }
+                    curoffset = curoffset + desclength * 2 + 2;
+                }
+                else // ascii
+                {
+                    uint8_t* description = new uint8_t[desclength+1];
+                    description = substr(tmpbuf, curoffset + 2, desclength);
+                    description[desclength] = 0;
+                    descstring = std::string((char*)description);
+                    //std::cout << "description: " << (char*)description << std::endl;
+                    delete[] description;
+                    curoffset = curoffset + desclength + 2;
+                }
+                std::cout << "description: " << descstring << std::endl;
             }
             if(flagbits[3] == 1)
             {
                 std::cout << "has a relative path string" << std::endl;
+                uint16_t relpathlength = 0;
+                ReadInteger(tmpbuf, curoffset, &relpathlength);
+                std::cout << "relpathlength: " << relpathlength << std::endl;
+                if(flags & 0x80)
+                {
+                    for(int i=0; i < relpathlength; i++)
+                    {
+                        uint16_t singleletter = 0;
+                        ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                        relpathstr += (char)singleletter;
+                    }
+                    curoffset = curoffset + relpathlength * 2 + 2;
+                }
+                else
+                {
+                    uint8_t* relpath = new uint8_t[relpathlength+1];
+                    relpath = substr(tmpbuf, curoffset + 2, relpathlength);
+                    relpath[relpathlength] = 0;
+                    relpathstr = std::string((char*)relpath);
+                    delete[] relpath;
+                    std::cout << "relpath: " << relpath << std::endl;
+                    curoffset = curoffset + relpathlength + 2;
+                }
             }
             if(flagbits[4] == 1)
             {
                 std::cout << "has a working directory" << std::endl;
+                uint16_t workdirlength = 0;
+                ReadInteger(tmpbuf, curoffset, &workdirlength);
+                if(flags & 0x80)
+                {
+                    for(int i=0; i < workdirlength; i++)
+                    {
+                        uint16_t singleletter = 0;
+                        ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                        workingdirectory += (char)singleletter;
+                    }
+                    curoffset = curoffset + workdirlength * 2 + 2;
+                }
+                else
+                {
+                    uint8_t* workdirchar = new uint8_t[workdirlength+1];
+                    workdirchar = substr(tmpbuf, curoffset + 2, workdirlength);
+                    workdirchar[workdirlength] = 0;
+                    workingdirectory = std::string((char*)workdirchar);
+                    delete[] workdirchar;
+                    curoffset = curoffset + workdirlength + 2;
+                }
+                std::cout << "working directory: " << workingdirectory << std::endl;
             }
             if(flagbits[5] == 1)
             {
                 std::cout << "has command line arguments" << std::endl;
+                uint16_t cmdlength = 0;
+                ReadInteger(tmpbuf, curoffset, &cmdlength);
+                if(flags & 0x80) // UTF-16 UNICODE
+                {
+                    for(int i=0; i < cmdlength; i++)
+                    {
+                        uint16_t singleletter = 0;
+                        ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                        commandstring += (char)singleletter;
+                    }
+                    curoffset = curoffset + cmdlength * 2 + 2;
+                }
+                else // ASCII
+                {
+                    uint8_t* cmdchar = new uint8_t[cmdlength+1];
+                    cmdchar = substr(tmpbuf, curoffset + 2, cmdlength);
+                    cmdchar[cmdlength] = 0;
+                    commandstring = std::string((char*)cmdchar);
+                    delete[] cmdchar;
+                    curoffset = curoffset + cmdlength + 2;
+                }
+                std::cout << "cmnd string: " << commandstring << std::endl;
             }
             if(flagbits[6] == 1)
             {
                 std::cout << "has a custom icon" << std::endl;
+                uint16_t iconlength = 0;
+                ReadInteger(tmpbuf, curoffset, &iconlength);
+                if(flags & 0x80) // UTF-16 UNICODE
+                {
+                    for(int i=0; i < iconlength; i++)
+                    {
+                        uint16_t singleletter = 0;
+                        ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                        iconstring += (char)singleletter;
+                    }
+                    curoffset = curoffset + iconlength * 2 + 2;
+                }
+                else // ASCII
+                {
+                    uint8_t* iconchar = new uint8_t[iconlength + 1];
+                    iconchar = substr(tmpbuf, curoffset + 2, iconlength);
+                    iconchar[iconlength] = 0;
+                    iconstring = std::string((char*)iconchar);
+                    delete[] iconchar;
+                    curoffset = curoffset + iconlength + 2;
+                }
+                std::cout << "icon string: " << iconstring << std::endl;
             }
+            std::cout << "curoffset after strings: " << curoffset << std::endl;
+            // THIS WORKS, NEED TO GET DISTRIBUTED TRACKING LINK BIT TO GET MACHINE IDENTIFIER
         }
         else // this should never occur, i don't think LNK files are every going to be bigger than 4GB.
         {
@@ -175,15 +303,6 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             fread(fbuf, 1, 4, tmpfile);
             ReadInteger(fbuf, 0, &flags);
             delete[] fbuf;
-            //std::cout << "flags: " << std::hex << flags << std::dec << std::endl;
-            /*
-            // FLAGS
-            uint8_t* ff = new uint8_t[1];
-            ReadContent(rawcontent, ff, diroffset + (j+k)*32 + 1, 1);
-            std::bitset<8> flagbits{(uint8_t)ff[0]};
-	    //std::cout << "flagbits: " << flagbits << std::endl;
-            delete[] ff;
-            */
             fclose(tmpfile);
         }
         filecontents->clear();
