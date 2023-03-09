@@ -153,6 +153,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         filecontents->append("File Size\t\t| " + ReturnFormattingSize(filesize) + " bytes\n");
         if(flagbits[0] == 1) // SHELL ITEM ID LIST IS PRESENT
         {
+            // PARSE SHELL ID LIST HERE
             ReadInteger(tmpbuf, 76, &shellstructurelength);
 	    libfwsi_item_list_t* itemlist = NULL;
 	    libfwsi_error_t* itemerror = NULL;
@@ -162,10 +163,26 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 	    ret = libfwsi_item_list_copy_from_byte_stream(itemlist, itemstream, shellstructurelength, LIBFWSI_CODEPAGE_ASCII, &itemerror);
 	    int itemlistcount = 0;
 	    ret = libfwsi_item_list_get_number_of_items(itemlist, &itemlistcount, &itemerror);
+	    std::cout << "number of list items: " << itemlistcount << std::endl;
+	    for(int i=0; i < itemlistcount; i++) // parse each shell item
+	    {
+		std::cout << "Item " << i+1 << std::endl << std::endl;
+		libfwsi_item_t* curitem;
+		ret = libfwsi_item_initialize(&curitem, &itemerror);
+		ret = libfwsi_item_list_get_item(itemlist, i, &curitem, &itemerror);
+		int itemtype = 0;
+		ret = libfwsi_item_get_type(curitem, &itemtype, &itemerror);
+		std::cout << "item type: " << itemtype << std::endl;
+		uint8_t classtype = 0;
+		ret = libfwsi_item_get_class_type(curitem, &classtype, &itemerror);
+		std::cout << "class type: " << classtype << std::endl;
+		// if the types to determine how to get the content i want.
+		
+		ret = libfwsi_item_free(&curitem, &itemerror);
+	    }
+
 	    libfwsi_item_list_free(&itemlist, &itemerror);
 	    libfwsi_error_free(&itemerror);
-	    std::cout << "number of list items: " << itemlistcount << std::endl;
-            // PARSE SHELL ID LIST HERE
             //std::cout << "shell structure length: " << shellstructurelength << std::endl;
             // SKIP FOR NOW
             //std::cout << "shell id is present" << std::endl;
