@@ -14,7 +14,7 @@
 
 #include "rapidxml.hpp" // XML PARSING
 #include <zip.h> // ZIP PARSING
-#include <libfwsi.h> // SHELL ITEM PARSING
+#include <libfwsi.h> // SHELL ITEM PARSING for LNK
 
 void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents);
 void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents);
