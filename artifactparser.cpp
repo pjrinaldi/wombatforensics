@@ -168,7 +168,6 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 	    {
                 filecontents->append("Shell Item\t\t| " + std::to_string(i+1) + "\n");
                 filecontents->append("\tItem Type\t| ");
-		//std::cout << "Item " << i+1 << std::endl << std::endl;
 		libfwsi_item_t* curitem;
 		ret = libfwsi_item_initialize(&curitem, &itemerror);
 		ret = libfwsi_item_list_get_item(itemlist, i, &curitem, &itemerror);
@@ -178,7 +177,6 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 		uint8_t classtype = 0;
 		ret = libfwsi_item_get_class_type(curitem, &classtype, &itemerror);
 		//std::cout << "class type: " << (uint)classtype << std::endl;
-		// if the types to determine how to get the content i want.
                 if(itemtype == 0)
                     filecontents->append("Unknown");
                 else if(itemtype == 1)
@@ -230,11 +228,12 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                 {
                     filecontents->append("Volume\n");
                     size_t volnamesize = libfwsi_volume_get_utf8_name_size(curitem, &volnamesize, &itemerror);
-                    std::cout << "vol name size: " << volnamesize << std::endl;
+                    //std::cout << "vol name size: " << volnamesize << std::endl;
                     uint8_t* volname = new uint8_t[volnamesize+1];
                     ret = libfwsi_volume_get_utf8_name(curitem, volname, volnamesize, &itemerror);
                     volname[volnamesize] = 0;
                     filecontents->append("\tVolume Name\t| " + std::string((char*)volname) + ":\\ \n");
+		    delete[] volname;
                 }
                 else if((uint)classtype < 64 && (uint)classtype >= 48)
                 {
@@ -245,6 +244,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                     ret = libfwsi_file_entry_get_utf8_name(curitem, fname, filenamesize, &itemerror);
                     fname[filenamesize] = 0;
                     filecontents->append("\tName\t\t| " + std::string((char*)fname) + "\n");
+		    delete[] fname;
                     uint32_t fatdatetime = 0;
                     ret = libfwsi_file_entry_get_modification_time(curitem, &fatdatetime, &itemerror);
 		    uint8_t* fdt = (uint8_t*)&fatdatetime;
@@ -289,6 +289,27 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                 else if((uint)classtype < 80 && (uint)classtype >= 64)
                 {
                     filecontents->append("Network Location\n");
+		    size_t locsize = 0;
+		    ret = libfwsi_network_location_get_utf8_location_size(curitem, &locsize, &itemerror);
+		    uint8_t* locname = new uint8_t[locsize+1];
+		    ret = libfwsi_network_location_get_utf8_location(curitem, locname, locsize, &itemerror);
+		    locname[locsize] = 0;
+		    filecontents->append("\tLocation\t| " + std::string((char*)locname) + "\n");
+		    delete[] locname;
+		    size_t descsize = 0;
+		    ret = libfwsi_network_location_get_utf8_description_size(curitem, &descsize, &itemerror);
+		    uint8_t* descname = new uint8_t[descsize + 1];
+		    ret = libfwsi_network_location_get_utf8_description(curitem, descname, descsize, &itemerror);
+		    descname[descsize] = 0;
+		    filecontents->append("\tDescription\t| " + std::string((char*)descname) + "\n");
+		    delete[] descname;
+		    size_t comsize = 0;
+		    ret = libfwsi_network_location_get_utf8_comments_size(curitem, &comsize, &itemerror);
+		    uint8_t* comname = new uint8_t[comsize+1];
+		    ret = libfwsi_network_location_get_utf8_comments(curitem, comname, comsize, &itemerror);
+		    comname[comsize] = 0;
+		    filecontents->append("\tComments\t| " + std::string((char*)comname) + "\n");
+		    delete[] comname;
                 }
                 else if((uint)classtype < 96 && (uint)classtype >= 80)
                 {
@@ -302,6 +323,34 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                 {
                     libfwsi_extension_block_t* curblock = NULL;
                     libfwsi_item_get_extension_block(curitem, j, &curblock, &itemerror);
+		    uint32_t extsig = 0;
+		    ret = libfwsi_extension_block_get_signature(curblock, &extsig, &itemerror);
+		    std::stringstream extstream;
+		    extstream << std::hex << extsig;
+		    if(extsig == 0xbeef0004)
+		    {
+			filecontents->append("Extension Block\t\t| " + std::to_string(j+1) + "\n");
+			filecontents->append("\tSignature\t| 0x" + extstream.str() + " File Entry Extension\n");
+		    }
+		    uint32_t creationtime = 0;
+		    ret = libfwsi_file_entry_extension_get_creation_time(curblock, &creationtime, &itemerror);
+		    uint8_t* cdt = (uint8_t*)&creationtime;
+		    uint16_t cdate = (uint16_t)cdt[0] | (uint16_t)cdt[1] << 8;
+		    uint16_t ctime = (uint16_t)cdt[2] | (uint16_t)cdt[3] << 8;
+		    filecontents->append("\tCreated Time\t| " + ConvertDosTimeToHuman(&cdate, &ctime) + " UTC\n");
+		    uint32_t accesstime = 0;
+		    ret = libfwsi_file_entry_extension_get_access_time(curblock, &accesstime, &itemerror);
+		    uint8_t* adt = (uint8_t*)&accesstime;
+		    uint16_t adate = (uint16_t)adt[0] | (uint16_t)adt[1] << 8;
+		    uint16_t atime = (uint16_t)adt[2] | (uint16_t)adt[3] << 8;
+		    filecontents->append("\tAccessed Time\t| " + ConvertDosTimeToHuman(&adate, &atime) + " UTC\n");
+		    size_t lnamesize = 0;
+		    ret = libfwsi_file_entry_extension_get_utf8_long_name_size(curblock, &lnamesize, &itemerror);
+		    uint8_t* lname = new uint8_t[lnamesize+1];
+		    ret = libfwsi_file_entry_extension_get_utf8_long_name(curblock, lname, lnamesize, &itemerror);
+		    filecontents->append("\tLong Name\t| " + std::string((char*)lname) + "\n");
+		    delete[] lname;
+		    libfwsi_extension_block_free(&curblock, &itemerror);
                 }
                 filecontents->append("\n");
 		ret = libfwsi_item_free(&curitem, &itemerror);
@@ -309,9 +358,8 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 
 	    libfwsi_item_list_free(&itemlist, &itemerror);
 	    libfwsi_error_free(&itemerror);
+	    delete[] itemstream;
             //std::cout << "shell structure length: " << shellstructurelength << std::endl;
-            // SKIP FOR NOW
-            //std::cout << "shell id is present" << std::endl;
             curoffset = 76 + shellstructurelength + 2;
         }
         //std::cout << "curoffset: " << curoffset << std::endl;
