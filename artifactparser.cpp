@@ -245,14 +245,46 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                     ret = libfwsi_file_entry_get_utf8_name(curitem, fname, filenamesize, &itemerror);
                     fname[filenamesize] = 0;
                     filecontents->append("\tName\t\t| " + std::string((char*)fname) + "\n");
-                    /*
                     uint32_t fatdatetime = 0;
                     ret = libfwsi_file_entry_get_modification_time(curitem, &fatdatetime, &itemerror);
+		    uint8_t* fdt = (uint8_t*)&fatdatetime;
+		    uint16_t fatdate = (uint16_t)fdt[0] | (uint16_t)fdt[1] << 8;
+		    uint16_t fattime = (uint16_t)fdt[2] | (uint16_t)fdt[3] << 8;
+		    filecontents->append("\tModified Time\t| " + ConvertDosTimeToHuman(&fatdate, &fattime) + " UTC\n");
                     uint32_t attrflags = 0;
                     ret = libfwsi_file_entry_get_file_attribute_flags(curitem, &attrflags, &itemerror);
-                    // NEED TO FIGURE OUT HOW TO CONVERT A UINT32_T TO TWO UINT16_T
-                    //uint16_t fatdate = (uint16_t)fatdatetime[0] | (uint16_t)fatdatetime[1] << 8;
-                    */
+		    filecontents->append("\tFile Attributes\t| ");
+		    if(attrflags & 0x01)
+			filecontents->append("Read Only,");
+		    if(attrflags & 0x02)
+			filecontents->append("Hidden,");
+		    if(attrflags & 0x04)
+			filecontents->append("System,");
+		    if(attrflags & 0x10)
+			filecontents->append("Directory,");
+		    if(attrflags & 0x20)
+			filecontents->append("Archive,");
+		    if(attrflags & 0x40)
+			filecontents->append("Device,");
+		    if(attrflags & 0x80)
+			filecontents->append("Normal,");
+		    if(attrflags & 0x100)
+			filecontents->append("Temporary,");
+		    if(attrflags & 0x200)
+			filecontents->append("Sparse,");
+		    if(attrflags & 0x400)
+			filecontents->append("Reparse Point,");
+		    if(attrflags & 0x800)
+			filecontents->append("Commpressed,");
+		    if(attrflags & 0x1000)
+			filecontents->append("Offline,");
+		    if(attrflags & 0x2000)
+			filecontents->append("Not Indexed,");
+		    if(attrflags & 0x4000)
+			filecontents->append("Encrypted,");
+		    if(attrflags & 0x10000)
+			filecontents->append("Virtual");
+		    filecontents->append("\n");
                 }
                 else if((uint)classtype < 80 && (uint)classtype >= 64)
                 {
