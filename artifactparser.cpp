@@ -150,7 +150,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         filecontents->append("Created\t\t\t| " + ConvertWindowsTimeToUnixTimeUTC(created) + "\n");
         filecontents->append("Modified\t\t| " + ConvertWindowsTimeToUnixTimeUTC(modified) + "\n");
         filecontents->append("Accessed\t\t| " + ConvertWindowsTimeToUnixTimeUTC(accessed) + "\n");
-        filecontents->append("File Size\t\t| " + ReturnFormattingSize(filesize) + " bytes\n");
+        filecontents->append("File Size\t\t| " + ReturnFormattingSize(filesize) + " bytes\n\n");
         if(flagbits[0] == 1) // SHELL ITEM ID LIST IS PRESENT
         {
             // PARSE SHELL ID LIST HERE
@@ -163,21 +163,100 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 	    ret = libfwsi_item_list_copy_from_byte_stream(itemlist, itemstream, shellstructurelength, LIBFWSI_CODEPAGE_ASCII, &itemerror);
 	    int itemlistcount = 0;
 	    ret = libfwsi_item_list_get_number_of_items(itemlist, &itemlistcount, &itemerror);
-	    std::cout << "number of list items: " << itemlistcount << std::endl;
+	    //std::cout << "number of list items: " << itemlistcount << std::endl;
 	    for(int i=0; i < itemlistcount; i++) // parse each shell item
 	    {
-		std::cout << "Item " << i+1 << std::endl << std::endl;
+                filecontents->append("Shell Item\t\t| " + std::to_string(i+1) + "\n");
+                filecontents->append("\tItem Type\t| ");
+		//std::cout << "Item " << i+1 << std::endl << std::endl;
 		libfwsi_item_t* curitem;
 		ret = libfwsi_item_initialize(&curitem, &itemerror);
 		ret = libfwsi_item_list_get_item(itemlist, i, &curitem, &itemerror);
 		int itemtype = 0;
 		ret = libfwsi_item_get_type(curitem, &itemtype, &itemerror);
-		std::cout << "item type: " << itemtype << std::endl;
+		//std::cout << "item type: " << itemtype << std::endl;
 		uint8_t classtype = 0;
 		ret = libfwsi_item_get_class_type(curitem, &classtype, &itemerror);
-		std::cout << "class type: " << classtype << std::endl;
+		//std::cout << "class type: " << (uint)classtype << std::endl;
 		// if the types to determine how to get the content i want.
+                if(itemtype == 0)
+                    filecontents->append("Unknown");
+                else if(itemtype == 1)
+                    filecontents->append("CDBurn");
+                else if(itemtype == 2)
+                    filecontents->append("Compressed Folder");
+                else if(itemtype == 3)
+                    filecontents->append("Control Panel");
+                else if(itemtype == 4)
+                    filecontents->append("Control Panel Category");
+                else if(itemtype == 5)
+                    filecontents->append("Control Panel CPL File");
+                else if(itemtype == 6)
+                    filecontents->append("Delegate");
+                else if(itemtype == 7)
+                    filecontents->append("File Entry");
+                else if(itemtype == 8)
+                    filecontents->append("Game Folder");
+                else if(itemtype == 9)
+                    filecontents->append("MTP File Entry");
+                else if(itemtype == 10)
+                    filecontents->append("MTP Volume");
+                else if(itemtype == 11)
+                    filecontents->append("Network Location");
+                else if(itemtype == 12)
+                    filecontents->append("Root Folder");
+                else if(itemtype == 13)
+                    filecontents->append("URI");
+                else if(itemtype == 14)
+                    filecontents->append("URI Sub Values");
+                else if(itemtype == 15)
+                    filecontents->append("User's Property View");
+                else if(itemtype == 16)
+                    filecontents->append("Volume");
+                filecontents->append("\n");
+                filecontents->append("\tClass Type\t| ");
+                if((uint)classtype < 32)
+                {
+                    filecontents->append("Root Folder\n");
+                    uint8_t* rootguid = new uint8_t[16];
+                    libfwsi_root_folder_get_shell_folder_identifier(curitem, rootguid, 16, &itemerror);
+                    std::stringstream guidstream;
+                    guidstream << std::hex << (uint)rootguid[3] << (uint)rootguid[2] << (uint)rootguid[1] << (uint)rootguid[0] << "-" << (uint)rootguid[5] << (uint)rootguid[4] << "-" << (uint)rootguid[7] << (uint)rootguid[6] << "-" << (uint)rootguid[8] << (uint)rootguid[9] << "-" << (uint)rootguid[10] << (uint)rootguid[11] << (uint)rootguid[12] << (uint)rootguid[13] << (uint)rootguid[14] << (uint)rootguid[15];
+                    filecontents->append("\tIdentifier\t| " + guidstream.str() + "\n");
+                    filecontents->append("\tFolder Nmae\t| " + std::string(libfwsi_shell_folder_identifier_get_name(rootguid)) + "\n\n");
+                    delete[] rootguid;
+                }
+                else if((uint)classtype < 48 && (uint)classtype >= 32)
+                {
+                    filecontents->append("Volume\n");
+                    size_t volnamesize = libfwsi_volume_get_utf8_name_size(curitem, &volnamesize, &itemerror);
+                    std::cout << "vol name size: " << volnamesize << std::endl;
+                    uint8_t* volname = new uint8_t[volnamesize+1];
+                    ret = libfwsi_volume_get_utf8_name(curitem, volname, volnamesize, &itemerror);
+                    volname[volnamesize] = 0;
+                    filecontents->append("\tVolume Name\t| " + std::string((char*)volname) + ":\\ \n\n");
+                }
+                else if((uint)classtype < 64 && (uint)classtype >= 48)
+                {
+                    filecontents->append("File Entry\n");
+                }
+                else if((uint)classtype < 80 && (uint)classtype >= 64)
+                {
+                    filecontents->append("Network Location\n");
+                }
+                else if((uint)classtype < 96 && (uint)classtype >= 80)
+                {
+                    filecontents->append("URI\n");
+                }
 		
+                int extblkcount = 0;
+                ret = libfwsi_item_get_number_of_extension_blocks(curitem, &extblkcount, &itemerror);
+                //std::cout << "extblkcnt: " << extblkcount << std::endl;
+                for(int j=0; j < extblkcount; j++)
+                {
+                    libfwsi_extension_block_t* curblock = NULL;
+                    libfwsi_item_get_extension_block(curitem, j, &curblock, &itemerror);
+                }
 		ret = libfwsi_item_free(&curitem, &itemerror);
 	    }
 
