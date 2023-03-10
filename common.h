@@ -77,6 +77,7 @@ struct FileItem
 //std::string ConvertUnixTimeToHuman(uint32_t unixtime);
 
 char* GetDateTime(char *buff);
+std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime);
 std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
 uint8_t* substr(uint8_t* arr, int begin, int len);
 

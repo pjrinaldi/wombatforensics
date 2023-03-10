@@ -11,6 +11,40 @@ std::string ConvertUnixTimeToHuman(uint32_t unixtime)
     return std::string(hchar);
 }
 */
+std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime)
+{
+    std::string humanstring = "";
+    if(((*dosdate & 0x1e0) >> 5) < 10)
+        humanstring += "0";
+    humanstring += std::to_string(((*dosdate & 0x1e0) >> 5)); // MONTH
+    humanstring += "/"; // DIVIDER
+    if(((*dosdate & 0x1f) >> 0) < 10)
+        humanstring += "0";
+    humanstring += std::to_string(((*dosdate & 0x1f) >> 0)); // MONTH
+    humanstring += "/"; // DIVIDER
+    humanstring += std::to_string(((*dosdate & 0xfe00) >> 9) + 1980); // YEAR
+    humanstring += " ";
+    if(dostime == NULL)
+	humanstring += "00:00:00";
+    else
+    {
+        if(((*dostime & 0xf800) >> 11) < 10)
+            humanstring += "0";
+	humanstring += std::to_string(((*dostime & 0xf800) >> 11)); // HOUR
+	humanstring += ":";
+        if(((*dostime & 0x7e0) >> 5) < 10)
+            humanstring += "0";
+	humanstring += std::to_string(((*dostime & 0x7e0) >> 5)); // MINUTE
+	humanstring += ":";
+        if((((*dostime & 0x1f) >> 0) * 2) < 10)
+            humanstring += "0";
+	humanstring += std::to_string(((*dostime & 0x1f) >> 0) * 2); // SECOND
+    }
+    //humanstring += " (UTC)";
+    
+    return humanstring;
+}
+
 std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
 {
     uint64_t temp;

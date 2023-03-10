@@ -239,6 +239,10 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                 else if((uint)classtype < 64 && (uint)classtype >= 48)
                 {
                     filecontents->append("File Entry\n");
+                    uint32_t fatdatetime = 0;
+                    ret = libfwsi_file_entry_get_modification_time(curitem, &fatdatetime, &itemerror);
+                    // NEED TO FIGURE OUT HOW TO CONVERT A UINT32_T TO TWO UINT16_T
+                    //uint16_t fatdate = (uint16_t)fatdatetime[0] | (uint16_t)fatdatetime[1] << 8;
                 }
                 else if((uint)classtype < 80 && (uint)classtype >= 64)
                 {
