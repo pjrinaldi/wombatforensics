@@ -108,8 +108,6 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         //if(flags & 0x80)
         //    std::cout << "data strings are unicode rather than ascii." << std::endl;
         //std::cout << "flags: " << std::hex << flags << std::dec << std::endl;
-        std::bitset<8> flagbits(flags); // values are reversed
-        //std::cout << "flagbits: " << flagbits << std::endl;
         ReadInteger(tmpbuf, 24, &attributes);
         filecontents->append("File Attributes\t\t| ");
         if(attributes & 0x01)
@@ -151,7 +149,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         filecontents->append("Modified\t\t| " + ConvertWindowsTimeToUnixTimeUTC(modified) + "\n");
         filecontents->append("Accessed\t\t| " + ConvertWindowsTimeToUnixTimeUTC(accessed) + "\n");
         filecontents->append("File Size\t\t| " + ReturnFormattingSize(filesize) + " bytes\n\n");
-        if(flagbits[0] == 1) // SHELL ITEM ID LIST IS PRESENT
+        if(flags & 0x01) // SHELL ITEM ID LIST IS PRESENT
         {
             // PARSE SHELL ID LIST HERE
             ReadInteger(tmpbuf, 76, &shellstructurelength);
@@ -363,7 +361,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             curoffset = 76 + shellstructurelength + 2;
         }
         //std::cout << "curoffset: " << curoffset << std::endl;
-        if(flagbits[1] == 1)
+        if(flags & 0x02)
         {
             // GET structure offsets
             ReadInteger(tmpbuf, curoffset, &totalstructurelength);
@@ -440,7 +438,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         }
         //std::cout << "on to different strings: " << curoffset + totalstructurelength << std::endl;
         curoffset = curoffset + totalstructurelength;
-        if(flagbits[2] == 1)
+        if(flags & 0x04)
         {
             //std::cout << "has a descriptive string" << std::endl;
             uint16_t desclength = 0;
@@ -469,7 +467,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             filecontents->append("Description\t\t| " + descstring + "\n");
             //std::cout << "description: " << descstring << std::endl;
         }
-        if(flagbits[3] == 1)
+        if(flags & 0x08)
         {
             //std::cout << "has a relative path string" << std::endl;
             uint16_t relpathlength = 0;
@@ -497,7 +495,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             }
             filecontents->append("Relative Path\t| " + relpathstr + "\n");
         }
-        if(flagbits[4] == 1)
+        if(flags & 0x10)
         {
             //std::cout << "has a working directory" << std::endl;
             uint16_t workdirlength = 0;
@@ -524,7 +522,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             filecontents->append("Working Directory\t| " + workingdirectory + "\n");
             //std::cout << "working directory: " << workingdirectory << std::endl;
         }
-        if(flagbits[5] == 1)
+        if(flags & 0x20)
         {
             //std::cout << "has command line arguments" << std::endl;
             uint16_t cmdlength = 0;
@@ -551,7 +549,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             filecontents->append("Command Line\t| " + commandstring + "\n");
             //std::cout << "cmnd string: " << commandstring << std::endl;
         }
-        if(flagbits[6] == 1)
+        if(flags & 0x40)
         {
             //std::cout << "has a custom icon" << std::endl;
             uint16_t iconlength = 0;
@@ -578,7 +576,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             filecontents->append("Icon File\t\t| " + iconstring + "\n");
             //std::cout << "icon string: " << iconstring << std::endl;
         }
-        //std::cout << "curoffset after strings: " << curoffset << std::endl;
+        std::cout << "curoffset after strings: " << curoffset << std::endl;
         // PARSE EXTRA BLOCKS HERE
         // THIS WORKS, NEED TO GET DISTRIBUTED TRACKING LINK BIT TO GET MACHINE IDENTIFIER
     }
