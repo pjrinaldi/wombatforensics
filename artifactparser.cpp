@@ -223,7 +223,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                     std::stringstream guidstream;
                     guidstream << std::hex << (uint)rootguid[3] << (uint)rootguid[2] << (uint)rootguid[1] << (uint)rootguid[0] << "-" << (uint)rootguid[5] << (uint)rootguid[4] << "-" << (uint)rootguid[7] << (uint)rootguid[6] << "-" << (uint)rootguid[8] << (uint)rootguid[9] << "-" << (uint)rootguid[10] << (uint)rootguid[11] << (uint)rootguid[12] << (uint)rootguid[13] << (uint)rootguid[14] << (uint)rootguid[15];
                     filecontents->append("\tIdentifier\t| " + guidstream.str() + "\n");
-                    filecontents->append("\tFolder Nmae\t| " + std::string(libfwsi_shell_folder_identifier_get_name(rootguid)) + "\n\n");
+                    filecontents->append("\tFolder Nmae\t| " + std::string(libfwsi_shell_folder_identifier_get_name(rootguid)) + "\n");
                     delete[] rootguid;
                 }
                 else if((uint)classtype < 48 && (uint)classtype >= 32)
@@ -234,15 +234,25 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                     uint8_t* volname = new uint8_t[volnamesize+1];
                     ret = libfwsi_volume_get_utf8_name(curitem, volname, volnamesize, &itemerror);
                     volname[volnamesize] = 0;
-                    filecontents->append("\tVolume Name\t| " + std::string((char*)volname) + ":\\ \n\n");
+                    filecontents->append("\tVolume Name\t| " + std::string((char*)volname) + ":\\ \n");
                 }
                 else if((uint)classtype < 64 && (uint)classtype >= 48)
                 {
                     filecontents->append("File Entry\n");
+                    size_t filenamesize = 0;
+                    ret = libfwsi_file_entry_get_utf8_name_size(curitem, &filenamesize, &itemerror);
+                    uint8_t* fname = new uint8_t[filenamesize+1];
+                    ret = libfwsi_file_entry_get_utf8_name(curitem, fname, filenamesize, &itemerror);
+                    fname[filenamesize] = 0;
+                    filecontents->append("\tName\t\t| " + std::string((char*)fname) + "\n");
+                    /*
                     uint32_t fatdatetime = 0;
                     ret = libfwsi_file_entry_get_modification_time(curitem, &fatdatetime, &itemerror);
+                    uint32_t attrflags = 0;
+                    ret = libfwsi_file_entry_get_file_attribute_flags(curitem, &attrflags, &itemerror);
                     // NEED TO FIGURE OUT HOW TO CONVERT A UINT32_T TO TWO UINT16_T
                     //uint16_t fatdate = (uint16_t)fatdatetime[0] | (uint16_t)fatdatetime[1] << 8;
+                    */
                 }
                 else if((uint)classtype < 80 && (uint)classtype >= 64)
                 {
@@ -261,6 +271,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                     libfwsi_extension_block_t* curblock = NULL;
                     libfwsi_item_get_extension_block(curitem, j, &curblock, &itemerror);
                 }
+                filecontents->append("\n");
 		ret = libfwsi_item_free(&curitem, &itemerror);
 	    }
 
