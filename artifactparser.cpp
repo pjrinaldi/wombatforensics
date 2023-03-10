@@ -689,6 +689,270 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 	    }
 	}
     }
+    else if(curfileitem->sig.compare("Recycler") == 0) // INFO2 file
+    {
+	/*
+	QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
+    htmlstr += "<div style='" + ReturnCssString(1) + "'>INFO2 File Analysis for " + info2name + " (" + info2id + ")</div><br/>";
+    htmlstr += "<table style='" + ReturnCssString(2) + "' width='100%'><tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "'>FILE NAME</th><th style='" + ReturnCssString(6) + "'>DELETED</th></tr>";
+    QString info2file = wombatvariable.tmpfilepath + info2id + "-fhex";
+    QByteArray info2content;
+    info2content.clear();
+    QFile i2file(info2file);
+    if(!i2file.isOpen())
+        i2file.open(QIODevice::ReadOnly);
+    if(i2file.isOpen())
+        info2content = i2file.readAll();
+    i2file.close();
+    uint32_t fileentrysize = qFromLittleEndian<uint32_t>(info2content.mid(12, 4));
+    int curpos = 20; // content starts after offset
+    int a = 1;
+    while(curpos < info2content.count())
+    {
+        if(a % 2 == 0)
+            htmlstr += "<tr style='" + ReturnCssString(5) + "'>";
+        else
+            htmlstr += "<tr style='" + ReturnCssString(4) + "'>";
+	QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 3, 260).toStdString().c_str(), -1).toStdString());
+        uint64_t deleteddate = qFromLittleEndian<uint64_t>(info2content.mid(curpos + 268, 8));
+        htmlstr += "<td style='" + ReturnCssString(7) + "'>" + filenamestring + "</td>";
+        htmlstr += "<td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td>";
+        htmlstr += "</tr>";
+        curpos = curpos + fileentrysize;
+    }
+
+    htmlstr += "</table></body></html>";
+    
+    return htmlstr;
+
+	 */ 
+    }
+    else if(curfileitem->sig.compare("Recycle.Bin") == 0) // $I file
+    {
+	/*
+	QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
+    htmlstr += "<div style='" + ReturnCssString(1) + "'>$I File Analysis for " + idollarname + " (" + idollarid + ")</div><br/>";
+    htmlstr += "<table style='" + ReturnCssString(2) + "' width='100%'><tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "'>NAME</th><th style='" + ReturnCssString(6) + "'>Value</th></tr>";
+    QString idollarfilestr = wombatvariable.tmpfilepath + idollarid + "-fhex";
+    QByteArray idollarcontent;
+    idollarcontent.clear();
+    QFile idollarfile(idollarfilestr);
+    if(!idollarfile.isOpen())
+        idollarfile.open(QIODevice::ReadOnly);
+    if(idollarfile.isOpen())
+        idollarcontent = idollarfile.readAll();
+    idollarfile.close();
+    uint64_t versionformat = qFromLittleEndian<uint64_t>(idollarcontent.left(8));
+    uint64_t filesize = qFromLittleEndian<uint64_t>(idollarcontent.mid(8, 8));
+    uint64_t deleteddate = qFromLittleEndian<uint64_t>(idollarcontent.mid(16, 8));
+    QString filenamestring = "";
+    if(versionformat == 0x01)
+    {
+        filenamestring = QString::fromStdString(idollarcontent.mid(24, 520).trimmed().toStdString());
+    }
+    else if(versionformat == 0x02)
+    {
+        uint32_t filenamesize = qFromLittleEndian<uint32_t>(idollarcontent.mid(24, 4));
+        filenamestring = QString::fromStdString(idollarcontent.mid(24, filenamesize).trimmed().toStdString());
+    }
+    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>File Name:</td><td style='" + ReturnCssString(7) + "'>" + filenamestring + "</td></tr>";
+    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Deleted:</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td></tr>";
+    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>File Size:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(filesize) + " bytes</td></tr>";
+
+    htmlstr += "</table></body></html>";
+    
+    return htmlstr;
+
+	 */ 
+    }
+    else if(curfileitem->sig.compare("Prefetch") == 0) // pf file
+    {
+        if(!inmemory)
+        {
+            std::ifstream file(tmpfilestr.c_str(),  std::ios::binary | std::ios::ate);
+            std::streamsize size = file.tellg();
+            file.seekg(0, std::ios::beg);
+            tmpbuf = new uint8_t[size];
+            file.read((char*)tmpbuf, size);
+        }
+	/*
+        uint32_t flags = 0;
+        uint32_t attributes = 0;
+        uint64_t created = 0;
+        uint64_t modified = 0;
+        uint64_t accessed = 0;
+        uint32_t filesize = 0;
+        uint16_t shellstructurelength = 0;
+        uint32_t voloffset = 0;
+        uint32_t volstructurelength = 0;
+        uint32_t voltype = 0;
+        uint32_t volserial = 0;
+        uint32_t volnameoffset = 0;
+        uint32_t basepathoffset = 0;
+        uint32_t networkvoloffset = 0;
+        uint32_t remainingpathoffset = 0;
+        uint32_t totalstructurelength = 0;
+        std::string volnamestr = "";
+        std::string basepathstr = "";
+        std::string descstring = "";
+        std::string relpathstr = "";
+        std::string workingdirectory  = "";
+        std::string commandstring = "";
+        std::string iconstring = "";
+        int curoffset = 0;
+	*/
+
+	uint8_t* uncompresseddata = NULL;
+        std::string titlestring = "Prefetch File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+        filecontents->clear();
+        filecontents->append(titlestring + "\n");
+        for(int i=0; i < titlestring.size(); i++)
+            filecontents->append("-");
+        filecontents->append("\n\n");
+	uint8_t* mamchar = new uint8_t[3];
+	mamchar = substr(tmpbuf, 0, 3);
+	if(std::string((char*)mamchar).compare("MAM") == 0) // WIN10+ Prefetch
+	{
+	    uint32_t datasize = 0;
+	    ReadInteger(tmpbuf, 4, &datasize);
+	    libfwnt_error_t* fwnterror = NULL;
+	    size_t compressedsize = curfileitem->size - 8;
+	    size_t uncompressedsize = datasize;
+	    uint8_t* compresseddata = new uint8_t[compressedsize];
+	    uncompresseddata = new uint8_t[uncompressedsize];
+	    compresseddata = substr(tmpbuf, 8, compressedsize);
+	    libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, uncompresseddata, &uncompressedsize, &fwnterror);
+	    delete[] compresseddata;
+	}
+	else
+	    uncompresseddata = tmpbuf;
+	delete[] mamchar;
+	// NOW WE HAVE THE CONTENT FROM EITHER TYPE AS REGULAR PREFETCH, RUN SIG CHECK AND PARSE
+	uint8_t* sigchar = new uint8_t[4];
+	sigchar = substr(uncompresseddata, 4, 4);
+	if(std::string((char*)sigchar).compare("SCCA") == 0) // PARSE Prefetch
+	{
+	    std::cout << "parse prefetch here..." << std::endl;
+	}
+
+	/*
+    if(pfheader.contains("SCCA"))
+    {
+	uint32_t pfversion = qFromLittleEndian<uint32_t>(pfcontent.left(4));
+	htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Format Version:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(pfversion) + "</td></tr>";
+	QString filenamestring = "";
+	for(int i=16; i < 76; i++)
+	{
+	    if(i % 2 == 0)
+	    {
+		if(pfcontent.at(i) == '\u0000')
+		    break;
+		filenamestring.append(pfcontent.at(i));
+	    }
+	}
+	htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Executable File Name:</td><td style='" + ReturnCssString(7) + "'>" + filenamestring + "</td></tr>";
+	tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(76, 4));
+	htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Prefetch Hash:</td><td style='" + ReturnCssString(7) + "'>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
+	tmpuint32 = 0;
+	uint32_t fnamestringsoffset = 0;
+	uint32_t fnamestringssize = 0;
+	uint32_t volinfooffset = 0;
+	uint32_t volinfosize = 0;
+	uint32_t volinfocount = 0;
+	uint32_t metricsoffset = 0;
+	QByteArray fileinformation;
+	QByteArray filenamestrings;
+	QByteArray volinfocontent;
+	fileinformation.clear();
+	metricsoffset = qFromLittleEndian<uint32_t>(pfcontent.mid(84, 4));
+	if(pfversion == 17) // WINXP, WIN2003
+	    fileinformation = pfcontent.mid(84, 68);
+	else if(pfversion == 23) // VISTA, WIN7
+	    fileinformation = pfcontent.mid(84, 156);
+	else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130)) // WIN8.1/WIN10
+	    fileinformation = pfcontent.mid(84, 224);
+	else if(pfversion == 30 && metricsoffset == 0x128) // WIN10
+	    fileinformation = pfcontent.mid(84, 216);
+	fnamestringsoffset = qFromLittleEndian<uint32_t>(fileinformation.mid(16, 4));
+	fnamestringssize = qFromLittleEndian<uint32_t>(fileinformation.mid(20, 4));
+	volinfooffset = qFromLittleEndian<uint32_t>(fileinformation.mid(24, 4));
+	volinfocount = qFromLittleEndian<uint32_t>(fileinformation.mid(28, 4));
+	volinfosize = qFromLittleEndian<uint32_t>(fileinformation.mid(32, 4));
+	if(pfversion == 17)
+	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Run Count:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(60, 4))) + "</td></tr>";
+	else if(pfversion == 23)
+	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Run Count:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(68, 4))) + "</td></tr>";
+	else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130))
+	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Run Count:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(124, 4))) + "</td></tr>";
+	else if(pfversion == 30 && metricsoffset == 0x128)
+	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Run Count:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(116, 4))) + "</td></tr>";
+	if(pfversion == 17)
+	    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Last Run Time:</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(36, 8))) + "</td></tr>";
+	else if(pfversion == 23)
+	    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Last Run Time:</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(44, 8))) + "</td></tr>";
+	else if(pfversion == 26 || pfversion == 30)
+	{
+	    for(int i=0; i < 8; i++)
+	    {
+		uint64_t lastruntime = qFromLittleEndian<uint64_t>(fileinformation.mid(44+(i*8), 8));
+		if(lastruntime == 0)
+		    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Last Run Time" + QString::number(i+1) + "</td><td style='" + ReturnCssString(7) + "'>Not Set (0)</td></tr>";
+		else
+		    htmlstr += "<tr style='" + ReturnCssString(4) + "'><tdstyle='" + ReturnCssString(8) + "'>Last Run Time" + QString::number(i+1) + "</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(lastruntime) + "</td></tr>";
+	    }
+	}
+	filenamestrings.clear();
+	filenamestrings = pfcontent.mid(fnamestringsoffset, fnamestringssize);
+	QStringList tmpstrlist;
+	tmpstrlist.clear();
+	QString tmpstr = "";
+	for(uint i=0; i < fnamestringssize; i++)
+	{
+	    if(i % 2 == 0)
+	    {
+		if(filenamestrings.at(i) == '\u0000')
+		{
+		    tmpstrlist.append(tmpstr);
+		    tmpstr = "";
+		}
+		else
+		    tmpstr += filenamestrings.at(i);
+	    }
+	}
+	for(int i=0; i < tmpstrlist.count(); i++)
+	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>File Name " + QString::number(i+1) + ":</td><td style='" + ReturnCssString(7) + "'>" + tmpstrlist.at(i) + "</td></tr>";
+	volinfocontent.clear();
+	volinfocontent = pfcontent.mid(volinfooffset, volinfosize);
+	int curpos = 0;
+	for(uint i=0; i < volinfocount; i++)
+	{
+	    if(pfversion == 17)
+		curpos = 40*i;
+	    else if(pfversion == 23 || pfversion == 26)
+		curpos = 104*i;
+	    else if(pfversion == 30)
+		curpos = 96*i;
+	    uint32_t volpathoffset = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos, 4));
+	    uint32_t volpathsize = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+4, 4));
+	    QByteArray volpath = volinfocontent.mid(curpos + volpathoffset, volpathsize*2);
+	    QString volpathstr = "";
+	    for(int j=0; j < volpath.count(); j++)
+	    {
+		if(j % 2 == 0)
+		    volpathstr += volpath.at(j);
+	    }
+	    uint64_t tmpuint64 = qFromLittleEndian<uint64_t>(volinfocontent.mid(curpos+8, 8));
+	    uint32_t volserial = qFromLittleEndian<uint32_t>(volinfocontent.mid(curpos+16, 4));
+	    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Volume " + QString::number(i+1) + " Path:</td><td style='" + ReturnCssString(7) + "'>" + volpathstr + "</td></tr>";
+	    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Volume " + QString::number(i+1) + " Serial Number:</td><td style='" + ReturnCssString(7) + "'>0x" + QString::number(volserial, 16) + "</td></tr>";
+	    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Volume " + QString::number(i+1) + " Creation Time:</td><td style='" + ReturnCssString(7)+ + "'>" + ConvertWindowsTimeToUnixTime(tmpuint64) + "</td></tr>";
+	}
+    }
+    htmlstr += "</table></body></html>";
+
+    return htmlstr;
+	 */ 
+    }
     else
         std::cout << "launch internal/external viewer for files here..." << std::endl;
 }
