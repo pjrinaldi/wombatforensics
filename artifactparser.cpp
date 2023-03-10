@@ -216,9 +216,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                     filecontents->append("Root Folder\n");
                     uint8_t* rootguid = new uint8_t[16];
                     libfwsi_root_folder_get_shell_folder_identifier(curitem, rootguid, 16, &itemerror);
-                    std::stringstream guidstream;
-                    guidstream << std::hex << (uint)rootguid[3] << (uint)rootguid[2] << (uint)rootguid[1] << (uint)rootguid[0] << "-" << (uint)rootguid[5] << (uint)rootguid[4] << "-" << (uint)rootguid[7] << (uint)rootguid[6] << "-" << (uint)rootguid[8] << (uint)rootguid[9] << "-" << (uint)rootguid[10] << (uint)rootguid[11] << (uint)rootguid[12] << (uint)rootguid[13] << (uint)rootguid[14] << (uint)rootguid[15];
-                    filecontents->append("\tIdentifier\t| " + guidstream.str() + "\n");
+		    filecontents->append("\tIdentifier\t| " + ReturnFormattedGuid(rootguid) + "\n");
                     filecontents->append("\tFolder Nmae\t| " + std::string(libfwsi_shell_folder_identifier_get_name(rootguid)) + "\n");
                     delete[] rootguid;
                 }
@@ -576,9 +574,120 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             filecontents->append("Icon File\t\t| " + iconstring + "\n");
             //std::cout << "icon string: " << iconstring << std::endl;
         }
-        std::cout << "curoffset after strings: " << curoffset << std::endl;
+	filecontents->append("\n");
+        //std::cout << "curoffset after strings: " << curoffset << std::endl;
+	//std::cout << "flags: " << flags << std::endl;
         // PARSE EXTRA BLOCKS HERE
         // THIS WORKS, NEED TO GET DISTRIBUTED TRACKING LINK BIT TO GET MACHINE IDENTIFIER
+	int k = 1;
+	while(curoffset < curfileitem->size)
+	{
+	    uint32_t blksize = 0;
+	    ReadInteger(tmpbuf, curoffset, &blksize);
+	    if(blksize == 0)
+		break;
+	    filecontents->append("Data Block\t\t| " + std::to_string(k) + "\n");
+	    uint32_t blksig = 0;
+	    ReadInteger(tmpbuf, curoffset + 4, &blksig);
+	    if(blksig == 0xa0000001) // environment variables location (788 bytes)
+	    {
+		filecontents->append("\tSignature\t| Environment Variables Location (0xa0000001)\n");
+		uint8_t* evloc = new uint8_t[260];
+		evloc = substr(tmpbuf, curoffset + 8, 260);
+		filecontents->append("\tENV VAR Location\t| " + std::string((char*)evloc) + "\n");
+		delete[] evloc;
+		k++;
+		curoffset = curoffset + 788;
+	    }
+	    else if(blksig == 0xa0000002) // console properties (204 bytes)
+	    {
+		filecontents->append("\tSignature\t| Console Properties (0xa0000002)\n");
+		k++;
+		curoffset = curoffset + 204;
+	    }
+	    else if(blksig == 0xa0000003) // distributed link tracker properties (96 bytes)
+	    {
+		filecontents->append("\tSignature\t| Distributed Link Tracker Properties (0xa0000003)\n");
+		uint8_t* machineid = new uint8_t[16];
+		machineid = substr(tmpbuf, curoffset + 16, 16);
+		filecontents->append("\tMachine ID\t| " + std::string((char*)machineid) + "\n");
+		delete[] machineid;
+		uint8_t* dvid = new uint8_t[16];
+		dvid = substr(tmpbuf, curoffset + 32, 16);
+		filecontents->append("\tDroid Volume ID | " + ReturnFormattedGuid(dvid) + "\n");
+		delete[] dvid;
+		uint8_t* fid = new uint8_t[16];
+		fid = substr(tmpbuf, curoffset + 48, 16);
+		filecontents->append("\tDroid File ID\t| " + ReturnFormattedGuid(fid) + "\n");
+		delete[] fid;
+		uint8_t* bdvid = new uint8_t[16];
+		bdvid = substr(tmpbuf, curoffset + 64, 16);
+		filecontents->append("\tBirth Volume ID | " + ReturnFormattedGuid(bdvid) + "\n");
+		delete[] bdvid;
+		uint8_t* bfid = new uint8_t[16];
+		bfid = substr(tmpbuf, curoffset + 80, 16);
+		filecontents->append("\tBirth File ID\t| " + ReturnFormattedGuid(bfid) + "\n");
+		delete[] bfid;
+		k++;
+		curoffset = curoffset + 96;
+	    }
+	    else if(blksig == 0xa0000004) // console codepage (12 bytes)
+	    {
+		filecontents->append("\tSignature\t| Console Codepage (0xa0000004)\n");
+		k++;
+		curoffset = curoffset + 12;
+	    }
+	    else if(blksig == 0xa0000005) // special folder location (16 bytes)
+	    {
+		filecontents->append("\tSignature\t| Special Folder Location (0xa0000005)\n");
+		k++;
+		curoffset = curoffset + 16;
+	    }
+	    else if(blksig == 0xa0000006) // darwin properties (788 bytes)
+	    {
+		filecontents->append("\tSignature\t| Darwin Properties (0xa0000006)\n");
+		uint8_t* dp = new uint8_t[260];
+		dp = substr(tmpbuf, curoffset + 8, 260);
+		filecontents->append("\tApp ID\t| " + std::string((char*)dp) + "\n");
+		delete[] dp;
+		k++;
+		curoffset = curoffset + 788;
+	    }
+	    else if(blksig == 0xa0000007) // icon location (788 bytes)
+	    {
+		filecontents->append("\tSignature\t| Icon Location (0xa0000007)\n");
+		uint8_t* dp = new uint8_t[260];
+		dp = substr(tmpbuf, curoffset + 8, 260);
+		filecontents->append("\tIcon Location\t| " + std::string((char*)dp) + "\n");
+		delete[] dp;
+		k++;
+		curoffset = curoffset + 788;
+	    }
+	    else if(blksig == 0xa0000008) // shim layer properties (variable)
+	    {
+		filecontents->append("\tSignature\t| Shim Layer Properties (0xa0000008)\n");
+		k++;
+		curoffset = curoffset + blksize;
+	    }
+	    else if(blksig == 0xa0000009) // metadata property store (variable)
+	    {
+		filecontents->append("\tSignature\t| Metadata Property Store (0xa0000009)\n");
+		k++;
+		curoffset = curoffset + blksize;
+	    }
+	    else if(blksig == 0xa000000b) // known folder location (28 bytes)
+	    {
+		filecontents->append("\tSignature\t| Known Folder Location (0xa000000b)\n");
+		k++;
+		curoffset = curoffset + 28;
+	    }
+	    else if(blksig == 0xa000000c) // shell item identifiers list (variable)
+	    {
+		filecontents->append("\tSignature\t| Shell Item Identifiers List (0xa000000c)\n");
+		k++;
+		curoffset = curoffset + blksize;
+	    }
+	}
     }
     else
         std::cout << "launch internal/external viewer for files here..." << std::endl;

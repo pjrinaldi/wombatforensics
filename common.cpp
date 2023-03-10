@@ -83,6 +83,14 @@ std::string ReturnFormattingSize(uint size)
     return ss.str();
 }
 
+std::string ReturnFormattedGuid(uint8_t* guidbuffer)
+{
+    std::stringstream guidstream;
+    guidstream << std::hex << std::setfill('0') << std::setw(2) << (uint)guidbuffer[3] << std::setw(2) << (uint)guidbuffer[2] << std::setw(2) << (uint)guidbuffer[1] << std::setw(2) << (uint)guidbuffer[0] << "-" << std::setw(2) << (uint)guidbuffer[5] << std::setw(2) << (uint)guidbuffer[4] << "-" << std::setw(2) << (uint)guidbuffer[7] << std::setw(2) << (uint)guidbuffer[6] << "-" << std::setw(2) << (uint)guidbuffer[8] << std::setw(2) << (uint)guidbuffer[9] << "-" << std::setw(2) << (uint)guidbuffer[10] << std::setw(2) << (uint)guidbuffer[11] << std::setw(2) << (uint)guidbuffer[12] << std::setw(2) << (uint)guidbuffer[13] << std::setw(2) << (uint)guidbuffer[14] << std::setw(2) << (uint)guidbuffer[15];
+
+    return guidstream.str();
+}
+
 /*
 void ReadContent(std::ifstream* rawcontent, uint8_t* tmpbuf, uint64_t offset, uint64_t size)
 {
