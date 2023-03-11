@@ -802,7 +802,7 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         int curoffset = 0;
 	*/
 
-	uint8_t* uncompresseddata = NULL;
+	uint8_t* udata = NULL;
         std::string titlestring = "Prefetch File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
         filecontents->clear();
         filecontents->append(titlestring + "\n");
@@ -817,90 +817,126 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 	    ReadInteger(tmpbuf, 4, &datasize);
 	    libfwnt_error_t* fwnterror = NULL;
 	    size_t compressedsize = curfileitem->size - 8;
-	    size_t uncompressedsize = datasize;
+	    size_t usize = datasize;
 	    uint8_t* compresseddata = new uint8_t[compressedsize];
-	    uncompresseddata = new uint8_t[uncompressedsize];
+	    udata = new uint8_t[usize];
 	    compresseddata = substr(tmpbuf, 8, compressedsize);
-	    libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, uncompresseddata, &uncompressedsize, &fwnterror);
+	    libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, udata, &usize, &fwnterror);
 	    delete[] compresseddata;
 	}
 	else
-	    uncompresseddata = tmpbuf;
+	    udata = tmpbuf;
 	delete[] mamchar;
 	// NOW WE HAVE THE CONTENT FROM EITHER TYPE AS REGULAR PREFETCH, RUN SIG CHECK AND PARSE
 	uint8_t* sigchar = new uint8_t[4];
-	sigchar = substr(uncompresseddata, 4, 4);
+	sigchar = substr(udata, 4, 4);
 	if(std::string((char*)sigchar).compare("SCCA") == 0) // PARSE Prefetch
 	{
-	    std::cout << "parse prefetch here..." << std::endl;
+            uint32_t pfversion = 0;
+            ReadInteger(udata, 0, &pfversion);
+            filecontents->append("Format Version\t\t| " + std::to_string(pfversion) + "\n");
+            filecontents->append("Executable Filename\t| ");
+            std::string fname = "";
+            for(int i=0; i < 60; i++)
+            {
+                uint16_t singleletter = 0;
+                ReadInteger(udata, 16 + i*2, &singleletter);
+                if(singleletter == 0x0000)
+                    break;
+                fname += (char)singleletter;
+            }
+            filecontents->append(fname + "\n");
+            uint32_t pfhash = 0;
+            ReadInteger(udata, 76, &pfhash);
+            std::stringstream hashstream;
+            hashstream << std::hex << pfhash;
+            filecontents->append("Prefetch Hash\t\t| 0x" + hashstream.str() + "\n");
+            uint32_t metricsoffset = 0;
+            ReadInteger(udata, 84, &metricsoffset);
+            uint16_t fileinformationsize = 0;
+            if(pfversion == 17) // WINXP, WIN2003
+            {
+                fileinformationsize = 68;
+            }
+            else if(pfversion == 23) // WINVISTA, WIN7
+            {
+                fileinformationsize = 156;
+            }
+            else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130)) // WIN8.1, WIN10
+            {
+                fileinformationsize = 224;
+            }
+            else if(pfversion == 30 && metricsoffset == 0x128) // WIN10
+            {
+                fileinformationsize = 216;
+            }
+            uint32_t fnamestringoffset = 0;
+            ReadInteger(udata, 100, &fnamestringoffset);
+            uint32_t fnamestringsize = 0;
+            ReadInteger(udata, 104, &fnamestringsize);
+            uint32_t volinfooffset = 0;
+            ReadInteger(udata, 108, &volinfooffset);
+            uint32_t volinfocount = 0;
+            ReadInteger(udata, 112, &volinfocount);
+            uint32_t volinfosize = 0;
+            ReadInteger(udata, 116, &volinfosize);
+            uint32_t runcount = 0;
+            if(pfversion == 17)
+                ReadInteger(udata, 60, &runcount);
+            else if(pfversion == 23)
+                ReadInteger(udata, 68, &runcount);
+            else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130))
+                ReadInteger(udata, 124, &runcount);
+            else if(pfversion == 30 && metricsoffset == 0x128)
+                ReadInteger(udata, 116, &runcount);
+            filecontents->append("Run Count\t\t| " + std::to_string(runcount) + "\n");
+            uint64_t lastruntime = 0;
+            if(pfversion == 17)
+            {
+                ReadInteger(udata, 120, &lastruntime);
+                filecontents->append("Last Run Time\t\t| " + ConvertWindowsTimeToUnixTimeUTC(lastruntime) + "\n");
+            }
+            else if(pfversion == 23)
+            {
+                ReadInteger(udata, 128, &lastruntime);
+                filecontents->append("Last Run Time\t\t| " + ConvertWindowsTimeToUnixTimeUTC(lastruntime) + "\n");
+            }
+            else if(pfversion == 26 || pfversion == 30)
+            {
+                for(int i=0; i < 8; i++)
+                {
+                    ReadInteger(udata, 128 + i*8, &lastruntime);
+                    if(lastruntime == 0)
+                        filecontents->append("Last Run Time " + std::to_string(i+1) + "\t| Not Set (0)\n");
+                    else
+                        filecontents->append("Last Run Time " + std::to_string(i+1) + "\t| " + ConvertWindowsTimeToUnixTimeUTC(lastruntime) + "\n");
+                }
+            }
+            std::string tmpstr = "";
+            int increment = 1;
+            std::cout << "fname string offset: " << fnamestringoffset << " fname string size: " << fnamestringsize << std::endl;
+            std::cout << "filename count: " << fname
+            for(int i=0; i < fnamestringsize; i++)
+            {
+                uint16_t singleletter = 0;
+                ReadInteger(udata, fnamestringoffset + i*2, &singleletter);
+                if(singleletter == 0x0000)
+                {
+                    filecontents->append("File Name " + std::to_string(increment) + "\t\t| " + tmpstr + "\n");
+                    increment++;
+                    //tmpstr = "";
+                }
+                tmpstr += (char)singleletter;
+            }
 	}
 
 	/*
     if(pfheader.contains("SCCA"))
     {
-	uint32_t pfversion = qFromLittleEndian<uint32_t>(pfcontent.left(4));
-	htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Format Version:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(pfversion) + "</td></tr>";
-	QString filenamestring = "";
-	for(int i=16; i < 76; i++)
-	{
-	    if(i % 2 == 0)
-	    {
-		if(pfcontent.at(i) == '\u0000')
-		    break;
-		filenamestring.append(pfcontent.at(i));
-	    }
-	}
-	htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Executable File Name:</td><td style='" + ReturnCssString(7) + "'>" + filenamestring + "</td></tr>";
-	tmpuint32 = qFromLittleEndian<uint32_t>(pfcontent.mid(76, 4));
-	htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Prefetch Hash:</td><td style='" + ReturnCssString(7) + "'>0x" + QString::number(tmpuint32, 16) + "</td></tr>";
-	tmpuint32 = 0;
-	uint32_t fnamestringsoffset = 0;
-	uint32_t fnamestringssize = 0;
-	uint32_t volinfooffset = 0;
-	uint32_t volinfosize = 0;
-	uint32_t volinfocount = 0;
-	uint32_t metricsoffset = 0;
 	QByteArray fileinformation;
 	QByteArray filenamestrings;
 	QByteArray volinfocontent;
-	fileinformation.clear();
-	metricsoffset = qFromLittleEndian<uint32_t>(pfcontent.mid(84, 4));
-	if(pfversion == 17) // WINXP, WIN2003
-	    fileinformation = pfcontent.mid(84, 68);
-	else if(pfversion == 23) // VISTA, WIN7
-	    fileinformation = pfcontent.mid(84, 156);
-	else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130)) // WIN8.1/WIN10
-	    fileinformation = pfcontent.mid(84, 224);
-	else if(pfversion == 30 && metricsoffset == 0x128) // WIN10
-	    fileinformation = pfcontent.mid(84, 216);
-	fnamestringsoffset = qFromLittleEndian<uint32_t>(fileinformation.mid(16, 4));
-	fnamestringssize = qFromLittleEndian<uint32_t>(fileinformation.mid(20, 4));
-	volinfooffset = qFromLittleEndian<uint32_t>(fileinformation.mid(24, 4));
-	volinfocount = qFromLittleEndian<uint32_t>(fileinformation.mid(28, 4));
-	volinfosize = qFromLittleEndian<uint32_t>(fileinformation.mid(32, 4));
-	if(pfversion == 17)
-	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Run Count:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(60, 4))) + "</td></tr>";
-	else if(pfversion == 23)
-	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Run Count:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(68, 4))) + "</td></tr>";
-	else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130))
-	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Run Count:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(124, 4))) + "</td></tr>";
-	else if(pfversion == 30 && metricsoffset == 0x128)
-	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Run Count:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(qFromLittleEndian<uint32_t>(fileinformation.mid(116, 4))) + "</td></tr>";
-	if(pfversion == 17)
-	    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Last Run Time:</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(36, 8))) + "</td></tr>";
-	else if(pfversion == 23)
-	    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Last Run Time:</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(qFromLittleEndian<uint64_t>(fileinformation.mid(44, 8))) + "</td></tr>";
-	else if(pfversion == 26 || pfversion == 30)
-	{
-	    for(int i=0; i < 8; i++)
-	    {
-		uint64_t lastruntime = qFromLittleEndian<uint64_t>(fileinformation.mid(44+(i*8), 8));
-		if(lastruntime == 0)
-		    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>Last Run Time" + QString::number(i+1) + "</td><td style='" + ReturnCssString(7) + "'>Not Set (0)</td></tr>";
-		else
-		    htmlstr += "<tr style='" + ReturnCssString(4) + "'><tdstyle='" + ReturnCssString(8) + "'>Last Run Time" + QString::number(i+1) + "</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(lastruntime) + "</td></tr>";
-	    }
-	}
+
 	filenamestrings.clear();
 	filenamestrings = pfcontent.mid(fnamestringsoffset, fnamestringssize);
 	QStringList tmpstrlist;
