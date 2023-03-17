@@ -715,7 +715,6 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 
     uint32_t fileentrysize = qFromLittleEndian<uint32_t>(info2content.mid(12, 4));
     int curpos = 20; // content starts after offset
-    int a = 1;
     while(curpos < info2content.count())
     {
         if(a % 2 == 0)
