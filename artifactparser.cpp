@@ -691,19 +691,28 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
     }
     else if(curfileitem->sig.compare("Recycler") == 0) // INFO2 file
     {
+        if(!inmemory)
+        {
+            std::ifstream file(tmpfilestr.c_str(),  std::ios::binary | std::ios::ate);
+            std::streamsize size = file.tellg();
+            file.seekg(0, std::ios::beg);
+            tmpbuf = new uint8_t[size];
+            file.read((char*)tmpbuf, size);
+        }
+        std::string titlestring = "INFO2 File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+        filecontents->clear();
+        filecontents->append(titlestring + "\n");
+        for(int i=0; i < titlestring.size(); i++)
+            filecontents->append("-");
+        filecontents->append("\n\n");
+        uint32_t fileentrysize = 0;
+        ReadInteger(tmpbuf, 12, &fileentrysize);
+        std::cout << "file entry size: " << fileentrysize << std::endl;
+
 	/*
 	QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
-    htmlstr += "<div style='" + ReturnCssString(1) + "'>INFO2 File Analysis for " + info2name + " (" + info2id + ")</div><br/>";
     htmlstr += "<table style='" + ReturnCssString(2) + "' width='100%'><tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "'>FILE NAME</th><th style='" + ReturnCssString(6) + "'>DELETED</th></tr>";
-    QString info2file = wombatvariable.tmpfilepath + info2id + "-fhex";
-    QByteArray info2content;
-    info2content.clear();
-    QFile i2file(info2file);
-    if(!i2file.isOpen())
-        i2file.open(QIODevice::ReadOnly);
-    if(i2file.isOpen())
-        info2content = i2file.readAll();
-    i2file.close();
+
     uint32_t fileentrysize = qFromLittleEndian<uint32_t>(info2content.mid(12, 4));
     int curpos = 20; // content starts after offset
     int a = 1;
@@ -729,7 +738,24 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
     }
     else if(curfileitem->sig.compare("Recycle.Bin") == 0) // $I file
     {
+        if(!inmemory)
+        {
+            std::ifstream file(tmpfilestr.c_str(),  std::ios::binary | std::ios::ate);
+            std::streamsize size = file.tellg();
+            file.seekg(0, std::ios::beg);
+            tmpbuf = new uint8_t[size];
+            file.read((char*)tmpbuf, size);
+        }
 	/*
+        std::string titlestring = "LNK File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+        filecontents->clear();
+        filecontents->append(titlestring + "\n");
+        for(int i=0; i < titlestring.size(); i++)
+            filecontents->append("-");
+        filecontents->append("\n\n");
+
+
+
 	QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
     htmlstr += "<div style='" + ReturnCssString(1) + "'>$I File Analysis for " + idollarname + " (" + idollarid + ")</div><br/>";
     htmlstr += "<table style='" + ReturnCssString(2) + "' width='100%'><tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "'>NAME</th><th style='" + ReturnCssString(6) + "'>Value</th></tr>";
