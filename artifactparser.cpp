@@ -914,9 +914,8 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             }
             std::string tmpstr = "";
             int increment = 1;
-            std::cout << "fname string offset: " << fnamestringoffset << " fname string size: " << fnamestringsize << std::endl;
-            std::cout << "filename count: " << fname
-            for(int i=0; i < fnamestringsize; i++)
+            //std::cout << "fname string offset: " << fnamestringoffset << " fname string size: " << fnamestringsize << std::endl;
+            for(int i=0; i < fnamestringsize/2; i++)
             {
                 uint16_t singleletter = 0;
                 ReadInteger(udata, fnamestringoffset + i*2, &singleletter);
@@ -924,9 +923,41 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
                 {
                     filecontents->append("File Name " + std::to_string(increment) + "\t\t| " + tmpstr + "\n");
                     increment++;
-                    //tmpstr = "";
+                    tmpstr = "";
                 }
-                tmpstr += (char)singleletter;
+                else
+                    tmpstr += (char)singleletter;
+            }
+            filecontents->append("\n");
+            for(int i=0; i < volinfocount; i++)
+            {
+                int curpos = 0;
+                uint32_t volpathoffset = 0;
+                uint32_t volpathsize = 0;
+                std::string volpathstr = "";
+                if(pfversion == 17)
+                    curpos = 40*i;
+                else if(pfversion == 23 || pfversion == 26)
+                    curpos = 104*i;
+                else if(pfversion == 30)
+                    curpos = 96*i;
+                ReadInteger(udata, volinfooffset + curpos, &volpathoffset);
+                ReadInteger(udata, volinfooffset + curpos + 4, &volpathsize);
+                for(int j=0; j < volpathsize; j++)
+                {
+                    uint16_t singleletter = 0;
+                    ReadInteger(udata, volinfooffset + curpos + volpathoffset + j*2, &singleletter);
+                    volpathstr += (char)singleletter;
+                }
+                filecontents->append("Volume " + std::to_string(i+1) + " Path\t\t| " + volpathstr + "\n");
+                uint64_t volctime = 0;
+                ReadInteger(udata, volinfooffset + curpos + 8, &volctime);
+                filecontents->append("Volume " + std::to_string(i+1) + " Creation\t| " + ConvertWindowsTimeToUnixTimeUTC(volctime) + "\n");
+                uint32_t volserial = 0;
+                ReadInteger(udata, volinfooffset + curpos + 16, &volserial);
+                std::stringstream vserstream;
+                vserstream << std::hex << volserial;
+                filecontents->append("Volume " + std::to_string(i+1) + " Serial\t\t| 0x" + vserstream.str() + "\n");
             }
 	}
 
@@ -937,26 +968,6 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
 	QByteArray filenamestrings;
 	QByteArray volinfocontent;
 
-	filenamestrings.clear();
-	filenamestrings = pfcontent.mid(fnamestringsoffset, fnamestringssize);
-	QStringList tmpstrlist;
-	tmpstrlist.clear();
-	QString tmpstr = "";
-	for(uint i=0; i < fnamestringssize; i++)
-	{
-	    if(i % 2 == 0)
-	    {
-		if(filenamestrings.at(i) == '\u0000')
-		{
-		    tmpstrlist.append(tmpstr);
-		    tmpstr = "";
-		}
-		else
-		    tmpstr += filenamestrings.at(i);
-	    }
-	}
-	for(int i=0; i < tmpstrlist.count(); i++)
-	    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>File Name " + QString::number(i+1) + ":</td><td style='" + ReturnCssString(7) + "'>" + tmpstrlist.at(i) + "</td></tr>";
 	volinfocontent.clear();
 	volinfocontent = pfcontent.mid(volinfooffset, volinfosize);
 	int curpos = 0;
