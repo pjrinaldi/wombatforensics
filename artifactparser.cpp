@@ -739,50 +739,40 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             tmpbuf = new uint8_t[size];
             file.read((char*)tmpbuf, size);
         }
-	/*
-        std::string titlestring = "LNK File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+        std::string titlestring = "$I File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
         filecontents->clear();
         filecontents->append(titlestring + "\n");
         for(int i=0; i < titlestring.size(); i++)
             filecontents->append("-");
         filecontents->append("\n\n");
-
-
-
-	QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
-    htmlstr += "<div style='" + ReturnCssString(1) + "'>$I File Analysis for " + idollarname + " (" + idollarid + ")</div><br/>";
-    htmlstr += "<table style='" + ReturnCssString(2) + "' width='100%'><tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "'>NAME</th><th style='" + ReturnCssString(6) + "'>Value</th></tr>";
-    QString idollarfilestr = wombatvariable.tmpfilepath + idollarid + "-fhex";
-    QByteArray idollarcontent;
-    idollarcontent.clear();
-    QFile idollarfile(idollarfilestr);
-    if(!idollarfile.isOpen())
-        idollarfile.open(QIODevice::ReadOnly);
-    if(idollarfile.isOpen())
-        idollarcontent = idollarfile.readAll();
-    idollarfile.close();
-    uint64_t versionformat = qFromLittleEndian<uint64_t>(idollarcontent.left(8));
-    uint64_t filesize = qFromLittleEndian<uint64_t>(idollarcontent.mid(8, 8));
-    uint64_t deleteddate = qFromLittleEndian<uint64_t>(idollarcontent.mid(16, 8));
-    QString filenamestring = "";
-    if(versionformat == 0x01)
-    {
-        filenamestring = QString::fromStdString(idollarcontent.mid(24, 520).trimmed().toStdString());
-    }
-    else if(versionformat == 0x02)
-    {
-        uint32_t filenamesize = qFromLittleEndian<uint32_t>(idollarcontent.mid(24, 4));
-        filenamestring = QString::fromStdString(idollarcontent.mid(24, filenamesize).trimmed().toStdString());
-    }
-    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>File Name:</td><td style='" + ReturnCssString(7) + "'>" + filenamestring + "</td></tr>";
-    htmlstr += "<tr style='" + ReturnCssString(5) + "'><td style='" + ReturnCssString(8) + "'>Deleted:</td><td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td></tr>";
-    htmlstr += "<tr style='" + ReturnCssString(4) + "'><td style='" + ReturnCssString(8) + "'>File Size:</td><td style='" + ReturnCssString(7) + "'>" + QString::number(filesize) + " bytes</td></tr>";
-
-    htmlstr += "</table></body></html>";
-    
-    return htmlstr;
-
-	 */ 
+        uint64_t versionformat = 0;
+        ReadInteger(tmpbuf, 0, &versionformat);
+        uint64_t filesize = 0;
+        ReadInteger(tmpbuf, 8, &filesize);
+        uint64_t deletedate = 0;
+        ReadInteger(tmpbuf, 16, &deletedate);
+        uint32_t fnamesize = 0;
+        uint32_t offset = 24;
+        if(versionformat == 0x01)
+            fnamesize = 520;
+        else if(versionformat == 0x02)
+        {
+            uint32_t fnamesize = 0;
+            ReadInteger(tmpbuf, 24, &fnamesize);
+            offset = 28;
+        }
+        uint8_t* fnamestr = new uint8_t[fnamesize/2 +1];
+        for(int i=0; i < fnamesize / 2; i++)
+        {
+            uint16_t singleletter = 0;
+            ReadInteger(tmpbuf, offset + i*2, &singleletter);
+            fnamestr[i] = (uint8_t)singleletter;
+        }
+        fnamestr[fnamesize] = 0;
+        filecontents->append("File Path\t| " + std::string((char*)fnamestr) + "\n");
+        filecontents->append("Deleted Date\t| " + ConvertWindowsTimeToUnixTimeUTC(deletedate) + "\n");
+        filecontents->append("File Size\t| " + ReturnFormattingSize(filesize) + " bytes\n");
+        delete[] fnamestr;
     }
     else if(curfileitem->sig.compare("Prefetch") == 0) // pf file
     {
