@@ -707,33 +707,27 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
         filecontents->append("\n\n");
         uint32_t fileentrysize = 0;
         ReadInteger(tmpbuf, 12, &fileentrysize);
-        std::cout << "file entry size: " << fileentrysize << std::endl;
-
-	/*
-	QString htmlstr = "<html><body style='" + ReturnCssString(0) + "'>";
-    htmlstr += "<table style='" + ReturnCssString(2) + "' width='100%'><tr style='" + ReturnCssString(3) + "'><th style='" + ReturnCssString(6) + "'>FILE NAME</th><th style='" + ReturnCssString(6) + "'>DELETED</th></tr>";
-
-    uint32_t fileentrysize = qFromLittleEndian<uint32_t>(info2content.mid(12, 4));
-    int curpos = 20; // content starts after offset
-    while(curpos < info2content.count())
-    {
-        if(a % 2 == 0)
-            htmlstr += "<tr style='" + ReturnCssString(5) + "'>";
-        else
-            htmlstr += "<tr style='" + ReturnCssString(4) + "'>";
-	QString filenamestring = QString::fromStdString(QByteArray(info2content.mid(curpos + 3, 260).toStdString().c_str(), -1).toStdString());
-        uint64_t deleteddate = qFromLittleEndian<uint64_t>(info2content.mid(curpos + 268, 8));
-        htmlstr += "<td style='" + ReturnCssString(7) + "'>" + filenamestring + "</td>";
-        htmlstr += "<td style='" + ReturnCssString(7) + "'>" + ConvertWindowsTimeToUnixTime(deleteddate) + "</td>";
-        htmlstr += "</tr>";
-        curpos = curpos + fileentrysize;
-    }
-
-    htmlstr += "</table></body></html>";
-    
-    return htmlstr;
-
-	 */ 
+        int curpos = 20;
+        while(curpos < curfileitem->size)
+        {
+            uint8_t* fnamestr = new uint8_t[260];
+            fnamestr = substr(tmpbuf, curpos, 260);
+            uint32_t recycleindex = 0;
+            ReadInteger(tmpbuf, curpos + 260, &recycleindex);
+            uint32_t drivenumber = 0;
+            ReadInteger(tmpbuf, curpos + 264, &drivenumber);
+            filecontents->append("Index\t\t| " + std::to_string(recycleindex) + "\n");
+            filecontents->append("File Path\t| " + std::string((char*)fnamestr) + "\n");
+            delete[] fnamestr;
+            std::string filenamestring = "";
+            uint64_t deletedate = 0;
+            ReadInteger(tmpbuf, curpos + 268, &deletedate);
+            filecontents->append("Deleted Date\t| " + ConvertWindowsTimeToUnixTimeUTC(deletedate) + "\n");
+            uint32_t fsize = 0;
+            ReadInteger(tmpbuf, curpos + 276, &fsize);
+            filecontents->append("File Size\t| " + ReturnFormattingSize(fsize) + " bytes\n\n");
+            curpos = curpos + fileentrysize;
+        }
     }
     else if(curfileitem->sig.compare("Recycle.Bin") == 0) // $I file
     {
