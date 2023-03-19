@@ -2363,7 +2363,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     FILE* tmpfile;
     std::string filecontents = "";
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    ParseArtifact(curforimg, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
+    ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
     plaintext->setText(FXString(filecontents.c_str()));
     if(!inmemory)
 	fclose(tmpfile);
@@ -2420,8 +2420,8 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	if(fileitemvector.size() > 0)
 	{
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    if(!currentfileitem.isdirectory)
-		PlainView(&currentfileitem);
+	    //if(!currentfileitem.isdirectory)
+	    PlainView(&currentfileitem);
 	}
     }
 

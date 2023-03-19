@@ -10,6 +10,7 @@
 #include <bitset>
 
 #include "common.h"
+#include "directories.h"
 #include "forensicimage.h"
 
 #include "rapidxml.hpp" // XML PARSING
@@ -17,7 +18,7 @@
 #include <libfwsi.h> // SHELL ITEM PARSING for LNK
 #include <libfwnt.h> // LZEXPRESS HUFFMAN for PF
 
-void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents);
+void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents);
 void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents);
 
 #endif // ARTIFACTPARSER_H

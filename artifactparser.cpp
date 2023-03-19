@@ -15,7 +15,7 @@ void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents)
     }
 }
 
-void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents)
+void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents)
 {
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     if(curfileitem->sig.compare("Microsoft Word 2007+") == 0) // word document
@@ -944,6 +944,36 @@ void ParseArtifact(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uin
             }
 	}
     }
+    else if(curfileitem->sig.compare("Directory") == 0)
+    {
+        //std::cout << "list directory contents here..." << std::endl;
+        std::string pathstr = curitem->tmppath + "burrow/";
+        std::string filestr = curforimg->ImageFileName() + "." + std::to_string(curitem->voloffset) + "." + std::to_string(curfileitem->gid);
+        filecontents->clear();
+        std::string titlestring = "File Listing for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+        filecontents->append(titlestring + "\n");
+        for(int i=0; i < titlestring.size(); i++)
+            filecontents->append("-");
+        filecontents->append("\n\n");
+        std::vector<std::string> filearray;
+        filearray.clear();
+        for(const auto & entry : std::filesystem::directory_iterator(pathstr))
+        {
+            if(filestr.compare(entry.path().stem()) == 0)
+            {
+                filearray.push_back(entry.path().string());
+                // need to open the file, get the info and display in the plaintext view
+            }
+        }
+        if(filearray.size() > 0)
+        {
+            // open the file's get the info and display it.
+        }
+        else
+        {
+            // ListDirectoryContents();
+        }
+    }
     else
-        std::cout << "launch internal/external viewer for files here..." << std::endl;
+        std::cout << " launch internal/external viewer for files here..." << std::endl;
 }
