@@ -974,6 +974,24 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
             // ListDirectoryContents();
         }
     }
+    else if(curfileitem->sig.compare("Pdf") == 0)
+    {
+        if(!inmemory)
+        {
+            std::ifstream file(tmpfilestr.c_str(),  std::ios::binary | std::ios::ate);
+            std::streamsize size = file.tellg();
+            file.seekg(0, std::ios::beg);
+            tmpbuf = new uint8_t[size];
+            file.read((char*)tmpbuf, size);
+        }
+	std::cout << "parse pdf here..." << std::endl;
+	poppler::document* pdfdoc;
+	poppler::page* pdfpage;
+	pdfdoc = poppler::document::load_from_raw_data((char*)tmpbuf, curfileitem->size);
+	int pagecount = pdfdoc->pages();
+	for(int i=0; i < pagecount; i++)
+	    filecontents->append(pdfdoc->create_page(i)->text().to_latin1());
+    }
     else
         std::cout << " launch internal/external viewer for files here..." << std::endl;
 }

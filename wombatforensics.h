@@ -35,6 +35,7 @@
 #include "managehashlist.h"
 #include "hexviewer.h"
 #include "artifactparser.h"
+#include "pdfviewer.h"
 // SHARED LIBRARIES
 #include <tar.h> // TAR FOR WCF
 #include <libtar.h> // TAR FOR WCF

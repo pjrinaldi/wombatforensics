@@ -495,6 +495,11 @@ void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, 
         *cat = "Windows System";
         *sig = "Shortcut";
     }
+    else if(catsigstr.compare("Application/Pdf") == 0)
+    {
+	*cat = "Document";
+	*sig = "Pdf";
+    }
     else if(catsigstr.find("Text/") != std::string::npos)
     {
         if(filename->find(".mbox") != std::string::npos)
