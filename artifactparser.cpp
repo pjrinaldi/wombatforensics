@@ -984,7 +984,6 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
             tmpbuf = new uint8_t[size];
             file.read((char*)tmpbuf, size);
         }
-	std::cout << "parse pdf here..." << std::endl;
 	poppler::document* pdfdoc;
 	poppler::page* pdfpage;
 	pdfdoc = poppler::document::load_from_raw_data((char*)tmpbuf, curfileitem->size);

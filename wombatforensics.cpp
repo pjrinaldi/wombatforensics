@@ -2683,12 +2683,25 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             //how to determine if it's a directory???, can read file content or get the fileitemvector
             //std::cout << "is dir: " << fileitemvector.at(tablelist->getCurrentRow()).isdirectory << std::endl;
             //FileItem curfileitem = fileitemvector.at(tablelist->getCurrentRow());
+	    //if(curfileitem
 
 	    // THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
+	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+	    if(currentfileitem.sig.compare("Pdf") == 0)
+	    {
+		PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
+		pdfview->create();
+		pdfview->show(PLACEMENT_CURSOR);
+	    }
 	    /*
             currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
             if(!currentfileitem.isdirectory)
                 PlainView(&currentfileitem);
+    FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+    HexViewer* hexview = new HexViewer(this, fileitemstr);
+    //hexview->execute(PLACEMENT_OWNER);
+    hexview->create();
+    hexview->show(PLACEMENT_CURSOR);
 	    */
             this->getApp()->endWaitCursor();
         }
