@@ -9,7 +9,6 @@
 
 #include "icons.h"
 
-//#include "hpdf.h"
 #include "/usr/include/poppler/cpp/poppler-document.h"
 #include "/usr/include/poppler/cpp/poppler-page.h"
 #include "/usr/include/poppler/cpp/poppler-page-renderer.h"
@@ -23,18 +22,17 @@ class PdfViewer : public FXDialogBox
 
     private:
         FXVerticalFrame* vframe;
+	FXHorizontalFrame* hframe;
         FXImageView* imgview;
-        //FXText* textview;
-        //FXFont* plainfont;
+        FXIcon* nexticon;
+	FXButton* nextbutton;
+        FXIcon* previcon;
+	FXButton* prevbutton;
+	FXLabel* pglabel;
+	FXLabel* oflabel;
+	FXTextField* curfield;
+	FXTextField* totfield;
         /*
-        HPDF_Doc pdf;
-        HPDF_Page page;
-        HPDF_Font defaultfont;
-        HPDF_Font monofont;
-        HPDF_REAL tw;
-        HPDF_REAL height;
-        HPDF_REAL width;
-        HPDF_UINT i;
         poppler::document* pdfdoc;
         poppler::page* pdfpage;
         poppler::image pdfimage;
@@ -45,9 +43,26 @@ class PdfViewer : public FXDialogBox
         PdfViewer() {}
 
     public:
+        enum
+        {
+	    ID_PREV = 100,
+	    ID_NEXT = 101,
+            ID_LAST
+        };
         PdfViewer(FXWindow* parent, const FXString& title);
+
+	long LoadPrevious(FXObject*, FXSelector, void*);
+        
+	//long AddEvidence(FXObject*, FXSelector, void*);
         //void GenerateReport(FXArray<FXString> taggedlist, std::vector<std::string> tags);
         //void GetText(FXString* buf);
+};
+
+FXDEFMAP(PdfViewer) PdfViewerMap[]={
+    FXMAPFUNC(SEL_COMMAND, PdfViewer::ID_PREV, PdfViewer::LoadPrevious),
+    //FXMAPFUNC(SEL_COMMAND, PdfViewer::ID_ADDEVID, EvidenceManager::AddEvidence),
+    //FXMAPFUNC(SEL_COMMAND, PdfViewer::ID_REMEVID, EvidenceManager::RemEvidence),
+    //FXMAPFUNC(SEL_SELECTED, PdfViewer::ID_EVIDLIST, EvidenceManager::EvidenceSelected),
 };
 
 #endif // PDFVIEWER_H

@@ -1,16 +1,35 @@
 #include "pdfviewer.h"
 
 
-FXIMPLEMENT(PdfViewer,FXDialogBox, NULL, 0)
+FXIMPLEMENT(PdfViewer,FXDialogBox, PdfViewerMap, ARRAYNUMBER(PdfViewerMap))
 
 PdfViewer::PdfViewer(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_RESIZE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 400, 300, 0,0,0,0, 0, 0)
 {
     //plainfont = new FXFont(this->getApp(), "monospace");
     vframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
+    hframe = new FXHorizontalFrame(vframe, LAYOUT_TOP|LAYOUT_FILL_X);
+    previcon = new FXPNGIcon(this->getApp(), back16);
+    prevbutton = new FXButton(hframe, "", previcon, this, ID_PREV, FRAME_RAISED|FRAME_THICK, 0, 0, 0, 0, 5, 5);
+    nexticon = new FXPNGIcon(this->getApp(), frwd16);
+    nextbutton = new FXButton(hframe, "", nexticon, this, ID_NEXT, FRAME_RAISED|FRAME_THICK, 0, 0, 0, 0, 5, 5);
+    pglabel = new FXLabel(hframe, "Page:", NULL, JUSTIFY_CENTER_Y);
+    curfield = new FXTextField(hframe, 4);
+    oflabel = new FXLabel(hframe, "of");
+    totfield = new FXTextField(hframe, 4);
     imgview = new FXImageView(vframe, NULL, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    //newicon = new FXPNGIcon(this->getApp(), documentnew);
+    //newbutton = new FXButton(toolbar, "", newicon, this, ID_NEW, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
+    //addbutton = new FXButton(hframe1, "Add", NULL, this, ID_ADDEVID, FRAME_RAISED|FRAME_THICK, 0, 0, 0, 0, 20, 20);
     //textview = new FXText(vframe, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);
     //textview->setFont(plainfont);
     //textview->setEditable(false);
+}
+
+long PdfViewer::LoadPrevious(FXObject*, FXSelector, void*)
+{
+    std::cout << "load previous page if exists" << std::endl;
+
+    return 1;
 }
 
 /*
