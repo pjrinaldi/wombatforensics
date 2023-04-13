@@ -2693,16 +2693,15 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		pdfview->create();
 		pdfview->show(PLACEMENT_CURSOR);
 	    }
-	    /*
-            currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-            if(!currentfileitem.isdirectory)
-                PlainView(&currentfileitem);
-    FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
-    HexViewer* hexview = new HexViewer(this, fileitemstr);
-    //hexview->execute(PLACEMENT_OWNER);
-    hexview->create();
-    hexview->show(PLACEMENT_CURSOR);
-	    */
+	    else // default should be hex viewer of the content
+	    {
+		/*
+		FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+		HexViewer* hexview = new HexViewer(this, fileitemstr);
+		hexview->create();
+		hexview->show(PLACEMENT_CURSOR);
+		*/
+	    }
             this->getApp()->endWaitCursor();
         }
     }
