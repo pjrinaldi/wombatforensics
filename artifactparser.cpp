@@ -946,33 +946,21 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
     }
     else if(curfileitem->sig.compare("Directory") == 0)
     {
-        //std::cout << "list directory contents here..." << std::endl;
-        std::string pathstr = curitem->tmppath + "burrow/";
-        std::string filestr = curforimg->ImageFileName() + "." + std::to_string(curitem->voloffset) + "." + std::to_string(curfileitem->gid);
+        std::vector<FileItem> fileitemvector;
+        fileitemvector.clear();
+        int filecount = 0;
+        if(curfileitem->gid == 0)
+            filecount = ReadDirectory(curitem, &fileitemvector, NULL);
+        else
+            filecount = ReadDirectory(curitem, &fileitemvector, curfileitem);
         filecontents->clear();
         std::string titlestring = "File Listing for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
         filecontents->append(titlestring + "\n");
         for(int i=0; i < titlestring.size(); i++)
             filecontents->append("-");
         filecontents->append("\n\n");
-        std::vector<std::string> filearray;
-        filearray.clear();
-        for(const auto & entry : std::filesystem::directory_iterator(pathstr))
-        {
-            if(filestr.compare(entry.path().stem()) == 0)
-            {
-                filearray.push_back(entry.path().string());
-                // need to open the file, get the info and display in the plaintext view
-            }
-        }
-        if(filearray.size() > 0)
-        {
-            // open the file's get the info and display it.
-        }
-        else
-        {
-            // ListDirectoryContents();
-        }
+	for(int i=0; i < fileitemvector.size(); i++)
+	    filecontents->append(fileitemvector.at(i).name + "\n");
     }
     else if(curfileitem->sig.compare("Pdf") == 0)
     {
