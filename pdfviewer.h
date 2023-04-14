@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "icons.h"
+#include "common.h"
 
 #include "/usr/include/poppler/cpp/poppler-document.h"
 #include "/usr/include/poppler/cpp/poppler-page.h"
@@ -32,12 +33,12 @@ class PdfViewer : public FXDialogBox
 	FXLabel* oflabel;
 	FXTextField* curfield;
 	FXTextField* totfield;
-        /*
         poppler::document* pdfdoc;
         poppler::page* pdfpage;
         poppler::image pdfimage;
         poppler::page_renderer pdfrender;
-        */
+	int pagenum = 0;
+	int pagecnt = 0;
 
     protected:
         PdfViewer() {}
@@ -50,8 +51,10 @@ class PdfViewer : public FXDialogBox
             ID_LAST
         };
         PdfViewer(FXWindow* parent, const FXString& title);
+	void LoadPdf(ForImg* curforimg, FileItem* curfileitem);
 
-	long LoadPrevious(FXObject*, FXSelector, void*);
+	long LoadPrevPage(FXObject*, FXSelector, void*);
+	long LoadNextPage(FXObject*, FXSelector, void*);
         
 	//long AddEvidence(FXObject*, FXSelector, void*);
         //void GenerateReport(FXArray<FXString> taggedlist, std::vector<std::string> tags);
@@ -59,7 +62,8 @@ class PdfViewer : public FXDialogBox
 };
 
 FXDEFMAP(PdfViewer) PdfViewerMap[]={
-    FXMAPFUNC(SEL_COMMAND, PdfViewer::ID_PREV, PdfViewer::LoadPrevious),
+    FXMAPFUNC(SEL_COMMAND, PdfViewer::ID_PREV, PdfViewer::LoadPrevPage),
+    FXMAPFUNC(SEL_COMMAND, PdfViewer::ID_NEXT, PdfViewer::LoadNextPage),
     //FXMAPFUNC(SEL_COMMAND, PdfViewer::ID_ADDEVID, EvidenceManager::AddEvidence),
     //FXMAPFUNC(SEL_COMMAND, PdfViewer::ID_REMEVID, EvidenceManager::RemEvidence),
     //FXMAPFUNC(SEL_SELECTED, PdfViewer::ID_EVIDLIST, EvidenceManager::EvidenceSelected),

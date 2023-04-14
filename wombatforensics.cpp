@@ -2690,6 +2690,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    if(currentfileitem.sig.compare("Pdf") == 0)
 	    {
 		PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
+		pdfview->LoadPdf(curforimg, &currentfileitem);
 		pdfview->create();
 		pdfview->show(PLACEMENT_CURSOR);
 	    }
