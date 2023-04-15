@@ -959,8 +959,15 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
         for(int i=0; i < titlestring.size(); i++)
             filecontents->append("-");
         filecontents->append("\n\n");
+        /*
+        std::string thstring = "#\tFileName\tSize";
+        filecontents->append(thstring + "\n");
+        for(int i=0; i < thstring.size() + 13; i++)
+            filecontents->append("-");
+        filecontents->append("\n");
+        */
 	for(int i=0; i < fileitemvector.size(); i++)
-	    filecontents->append(fileitemvector.at(i).name + "\n");
+	    filecontents->append("(" + std::to_string(i+1) + ")  " + fileitemvector.at(i).name + "\n");
     }
     else if(curfileitem->sig.compare("Pdf") == 0)
     {
