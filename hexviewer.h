@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "icons.h"
+#include "common.h"
 
 #include "/usr/local/include/fox-1.7/fx.h"
 
@@ -25,8 +26,7 @@ class HexViewer : public FXDialogBox
 
     public:
         HexViewer(FXWindow* parent, const FXString& title);
-        //void GenerateReport(FXArray<FXString> taggedlist, std::vector<std::string> tags);
-        //void GetText(FXString* buf);
+        void LoadHex(ForImg* curforimg, FileItem* curfileitem);
 };
 
 #endif // HEXVIEWER_H
