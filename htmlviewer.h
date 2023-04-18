@@ -9,7 +9,7 @@
 
 #include "icons.h"
 
-#include <wpe/webkit.h>
+#include <hubbub/hubbub.h>
 
 #include "/usr/local/include/fox-1.7/fx.h"
 

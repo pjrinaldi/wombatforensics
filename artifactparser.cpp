@@ -986,6 +986,19 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
 	for(int i=0; i < pagecount; i++)
 	    filecontents->append(pdfdoc->create_page(i)->text().to_latin1());
     }
+    else if(curfileitem->sig.compare("Html") == 0)
+    {
+        hubbub_parser* parser;
+        hubbub_parser_optparams params;
+        hubbub_tree_handler treehandler;
+        hubbub_error huberr;
+        huberr = hubbub_parser_create(NULL, false, &parser);
+        huberr = hubbub_parser_parse_chunk(parser, tmpbuf, curfileitem->size);
+        huberr = hubbub_parser_completed(parser);
+        //params.document_node;
+        std::cout << "parse html and get text from it here..." << std::endl;
+        huberr = hubbub_parser_destroy(parser);
+    }
     else
         std::cout << " launch internal/external viewer for files here..." << std::endl;
 }
