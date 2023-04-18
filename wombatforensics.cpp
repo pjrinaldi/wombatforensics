@@ -1455,6 +1455,7 @@ long WombatForensics::PreviewReport(FXObject*, FXSelector, void*)
     return 1;
 }
 
+
 long WombatForensics::OpenSettings(FXObject*, FXSelector, void*)
 {
     Settings settings(this, "Settings");
