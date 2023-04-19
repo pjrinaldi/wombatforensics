@@ -988,6 +988,17 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
     }
     else if(curfileitem->sig.compare("Html") == 0)
     {
+	/*
+	char htmlbuf[curfileitem->size + 1];
+	memcpy(&htmlbuf, (char*)tmpbuf, curfileitem->size);
+	htmlbuf[curfileitem->size] = 0;
+	rapidxml::xml_document<> htmldoc;
+	htmldoc.parse<0>(htmlbuf);
+	//htmldoc.parse<0>(((char*)tmpbuf));
+	rapidxml::xml_node<>* rootnode = htmldoc.first_node();
+	GetXmlText(rootnode, filecontents);
+	*/
+	/*
         hubbub_parser* parser;
         hubbub_parser_optparams params;
         hubbub_tree_handler treehandler;
@@ -995,9 +1006,12 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
         huberr = hubbub_parser_create(NULL, false, &parser);
         huberr = hubbub_parser_parse_chunk(parser, tmpbuf, curfileitem->size);
         huberr = hubbub_parser_completed(parser);
+	*/
         //params.document_node;
         std::cout << "parse html and get text from it here..." << std::endl;
+	/*
         huberr = hubbub_parser_destroy(parser);
+	*/
     }
     else
         std::cout << " launch internal/external viewer for files here..." << std::endl;

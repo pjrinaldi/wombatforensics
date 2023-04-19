@@ -21,6 +21,7 @@
 #include "/usr/include/poppler/cpp/poppler-page.h" // PDF PARSING
 #include <hubbub/parser.h> // HTML PARSING
 //#include <hubbub/tree.h> // HTML PARSING
+#include <litehtml/litehtml.h> // HTML PARSING
 
 void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents);
 void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents);
