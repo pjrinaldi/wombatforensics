@@ -1,5 +1,19 @@
 #include "artifactparser.h"
 
+static lxb_html_token_t* token_callback(lxb_html_tokenizer_t *tkz, lxb_html_token_t *token, void *ctx)
+{
+    /* Skip all not #text tokens */
+    if (token->tag_id != LXB_TAG__TEXT) {
+        return token;
+    }
+
+    // need to move from std::cout to my string..
+    printf("%.*s", (int) (token->text_end - token->text_start),
+           token->text_start);
+
+
+    return token;
+}
 void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents)
 {
     if(curnode->type() == rapidxml::node_data || curnode->type() == rapidxml::node_cdata || curnode->type() == rapidxml::node_comment || curnode->type() == rapidxml::node_doctype)
@@ -988,6 +1002,17 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
     }
     else if(curfileitem->sig.compare("Html") == 0)
     {
+	lxb_status_t status;
+	lxb_html_tokenizer_t* tkz;
+
+	tkz = lxb_html_tokenizer_create();
+	status = lxb_html_tokenizer_init(tkz);
+	lxb_html_tokenizer_callback_token_done_set(tkz, token_callback, NULL);
+
+	status = lxb_html_tokenizer_begin(tkz);
+	status = lxb_html_tokenizer_chunk(tkz, tmpbuf, curfileitem->size);
+	status = lxb_html_tokenizer_end(tkz);
+	lxb_html_tokenizer_destroy(tkz);
 	/*
 	char htmlbuf[curfileitem->size + 1];
 	memcpy(&htmlbuf, (char*)tmpbuf, curfileitem->size);
@@ -1008,7 +1033,7 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
         huberr = hubbub_parser_completed(parser);
 	*/
         //params.document_node;
-        std::cout << "parse html and get text from it here..." << std::endl;
+        //std::cout << "parse html and get text from it here..." << std::endl;
 	/*
         huberr = hubbub_parser_destroy(parser);
 	*/
@@ -1016,3 +1041,5 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
     else
         std::cout << " launch internal/external viewer for files here..." << std::endl;
 }
+
+
