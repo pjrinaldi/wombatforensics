@@ -6,11 +6,10 @@ static lxb_html_token_t* token_callback(lxb_html_tokenizer_t *tkz, lxb_html_toke
     if (token->tag_id != LXB_TAG__TEXT) {
         return token;
     }
-
-    // need to move from std::cout to my string..
-    printf("%.*s", (int) (token->text_end - token->text_start),
-           token->text_start);
-
+    char htmlbuf[(int)(token->text_end - token->text_start)];
+    sprintf(htmlbuf, "%.*s", (int) (token->text_end - token->text_start), token->text_start);
+    ((std::string*)ctx)->append(htmlbuf);
+    //printf("%.*s", (int) (token->text_end - token->text_start), token->text_start);
 
     return token;
 }
@@ -1007,7 +1006,7 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
 
 	tkz = lxb_html_tokenizer_create();
 	status = lxb_html_tokenizer_init(tkz);
-	lxb_html_tokenizer_callback_token_done_set(tkz, token_callback, NULL);
+	lxb_html_tokenizer_callback_token_done_set(tkz, token_callback, filecontents);
 
 	status = lxb_html_tokenizer_begin(tkz);
 	status = lxb_html_tokenizer_chunk(tkz, tmpbuf, curfileitem->size);
