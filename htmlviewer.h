@@ -18,9 +18,9 @@ class browserwindow;
 
 class HtmlWidget : public FXCanvas
 {
-    /*
     FXDECLARE(HtmlWidget);
 
+    /*
     protected:
 	HtmlWidget();
     private:

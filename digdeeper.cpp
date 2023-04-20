@@ -15,6 +15,7 @@ DigDeeper::DigDeeper(FXWindow* parent, const FXString& title):FXDialogBox(parent
     allradio = new FXRadioButton(hframe1, "All Processed (0)", this, ID_FILES, RADIOBUTTON_NORMAL|LAYOUT_FILL_X);
     optionsgroup = new FXGroupBox(mainframe, "For the Following Option(s)", GROUPBOX_NORMAL|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     vframe1 = new FXVerticalFrame(optionsgroup, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    orphandeleted = new FXCheckButton(vframe1, "Recover Orphan and Deleted Files");
     expandarchives = new FXCheckButton(vframe1, "Expand Archives (zip)", NULL, 0, CHECKBUTTON_NORMAL);
     expandemail = new FXCheckButton(vframe1, "Expand Mailboxes (mbox)");
     imagethumbnails = new FXCheckButton(vframe1, "Generate Thumbnails for Images");
@@ -86,6 +87,9 @@ void DigDeeper::ReturnDigging(std::vector<std::string>* digginglist)
         hashstr += "6";
         digginglist->push_back(hashstr);
     }
+    // ORPHAN/DELETED FILES - 7
+    if(orphandeleted->getCheck())
+	digginglist->push_back("7");
 }
 
 void DigDeeper::LoadFileCounts(void)

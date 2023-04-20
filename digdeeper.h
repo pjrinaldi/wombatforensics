@@ -24,6 +24,7 @@ class DigDeeper : public FXDialogBox
 	FXRadioButton* allradio;
 	FXGroupBox* optionsgroup;
 	FXVerticalFrame* vframe1;
+	FXCheckButton* orphandeleted;
 	FXCheckButton* expandarchives;
 	FXCheckButton* expandemail;
 	FXCheckButton* imagethumbnails;
