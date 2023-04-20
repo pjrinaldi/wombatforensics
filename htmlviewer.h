@@ -9,9 +9,30 @@
 
 #include "icons.h"
 
-#include <hubbub/hubbub.h>
+//#include <hubbub/hubbub.h>
+#include <litehtml/litehtml.h>
 
 #include "/usr/local/include/fox-1.7/fx.h"
+
+class browserwindow;
+
+class HtmlWidget : public FXCanvas
+{
+    /*
+    FXDECLARE(HtmlWidget);
+
+    protected:
+	HtmlWidget();
+    private:
+	HtmlWidget(const HtmlWidget&);
+	HtmlWidget &operator=(const HtmlWidget&);
+    public:
+	HtmlWidget(FXComposite* p, FXObject* tgt=nullptr, FXSelector sel=0, FXuint opts=FRAME_NORMAL, FXint x=0, FXint y=0, FXint w=0, FXint h=0)
+	{
+	    FXCanvas(p, tgt, sel, opts, x, y, w, h);
+	};
+    */
+};
 
 class HtmlViewer : public FXDialogBox
 {
@@ -24,6 +45,7 @@ class HtmlViewer : public FXDialogBox
 
     protected:
         HtmlViewer() {}
+	HtmlWidget* hwidget;
 
     public:
         HtmlViewer(FXWindow* parent, const FXString& title);

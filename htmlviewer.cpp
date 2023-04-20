@@ -4,11 +4,14 @@ FXIMPLEMENT(HtmlViewer,FXDialogBox, NULL, 0)
 
 HtmlViewer::HtmlViewer(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_RESIZE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 400, 300, 0,0,0,0, 0, 0)
 {
+
     plainfont = new FXFont(this->getApp(), "monospace");
     vframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
-    textview = new FXText(vframe, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    textview->setFont(plainfont);
-    textview->setEditable(false);
+    //hwidget = new HtmlWidget(vframe, NULL, 0, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+
+    //textview = new FXText(vframe, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    //textview->setFont(plainfont);
+    //textview->setEditable(false);
 }
 
 void HtmlViewer::GetText(FXString* buf)
