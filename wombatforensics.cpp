@@ -2361,10 +2361,13 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 {
     bool inmemory = true;
     uint8_t* tmpbuf = NULL;
+    uint8_t* slkbuf = NULL;
     FILE* tmpfile;
     std::string filecontents = "";
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
+    //GetFileSlack(curforimg, curfileitem, &slkbuf);
+    //AddFileSlack(curforimg, curfileitem, slkbuf, &filecontents);
     plaintext->setText(FXString(filecontents.c_str()));
     if(!inmemory)
 	fclose(tmpfile);

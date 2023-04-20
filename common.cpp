@@ -398,6 +398,35 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
     *tmpbuffer = tmpbuf;
 }
 
+void GetFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t** tmpbuf, uint64_t* slacksize)
+{
+    std::vector<std::string> layoutlist;
+    layoutlist.clear();
+    std::istringstream layoutstream(curfileitem->layout);
+    std::string curlayout;
+    while(getline(layoutstream, curlayout, ';'))
+        layoutlist.push_back(curlayout);
+    uint64_t physicalsize = 0;
+    uint64_t lastoffset = 0;
+    for(int i=0; i < layoutlist.size(); i++)
+    {
+	std::size_t layoutsplit = layoutlist.at(i).find(",");
+	uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
+	uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
+	lastoffset = curoffset + cursize;
+	physicalsize += cursize;
+    }
+    *slacksize = physicalsize - curfileitem->size;
+    uint64_t slackoffset = lastoffset - *slacksize;
+    *tmpbuf = new uint8_t[*slacksize];
+    curforimg->ReadContent(*tmpbuf, slackoffset, *slacksize);
+}
+
+void AddFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t* slkbuf, std::string* filecontents)
+{
+
+}
+
 void HashFile(FileItem* curfileitem, ForImg* curforimg)
 {
     //std::cout << "hash it here..." << std::endl;
