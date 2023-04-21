@@ -153,7 +153,6 @@ class WombatForensics : public FXMainWindow
         FXFont* plainfont;
         FXText* plaintext;
 	FXImageView* imgview;
-	//FXJPGImage* imgviewimage;
 
         FXIcon* newicon;
         FXButton* newbutton;

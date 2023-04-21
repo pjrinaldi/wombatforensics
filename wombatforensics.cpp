@@ -57,8 +57,6 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     plaintext->setEditable(false);
     imgview = new FXImageView(hsplitter);
     imgview->hide();
-    //imgviewimage = new FXJPGImage(this->getApp());
-    //imgviewimage->create();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
     msglog = new MessageLog(this, "Message Log");
     // TOOLBAR ICONS
