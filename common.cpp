@@ -450,6 +450,121 @@ void HashFile(FileItem* curfileitem, ForImg* curforimg)
     delete[] tmpbuf;
 }
 
+void ThumbnailImage(int thumbsize)
+{
+    Magick::Geometry thumbgeometry(thumbsize, thumbsize);
+    /*
+    genthmbpath = wombatvariable.tmpmntpath;
+    ForImg* curimg = NULL;
+    for(int i=0; i < existingforimglist.count(); i++)
+    {
+        if(existingforimglist.at(i)->MountPath().endsWith(thumbid.split("-").at(0)))
+        {
+            curimg = existingforimglist.at(i);
+            break;
+        }
+    }
+
+    //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
+    QImage* testimage = new QImage();
+    bool imgbool = testimage->load(thumbtestpath);
+    if(imgbool && (testimage->width() == thumbsize || testimage->height() == thumbsize))
+    {
+	qInfo() << "Thumbnail:" << thumbtestpath << "already exists. Skipping.";
+    }
+    else
+    {
+        //category = treenodemodel->GetNodeColumnValue(thumbid, "cat").toString();
+	//TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
+	//qint64 filesize = curitem->Data("size").toLongLong();
+        qint64 filesize = treenodemodel->GetNodeColumnValue(thumbid, "size").toLongLong();
+	Magick::Geometry thumbgeometry(thumbsize, thumbsize);
+	if(filesize > 0 && !isclosing)
+	{
+	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
+            QString layout = ReturnFileContent(curimg, thumbid);
+	    QByteArray ba;
+	    ba.clear();
+            QString fullpath = treenodemodel->GetNodeColumnValue(thumbid, "path").toString() + treenodemodel->GetNodeColumnValue(thumbid, "name").toString();
+	    //QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
+	    ba.append(fullpath.toUtf8());
+	    imageshash.insert(thumbid, QString(ba.toBase64()));
+	    try
+	    {
+		if(!isclosing)
+		{
+                    Magick::Image master;
+                    master.read(QString(wombatvariable.tmpfilepath + thumbid + "-tmp").toStdString());
+		    //qDebug() << "genthmbpath:" << QString(genthmbpath + "thumbs/" + thumbid + ".jpg");
+		    //qDebug() << "thumbgeometry:" << thumbsize;
+		    master.quiet(false);
+		    master.resize(thumbgeometry);
+		    master.magick("PNG");
+		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+		}
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		qDebug() << "Item:" << thumbid << "magick resize exception:" << error.what() << ". Missing image thumbnail used.";
+		try
+		{
+		    if(!isclosing)
+		    {
+			QPixmap pixmap(":/missingimage", "PNG");
+			QByteArray iarray;
+			QBuffer buffer(&iarray);
+			buffer.open(QIODevice::WriteOnly);
+			pixmap.save(&buffer, "PNG");
+			Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
+			Magick::Image master(blob);
+			master.quiet(false);
+			master.resize(thumbgeometry);
+			master.magick("PNG");
+			master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+		    }
+		}
+		catch(Magick::Exception &error)
+		{
+		    qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
+		}
+	    }
+	}
+	else if(filesize == 0 && !isclosing)
+	{
+	    qDebug() << "Item:" << thumbid << "has zero filesize, so missing image thumbnail is used.";
+	    try
+	    {
+		if(!isclosing)
+		{
+		    QPixmap pixmap(":/missingimage", "PNG");
+		    QByteArray iarray;
+		    QBuffer buffer(&iarray);
+		    buffer.open(QIODevice::WriteOnly);
+		    pixmap.save(&buffer, "PNG");
+		    Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
+		    Magick::Image master(blob);
+		    master.quiet(false);
+		    master.resize(thumbgeometry);
+		    master.magick("PNG");
+		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+		}
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
+	    }
+	}
+    }
+    if(!isclosing)
+    {
+        digimgthumbcount++;
+        isignals->DigUpd(0, digimgthumbcount);
+    }
+
+     */ 
+}
+
 void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig)
 {
     int found = layout->find(";");

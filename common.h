@@ -10,6 +10,7 @@
 #include <bitset>
 
 #include <magic.h>
+#include <Magick++.h>
 
 // BLAKE3 HASH
 #include "blake3/blake3.h"
@@ -116,5 +117,6 @@ void GetFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t** tmpbuf, ui
 void AddFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t* slkbuf, std::string* filecontents);
 
 void HashFile(FileItem* curfileitem, ForImg* curforimg);
+void ThumbnailImage(int thumbsize);
 
 #endif

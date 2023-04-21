@@ -1401,6 +1401,16 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                     curfile.close();
                 }
             }
+	    if(std::stoi(diglist.at(i)) == 3) // THUMBNAIL FILE
+	    {
+		for(int i=0; i < digfilelist.size(); i++)
+		{
+		    int thumbsize = GetSettings(0).toInt();
+		    //std::cout << "thumbsize: " << thumbsize << std::endl;
+		    if(digfilelist.at(i).cat == "Image")
+			ThumbnailImage(thumbsize);
+		}
+	    }
             //std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;
         }
     }
@@ -3075,6 +3085,7 @@ int main(int argc, char* argv[])
     FXApp* wr = new FXApp("SQLite Forensics", "Wombat");
 
     wr->init(argc, argv);
+    Magick::InitializeMagick(*argv);
 
     new WombatForensics(wr);
 
