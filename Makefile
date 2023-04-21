@@ -14,7 +14,7 @@ blake3:
 # Link it all together
 
 wombatforensics: $(OBJECTS)
-	g++ -I/usr/include/ImageMagick-7/ -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -O3 -o wombatforensics $(OBJECTS) -lX11 -lXext -lXft -lfontconfig -lfreetype -lXcursor -lXrender -lXrandr -lXfixes -lXi -lGLU -lGL -ldl -lpthread -ljpeg -lrt -lpng -ltiff -lz -lbz2 -ltar -lewf -laff4 -lsmraw -lfwsi -lfwnt -lzstd -lmagic -lzip -lpoppler-cpp -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -lImlib2 -llitehtml liblexbor_static.a blake3/libblake3.a libFOX-1.7.a
+	g++ -I/usr/include/ImageMagick-7/ -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -O3 -o wombatforensics $(OBJECTS) -lX11 -lXext -lXft -lfontconfig -lfreetype -lXcursor -lXrender -lXrandr -lXfixes -lXi -lGLU -lGL -ldl -lpthread -ljpeg -lrt -lpng -ltiff -lz -lbz2 -ltar -lewf -laff4 -lsmraw -lfwsi -lfwnt -lzstd -lmagic -lzip -lpoppler-cpp -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI -llitehtml liblexbor_static.a blake3/libblake3.a libFOX-1.7.a
 
 
 wombatforensics.o: wombatforensics.cpp icons.cpp managetags.cpp aboutbox.cpp viewer.cpp common.cpp settings.cpp managecarving.cpp evidencemanager.cpp forensicimage.cpp partitions.cpp directories.cpp manageviewer.cpp messagelog.cpp filters.cpp filterview.cpp digdeeper.cpp managehashlist.cpp hexviewer.cpp artifactparser.cpp pdfviewer.cpp htmlviewer.cpp propviewer.cpp imageviewer.cpp
