@@ -38,6 +38,7 @@
 #include "pdfviewer.h"
 #include "htmlviewer.h"
 #include "propviewer.h"
+#include "imageviewer.h"
 // SHARED LIBRARIES
 #include <tar.h> // TAR FOR WCF
 #include <libtar.h> // TAR FOR WCF
@@ -151,6 +152,8 @@ class WombatForensics : public FXMainWindow
         FXStatusBar* statusbar;
         FXFont* plainfont;
         FXText* plaintext;
+	FXImageView* imgview;
+	//FXJPGImage* imgviewimage;
 
         FXIcon* newicon;
         FXButton* newbutton;

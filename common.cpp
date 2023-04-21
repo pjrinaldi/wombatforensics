@@ -351,7 +351,8 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
         layoutlist.push_back(curlayout);
     uint64_t curlogicalsize = 0;
     uint8_t* tmpbuf = NULL;
-    std::string tmpfilestr = "";
+    //std::string tmpfilestr = "";
+    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     if(*inmemory) // store in memory
         tmpbuf = new uint8_t[curfileitem->size];
     if(!*inmemory)

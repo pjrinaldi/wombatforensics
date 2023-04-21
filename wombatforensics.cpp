@@ -55,6 +55,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
+    //imgview = new FXImageView(hsplitter);
+    //imgview->hide();
+    //imgviewimage = new FXJPGImage(this->getApp());
+    //imgviewimage->create();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
     msglog = new MessageLog(this, "Message Log");
     // TOOLBAR ICONS
@@ -2386,9 +2390,42 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     FILE* tmpfile;
     std::string filecontents = "";
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    /*
+    if(curfileitem->cat.compare("Image") == 0)
+    {
+	if(!imgview->shown())
+	{
+	    // this doesn't work right now, it displays the 1st image clicked and won't reload any other image.
+	    // going to implement the imageviewer double click code and see how that does...
+	    plaintext->hide();
+	    imgview->setImage(NULL);
+	    //imgviewimage = new FXJPGImage(this->getApp(), tmpbuf, IMAGE_KEEP);
+	    //imgviewimage->create();
+	    //imgviewimage->render();
+	    //imgview->setImage(imgviewimage);
+	    //imgview->repaint();
+	    //imgviewimage->release();
+	    FXJPGImage* tmpimg = new FXJPGImage(this->getApp(), tmpbuf);
+	    tmpimg->create();
+	    imgview->setImage(tmpimg);
+	    //imgview->repaint();
+	    imgview->show();
+	}
+    }
+    else
+    {
+	ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
+	//GetFileSlack(curforimg, curfileitem, &slkbuf);
+	//AddFileSlack(curforimg, curfileitem, slkbuf, &filecontents);
+	if(!plaintext->shown())
+	{
+	    imgview->hide();
+	    plaintext->show();
+	}
+	plaintext->setText(FXString(filecontents.c_str()));
+    }
+    */
     ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
-    //GetFileSlack(curforimg, curfileitem, &slkbuf);
-    //AddFileSlack(curforimg, curfileitem, slkbuf, &filecontents);
     plaintext->setText(FXString(filecontents.c_str()));
     if(!inmemory)
 	fclose(tmpfile);
@@ -2712,12 +2749,19 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 
 	    // THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    if(currentfileitem.sig.compare("Pdf") == 0)
+	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF
 	    {
 		PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
 		pdfview->LoadPdf(curforimg, &currentfileitem);
 		pdfview->create();
 		pdfview->show(PLACEMENT_CURSOR);
+	    }
+	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE
+	    {
+		ImageViewer* imgview = new ImageViewer(this, "Image Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
+		imgview->LoadImage(curforimg, &currentfileitem);
+		imgview->create();
+		imgview->show(PLACEMENT_CURSOR);
 	    }
 	    else // default should be hex viewer of the content
 	    {
