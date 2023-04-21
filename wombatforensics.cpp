@@ -55,8 +55,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
-    //imgview = new FXImageView(hsplitter);
-    //imgview->hide();
+    imgview = new FXImageView(hsplitter);
+    imgview->hide();
     //imgviewimage = new FXJPGImage(this->getApp());
     //imgviewimage->create();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
@@ -2390,33 +2390,38 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     FILE* tmpfile;
     std::string filecontents = "";
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    /*
     if(curfileitem->cat.compare("Image") == 0)
     {
-	if(!imgview->shown())
+	if(plaintext->shown() || imgview->shown())
 	{
-	    // this doesn't work right now, it displays the 1st image clicked and won't reload any other image.
-	    // going to implement the imageviewer double click code and see how that does...
 	    plaintext->hide();
-	    imgview->setImage(NULL);
-	    //imgviewimage = new FXJPGImage(this->getApp(), tmpbuf, IMAGE_KEEP);
-	    //imgviewimage->create();
-	    //imgviewimage->render();
-	    //imgview->setImage(imgviewimage);
-	    //imgview->repaint();
-	    //imgviewimage->release();
-	    FXJPGImage* tmpimg = new FXJPGImage(this->getApp(), tmpbuf);
-	    tmpimg->create();
-	    imgview->setImage(tmpimg);
-	    //imgview->repaint();
 	    imgview->show();
+	    try
+	    {
+		Magick::Blob inblob(tmpbuf, curfileitem->size);
+		Magick::Image inimage(inblob);
+		inimage.magick("PNG");
+		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
+		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		FXFileStream stream;
+		this->getApp()->beginWaitCursor();
+		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
+		img->loadPixels(stream);
+		stream.close();
+		img->create();
+		imgview->setImage(img);
+		imgview->update();
+		this->getApp()->endWaitCursor();
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		std::cout << "error encoutered: " << error.what() << std::endl;
+	    }
 	}
     }
     else
     {
 	ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
-	//GetFileSlack(curforimg, curfileitem, &slkbuf);
-	//AddFileSlack(curforimg, curfileitem, slkbuf, &filecontents);
 	if(!plaintext->shown())
 	{
 	    imgview->hide();
@@ -2424,9 +2429,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	}
 	plaintext->setText(FXString(filecontents.c_str()));
     }
-    */
-    ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
-    plaintext->setText(FXString(filecontents.c_str()));
+    //ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
+    //plaintext->setText(FXString(filecontents.c_str()));
     if(!inmemory)
 	fclose(tmpfile);
     delete[] tmpbuf;

@@ -19,8 +19,6 @@ class ImageViewer : public FXDialogBox
     private:
         FXVerticalFrame* vframe;
 	FXImageView* imageview;
-        //FXText* textview;
-        //FXFont* plainfont;
 
     protected:
         ImageViewer() {}
@@ -28,8 +26,6 @@ class ImageViewer : public FXDialogBox
     public:
         ImageViewer(FXWindow* parent, const FXString& title);
 	void LoadImage(ForImg* curforimg, FileItem* curfileitem);
-        //void GenerateReport(FXArray<FXString> taggedlist, std::vector<std::string> tags);
-        //void GetText(FXString* buf);
 };
 
 #endif // IMAGEVIEWER_H
