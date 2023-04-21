@@ -822,6 +822,17 @@ long WombatForensics::OpenHexViewer(FXObject*, FXSelector, void*)
 
     return 1;
 }
+long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
+{
+    FXString fileitemstr = "Property Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+    PropertyViewer* propview = new PropertyViewer(this, fileitemstr);
+    //propview->LoadProp();
+    propview->create();
+    propview->show(PLACEMENT_CURSOR);
+
+    return 1;
+}
+
 /*
 long WombatForensics::CreateNewTag(FXObject*, FXSelector, void*)
 {
