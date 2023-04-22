@@ -2765,6 +2765,42 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		imgview->create();
 		imgview->show(PLACEMENT_CURSOR);
 	    }
+            else if(currentfileitem.cat.compare("Video") == 0) // VIDEO - SETTING 6
+            {
+                std::string vidpath = std::string(GetSettings(6).text()) + " ";
+                bool inmemory = true;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
+                if(inmemory)
+                {
+                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
+                    file.seekp(0, std::ios::beg);
+                    file.write((char*)tmpbuf, currentfileitem.size);
+                }
+                delete[] tmpbuf;
+                vidpath += tmpfilestr;
+                std::system(vidpath.c_str());
+            }
+            else if(currentfileitem.sig.compare("Html") == 0) // HTML - SETTING 7
+            {
+                std::string htmlpath = std::string(GetSettings(7).text()) + " ";
+                bool inmemory = true;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
+                if(inmemory)
+                {
+                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
+                    file.seekp(0, std::ios::beg);
+                    file.write((char*)tmpbuf, currentfileitem.size);
+                }
+                delete[] tmpbuf;
+                htmlpath += tmpfilestr;
+                std::system(htmlpath.c_str());
+            }
 	    else // default should be hex viewer of the content
 	    {
 		FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);

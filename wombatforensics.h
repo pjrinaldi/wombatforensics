@@ -36,7 +36,6 @@
 #include "hexviewer.h"
 #include "artifactparser.h"
 #include "pdfviewer.h"
-#include "htmlviewer.h"
 #include "propviewer.h"
 #include "imageviewer.h"
 // SHARED LIBRARIES

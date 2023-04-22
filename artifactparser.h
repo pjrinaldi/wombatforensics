@@ -19,10 +19,7 @@
 #include <libfwnt.h> // LZEXPRESS HUFFMAN for PF
 #include "/usr/include/poppler/cpp/poppler-document.h" // PDF PARSING
 #include "/usr/include/poppler/cpp/poppler-page.h" // PDF PARSING
-//#include <hubbub/parser.h> // HTML PARSING
-//#include <hubbub/tree.h> // HTML PARSING
-//#include <litehtml/litehtml.h> // HTML PARSING
-#include <lexbor/html/tokenizer.h>
+#include <lexbor/html/tokenizer.h> // HTML PARSING
 
 static lxb_html_token_t* token_callback(lxb_html_tokenizer_t *tkz, lxb_html_token_t *token, void *ctx);
 
