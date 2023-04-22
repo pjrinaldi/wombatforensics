@@ -2,7 +2,7 @@
 
 FXIMPLEMENT(Settings,FXDialogBox,SettingsMap,ARRAYNUMBER(SettingsMap))
 
-Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 480, 260, 0,0,0,0, 10, 10)
+Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 540, 340, 0,0,0,0, 10, 10)
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 10, 10, 10, 10);
     hframe1 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
@@ -38,6 +38,16 @@ Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     autosavespinner = new FXSpinner(hframe6, 5);
     autosavespinner->setRange(1, 120);
     autosavespinner->setIncrement(1);
+    hframe9 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
+    vidlabel = new FXLabel(hframe9, "Video Viewer Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
+    new FXSpring(hframe9);
+    vidtextfield = new FXTextField(hframe9, 40);
+    vidbutton = new FXButton(hframe9, "Browse", NULL, this, ID_VIDPATH, FRAME_RAISED|FRAME_THICK, 0, 0, 0, 0, 20, 20);
+    hframe10 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
+    htmllabel = new FXLabel(hframe10, "Html Viewer Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
+    new FXSpring(hframe10);
+    htmltextfield = new FXTextField(hframe10, 40);
+    htmlbutton = new FXButton(hframe10, "Browse", NULL, this, ID_HTMLPATH, FRAME_RAISED|FRAME_THICK, 0, 0, 0, 0, 20, 20);
     hframe8 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     new FXLabel(hframe8, "", NULL, LAYOUT_FILL_X);
     new FXSpring(hframe8);
@@ -53,6 +63,8 @@ FXString Settings::ReturnSettings()
     settingsstring += "|" + reportpathtextfield->getText();
     settingsstring += "|" + reporttzcombo->getItemText(reporttzcombo->getCurrentItem());
     settingsstring += "|" + FXString::value(autosavespinner->getValue());
+    settingsstring += "|" + vidtextfield->getText();
+    settingsstring += "|" + htmltextfield->getText();
     return settingsstring;
 }
 
@@ -63,12 +75,16 @@ void Settings::LoadSettings(FXString cursettings)
     int found3 = cursettings.find("|", found2+1);
     int found4 = cursettings.find("|", found3+1);
     int found5 = cursettings.find("|", found4+1);
+    int found6 = cursettings.find("|", found5+1);
+    int found7 = cursettings.find("|", found6+1);
     thumbsizespinner->setValue(cursettings.left(found1).toUInt());
     vidthumbspinner->setValue(cursettings.mid(found1+1, found2 - found1 - 1).toUInt());
     casepathtextfield->setText(cursettings.mid(found2+1, found3 - found2 - 1));
     reportpathtextfield->setText(cursettings.mid(found3+1, found4 - found3 - 1));
     reporttzcombo->setCurrentItem(cursettings.mid(found4+1, found5 - found4 - 1).toUInt());
-    autosavespinner->setValue(cursettings.mid(found5+1, cursettings.length() - found5 - 1).toUInt());
+    autosavespinner->setValue(cursettings.mid(found5+1, found6 - found5 - 1).toUInt());
+    vidtextfield->setText(cursettings.mid(found6+1, found7 - found6 - 1));
+    htmltextfield->setText(cursettings.mid(found7+1, cursettings.length() - found7 - 1));
 }
 
 long Settings::SetCasePath(FXObject*, FXSelector, void*)
@@ -85,6 +101,24 @@ long Settings::SetReportPath(FXObject*, FXSelector, void*)
     FXString reportpathstring = FXDirDialog::getOpenDirectory(this, "Select the Directory to store the Reports", reportpathtextfield->getText());
     if(!reportpathstring.empty())
         reportpathtextfield->setText(reportpathstring + "/");
+
+    return 1;
+}
+
+long Settings::SetVideoPath(FXObject*, FXSelector, void*)
+{
+    FXString vidpathstring = FXFileDialog::getOpenFilename(this, "Select the Default Video Player Binary", vidtextfield->getText());
+    if(!vidpathstring.empty())
+        vidtextfield->setText(vidpathstring);
+
+    return 1;
+}
+
+long Settings::SetHtmlPath(FXObject*, FXSelector, void*)
+{
+    FXString htmlpathstring = FXFileDialog::getOpenFilename(this, "Select the Default Web Browser Binary", htmltextfield->getText());
+    if(!htmlpathstring.empty())
+        htmltextfield->setText(htmlpathstring);
 
     return 1;
 }

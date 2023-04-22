@@ -40,6 +40,14 @@ class Settings : public FXDialogBox
         FXButton* cancelbutton;
         FXButton* savebutton;
         FXString timezones = "America/New_York\nAmerica/Chicago\n";
+        FXHorizontalFrame* hframe9;
+        FXLabel* vidlabel;
+        FXTextField* vidtextfield;
+        FXButton* vidbutton;
+        FXHorizontalFrame* hframe10;
+        FXLabel* htmllabel;
+        FXTextField* htmltextfield;
+        FXButton* htmlbutton;
 
     protected:
         Settings() {}
@@ -47,8 +55,10 @@ class Settings : public FXDialogBox
     public:
         enum
         {
-            ID_CASEPATH = 1,
-            ID_REPORTPATH = 2,
+            ID_CASEPATH = 101,
+            ID_REPORTPATH = 102,
+            ID_VIDPATH = 103,
+            ID_HTMLPATH = 104,
             ID_LAST
         };
         Settings(FXWindow* parent, const FXString& title);
@@ -57,11 +67,15 @@ class Settings : public FXDialogBox
 
         long SetCasePath(FXObject*, FXSelector, void*);
         long SetReportPath(FXObject*, FXSelector, void*);
+        long SetVideoPath(FXObject*, FXSelector, void*);
+        long SetHtmlPath(FXObject*, FXSelector, void*);
 };
 
 FXDEFMAP(Settings) SettingsMap[]={
     FXMAPFUNC(SEL_COMMAND, Settings::ID_CASEPATH, Settings::SetCasePath),
     FXMAPFUNC(SEL_COMMAND, Settings::ID_REPORTPATH, Settings::SetReportPath),
+    FXMAPFUNC(SEL_COMMAND, Settings::ID_VIDPATH, Settings::SetVideoPath),
+    FXMAPFUNC(SEL_COMMAND, Settings::ID_HTMLPATH, Settings::SetHtmlPath),
 };
 
 #endif // ABOUTBOX_H
