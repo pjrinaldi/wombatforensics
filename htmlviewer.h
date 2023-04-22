@@ -10,17 +10,17 @@
 #include "icons.h"
 
 //#include <hubbub/hubbub.h>
-#include <litehtml/litehtml.h>
+//#include <litehtml/litehtml.h>
 
 #include "/usr/local/include/fox-1.7/fx.h"
 
 class browserwindow;
 
+/*
 class HtmlWidget : public FXCanvas
 {
     FXDECLARE(HtmlWidget);
 
-    /*
     protected:
 	HtmlWidget();
     private:
@@ -31,8 +31,8 @@ class HtmlWidget : public FXCanvas
 	{
 	    FXCanvas(p, tgt, sel, opts, x, y, w, h);
 	};
-    */
 };
+*/
 
 class HtmlViewer : public FXDialogBox
 {
@@ -45,7 +45,7 @@ class HtmlViewer : public FXDialogBox
 
     protected:
         HtmlViewer() {}
-	HtmlWidget* hwidget;
+	//HtmlWidget* hwidget;
 
     public:
         HtmlViewer(FXWindow* parent, const FXString& title);
