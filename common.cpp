@@ -451,21 +451,20 @@ void HashFile(FileItem* curfileitem, ForImg* curforimg)
     delete[] tmpbuf;
 }
 
-void ThumbnailImage(int thumbsize)
+void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std::string tmppath)
 {
+    bool inmemory = true;
+    uint8_t* tmpbuf = NULL;
+    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    std::string thumbfilestr = tmppath + "thumbs/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png";
+    std::cout << "thumb file str: " << thumbfilestr << std::endl;
+    FILE* tmpfile;
+    GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     Magick::Geometry thumbgeometry(thumbsize, thumbsize);
-    /*
-    genthmbpath = wombatvariable.tmpmntpath;
-    ForImg* curimg = NULL;
-    for(int i=0; i < existingforimglist.count(); i++)
+    if(curfileitem->size > 0)
     {
-        if(existingforimglist.at(i)->MountPath().endsWith(thumbid.split("-").at(0)))
-        {
-            curimg = existingforimglist.at(i);
-            break;
-        }
     }
-
+    /*
     //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();

@@ -117,6 +117,6 @@ void GetFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t** tmpbuf, ui
 void AddFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t* slkbuf, std::string* filecontents);
 
 void HashFile(FileItem* curfileitem, ForImg* curforimg);
-void ThumbnailImage(int thumbsize);
+void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std::string tmppath);
 
 #endif
