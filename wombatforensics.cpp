@@ -1424,10 +1424,10 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                 for(int i=0; i < digfilelist.size(); i++)
                 {
                     int thumbsize = GetSettings(0).toInt();
-                    int thumbcount = 100 / GetSettings(1).toInt();
+                    //int thumbcount = 100 / GetSettings(1).toInt();
                     //std::cout << "thumb count: " << thumbcount << std::endl;
                     if(digfilelist.at(i).cat == "Video")
-                        ThumbnailVideo(curforimg, &(digfilelist.at(i)), thumbsize, thumbcount, tmppath.text());
+                        ThumbnailVideo(curforimg, &(digfilelist.at(i)), thumbsize, GetSettings(1).toInt(), tmppath.text());
                 }
             }
             //std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;
