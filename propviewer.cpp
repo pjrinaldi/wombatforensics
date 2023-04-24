@@ -4,12 +4,22 @@ FXIMPLEMENT(PropertyViewer,FXDialogBox, NULL, 0)
 
 PropertyViewer::PropertyViewer(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_RESIZE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 415, 515, 0,0,0,0, 0, 0)
 {
-    plainfont = new FXFont(this->getApp(), "monospace");
     vframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
-    textview = new FXText(vframe, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    textview->setFont(plainfont);
+    //proptable = new FXTable(vframe, this, 0, TABLE_COL_SIZABLE|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_Y|LAYOUT_FILL_X);
+    /*
+    proptable = new FXTable(vframe, this, 0, TABLE_COL_SIZABLE|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    proptable->setTableSize(10, 2);
+    proptable->setColumnText(0, "Property");
+    proptable->setColumnText(1, "Value");
+    proptable->setColumnHeaderHeight(proptable->getColumnHeaderHeight() + 5);
+    proptable->setRowHeaderWidth(0);
+    //proptable->setHeight(this->getHeight() / 2);
+    */
+    textview = new FXText(vframe, NULL, 0, LAYOUT_LEFT|LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    textview->setHeight(50);
     textview->setEditable(false);
 }
+
 /*
 void PropertyViewer::LoadHex(ForImg* curforimg, FileItem* curfileitem)
 {

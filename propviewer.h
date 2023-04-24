@@ -18,15 +18,14 @@ class PropertyViewer : public FXDialogBox
 
     private:
         FXVerticalFrame* vframe;
+        //FXTable* proptable;
         FXText* textview;
-        FXFont* plainfont;
 
     protected:
         PropertyViewer() {}
 
     public:
         PropertyViewer(FXWindow* parent, const FXString& title);
-        //void LoadHex(ForImg* curforimg, FileItem* curfileitem);
 };
 
 #endif // PROPVIEWER_H
