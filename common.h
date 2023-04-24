@@ -10,8 +10,13 @@
 #include <bitset>
 //#include <sys/stat.h>
 
+// FILE CATEGORY/SIGNATURE
 #include <magic.h>
+// IMAGEMAGICK THUMBNAILER
 #include <Magick++.h>
+// LIBFFMPEG THUMBNAILER HEADERS
+#include <libffmpegthumbnailer/filmstripfilter.h>
+#include <libffmpegthumbnailer/videothumbnailer.h>
 
 // BLAKE3 HASH
 #include "blake3/blake3.h"
@@ -119,5 +124,6 @@ void AddFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t* slkbuf, std
 
 void HashFile(FileItem* curfileitem, ForImg* curforimg);
 void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std::string tmppath);
+void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int thumbcount, std::string tmppath);
 
 #endif

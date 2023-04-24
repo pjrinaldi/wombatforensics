@@ -1409,7 +1409,7 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                     curfile.close();
                 }
             }
-	    if(std::stoi(diglist.at(i)) == 3) // THUMBNAIL FILE
+	    if(std::stoi(diglist.at(i)) == 3) // THUMBNAIL IMAGE
 	    {
 		for(int i=0; i < digfilelist.size(); i++)
 		{
@@ -1419,6 +1419,17 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
 			ThumbnailImage(curforimg, &(digfilelist.at(i)), thumbsize, tmppath.text());
 		}
 	    }
+            if(std::stoi(diglist.at(i)) == 4) // THUMBNAIL VIDEO
+            {
+                for(int i=0; i < digfilelist.size(); i++)
+                {
+                    int thumbsize = GetSettings(0).toInt();
+                    int thumbcount = 100 / GetSettings(1).toInt();
+                    //std::cout << "thumb count: " << thumbcount << std::endl;
+                    if(digfilelist.at(i).cat == "Video")
+                        ThumbnailVideo(curforimg, &(digfilelist.at(i)), thumbsize, thumbcount, tmppath.text());
+                }
+            }
             //std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;
         }
     }
