@@ -453,6 +453,17 @@ void HashFile(FileItem* curfileitem, ForImg* curforimg)
 
 void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std::string tmppath)
 {
+    // NEED TO SEE IF THUMBNAIL ALREADY EXISTS AND IF IT IS THE CORRECT SIZE AND THEN SKIP RECREATING IT.
+    /*
+    //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
+    QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
+    QImage* testimage = new QImage();
+    bool imgbool = testimage->load(thumbtestpath);
+    if(imgbool && (testimage->width() == thumbsize || testimage->height() == thumbsize))
+    {
+	qInfo() << "Thumbnail:" << thumbtestpath << "already exists. Skipping.";
+    }
+     */ 
     bool inmemory = true;
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
@@ -478,23 +489,11 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 	    std::cout << "error encountered for: " << curfileitem->name + "-" + std::to_string(curfileitem->gid) << ": " << error.what() << std::endl;
 	    try
 	    {
-		// NEED TO PULL THIS PNG IN AND GET IT INTO MAGICK TO RESIZE AND SAVE AS THE THUMBFILESTR...
-		/*
-		Magick::Blob inblob(tmpbuf, curfileitem->size);
-		Magick::Image inimage(inblob);
+		Magick::Image inimage("/tmp/wf/mt.png");
+		inimage.quiet(false);
+		inimage.resize(thumbgeometry);
 		inimage.magick("PNG");
-		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
-		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-		FXFileStream stream;
-		this->getApp()->beginWaitCursor();
-		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
-		img->loadPixels(stream);
-		stream.close();
-		img->create();
-		imageview->setImage(img);
-		this->getApp()->endWaitCursor();
-		 */ 
-		//Magick::
+		inimage.write(thumbfilestr);
 	    }
 	    catch(Magick::Exception &error)
 	    {
@@ -502,131 +501,21 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 	    }
 	}
     }
-    /*
-    catch(Magick::Exception &error)
+    else
     {
-	qDebug() << "Item:" << thumbid << "magick resize exception:" << error.what() << ". Missing image thumbnail used.";
 	try
 	{
-	    if(!isclosing)
-	    {
-		QPixmap pixmap(":/missingimage", "PNG");
-		QByteArray iarray;
-		QBuffer buffer(&iarray);
-		buffer.open(QIODevice::WriteOnly);
-		pixmap.save(&buffer, "PNG");
-		Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
-		Magick::Image master(blob);
-		master.quiet(false);
-		master.resize(thumbgeometry);
-		master.magick("PNG");
-		master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-	    }
+	    Magick::Image inimage("/tmp/wf/mt.png");
+	    inimage.quiet(false);
+	    inimage.resize(thumbgeometry);
+	    inimage.magick("PNG");
+	    inimage.write(thumbfilestr);
 	}
 	catch(Magick::Exception &error)
 	{
-	    qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
+	    std::cout << "File: " << tmpfilestr << " magick error:" << error.what() << std::endl;
 	}
     }
-
-    //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
-    QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
-    QImage* testimage = new QImage();
-    bool imgbool = testimage->load(thumbtestpath);
-    if(imgbool && (testimage->width() == thumbsize || testimage->height() == thumbsize))
-    {
-	qInfo() << "Thumbnail:" << thumbtestpath << "already exists. Skipping.";
-    }
-    else
-    {
-        //category = treenodemodel->GetNodeColumnValue(thumbid, "cat").toString();
-	//TreeNode* curitem = static_cast<TreeNode*>(indxlist.first().internalPointer());
-	//qint64 filesize = curitem->Data("size").toLongLong();
-        qint64 filesize = treenodemodel->GetNodeColumnValue(thumbid, "size").toLongLong();
-	Magick::Geometry thumbgeometry(thumbsize, thumbsize);
-	if(filesize > 0 && !isclosing)
-	{
-	    // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
-            QString layout = ReturnFileContent(curimg, thumbid);
-	    QByteArray ba;
-	    ba.clear();
-            QString fullpath = treenodemodel->GetNodeColumnValue(thumbid, "path").toString() + treenodemodel->GetNodeColumnValue(thumbid, "name").toString();
-	    //QString fullpath = curitem->Data("path").toString() + curitem->Data("name").toString();
-	    ba.append(fullpath.toUtf8());
-	    imageshash.insert(thumbid, QString(ba.toBase64()));
-	    try
-	    {
-		if(!isclosing)
-		{
-                    Magick::Image master;
-                    master.read(QString(wombatvariable.tmpfilepath + thumbid + "-tmp").toStdString());
-		    //qDebug() << "genthmbpath:" << QString(genthmbpath + "thumbs/" + thumbid + ".jpg");
-		    //qDebug() << "thumbgeometry:" << thumbsize;
-		    master.quiet(false);
-		    master.resize(thumbgeometry);
-		    master.magick("PNG");
-		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-		}
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		qDebug() << "Item:" << thumbid << "magick resize exception:" << error.what() << ". Missing image thumbnail used.";
-		try
-		{
-		    if(!isclosing)
-		    {
-			QPixmap pixmap(":/missingimage", "PNG");
-			QByteArray iarray;
-			QBuffer buffer(&iarray);
-			buffer.open(QIODevice::WriteOnly);
-			pixmap.save(&buffer, "PNG");
-			Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
-			Magick::Image master(blob);
-			master.quiet(false);
-			master.resize(thumbgeometry);
-			master.magick("PNG");
-			master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-		    }
-		}
-		catch(Magick::Exception &error)
-		{
-		    qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
-		}
-	    }
-	}
-	else if(filesize == 0 && !isclosing)
-	{
-	    qDebug() << "Item:" << thumbid << "has zero filesize, so missing image thumbnail is used.";
-	    try
-	    {
-		if(!isclosing)
-		{
-		    QPixmap pixmap(":/missingimage", "PNG");
-		    QByteArray iarray;
-		    QBuffer buffer(&iarray);
-		    buffer.open(QIODevice::WriteOnly);
-		    pixmap.save(&buffer, "PNG");
-		    Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
-		    Magick::Image master(blob);
-		    master.quiet(false);
-		    master.resize(thumbgeometry);
-		    master.magick("PNG");
-		    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-		}
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
-	    }
-	}
-    }
-    if(!isclosing)
-    {
-        digimgthumbcount++;
-        isignals->DigUpd(0, digimgthumbcount);
-    }
-
-     */ 
 }
 
 void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig)

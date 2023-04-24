@@ -191,8 +191,11 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     filtericon = new FXPNGIcon(this->getApp(), filter);
     filtericon->create();
 
-    thumbmissingimage = new FXPNGImage(this->getApp(), thumbmissing);
-    thumbmissingimage->create();
+    FXPNGImage* thumbmissingimage = new FXPNGImage(this->getApp(), thumbmissing);
+    FXFileStream tmpstr;
+    tmpstr.open("/tmp/wf/mt.png", FXStreamSave);
+    thumbmissingimage->savePixels(tmpstr);
+    tmpstr.close();
 
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
