@@ -463,8 +463,82 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     Magick::Geometry thumbgeometry(thumbsize, thumbsize);
     if(curfileitem->size > 0)
     {
+	try
+	{
+	    Magick::Blob inblob(tmpbuf, curfileitem->size);
+	    Magick::Image master(inblob);
+	    master.quiet(false);
+	    master.resize(thumbgeometry);
+	    master.magick("PNG");
+	    master.write(thumbfilestr);
+	}
+	catch(Magick::Exception &error)
+	{
+	    // MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
+	    std::cout << "error encountered for: " curfileitem->name + "-" + std::to_string(curfileitem->gid) << std::endl;
+	}
     }
     /*
+    try
+    {
+	Magick::Blob inblob(tmpbuf, curfileitem->size);
+	Magick::Image inimage(inblob);
+	inimage.magick("PNG");
+	inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
+	FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+	FXFileStream stream;
+	this->getApp()->beginWaitCursor();
+	stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
+	img->loadPixels(stream);
+	stream.close();
+	img->create();
+	imageview->setImage(img);
+	this->getApp()->endWaitCursor();
+    }
+    catch(Magick::Exception &error)
+    {
+	std::cout << "error encoutered: " << error.what() << std::endl;
+    }
+    try
+    {
+	if(!isclosing)
+	{
+	    Magick::Image master;
+	    master.read(QString(wombatvariable.tmpfilepath + thumbid + "-tmp").toStdString());
+	    //qDebug() << "genthmbpath:" << QString(genthmbpath + "thumbs/" + thumbid + ".jpg");
+	    //qDebug() << "thumbgeometry:" << thumbsize;
+	    master.quiet(false);
+	    master.resize(thumbgeometry);
+	    master.magick("PNG");
+	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+	}
+    }
+    catch(Magick::Exception &error)
+    {
+	qDebug() << "Item:" << thumbid << "magick resize exception:" << error.what() << ". Missing image thumbnail used.";
+	try
+	{
+	    if(!isclosing)
+	    {
+		QPixmap pixmap(":/missingimage", "PNG");
+		QByteArray iarray;
+		QBuffer buffer(&iarray);
+		buffer.open(QIODevice::WriteOnly);
+		pixmap.save(&buffer, "PNG");
+		Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
+		Magick::Image master(blob);
+		master.quiet(false);
+		master.resize(thumbgeometry);
+		master.magick("PNG");
+		master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
+	    }
+	}
+	catch(Magick::Exception &error)
+	{
+	    qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
+	}
+    }
+
     //QModelIndexList indxlist = treenodemodel->match(treenodemodel->index(0, treenodemodel->GetColumnIndex("id"), QModelIndex()), Qt::DisplayRole, QVariant(thumbid), -1, Qt::MatchFlags(Qt::MatchExactly | Qt::MatchRecursive));
     QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
     QImage* testimage = new QImage();
