@@ -191,6 +191,9 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     filtericon = new FXPNGIcon(this->getApp(), filter);
     filtericon->create();
 
+    thumbmissingimage = new FXPNGImage(this->getApp(), thumbmissing);
+    thumbmissingimage->create();
+
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
     //sqlitefiles.clear();

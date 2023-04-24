@@ -232,6 +232,9 @@ class WombatForensics : public FXMainWindow
         FXIcon* virtualfoldericon;
         FXIcon* filtericon;
 
+	FXImage* thumbmissingimage;
+	//FXIcon* thumbmissingicon;
+
         std::vector<std::string> tags;
         std::vector<std::string> binaries;
         std::vector<std::string> whlfiles;

@@ -475,44 +475,34 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 	catch(Magick::Exception &error)
 	{
 	    // MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
-	    std::cout << "error encountered for: " curfileitem->name + "-" + std::to_string(curfileitem->gid) << std::endl;
+	    std::cout << "error encountered for: " << curfileitem->name + "-" + std::to_string(curfileitem->gid) << ": " << error.what() << std::endl;
+	    try
+	    {
+		// NEED TO PULL THIS PNG IN AND GET IT INTO MAGICK TO RESIZE AND SAVE AS THE THUMBFILESTR...
+		/*
+		Magick::Blob inblob(tmpbuf, curfileitem->size);
+		Magick::Image inimage(inblob);
+		inimage.magick("PNG");
+		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
+		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		FXFileStream stream;
+		this->getApp()->beginWaitCursor();
+		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
+		img->loadPixels(stream);
+		stream.close();
+		img->create();
+		imageview->setImage(img);
+		this->getApp()->endWaitCursor();
+		 */ 
+		//Magick::
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		std::cout << "File: " << tmpfilestr << " magick error: " << error.what() << std::endl;
+	    }
 	}
     }
     /*
-    try
-    {
-	Magick::Blob inblob(tmpbuf, curfileitem->size);
-	Magick::Image inimage(inblob);
-	inimage.magick("PNG");
-	inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
-	FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-	FXFileStream stream;
-	this->getApp()->beginWaitCursor();
-	stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
-	img->loadPixels(stream);
-	stream.close();
-	img->create();
-	imageview->setImage(img);
-	this->getApp()->endWaitCursor();
-    }
-    catch(Magick::Exception &error)
-    {
-	std::cout << "error encoutered: " << error.what() << std::endl;
-    }
-    try
-    {
-	if(!isclosing)
-	{
-	    Magick::Image master;
-	    master.read(QString(wombatvariable.tmpfilepath + thumbid + "-tmp").toStdString());
-	    //qDebug() << "genthmbpath:" << QString(genthmbpath + "thumbs/" + thumbid + ".jpg");
-	    //qDebug() << "thumbgeometry:" << thumbsize;
-	    master.quiet(false);
-	    master.resize(thumbgeometry);
-	    master.magick("PNG");
-	    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-	}
-    }
     catch(Magick::Exception &error)
     {
 	qDebug() << "Item:" << thumbid << "magick resize exception:" << error.what() << ". Missing image thumbnail used.";
