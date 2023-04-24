@@ -468,25 +468,60 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     std::string thumbfilestr = tmppath + "thumbs/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png";
-    std::cout << "thumb file str: " << thumbfilestr << std::endl;
+    Magick::Image imgexists;
+    bool thumbexists = false;
+    try // attempt to open existing thumbnail
+    {
+	imgexists.read(thumbfilestr);
+	thumbexists = true;
+    }
+    catch(Magick::Exception &error) // thumbnail doesn't exist
+    {
+	//std::cout << "Error: " << error.what() << std::endl;
+    }
+    //std::cout << "thumb file str: " << thumbfilestr << std::endl;
     FILE* tmpfile;
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     Magick::Geometry thumbgeometry(thumbsize, thumbsize);
-    if(curfileitem->size > 0)
+    if(thumbexists && (imgexists.size().width() == thumbsize || imgexists.size().height() == thumbsize))
     {
-	try
+	// MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
+	std::cout << "Thumbnail exists for " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << ". skipping." << std::endl;
+    }
+    else
+    {
+	if(curfileitem->size > 0)
 	{
-	    Magick::Blob inblob(tmpbuf, curfileitem->size);
-	    Magick::Image master(inblob);
-	    master.quiet(false);
-	    master.resize(thumbgeometry);
-	    master.magick("PNG");
-	    master.write(thumbfilestr);
+	    try
+	    {
+		Magick::Blob inblob(tmpbuf, curfileitem->size);
+		Magick::Image master(inblob);
+		master.quiet(false);
+		master.resize(thumbgeometry);
+		master.magick("PNG");
+		master.write(thumbfilestr);
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		// MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
+		std::cout << "error encountered for: " << curfileitem->name + "-" + std::to_string(curfileitem->gid) << ": " << error.what() << std::endl;
+		try
+		{
+		    Magick::Image inimage("/tmp/wf/mt.png");
+		    inimage.quiet(false);
+		    inimage.resize(thumbgeometry);
+		    inimage.magick("PNG");
+		    inimage.write(thumbfilestr);
+		}
+		catch(Magick::Exception &error)
+		{
+		    // MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
+		    std::cout << "File: " << tmpfilestr << " magick error: " << error.what() << std::endl;
+		}
+	    }
 	}
-	catch(Magick::Exception &error)
+	else
 	{
-	    // MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
-	    std::cout << "error encountered for: " << curfileitem->name + "-" + std::to_string(curfileitem->gid) << ": " << error.what() << std::endl;
 	    try
 	    {
 		Magick::Image inimage("/tmp/wf/mt.png");
@@ -497,23 +532,9 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 	    }
 	    catch(Magick::Exception &error)
 	    {
-		std::cout << "File: " << tmpfilestr << " magick error: " << error.what() << std::endl;
+		// MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
+		std::cout << "File: " << tmpfilestr << " magick error:" << error.what() << std::endl;
 	    }
-	}
-    }
-    else
-    {
-	try
-	{
-	    Magick::Image inimage("/tmp/wf/mt.png");
-	    inimage.quiet(false);
-	    inimage.resize(thumbgeometry);
-	    inimage.magick("PNG");
-	    inimage.write(thumbfilestr);
-	}
-	catch(Magick::Exception &error)
-	{
-	    std::cout << "File: " << tmpfilestr << " magick error:" << error.what() << std::endl;
 	}
     }
 }

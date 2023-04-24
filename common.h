@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cmath>
 #include <bitset>
+//#include <sys/stat.h>
 
 #include <magic.h>
 #include <Magick++.h>
