@@ -471,6 +471,7 @@ long WombatForensics::OpenCase(FXObject*, FXSelector, void*)
         msglog->AddMsg("Case was opened successfully.");
         EnableCaseButtons();
         LoadCaseState();
+        InitializeThumbCache();
         this->getApp()->endWaitCursor();
 	StatusUpdate("Ready");
     }
@@ -481,6 +482,12 @@ long WombatForensics::SaveCase(FXObject*, FXSelector, void*)
 {
     SaveCurrentCase();
     return 1;
+}
+
+void WombatForensics::InitializeThumbCache()
+{
+    // find files in iconcache and write to thumblist...
+    // initialize thumbcache here..., so the lists match...
 }
 
 void WombatForensics::SaveCurrentCase()

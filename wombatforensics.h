@@ -288,6 +288,9 @@ class WombatForensics : public FXMainWindow
         std::vector<uint64_t> voloffsets;
         std::vector<FileItem> fileitemvector;
 
+        std::vector<std::string thumblist;
+        FXIconCache* thumbcache;
+
     protected:
         WombatForensics() {}
 	~WombatForensics();
@@ -428,6 +431,7 @@ class WombatForensics : public FXMainWindow
 	//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, FXArray<uint>* clusterlist);
 	//FXString ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset);
 	void UpdateForensicImages(void);
+        void InitializeThumbCache(void);
 
         void LogEntry(FXString logstring)
         {
