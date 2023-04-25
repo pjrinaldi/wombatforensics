@@ -2,12 +2,14 @@
 
 FXIMPLEMENT(ThumbViewer,FXDialogBox, NULL, 0)
 
-ThumbViewer::ThumbViewer(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_RESIZE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 400, 300, 0,0,0,0, 0, 0)
+ThumbViewer::ThumbViewer(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_RESIZE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 800, 600, 0,0,0,0, 0, 0)
 {
     vframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
-    imageview = new FXImageView(vframe, NULL, NULL, 0, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    iconlist = new FXIconList(vframe, NULL, 0, ICONLIST_BIG_ICONS|LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    //imageview = new FXImageView(vframe, NULL, NULL, 0, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 }
 
+/*
 void ThumbViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
 {
     bool inmemory = true;
@@ -48,3 +50,4 @@ void ThumbViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
 	fclose(tmpfile);
     delete[] tmpbuf;
 }
+*/

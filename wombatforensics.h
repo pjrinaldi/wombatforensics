@@ -38,6 +38,7 @@
 #include "pdfviewer.h"
 #include "propviewer.h"
 #include "imageviewer.h"
+#include "thumbviewer.h"
 // SHARED LIBRARIES
 #include <tar.h> // TAR FOR WCF
 #include <libtar.h> // TAR FOR WCF
@@ -269,6 +270,7 @@ class WombatForensics : public FXMainWindow
         ForImg* curforimg;
         std::vector<ForImg*> forimgvector;
         MessageLog* msglog;
+	ThumbViewer* thumbviewer;
 
         uint64_t globalid;
         uint64_t curid;
@@ -373,6 +375,7 @@ class WombatForensics : public FXMainWindow
         long CheckSelected(FXObject* sender, FXSelector sel, void*);
         long OpenHexViewer(FXObject*, FXSelector, void*);
 	long OpenPropertyViewer(FXObject*, FXSelector, void*);
+	long OpenThumbViewer(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -469,6 +472,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLEHEADER, WombatForensics::FilterColumn),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HEXCONTENTS, WombatForensics::OpenHexViewer),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PROPERTIES, WombatForensics::OpenPropertyViewer),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_IMGVIDTHUMB, WombatForensics::OpenThumbViewer),
 
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),

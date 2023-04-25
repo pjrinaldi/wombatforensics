@@ -59,6 +59,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     imgview->hide();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
     msglog = new MessageLog(this, "Message Log");
+    thumbviewer = new ThumbViewer(this, "Thumbnail Viewer");
     // TOOLBAR ICONS
     // WOMBAT CASE FILE ICONS
     newicon = new FXPNGIcon(this->getApp(), documentnew);
@@ -841,6 +842,13 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
     //propview->LoadProp();
     propview->create();
     propview->show(PLACEMENT_CURSOR);
+
+    return 1;
+}
+
+long WombatForensics::OpenThumbViewer(FXObject*, FXSelector, void*)
+{
+    thumbviewer->show(PLACEMENT_OWNER);
 
     return 1;
 }

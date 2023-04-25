@@ -18,14 +18,15 @@ class ThumbViewer : public FXDialogBox
 
     private:
         FXVerticalFrame* vframe;
-	FXImageView* imageview;
+	//FXImageView* imageview;
+	FXIconList* iconlist;
 
     protected:
         ThumbViewer() {}
 
     public:
         ThumbViewer(FXWindow* parent, const FXString& title);
-	void LoadImage(ForImg* curforimg, FileItem* curfileitem);
+	//void LoadImage(ForImg* curforimg, FileItem* curfileitem);
 };
 
 #endif // THUMBVIEWER_H
