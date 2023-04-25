@@ -547,6 +547,13 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
     }
     FILE* tmpfile;
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    if(inmemory)
+    {
+	std::ofstream sfile(tmpfilestr.c_str(), std::ios::binary);
+	sfile.seekp(0, std::ios::beg);
+	sfile.write((char*)tmpbuf, curfileitem->size);
+    }
+    delete[] tmpbuf;
     Magick::Geometry thumbgeometry(thumbsize, thumbsize);
     if(thumbexists && (imgexists.size().width() == thumbsize || imgexists.size().height() == thumbsize))
     {
@@ -564,9 +571,11 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
                 ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
                 videothumbnailer.setThumbnailSize(thumbsize);
                 std::unique_ptr<ffmpegthumbnailer::FilmStripFilter> filmstripfilter;
+		filmstripfilter.reset(new ffmpegthumbnailer::FilmStripFilter());
                 videothumbnailer.addFilter(filmstripfilter.get());
                 videothumbnailer.setPreferEmbeddedMetadata(false);
-                int vtcnt = 100 /thumbcount;
+                int vtcnt = 100 / thumbcount;
+		std::cout << "vtcnt: " << vtcnt << std::endl;
                 for(int i=0; i < vtcnt; i++)
                 {
                     int seekpercentage = i * thumbcount;
@@ -574,191 +583,100 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
                         seekpercentage = 5;
                     if(seekpercentage == 100)
                         seekpercentage = 95;
-                    std::string tmpoutfile = "/tmp/wf" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
+		    std::cout << "seek percentage: " << seekpercentage << std::endl;
+                    std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
                     tlist.push_back(tmpoutfile);
                     videothumbnailer.setSeekPercentage(seekpercentage);
-                    // tmpstring is the file content written to a file...
-                    //videothumbnailer.generateThumbnail(tmpstring.toStdString(), Png, tmpoutfile.toStdString());
+		    videothumbnailer.generateThumbnail(tmpfilestr, Png, tmpoutfile);
                 }
+		try
+		{
+		    std::list<Magick::Image> thumbimages;
+		    std::list<Magick::Image> montage;
+		    Magick::Image image;
+		    for(int i=0; i < tlist.size(); i++)
+		    {
+			image.read(tlist.at(i));
+			thumbimages.push_back(image);
+		    }
+		    Magick::Montage montageoptions;
+		    Magick::Color color("rgba(0,0,0,0)");
+		    montageoptions.geometry(std::to_string(thumbsize) + "x" + std::to_string(thumbsize) + "+1+1");
+		    montageoptions.tile(std::to_string(tlist.size()) + "x1");
+		    montageoptions.backgroundColor(color);
+		    montageoptions.fileName(thumbfilestr);
+		    Magick::montageImages(&montage, thumbimages.begin(), thumbimages.end(), montageoptions);
+		    if(montage.size() == 1)
+		    {
+			Magick::Image& montageimage = montage.front();
+			montageimage.magick("png");
+			montageimage.write(thumbfilestr);
+		    }
+		    else
+		    {
+			std::cout << curfileitem->name << "-" << std::to_string(curfileitem->gid) << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
+			try
+			{
+			    Magick::Image vimage("/tmp/wf/ve.png");
+			    vimage.quiet(false);
+			    vimage.resize(thumbgeometry);
+			    vimage.magick("PNG");
+			    vimage.write(thumbfilestr);
+			}
+			catch(Magick::Exception &error)
+			{
+			    std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
+			}
+		    }
+		}
+		catch(Magick::Exception &error)
+		{
+		    try
+		    {
+			Magick::Image vimage("/tmp/wf/ve.png");
+			vimage.quiet(false);
+			vimage.resize(thumbgeometry);
+			vimage.magick("PNG");
+			vimage.write(thumbfilestr);
+		    }
+		    catch(Magick::Exception &error)
+		    {
+			std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
+		    }
+		}
             }
             catch(std::exception &e)
             {
+		try
+		{
+		    Magick::Image vimage("/tmp/wf/ve.png");
+		    vimage.quiet(false);
+		    vimage.resize(thumbgeometry);
+		    vimage.magick("PNG");
+		    vimage.write(thumbfilestr);
+		}
+		catch(Magick::Exception &error)
+		{
+		    std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
+		}
             }
         }
         else
         {
+	    try
+	    {
+		Magick::Image vimage("/tmp/wf/ve.png");
+		vimage.quiet(false);
+		vimage.resize(thumbgeometry);
+		vimage.magick("PNG");
+		vimage.write(thumbfilestr);
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
+	    }
         }
     }
-    /*
-    genthmbpath = wombatvariable.tmpmntpath;
-    QString thumbtestpath = genthmbpath + "thumbs/" + thumbid + ".png";
-
-    if(filesize > 0 && !isclosing)
-    {
-        //qDebug() << "in right if statement.";
-        // IMPLEMENT QBYTEARRAY RETURN FUNCTION HERE
-        //QByteArray filebytes;
-        //filebytes.clear();
-        //filebytes = ReturnFileContent(thumbid);
-        QString layout = ReturnFileContent(curimg, thumbid);
-        //qDebug() << "layout:" << layout;
-        QString tmpstring = wombatvariable.tmpfilepath + thumbid + "-tmp";
-        QStringList tlist;
-        try
-        {
-            if(!isclosing)
-            {
-                ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
-                videothumbnailer.setThumbnailSize(QString::number(thumbsize).toStdString());
-                std::unique_ptr<ffmpegthumbnailer::FilmStripFilter> filmstripfilter;
-                filmstripfilter.reset(new ffmpegthumbnailer::FilmStripFilter());
-                videothumbnailer.addFilter(filmstripfilter.get());
-                videothumbnailer.setPreferEmbeddedMetadata(false);
-                int vtcnt = 100 / vidcount;
-                tlist.clear();
-                for(int i=0; i <= vtcnt; i++)
-                {
-                    int seekpercentage = i * vidcount;
-                    if(seekpercentage == 0)
-                        seekpercentage = 5;
-                    if(seekpercentage == 100)
-                        seekpercentage = 95;
-                    QString tmpoutfile = wombatvariable.tmpfilepath + thumbid + ".t" + QString::number(seekpercentage) + ".png";
-                    tlist.append(tmpoutfile);
-                    videothumbnailer.setSeekPercentage(seekpercentage);
-                    videothumbnailer.generateThumbnail(tmpstring.toStdString(), Png, tmpoutfile.toStdString());
-                }
-                try
-                {
-                    std::list<Magick::Image> thmbimages;
-                    std::list<Magick::Image> montage;
-                    Magick::Image image;
-                    for(int i=0; i < tlist.count(); i++)
-                    {
-                        image.read(tlist.at(i).toStdString());
-                        thmbimages.push_back(image);
-                    }
-                    QString thumbout = genthmbpath + "thumbs/" + thumbid + ".png";
-                    Magick::Montage montageopts;
-                    Magick::Color color("rgba(0,0,0,0)");
-                    montageopts.geometry(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize) + "+1+1").toStdString());
-                    montageopts.tile(QString(QString::number(tlist.count()) + "x1").toStdString());
-                    montageopts.backgroundColor(color);
-                    montageopts.fileName(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-                    Magick::montageImages(&montage, thmbimages.begin(), thmbimages.end(), montageopts); 
-                    if(montage.size() == 1)
-                    {
-                        std::string mstring = thumbout.toStdString();
-                        Magick::Image& montageimage = montage.front();
-                        montageimage.magick("png");
-                        montageimage.write(mstring);
-                    }
-                    else
-                    {
-                        qDebug() << "Item:" << thumbid << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
-                        try
-                        {
-                            if(!isclosing)
-                            {
-                                QPixmap pixmap(":/videoerror", "PNG");
-                                QByteArray iarray;
-                                QBuffer buffer(&iarray);
-                                buffer.open(QIODevice::WriteOnly);
-                                pixmap.save(&buffer, "PNG");
-                                Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
-                                Magick::Image master(blob);
-                                master.quiet(false);
-                                master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
-                                master.magick("PNG");
-                                master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-                            }
-                        }
-                        catch(Magick::Exception &error)
-                        {
-                            qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
-                        }
-                    }
-                }
-                catch(Magick::Exception &error)
-                {
-                    qDebug() << "Item:" << thumbid << "caught exception during montage operation:" << error.what() << ". Missing video thumbnail will be used.";
-                    try
-                    {
-                        if(!isclosing)
-                        {
-                            QPixmap pixmap(":/videoerror", "PNG");
-                            QByteArray iarray;
-                            QBuffer buffer(&iarray);
-                            buffer.open(QIODevice::WriteOnly);
-                            pixmap.save(&buffer, "PNG");
-                            Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
-                            Magick::Image master(blob);
-                            master.quiet(false);
-                            master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
-                            master.magick("PNG");
-                            master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-                        }
-                    }
-                    catch(Magick::Exception &error)
-                    {
-                        qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
-                    }
-                }
-            }
-        }
-        catch(std::exception& e)
-        {
-            qDebug() << "Item:" << thumbid << "libffmpegthumbnailer error:" << e.what() << ". Missing video thumbnail used instead.";
-            try
-            {
-                if(!isclosing)
-                {
-                    QPixmap pixmap(":/videoerror", "PNG");
-                    QByteArray iarray;
-                    QBuffer buffer(&iarray);
-                    buffer.open(QIODevice::WriteOnly);
-                    pixmap.save(&buffer, "PNG");
-                    Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
-                    Magick::Image master(blob);
-                    master.quiet(false);
-                    master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
-                    master.magick("PNG");
-                    master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-                }
-            }
-            catch(Magick::Exception &error)
-            {
-                qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
-            }
-        }
-    }
-    else if(filesize == 0 && !isclosing)// video was 0 length
-    {
-        try
-        {
-            if(!isclosing)
-            {
-                QPixmap pixmap(":/videoerror", "PNG");
-                QByteArray iarray;
-                QBuffer buffer(&iarray);
-                buffer.open(QIODevice::WriteOnly);
-                pixmap.save(&buffer, "PNG");
-                Magick::Blob blob(static_cast<const void*>(iarray.data()), iarray.size());
-                Magick::Image master(blob);
-                master.quiet(false);
-                master.resize(QString(QString::number(thumbsize) + "x" + QString::number(thumbsize)).toStdString());
-                master.magick("PNG");
-                master.write(QString(genthmbpath + "thumbs/" + thumbid + ".png").toStdString());
-            }
-        }
-        catch(Magick::Exception &error)
-        {
-            qDebug() << "Item:" << thumbid << "magick error:" << error.what() << ".";
-        }
-    }
-    else
-        qDebug() << "why does it think we are closing?";
-     */ 
 }
 
 void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig)

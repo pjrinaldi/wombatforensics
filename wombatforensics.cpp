@@ -196,6 +196,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tmpstr.open("/tmp/wf/mt.png", FXStreamSave);
     thumbmissingimage->savePixels(tmpstr);
     tmpstr.close();
+    FXPNGImage* videoerrorimage = new FXPNGImage(this->getApp(), videoerror);
+    tmpstr.open("/tmp/wf/ve.png", FXStreamSave);
+    videoerrorimage->savePixels(tmpstr);
+    tmpstr.close();
 
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();

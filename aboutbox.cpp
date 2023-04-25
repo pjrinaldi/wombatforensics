@@ -14,6 +14,7 @@ AboutBox::AboutBox(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     abouttext += "This program incorporates Fox Toolkit v1.7.6.81 (LGPLv2),\n";
     abouttext += "some of the elementary icons (GPLv3),\n";
     abouttext += "and tango icons (public domain).\n\n";
+    //<a href="https://www.flaticon.com/free-icons/movie" title="movie icons">Movie icons created by Smashicons - Flaticon</a>
     abouttext += "Wombat icon and about image designed by Lindsay Pargman.\n";
     abouttext += "Design Implementation ideas brainstormed with Mark Smith.\n\n";
     abouttext += "If I have forgotten to mention any library or anyone,\n";
