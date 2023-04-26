@@ -891,8 +891,9 @@ long WombatForensics::OpenImageThumbViewer(FXObject*, FXSelector, void*)
         //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
         //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
         //imagethumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
-        imagethumbviewer->SetItemSpace(GetSettings(0).toInt());
     }
+    std::cout << "image itemspace: " << GetSettings(0).toInt() << std::endl;
+    imagethumbviewer->SetItemSpace(GetSettings(0).toInt());
     imagethumbviewer->show(PLACEMENT_OWNER);
     return 1;
 }
@@ -905,9 +906,10 @@ long WombatForensics::OpenVideoThumbViewer(FXObject*, FXSelector, void*)
         //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
         //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
         //videothumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
-        videothumbviewer->SetItemSpace(GetSettings(0).toInt() * GetSettings(1).toInt());
 
     }
+    std::cout << "video itemspace: " << GetSettings(0).toInt() * (100 / GetSettings(1).toInt()) << std::endl;
+    videothumbviewer->SetItemSpace(GetSettings(0).toInt() * (100 / GetSettings(1).toInt()));
     videothumbviewer->show(PLACEMENT_OWNER);
     return 1;
 }
