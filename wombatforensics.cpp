@@ -399,7 +399,9 @@ long WombatForensics::NewCase(FXObject*, FXSelector, void*)
         FXDir::create(tmppath + "archives/");
         FXDir::create(tmppath + "hashlists/");
         FXDir::create(tmppath + "mailboxes/");
-        FXDir::create(tmppath + "thumbs/");
+        //FXDir::create(tmppath + "thumbs/");
+        FXDir::create(tmppath + "imgthumbs/");
+        FXDir::create(tmppath + "vidthumbs/");
         FXFile::create(tmppath + "tags", FXIO::OwnerReadWrite);
         FXFile::create(tmppath + "msglog", FXIO::OwnerReadWrite);
         LogEntry("Case Structure Created Successfully");
@@ -495,6 +497,7 @@ long WombatForensics::SaveCase(FXObject*, FXSelector, void*)
 
 void WombatForensics::InitializeThumbCache()
 {
+    /*
     tnamelist.clear();
     tpathlist.clear();
     //thumblist.clear();
@@ -512,6 +515,7 @@ void WombatForensics::InitializeThumbCache()
     //thumbcache = new FXIconCache(this->getApp(), FXString(tmppath + "thumbs/"));
     // find files in iconcache and write to thumblist...
     // initialize thumbcache here..., so the lists match...
+    */
 }
 
 void WombatForensics::SaveCurrentCase()
