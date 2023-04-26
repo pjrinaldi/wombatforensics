@@ -59,7 +59,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     imgview->hide();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
     msglog = new MessageLog(this, "Message Log");
-    thumbviewer = new ThumbViewer(this, "Thumbnail Viewer");
+    imagethumbviewer = new ThumbViewer(this, "Thumbnail Viewer");
+    videothumbviewer = new ThumbViewer(this, "Thumbnail Viewer");
     // TOOLBAR ICONS
     // WOMBAT CASE FILE ICONS
     newicon = new FXPNGIcon(this->getApp(), documentnew);
@@ -99,9 +100,15 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     messagelogbutton->setTipText("Message Log");
     new FXVerticalSeparator(toolbar);
     // ARTIFACT ICONS
-    imgvidthumbicon = new FXPNGIcon(this->getApp(), imgvidthumbs);
-    imgvidthumbbutton = new FXButton(toolbar, "", imgvidthumbicon, this, ID_IMGVIDTHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
-    imgvidthumbbutton->setTipText("Thumbnail Viewer");
+    //imgvidthumbicon = new FXPNGIcon(this->getApp(), imgvidthumbs);
+    //imgvidthumbbutton = new FXButton(toolbar, "", imgvidthumbicon, this, ID_IMGVIDTHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
+    //imgvidthumbbutton->setTipText("Thumbnail Viewer");
+    imagethumbicon = new FXPNGIcon(this->getApp(), imagethumb);
+    imagethumbbutton = new FXButton(toolbar, "", imagethumbicon, this, ID_IMAGETHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
+    imagethumbbutton->setTipText("Image Thumbnail Viewer");
+    videothumbicon = new FXPNGIcon(this->getApp(), videothumb);
+    videothumbbutton = new FXButton(toolbar, "", videothumbicon, this, ID_IMAGETHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
+    videothumbbutton->setTipText("Video Thumbnail Viewer");
     digdeepericon = new FXPNGIcon(this->getApp(), digdeeper);
     digdeeperbutton = new FXButton(toolbar, "", digdeepericon, this, ID_DIGDEEPER, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     digdeeperbutton->setTipText("Dig Deeper");
@@ -294,7 +301,9 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 
     savebutton->disable();
     evidmanbutton->disable();
-    imgvidthumbbutton->disable();
+    //imgvidthumbbutton->disable();
+    imagethumbbutton->disable();
+    videothumbbutton->disable();
     digdeeperbutton->disable();
     carvingbutton->disable();
     exportfilesbutton->disable();
@@ -500,7 +509,7 @@ void WombatForensics::InitializeThumbCache()
         size_t found = direntry.path().string().rfind("/");
         tnamelist.push_back(FXString(direntry.path().string().substr(found+1, std::string::npos).c_str()));
     }
-    thumbcache = new FXIconCache(this->getApp(), FXString(tmppath + "thumbs/"));
+    //thumbcache = new FXIconCache(this->getApp(), FXString(tmppath + "thumbs/"));
     // find files in iconcache and write to thumblist...
     // initialize thumbcache here..., so the lists match...
 }
@@ -562,7 +571,9 @@ void WombatForensics::EnableCaseButtons()
 {   
     savebutton->enable();
     evidmanbutton->enable();
-    imgvidthumbbutton->enable();
+    //imgvidthumbbutton->enable();
+    imagethumbbutton->enable();
+    videothumbbutton->enable();
     digdeeperbutton->enable();
     carvingbutton->enable();
     exportfilesbutton->enable();
@@ -868,17 +879,31 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
     return 1;
 }
 
-long WombatForensics::OpenThumbViewer(FXObject*, FXSelector, void*)
+long WombatForensics::OpenImageThumbViewer(FXObject*, FXSelector, void*)
 {
     //std::cout << "thumblist size: " << thumblist.size() << std::endl;
     for(int i=0; i < thumblist.size(); i++)
     {
         //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
         //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
-        thumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
+        imagethumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
+        //imagethumbviewer->SetIconSpace(520);
+    }
+    imagethumbviewer->show(PLACEMENT_OWNER);
+    return 1;
+}
+
+long WombatForensics::OpenVideoThumbViewer(FXObject*, FXSelector, void*)
+{
+    //std::cout << "thumblist size: " << thumblist.size() << std::endl;
+    for(int i=0; i < thumblist.size(); i++)
+    {
+        //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
+        //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
+        videothumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
 
     }
-    thumbviewer->show(PLACEMENT_OWNER);
+    videothumbviewer->show(PLACEMENT_OWNER);
     return 1;
 }
 

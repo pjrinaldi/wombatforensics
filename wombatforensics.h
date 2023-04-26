@@ -180,8 +180,12 @@ class WombatForensics : public FXMainWindow
         FXIcon* messagelogicon;
         FXButton* messagelogbutton;
 
-        FXIcon* imgvidthumbicon;
-        FXButton* imgvidthumbbutton;
+        //FXIcon* imgvidthumbicon;
+        //FXButton* imgvidthumbbutton;
+        FXIcon* imagethumbicon;
+        FXButton* imagethumbbutton;
+        FXIcon* videothumbicon;
+        FXButton* videothumbbutton;
         FXIcon* digdeepericon;
         FXButton* digdeeperbutton;
         FXIcon* carvingicon;
@@ -270,7 +274,8 @@ class WombatForensics : public FXMainWindow
         ForImg* curforimg;
         std::vector<ForImg*> forimgvector;
         MessageLog* msglog;
-	ThumbViewer* thumbviewer;
+	ThumbViewer* imagethumbviewer;
+        ThumbViewer* videothumbviewer;
 
         uint64_t globalid;
         uint64_t curid;
@@ -287,11 +292,10 @@ class WombatForensics : public FXMainWindow
         std::vector<uint64_t> volsizes;
         std::vector<uint64_t> voloffsets;
         std::vector<FileItem> fileitemvector;
-
-        std::vector<std::string> thumblist;
+        //std::vector<std::string> imagethumblist;
         std::vector<FXString> tpathlist;
         std::vector<FXString> tnamelist;
-        FXIconCache* thumbcache;
+        //FXIconCache* thumbcache;
 
     protected:
         WombatForensics() {}
@@ -350,6 +354,8 @@ class WombatForensics : public FXMainWindow
             ID_CHECKIT = 127,
             ID_UNCHECKALL = 128,
             ID_HEXCONTENTS = 129,
+            ID_IMAGETHUMB = 130,
+            ID_VIDEOTHUMB = 131,
             ID_LAST
         };
         WombatForensics(FXApp* a);
@@ -380,7 +386,9 @@ class WombatForensics : public FXMainWindow
         long CheckSelected(FXObject* sender, FXSelector sel, void*);
         long OpenHexViewer(FXObject*, FXSelector, void*);
 	long OpenPropertyViewer(FXObject*, FXSelector, void*);
-	long OpenThumbViewer(FXObject*, FXSelector, void*);
+	//long OpenThumbViewer(FXObject*, FXSelector, void*);
+	long OpenImageThumbViewer(FXObject*, FXSelector, void*);
+	long OpenVideoThumbViewer(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
 	long ValueSelected(FXObject*, FXSelector, void*);
@@ -478,7 +486,9 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, WombatForensics::ID_TABLEHEADER, WombatForensics::FilterColumn),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HEXCONTENTS, WombatForensics::OpenHexViewer),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PROPERTIES, WombatForensics::OpenPropertyViewer),
-    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_IMGVIDTHUMB, WombatForensics::OpenThumbViewer),
+    //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_IMGVIDTHUMB, WombatForensics::OpenThumbViewer),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_IMAGETHUMB, WombatForensics::OpenVideoThumbViewer),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_VIDEOTHUMB, WombatForensics::OpenImageThumbViewer),
 
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),
