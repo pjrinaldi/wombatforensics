@@ -497,14 +497,14 @@ void WombatForensics::InitializeThumbCache()
 {
     tnamelist.clear();
     tpathlist.clear();
-    thumblist.clear();
+    //thumblist.clear();
     //std::cout << "tmppath: " << tmppath.text() << std::endl;
     std::string tpath = std::string(tmppath.text()) + "thumbs/";
     std::filesystem::path thumbpath(tpath);
     for(auto const& direntry : std::filesystem::directory_iterator(thumbpath))
     {
         //std::cout << "direntry: " << direntry.path() << std::endl;
-        thumblist.push_back(direntry.path().string());
+        //thumblist.push_back(direntry.path().string());
         tpathlist.push_back(FXString(direntry.path().string().c_str()));
         size_t found = direntry.path().string().rfind("/");
         tnamelist.push_back(FXString(direntry.path().string().substr(found+1, std::string::npos).c_str()));
@@ -882,7 +882,7 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 long WombatForensics::OpenImageThumbViewer(FXObject*, FXSelector, void*)
 {
     //std::cout << "thumblist size: " << thumblist.size() << std::endl;
-    for(int i=0; i < thumblist.size(); i++)
+    for(int i=0; i < tpathlist.size(); i++)
     {
         //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
         //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
@@ -896,7 +896,7 @@ long WombatForensics::OpenImageThumbViewer(FXObject*, FXSelector, void*)
 long WombatForensics::OpenVideoThumbViewer(FXObject*, FXSelector, void*)
 {
     //std::cout << "thumblist size: " << thumblist.size() << std::endl;
-    for(int i=0; i < thumblist.size(); i++)
+    for(int i=0; i < tpathlist.size(); i++)
     {
         //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
         //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
@@ -1495,8 +1495,8 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                     if(digfilelist.at(i).cat == "Video")
                     {
                         ThumbnailVideo(curforimg, &(digfilelist.at(i)), thumbsize, GetSettings(1).toInt(), tmppath.text());
-                        thumblist.push_back(std::string(tmppath.text()) + "thumbs/" + digfilelist.at(i).name + "-" + std::to_string(digfilelist.at(i).gid) + ".png");
-                        thumbcache->insert((std::string(tmppath.text()) + "thumbs/" + digfilelist.at(i).name + "-" + std::to_string(digfilelist.at(i).gid) + ".png").c_str());
+                        //thumblist.push_back(std::string(tmppath.text()) + "thumbs/" + digfilelist.at(i).name + "-" + std::to_string(digfilelist.at(i).gid) + ".png");
+                        //thumbcache->insert((std::string(tmppath.text()) + "thumbs/" + digfilelist.at(i).name + "-" + std::to_string(digfilelist.at(i).gid) + ".png").c_str());
                     }
                 }
             }
