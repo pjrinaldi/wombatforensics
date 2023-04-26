@@ -7,8 +7,36 @@ ThumbViewer::ThumbViewer(FXWindow* parent, const FXString& title):FXDialogBox(pa
     vframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 0, 0, 0, 0);
     iconlist = new FXIconList(vframe, NULL, 0, ICONLIST_BIG_ICONS|LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     //imageview = new FXImageView(vframe, NULL, NULL, 0, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    std::cout << "iconlist itemspace: " << iconlist->getItemSpace() << std::endl;
+    iconlist->setItemSpace(520);
 }
 
+void ThumbViewer::LoadIcon(FXString curstring, FXIcon* curicon)
+{
+    iconlist->appendItem(curstring, curicon, curicon);
+}
+void ThumbViewer::LoadIcon(FXString iconpath, FXString itemname)
+{
+    FXIcon* tmpicon = new FXPNGIcon(this->getApp());
+    FXFileStream stream;
+    stream.open(iconpath, FXStreamLoad);
+    tmpicon->loadPixels(stream);
+    stream.close();
+    tmpicon->create();
+    iconlist->appendItem(itemname, tmpicon, NULL);
+    /*
+    FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+    FXFileStream stream;
+    this->getApp()->beginWaitCursor();
+    stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
+    img->loadPixels(stream);
+    stream.close();
+    img->create();
+    imgview->setImage(img);
+     */ 
+    //FXIcon* tmpicon = new FXPNGIcon(
+    //std::cout << iconpath.text() << itemname.text() << std::endl;
+}
 /*
 void ThumbViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
 {

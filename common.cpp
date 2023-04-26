@@ -575,7 +575,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
                 videothumbnailer.addFilter(filmstripfilter.get());
                 videothumbnailer.setPreferEmbeddedMetadata(false);
                 int vtcnt = 100 / thumbcount;
-		std::cout << "vtcnt: " << vtcnt << std::endl;
+		//std::cout << "vtcnt: " << vtcnt << std::endl;
                 for(int i=0; i < vtcnt; i++)
                 {
                     int seekpercentage = i * thumbcount;
@@ -583,7 +583,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
                         seekpercentage = 5;
                     if(seekpercentage == 100)
                         seekpercentage = 95;
-		    std::cout << "seek percentage: " << seekpercentage << std::endl;
+		    //std::cout << "seek percentage: " << seekpercentage << std::endl;
                     std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
                     tlist.push_back(tmpoutfile);
                     videothumbnailer.setSeekPercentage(seekpercentage);

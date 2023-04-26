@@ -26,6 +26,8 @@ class ThumbViewer : public FXDialogBox
 
     public:
         ThumbViewer(FXWindow* parent, const FXString& title);
+        void LoadIcon(FXString curstring, FXIcon* curicon);
+        void LoadIcon(FXString iconpath, FXString itemname);
 	//void LoadImage(ForImg* curforimg, FileItem* curfileitem);
 };
 

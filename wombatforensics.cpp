@@ -486,6 +486,21 @@ long WombatForensics::SaveCase(FXObject*, FXSelector, void*)
 
 void WombatForensics::InitializeThumbCache()
 {
+    tnamelist.clear();
+    tpathlist.clear();
+    thumblist.clear();
+    //std::cout << "tmppath: " << tmppath.text() << std::endl;
+    std::string tpath = std::string(tmppath.text()) + "thumbs/";
+    std::filesystem::path thumbpath(tpath);
+    for(auto const& direntry : std::filesystem::directory_iterator(thumbpath))
+    {
+        //std::cout << "direntry: " << direntry.path() << std::endl;
+        thumblist.push_back(direntry.path().string());
+        tpathlist.push_back(FXString(direntry.path().string().c_str()));
+        size_t found = direntry.path().string().rfind("/");
+        tnamelist.push_back(FXString(direntry.path().string().substr(found+1, std::string::npos).c_str()));
+    }
+    thumbcache = new FXIconCache(this->getApp(), FXString(tmppath + "thumbs/"));
     // find files in iconcache and write to thumblist...
     // initialize thumbcache here..., so the lists match...
 }
@@ -855,8 +870,15 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 
 long WombatForensics::OpenThumbViewer(FXObject*, FXSelector, void*)
 {
-    thumbviewer->show(PLACEMENT_OWNER);
+    //std::cout << "thumblist size: " << thumblist.size() << std::endl;
+    for(int i=0; i < thumblist.size(); i++)
+    {
+        //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
+        //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
+        thumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
 
+    }
+    thumbviewer->show(PLACEMENT_OWNER);
     return 1;
 }
 
@@ -1446,7 +1468,11 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                     //int thumbcount = 100 / GetSettings(1).toInt();
                     //std::cout << "thumb count: " << thumbcount << std::endl;
                     if(digfilelist.at(i).cat == "Video")
+                    {
                         ThumbnailVideo(curforimg, &(digfilelist.at(i)), thumbsize, GetSettings(1).toInt(), tmppath.text());
+                        thumblist.push_back(std::string(tmppath.text()) + "thumbs/" + digfilelist.at(i).name + "-" + std::to_string(digfilelist.at(i).gid) + ".png");
+                        thumbcache->insert((std::string(tmppath.text()) + "thumbs/" + digfilelist.at(i).name + "-" + std::to_string(digfilelist.at(i).gid) + ".png").c_str());
+                    }
                 }
             }
             //std::cout << "diglist " << i << ": " << diglist.at(i) << std::endl;

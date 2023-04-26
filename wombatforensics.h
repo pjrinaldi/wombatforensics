@@ -288,7 +288,9 @@ class WombatForensics : public FXMainWindow
         std::vector<uint64_t> voloffsets;
         std::vector<FileItem> fileitemvector;
 
-        std::vector<std::string thumblist;
+        std::vector<std::string> thumblist;
+        std::vector<FXString> tpathlist;
+        std::vector<FXString> tnamelist;
         FXIconCache* thumbcache;
 
     protected:
