@@ -487,8 +487,8 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HEXCONTENTS, WombatForensics::OpenHexViewer),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PROPERTIES, WombatForensics::OpenPropertyViewer),
     //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_IMGVIDTHUMB, WombatForensics::OpenThumbViewer),
-    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_IMAGETHUMB, WombatForensics::OpenVideoThumbViewer),
-    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_VIDEOTHUMB, WombatForensics::OpenImageThumbViewer),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_IMAGETHUMB, WombatForensics::OpenImageThumbViewer),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_VIDEOTHUMB, WombatForensics::OpenVideoThumbViewer),
 
     /*
     //FXMAPFUNC(SEL_CLICKED, WombatForensics::ID_TREESELECT, WombatForensics::KeySelected),

@@ -107,7 +107,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     imagethumbbutton = new FXButton(toolbar, "", imagethumbicon, this, ID_IMAGETHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     imagethumbbutton->setTipText("Image Thumbnail Viewer");
     videothumbicon = new FXPNGIcon(this->getApp(), videothumb);
-    videothumbbutton = new FXButton(toolbar, "", videothumbicon, this, ID_IMAGETHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
+    videothumbbutton = new FXButton(toolbar, "", videothumbicon, this, ID_VIDEOTHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     videothumbbutton->setTipText("Video Thumbnail Viewer");
     digdeepericon = new FXPNGIcon(this->getApp(), digdeeper);
     digdeeperbutton = new FXButton(toolbar, "", digdeepericon, this, ID_DIGDEEPER, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
@@ -890,8 +890,8 @@ long WombatForensics::OpenImageThumbViewer(FXObject*, FXSelector, void*)
     {
         //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
         //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
-        imagethumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
-        //imagethumbviewer->SetIconSpace(520);
+        //imagethumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
+        imagethumbviewer->SetItemSpace(GetSettings(0).toInt());
     }
     imagethumbviewer->show(PLACEMENT_OWNER);
     return 1;
@@ -904,7 +904,8 @@ long WombatForensics::OpenVideoThumbViewer(FXObject*, FXSelector, void*)
     {
         //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
         //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
-        videothumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
+        //videothumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
+        videothumbviewer->SetItemSpace(GetSettings(0).toInt() * GetSettings(1).toInt());
 
     }
     videothumbviewer->show(PLACEMENT_OWNER);
