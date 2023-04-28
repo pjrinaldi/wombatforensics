@@ -457,6 +457,7 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
+    std::cout << "tmpfilestr: " << tmpfilestr << " thumbfilestr: " << thumbfilestr << std::endl;
     Magick::Image imgexists;
     bool thumbexists = false;
     try // attempt to open existing thumbnail

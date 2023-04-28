@@ -1510,6 +1510,7 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
 		    //std::cout << "thumbsize: " << thumbsize << std::endl;
 		    if(digfilelist.at(i).cat == "Image")
 		    {
+			//std::cout << digfilelist.at(i).name << " " << digfilelist.at(i).gid << std::endl;
 			ThumbnailImage(curforimg, &(digfilelist.at(i)), thumbsize, tmppath.text());
 			imgthumbpathlist.push_back(FXString(tmppath + "imgthumbs/" + FXString::value(digfilelist.at(i).gid) + "-" + digfilelist.at(i).name.c_str()));
 		    }
@@ -2602,7 +2603,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	if(fileitemvector.size() > 0)
 	{
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    //if(!currentfileitem.isdirectory)
+	    std::cout << currentfileitem.name << " " << currentfileitem.gid << std::endl;
 	    PlainView(&currentfileitem);
 	}
     }
