@@ -456,7 +456,7 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     bool inmemory = true;
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-    std::string thumbfilestr = tmppath + "imgthumbs/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png";
+    std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     Magick::Image imgexists;
     bool thumbexists = false;
     try // attempt to open existing thumbnail
@@ -468,7 +468,7 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     {
 	//std::cout << "Error: " << error.what() << std::endl;
     }
-    //std::cout << "thumb file str: " << thumbfilestr << std::endl;
+    std::cout << "thumb file str: " << thumbfilestr << std::endl;
     FILE* tmpfile;
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     Magick::Geometry thumbgeometry(thumbsize, thumbsize);
@@ -533,8 +533,8 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
     bool inmemory = true;
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-    std::string thumbfilestr = tmppath + "vidthumbs/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png";
-    //std::cout << "thumb file str: " << thumbfilestr << std::endl;
+    std::string thumbfilestr = tmppath + "vidthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
+    std::cout << "thumb file str: " << thumbfilestr << std::endl;
     Magick::Image imgexists;
     bool thumbexists = false;
     try // attempt to open existing thumbnail

@@ -18,7 +18,6 @@ class ThumbViewer : public FXDialogBox
 
     private:
         FXVerticalFrame* vframe;
-	//FXImageView* imageview;
 	FXIconList* iconlist;
 
     protected:
@@ -26,10 +25,9 @@ class ThumbViewer : public FXDialogBox
 
     public:
         ThumbViewer(FXWindow* parent, const FXString& title);
-        //void LoadIcon(FXString curstring, FXIcon* curicon);
-        void LoadIcon(FXString iconpath, FXString itemname);
+        void LoadIcon(FXString iconpath);
         void SetItemSpace(int itemspace);
-	//void LoadImage(ForImg* curforimg, FileItem* curfileitem);
+	void Clear(void);
 };
 
 #endif // THUMBVIEWER_H
