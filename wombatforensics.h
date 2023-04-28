@@ -180,8 +180,6 @@ class WombatForensics : public FXMainWindow
         FXIcon* messagelogicon;
         FXButton* messagelogbutton;
 
-        //FXIcon* imgvidthumbicon;
-        //FXButton* imgvidthumbbutton;
         FXIcon* imagethumbicon;
         FXButton* imagethumbbutton;
         FXIcon* videothumbicon;
@@ -294,11 +292,6 @@ class WombatForensics : public FXMainWindow
         std::vector<FileItem> fileitemvector;
 	std::vector<FXString> vidthumbpathlist;
 	std::vector<FXString> imgthumbpathlist;
-	//std::vector<FXString> vidthumbnamelist;
-        //std::vector<std::string> imagethumblist;
-        //std::vector<FXString> tpathlist;
-        //std::vector<FXString> tnamelist;
-        //FXIconCache* thumbcache;
 
     protected:
         WombatForensics() {}

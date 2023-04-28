@@ -100,9 +100,6 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     messagelogbutton->setTipText("Message Log");
     new FXVerticalSeparator(toolbar);
     // ARTIFACT ICONS
-    //imgvidthumbicon = new FXPNGIcon(this->getApp(), imgvidthumbs);
-    //imgvidthumbbutton = new FXButton(toolbar, "", imgvidthumbicon, this, ID_IMGVIDTHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
-    //imgvidthumbbutton->setTipText("Thumbnail Viewer");
     imagethumbicon = new FXPNGIcon(this->getApp(), imagethumb);
     imagethumbbutton = new FXButton(toolbar, "", imagethumbicon, this, ID_IMAGETHUMB, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     imagethumbbutton->setTipText("Image Thumbnail Viewer");
@@ -301,7 +298,6 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
 
     savebutton->disable();
     evidmanbutton->disable();
-    //imgvidthumbbutton->disable();
     imagethumbbutton->disable();
     videothumbbutton->disable();
     digdeeperbutton->disable();
@@ -507,25 +503,6 @@ void WombatForensics::InitializeThumbCache()
     std::filesystem::path videopath(vidpath);
     for(auto const& direntry : std::filesystem::directory_iterator(videopath))
 	vidthumbpathlist.push_back(FXString(direntry.path().string().c_str()));
-    /*
-    tnamelist.clear();
-    tpathlist.clear();
-    //thumblist.clear();
-    //std::cout << "tmppath: " << tmppath.text() << std::endl;
-    std::string tpath = std::string(tmppath.text()) + "thumbs/";
-    std::filesystem::path thumbpath(tpath);
-    for(auto const& direntry : std::filesystem::directory_iterator(thumbpath))
-    {
-        //std::cout << "direntry: " << direntry.path() << std::endl;
-        //thumblist.push_back(direntry.path().string());
-        tpathlist.push_back(FXString(direntry.path().string().c_str()));
-        size_t found = direntry.path().string().rfind("/");
-        tnamelist.push_back(FXString(direntry.path().string().substr(found+1, std::string::npos).c_str()));
-    }
-    //thumbcache = new FXIconCache(this->getApp(), FXString(tmppath + "thumbs/"));
-    // find files in iconcache and write to thumblist...
-    // initialize thumbcache here..., so the lists match...
-    */
 }
 
 void WombatForensics::SaveCurrentCase()
@@ -585,7 +562,6 @@ void WombatForensics::EnableCaseButtons()
 {   
     savebutton->enable();
     evidmanbutton->enable();
-    //imgvidthumbbutton->enable();
     imagethumbbutton->enable();
     videothumbbutton->enable();
     digdeeperbutton->enable();
@@ -898,16 +874,6 @@ long WombatForensics::OpenImageThumbViewer(FXObject*, FXSelector, void*)
     imagethumbviewer->Clear();
     for(int i=0; i < imgthumbpathlist.size(); i++)
 	imagethumbviewer->LoadIcon(imgthumbpathlist.at(i));
-    //std::cout << "thumblist size: " << thumblist.size() << std::endl;
-    /*
-    for(int i=0; i < tpathlist.size(); i++)
-    {
-        //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
-        //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
-        //imagethumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
-    }
-    */
-    //std::cout << "image itemspace: " << GetSettings(0).toInt() << std::endl;
     imagethumbviewer->SetItemSpace(GetSettings(0).toInt());
     imagethumbviewer->show(PLACEMENT_OWNER);
     return 1;
@@ -918,17 +884,6 @@ long WombatForensics::OpenVideoThumbViewer(FXObject*, FXSelector, void*)
     videothumbviewer->Clear();
     for(int i=0; i < vidthumbpathlist.size(); i++)
 	videothumbviewer->LoadIcon(vidthumbpathlist.at(i));
-    //std::cout << "thumblist size: " << thumblist.size() << std::endl;
-    /*
-    for(int i=0; i < tpathlist.size(); i++)
-    {
-        //std::cout << "thumblist at " << i << ": " << thumblist.at(i) << std::endl;
-        //thumbviewer->LoadIcon(FXString(thumblist.at(i).c_str()), thumbcache->find(FXString(thumblist.at(i).c_str())));
-        //videothumbviewer->LoadIcon(tpathlist.at(i), tnamelist.at(i));
-
-    }
-    */
-    //std::cout << "video itemspace: " << GetSettings(0).toInt() * (100 / GetSettings(1).toInt()) << std::endl;
     videothumbviewer->SetItemSpace(GetSettings(0).toInt() * (100 / GetSettings(1).toInt()));
     videothumbviewer->show(PLACEMENT_OWNER);
     return 1;
@@ -2603,7 +2558,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	if(fileitemvector.size() > 0)
 	{
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    std::cout << currentfileitem.name << " " << currentfileitem.gid << std::endl;
+	    //std::cout << currentfileitem.name << " " << currentfileitem.gid << std::endl;
 	    PlainView(&currentfileitem);
 	}
     }
