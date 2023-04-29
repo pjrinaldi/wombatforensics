@@ -55,8 +55,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
-    imgview = new FXImageView(hsplitter);
-    imgview->hide();
+    //imgview = new FXImageView(hsplitter);
+    //imgview->hide();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
     msglog = new MessageLog(this, "Message Log");
     imagethumbviewer = new ThumbViewer(this, "Image Thumbnail Viewer");
@@ -2463,9 +2463,9 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     std::string filecontents = "";
     this->getApp()->beginWaitCursor();
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    /*
     if(curfileitem->cat.compare("Image") == 0)
     {
-        /*
 	if(plaintext->shown() || imgview->shown())
 	{
 	    plaintext->hide();
@@ -2492,18 +2492,17 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		std::cout << "error encoutered: " << error.what() << std::endl;
 	    }
 	}
-        */
     }
     else
-    {
+    {*/
 	ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
 	if(!plaintext->shown())
 	{
-	    imgview->hide();
+	    //imgview->hide();
 	    plaintext->show();
 	}
 	plaintext->setText(FXString(filecontents.c_str()));
-    }
+    //}
     this->getApp()->endWaitCursor();
     //ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
     //plaintext->setText(FXString(filecontents.c_str()));
