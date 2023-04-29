@@ -1386,7 +1386,7 @@ long WombatForensics::OpenXChomp(FXObject*, FXSelector, void*)
     std::string apppath = std::string(this->getApp()->getArgv()[0]);
     int found = apppath.find_last_of("/");
     std::string xchomppath = apppath.substr(0, found);
-    xchomppath += "/xchomp";
+    xchomppath += "/xchomp &";
     //std::cout << xchomppath << std::endl;
     std::system(xchomppath.c_str());
 
@@ -2830,10 +2830,27 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
 	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF
 	    {
+                std::string pdfpath = "/usr/bin/mupdf ";
+                bool inmemory = true;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                std::string tmpfilestr = "/tmp/wf" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
+                if(inmemory)
+                {
+                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
+                    file.seekp(0, std::ios::beg);
+                    file.write((char*)tmpbuf, currentfileitem.size);
+                }
+                delete[] tmpbuf;
+                pdfpath += tmpfilestr + " &";
+                std::system(pdfpath.c_str());
+                /*
 		PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
 		pdfview->LoadPdf(curforimg, &currentfileitem);
 		pdfview->create();
 		pdfview->show(PLACEMENT_CURSOR);
+                */
 	    }
 	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE
 	    {
@@ -2850,7 +2867,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
-                imgpath += tmpfilestr;
+                imgpath += tmpfilestr + " &";
                 std::system(imgpath.c_str());
                 /*
 		ImageViewer* imgview = new ImageViewer(this, "Image Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
@@ -2874,7 +2891,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
-                vidpath += tmpfilestr;
+                vidpath += tmpfilestr + " &";
                 std::system(vidpath.c_str());
             }
             else if(currentfileitem.sig.compare("Html") == 0) // HTML - SETTING 7
@@ -2892,7 +2909,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
-                htmlpath += tmpfilestr;
+                htmlpath += tmpfilestr + " &";
                 std::system(htmlpath.c_str());
             }
 	    else // default should be hex viewer of the content
