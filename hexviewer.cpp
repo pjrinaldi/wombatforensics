@@ -13,6 +13,7 @@ HexViewer::HexViewer(FXWindow* parent, const FXString& title):FXDialogBox(parent
 
 void HexViewer::LoadHex(ForImg* curforimg, FileItem* curfileitem)
 {
+    // GET CONTENT
     bool inmemory = true;
     uint8_t* tmpbuf = NULL;
     FILE* tmpfile;
@@ -81,10 +82,11 @@ void HexViewer::LoadHex(ForImg* curforimg, FileItem* curfileitem)
             filecontents += "\n";
         }
     }
-    // POPULATE SLACK
+    // GET SLACK
     uint8_t* slkbuf = NULL;
     uint64_t slacksize = 0;
     GetFileSlack(curforimg, curfileitem, &slkbuf, &slacksize);
+    // POPULATE SLACK
     if(slacksize > 0)
     {
 	filecontents += "\nSLACK SPACE\n-----------\n";
