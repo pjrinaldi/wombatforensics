@@ -3135,6 +3135,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         if(filecount == 0)
         {
             IncrementGlobalId(&globalid, &curid);
+            fileitems->at(i).gid = globalid;
             FXFile filefile;
             FXFile::create(filestr + FXString::value(globalid), FXIO::OwnerReadWrite);
             filefile.open(filestr + FXString::value(globalid), FXIO::Writing, FXIO::OwnerReadWrite);
