@@ -12,7 +12,7 @@ blake3:
 	cd ..
 
 # Link it all together
-
+# If i don't pull text from pdf's or html i can get rid of poppler and liblexbor_static
 wombatforensics: $(OBJECTS)
 	g++ -I/usr/include/ImageMagick-7/ -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -O3 -o wombatforensics $(OBJECTS) -lX11 -lXext -lXft -lfontconfig -lfreetype -lXcursor -lXrender -lXrandr -lXfixes -lXi -lGLU -lGL -ldl -lpthread -ljpeg -lrt -lpng -ltiff -lz -lbz2 -ltar -lewf -laff4 -lsmraw -lfwsi -lfwnt -lzstd -lmagic -lzip -lpoppler-cpp -lffmpegthumbnailer -lMagick++-7.Q16HDRI -lMagickCore-7.Q16HDRI liblexbor_static.a blake3/libblake3.a libFOX-1.7.a
 

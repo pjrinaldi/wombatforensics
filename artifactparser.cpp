@@ -1042,7 +1042,7 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
     else
     {
         // need to display hex here for the file...
-        std::cout << " launch internal/external viewer for files here..." << std::endl;
+        //std::cout << " launch internal/external viewer for files here..." << std::endl;
     }
 }
 
