@@ -2838,10 +2838,27 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    }
 	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE
 	    {
+                std::string imgpath = "/usr/bin/feh ";
+                bool inmemory = true;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
+                if(inmemory)
+                {
+                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
+                    file.seekp(0, std::ios::beg);
+                    file.write((char*)tmpbuf, currentfileitem.size);
+                }
+                delete[] tmpbuf;
+                imgpath += tmpfilestr;
+                std::system(imgpath.c_str());
+                /*
 		ImageViewer* imgview = new ImageViewer(this, "Image Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
 		imgview->LoadImage(curforimg, &currentfileitem);
 		imgview->create();
 		imgview->show(PLACEMENT_CURSOR);
+                */
 	    }
             else if(currentfileitem.cat.compare("Video") == 0) // VIDEO - SETTING 6
             {
