@@ -2461,9 +2461,11 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     uint8_t* slkbuf = NULL;
     FILE* tmpfile;
     std::string filecontents = "";
+    this->getApp()->beginWaitCursor();
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     if(curfileitem->cat.compare("Image") == 0)
     {
+        /*
 	if(plaintext->shown() || imgview->shown())
 	{
 	    plaintext->hide();
@@ -2476,20 +2478,21 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
 		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
 		FXFileStream stream;
-		this->getApp()->beginWaitCursor();
 		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
 		img->loadPixels(stream);
 		stream.close();
 		img->create();
+                this->getApp()->beginWaitCursor();
 		imgview->setImage(img);
 		imgview->update();
-		this->getApp()->endWaitCursor();
+                this->getApp()->endWaitCursor();
 	    }
 	    catch(Magick::Exception &error)
 	    {
 		std::cout << "error encoutered: " << error.what() << std::endl;
 	    }
 	}
+        */
     }
     else
     {
@@ -2501,6 +2504,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	}
 	plaintext->setText(FXString(filecontents.c_str()));
     }
+    this->getApp()->endWaitCursor();
     //ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
     //plaintext->setText(FXString(filecontents.c_str()));
     if(!inmemory)
@@ -2552,9 +2556,9 @@ void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t* currentid)
 
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 {
+    tablelist->selectRow(tablelist->getCurrentRow());
     if(tablelist->getCurrentRow() > -1)
     {
-        tablelist->selectRow(tablelist->getCurrentRow());
 	if(fileitemvector.size() > 0)
 	{
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
