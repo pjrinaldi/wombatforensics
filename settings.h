@@ -48,6 +48,14 @@ class Settings : public FXDialogBox
         FXLabel* htmllabel;
         FXTextField* htmltextfield;
         FXButton* htmlbutton;
+        FXHorizontalFrame* hframe11;
+        FXLabel* pdflabel;
+        FXTextField* pdftextfield;
+        FXButton* pdfbutton;
+        FXHorizontalFrame* hframe12;
+        FXLabel* imglabel;
+        FXTextField* imgtextfield;
+        FXButton* imgbutton;
 
     protected:
         Settings() {}
@@ -59,6 +67,8 @@ class Settings : public FXDialogBox
             ID_REPORTPATH = 102,
             ID_VIDPATH = 103,
             ID_HTMLPATH = 104,
+            ID_PDFPATH = 105,
+            ID_IMGPATH = 106,
             ID_LAST
         };
         Settings(FXWindow* parent, const FXString& title);
@@ -69,6 +79,8 @@ class Settings : public FXDialogBox
         long SetReportPath(FXObject*, FXSelector, void*);
         long SetVideoPath(FXObject*, FXSelector, void*);
         long SetHtmlPath(FXObject*, FXSelector, void*);
+        long SetPdfPath(FXObject*, FXSelector, void*);
+        long SetImagePath(FXObject*, FXSelector, void*);
 };
 
 FXDEFMAP(Settings) SettingsMap[]={
@@ -76,6 +88,8 @@ FXDEFMAP(Settings) SettingsMap[]={
     FXMAPFUNC(SEL_COMMAND, Settings::ID_REPORTPATH, Settings::SetReportPath),
     FXMAPFUNC(SEL_COMMAND, Settings::ID_VIDPATH, Settings::SetVideoPath),
     FXMAPFUNC(SEL_COMMAND, Settings::ID_HTMLPATH, Settings::SetHtmlPath),
+    FXMAPFUNC(SEL_COMMAND, Settings::ID_PDFPATH, Settings::SetPdfPath),
+    FXMAPFUNC(SEL_COMMAND, Settings::ID_IMGPATH, Settings::SetImagePath),
 };
 
 #endif // ABOUTBOX_H

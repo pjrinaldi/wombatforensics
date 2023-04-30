@@ -35,7 +35,7 @@
 #include "managehashlist.h"
 #include "hexviewer.h"
 #include "artifactparser.h"
-#include "pdfviewer.h"
+//#include "pdfviewer.h"
 #include "propviewer.h"
 //#include "imageviewer.h"
 #include "thumbviewer.h"
