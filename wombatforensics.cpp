@@ -2458,7 +2458,7 @@ void WombatForensics::FitColumnContents(int col)
 
 void WombatForensics::PlainView(FileItem* curfileitem)
 {
-    bool inmemory = true;
+    bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     uint8_t* slkbuf = NULL;
     FILE* tmpfile;
@@ -2849,7 +2849,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF - SETTING 9
 	    {
                 std::string pdfpath = std::string(GetSettings(8).text()) + " ";
-                bool inmemory = true;
+                bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
                 std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
@@ -2874,7 +2874,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE - SETTING 8
 	    {
                 std::string imgpath = std::string(GetSettings(9).text()) + " ";
-                bool inmemory = true;
+                bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
                 std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
@@ -2899,7 +2899,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             else if(currentfileitem.cat.compare("Video") == 0) // VIDEO - SETTING 6
             {
                 std::string vidpath = std::string(GetSettings(6).text()) + " ";
-                bool inmemory = true;
+                bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
                 std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
@@ -2917,7 +2917,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             else if(currentfileitem.sig.compare("Html") == 0) // HTML - SETTING 7
             {
                 std::string htmlpath = std::string(GetSettings(7).text()) + " ";
-                bool inmemory = true;
+                bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
                 std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";

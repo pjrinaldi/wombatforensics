@@ -341,8 +341,10 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
     std::cout << "curforimg: " << curforimg->ImageFileName() << std::endl;
     */
 
-    if(curfileitem->size > memlimit)
-        *inmemory = false;
+    if(curfileitem->size < memlimit)
+        *inmemory = true;
+    if(curfileitem->sig.compare("Shortcut") == 0 || curfileitem->sig.compare("Recycler") == 0 || curfileitem->sig.compare("Recycle.Bin") == 0 || curfileitem->sig.compare("Prefetch") == 0)
+        *inmemory = true;
     std::vector<std::string> layoutlist;
     layoutlist.clear();
     std::istringstream layoutstream(curfileitem->layout);
