@@ -2939,6 +2939,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
                 std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+                tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
                 GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 if(inmemory)
                 {
