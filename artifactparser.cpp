@@ -984,7 +984,7 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
     }
     else if(curfileitem->sig.compare("Pdf") == 0)
     {
-        /*
+        /**/
         if(!inmemory)
         {
             std::ifstream file(tmpfilestr.c_str(),  std::ios::binary | std::ios::ate);
@@ -999,7 +999,7 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
 	int pagecount = pdfdoc->pages();
 	for(int i=0; i < pagecount; i++)
 	    filecontents->append(pdfdoc->create_page(i)->text().to_latin1());
-        */
+        /**/
     }
     else if(curfileitem->sig.compare("Html") == 0)
     {

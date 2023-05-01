@@ -13,6 +13,7 @@
 #include <byteswap.h>
 #include <time.h>
 #include <fcntl.h>
+#include <thread>
 // FOX TOOLKIT GUI 
 #include "/usr/local/include/fox-1.7/fx.h"
 // PROJECT INCLUDES

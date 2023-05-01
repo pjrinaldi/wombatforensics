@@ -2464,6 +2464,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     FILE* tmpfile;
     std::string filecontents = "";
     this->getApp()->beginWaitCursor();
+    //std::thread tmp(GetFileContent, curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    //tmp.join();
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     /* // THREADING
 	for(int i=0; i < filelist.size(); i++)
@@ -2505,6 +2507,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     }
     else
     {*/
+	//std::thread tmp2(ParseArtifact, curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
+	//tmp2.join();
 	ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
 	if(!plaintext->shown())
 	{
@@ -2565,6 +2569,7 @@ void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t* currentid)
 
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 {
+    this->getApp()->beginWaitCursor();
     tablelist->selectRow(tablelist->getCurrentRow());
     if(tablelist->getCurrentRow() > -1)
     {
@@ -2575,6 +2580,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	    PlainView(&currentfileitem);
 	}
     }
+    this->getApp()->endWaitCursor();
 
     return 1;
 }
