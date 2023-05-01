@@ -52,9 +52,9 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tableheader->setArrowDir(13, 0);
     //tableheader->setHeaderStyle(HEADER_NORMAL|HEADER_TRACKING);
     plainfont = new FXFont(a, "monospace");
-    plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-    plaintext->setFont(plainfont);
-    plaintext->setEditable(false);
+    //plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    //plaintext->setFont(plainfont);
+    //plaintext->setEditable(false);
     //imgview = new FXImageView(hsplitter);
     //imgview->hide();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
@@ -2509,6 +2509,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     {*/
 	//std::thread tmp2(ParseArtifact, curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
 	//tmp2.join();
+        /*
 	ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
 	if(!plaintext->shown())
 	{
@@ -2516,6 +2517,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    plaintext->show();
 	}
 	plaintext->setText(FXString(filecontents.c_str()));
+        */
     //}
     this->getApp()->endWaitCursor();
     //ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);

@@ -152,7 +152,7 @@ class WombatForensics : public FXMainWindow
         FXHeader* tableheader;
         FXStatusBar* statusbar;
         FXFont* plainfont;
-        FXText* plaintext;
+        //FXText* plaintext;
 	//FXImageView* imgview;
 
         FXIcon* newicon;
