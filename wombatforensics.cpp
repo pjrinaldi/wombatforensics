@@ -851,10 +851,12 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
 long WombatForensics::OpenHexViewer(FXObject*, FXSelector, void*)
 {
     FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+    /*
     HexViewer* hexview = new HexViewer(this, fileitemstr);
     hexview->LoadHex(curforimg, &currentfileitem);
     hexview->create();
     hexview->show(PLACEMENT_CURSOR);
+    */
 
     return 1;
 }
@@ -2828,13 +2830,13 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 
 	    // THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF
+	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF - SETTING 9
 	    {
-                std::string pdfpath = "/usr/bin/mupdf ";
+                std::string pdfpath = std::string(GetSettings(8).text()) + " ";
                 bool inmemory = true;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
-                std::string tmpfilestr = "/tmp/wf" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
                 GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 if(inmemory)
                 {
@@ -2844,6 +2846,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
                 pdfpath += tmpfilestr + " &";
+                std::cout << "pdfpath: " << pdfpath << std::endl;
                 std::system(pdfpath.c_str());
                 /*
 		PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
@@ -2852,9 +2855,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		pdfview->show(PLACEMENT_CURSOR);
                 */
 	    }
-	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE
+	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE - SETTING 8
 	    {
-                std::string imgpath = "/usr/bin/feh ";
+                std::string imgpath = std::string(GetSettings(9).text()) + " ";
                 bool inmemory = true;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
@@ -2868,6 +2871,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
                 imgpath += tmpfilestr + " &";
+                std::cout << "imgpath: " << imgpath << std::endl;
                 std::system(imgpath.c_str());
                 /*
 		ImageViewer* imgview = new ImageViewer(this, "Image Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
@@ -2914,11 +2918,29 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             }
 	    else // default should be hex viewer of the content
 	    {
+                std::string hexpath = std::string(GetSettings(10).text()) + " ";
+                bool inmemory = false;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
+                if(inmemory)
+                {
+                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
+                    file.seekp(0, std::ios::beg);
+                    file.write((char*)tmpbuf, currentfileitem.size);
+                }
+                delete[] tmpbuf;
+                hexpath += tmpfilestr + " &";
+                std::cout << "hexpath: " << hexpath << std::endl;
+                std::system(hexpath.c_str());
+                /*
 		FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
 		HexViewer* hexview = new HexViewer(this, fileitemstr);
                 hexview->LoadHex(curforimg, &currentfileitem);
 		hexview->create();
 		hexview->show(PLACEMENT_CURSOR);
+                */
 	    }
             this->getApp()->endWaitCursor();
         }

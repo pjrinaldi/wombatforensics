@@ -2,7 +2,7 @@
 
 FXIMPLEMENT(Settings,FXDialogBox,SettingsMap,ARRAYNUMBER(SettingsMap))
 
-Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 540, 420, 0,0,0,0, 10, 10)
+Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, title, DECOR_TITLE|DECOR_BORDER|DECOR_CLOSE, 0, 0, 540, 450, 0,0,0,0, 10, 10)
 {
     mainframe = new FXVerticalFrame(this, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 0, 0, 10, 10, 10, 10);
     hframe1 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
@@ -58,6 +58,11 @@ Settings::Settings(FXWindow* parent, const FXString& title):FXDialogBox(parent, 
     new FXSpring(hframe12);
     imgtextfield = new FXTextField(hframe12, 40);
     imgbutton = new FXButton(hframe12, "Browse", NULL, this, ID_IMGPATH, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
+    hframe13 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
+    hexlabel = new FXLabel(hframe13, "Hex Viewer Path:", NULL, LAYOUT_FILL_X|JUSTIFY_LEFT);
+    new FXSpring(hframe13);
+    hextextfield = new FXTextField(hframe13, 40);
+    hexbutton = new FXButton(hframe13, "Browse", NULL, this, ID_HEXPATH, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 20,20);
     hframe8 = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_FILL_X);
     new FXLabel(hframe8, "", NULL, LAYOUT_FILL_X);
     new FXSpring(hframe8);
@@ -77,6 +82,7 @@ FXString Settings::ReturnSettings()
     settingsstring += "|" + htmltextfield->getText();
     settingsstring += "|" + pdftextfield->getText();
     settingsstring += "|" + imgtextfield->getText();
+    settingsstring += "|" + hextextfield->getText();
     return settingsstring;
 }
 
@@ -91,6 +97,7 @@ void Settings::LoadSettings(FXString cursettings)
     int found7 = cursettings.find("|", found6+1);
     int found8 = cursettings.find("|", found7+1);
     int found9 = cursettings.find("|", found8+1);
+    int found10 = cursettings.find("|", found9+1);
     thumbsizespinner->setValue(cursettings.left(found1).toUInt());
     vidthumbspinner->setValue(cursettings.mid(found1+1, found2 - found1 - 1).toUInt());
     casepathtextfield->setText(cursettings.mid(found2+1, found3 - found2 - 1));
@@ -100,7 +107,8 @@ void Settings::LoadSettings(FXString cursettings)
     vidtextfield->setText(cursettings.mid(found6+1, found7 - found6 - 1));
     htmltextfield->setText(cursettings.mid(found7+1, found8 - found7 - 1));
     pdftextfield->setText(cursettings.mid(found8+1, found9 - found8 - 1));
-    imgtextfield->setText(cursettings.mid(found9+1, cursettings.length() - found9 - 1));
+    imgtextfield->setText(cursettings.mid(found9+1, found10 - found9 - 1));
+    hextextfield->setText(cursettings.mid(found10+1, cursettings.length() - found10 - 1));
 }
 
 long Settings::SetCasePath(FXObject*, FXSelector, void*)
@@ -153,6 +161,15 @@ long Settings::SetImagePath(FXObject*, FXSelector, void*)
     FXString imgpathstring = FXFileDialog::getOpenFilename(this, "Select the Default Image Viewer Binary", imgtextfield->getText());
     if(!imgpathstring.empty())
         imgtextfield->setText(imgpathstring);
+
+    return 1;
+}
+
+long Settings::SetHexPath(FXObject*, FXSelector, void*)
+{
+    FXString hexpathstring = FXFileDialog::getOpenFilename(this, "Select the Default Hex Viewer Binary", hextextfield->getText());
+    if(!hexpathstring.empty())
+        hextextfield->setText(hexpathstring);
 
     return 1;
 }
