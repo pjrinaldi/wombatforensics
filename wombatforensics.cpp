@@ -2465,6 +2465,14 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     std::string filecontents = "";
     this->getApp()->beginWaitCursor();
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    /* // THREADING
+	for(int i=0; i < filelist.size(); i++)
+	{
+	    std::thread tmp(HashFile, filelist.at(i).string(), whlstr);
+	    tmp.join();
+	}
+     */
+
     /*
     if(curfileitem->cat.compare("Image") == 0)
     {
