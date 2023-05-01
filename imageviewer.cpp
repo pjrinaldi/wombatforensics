@@ -10,7 +10,7 @@ ImageViewer::ImageViewer(FXWindow* parent, const FXString& title):FXDialogBox(pa
 
 void ImageViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
 {
-    bool inmemory = true;
+    bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     FILE* tmpfile;
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);

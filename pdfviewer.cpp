@@ -73,7 +73,7 @@ void PdfViewer::LoadPage(int pnum)
 
 void PdfViewer::LoadPdf(ForImg* curforimg, FileItem* curfileitem)
 {
-    bool inmemory = true;
+    bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     FILE* tmpfile;
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);

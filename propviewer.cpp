@@ -23,7 +23,7 @@ PropertyViewer::PropertyViewer(FXWindow* parent, const FXString& title):FXDialog
 /*
 void PropertyViewer::LoadHex(ForImg* curforimg, FileItem* curfileitem)
 {
-    bool inmemory = true;
+    bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     FILE* tmpfile;
     FXString filecontents = "";

@@ -435,7 +435,7 @@ void HashFile(FileItem* curfileitem, ForImg* curforimg)
     //std::cout << "hash it here..." << std::endl;
     //std::cout << "curfileitem layout: " << curfileitem->layout << std::endl;
 
-    bool inmemory = true;
+    bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     FILE* tmpfile;
@@ -455,7 +455,7 @@ void HashFile(FileItem* curfileitem, ForImg* curforimg)
 
 void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std::string tmppath)
 {
-    bool inmemory = true;
+    bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
@@ -533,7 +533,7 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 
 void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int thumbcount, std::string tmppath)
 {
-    bool inmemory = true;
+    bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     std::string thumbfilestr = tmppath + "vidthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";

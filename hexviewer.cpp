@@ -14,7 +14,7 @@ HexViewer::HexViewer(FXWindow* parent, const FXString& title):FXDialogBox(parent
 void HexViewer::LoadHex(ForImg* curforimg, FileItem* curfileitem)
 {
     // GET CONTENT
-    bool inmemory = true;
+    bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     FILE* tmpfile;
     FXString filecontents = "";
