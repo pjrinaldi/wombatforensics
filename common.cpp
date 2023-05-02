@@ -361,6 +361,7 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
         tmpbuf = new uint8_t[curfileitem->size];
     if(!*inmemory)
     {
+        //tmpbuf = new uint8_t[524288];
         //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
         tmpfile = fopen(tmpfilestr.c_str(), "w+");
     }
@@ -442,9 +443,12 @@ void HashFile(FileItem* curfileitem, ForImg* curforimg)
 
     bool inmemory = false;
     uint8_t* tmpbuf = NULL;
-    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-    FILE* tmpfile;
-    GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    FILE* tmpfile = NULL;
+    //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    if(!std::filesystem::exists(tmpfilestr))
+        GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
 
     blake3_hasher hasher;
     blake3_hasher_init(&hasher);
@@ -462,8 +466,9 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 {
     bool inmemory = false;
     uint8_t* tmpbuf = NULL;
-    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
+    thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
     //std::cout << "tmpfilestr: " << tmpfilestr << " thumbfilestr: " << thumbfilestr << std::endl;
     Magick::Image imgexists;
     bool thumbexists = false;
@@ -478,7 +483,10 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     }
     //std::cout << "thumb file str: " << thumbfilestr << std::endl;
     FILE* tmpfile;
-    GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    if(!std::filesystem::exists(tmpfilestr))
+        GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     Magick::Geometry thumbgeometry(thumbsize, thumbsize);
     if(thumbexists && (imgexists.size().width() == thumbsize || imgexists.size().height() == thumbsize))
     {
@@ -540,8 +548,9 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 {
     bool inmemory = false;
     uint8_t* tmpbuf = NULL;
-    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     std::string thumbfilestr = tmppath + "vidthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
+    thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
     //std::cout << "thumb file str: " << thumbfilestr << std::endl;
     Magick::Image imgexists;
     bool thumbexists = false;
@@ -554,7 +563,10 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
     {
     }
     FILE* tmpfile;
-    GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    if(!std::filesystem::exists(tmpfilestr))
+        GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     if(inmemory)
     {
 	std::ofstream sfile(tmpfilestr.c_str(), std::ios::binary);
