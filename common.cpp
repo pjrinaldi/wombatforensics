@@ -407,14 +407,17 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
     delete[] tmpbuf;
 }
 
-void GetPreviewContent(ForImg* curforimg, FileItem* curfileitem, uint8_t** prebuf)
+void GetPreviewContent(ForImg* curforimg, FileItem* curfileitem, uint8_t** prebuf, uint64_t bufsize)
 {
+    /*
     uint64_t bufsize = 524288;
     if(curfileitem->size < bufsize)
         bufsize = curfileitem->size;
-    *prebuf = new uint8_t[bufsize];
+    */
+    uint8_t* tmpbuf = new uint8_t[bufsize];
 
     uint64_t curlogicalsize = 0;
+    uint64_t curpos = 0;
     std::vector<std::string> layoutlist;
     layoutlist.clear();
     std::istringstream layoutstream(curfileitem->layout);
@@ -430,42 +433,22 @@ void GetPreviewContent(ForImg* curforimg, FileItem* curfileitem, uint8_t** prebu
         uint8_t* inbuf = NULL; 
         if(curlogicalsize < bufsize)
         {
-        }
-        else
-        {
-        }
-        /*
-        if(curlogicalsize <= curfileitem->size)
-        {
             inbuf = new uint8_t[cursize];
             curforimg->ReadContent(inbuf, curoffset, cursize);
-            if(*inmemory)
-                memcpy(&tmpbuf[curpos], inbuf, cursize);
-            else
-                fwrite(inbuf, 1, cursize, tmpfile);
+            memcpy(&tmpbuf[curpos], inbuf, cursize);
             curpos += cursize;
         }
         else
         {
-            inbuf = new uint8_t[(cursize - (curlogicalsize - curfileitem->size))];
-            curforimg->ReadContent(inbuf, curoffset, (cursize - (curlogicalsize - curfileitem->size)));
-            //std::cout << "reduction size: " << cursize - (curlogicalsize - curfileitem->size) << std::endl;
-            //std::cout << "inbuf head: " << (char)inbuf[0] << (char)inbuf[1] << std::endl;
-            if(*inmemory)
-                memcpy(&tmpbuf[curpos], inbuf, (cursize - (curlogicalsize - curfileitem->size)));
-            else
-                fwrite(inbuf, 1, (cursize - (curlogicalsize - curfileitem->size)), tmpfile);
-            curpos += cursize - (curlogicalsize - curfileitem->size);
+            inbuf = new uint8_t[(cursize - (curlogicalsize - bufsize))];
+            curforimg->ReadContent(inbuf, curoffset, (cursize - (curlogicalsize - bufsize)));
+            memcpy(&tmpbuf[curpos], inbuf, (cursize - (curlogicalsize - bufsize)));
+            curpos += cursize - (curlogicalsize - bufsize);
         }
         delete[] inbuf;
     }
-    fclose(tmpfile);
-    //std::cout << "tmpbuf in function: " << tmpbuf[0] << tmpbuf[1] << std::endl;
-    if(*inmemory)
-	*tmpbuffer = tmpbuf;
-
-         */ 
-    }
+    *prebuf = tmpbuf;
+    delete[] tmpbuf;
 }
 
 void GetFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t** tmpbuf, uint64_t* slacksize)
