@@ -2483,8 +2483,19 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     uint64_t bufsize = 524288;
     if(curfileitem->size < bufsize)
         bufsize = curfileitem->size;
-    GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
-    ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
+    if(curfileitem->cat.compare("Image") == 0 || curfileitem->cat.compare("Video") == 0)
+    {
+        plaintext->hide();
+        imgview->show();
+    }
+    else
+    {
+        imgview->hide();
+        plaintext->show();
+        GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
+        ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
+        plaintext->setText(FXString(filecontents.c_str()));
+    }
     /*
     if(curfileitem->sig.compare("Pdf") == 0)
     {

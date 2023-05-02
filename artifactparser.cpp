@@ -30,11 +30,48 @@ void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents)
 
 void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
 {
+    /*
+    if(curfileitem->sig.compare("Pdf") == 0)
+    {
+	poppler::document* pdfdoc;
+	poppler::page* pdfpage;
+        pdfdoc = poppler::document::load_from_file(tmpfilestr);
+	int pagecount = pdfdoc->pages();
+        if(pagecount > 0)
+        {
+            std::string prevcontent = pdfdoc->create_page(0)->text().to_latin1();
+            plaintext->setText(FXString(prevcontent.c_str()));
+        }
+    }
+    else if(curfileitem->sig.compare("Html") == 0)
+    {
+	lxb_status_t status;
+	lxb_html_tokenizer_t* tkz;
+        std::string filecontents = "";
+
+	tkz = lxb_html_tokenizer_create();
+	status = lxb_html_tokenizer_init(tkz);
+	lxb_html_tokenizer_callback_token_done_set(tkz, token_callback, &filecontents);
+
+	status = lxb_html_tokenizer_begin(tkz);
+	status = lxb_html_tokenizer_chunk(tkz, prebuf, bufsize);
+	//status = lxb_html_tokenizer_chunk(tkz, tmpbuf, curfileitem->size);
+	status = lxb_html_tokenizer_end(tkz);
+	lxb_html_tokenizer_destroy(tkz);
+        plaintext->setText(FXString(filecontents.c_str()));
+    }
+    else // partial hex preview
+    {
+        GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
+    }
+    */
 }
 
 void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents)
 {
-    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(curfileitem->sig.compare("Microsoft Word 2007+") == 0) // word document
     {
         zip_error_t err;
