@@ -2470,6 +2470,11 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(!std::filesystem::exists(tmpfilestr))
 	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    if(!inmemory) // get preview text
+    {
+        uint8_t* prebuf = NULL;
+        GetPreviewContent(curforimg, curfileitem, &prebuf);
+    }
 
     /* // THREADING
 	for(int i=0; i < filelist.size(); i++)

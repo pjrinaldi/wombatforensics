@@ -407,6 +407,22 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
     //delete[] tmpbuf;
 }
 
+void GetPreviewContent(ForImg* curforimg, FileItem* curfileitem, uint8_t** prebuf)
+{
+    std::vector<std::string> layoutlist;
+    layoutlist.clear();
+    std::istringstream layoutstream(curfileitem->layout);
+    std::string curlayout;
+    while(getline(layoutstream, curlayout, ";"))
+        layoutlist.push_back(curlayout);
+    for(int i=0; i < layoutlist.size(); i++)
+    {
+        std::size_t layoutsplit = layoutlist.at(i).find(",");
+        uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
+        uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
+    }
+}
+
 void GetFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t** tmpbuf, uint64_t* slacksize)
 {
     std::vector<std::string> layoutlist;
