@@ -65,6 +65,37 @@ void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem
         GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
     }
     */
+    /*
+    if(curfileitem->cat.compare("Image") == 0)
+    {
+	if(plaintext->shown() || imgview->shown())
+	{
+	    plaintext->hide();
+	    imgview->show();
+	    try
+	    {
+		Magick::Blob inblob(tmpbuf, curfileitem->size);
+		Magick::Image inimage(inblob);
+		inimage.magick("PNG");
+		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
+		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		FXFileStream stream;
+		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
+		img->loadPixels(stream);
+		stream.close();
+		img->create();
+                this->getApp()->beginWaitCursor();
+		imgview->setImage(img);
+		imgview->update();
+                this->getApp()->endWaitCursor();
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		std::cout << "error encoutered: " << error.what() << std::endl;
+	    }
+	}
+    }
+    */
 }
 
 void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents)
