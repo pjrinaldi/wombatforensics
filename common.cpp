@@ -330,6 +330,7 @@ std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocks
 
 void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t** tmpbuffer, FILE* tmpfile)
 {
+    std::cout << "GetFileContent() called to generate tmpfile." << std::endl;
     uint64_t memlimit = 4294967296; // 4GB
     /*
     bool inmemory = true;
@@ -341,9 +342,9 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
     std::cout << "curforimg: " << curforimg->ImageFileName() << std::endl;
     */
 
-    if(curfileitem->size < memlimit)
-        *inmemory = true;
-    if(curfileitem->sig.compare("Shortcut") == 0 || curfileitem->sig.compare("Recycler") == 0 || curfileitem->sig.compare("Recycle.Bin") == 0 || curfileitem->sig.compare("Prefetch") == 0)
+    //if(curfileitem->size < memlimit)
+    //    *inmemory = true;
+    if((curfileitem->sig.compare("Shortcut") == 0 || curfileitem->sig.compare("Recycler") == 0 || curfileitem->sig.compare("Recycle.Bin") == 0 || curfileitem->sig.compare("Prefetch") == 0) && curfileitem->size < memlimit)
         *inmemory = true;
     std::vector<std::string> layoutlist;
     layoutlist.clear();
@@ -354,13 +355,14 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
     uint64_t curlogicalsize = 0;
     uint8_t* tmpbuf = NULL;
     //std::string tmpfilestr = "";
-    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(*inmemory) // store in memory
         tmpbuf = new uint8_t[curfileitem->size];
     if(!*inmemory)
     {
-        tmpfile = fopen(tmpfilestr.c_str(), "w+");
         //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
+        tmpfile = fopen(tmpfilestr.c_str(), "w+");
     }
     uint64_t curpos = 0;
     for(int i=0; i < layoutlist.size(); i++)
@@ -397,8 +399,11 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
         }
         delete[] inbuf;
     }
+    fclose(tmpfile);
     //std::cout << "tmpbuf in function: " << tmpbuf[0] << tmpbuf[1] << std::endl;
-    *tmpbuffer = tmpbuf;
+    if(*inmemory)
+	*tmpbuffer = tmpbuf;
+    //delete[] tmpbuf;
 }
 
 void GetFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t** tmpbuf, uint64_t* slacksize)

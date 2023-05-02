@@ -2461,12 +2461,15 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     bool inmemory = false;
     uint8_t* tmpbuf = NULL;
     uint8_t* slkbuf = NULL;
-    FILE* tmpfile;
+    FILE* tmpfile = NULL;
     std::string filecontents = "";
     this->getApp()->beginWaitCursor();
     //std::thread tmp(GetFileContent, curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     //tmp.join();
-    GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    if(!std::filesystem::exists(tmpfilestr))
+	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     /* // THREADING
 	for(int i=0; i < filelist.size(); i++)
 	{
@@ -2522,8 +2525,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     this->getApp()->endWaitCursor();
     //ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
     //plaintext->setText(FXString(filecontents.c_str()));
-    if(!inmemory)
-	fclose(tmpfile);
+    //if(!inmemory)
+	//fclose(tmpfile);
     delete[] tmpbuf;
 }
 
@@ -2846,13 +2849,16 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 
 	    // THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+            tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
 	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF - SETTING 9
 	    {
                 std::string pdfpath = std::string(GetSettings(8).text()) + " ";
+		/*
                 bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
-                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
                 GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 if(inmemory)
                 {
@@ -2861,8 +2867,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
+		*/
                 pdfpath += tmpfilestr + " &";
-                std::cout << "pdfpath: " << pdfpath << std::endl;
+                //std::cout << "pdfpath: " << pdfpath << std::endl;
                 std::system(pdfpath.c_str());
                 /*
 		PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
@@ -2874,10 +2881,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE - SETTING 8
 	    {
                 std::string imgpath = std::string(GetSettings(9).text()) + " ";
+		/*
                 bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
-                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+		std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
                 GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 if(inmemory)
                 {
@@ -2886,8 +2895,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
+		*/
                 imgpath += tmpfilestr + " &";
-                std::cout << "imgpath: " << imgpath << std::endl;
+                //std::cout << "imgpath: " << imgpath << std::endl;
                 std::system(imgpath.c_str());
                 /*
 		ImageViewer* imgview = new ImageViewer(this, "Image Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
@@ -2899,10 +2909,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             else if(currentfileitem.cat.compare("Video") == 0) // VIDEO - SETTING 6
             {
                 std::string vidpath = std::string(GetSettings(6).text()) + " ";
+		/*
                 bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
-                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+		std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
                 GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 if(inmemory)
                 {
@@ -2911,16 +2923,19 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
+		*/
                 vidpath += tmpfilestr + " &";
                 std::system(vidpath.c_str());
             }
             else if(currentfileitem.sig.compare("Html") == 0) // HTML - SETTING 7
             {
                 std::string htmlpath = std::string(GetSettings(7).text()) + " ";
+		/*
                 bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
-                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+		std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
                 GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 if(inmemory)
                 {
@@ -2929,16 +2944,19 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
+		*/
                 htmlpath += tmpfilestr + " &";
                 std::system(htmlpath.c_str());
             }
 	    else // default should be hex viewer of the content
 	    {
                 std::string hexpath = std::string(GetSettings(10).text()) + " ";
+		/*
                 bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
-                std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
+		std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
                 tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
                 GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 if(inmemory)
@@ -2948,8 +2966,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
+		*/
                 hexpath += tmpfilestr + " &";
-                std::cout << "hexpath: " << hexpath << std::endl;
+                //std::cout << "hexpath: " << hexpath << std::endl;
                 std::system(hexpath.c_str());
                 /*
 		FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
