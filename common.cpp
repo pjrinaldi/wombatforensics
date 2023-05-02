@@ -413,7 +413,7 @@ void GetPreviewContent(ForImg* curforimg, FileItem* curfileitem, uint8_t** prebu
     layoutlist.clear();
     std::istringstream layoutstream(curfileitem->layout);
     std::string curlayout;
-    while(getline(layoutstream, curlayout, ";"))
+    while(getline(layoutstream, curlayout, ';'))
         layoutlist.push_back(curlayout);
     for(int i=0; i < layoutlist.size(); i++)
     {
