@@ -124,6 +124,235 @@ void ParseRecycleBin(FileItem* curfileitem, uint8_t* prebuf, std::string* fileco
     delete[] fnamestr;
 }
 
+void ParseDirectory(CurrentItem* curitem, FileItem* curfileitem, std::string* filecontents)
+{
+    std::vector<FileItem> fileitemvector;
+    fileitemvector.clear();
+    int filecount = 0;
+    if(curfileitem->gid == 0)
+        filecount = ReadDirectory(curitem, &fileitemvector, NULL);
+    else
+        filecount = ReadDirectory(curitem, &fileitemvector, curfileitem);
+    filecontents->clear();
+    std::string titlestring = "File Listing for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+    filecontents->append(titlestring + "\n");
+    for(int i=0; i < titlestring.size(); i++)
+        filecontents->append("-");
+    filecontents->append("\n\n");
+    /*
+    std::string thstring = "#\tFileName\tSize";
+    filecontents->append(thstring + "\n");
+    for(int i=0; i < thstring.size() + 13; i++)
+        filecontents->append("-");
+    filecontents->append("\n");
+    */
+    for(int i=0; i < fileitemvector.size(); i++)
+        filecontents->append("(" + std::to_string(i+1) + ")  " + fileitemvector.at(i).name + "\n");
+}
+
+void ParseDocx(FileItem* curfileitem, std::string* filecontents)
+{
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+
+    zip_error_t err;
+    int interr = 0;
+    int zipfileid = 0;
+    std::string zipfilename = "";
+    zip_uint64_t zipfilesize = 0;
+    zip_t* curzip = NULL;
+    curzip = zip_open(tmpfilestr.c_str(), ZIP_RDONLY, &interr);
+    int64_t zipentrycnt = zip_get_num_entries(curzip, 0);
+    //std::cout << "zip entries count: " << zipentrycnt << std::endl;
+    struct zip_stat zipstat;
+    zip_stat_init(&zipstat);
+    for(int i=0; i < zipentrycnt; i++)
+    {
+        zip_stat_index(curzip, i, 0, &zipstat);
+        if(strcmp(zipstat.name, "word/document.xml") == 0)
+        {
+            zipfileid = i;
+            zipfilename = zipstat.name;
+            zipfilesize = zipstat.size;
+        }
+    }
+    //std::cout << "zipfileid: " << zipfileid << std::endl;
+    zip_file_t* docxml = zip_fopen_index(curzip, zipfileid, ZIP_FL_UNCHANGED);
+    char zipfilebuf[zipfilesize+1];
+    zip_int64_t bytesread = zip_fread(docxml, zipfilebuf, zipfilesize);
+    zipfilebuf[zipfilesize] = 0;
+    interr = zip_fclose(docxml);
+
+    rapidxml::xml_document<> worddoc;
+    worddoc.parse<0>(zipfilebuf);
+    rapidxml::xml_node<>* rootnode = worddoc.first_node();
+    GetXmlText(rootnode, filecontents);
+    //std::cout << filecontents << std::endl;
+}
+
+void ParsePrefetch(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecontents)
+{
+    uint8_t* udata = NULL;
+    std::string titlestring = "Prefetch File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+    filecontents->clear();
+    filecontents->append(titlestring + "\n");
+    for(int i=0; i < titlestring.size(); i++)
+        filecontents->append("-");
+    filecontents->append("\n\n");
+    uint8_t* mamchar = new uint8_t[3];
+    mamchar = substr(tmpbuf, 0, 3);
+    if(std::string((char*)mamchar).compare("MAM") == 0) // WIN10+ Prefetch
+    {
+        uint32_t datasize = 0;
+        ReadInteger(tmpbuf, 4, &datasize);
+        libfwnt_error_t* fwnterror = NULL;
+        size_t compressedsize = curfileitem->size - 8;
+        size_t usize = datasize;
+        uint8_t* compresseddata = new uint8_t[compressedsize];
+        udata = new uint8_t[usize];
+        compresseddata = substr(tmpbuf, 8, compressedsize);
+        libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, udata, &usize, &fwnterror);
+        delete[] compresseddata;
+    }
+    else
+        udata = tmpbuf;
+    delete[] mamchar;
+    // NOW WE HAVE THE CONTENT FROM EITHER TYPE AS REGULAR PREFETCH, RUN SIG CHECK AND PARSE
+    uint8_t* sigchar = new uint8_t[4];
+    sigchar = substr(udata, 4, 4);
+    if(std::string((char*)sigchar).compare("SCCA") == 0) // PARSE Prefetch
+    {
+        uint32_t pfversion = 0;
+        ReadInteger(udata, 0, &pfversion);
+        filecontents->append("Format Version\t\t| " + std::to_string(pfversion) + "\n");
+        filecontents->append("Executable Filename\t| ");
+        std::string fname = "";
+        for(int i=0; i < 60; i++)
+        {
+            uint16_t singleletter = 0;
+            ReadInteger(udata, 16 + i*2, &singleletter);
+            if(singleletter == 0x0000)
+                break;
+            fname += (char)singleletter;
+        }
+        filecontents->append(fname + "\n");
+        uint32_t pfhash = 0;
+        ReadInteger(udata, 76, &pfhash);
+        std::stringstream hashstream;
+        hashstream << std::hex << pfhash;
+        filecontents->append("Prefetch Hash\t\t| 0x" + hashstream.str() + "\n");
+        uint32_t metricsoffset = 0;
+        ReadInteger(udata, 84, &metricsoffset);
+        uint16_t fileinformationsize = 0;
+        if(pfversion == 17) // WINXP, WIN2003
+        {
+            fileinformationsize = 68;
+        }
+        else if(pfversion == 23) // WINVISTA, WIN7
+        {
+            fileinformationsize = 156;
+        }
+        else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130)) // WIN8.1, WIN10
+        {
+            fileinformationsize = 224;
+        }
+        else if(pfversion == 30 && metricsoffset == 0x128) // WIN10
+        {
+            fileinformationsize = 216;
+        }
+        uint32_t fnamestringoffset = 0;
+        ReadInteger(udata, 100, &fnamestringoffset);
+        uint32_t fnamestringsize = 0;
+        ReadInteger(udata, 104, &fnamestringsize);
+        uint32_t volinfooffset = 0;
+        ReadInteger(udata, 108, &volinfooffset);
+        uint32_t volinfocount = 0;
+        ReadInteger(udata, 112, &volinfocount);
+        uint32_t volinfosize = 0;
+        ReadInteger(udata, 116, &volinfosize);
+        uint32_t runcount = 0;
+        if(pfversion == 17)
+            ReadInteger(udata, 60, &runcount);
+        else if(pfversion == 23)
+            ReadInteger(udata, 68, &runcount);
+        else if(pfversion == 26 || (pfversion == 30 && metricsoffset == 0x130))
+            ReadInteger(udata, 124, &runcount);
+        else if(pfversion == 30 && metricsoffset == 0x128)
+            ReadInteger(udata, 116, &runcount);
+        filecontents->append("Run Count\t\t| " + std::to_string(runcount) + "\n");
+        uint64_t lastruntime = 0;
+        if(pfversion == 17)
+        {
+            ReadInteger(udata, 120, &lastruntime);
+            filecontents->append("Last Run Time\t\t| " + ConvertWindowsTimeToUnixTimeUTC(lastruntime) + "\n");
+        }
+        else if(pfversion == 23)
+        {
+            ReadInteger(udata, 128, &lastruntime);
+            filecontents->append("Last Run Time\t\t| " + ConvertWindowsTimeToUnixTimeUTC(lastruntime) + "\n");
+        }
+        else if(pfversion == 26 || pfversion == 30)
+        {
+            for(int i=0; i < 8; i++)
+            {
+                ReadInteger(udata, 128 + i*8, &lastruntime);
+                if(lastruntime == 0)
+                    filecontents->append("Last Run Time " + std::to_string(i+1) + "\t| Not Set (0)\n");
+                else
+                    filecontents->append("Last Run Time " + std::to_string(i+1) + "\t| " + ConvertWindowsTimeToUnixTimeUTC(lastruntime) + "\n");
+            }
+        }
+        std::string tmpstr = "";
+        int increment = 1;
+        //std::cout << "fname string offset: " << fnamestringoffset << " fname string size: " << fnamestringsize << std::endl;
+        for(int i=0; i < fnamestringsize/2; i++)
+        {
+            uint16_t singleletter = 0;
+            ReadInteger(udata, fnamestringoffset + i*2, &singleletter);
+            if(singleletter == 0x0000)
+            {
+                filecontents->append("File Name " + std::to_string(increment) + "\t\t| " + tmpstr + "\n");
+                increment++;
+                tmpstr = "";
+            }
+            else
+                tmpstr += (char)singleletter;
+        }
+        filecontents->append("\n");
+        for(int i=0; i < volinfocount; i++)
+        {
+            int curpos = 0;
+            uint32_t volpathoffset = 0;
+            uint32_t volpathsize = 0;
+            std::string volpathstr = "";
+            if(pfversion == 17)
+                curpos = 40*i;
+            else if(pfversion == 23 || pfversion == 26)
+                curpos = 104*i;
+            else if(pfversion == 30)
+                curpos = 96*i;
+            ReadInteger(udata, volinfooffset + curpos, &volpathoffset);
+            ReadInteger(udata, volinfooffset + curpos + 4, &volpathsize);
+            for(int j=0; j < volpathsize; j++)
+            {
+                uint16_t singleletter = 0;
+                ReadInteger(udata, volinfooffset + curpos + volpathoffset + j*2, &singleletter);
+                volpathstr += (char)singleletter;
+            }
+            filecontents->append("Volume " + std::to_string(i+1) + " Path\t\t| " + volpathstr + "\n");
+            uint64_t volctime = 0;
+            ReadInteger(udata, volinfooffset + curpos + 8, &volctime);
+            filecontents->append("Volume " + std::to_string(i+1) + " Creation\t| " + ConvertWindowsTimeToUnixTimeUTC(volctime) + "\n");
+            uint32_t volserial = 0;
+            ReadInteger(udata, volinfooffset + curpos + 16, &volserial);
+            std::stringstream vserstream;
+            vserstream << std::hex << volserial;
+            filecontents->append("Volume " + std::to_string(i+1) + " Serial\t\t| 0x" + vserstream.str() + "\n");
+        }
+    }
+
+}
+
 void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents, Magick::Image* previmg)
 {
     if(curfileitem->sig.compare("Pdf") == 0) // PDF file
@@ -141,6 +370,18 @@ void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem
     else if(curfileitem->sig.compare("Recycle.Bin") == 0) // $I file
     {
         ParseRecycleBin(curfileitem, prebuf, filecontents);
+    }
+    else if(curfileitem->sig.compare("Directory") == 0) // directory listing
+    {
+        ParseDirectory(curitem, curfileitem, filecontents);
+    }
+    else if(curfileitem->sig.compare("Microsoft Word 2007+") == 0) // word document (docx)
+    {
+        ParseDocx(curfileitem, filecontents);
+    }
+    else if(curfileitem->sig.compare("Prefetch") == 0) // pf file
+    {
+        ParsePrefetch(curfileitem, prebuf, filecontents);
     }
     else // partial hex preview
     {

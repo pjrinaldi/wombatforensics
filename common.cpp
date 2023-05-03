@@ -330,7 +330,7 @@ std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocks
 
 void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, uint8_t** tmpbuffer, FILE* tmpfile)
 {
-    std::cout << "GetFileContent() called to generate tmpfile." << std::endl;
+    //std::cout << "GetFileContent() called to generate tmpfile." << std::endl;
     uint64_t memlimit = 4294967296; // 4GB
     /*
     bool inmemory = true;

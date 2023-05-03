@@ -31,5 +31,8 @@ void ParsePdf(FileItem* curfileitem, std::string* filecontents);
 void ParseHtml(uint8_t* prebuf, uint64_t bufsize, std::string* filecontents);
 void ParseRecycler(FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents);
 void ParseRecycleBin(FileItem* curfileitem, uint8_t* prebuf, std::string* filecontents);
+void ParseDirectory(CurrentItem* curitem, FileItem* curfileitem, std::string* filecontents);
+void ParseDocx(FileItem* curfileitem, std::string* filecontents);
+void ParsePrefetch(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecontents);
 
 #endif // ARTIFACTPARSER_H
