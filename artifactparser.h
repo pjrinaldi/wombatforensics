@@ -34,5 +34,6 @@ void ParseRecycleBin(FileItem* curfileitem, uint8_t* prebuf, std::string* fileco
 void ParseDirectory(CurrentItem* curitem, FileItem* curfileitem, std::string* filecontents);
 void ParseDocx(FileItem* curfileitem, std::string* filecontents);
 void ParsePrefetch(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecontents);
+void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecontents);
 
 #endif // ARTIFACTPARSER_H
