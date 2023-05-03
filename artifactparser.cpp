@@ -86,6 +86,44 @@ void ParseRecycler(FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std
     }
 }
 
+void ParseRecycleBin(FileItem* curfileitem, uint8_t* prebuf, std::string* filecontents)
+{
+    std::string titlestring = "$I File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+    filecontents->clear();
+    filecontents->append(titlestring + "\n");
+    for(int i=0; i < titlestring.size(); i++)
+        filecontents->append("-");
+    filecontents->append("\n\n");
+    uint64_t versionformat = 0;
+    ReadInteger(prebuf, 0, &versionformat);
+    uint64_t filesize = 0;
+    ReadInteger(prebuf, 8, &filesize);
+    uint64_t deletedate = 0;
+    ReadInteger(prebuf, 16, &deletedate);
+    uint32_t fnamesize = 0;
+    uint32_t offset = 24;
+    if(versionformat == 0x01)
+        fnamesize = 520;
+    else if(versionformat == 0x02)
+    {
+        uint32_t fnamesize = 0;
+        ReadInteger(prebuf, 24, &fnamesize);
+        offset = 28;
+    }
+    uint8_t* fnamestr = new uint8_t[fnamesize/2 +1];
+    for(int i=0; i < fnamesize / 2; i++)
+    {
+        uint16_t singleletter = 0;
+        ReadInteger(prebuf, offset + i*2, &singleletter);
+        fnamestr[i] = (uint8_t)singleletter;
+    }
+    fnamestr[fnamesize] = 0;
+    filecontents->append("File Path\t| " + std::string((char*)fnamestr) + "\n");
+    filecontents->append("Deleted Date\t| " + ConvertWindowsTimeToUnixTimeUTC(deletedate) + "\n");
+    filecontents->append("File Size\t| " + ReturnFormattingSize(filesize) + " bytes\n");
+    delete[] fnamestr;
+}
+
 void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents, Magick::Image* previmg)
 {
     if(curfileitem->sig.compare("Pdf") == 0) // PDF file
@@ -99,6 +137,10 @@ void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem
     else if(curfileitem->sig.compare("Recycler") == 0) // INFO2 file
     {
         ParseRecycler(curfileitem, prebuf, bufsize, filecontents);
+    }
+    else if(curfileitem->sig.compare("Recycle.Bin") == 0) // $I file
+    {
+        ParseRecycleBin(curfileitem, prebuf, filecontents);
     }
     else // partial hex preview
     {
