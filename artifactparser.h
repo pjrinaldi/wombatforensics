@@ -28,5 +28,7 @@ void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileite
 void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents);
 
 void ParsePdf(FileItem* curfileitem, std::string* filecontents);
+void ParseHtml(uint8_t* prebuf, uint64_t bufsize, std::string* filecontents);
+void ParseRecycler(FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents);
 
 #endif // ARTIFACTPARSER_H

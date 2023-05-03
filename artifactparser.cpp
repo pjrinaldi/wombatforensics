@@ -40,48 +40,69 @@ void ParsePdf(FileItem* curfileitem, std::string* filecontents)
         *filecontents = pdfdoc->create_page(0)->text().to_latin1();
 }
 
+void ParseHtml(uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+{   
+    lxb_status_t status;
+    lxb_html_tokenizer_t* tkz;
+    tkz = lxb_html_tokenizer_create();
+    status = lxb_html_tokenizer_init(tkz);
+    lxb_html_tokenizer_callback_token_done_set(tkz, token_callback, filecontents);
+    status = lxb_html_tokenizer_begin(tkz);
+    status = lxb_html_tokenizer_chunk(tkz, prebuf, bufsize);
+    status = lxb_html_tokenizer_end(tkz);
+    lxb_html_tokenizer_destroy(tkz);
+}
+
+void ParseRecycler(FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+{
+    std::string titlestring = "INFO2 File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
+    filecontents->clear();
+    filecontents->append(titlestring + "\n");
+    for(int i=0; i < titlestring.size(); i++)
+        filecontents->append("-");
+    filecontents->append("\n\n");
+    uint32_t fileentrysize = 0;
+    ReadInteger(prebuf, 12, &fileentrysize);
+    int curpos = 20;
+    while(curpos < bufsize)
+    {
+        uint8_t* fnamestr = new uint8_t[260];
+        fnamestr = substr(prebuf, curpos, 260);
+        uint32_t recycleindex = 0;
+        ReadInteger(prebuf, curpos + 260, &recycleindex);
+        uint32_t drivenumber = 0;
+        ReadInteger(prebuf, curpos + 264, &drivenumber);
+        filecontents->append("Index\t\t| " + std::to_string(recycleindex) + "\n");
+        filecontents->append("File Path\t| " + std::string((char*)fnamestr) + "\n");
+        delete[] fnamestr;
+        std::string filenamestring = "";
+        uint64_t deletedate = 0;
+        ReadInteger(prebuf, curpos + 268, &deletedate);
+        filecontents->append("Deleted Date\t| " + ConvertWindowsTimeToUnixTimeUTC(deletedate) + "\n");
+        uint32_t fsize = 0;
+        ReadInteger(prebuf, curpos + 276, &fsize);
+        filecontents->append("File Size\t| " + ReturnFormattingSize(fsize) + " bytes\n\n");
+        curpos = curpos + fileentrysize;
+    }
+}
+
 void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents, Magick::Image* previmg)
 {
-    if(curfileitem->sig.compare("Pdf") == 0)
+    if(curfileitem->sig.compare("Pdf") == 0) // PDF file
     { 
         ParsePdf(curfileitem, filecontents);
-        //ParsePdf();
     }
-    /*
-    if(curfileitem->sig.compare("Pdf") == 0)
+    else if(curfileitem->sig.compare("Html") == 0) // HTML file
     {
-	poppler::document* pdfdoc;
-	poppler::page* pdfpage;
-        pdfdoc = poppler::document::load_from_file(tmpfilestr);
-	int pagecount = pdfdoc->pages();
-        if(pagecount > 0)
-        {
-            std::string prevcontent = pdfdoc->create_page(0)->text().to_latin1();
-            plaintext->setText(FXString(prevcontent.c_str()));
-        }
+        ParseHtml(prebuf, bufsize, filecontents);
     }
-    else if(curfileitem->sig.compare("Html") == 0)
+    else if(curfileitem->sig.compare("Recycler") == 0) // INFO2 file
     {
-	lxb_status_t status;
-	lxb_html_tokenizer_t* tkz;
-        std::string filecontents = "";
-
-	tkz = lxb_html_tokenizer_create();
-	status = lxb_html_tokenizer_init(tkz);
-	lxb_html_tokenizer_callback_token_done_set(tkz, token_callback, &filecontents);
-
-	status = lxb_html_tokenizer_begin(tkz);
-	status = lxb_html_tokenizer_chunk(tkz, prebuf, bufsize);
-	//status = lxb_html_tokenizer_chunk(tkz, tmpbuf, curfileitem->size);
-	status = lxb_html_tokenizer_end(tkz);
-	lxb_html_tokenizer_destroy(tkz);
-        plaintext->setText(FXString(filecontents.c_str()));
+        ParseRecycler(curfileitem, prebuf, bufsize, filecontents);
     }
     else // partial hex preview
     {
-        GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
     }
-    */
     /*
     if(curfileitem->cat.compare("Image") == 0)
     {

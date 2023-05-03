@@ -2498,42 +2498,6 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents, &previewimage);
         plaintext->setText(FXString(filecontents.c_str()));
     }
-    /*
-    if(curfileitem->sig.compare("Pdf") == 0)
-    {
-	poppler::document* pdfdoc;
-	poppler::page* pdfpage;
-        pdfdoc = poppler::document::load_from_file(tmpfilestr);
-	int pagecount = pdfdoc->pages();
-        if(pagecount > 0)
-        {
-            std::string prevcontent = pdfdoc->create_page(0)->text().to_latin1();
-            plaintext->setText(FXString(prevcontent.c_str()));
-        }
-    }
-    else if(curfileitem->sig.compare("Html") == 0)
-    {
-	lxb_status_t status;
-	lxb_html_tokenizer_t* tkz;
-        std::string filecontents = "";
-
-	tkz = lxb_html_tokenizer_create();
-	status = lxb_html_tokenizer_init(tkz);
-	lxb_html_tokenizer_callback_token_done_set(tkz, token_callback, &filecontents);
-
-	status = lxb_html_tokenizer_begin(tkz);
-	status = lxb_html_tokenizer_chunk(tkz, prebuf, bufsize);
-	//status = lxb_html_tokenizer_chunk(tkz, tmpbuf, curfileitem->size);
-	status = lxb_html_tokenizer_end(tkz);
-	lxb_html_tokenizer_destroy(tkz);
-        plaintext->setText(FXString(filecontents.c_str()));
-    }
-    else // partial hex preview
-    {
-        GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
-    }
-    */
-
     /* // THREADING
 	for(int i=0; i < filelist.size(); i++)
 	{

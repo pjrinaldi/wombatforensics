@@ -400,22 +400,17 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
         }
         delete[] inbuf;
     }
-    fclose(tmpfile);
+    if(!*inmemory)
+        fclose(tmpfile);
     //std::cout << "tmpbuf in function: " << tmpbuf[0] << tmpbuf[1] << std::endl;
     if(*inmemory)
 	*tmpbuffer = tmpbuf;
-    delete[] tmpbuf;
+    //delete[] tmpbuf;
 }
 
 void GetPreviewContent(ForImg* curforimg, FileItem* curfileitem, uint8_t** prebuf, uint64_t bufsize)
 {
-    /*
-    uint64_t bufsize = 524288;
-    if(curfileitem->size < bufsize)
-        bufsize = curfileitem->size;
-    */
     uint8_t* tmpbuf = new uint8_t[bufsize];
-
     uint64_t curlogicalsize = 0;
     uint64_t curpos = 0;
     std::vector<std::string> layoutlist;
