@@ -2481,19 +2481,21 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     // Generate Preview Content
     uint8_t* prebuf = NULL;
     uint64_t bufsize = 524288;
+    Magick::Image previewimage;
     if(curfileitem->size < bufsize)
         bufsize = curfileitem->size;
     if(curfileitem->cat.compare("Image") == 0 || curfileitem->cat.compare("Video") == 0)
     {
         plaintext->hide();
         imgview->show();
+        ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents, &previewimage);
     }
     else
     {
         imgview->hide();
         plaintext->show();
         GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
-        ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
+        ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents, &previewimage);
         plaintext->setText(FXString(filecontents.c_str()));
     }
     /*

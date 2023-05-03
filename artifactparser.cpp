@@ -28,8 +28,25 @@ void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents)
     }
 }
 
-void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+void ParsePdf(FileItem* curfileitem, std::string* filecontents)
 {
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    poppler::document* pdfdoc;
+    poppler::page* pdfpage;
+    pdfdoc = poppler::document::load_from_file(tmpfilestr);
+    int pagecount = pdfdoc->pages();
+    if(pagecount > 0)
+        *filecontents = pdfdoc->create_page(0)->text().to_latin1();
+}
+
+void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents, Magick::Image* previmg)
+{
+    if(curfileitem->sig.compare("Pdf") == 0)
+    { 
+        ParsePdf(curfileitem, filecontents);
+        //ParsePdf();
+    }
     /*
     if(curfileitem->sig.compare("Pdf") == 0)
     {
