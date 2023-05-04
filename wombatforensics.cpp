@@ -2548,7 +2548,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		jpgimg->create();
 		imgview->setImage(jpgimg);
 	    }
-            else if(curfileitem->sig.compare("X-Pcx") == 0)
+            else if(curfileitem->sig.compare("Pcx") == 0)
             {
             }
 	    else if(curfileitem->sig.compare("Png") == 0)
@@ -2567,7 +2567,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		pngimg->create();
 		imgview->setImage(pngimg);
 	    }
-            else if(curfileitem->sig.compare("X-Portable-Pixmap") == 0)
+            else if(curfileitem->sig.compare("Xpm") == 0)
             {
             }
             else if(curfileitem->sig.compare("Ras") == 0)
@@ -2576,7 +2576,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             else if(curfileitem->sig.compare("Sgi") == 0)
             {
             }
-            else if(curfileitem->sig.compare("X-Tga") == 0)
+            else if(curfileitem->sig.compare("Tga") == 0)
             {
             }
             else if(curfileitem->sig.compare("Tiff") == 0)
@@ -2588,7 +2588,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             else if(curfileitem->sig.compare("Xbm") == 0)
             {
             }
-            else if(curfileitem->sig.compare("X-Xpixmap") == 0)
+            else if(curfileitem->sig.compare("Xpm") == 0)
             {
             }
             /*

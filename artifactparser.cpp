@@ -126,6 +126,7 @@ void ParseRecycleBin(FileItem* curfileitem, uint8_t* prebuf, std::string* fileco
 
 void ParseDirectory(CurrentItem* curitem, FileItem* curfileitem, std::string* filecontents)
 {
+    // this only works after loading the text files, need to fix this
     std::vector<FileItem> fileitemvector;
     fileitemvector.clear();
     int filecount = 0;

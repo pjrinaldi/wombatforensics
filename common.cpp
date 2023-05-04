@@ -811,6 +811,11 @@ void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, 
             *cat = "Image";
             *sig = "Ras";
         }
+        else if(sigbuf[0] == 0x01 && sigbuf[1] == 0xda)
+        {
+            *cat = "Image";
+            *sig = "Sgi";
+        }
         else
         {
             *cat = "Application";
@@ -826,6 +831,36 @@ void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, 
     {
 	*cat = "Document";
 	*sig = "Pdf";
+    }
+    else if(catsigstr.find("Image/Vnd.microsoft.icon") != std::string::npos)
+    {
+        *cat = "Image";
+        *sig = "Ico";
+    }
+    else if(catsigstr.find("Image/X-Tga") != std::string::npos)
+    {
+        *cat = "Image";
+        *sig = "Tga";
+    }
+    else if(catsigstr.find("Image/X-Pcx") != std::string::npos)
+    {
+        *cat = "Image";
+        *sig = "Pcx";
+    }
+    else if(catsigstr.find("Image/X-Portable-Pixmap") != std::string::npos)
+    {
+        *cat = "Image";
+        *sig = "Ppm";
+    }
+    else if(catsigstr.find("Image/Svg+xml") != std::string::npos)
+    {
+        *cat = "Image";
+        *sig = "Svg";
+    }
+    else if(catsigstr.find("Image/X-Xpixmap") != std::string::npos)
+    {
+        *cat = "Image";
+        *sig = "Xpm";
     }
     else if(catsigstr.find("Text/") != std::string::npos)
     {
