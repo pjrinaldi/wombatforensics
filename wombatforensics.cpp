@@ -60,7 +60,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     //plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
-    imgview = new FXImageView(previewbox, NULL, 0, IMAGEVIEW_NORMAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    imgview = new FXImageView(previewbox, NULL, 0, IMAGEVIEW_NORMAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 512, 512);
     //imgview = new FXImageView(hsplitter);
     imgview->hide();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
@@ -2486,11 +2486,24 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         bufsize = curfileitem->size;
     if(curfileitem->cat.compare("Image") == 0 || curfileitem->cat.compare("Video") == 0)
     {
+        //this->getApp()->beginWaitCursor();
         //ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
         if(filecontents.empty())
         {
-            /*
             plaintext->hide();
+            std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+            tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+            FXImage* img = new FXImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP, 1000, 1000);
+            FXFileStream stream;
+            stream.open(FXString(tmpfilestr.c_str()), FXStreamLoad);
+            //img->load(stream);
+            img->loadPixels(stream);
+            stream.close();
+            img->create();
+            imgview->setImage(img);
+            imgview->update();
+            imgview->show();
+            /*
             std::string previewfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
             previewfilestr.erase(std::remove(previewfilestr.begin(), previewfilestr.end(), '$'), previewfilestr.end());
             FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
@@ -2510,7 +2523,9 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         {
             plaintext->show();
             imgview->hide();
+            plaintext->setText(FXString(filecontents.c_str()));
         }
+        //this->getApp()->endWaitCursor();
         /*
             try
 	    {
