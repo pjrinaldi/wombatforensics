@@ -2527,23 +2527,101 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             }
             else if(curfileitem->sig.compare("Dds") == 0)
             {
+		ddsimg = new FXDDSImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		ddsimg->loadPixels(stream);
+		int imgheight = ddsimg->getHeight() / 512;
+		int imgwidth = ddsimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			ddsimg->scale((int)(ddsimg->getWidth() / imgheight), (int)(ddsimg->getHeight() / imgheight));
+		    else
+			ddsimg->scale(ddsimg->getWidth() / imgwidth, ddsimg->getHeight() / imgwidth);
+		}
+		ddsimg->create();
+		imgview->setImage(ddsimg);
             }
             /*
             else if(curfileitem->sig.compare("Exe") == 0)
             {
+		exeimg = new FXEXEImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		exeimg->loadPixels(stream);
+		int imgheight = exeimg->getHeight() / 512;
+		int imgwidth = exeimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			exeimg->scale((int)(exeimg->getWidth() / imgheight), (int)(exeimg->getHeight() / imgheight));
+		    else
+			exeimg->scale(exeimg->getWidth() / imgwidth, exeimg->getHeight() / imgwidth);
+		}
+		exeimg->create();
+		imgview->setImage(exeimg);
             }
             */
             else if(curfileitem->sig.compare("Gif") == 0)
             {
+		gifimg = new FXGIFImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		gifimg->loadPixels(stream);
+		int imgheight = gifimg->getHeight() / 512;
+		int imgwidth = gifimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			gifimg->scale((int)(gifimg->getWidth() / imgheight), (int)(gifimg->getHeight() / imgheight));
+		    else
+			gifimg->scale(gifimg->getWidth() / imgwidth, gifimg->getHeight() / imgwidth);
+		}
+		gifimg->create();
+		imgview->setImage(gifimg);
             }
             else if(curfileitem->sig.compare("Ico") == 0)
             {
+		icoimg = new FXICOImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		icoimg->loadPixels(stream);
+		int imgheight = icoimg->getHeight() / 512;
+		int imgwidth = icoimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			icoimg->scale((int)(icoimg->getWidth() / imgheight), (int)(icoimg->getHeight() / imgheight));
+		    else
+			icoimg->scale(icoimg->getWidth() / imgwidth, icoimg->getHeight() / imgwidth);
+		}
+		icoimg->create();
+		imgview->setImage(icoimg);
             }
             else if(curfileitem->sig.compare("Iff") == 0)
             {
+		iffimg = new FXIFFImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		iffimg->loadPixels(stream);
+		int imgheight = iffimg->getHeight() / 512;
+		int imgwidth = iffimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			iffimg->scale((int)(iffimg->getWidth() / imgheight), (int)(iffimg->getHeight() / imgheight));
+		    else
+			iffimg->scale(iffimg->getWidth() / imgwidth, iffimg->getHeight() / imgwidth);
+		}
+		iffimg->create();
+		imgview->setImage(iffimg);
             }
             else if(curfileitem->sig.compare("Jp2") == 0)
             {
+		jp2img = new FXJP2Image(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		jp2img->loadPixels(stream);
+		int imgheight = jp2img->getHeight() / 512;
+		int imgwidth = jp2img->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			jp2img->scale((int)(jp2img->getWidth() / imgheight), (int)(jp2img->getHeight() / imgheight));
+		    else
+			jp2img->scale(jp2img->getWidth() / imgwidth, jp2img->getHeight() / imgwidth);
+		}
+		jp2img->create();
+		imgview->setImage(jp2img);
             }
             else if(curfileitem->sig.compare("Jpeg") == 0)
 	    {
@@ -2561,8 +2639,27 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		jpgimg->create();
 		imgview->setImage(jpgimg);
 	    }
+            else if(curfileitem->sig.compare("Heic") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Heif") == 0)
+            {
+            }
             else if(curfileitem->sig.compare("Pcx") == 0)
             {
+		pcximg = new FXPCXImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		pcximg->loadPixels(stream);
+		int imgheight = pcximg->getHeight() / 512;
+		int imgwidth = pcximg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			pcximg->scale((int)(pcximg->getWidth() / imgheight), (int)(pcximg->getHeight() / imgheight));
+		    else
+			pcximg->scale(pcximg->getWidth() / imgwidth, pcximg->getHeight() / imgwidth);
+		}
+		pcximg->create();
+		imgview->setImage(pcximg);
             }
 	    else if(curfileitem->sig.compare("Png") == 0)
 	    {
@@ -2580,40 +2677,153 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		pngimg->create();
 		imgview->setImage(pngimg);
 	    }
+            else if(curfileitem->sig.compare("Svg") == 0)
+            {
+            }
+	    else if(curfileitem->sig.compare("Ppm") == 0)
+	    {
+		ppmimg = new FXPPMImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		ppmimg->loadPixels(stream);
+		int imgheight = ppmimg->getHeight() / 512;
+		int imgwidth = ppmimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			ppmimg->scale(ppmimg->getWidth() / imgheight, ppmimg->getHeight() / imgheight);
+		    else
+			ppmimg->scale(ppmimg->getWidth() / imgwidth, ppmimg->getHeight() / imgwidth);
+		}
+		ppmimg->create();
+		imgview->setImage(ppmimg);
+	    }
             else if(curfileitem->sig.compare("Xpm") == 0)
             {
+		xpmimg = new FXXPMImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		xpmimg->loadPixels(stream);
+		int imgheight = xpmimg->getHeight() / 512;
+		int imgwidth = xpmimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			xpmimg->scale((int)(xpmimg->getWidth() / imgheight), (int)(xpmimg->getHeight() / imgheight));
+		    else
+			xpmimg->scale(xpmimg->getWidth() / imgwidth, xpmimg->getHeight() / imgwidth);
+		}
+		xpmimg->create();
+		imgview->setImage(xpmimg);
             }
             else if(curfileitem->sig.compare("Ras") == 0)
             {
+		rasimg = new FXRASImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		rasimg->loadPixels(stream);
+		int imgheight = rasimg->getHeight() / 512;
+		int imgwidth = rasimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			rasimg->scale((int)(rasimg->getWidth() / imgheight), (int)(rasimg->getHeight() / imgheight));
+		    else
+			rasimg->scale(rasimg->getWidth() / imgwidth, rasimg->getHeight() / imgwidth);
+		}
+		rasimg->create();
+		imgview->setImage(rasimg);
             }
             else if(curfileitem->sig.compare("Sgi") == 0)
             {
+		rgbimg = new FXRGBImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		rgbimg->loadPixels(stream);
+		int imgheight = rgbimg->getHeight() / 512;
+		int imgwidth = rgbimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			rgbimg->scale((int)(rgbimg->getWidth() / imgheight), (int)(rgbimg->getHeight() / imgheight));
+		    else
+			rgbimg->scale(rgbimg->getWidth() / imgwidth, rgbimg->getHeight() / imgwidth);
+		}
+		rgbimg->create();
+		imgview->setImage(rgbimg);
             }
             else if(curfileitem->sig.compare("Tga") == 0)
             {
+		tgaimg = new FXTGAImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		tgaimg->loadPixels(stream);
+		int imgheight = tgaimg->getHeight() / 512;
+		int imgwidth = tgaimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			tgaimg->scale((int)(tgaimg->getWidth() / imgheight), (int)(tgaimg->getHeight() / imgheight));
+		    else
+			tgaimg->scale(tgaimg->getWidth() / imgwidth, tgaimg->getHeight() / imgwidth);
+		}
+		tgaimg->create();
+		imgview->setImage(tgaimg);
             }
             else if(curfileitem->sig.compare("Tiff") == 0)
             {
+		tifimg = new FXTIFImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		tifimg->loadPixels(stream);
+		int imgheight = tifimg->getHeight() / 512;
+		int imgwidth = tifimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			tifimg->scale((int)(tifimg->getWidth() / imgheight), (int)(tifimg->getHeight() / imgheight));
+		    else
+			tifimg->scale(tifimg->getWidth() / imgwidth, tifimg->getHeight() / imgwidth);
+		}
+		tifimg->create();
+		imgview->setImage(tifimg);
             }
             else if(curfileitem->sig.compare("Webp") == 0)
             {
+		webpimg = new FXWEBPImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		webpimg->loadPixels(stream);
+		int imgheight = webpimg->getHeight() / 512;
+		int imgwidth = webpimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			webpimg->scale((int)(webpimg->getWidth() / imgheight), (int)(webpimg->getHeight() / imgheight));
+		    else
+			webpimg->scale(webpimg->getWidth() / imgwidth, webpimg->getHeight() / imgwidth);
+		}
+		webpimg->create();
+		imgview->setImage(webpimg);
             }
             else if(curfileitem->sig.compare("Xbm") == 0)
             {
+		xbmimg = new FXXBMImage(this->getApp());
+		xbmimg->loadPixels(stream);
+		int imgheight = xbmimg->getHeight() / 512;
+		int imgwidth = xbmimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			xbmimg->scale((int)(xbmimg->getWidth() / imgheight), (int)(xbmimg->getHeight() / imgheight));
+		    else
+			xbmimg->scale(xbmimg->getWidth() / imgwidth, xbmimg->getHeight() / imgwidth);
+		}
+		xbmimg->create();
+		imgview->setImage(xbmimg);
             }
             else if(curfileitem->sig.compare("Xpm") == 0)
             {
+		xpmimg = new FXXPMImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		xpmimg->loadPixels(stream);
+		int imgheight = xpmimg->getHeight() / 512;
+		int imgwidth = xpmimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			xpmimg->scale((int)(xpmimg->getWidth() / imgheight), (int)(xpmimg->getHeight() / imgheight));
+		    else
+			xpmimg->scale(xpmimg->getWidth() / imgwidth, xpmimg->getHeight() / imgwidth);
+		}
+		xpmimg->create();
+		imgview->setImage(xpmimg);
             }
-            /*
-            FXPPMImage* ppmimg = NULL; // Portable PixMap
-            FXRASImage* rasimg = NULL; // SUN Raster Image
-            FXRGBImage* rgbimg = NULL; // IRIS RGB Image
-            FXTGAImage* tgaimg = NULL; // Targa Graphics
-            FXTIFImage* tifimg = NULL; // Tagged Image File Format
-            FXWEBPImage* webpimg = NULL; // WebP
-            FXXBMImage* xbmimg = NULL; // X Bitmap
-            FXXPMImage* xpmimg = NULL; // X PixMap
-             */ 
             stream.close();
             imgview->update();
             imgview->show();
