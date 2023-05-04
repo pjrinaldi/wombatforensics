@@ -2487,8 +2487,24 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         if(curfileitem->size > 0)
         {
             plaintext->hide();
-	    FXPNGImage* pimg = NULL;
-	    FXJPGImage* jimg = NULL;
+            FXBMPImage* bmpimg = NULL; // Microsoft Bitmap
+            FXDDSImage* ddsimg = NULL; // Direct Draw Surface
+            FXEXEImage* exeimg = NULL; // Windows Executable
+            FXGIFImage* gifimg = NULL; // Graphics Interchange Format
+            FXICOImage* icoimg = NULL; // Microsoft Icon
+            FXIFFImage* iffimg = NULL; // EA/Amiga Image File Format
+            FXJP2Image* jp2img = NULL; // JPEG-2000
+	    FXJPGImage* jpgimg = NULL; // JPEG
+            FXPCXImage* pcximg = NULL; // PiCture eXchange
+	    FXPNGImage* pngimg = NULL; // Portable Network Graphics
+            FXPPMImage* ppmimg = NULL; // Portable PixMap
+            FXRASImage* rasimg = NULL; // SUN Raster Image
+            FXRGBImage* rgbimg = NULL; // IRIS RGB Image
+            FXTGAImage* tgaimg = NULL; // Targa Graphics
+            FXTIFImage* tifimg = NULL; // Tagged Image File Format
+            FXWEBPImage* webpimg = NULL; // WebP
+            FXXBMImage* xbmimg = NULL; // X Bitmap
+            FXXPMImage* xpmimg = NULL; // X PixMap
             std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
             FXFileStream stream;
@@ -2496,35 +2512,35 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    // NEED TO IMPLEMENT OTHER SUPPORTED IMAGE FORMATS
 	    if(curfileitem->sig.compare("Jpeg") == 0)
 	    {
-		jimg = new FXJPGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-		jimg->loadPixels(stream);
-		int imgheight = jimg->getHeight() / 512;
-		int imgwidth = jimg->getWidth() / 512;
+		jpgimg = new FXJPGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		jpgimg->loadPixels(stream);
+		int imgheight = jpgimg->getHeight() / 512;
+		int imgwidth = jpgimg->getWidth() / 512;
 		if(imgheight > 1 && imgwidth > 1)
 		{
 		    if(imgwidth < imgheight)
-			jimg->scale((int)(jimg->getWidth() / imgheight), (int)(jimg->getHeight() / imgheight));
+			jpgimg->scale((int)(jpgimg->getWidth() / imgheight), (int)(jpgimg->getHeight() / imgheight));
 		    else
-			jimg->scale(jimg->getWidth() / imgwidth, jimg->getHeight() / imgwidth);
+			jpgimg->scale(jpgimg->getWidth() / imgwidth, jpgimg->getHeight() / imgwidth);
 		}
-		jimg->create();
-		imgview->setImage(jimg);
+		jpgimg->create();
+		imgview->setImage(jpgimg);
 	    }
 	    else if(curfileitem->sig.compare("Png") == 0)
 	    {
-		pimg = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-		pimg->loadPixels(stream);
-		int imgheight = pimg->getHeight() / 512;
-		int imgwidth = pimg->getWidth() / 512;
+		pngimg = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		pngimg->loadPixels(stream);
+		int imgheight = pngimg->getHeight() / 512;
+		int imgwidth = pngimg->getWidth() / 512;
 		if(imgheight > 1 && imgwidth > 1)
 		{
 		    if(imgwidth < imgheight)
-			pimg->scale(pimg->getWidth() / imgheight, pimg->getHeight() / imgheight);
+			pngimg->scale(pngimg->getWidth() / imgheight, pngimg->getHeight() / imgheight);
 		    else
-			pimg->scale(pimg->getWidth() / imgwidth, pimg->getHeight() / imgwidth);
+			pngimg->scale(pngimg->getWidth() / imgwidth, pngimg->getHeight() / imgwidth);
 		}
-		pimg->create();
-		imgview->setImage(pimg);
+		pngimg->create();
+		imgview->setImage(pngimg);
 	    }
             stream.close();
             imgview->update();
@@ -2555,10 +2571,10 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    videothumbnailer.generateThumbnail(tmpfilestr, Png, tmpoutfile);
             FXFileStream stream;
             stream.open(FXString(tmpoutfile.c_str()), FXStreamLoad);
-	    FXPNGImage* pimg = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-	    pimg->loadPixels(stream);
-	    pimg->create();
-	    imgview->setImage(pimg);
+	    FXPNGImage* pngimg = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+	    pngimg->loadPixels(stream);
+	    pngimg->create();
+	    imgview->setImage(pngimg);
 	    stream.close();
 	    imgview->update();
 	    imgview->show();
