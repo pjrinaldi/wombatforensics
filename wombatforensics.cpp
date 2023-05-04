@@ -60,7 +60,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     //plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
-    imgview = new FXImageView(previewbox, NULL, 0, IMAGEVIEW_NORMAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 512, 512);
+    imgview = new FXImageFrame(previewbox, NULL);
+    //imgview = new FXImageView(previewbox);
     //imgview = new FXImageView(hsplitter);
     imgview->hide();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
@@ -2491,16 +2492,36 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         if(filecontents.empty())
         {
             plaintext->hide();
+	    FXPNGImage* pimg = NULL;
+	    FXJPGImage* jimg = NULL;
             std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
-            FXImage* img = new FXImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP, 1000, 1000);
             FXFileStream stream;
             stream.open(FXString(tmpfilestr.c_str()), FXStreamLoad);
+	    if(curfileitem->sig.compare("Jpeg") == 0)
+	    {
+		jimg = new FXJPGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		jimg->loadPixels(stream);
+		jimg->scale(512,512);
+		jimg->create();
+		std::cout << "jpg widthxheight: " << jimg->getWidth() << "x" << jimg->getHeight() << std::endl;
+		imgview->setImage(jimg);
+	    }
+	    else if(curfileitem->sig.compare("Png") == 0)
+	    {
+		pimg = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		pimg->loadPixels(stream);
+		pimg->scale(512,512);
+		pimg->create();
+		std::cout << "png widthxheight: " << pimg->getWidth() << "x" << pimg->getHeight() << std::endl;
+		imgview->setImage(pimg);
+	    }
+            //FXImage* img = new FXImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
             //img->load(stream);
-            img->loadPixels(stream);
+            //img->loadPixels(stream);
             stream.close();
-            img->create();
-            imgview->setImage(img);
+            //img->create();
+            //imgview->setImage(img);
             imgview->update();
             imgview->show();
             /*
