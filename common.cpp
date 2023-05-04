@@ -801,6 +801,16 @@ void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, 
             *cat = "Windows System";
             *sig = "Prefetch";
         }
+        else if(sigbuf[0] == 0x44 && sigbuf[1] == 0x44 && sigbuf[2] == 0x53 && sigbuf[3] == 0x20)
+        {
+            *cat = "Image";
+            *sig = "Dds";
+        }
+        else if(sigbuf[0] == 0x59 && sigbuf[1] == 0xa6 && sigbuf[2] == 0x6a && sigbuf[3] == 0x95)
+        {
+            *cat = "Image";
+            *sig = "Ras";
+        }
         else
         {
             *cat = "Application";
@@ -823,6 +833,11 @@ void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, 
         {
             *cat = "Email";
             *sig = "MBox";
+        }
+        else if(filename->find(".xbm") != std::string::npos)
+        {
+            *cat = "Image";
+            *sig = "Xbm";
         }
         else
         {

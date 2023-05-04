@@ -2489,7 +2489,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             plaintext->hide();
             FXBMPImage* bmpimg = NULL; // Microsoft Bitmap
             FXDDSImage* ddsimg = NULL; // Direct Draw Surface
-            FXEXEImage* exeimg = NULL; // Windows Executable
+            //FXEXEImage* exeimg = NULL; // Windows Executable
             FXGIFImage* gifimg = NULL; // Graphics Interchange Format
             FXICOImage* icoimg = NULL; // Microsoft Icon
             FXIFFImage* iffimg = NULL; // EA/Amiga Image File Format
@@ -2509,8 +2509,30 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
             FXFileStream stream;
             stream.open(FXString(tmpfilestr.c_str()), FXStreamLoad);
-	    // NEED TO IMPLEMENT OTHER SUPPORTED IMAGE FORMATS
-	    if(curfileitem->sig.compare("Jpeg") == 0)
+            if(curfileitem->sig.compare("Bmp") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Dds") == 0)
+            {
+            }
+            /*
+            else if(curfileitem->sig.compare("Exe") == 0)
+            {
+            }
+            */
+            else if(curfileitem->sig.compare("Gif") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Ico") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Iff") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Jp2") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Jpeg") == 0)
 	    {
 		jpgimg = new FXJPGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
 		jpgimg->loadPixels(stream);
@@ -2526,6 +2548,9 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		jpgimg->create();
 		imgview->setImage(jpgimg);
 	    }
+            else if(curfileitem->sig.compare("X-Pcx") == 0)
+            {
+            }
 	    else if(curfileitem->sig.compare("Png") == 0)
 	    {
 		pngimg = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
@@ -2542,6 +2567,40 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		pngimg->create();
 		imgview->setImage(pngimg);
 	    }
+            else if(curfileitem->sig.compare("X-Portable-Pixmap") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Ras") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Sgi") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("X-Tga") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Tiff") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Webp") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("Xbm") == 0)
+            {
+            }
+            else if(curfileitem->sig.compare("X-Xpixmap") == 0)
+            {
+            }
+            /*
+            FXPPMImage* ppmimg = NULL; // Portable PixMap
+            FXRASImage* rasimg = NULL; // SUN Raster Image
+            FXRGBImage* rgbimg = NULL; // IRIS RGB Image
+            FXTGAImage* tgaimg = NULL; // Targa Graphics
+            FXTIFImage* tifimg = NULL; // Tagged Image File Format
+            FXWEBPImage* webpimg = NULL; // WebP
+            FXXBMImage* xbmimg = NULL; // X Bitmap
+            FXXPMImage* xpmimg = NULL; // X PixMap
+             */ 
             stream.close();
             imgview->update();
             imgview->show();
