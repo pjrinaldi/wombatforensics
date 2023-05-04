@@ -60,7 +60,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     //plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
-    imgview = new FXImageView(previewbox);
+    imgview = new FXImageView(previewbox, NULL, 0, IMAGEVIEW_NORMAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     //imgview = new FXImageView(hsplitter);
     imgview->hide();
     statusbar = new FXStatusBar(mainframe, LAYOUT_BOTTOM|LAYOUT_LEFT|LAYOUT_FILL_X|STATUSBAR_WITH_DRAGCORNER);
@@ -2481,21 +2481,67 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     // Generate Preview Content
     uint8_t* prebuf = NULL;
     uint64_t bufsize = 524288;
-    Magick::Image previewimage;
+    //Magick::Image previewimage;
     if(curfileitem->size < bufsize)
         bufsize = curfileitem->size;
     if(curfileitem->cat.compare("Image") == 0 || curfileitem->cat.compare("Video") == 0)
     {
-        plaintext->hide();
-        imgview->show();
-        ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents, &previewimage);
+        //ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
+        if(filecontents.empty())
+        {
+            /*
+            plaintext->hide();
+            std::string previewfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
+            previewfilestr.erase(std::remove(previewfilestr.begin(), previewfilestr.end(), '$'), previewfilestr.end());
+            FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+            FXFileStream stream;
+            stream.open(FXString(previewfilestr.c_str()), FXStreamLoad);
+            img->loadPixels(stream);
+            stream.close();
+            img->create();
+            this->getApp()->beginWaitCursor();
+            imgview->setImage(img);
+            imgview->update();
+            this->getApp()->endWaitCursor();
+            imgview->show();
+            */
+        }
+        else
+        {
+            plaintext->show();
+            imgview->hide();
+        }
+        /*
+            try
+	    {
+		Magick::Blob inblob(tmpbuf, curfileitem->size);
+		Magick::Image inimage(inblob);
+		inimage.magick("PNG");
+		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
+		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		FXFileStream stream;
+		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
+		img->loadPixels(stream);
+		stream.close();
+		img->create();
+                this->getApp()->beginWaitCursor();
+		imgview->setImage(img);
+		imgview->update();
+                this->getApp()->endWaitCursor();
+	    }
+	    catch(Magick::Exception &error)
+	    {
+		std::cout << "error encoutered: " << error.what() << std::endl;
+	    }
+
+         */ 
     }
     else
     {
         imgview->hide();
         plaintext->show();
         GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
-        ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents, &previewimage);
+        ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
         plaintext->setText(FXString(filecontents.c_str()));
     }
     /* // THREADING

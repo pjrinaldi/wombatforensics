@@ -983,7 +983,31 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     }
 }
 
-void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents, Magick::Image* previmg)
+void ParseImage(FileItem* curfileitem, std::string* filecontents)
+{
+    filecontents->clear();
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    std::string previewfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
+    previewfilestr.erase(std::remove(previewfilestr.begin(), previewfilestr.end(), '$'), previewfilestr.end());
+    Magick::Geometry previewgeometry(512, 512);
+    try
+    {
+        Magick::Image inimage(tmpfilestr);
+        inimage.quiet(false);
+        inimage.resize(previewgeometry);
+        inimage.magick("PNG");
+        inimage.write(previewfilestr);
+    }
+    catch(Magick::Exception &error)
+    {
+        // MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
+        //std::cout << "File: " << tmpfilestr << " magick error: " << error.what() << std::endl;
+        filecontents->append("File: " + tmpfilestr + " magick error: " + error.what());
+    }
+}
+
+void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
 {
     if(curfileitem->sig.compare("Pdf") == 0) // PDF file
     { 
@@ -1017,40 +1041,19 @@ void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem
     {
         ParseShortcut(curfileitem, prebuf, filecontents);
     }
+    else if(curfileitem->cat.compare("Image") == 0) // Image preview
+    {
+        if(curfileitem->size > 0)
+            ParseImage(curfileitem, filecontents);
+        else
+        {
+            filecontents->clear();
+            filecontents->append("Zero Image. No Content");
+        }
+    }
     else // partial hex preview
     {
     }
-    /*
-    if(curfileitem->cat.compare("Image") == 0)
-    {
-	if(plaintext->shown() || imgview->shown())
-	{
-	    plaintext->hide();
-	    imgview->show();
-	    try
-	    {
-		Magick::Blob inblob(tmpbuf, curfileitem->size);
-		Magick::Image inimage(inblob);
-		inimage.magick("PNG");
-		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
-		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-		FXFileStream stream;
-		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
-		img->loadPixels(stream);
-		stream.close();
-		img->create();
-                this->getApp()->beginWaitCursor();
-		imgview->setImage(img);
-		imgview->update();
-                this->getApp()->endWaitCursor();
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		std::cout << "error encoutered: " << error.what() << std::endl;
-	    }
-	}
-    }
-    */
 }
 
 void ParseArtifact(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, bool* inmemory, uint8_t* tmpbuf, FILE* tmpfile, std::string* filecontents)
