@@ -60,6 +60,8 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     //plaintext = new FXText(hsplitter, this, ID_HEXTEXT, LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     plaintext->setFont(plainfont);
     plaintext->setEditable(false);
+    //iframe = new FXVerticalFrame(previewbox, LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+    //imgview = new FXImageView(iframe);
     imgview = new FXImageFrame(previewbox, NULL);
     //imgview = new FXImageView(previewbox);
     //imgview = new FXImageView(hsplitter);
@@ -2471,25 +2473,18 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     FILE* tmpfile = NULL;
     std::string filecontents = "";
     this->getApp()->beginWaitCursor();
-    //std::thread tmp(GetFileContent, curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    //tmp.join();
     std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(!std::filesystem::exists(tmpfilestr))
 	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    //ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
-    // MOVE ALL OF THIS INTO ARTIFACTPARSER FUNCTION CALLED PARSEPREVIEW
     // Generate Preview Content
     uint8_t* prebuf = NULL;
     uint64_t bufsize = 524288;
-    //Magick::Image previewimage;
     if(curfileitem->size < bufsize)
         bufsize = curfileitem->size;
-    if(curfileitem->cat.compare("Image") == 0 || curfileitem->cat.compare("Video") == 0)
+    if(curfileitem->cat.compare("Image") == 0)
     {
-        //this->getApp()->beginWaitCursor();
-        //ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
-        if(filecontents.empty())
+        if(curfileitem->size > 0)
         {
             plaintext->hide();
 	    FXPNGImage* pimg = NULL;
@@ -2498,79 +2493,82 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
             FXFileStream stream;
             stream.open(FXString(tmpfilestr.c_str()), FXStreamLoad);
+	    // NEED TO IMPLEMENT OTHER SUPPORTED IMAGE FORMATS
 	    if(curfileitem->sig.compare("Jpeg") == 0)
 	    {
 		jimg = new FXJPGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
 		jimg->loadPixels(stream);
-		jimg->scale(512,512);
+		int imgheight = jimg->getHeight() / 512;
+		int imgwidth = jimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			jimg->scale((int)(jimg->getWidth() / imgheight), (int)(jimg->getHeight() / imgheight));
+		    else
+			jimg->scale(jimg->getWidth() / imgwidth, jimg->getHeight() / imgwidth);
+		}
 		jimg->create();
-		std::cout << "jpg widthxheight: " << jimg->getWidth() << "x" << jimg->getHeight() << std::endl;
 		imgview->setImage(jimg);
 	    }
 	    else if(curfileitem->sig.compare("Png") == 0)
 	    {
 		pimg = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
 		pimg->loadPixels(stream);
-		pimg->scale(512,512);
+		int imgheight = pimg->getHeight() / 512;
+		int imgwidth = pimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			pimg->scale(pimg->getWidth() / imgheight, pimg->getHeight() / imgheight);
+		    else
+			pimg->scale(pimg->getWidth() / imgwidth, pimg->getHeight() / imgwidth);
+		}
 		pimg->create();
-		std::cout << "png widthxheight: " << pimg->getWidth() << "x" << pimg->getHeight() << std::endl;
 		imgview->setImage(pimg);
 	    }
-            //FXImage* img = new FXImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-            //img->load(stream);
-            //img->loadPixels(stream);
             stream.close();
-            //img->create();
-            //imgview->setImage(img);
             imgview->update();
             imgview->show();
-            /*
-            std::string previewfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
-            previewfilestr.erase(std::remove(previewfilestr.begin(), previewfilestr.end(), '$'), previewfilestr.end());
-            FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-            FXFileStream stream;
-            stream.open(FXString(previewfilestr.c_str()), FXStreamLoad);
-            img->loadPixels(stream);
-            stream.close();
-            img->create();
-            this->getApp()->beginWaitCursor();
-            imgview->setImage(img);
-            imgview->update();
-            this->getApp()->endWaitCursor();
-            imgview->show();
-            */
         }
         else
         {
             plaintext->show();
             imgview->hide();
-            plaintext->setText(FXString(filecontents.c_str()));
+            plaintext->setText("Zero Image");
         }
-        //this->getApp()->endWaitCursor();
-        /*
-            try
-	    {
-		Magick::Blob inblob(tmpbuf, curfileitem->size);
-		Magick::Image inimage(inblob);
-		inimage.magick("PNG");
-		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
-		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-		FXFileStream stream;
-		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
-		img->loadPixels(stream);
-		stream.close();
-		img->create();
-                this->getApp()->beginWaitCursor();
-		imgview->setImage(img);
-		imgview->update();
-                this->getApp()->endWaitCursor();
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		std::cout << "error encoutered: " << error.what() << std::endl;
-	    }
-
-         */ 
+    }
+    else if(curfileitem->cat.compare("Video") == 0)
+    {
+	if(curfileitem->size > 0)
+	{
+	    plaintext->hide();
+            std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+            tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+	    ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
+	    videothumbnailer.setThumbnailSize(512);
+	    std::unique_ptr<ffmpegthumbnailer::FilmStripFilter> filmstripfilter;
+	    filmstripfilter.reset(new ffmpegthumbnailer::FilmStripFilter());
+	    videothumbnailer.addFilter(filmstripfilter.get());
+	    videothumbnailer.setPreferEmbeddedMetadata(false);
+	    std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".png";
+	    videothumbnailer.setSeekPercentage(5);
+	    videothumbnailer.generateThumbnail(tmpfilestr, Png, tmpoutfile);
+            FXFileStream stream;
+            stream.open(FXString(tmpoutfile.c_str()), FXStreamLoad);
+	    FXPNGImage* pimg = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+	    pimg->loadPixels(stream);
+	    pimg->create();
+	    imgview->setImage(pimg);
+	    stream.close();
+	    imgview->update();
+	    imgview->show();
+	}
+	else
+	{
+	    plaintext->show();
+	    imgview->hide();
+	    plaintext->setText("Zero Video");
+	}
     }
     else
     {
@@ -2582,61 +2580,9 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     }
     /* // THREADING
 	for(int i=0; i < filelist.size(); i++)
-	{
 	    std::thread tmp(HashFile, filelist.at(i).string(), whlstr);
-	    tmp.join();
-	}
-     */
-
-    /*
-    if(curfileitem->cat.compare("Image") == 0)
-    {
-	if(plaintext->shown() || imgview->shown())
-	{
-	    plaintext->hide();
-	    imgview->show();
-	    try
-	    {
-		Magick::Blob inblob(tmpbuf, curfileitem->size);
-		Magick::Image inimage(inblob);
-		inimage.magick("PNG");
-		inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
-		FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-		FXFileStream stream;
-		stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
-		img->loadPixels(stream);
-		stream.close();
-		img->create();
-                this->getApp()->beginWaitCursor();
-		imgview->setImage(img);
-		imgview->update();
-                this->getApp()->endWaitCursor();
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		std::cout << "error encoutered: " << error.what() << std::endl;
-	    }
-	}
-    }
-    else
-    {*/
-	//std::thread tmp2(ParseArtifact, curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
-	//tmp2.join();
-        /*
-	ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
-	if(!plaintext->shown())
-	{
-	    //imgview->hide();
-	    plaintext->show();
-	}
-	plaintext->setText(FXString(filecontents.c_str()));
-        */
-    //}
+	    tmp.join();*/
     this->getApp()->endWaitCursor();
-    //ParseArtifact(curforimg, &currentitem, curfileitem, &inmemory, tmpbuf, tmpfile, &filecontents);
-    //plaintext->setText(FXString(filecontents.c_str()));
-    //if(!inmemory)
-	//fclose(tmpfile);
     delete[] tmpbuf;
 }
 
