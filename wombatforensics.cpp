@@ -2511,6 +2511,19 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             stream.open(FXString(tmpfilestr.c_str()), FXStreamLoad);
             if(curfileitem->sig.compare("Bmp") == 0)
             {
+		bmpimg = new FXBMPImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		bmpimg->loadPixels(stream);
+		int imgheight = bmpimg->getHeight() / 512;
+		int imgwidth = bmpimg->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			bmpimg->scale((int)(bmpimg->getWidth() / imgheight), (int)(bmpimg->getHeight() / imgheight));
+		    else
+			bmpimg->scale(bmpimg->getWidth() / imgwidth, bmpimg->getHeight() / imgwidth);
+		}
+		bmpimg->create();
+		imgview->setImage(bmpimg);
             }
             else if(curfileitem->sig.compare("Dds") == 0)
             {
