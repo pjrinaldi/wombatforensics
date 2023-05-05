@@ -17,6 +17,8 @@
 // LIBFFMPEG THUMBNAILER HEADERS
 #include <libffmpegthumbnailer/filmstripfilter.h>
 #include <libffmpegthumbnailer/videothumbnailer.h>
+// HEIF TO JPEG HEADER
+#include <libheif/heif.h>
 // BLAKE3 HASH
 #include "blake3/blake3.h"
 #include "forensicimage.h"
@@ -127,5 +129,6 @@ void HashFile(FileItem* curfileitem, ForImg* curforimg);
 void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std::string tmppath);
 void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int thumbcount, std::string tmppath);
 void ConvertSvgToPng(std::string* tmpfilestr);
+void ConvertHeifToJpg(std::string* heifstr);
 
 #endif
