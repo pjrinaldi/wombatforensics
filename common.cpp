@@ -68,8 +68,8 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
 
 void ConvertSvgToPng(std::string* svgfilestr)
 {
-    std::string pngfilestr = *svgfilestr + ".png";
-    std::cout << "raste: " << pngfilestr << std::endl;
+    std::string pngfilestr = *svgfilestr + ".bmp";
+    //std::cout << "raste: " << pngfilestr << std::endl;
     NSVGimage* image = NULL;
     NSVGrasterizer* rast = NULL;
     unsigned char* img = NULL;
@@ -79,7 +79,8 @@ void ConvertSvgToPng(std::string* svgfilestr)
     rast = nsvgCreateRasterizer();
     img = new unsigned char[(w*h*4)];
     nsvgRasterize(rast, image, 0, 0, 1, img, w, h, w*4);
-    stbi_write_png(pngfilestr.c_str(), w, h, 4, img, w*4);
+    stbi_write_bmp(pngfilestr.c_str(), w, h, 4, img);
+    //stbi_write_bmp(pngfilestr.c_str(), w, h, 4, img, w*4);
     nsvgDeleteRasterizer(rast);
     nsvgDelete(image);
 }

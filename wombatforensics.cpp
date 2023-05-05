@@ -2497,7 +2497,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    FXJPGImage* jpgimg = NULL; // JPEG
             FXPCXImage* pcximg = NULL; // PiCture eXchange
 	    FXPNGImage* pngimg = NULL; // Portable Network Graphics
-            FXPNGImage* png2img = NULL; // png for svg
+            FXBMPImage* png2img = NULL; // png for svg
             FXPPMImage* ppmimg = NULL; // Portable PixMap
             FXRASImage* rasimg = NULL; // SUN Raster Image
             FXRGBImage* rgbimg = NULL; // IRIS RGB Image
@@ -2682,11 +2682,11 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             {
                 //stream.close();
                 ConvertSvgToPng(&tmpfilestr);
-                std::string pngstr = tmpfilestr + ".png";
-                std::cout << "fxpng: " << pngstr << std::endl;
+                std::string pngstr = tmpfilestr + ".bmp";
+                //std::cout << "fxpng: " << pngstr << std::endl;
                 FXFileStream stream2;
                 stream2.open(FXString(pngstr.c_str()), FXStreamLoad);
-                png2img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+                png2img = new FXBMPImage(this->getApp(), NULL, IMAGE_KEEP);
 		png2img->loadPixels(stream2);
 		int imgheight = png2img->getHeight() / 512;
 		int imgwidth = png2img->getWidth() / 512;
