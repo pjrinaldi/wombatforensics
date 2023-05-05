@@ -2497,6 +2497,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    FXJPGImage* jpgimg = NULL; // JPEG
             FXPCXImage* pcximg = NULL; // PiCture eXchange
 	    FXPNGImage* pngimg = NULL; // Portable Network Graphics
+            FXPNGImage* png2img = NULL; // png for svg
             FXPPMImage* ppmimg = NULL; // Portable PixMap
             FXRASImage* rasimg = NULL; // SUN Raster Image
             FXRGBImage* rgbimg = NULL; // IRIS RGB Image
@@ -2541,9 +2542,9 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		ddsimg->create();
 		imgview->setImage(ddsimg);
             }
-            /*
             else if(curfileitem->sig.compare("Exe") == 0)
             {
+                /*
 		exeimg = new FXEXEImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
 		exeimg->loadPixels(stream);
 		int imgheight = exeimg->getHeight() / 512;
@@ -2557,8 +2558,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		}
 		exeimg->create();
 		imgview->setImage(exeimg);
+                */
             }
-            */
             else if(curfileitem->sig.compare("Gif") == 0)
             {
 		gifimg = new FXGIFImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
@@ -2679,7 +2680,27 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    }
             else if(curfileitem->sig.compare("Svg") == 0)
             {
-            }
+                //stream.close();
+                ConvertSvgToPng(&tmpfilestr);
+                std::string pngstr = tmpfilestr + ".png";
+                std::cout << "fxpng: " << pngstr << std::endl;
+                FXFileStream stream2;
+                stream2.open(FXString(pngstr.c_str()), FXStreamLoad);
+                png2img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+		png2img->loadPixels(stream2);
+		int imgheight = png2img->getHeight() / 512;
+		int imgwidth = png2img->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			png2img->scale(png2img->getWidth() / imgheight, png2img->getHeight() / imgheight);
+		    else
+			png2img->scale(png2img->getWidth() / imgwidth, png2img->getHeight() / imgwidth);
+		}
+		png2img->create();
+		imgview->setImage(png2img);
+                stream2.close();
+	    }
 	    else if(curfileitem->sig.compare("Ppm") == 0)
 	    {
 		ppmimg = new FXPPMImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);

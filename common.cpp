@@ -1,4 +1,11 @@
 #include "common.h"
+// SVG TO PNG HEADERS
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#define NANOSVG_IMPLEMENTATION
+#include "nanosvg.h"
+#define NANOSVGRAST_IMPLEMENTATION
+#include "nanosvgrast.h"
 
 /*
 std::string ConvertUnixTimeToHuman(uint32_t unixtime)
@@ -57,6 +64,24 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
     strftime(timestr, sizeof(timestr), "%m/%d/%Y %I:%M:%S %p UTC", dt);
 
     return timestr;
+}
+
+void ConvertSvgToPng(std::string* svgfilestr)
+{
+    std::string pngfilestr = *svgfilestr + ".png";
+    std::cout << "raste: " << pngfilestr << std::endl;
+    NSVGimage* image = NULL;
+    NSVGrasterizer* rast = NULL;
+    unsigned char* img = NULL;
+    image = nsvgParseFromFile(svgfilestr->c_str(), "px", 96);
+    int w = (int)image->width;
+    int h = (int)image->height;
+    rast = nsvgCreateRasterizer();
+    img = new unsigned char[(w*h*4)];
+    nsvgRasterize(rast, image, 0, 0, 1, img, w, h, w*4);
+    stbi_write_png(pngfilestr.c_str(), w, h, 4, img, w*4);
+    nsvgDeleteRasterizer(rast);
+    nsvgDelete(image);
 }
 
 uint8_t* substr(uint8_t* arr, int begin, int len)
