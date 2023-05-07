@@ -2643,7 +2643,6 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             else if(curfileitem->sig.compare("Heic") == 0)
             {
                 ConvertHeifToJpg(&tmpfilestr);
-                //LibHeifInitializer heifinitializer;
             }
             else if(curfileitem->sig.compare("Heif") == 0)
             {
