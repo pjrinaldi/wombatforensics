@@ -68,6 +68,95 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
 
 void ConvertHeifToJpg(std::string* heifstr)
 {
+    heif_init(nullptr);
+    std::string jpgfilestr = *heifstr + ".jpg";
+    struct heif_context* ctx = heif_context_alloc();
+    struct heif_error err;
+    err = heif_context_read_from_file(ctx, heifstr->c_str(), nullptr);
+    if(err.code != 0)
+        std::cerr << "Could not read HEIF/HEIC file: " << err.message << std::endl;
+    int num_images = heif_context_get_number_of_top_level_images(ctx);
+    std::vector<heif_item_id> imageids(num_images);
+    num_images = heif_context_get_list_of_top_level_image_IDs(ctx, imageids.data(), num_images);
+    struct heif_image_handle* handle;
+    err = heif_context_get_image_handle(ctx, imageids[0], &handle);
+    if(err.code)
+        std::cerr << "Could not read HEIF/HEIC image: " << err.message << std::endl;
+    struct heif_decoding_options* decodeoptions = heif_decoding_options_alloc();
+    decodeoptions->strict_decoding = false;
+    decodeoptions->decoder_id = "libde265";
+    decodeoptions->color_conversion_options.preferred_chroma_upsampling_algorithm = heif_chroma_upsampling_nearest_neighbor;
+    decodeoptions->color_conversion_options.only_use_preferred_chroma_algorithm = true;
+    decodeoptions->convert_hdr_to_8bit = 1;
+    struct heif_image* image;
+    err = heif_decode_image(handle, &image, heif_colorspace_YCbCr, heif_chroma_420, decodeoptions);
+    if(err.code)
+        std::cerr << "Could not decode image: " << err.message << std::endl;
+    heif_decoding_options_free(decodeoptions);
+    if(err.code)
+        std::cerr << "Could not decode image: " << err.message << std::endl;
+    if(image) // write image to file here.
+    {
+        FILE* fp = fopen(jpgfilestr.c_str(), "wb");
+        struct jpeg_compress_struct cinfo;
+        jpeg_create_compress(&cinfo);
+        jpeg_stdio_dest(&cinfo, fp);
+        cinfo.image_width = heif_image_get_width(image, heif_channel_Y);
+        cinfo.image_height = heif_image_get_height(image, heif_channel_Y);
+        cinfo.input_components = 3;
+        cinfo.in_color_space = JCS_YCbCr;
+        jpeg_set_defaults(&cinfo);
+        jpeg_set_quality(&cinfo, 90, true);
+        std::cout << "line 108" << std::endl;
+        jpeg_start_compress(&cinfo, false);
+        std::cout << "line 112" << std::endl;
+        // WRITE ICC
+        size_t profile_size = heif_image_handle_get_raw_color_profile_size(handle);
+        std::cout << "line 111" << std::endl;
+        uint8_t* profile_data = static_cast<uint8_t*>(malloc(profile_size));
+        heif_image_handle_get_raw_color_profile(handle, profile_data);
+        jpeg_write_icc_profile(&cinfo, profile_data, (unsigned int) profile_size);
+        free(profile_data);
+        std::cout << "line 115" << std::endl;
+        int stride_y;
+        const uint8_t* row_y = heif_image_get_plane_readonly(image, heif_channel_Y, &stride_y);
+        int stride_u;
+        const uint8_t* row_u = heif_image_get_plane_readonly(image, heif_channel_Cb, &stride_u);
+        int stride_v;
+        const uint8_t* row_v = heif_image_get_plane_readonly(image, heif_channel_Cr, &stride_v);
+        std::cout << "line 122" << std::endl;
+        JSAMPARRAY buffer = cinfo.mem->alloc_sarray(reinterpret_cast<j_common_ptr>(&cinfo), JPOOL_IMAGE, cinfo.image_width * cinfo.input_components, 1);
+        std::cout << "line 124" << std::endl;
+        JSAMPROW row[1] = {buffer[0]};
+        std::cout << "line 126" << std::endl;
+        while(cinfo.next_scanline < cinfo.image_height)
+        {
+            size_t offset_y = cinfo.next_scanline * stride_y;
+            const uint8_t* start_y = &row_y[offset_y];
+            size_t offset_u = (cinfo.next_scanline / 2) * stride_u;
+            const uint8_t* start_u = &row_y[offset_u];
+            size_t offset_v = (cinfo.next_scanline / 2) * stride_v;
+            const uint8_t* start_v = &row_y[offset_v];
+            JOCTET* bufp = buffer[0];
+            for(JDIMENSION x = 0; x < cinfo.image_width; ++x)
+            {
+                *bufp++ = start_y[x];
+                *bufp++ = start_u[x / 2];
+                *bufp++ = start_v[x / 2];
+            }
+            jpeg_write_scanlines(&cinfo, row, 1);
+        }
+        std::cout << "line 144" << std::endl;
+        jpeg_finish_compress(&cinfo);
+        std::cout << "line 146" << std::endl;
+        fclose(fp);
+        std::cout << "line 148" << std::endl;
+        jpeg_destroy_compress(&cinfo);
+    }
+    heif_image_release(image);
+    heif_image_handle_release(handle);
+    heif_context_free(ctx);
+    heif_deinit();
 }
 
 void ConvertSvgToPng(std::string* svgfilestr)
