@@ -118,6 +118,7 @@ void ConvertHeifToPng(std::string* heifstr)
         bool withalpha = (heif_image_get_chroma_format(image)  == heif_chroma_interleaved_RGBA || heif_image_get_chroma_format(image) == heif_chroma_interleaved_RRGGBBAA_BE);
         int width = heif_image_get_width(image, heif_channel_interleaved);
         int height = heif_image_get_height(image, heif_channel_interleaved);
+        std::cout << "height: " << height << std::endl;
         int bitdepth;
         int inputbpp = heif_image_get_bits_per_pixel_range(image, heif_channel_interleaved);
         if(inputbpp > 8)
