@@ -68,8 +68,21 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
 
 void ConvertHeifToPng(std::string* heifstr)
 {
+    std::string pngfilestr = *heifstr + ".png";
+    Magick::Image inimage(*heifstr);
+    inimage.magick("PNG");
+    inimage.write(pngfilestr);
+    /*
+		    Magick::Image inimage("/tmp/wf/mt.png");
+		    inimage.quiet(false);
+		    inimage.resize(thumbgeometry);
+		    inimage.magick("PNG");
+		    inimage.write(thumbfilestr);
+    */
+    /*
     heif_init(nullptr);
     std::string pngfilestr = *heifstr + ".png";
+    std::cout << pngfilestr << std::endl;
     struct heif_context* ctx = heif_context_alloc();
     struct heif_error err;
     err = heif_context_read_from_file(ctx, heifstr->c_str(), nullptr);
@@ -82,12 +95,13 @@ void ConvertHeifToPng(std::string* heifstr)
     err = heif_context_get_image_handle(ctx, imageids[0], &handle);
     if(err.code)
         std::cerr << "Could not read HEIF/HEIC image: " << err.message << std::endl;
+    int hasalpha = heif_image_handle_has_alpha_channel(handle);
     struct heif_decoding_options* decodeoptions = heif_decoding_options_alloc();
-    decodeoptions->strict_decoding = false;
-    decodeoptions->decoder_id = "libde265";
-    decodeoptions->color_conversion_options.preferred_chroma_upsampling_algorithm = heif_chroma_upsampling_nearest_neighbor;
-    decodeoptions->color_conversion_options.only_use_preferred_chroma_algorithm = false;
-    decodeoptions->convert_hdr_to_8bit = 1;
+    //decodeoptions->strict_decoding = false;
+    //decodeoptions->decoder_id = "libde265";
+    //decodeoptions->color_conversion_options.preferred_chroma_upsampling_algorithm = heif_chroma_upsampling_nearest_neighbor;
+    //decodeoptions->color_conversion_options.only_use_preferred_chroma_algorithm = true;
+    //decodeoptions->convert_hdr_to_8bit = 1;
     struct heif_image* image;
     err = heif_decode_image(handle, &image, heif_colorspace_YCbCr, heif_chroma_420, decodeoptions);
     if(err.code)
@@ -95,6 +109,7 @@ void ConvertHeifToPng(std::string* heifstr)
     heif_decoding_options_free(decodeoptions);
     if(err.code)
         std::cerr << "Could not free decode options: " << err.message << std::endl;
+
     if(image) // write image to file here
     {
         FILE* fp = fopen(pngfilestr.c_str(), "wb");
@@ -118,6 +133,7 @@ void ConvertHeifToPng(std::string* heifstr)
         bool withalpha = (heif_image_get_chroma_format(image)  == heif_chroma_interleaved_RGBA || heif_image_get_chroma_format(image) == heif_chroma_interleaved_RRGGBBAA_BE);
         int width = heif_image_get_width(image, heif_channel_interleaved);
         int height = heif_image_get_height(image, heif_channel_interleaved);
+        std::cout << "width: " << width << std::endl;
         std::cout << "height: " << height << std::endl;
         int bitdepth;
         int inputbpp = heif_image_get_bits_per_pixel_range(image, heif_channel_interleaved);
@@ -178,10 +194,12 @@ void ConvertHeifToPng(std::string* heifstr)
     heif_image_handle_release(handle);
     heif_context_free(ctx);
     heif_deinit();
+    */
 }
 
 void ConvertHeifToJpg(std::string* heifstr)
 {
+    /*
     heif_init(nullptr);
     std::string jpgfilestr = *heifstr + ".jpg";
     struct heif_context* ctx = heif_context_alloc();
@@ -209,6 +227,7 @@ void ConvertHeifToJpg(std::string* heifstr)
     heif_decoding_options_free(decodeoptions);
     if(err.code)
         std::cerr << "Could not decode image: " << err.message << std::endl;
+
     if(image) // write image to file here.
     {
         FILE* fp = fopen(jpgfilestr.c_str(), "wb");
@@ -222,7 +241,7 @@ void ConvertHeifToJpg(std::string* heifstr)
         jpeg_set_defaults(&cinfo);
         jpeg_set_quality(&cinfo, 90, true);
         std::cout << "line 108" << std::endl;
-        jpeg_start_compress(&cinfo, false);
+        jpeg_start_compress(&cinfo, true);
         std::cout << "line 112" << std::endl;
         // WRITE ICC
         size_t profile_size = heif_image_handle_get_raw_color_profile_size(handle);
@@ -271,6 +290,7 @@ void ConvertHeifToJpg(std::string* heifstr)
     heif_image_handle_release(handle);
     heif_context_free(ctx);
     heif_deinit();
+    */
 }
 
 void ConvertSvgToPng(std::string* svgfilestr)

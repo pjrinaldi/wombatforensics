@@ -18,9 +18,9 @@
 #include <libffmpegthumbnailer/filmstripfilter.h>
 #include <libffmpegthumbnailer/videothumbnailer.h>
 // HEIF TO JPEG HEADER
-#include <libheif/heif.h>
-#include <jpeglib.h>
-#include <png.h>
+//#include <libheif/heif.h>
+//#include <jpeglib.h>
+//#include <png.h>
 // BLAKE3 HASH
 #include "blake3/blake3.h"
 #include "forensicimage.h"

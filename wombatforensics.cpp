@@ -204,17 +204,6 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     virtualfoldericon->create();
     filtericon = new FXPNGIcon(this->getApp(), filter);
     filtericon->create();
-
-    FXPNGImage* thumbmissingimage = new FXPNGImage(this->getApp(), thumbmissing);
-    FXFileStream tmpstr;
-    tmpstr.open("/tmp/wf/mt.png", FXStreamSave);
-    thumbmissingimage->savePixels(tmpstr);
-    tmpstr.close();
-    FXPNGImage* videoerrorimage = new FXPNGImage(this->getApp(), videoerror);
-    tmpstr.open("/tmp/wf/ve.png", FXStreamSave);
-    videoerrorimage->savePixels(tmpstr);
-    tmpstr.close();
-
     statusbar->getStatusLine()->setNormalText("Open a Forensic Image, Device, or File to Begin");
     fileuserdata.clear();
     //sqlitefiles.clear();
@@ -233,6 +222,17 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     tmppath = "/tmp/wf/";
     FXDir::create("/tmp/wf/");
     FXDir::create(configpath);
+
+    FXPNGImage* thumbmissingimage = new FXPNGImage(this->getApp(), thumbmissing);
+    FXFileStream tmpstr;
+    tmpstr.open("/tmp/wf/mt.png", FXStreamSave);
+    thumbmissingimage->savePixels(tmpstr);
+    tmpstr.close();
+    FXPNGImage* videoerrorimage = new FXPNGImage(this->getApp(), videoerror);
+    tmpstr.open("/tmp/wf/ve.png", FXStreamSave);
+    videoerrorimage->savePixels(tmpstr);
+    tmpstr.close();
+
     bool issettings = settingfile.open(configpath + "settings", FXIO::Reading, FXIO::OwnerReadWrite);
     if(issettings == false)
     {
@@ -2498,6 +2498,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             FXPCXImage* pcximg = NULL; // PiCture eXchange
 	    FXPNGImage* pngimg = NULL; // Portable Network Graphics
             FXBMPImage* png2img = NULL; // png for svg
+            FXPNGImage* pngimg3 = NULL; // heif/c to png
             FXPPMImage* ppmimg = NULL; // Portable PixMap
             FXRASImage* rasimg = NULL; // SUN Raster Image
             FXRGBImage* rgbimg = NULL; // IRIS RGB Image
@@ -2640,15 +2641,26 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 		jpgimg->create();
 		imgview->setImage(jpgimg);
 	    }
-            else if(curfileitem->sig.compare("Heic") == 0)
+            else if(curfileitem->sig.compare("Heic") == 0 || curfileitem->sig.compare("Heif") == 0)
             {
                 ConvertHeifToPng(&tmpfilestr);
-                //ConvertHeifToJpg(&tmpfilestr);
-            }
-            else if(curfileitem->sig.compare("Heif") == 0)
-            {
-                ConvertHeifToPng(&tmpfilestr);
-                //ConvertHeifToJpg(&tmpfilestr);
+                std::string pngstr = tmpfilestr + ".png";
+                FXFileStream stream3;
+                stream3.open(FXString(pngstr.c_str()), FXStreamLoad);
+                pngimg3 = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+                pngimg3->loadPixels(stream3);
+		int imgheight = pngimg3->getHeight() / 512;
+		int imgwidth = pngimg3->getWidth() / 512;
+		if(imgheight > 1 && imgwidth > 1)
+		{
+		    if(imgwidth < imgheight)
+			pngimg3->scale(pngimg3->getWidth() / imgheight, pngimg3->getHeight() / imgheight);
+		    else
+			pngimg3->scale(pngimg3->getWidth() / imgwidth, pngimg3->getHeight() / imgwidth);
+		}
+		pngimg3->create();
+		imgview->setImage(pngimg3);
+                stream3.close();
             }
             else if(curfileitem->sig.compare("Pcx") == 0)
             {
