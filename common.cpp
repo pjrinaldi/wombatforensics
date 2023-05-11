@@ -66,6 +66,11 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
     return timestr;
 }
 
+void ConvertHeifToPng(std::string* heifstr)
+{
+
+}
+
 void ConvertHeifToJpg(std::string* heifstr)
 {
     heif_init(nullptr);

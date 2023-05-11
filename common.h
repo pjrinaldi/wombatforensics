@@ -20,6 +20,7 @@
 // HEIF TO JPEG HEADER
 #include <libheif/heif.h>
 #include <jpeglib.h>
+#include <png.h>
 // BLAKE3 HASH
 #include "blake3/blake3.h"
 #include "forensicimage.h"
@@ -131,5 +132,6 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int thumbcount, std::string tmppath);
 void ConvertSvgToPng(std::string* tmpfilestr);
 void ConvertHeifToJpg(std::string* heifstr);
+void ConvertHeifToPng(std::string* heifstr);
 
 #endif
