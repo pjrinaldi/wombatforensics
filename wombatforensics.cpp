@@ -2642,11 +2642,13 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    }
             else if(curfileitem->sig.compare("Heic") == 0)
             {
-                ConvertHeifToJpg(&tmpfilestr);
+                ConvertHeifToPng(&tmpfilestr);
+                //ConvertHeifToJpg(&tmpfilestr);
             }
             else if(curfileitem->sig.compare("Heif") == 0)
             {
-                ConvertHeifToJpg(&tmpfilestr);
+                ConvertHeifToPng(&tmpfilestr);
+                //ConvertHeifToJpg(&tmpfilestr);
             }
             else if(curfileitem->sig.compare("Pcx") == 0)
             {

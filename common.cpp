@@ -68,7 +68,115 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
 
 void ConvertHeifToPng(std::string* heifstr)
 {
+    heif_init(nullptr);
+    std::string pngfilestr = *heifstr + ".png";
+    struct heif_context* ctx = heif_context_alloc();
+    struct heif_error err;
+    err = heif_context_read_from_file(ctx, heifstr->c_str(), nullptr);
+    if(err.code != 0)
+        std::cerr << "Could not read HEIF/HEIC file: " << err.message << std::endl;
+    int numimages = heif_context_get_number_of_top_level_images(ctx);
+    std::vector<heif_item_id> imageids(numimages);
+    numimages = heif_context_get_list_of_top_level_image_IDs(ctx, imageids.data(), numimages);
+    struct heif_image_handle* handle;
+    err = heif_context_get_image_handle(ctx, imageids[0], &handle);
+    if(err.code)
+        std::cerr << "Could not read HEIF/HEIC image: " << err.message << std::endl;
+    struct heif_decoding_options* decodeoptions = heif_decoding_options_alloc();
+    decodeoptions->strict_decoding = false;
+    decodeoptions->decoder_id = "libde265";
+    decodeoptions->color_conversion_options.preferred_chroma_upsampling_algorithm = heif_chroma_upsampling_nearest_neighbor;
+    decodeoptions->color_conversion_options.only_use_preferred_chroma_algorithm = false;
+    decodeoptions->convert_hdr_to_8bit = 1;
+    struct heif_image* image;
+    err = heif_decode_image(handle, &image, heif_colorspace_YCbCr, heif_chroma_420, decodeoptions);
+    if(err.code)
+        std::cerr << "Could not decode image: " << err.message << std::endl;
+    heif_decoding_options_free(decodeoptions);
+    if(err.code)
+        std::cerr << "Could not free decode options: " << err.message << std::endl;
+    if(image) // write image to file here
+    {
+        FILE* fp = fopen(pngfilestr.c_str(), "wb");
+        png_structp pngptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+        if(!pngptr)
+            std::cerr << "libpng initialization failed" << std::endl;
+        png_infop infoptr = png_create_info_struct(pngptr);
+        if(!infoptr)
+        {
+            png_destroy_write_struct(&pngptr, nullptr);
+            fclose(fp);
+            std::cerr << "libpng initialization failed (2)" << std::endl;
+        }
+        if(setjmp(png_jmpbuf(pngptr)))
+        {
+            png_destroy_write_struct(&pngptr, &infoptr);
+            fclose(fp);
+            std::cerr << "error while encoding image" << std::endl;
+        }
+        png_init_io(pngptr, fp);
+        bool withalpha = (heif_image_get_chroma_format(image)  == heif_chroma_interleaved_RGBA || heif_image_get_chroma_format(image) == heif_chroma_interleaved_RRGGBBAA_BE);
+        int width = heif_image_get_width(image, heif_channel_interleaved);
+        int height = heif_image_get_height(image, heif_channel_interleaved);
+        int bitdepth;
+        int inputbpp = heif_image_get_bits_per_pixel_range(image, heif_channel_interleaved);
+        if(inputbpp > 8)
+            bitdepth = 16;
+        else
+            bitdepth = 8;
+        const int colortype = withalpha ? PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB;
+        png_set_IHDR(pngptr, infoptr, width, height, bitdepth, colortype, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
+        size_t profilesize = heif_image_handle_get_raw_color_profile_size(handle);
+        if(profilesize > 0)
+        {
+            uint8_t* profiledata = static_cast<uint8_t*>(malloc(profilesize));
+            heif_image_handle_get_raw_color_profile(handle, profiledata);
+            char profilename[] = "unknown";
+            png_set_iCCP(pngptr, infoptr, profilename, PNG_COMPRESSION_TYPE_BASE, 
+#if PNG_LIBPNG_VER < 10500
+                    (png_charp)profiledata, 
+#else
+                    (png_const_bytep)profiledata,
+#endif
+                    (png_uint_32)profilesize);
+            free(profiledata);
+        }
+        png_write_info(pngptr, infoptr);
+        uint8_t** rowpointers = new uint8_t* [height];
+
+        int stridergb;
+        const uint8_t* rowrgb = heif_image_get_plane_readonly(image, heif_channel_interleaved, &stridergb);
+        for(int y=0; y < height; ++y)
+            rowpointers[y] = const_cast<uint8_t*>(&rowrgb[y * stridergb]);
+        if(bitdepth == 16)
+        {
+            int shift = 16 - inputbpp;
+            if(shift > 8)
+            {
+                for(int y=0; y < height; ++y)
+                {
+                    for(int x=0; x < stridergb; x+= 2)
+                    {
+                        uint8_t* p = (&rowpointers[y][x]);
+                        int v = (p[0] << 8) | p[1];
+                        v = (v << shift) | (v >> (16 - shift));
+                        p[0] = (uint8_t)(v >> 8);
+                        p[1] = (uint8_t)(v & 0xff);
+                    }
+                }
+            }
+        }
+        png_write_image(pngptr, rowpointers);
+        png_write_end(pngptr, nullptr);
+        png_destroy_write_struct(&pngptr, &infoptr);
+        delete[] rowpointers;
+        fclose(fp);
+    }
+    heif_image_release(image);
+    heif_image_handle_release(handle);
+    heif_context_free(ctx);
+    heif_deinit();
 }
 
 void ConvertHeifToJpg(std::string* heifstr)
