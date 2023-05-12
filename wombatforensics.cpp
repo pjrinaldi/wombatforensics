@@ -2965,6 +2965,7 @@ void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t* currentid)
 
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 {
+    StatusUpdate("Loading Image Preview...");
     tablelist->selectRow(tablelist->getCurrentRow());
     if(tablelist->getCurrentRow() > -1)
     {
@@ -2975,6 +2976,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	    PlainView(&currentfileitem);
 	}
     }
+    StatusUpdate("Image Loaded");
 
     return 1;
 }
