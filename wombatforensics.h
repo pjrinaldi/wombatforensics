@@ -14,6 +14,7 @@
 #include <time.h>
 #include <fcntl.h>
 #include <thread>
+#include <future>
 #include <algorithm>
 // FOX TOOLKIT GUI 
 #include "/usr/local/include/fox-1.7/fx.h"
