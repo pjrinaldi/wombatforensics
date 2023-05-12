@@ -2965,7 +2965,6 @@ void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t* currentid)
 
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 {
-    this->getApp()->beginWaitCursor();
     tablelist->selectRow(tablelist->getCurrentRow());
     if(tablelist->getCurrentRow() > -1)
     {
@@ -2976,7 +2975,6 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	    PlainView(&currentfileitem);
 	}
     }
-    this->getApp()->endWaitCursor();
 
     return 1;
 }
