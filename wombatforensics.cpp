@@ -2995,6 +2995,8 @@ void WombatForensics::IncrementGlobalId(uint64_t* globalid, uint64_t* currentid)
 
 long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 {
+    tablelist->ungrab();
+    this->getApp()->beginWaitCursor();
     //StatusUpdate("Loading Image Preview...");
     tablelist->selectRow(tablelist->getCurrentRow());
     if(tablelist->getCurrentRow() > -1 && tablelist->getCurrentRow() != oldselectedrow)
@@ -3007,6 +3009,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	}
     }
     oldselectedrow = tablelist->getCurrentRow();
+    this->getApp()->endWaitCursor();
     //StatusUpdate("Image Loaded");
 
     return 1;
