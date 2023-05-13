@@ -2507,8 +2507,8 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             FXWEBPImage* webpimg = NULL; // WebP
             FXXBMImage* xbmimg = NULL; // X Bitmap
             FXXPMImage* xpmimg = NULL; // X PixMap
-            std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
-            tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+            //std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+            //tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
             FXFileStream stream;
             stream.open(FXString(tmpfilestr.c_str()), FXStreamLoad);
             if(curfileitem->sig.compare("Bmp") == 0)
@@ -2643,41 +2643,39 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    }
             else if(curfileitem->sig.compare("Heic") == 0 || curfileitem->sig.compare("Heif") == 0)
             {
-                //statusbar->layout();
-                //LogEntry("Loading Heif Preview...");
-                //StatusUpdate("Loading...");
-                //statusbar->layout();
-		// need to t1.detach, but move the load image into the convert function or call a different one...
-                std::future<bool> cfuture = std::async(ConvertHeifToPng, &tmpfilestr);
-                std::cout << "checking, please wait";
-                std::chrono::nanoseconds span(100);
-                /*
-                while(cfuture.wait_for(span) == std::future_status::timeout)
-                {
-                    //LogEntry("Loading Heif Preview...");
-                    //StatusUpdate("Loading...");
-                    std::cout << "." << std::flush;
-                }
-                */
-                bool x = cfuture.get();
-                std::cout << "conversion done..." << std::endl;
-                //StatusUpdate("Ready");
-		/*
-		std::thread t1(ConvertHeifToPng, &tmpfilestr);
-		auto rf = std::async(std::launch::async, t1);
-		auto status = rf.wait_for(std::chrono::nanoseconds(1));
-		while(status != std::future_status::ready)
-		{
-		    std::cout << "not finished";
-		    status = rf.wait_for(std::chrono::nanoseconds(1));
-		}
-		std::cout << std::endl << "finished" << std::endl;
-		*/
-		//std::packaged_task<void> pt(t1);
-		//std::future f2 = std::async(std::launch::async, ConvertHeifToPng, &tmpfilestr);
-		//t1.join();
-                //ConvertHeifToPng(&tmpfilestr);
                 std::string pngstr = tmpfilestr + ".png";
+                if(!std::filesystem::exists(pngstr))
+                {
+                    // need to t1.detach, but move the load image into the convert function or call a different one...
+                    std::future<bool> cfuture = std::async(ConvertHeifToPng, &tmpfilestr);
+                    //std::cout << "checking, please wait";
+                    /*
+                    std::chrono::nanoseconds span(100);
+                    while(cfuture.wait_for(span) == std::future_status::timeout)
+                    {
+                        //LogEntry("Loading Heif Preview...");
+                        //StatusUpdate("Loading...");
+                        std::cout << "." << std::flush;
+                    }
+                    */
+                    bool x = cfuture.get();
+                    //std::cout << "conversion done..." << std::endl;
+                    /*
+                    std::thread t1(ConvertHeifToPng, &tmpfilestr);
+                    auto rf = std::async(std::launch::async, t1);
+                    auto status = rf.wait_for(std::chrono::nanoseconds(1));
+                    while(status != std::future_status::ready)
+                    {
+                        std::cout << "not finished";
+                        status = rf.wait_for(std::chrono::nanoseconds(1));
+                    }
+                    std::cout << std::endl << "finished" << std::endl;
+                    */
+                    //std::packaged_task<void> pt(t1);
+                    //std::future f2 = std::async(std::launch::async, ConvertHeifToPng, &tmpfilestr);
+                    //t1.join();
+                    //ConvertHeifToPng(&tmpfilestr);
+                }
                 FXFileStream stream3;
                 stream3.open(FXString(pngstr.c_str()), FXStreamLoad);
                 pngimg3 = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
@@ -2729,10 +2727,9 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    }
             else if(curfileitem->sig.compare("Svg") == 0)
             {
-                //stream.close();
-                ConvertSvgToPng(&tmpfilestr);
                 std::string pngstr = tmpfilestr + ".bmp";
-                //std::cout << "fxpng: " << pngstr << std::endl;
+                if(!std::filesystem::exists(pngstr))
+                    ConvertSvgToPng(&tmpfilestr);
                 FXFileStream stream2;
                 stream2.open(FXString(pngstr.c_str()), FXStreamLoad);
                 png2img = new FXBMPImage(this->getApp(), NULL, IMAGE_KEEP);
