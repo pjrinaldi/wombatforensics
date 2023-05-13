@@ -286,6 +286,8 @@ class WombatForensics : public FXMainWindow
 
 	CurrentItem currentitem;
         FileItem currentfileitem;
+
+        int oldselectedrow = -1;
         
         int sortindex = 1;
         uint sortasc = 1;
