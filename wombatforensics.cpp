@@ -2478,6 +2478,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         if(curfileitem->size > 0)
         {
             plaintext->hide();
+            FXPNGImage* pngimg4 = NULL; // AVIF to png
             FXBMPImage* bmpimg = NULL; // Microsoft Bitmap
             FXDDSImage* ddsimg = NULL; // Direct Draw Surface
             //FXEXEImage* exeimg = NULL; // Windows Executable
@@ -2502,7 +2503,36 @@ void WombatForensics::PlainView(FileItem* curfileitem)
             //tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
             FXFileStream stream;
             stream.open(FXString(tmpfilestr.c_str()), FXStreamLoad);
-            if(curfileitem->sig.compare("Bmp") == 0)
+            if(curfileitem->sig.compare("Avif") == 0)
+            {
+                bool avifconv = true;
+                std::string pngstr = tmpfilestr + ".png";
+                if(!std::filesystem::exists(pngstr))
+                {
+                    std::future<bool> cfuture = std::async(ConvertAvifToPng, &tmpfilestr);
+                    avifconv = cfuture.get();
+                }
+                if(avifconv == true)
+                {
+                    FXFileStream stream3;
+                    stream3.open(FXString(pngstr.c_str()), FXStreamLoad);
+                    pngimg4 = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+                    pngimg4->loadPixels(stream3);
+                    int imgheight = pngimg4->getHeight() / 512;
+                    int imgwidth = pngimg4->getWidth() / 512;
+                    if(imgheight > 1 && imgwidth > 1)
+                    {
+                        if(imgwidth < imgheight)
+                            pngimg4->scale(pngimg4->getWidth() / imgheight, pngimg4->getHeight() / imgheight);
+                        else
+                            pngimg4->scale(pngimg4->getWidth() / imgwidth, pngimg4->getHeight() / imgwidth);
+                    }
+                    pngimg4->create();
+                    imgview->setImage(pngimg4);
+                    stream3.close();
+                }
+            }
+            else if(curfileitem->sig.compare("Bmp") == 0)
             {
 		bmpimg = new FXBMPImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
 		bmpimg->loadPixels(stream);
@@ -2634,6 +2664,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	    }
             else if(curfileitem->sig.compare("Heic") == 0 || curfileitem->sig.compare("Heif") == 0)
             {
+                bool heifconv = true;
                 std::string pngstr = tmpfilestr + ".png";
                 if(!std::filesystem::exists(pngstr))
                 {
@@ -2649,7 +2680,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
                         std::cout << "." << std::flush;
                     }
                     */
-                    bool x = cfuture.get();
+                    heifconv = cfuture.get();
                     //std::cout << "conversion done..." << std::endl;
                     /*
                     std::thread t1(ConvertHeifToPng, &tmpfilestr);
@@ -2667,22 +2698,25 @@ void WombatForensics::PlainView(FileItem* curfileitem)
                     //t1.join();
                     //ConvertHeifToPng(&tmpfilestr);
                 }
-                FXFileStream stream3;
-                stream3.open(FXString(pngstr.c_str()), FXStreamLoad);
-                pngimg3 = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-                pngimg3->loadPixels(stream3);
-		int imgheight = pngimg3->getHeight() / 512;
-		int imgwidth = pngimg3->getWidth() / 512;
-		if(imgheight > 1 && imgwidth > 1)
-		{
-		    if(imgwidth < imgheight)
-			pngimg3->scale(pngimg3->getWidth() / imgheight, pngimg3->getHeight() / imgheight);
-		    else
-			pngimg3->scale(pngimg3->getWidth() / imgwidth, pngimg3->getHeight() / imgwidth);
-		}
-		pngimg3->create();
-		imgview->setImage(pngimg3);
-                stream3.close();
+                if(heifconv == true)
+                {
+                    FXFileStream stream3;
+                    stream3.open(FXString(pngstr.c_str()), FXStreamLoad);
+                    pngimg3 = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+                    pngimg3->loadPixels(stream3);
+                    int imgheight = pngimg3->getHeight() / 512;
+                    int imgwidth = pngimg3->getWidth() / 512;
+                    if(imgheight > 1 && imgwidth > 1)
+                    {
+                        if(imgwidth < imgheight)
+                            pngimg3->scale(pngimg3->getWidth() / imgheight, pngimg3->getHeight() / imgheight);
+                        else
+                            pngimg3->scale(pngimg3->getWidth() / imgwidth, pngimg3->getHeight() / imgwidth);
+                    }
+                    pngimg3->create();
+                    imgview->setImage(pngimg3);
+                    stream3.close();
+                }
             }
             else if(curfileitem->sig.compare("Pcx") == 0)
             {

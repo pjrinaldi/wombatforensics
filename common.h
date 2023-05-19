@@ -132,5 +132,6 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int thumbcount, std::string tmppath);
 void ConvertSvgToPng(std::string* tmpfilestr);
 bool ConvertHeifToPng(std::string* heifstr);
+bool ConvertAvifToPng(std::string* avifstr);
 
 #endif

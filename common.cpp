@@ -68,10 +68,34 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
 
 bool ConvertHeifToPng(std::string* heifstr)
 {
-    std::string pngfilestr = *heifstr + ".png";
-    Magick::Image inimage(*heifstr);
-    inimage.magick("PNG");
-    inimage.write(pngfilestr);
+    try
+    {
+        std::string pngfilestr = *heifstr + ".png";
+        Magick::Image inimage(*heifstr);
+        inimage.magick("PNG");
+        inimage.write(pngfilestr);
+    }
+    catch(Magick::Exception e)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool ConvertAvifToPng(std::string* avifstr)
+{
+    try
+    {
+        std::string pngfilestr = *avifstr + ".png";
+        Magick::Image inimage(*avifstr);
+        inimage.magick("PNG");
+        inimage.write(pngfilestr);
+    }
+    catch(Magick::Exception e)
+    {
+        return false;
+    }
 
     return true;
 }
