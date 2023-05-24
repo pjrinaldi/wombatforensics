@@ -147,6 +147,7 @@ class WombatForensics : public FXMainWindow
     private:
         FXVerticalFrame* mainframe;
         FXToolBar* toolbar;
+        FXHorizontalFrame* pathframe;
         FXToolBar* pathtoolbar;
 	//FXMenuBar* pathmenubar;
         FXSplitter* hsplitter;
@@ -441,6 +442,7 @@ class WombatForensics : public FXMainWindow
         //FXString GetFileSystemName(ForImg* curforimg, uint64_t offset);
 	//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, FXArray<uint>* clusterlist);
 	//FXString ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset);
+        void UpdatePathFrame(void);
 	void UpdateForensicImages(void);
         void InitializeThumbCache(void);
 

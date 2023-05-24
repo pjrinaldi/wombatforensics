@@ -9,6 +9,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
     //mainframe->setBackColor(FXRGB(224,224,224));
     //toolbar->setBackColor(FXRGB(224,224,224));
+    pathframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     //pathmenubar = new FXMenuBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     hsplitter = new FXSplitter(mainframe, SPLITTER_VERTICAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
@@ -632,6 +633,11 @@ long WombatForensics::LoadForensicImages(FXObject*, FXSelector, void*)
     UpdateForensicImages();
     
     return 1;
+}
+
+void WombatForensics::UpdatePathFrame(void)
+{
+    std::cout << "update path frame here..." << std::endl;
 }
 
 void WombatForensics::UpdateForensicImages()
@@ -3271,6 +3277,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         // need to implement path toolbar here for the burrow and the partition and 
         //std::cout << "need to load the root directory for the partition selected here." << std::endl;
         this->getApp()->endWaitCursor();
+        UpdatePathFrame();
     }
     else if(itemtype == 3) // LOAD FILE CHILDREN ??? OR IMPLEMENT FUNCTIONALITY WHEN 
     {
