@@ -17,7 +17,7 @@
 #include <future>
 #include <algorithm>
 // FOX TOOLKIT GUI 
-#include "/usr/local/include/fox-1.7/fx.h"
+#include "fox-1.7/fx.h"
 // PROJECT INCLUDES
 #include "icons.h"
 #include "managetags.h"
