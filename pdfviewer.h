@@ -15,7 +15,7 @@
 #include "/usr/include/poppler/cpp/poppler-page-renderer.h"
 #include "/usr/include/poppler/cpp/poppler-image.h"
 
-#include "/usr/local/include/fox-1.7/fx.h"
+#include "fox-1.7/fx.h"
 
 class PdfViewer : public FXDialogBox
 {

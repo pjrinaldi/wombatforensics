@@ -15,11 +15,11 @@
 
 #include "rapidxml.hpp" // XML PARSING
 #include <zip.h> // ZIP PARSING
-#include <libfwsi.h> // SHELL ITEM PARSING for LNK
-#include <libfwnt.h> // LZEXPRESS HUFFMAN for PF
+#include "libfwsi.h" // SHELL ITEM PARSING for LNK
+#include "libfwnt.h" // LZEXPRESS HUFFMAN for PF
 #include "/usr/include/poppler/cpp/poppler-document.h" // PDF PARSING
 #include "/usr/include/poppler/cpp/poppler-page.h" // PDF PARSING
-#include <lexbor/html/tokenizer.h> // HTML PARSING
+#include "lexbor/tokenizer.h" // HTML PARSING
 
 static lxb_html_token_t* token_callback(lxb_html_tokenizer_t *tkz, lxb_html_token_t *token, void *ctx);
 
