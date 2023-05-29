@@ -638,6 +638,9 @@ long WombatForensics::LoadForensicImages(FXObject*, FXSelector, void*)
 void WombatForensics::UpdatePathFrame(void)
 {
     std::cout << "update path frame here..." << std::endl;
+    FXButton* burrowbutton2 = new FXButton(pathtoolbar, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
+    burrowbutton2->setIconPosition(ICON_BEFORE_TEXT);
+    burrowbutton2->setTipText("Burrow");
 }
 
 void WombatForensics::UpdateForensicImages()
@@ -3212,7 +3215,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             {
                 currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
                 if(currentfileitem.isdirectory)
-                    pathtext += FXString(currentfileitem.name.c_str()) + "/";
+                    pathtext = FXString(currentfileitem.path.c_str()) + "/";
+                    //pathtext += FXString(currentfileitem.name.c_str()) + "/";
+                std::cout << "curitem path: " << currentfileitem.path << std::endl;
             }
             else
                 currentfileitem.clear();
