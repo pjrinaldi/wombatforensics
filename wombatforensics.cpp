@@ -3328,6 +3328,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
 		*/
+                bool inmemory = false;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 pdfpath += tmpfilestr + " &";
                 //std::cout << "pdfpath: " << pdfpath << std::endl;
                 std::system(pdfpath.c_str());
@@ -3356,6 +3360,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
 		*/
+                bool inmemory = false;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 imgpath += tmpfilestr + " &";
                 //std::cout << "imgpath: " << imgpath << std::endl;
                 std::system(imgpath.c_str());
@@ -3384,6 +3392,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
 		*/
+                bool inmemory = false;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 vidpath += tmpfilestr + " &";
                 std::system(vidpath.c_str());
             }
@@ -3427,8 +3439,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
 		*/
+                bool inmemory = false;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 hexpath += tmpfilestr + " &";
-                //std::cout << "hexpath: " << hexpath << std::endl;
+                std::cout << "hexpath: " << hexpath << std::endl;
                 std::system(hexpath.c_str());
                 /*
 		FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
