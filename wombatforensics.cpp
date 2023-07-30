@@ -3311,6 +3311,19 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
 	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+            if(!std::filesystem::exists(tmpfilestr))
+            {
+                bool inmemory = false;
+                uint8_t* tmpbuf = NULL;
+                FILE* tmpfile = NULL;
+                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
+                if(inmemory)
+                {
+                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
+                    file.seekp(0, std::ios::beg);
+                    file.write((char*)tmpbuf, currentfileitem.size);
+                }
+            }
 	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF - SETTING 9
 	    {
                 std::string pdfpath = std::string(GetSettings(8).text()) + " ";
@@ -3328,10 +3341,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
 		*/
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 pdfpath += tmpfilestr + " &";
                 //std::cout << "pdfpath: " << pdfpath << std::endl;
                 std::system(pdfpath.c_str());
@@ -3360,10 +3369,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
 		*/
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 imgpath += tmpfilestr + " &";
                 //std::cout << "imgpath: " << imgpath << std::endl;
                 std::system(imgpath.c_str());
@@ -3392,10 +3397,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
 		*/
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 vidpath += tmpfilestr + " &";
                 std::system(vidpath.c_str());
             }
@@ -3439,10 +3440,6 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 }
                 delete[] tmpbuf;
 		*/
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
                 hexpath += tmpfilestr + " &";
                 std::cout << "hexpath: " << hexpath << std::endl;
                 std::system(hexpath.c_str());
