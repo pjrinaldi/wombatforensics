@@ -3311,7 +3311,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
 	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
-            std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
+            //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
             if(!std::filesystem::exists(tmpfilestr))
             {
                 bool inmemory = false;
@@ -3442,7 +3442,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 delete[] tmpbuf;
 		*/
                 hexpath += tmpfilestr + " &";
-                std::cout << "hexpath: " << hexpath << std::endl;
+                //std::cout << "hexpath: " << hexpath << std::endl;
                 std::system(hexpath.c_str());
                 /*
 		FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);

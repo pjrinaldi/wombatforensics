@@ -426,22 +426,16 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
         tmpfile = fopen(tmpfilestr.c_str(), "w+");
     }
     uint64_t curpos = 0;
-    std::cout << "curforimg image full path: " << curforimg->ImageFullPath() << std::endl;
     for(int i=0; i < layoutlist.size(); i++)
     {
         std::size_t layoutsplit = layoutlist.at(i).find(",");
         uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
         uint64_t cursize = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
-        std::cout << "curoffset: " << curoffset << " cursize: " << cursize << std::endl;
+        //std::cout << "curoffset: " << curoffset << " cursize: " << cursize << std::endl;
 
         uint8_t* inbuf = NULL;
         curlogicalsize += cursize;
-        std::cout << "curlogicalsize: " << curlogicalsize << "|" << cursize << " :cursize" << std::endl;
-        uint8_t* tbuf = NULL;
-        tbuf = new uint8_t[4];
-        curforimg->ReadContent(tbuf, 0, 4);
-        std::cout << "4 bytes: " << std::hex << (uint)tbuf[0] << (uint)tbuf[1] << (uint)tbuf[2] << (uint)tbuf[3] << std::dec << std::endl;
-        delete[] tbuf;
+        //std::cout << "curlogicalsize: " << curlogicalsize << "|" << cursize << " :cursize" << std::endl;
         if(curlogicalsize <= curfileitem->size)
         {
             inbuf = new uint8_t[cursize];
