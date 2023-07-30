@@ -3311,6 +3311,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
 	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+            std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
             if(!std::filesystem::exists(tmpfilestr))
             {
                 bool inmemory = false;
