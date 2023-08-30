@@ -14,6 +14,7 @@
 #include "libewf.h"
 #include "libsmraw.h"
 #include "aff4/aff4-c.h"
+#include "libvhdi.h"
 #include <zstd.h>
 
 struct wfi_metadata

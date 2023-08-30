@@ -19,6 +19,8 @@ ForImg::ForImg(std::string imgfile)
         imgtype = 5;
     else if(imgext.compare("wli") == 0) // WLI
         imgtype = 6;
+    else if(imgext.compare("vhd") == 0 || imgext.compare("vhdx") == 0 || imgext.compare("VHD") == 0 || imgext.compare("VHDX") == 0) // VHD/VHDX
+        imgtype = 7;
     else // ANY OLD FILE
         imgtype = 0;
     // SET IMGSIZE - GET THE SIZE OF THE RAW CONTENT
@@ -168,6 +170,24 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 6) // WLI
     {
+    }
+    else if(imgtype == 7) // VHD/VHDX
+    {
+        libvhdi_error_t* vhderror = NULL;
+        libvhdi_file_t* vhdfile = NULL;
+        int retopen = 0;
+        retopen = libvhdi_file_initialize(&vhdfile, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        retopen = libvhdi_file_open(vhdfile, imgpath.c_str(), LIBVHDI_OPEN_READ, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        libvhdi_file_get_media_size(vhdfile, &imgsize, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        libvhdi_file_close(vhdfile, &vhderror);
+        libvhdi_file_free(&vhdfile, &vhderror);
+        libvhdi_error_free(&vhderror);
     }
     else // everything else
     {
@@ -344,6 +364,26 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 6) // WLI
     {
+    }
+    else if(imgtype == 7) // VHD/VHDX
+    {
+        libvhdi_error_t* vhderror = NULL;
+        libvhdi_file_t* vhdfile = NULL;
+        int retopen = 0;
+        retopen = libvhdi_file_initialize(&vhdfile, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        retopen = libvhdi_file_open(vhdfile, imgpath.c_str(), LIBVHDI_OPEN_READ, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        uint64_t res = 0;
+        imgoffset = libvhdi_file_seek_offset(vhdfile, pos, SEEK_SET, &vhderror);
+        res = libvhdi_file_read_buffer(vhdfile, buf, size, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        libvhdi_file_close(vhdfile, &vhderror);
+        libvhdi_file_free(&vhdfile, &vhderror);
+        libvhdi_error_free(&vhderror);
     }
     else // EVERYTHING ELSE
     {
