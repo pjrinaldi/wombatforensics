@@ -68,6 +68,10 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
 
 bool ConvertHeifToPng(std::string* heifstr)
 {
+    std::string pngfilestr = *heifstr + ".png";
+    cimg_library::CImg<> inimage(heifstr->c_str());
+    inimage.save_png(pngfilestr.c_str());
+    /*
     try
     {
         std::string pngfilestr = *heifstr + ".png";
@@ -79,12 +83,16 @@ bool ConvertHeifToPng(std::string* heifstr)
     {
         return false;
     }
-
+    */
     return true;
 }
 
 bool ConvertAvifToPng(std::string* avifstr)
 {
+    std::string pngfilestr = *avifstr + ".png";
+    cimg_library::CImg<> inimage(avifstr->c_str());
+    inimage.save_png(pngfilestr.c_str());
+    /*
     try
     {
         std::string pngfilestr = *avifstr + ".png";
@@ -96,7 +104,7 @@ bool ConvertAvifToPng(std::string* avifstr)
     {
         return false;
     }
-
+    */
     return true;
 }
 
@@ -569,6 +577,7 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
     //std::cout << "tmpfilestr: " << tmpfilestr << " thumbfilestr: " << thumbfilestr << std::endl;
+    /*
     Magick::Image imgexists;
     bool thumbexists = false;
     try // attempt to open existing thumbnail
@@ -641,6 +650,7 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 	    }
 	}
     }
+    */
 }
 
 void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int thumbcount, std::string tmppath)
@@ -651,6 +661,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
     std::string thumbfilestr = tmppath + "vidthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
     //std::cout << "thumb file str: " << thumbfilestr << std::endl;
+    /*
     Magick::Image imgexists;
     bool thumbexists = false;
     try // attempt to open existing thumbnail
@@ -796,6 +807,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 	    }
         }
     }
+    */
 }
 
 void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig)

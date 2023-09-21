@@ -23,6 +23,8 @@ void ImageViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
 	tmpbuf = new uint8_t[size];
 	file.read((char*)tmpbuf, size);
     }
+
+    /*
     try
     {
 	Magick::Blob inblob(tmpbuf, curfileitem->size);
@@ -43,6 +45,7 @@ void ImageViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
     {
 	std::cout << "error encoutered: " << error.what() << std::endl;
     }
+    */
     // code cleanup
     if(!inmemory)
 	fclose(tmpfile);

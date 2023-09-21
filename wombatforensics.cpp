@@ -3811,7 +3811,7 @@ int main(int argc, char* argv[])
     FXApp* wr = new FXApp("SQLite Forensics", "Wombat");
 
     wr->init(argc, argv);
-    Magick::InitializeMagick(*argv);
+    //Magick::InitializeMagick(*argv);
 
     new WombatForensics(wr);
 

@@ -991,6 +991,12 @@ void ParseImage(FileItem* curfileitem, std::string* filecontents)
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     std::string previewfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     previewfilestr.erase(std::remove(previewfilestr.begin(), previewfilestr.end(), '$'), previewfilestr.end());
+    /* CImg Way
+     */
+    cimg_library::CImg<> img(tmpfilestr.c_str());
+    img.resize(512, 512);
+    img.save_png(previewfilestr.c_str());
+    /* ImageMagick Way
     Magick::Geometry previewgeometry(512, 512);
     try
     {
@@ -1006,6 +1012,7 @@ void ParseImage(FileItem* curfileitem, std::string* filecontents)
         //std::cout << "File: " << tmpfilestr << " magick error: " << error.what() << std::endl;
         filecontents->append("File: " + tmpfilestr + " magick error: " + error.what());
     }
+    */
 }
 
 void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
