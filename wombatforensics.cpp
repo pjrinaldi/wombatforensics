@@ -2472,7 +2472,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     FILE* tmpfile = NULL;
     std::string filecontents = "";
     this->getApp()->beginWaitCursor();
-    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(!std::filesystem::exists(tmpfilestr))
 	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
@@ -2940,7 +2940,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
 	if(curfileitem->size > 0)
 	{
 	    plaintext->hide();
-            std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+            std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
 	    ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
 	    videothumbnailer.setThumbnailSize(512);
@@ -3309,7 +3309,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 
 	    // THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name;
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
             //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
             if(!std::filesystem::exists(tmpfilestr))

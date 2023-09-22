@@ -423,7 +423,7 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
     uint64_t curlogicalsize = 0;
     uint8_t* tmpbuf = NULL;
     //std::string tmpfilestr = "";
-    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(*inmemory) // store in memory
         tmpbuf = new uint8_t[curfileitem->size];
@@ -578,11 +578,64 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
     //std::cout << "tmpfilestr: " << tmpfilestr << " thumbfilestr: " << thumbfilestr << std::endl;
     /*
+    cimg_library::CImg<> inimage(heifstr->c_str());
+    inimage.save_png(pngfilestr.c_str());
+    */
+    cimg_library::CImg<> imgexists;
+    bool thumbexists = std::filesystem::exists(thumbfilestr);
+    if(thumbexists)
+	imgexists.load(thumbfilestr.c_str());
+    FILE* tmpfile;
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    if(!std::filesystem::exists(tmpfilestr))
+	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    if(thumbexists)
+    {
+	if(imgexists.width() == thumbsize || imgexists.height() == thumbsize)
+	{
+	    std::cout << "Thumbnail exists for " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << ". skipping." << std::endl;
+	}
+	else // thumbnail exists, but isn't the right size
+	{
+	    if(curfileitem->size > 0)
+	    {
+		if(inmemory)
+		{
+		    tmpfile = fopen(tmpfilestr.c_str(), "w+");
+		    fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
+		    fclose(tmpfile);
+		}
+		cimg_library::CImg<> inimage(tmpfilestr.c_str());
+		inimage.resize(thumbsize, thumbsize);
+		inimage.save_png(thumbfilestr.c_str());
+	    }
+	    else // file is zero
+	    {
+		cimg_library::CImg<> inimage("/tmp/wf/mt.png");
+		inimage.resize(thumbsize, thumbsize);
+		inimage.save_png(thumbfilestr.c_str());
+	    }
+	}
+    }
+    else
+    {
+	if(inmemory)
+	{
+	    tmpfile = fopen(tmpfilestr.c_str(), "w+");
+	    fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
+	    fclose(tmpfile);
+	}
+	cimg_library::CImg<> inimage(tmpfilestr.c_str());
+	inimage.resize(thumbsize, thumbsize);
+	inimage.save_png(thumbfilestr.c_str());
+    }
+    /*
     Magick::Image imgexists;
     bool thumbexists = false;
     try // attempt to open existing thumbnail
     {
-	imgexists.read(thumbfilestr);
+	imgexists.read(thumbfilestr.c_str());
 	thumbexists = true;
     }
     catch(Magick::Exception &error) // thumbnail doesn't exist
