@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cmath>
 #include <bitset>
+#include <list>
 //#include <sys/stat.h>
 
 // FILE CATEGORY/SIGNATURE

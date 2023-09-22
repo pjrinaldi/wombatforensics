@@ -711,90 +711,131 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
     std::string thumbfilestr = tmppath + "vidthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
     //std::cout << "thumb file str: " << thumbfilestr << std::endl;
-    /*
-    Magick::Image imgexists;
-    bool thumbexists = false;
-    try // attempt to open existing thumbnail
-    {
-	imgexists.read(thumbfilestr);
-	thumbexists = true;
-    }
-    catch(Magick::Exception &error)
-    {
-    }
+    cimg_library::CImg<> imgexists;
+    bool thumbexists = std::filesystem::exists(thumbfilestr);
+    if(thumbexists)
+	imgexists.load(thumbfilestr.c_str());
     FILE* tmpfile;
-    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(!std::filesystem::exists(tmpfilestr))
         GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    if(inmemory)
+    // NEED TO IMPLEMENT TRY/CATCH TO CATCH ERRORS AND KEEP THE PROGRAM FROM CRASHING
+    if(thumbexists)
     {
-	std::ofstream sfile(tmpfilestr.c_str(), std::ios::binary);
-	sfile.seekp(0, std::ios::beg);
-	sfile.write((char*)tmpbuf, curfileitem->size);
-    }
-    delete[] tmpbuf;
-    Magick::Geometry thumbgeometry(thumbsize, thumbsize);
-    if(thumbexists && (imgexists.size().width() == thumbsize || imgexists.size().height() == thumbsize))
-    {
-	// MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
-	std::cout << "Thumbnail exists for " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << ". skipping." << std::endl;
-    }
-    else
-    {
-        if(curfileitem->size > 0)
-        {
-            std::vector<std::string> tlist;
-            tlist.clear();
-            try
-            {
-                ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
-                videothumbnailer.setThumbnailSize(thumbsize);
-                std::unique_ptr<ffmpegthumbnailer::FilmStripFilter> filmstripfilter;
-		filmstripfilter.reset(new ffmpegthumbnailer::FilmStripFilter());
-                videothumbnailer.addFilter(filmstripfilter.get());
-                videothumbnailer.setPreferEmbeddedMetadata(false);
-                int vtcnt = 100 / thumbcount;
-		//std::cout << "vtcnt: " << vtcnt << std::endl;
-                for(int i=0; i < vtcnt; i++)
-                {
-                    int seekpercentage = i * thumbcount;
-                    if(seekpercentage == 0)
-                        seekpercentage = 5;
-                    if(seekpercentage == 100)
-                        seekpercentage = 95;
-		    //std::cout << "seek percentage: " << seekpercentage << std::endl;
-                    std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
-                    tlist.push_back(tmpoutfile);
-                    videothumbnailer.setSeekPercentage(seekpercentage);
-		    videothumbnailer.generateThumbnail(tmpfilestr, Png, tmpoutfile);
-                }
+	if(imgexists.width() == thumbsize || imgexists.height() == thumbsize)
+	{
+	    std::cout << "Thumbnail exists for " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << ". skipping." << std::endl;
+	}
+	else // thumbnail exists but isn't right size
+	{
+	    if(curfileitem->size > 0)
+	    {
+		std::vector<std::string> tlist;
+		tlist.clear();
 		try
 		{
-		    std::list<Magick::Image> thumbimages;
-		    std::list<Magick::Image> montage;
-		    Magick::Image image;
-		    for(int i=0; i < tlist.size(); i++)
+		    ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
+		    videothumbnailer.setThumbnailSize(thumbsize);
+		    std::unique_ptr<ffmpegthumbnailer::FilmStripFilter> filmstripfilter;
+		    filmstripfilter.reset(new ffmpegthumbnailer::FilmStripFilter());
+		    videothumbnailer.addFilter(filmstripfilter.get());
+		    videothumbnailer.setPreferEmbeddedMetadata(false);
+		    int vtcnt = 100 / thumbcount;
+		    //std::cout << "vtcnt: " << vtcnt << std::endl;
+		    for(int i=0; i < vtcnt; i++)
 		    {
-			image.read(tlist.at(i));
-			thumbimages.push_back(image);
+			int seekpercentage = i * thumbcount;
+			if(seekpercentage == 0)
+			    seekpercentage = 5;
+			if(seekpercentage == 100)
+			    seekpercentage = 95;
+			//std::cout << "seek percentage: " << seekpercentage << std::endl;
+			std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
+			tlist.push_back(tmpoutfile);
+			videothumbnailer.setSeekPercentage(seekpercentage);
+			videothumbnailer.generateThumbnail(tmpfilestr, Png, tmpoutfile);
 		    }
-		    Magick::Montage montageoptions;
-		    Magick::Color color("rgba(0,0,0,0)");
-		    montageoptions.geometry(std::to_string(thumbsize) + "x" + std::to_string(thumbsize) + "+1+1");
-		    montageoptions.tile(std::to_string(tlist.size()) + "x1");
-		    montageoptions.backgroundColor(color);
-		    montageoptions.fileName(thumbfilestr);
-		    Magick::montageImages(&montage, thumbimages.begin(), thumbimages.end(), montageoptions);
-		    if(montage.size() == 1)
+		    try
 		    {
-			Magick::Image& montageimage = montage.front();
-			montageimage.magick("png");
-			montageimage.write(thumbfilestr);
+			std::list<cimg_library::CImg<>> thumbimages;
+			std::list<cimg_library::CImg<>> montage;
 		    }
-		    else
+		    catch(cimg_library::CImgException &error)
 		    {
-			std::cout << curfileitem->name << "-" << std::to_string(curfileitem->gid) << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
+			std::cout << "cimg error: " << error.what() << std::endl;
+		    }
+		}
+		catch(cimg_library::CImgException &error)
+		{
+			std::cout << "cimg error: " << error.what() << std::endl;
+		}
+		/*
+		if(inmemory)
+		{
+		    tmpfile = fopen(tmpfilestr.c_str(), "w+");
+		    fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
+		    fclose(tmpfile);
+		}
+		cimg_library::CImg<> inimage(tmpfilestr.c_str());
+		inimage.resize(thumbsize, thumbsize);
+		inimage.save_png(thumbfilestr.c_str());
+		*/
+	    }
+	    else
+	    {
+		cimg_library::CImg<> inimage("/tmp/wf/ve.png");
+		inimage.resize(thumbsize, thumbsize);
+		inimage.save_png(thumbfilestr.c_str());
+	    }
+	}
+    }
+    else // thumbnail doesn't exist
+    {
+    }
+    /*
+		    try
+		    {
+			std::list<Magick::Image> thumbimages;
+			std::list<Magick::Image> montage;
+			Magick::Image image;
+			for(int i=0; i < tlist.size(); i++)
+			{
+			    image.read(tlist.at(i));
+			    thumbimages.push_back(image);
+			}
+			Magick::Montage montageoptions;
+			Magick::Color color("rgba(0,0,0,0)");
+			montageoptions.geometry(std::to_string(thumbsize) + "x" + std::to_string(thumbsize) + "+1+1");
+			montageoptions.tile(std::to_string(tlist.size()) + "x1");
+			montageoptions.backgroundColor(color);
+			montageoptions.fileName(thumbfilestr);
+			Magick::montageImages(&montage, thumbimages.begin(), thumbimages.end(), montageoptions);
+			if(montage.size() == 1)
+			{
+			    Magick::Image& montageimage = montage.front();
+			    montageimage.magick("png");
+			    montageimage.write(thumbfilestr);
+			}
+			else
+			{
+			    std::cout << curfileitem->name << "-" << std::to_string(curfileitem->gid) << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
+			    try
+			    {
+				Magick::Image vimage("/tmp/wf/ve.png");
+				vimage.quiet(false);
+				vimage.resize(thumbgeometry);
+				vimage.magick("PNG");
+				vimage.write(thumbfilestr);
+			    }
+			    catch(Magick::Exception &error)
+			    {
+				std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
+			    }
+			}
+		    }
+		    catch(Magick::Exception &error)
+		    {
 			try
 			{
 			    Magick::Image vimage("/tmp/wf/ve.png");
@@ -809,7 +850,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 			}
 		    }
 		}
-		catch(Magick::Exception &error)
+		catch(std::exception &e)
 		{
 		    try
 		    {
@@ -824,22 +865,6 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 			std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
 		    }
 		}
-            }
-            catch(std::exception &e)
-            {
-		try
-		{
-		    Magick::Image vimage("/tmp/wf/ve.png");
-		    vimage.quiet(false);
-		    vimage.resize(thumbgeometry);
-		    vimage.magick("PNG");
-		    vimage.write(thumbfilestr);
-		}
-		catch(Magick::Exception &error)
-		{
-		    std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
-		}
-            }
         }
         else
         {
