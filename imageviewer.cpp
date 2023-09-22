@@ -23,11 +23,7 @@ void ImageViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
 	tmpbuf = new uint8_t[size];
 	file.read((char*)tmpbuf, size);
     }
-    /*
-    cimg_library::CImg<> img(tmpfilestr.c_str());
-    img.resize(512, 512);
-    img.save_png(previewfilestr.c_str());
-     */ 
+    // ADD TRY CATCH LOGIC
     cimg_library::CImg<> cimg(tmpfilestr.c_str());
     std::string tmpstr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png";
     cimg.save_png(tmpstr.c_str());
@@ -45,19 +41,6 @@ void ImageViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
     /*
     try
     {
-	Magick::Blob inblob(tmpbuf, curfileitem->size);
-	Magick::Image inimage(inblob);
-	inimage.magick("PNG");
-	inimage.write("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png");
-	FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
-	FXFileStream stream;
-	this->getApp()->beginWaitCursor();
-	stream.open(FXString(std::string("/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png").c_str()), FXStreamLoad);
-	img->loadPixels(stream);
-	stream.close();
-	img->create();
-	imageview->setImage(img);
-	this->getApp()->endWaitCursor();
     }
     catch(Magick::Exception &error)
     {

@@ -15,8 +15,6 @@
 #include <magic.h>
 // CIMG THUMBNAILER
 #include "CImg.h"
-// IMAGEMAGICK THUMBNAILER
-//#include <Magick++.h>
 // LIBFFMPEG THUMBNAILER HEADERS
 #include <libffmpegthumbnailer/filmstripfilter.h>
 #include <libffmpegthumbnailer/videothumbnailer.h>
