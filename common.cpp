@@ -577,10 +577,6 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
     //std::cout << "tmpfilestr: " << tmpfilestr << " thumbfilestr: " << thumbfilestr << std::endl;
-    /*
-    cimg_library::CImg<> inimage(heifstr->c_str());
-    inimage.save_png(pngfilestr.c_str());
-    */
     cimg_library::CImg<> imgexists;
     bool thumbexists = std::filesystem::exists(thumbfilestr);
     if(thumbexists)
@@ -590,6 +586,7 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(!std::filesystem::exists(tmpfilestr))
 	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    // NEED TO IMPLEMENT TRY/CATCH TO CATCH ERRORS AND KEEP THE PROGRAM FROM CRASHING
     if(thumbexists)
     {
 	if(imgexists.width() == thumbsize || imgexists.height() == thumbsize)
