@@ -742,7 +742,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 		    videothumbnailer.addFilter(filmstripfilter.get());
 		    videothumbnailer.setPreferEmbeddedMetadata(false);
 		    int vtcnt = 100 / thumbcount;
-		    //std::cout << "vtcnt: " << vtcnt << std::endl;
+		    std::cout << "vtcnt: " << vtcnt << std::endl;
 		    for(int i=0; i < vtcnt; i++)
 		    {
 			int seekpercentage = i * thumbcount;
@@ -750,7 +750,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 			    seekpercentage = 5;
 			if(seekpercentage == 100)
 			    seekpercentage = 95;
-			//std::cout << "seek percentage: " << seekpercentage << std::endl;
+			std::cout << "seek percentage: " << seekpercentage << std::endl;
 			std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
 			tlist.push_back(tmpoutfile);
 			videothumbnailer.setSeekPercentage(seekpercentage);
@@ -758,8 +758,16 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 		    }
 		    try
 		    {
-			std::list<cimg_library::CImg<>> thumbimages;
-			std::list<cimg_library::CImg<>> montage;
+			cimg_library::CImgList<> thumbimages;
+			for(int i=0; i < tlist.size(); i++)
+			{
+			    cimg_library::CImg<> tmpimg(tlist.at(i).c_str());
+			    thumbimages.push_back(tmpimg);
+			}
+			cimg_library::CImg<> thumbimage = thumbimages.get_append('x');
+			thumbimage.save_png(thumbfilestr.c_str());
+			//std::list<cimg_library::CImg<>> thumbimages;
+			//std::list<cimg_library::CImg<>> montage;
 		    }
 		    catch(cimg_library::CImgException &error)
 		    {
@@ -792,6 +800,73 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
     }
     else // thumbnail doesn't exist
     {
+	if(curfileitem->size > 0)
+	{
+	    std::vector<std::string> tlist;
+	    tlist.clear();
+	    try
+	    {
+		ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
+		videothumbnailer.setThumbnailSize(thumbsize);
+		std::unique_ptr<ffmpegthumbnailer::FilmStripFilter> filmstripfilter;
+		filmstripfilter.reset(new ffmpegthumbnailer::FilmStripFilter());
+		videothumbnailer.addFilter(filmstripfilter.get());
+		videothumbnailer.setPreferEmbeddedMetadata(false);
+		int vtcnt = 100 / thumbcount;
+		std::cout << "vtcnt: " << vtcnt << std::endl;
+		for(int i=0; i < vtcnt; i++)
+		{
+		    int seekpercentage = i * thumbcount;
+		    if(seekpercentage == 0)
+			seekpercentage = 5;
+		    if(seekpercentage == 100)
+			seekpercentage = 95;
+		    std::cout << "seek percentage: " << seekpercentage << std::endl;
+		    std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
+		    tlist.push_back(tmpoutfile);
+		    videothumbnailer.setSeekPercentage(seekpercentage);
+		    videothumbnailer.generateThumbnail(tmpfilestr, Png, tmpoutfile);
+		}
+		try
+		{
+		    cimg_library::CImgList<> thumbimages;
+		    for(int i=0; i < tlist.size(); i++)
+		    {
+			cimg_library::CImg<> tmpimg(tlist.at(i).c_str());
+			thumbimages.push_back(tmpimg);
+		    }
+		    cimg_library::CImg<> thumbimage = thumbimages.get_append('x');
+		    thumbimage.save_png(thumbfilestr.c_str());
+		    //std::list<cimg_library::CImg<>> thumbimages;
+		    //std::list<cimg_library::CImg<>> montage;
+		}
+		catch(cimg_library::CImgException &error)
+		{
+		    std::cout << "cimg error: " << error.what() << std::endl;
+		}
+	    }
+	    catch(cimg_library::CImgException &error)
+	    {
+		    std::cout << "cimg error: " << error.what() << std::endl;
+	    }
+	    /*
+	    if(inmemory)
+	    {
+		tmpfile = fopen(tmpfilestr.c_str(), "w+");
+		fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
+		fclose(tmpfile);
+	    }
+	    cimg_library::CImg<> inimage(tmpfilestr.c_str());
+	    inimage.resize(thumbsize, thumbsize);
+	    inimage.save_png(thumbfilestr.c_str());
+	    */
+	}
+	else
+	{
+	    cimg_library::CImg<> inimage("/tmp/wf/ve.png");
+	    inimage.resize(thumbsize, thumbsize);
+	    inimage.save_png(thumbfilestr.c_str());
+	}
     }
     /*
 		    try
