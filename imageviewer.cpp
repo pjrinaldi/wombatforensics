@@ -14,15 +14,33 @@ void ImageViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
     uint8_t* tmpbuf = NULL;
     FILE* tmpfile;
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
     if(!inmemory)
     {
-	std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
 	std::ifstream file(tmpfilestr.c_str(), std::ios::binary | std::ios::ate);
 	std::streamsize size = file.tellg();
 	file.seekg(0, std::ios::beg);
 	tmpbuf = new uint8_t[size];
 	file.read((char*)tmpbuf, size);
     }
+    /*
+    cimg_library::CImg<> img(tmpfilestr.c_str());
+    img.resize(512, 512);
+    img.save_png(previewfilestr.c_str());
+     */ 
+    cimg_library::CImg<> cimg(tmpfilestr.c_str());
+    std::string tmpstr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png";
+    cimg.save_png(tmpstr.c_str());
+
+    FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+    FXFileStream stream;
+    this->getApp()->beginWaitCursor();
+    stream.open(FXString(tmpstr.c_str()), FXStreamLoad);
+    img->loadPixels(stream);
+    stream.close();
+    img->create();
+    imageview->setImage(img);
+    this->getApp()->endWaitCursor();
 
     /*
     try
