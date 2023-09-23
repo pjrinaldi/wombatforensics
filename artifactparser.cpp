@@ -992,6 +992,7 @@ void ParseImage(FileItem* curfileitem, std::string* filecontents)
     std::string previewfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     previewfilestr.erase(std::remove(previewfilestr.begin(), previewfilestr.end(), '$'), previewfilestr.end());
     // ADD TRY CATCH LOGIC
+    //
     cimg_library::CImg<> img(tmpfilestr.c_str());
     img.resize(512, 512);
     img.save_png(previewfilestr.c_str());

@@ -21,6 +21,8 @@ ForImg::ForImg(std::string imgfile)
         imgtype = 6;
     else if(imgext.compare("vhd") == 0 || imgext.compare("vhdx") == 0 || imgext.compare("VHD") == 0 || imgext.compare("VHDX") == 0) // VHD/VHDX
         imgtype = 7;
+    else if(imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
+	imgtype = 8;
     else // ANY OLD FILE
         imgtype = 0;
     // SET IMGSIZE - GET THE SIZE OF THE RAW CONTENT
@@ -188,6 +190,24 @@ ForImg::ForImg(std::string imgfile)
         libvhdi_file_close(vhdfile, &vhderror);
         libvhdi_file_free(&vhdfile, &vhderror);
         libvhdi_error_free(&vhderror);
+    }
+    else if(imgtype == 8) // QCOW/QCOW2
+    {
+	libqcow_error_t* qcowerror = NULL;
+	libqcow_file_t* qcowfile = NULL;
+	int ret = 0;
+	ret = libqcow_file_initialize(&qcowfile, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	ret = libqcow_file_open(qcowfile, imgpath.c_str(), LIBQCOW_OPEN_READ, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	ret = libqcow_file_get_media_size(qcowfile, &imgsize, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	libqcow_file_close(qcowfile, &qcowerror);
+	libqcow_file_free(&qcowfile, &qcowerror);
+	libqcow_error_free(&qcowerror);
     }
     else // everything else
     {
@@ -384,6 +404,26 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
         libvhdi_file_close(vhdfile, &vhderror);
         libvhdi_file_free(&vhdfile, &vhderror);
         libvhdi_error_free(&vhderror);
+    }
+    else if(imgtype == 8) // QCOW/QCOW2
+    {
+	libqcow_error_t* qcowerror = NULL;
+	libqcow_file_t* qcowfile = NULL;
+	int ret = 0;
+	ret = libqcow_file_initialize(&qcowfile, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	ret = libqcow_file_open(qcowfile, imgpath.c_str(), LIBQCOW_OPEN_READ, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	uint64_t res = 0;
+	imgoffset = libqcow_file_seek_offset(qcowfile, pos, SEEK_SET, &qcowerror);
+	res = libqcow_file_read_buffer(qcowfile, buf, size, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	libqcow_file_close(qcowfile, &qcowerror);
+	libqcow_file_free(&qcowfile, &qcowerror);
+	libqcow_error_free(&qcowerror);
     }
     else // EVERYTHING ELSE
     {
