@@ -16,6 +16,8 @@
 #include "aff4/aff4-c.h"
 #include "libvhdi.h"
 #include "libqcow.h"
+#include "libvmdk.h"
+#include "libphdi.h"
 #include <zstd.h>
 
 struct wfi_metadata

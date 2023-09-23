@@ -23,6 +23,10 @@ ForImg::ForImg(std::string imgfile)
         imgtype = 7;
     else if(imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
 	imgtype = 8;
+    else if(imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
+	imgtype = 9;
+    else if(imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
+	imgtype = 10;
     else // ANY OLD FILE
         imgtype = 0;
     // SET IMGSIZE - GET THE SIZE OF THE RAW CONTENT
@@ -208,6 +212,42 @@ ForImg::ForImg(std::string imgfile)
 	libqcow_file_close(qcowfile, &qcowerror);
 	libqcow_file_free(&qcowfile, &qcowerror);
 	libqcow_error_free(&qcowerror);
+    }
+    else if(imgtype == 9) // VMDK
+    {
+	libvmdk_error_t* vmdkerror = NULL;
+	libvmdk_handle_t* vmdkfile = NULL;
+	int ret = 0;
+	ret = libvmdk_handle_initialize(&vmdkfile, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	ret = libvmdk_handle_open(vmdkfile, imgpath.c_str(), LIBVMDK_OPEN_READ, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	ret = libvmdk_handle_get_media_size(vmdkfile, &imgsize, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	libvmdk_handle_close(vmdkfile, &vmdkerror);
+	libvmdk_handle_free(&vmdkfile, &vmdkerror);
+	libvmdk_error_free(&vmdkerror);
+    }
+    else if(imgtype == 10) // PHD
+    {
+	libphdi_error_t* phdierror = NULL;
+	libphdi_handle_t* phdifile = NULL;
+	int ret = 0;
+	ret = libphdi_handle_initialize(&phdierror, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	ret = libphdi_handle_open(phdifile, imgpath.c_str(), LIBPHDI_OPEN_READ, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	ret = libphdi_handle_get_media_size(phdifile, &imgsize, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	libphdi_handle_close(phdifile, &phdierror);
+	libphdi_handle_free(&phdifile, &phdierror);
+	libphdi_error_free(&phdierror);
     }
     else // everything else
     {
@@ -424,6 +464,46 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
 	libqcow_file_close(qcowfile, &qcowerror);
 	libqcow_file_free(&qcowfile, &qcowerror);
 	libqcow_error_free(&qcowerror);
+    }
+    else if(imgtype == 9) // VMDK
+    {
+	libvmdk_error_t* vmdkerror = NULL;
+	libvmdk_handle_t* vmdkfile = NULL;
+	int ret = 0;
+	ret = libvmdk_handle_initialize(&vmdkfile, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	ret = libvmdk_handle_open(vmdkfile, imgpath.c_str(), LIBVMDK_OPEN_READ, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	uint64_t res = 0;
+	imgoffset = libvmdk_handle_seek_offset(vmdkfile, pos, SEEK_SET, &vmdkerror);
+	res = libvmdk_handle_read_buffer(vmdkfile, buf, size, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	libvmdk_handle_close(vmdkfile, &vmdkerror);
+	libvmdk_handle_free(&vmdkfile, &vmdkerror);
+	libvmdk_error_free(&vmdkerror);
+    }
+    else if(imgtype == 10) // PHDI
+    {
+	libphdi_error_t* phdierror = NULL;
+	libphdi_handle_t* phdifile = NULL;
+	int ret = 0;
+	ret = libphdi_handle_initialize(&phdifile, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	ret = libphdi_handle_open(phdifile, imgpath.c_str(), LIBPHDI_OPEN_READ, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	uint64_t res = 0;
+	imgoffset = libphdi_handle_seek_offset(phdifile, pos, SEEK_SET, &phdierror);
+	res = libphdi_handle_read_buffer(phdifile, buf, size, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	libphdi_handle_close(phdifile, &phdierror);
+	libphdi_handle_free(&phdifile, &phdierror);
+	libphdi_error_free(&phdierror);
     }
     else // EVERYTHING ELSE
     {
