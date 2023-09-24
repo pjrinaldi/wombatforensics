@@ -5,11 +5,16 @@ ForImg::ForImg(std::string imgfile)
     // SET IMGPATH - PATH TO THE FORENSIC IMAGE
     imgpath = imgfile;
     int rfound = imgfile.rfind(".");
+    libewf_error_t* ewferr = NULL;
+    libvhdi_error_t* vhderr = NULL;
+    libqcow_error_t* qcowerr = NULL;
+    libvmdk_error_t* vmdkerr = NULL;
+    libphdi_error_t* phderr = NULL;
     // SET IMGTYPE - DETERMINES HOW READ THE RAW CONTENT
     std::string imgext = imgfile.substr(rfound+1);
     if(imgext.compare("dd") == 0 || imgext.compare("DD") == 0) // RAW
         imgtype = 1;
-    else if(imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
+    else if(libewf_check_file_signature(imgfile.c_str(), &ewferr) == 1 || imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
         imgtype = 2;
     else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
         imgtype = 3;
@@ -19,16 +24,21 @@ ForImg::ForImg(std::string imgfile)
         imgtype = 5;
     else if(imgext.compare("wli") == 0) // WLI
         imgtype = 6;
-    else if(imgext.compare("vhd") == 0 || imgext.compare("vhdx") == 0 || imgext.compare("VHD") == 0 || imgext.compare("VHDX") == 0) // VHD/VHDX
+    else if(libvhdi_check_file_signature(imgfile.c_str(), &vhderr) == 1 || imgext.compare("vhd") == 0 || imgext.compare("vhdx") == 0 || imgext.compare("VHD") == 0 || imgext.compare("VHDX") == 0) // VHD/VHDX
         imgtype = 7;
-    else if(imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
+    else if(libqcow_check_file_signature(imgfile.c_str(), &qcowerr) == 1 || imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
 	imgtype = 8;
-    else if(imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
+    else if(libvmdk_check_file_signature(imgfile.c_str(), &vmdkerr) == 1 || imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
 	imgtype = 9;
-    else if(imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
+    else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
 	imgtype = 10;
     else // ANY OLD FILE
         imgtype = 0;
+    libewf_error_free(&ewferr);
+    libvhdi_error_free(&vhderr);
+    libqcow_error_free(&qcowerr);
+    libvmdk_error_free(&vmdkerr);
+    libphdi_error_free(&phderr);
     // SET IMGSIZE - GET THE SIZE OF THE RAW CONTENT
     if(imgtype == 1) // RAW
     {
