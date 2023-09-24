@@ -991,22 +991,17 @@ void ParseImage(FileItem* curfileitem, std::string* filecontents)
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     std::string previewfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     previewfilestr.erase(std::remove(previewfilestr.begin(), previewfilestr.end(), '$'), previewfilestr.end());
-    // ADD TRY CATCH LOGIC
-    //
-    cimg_library::CImg<> img(tmpfilestr.c_str());
-    img.resize(512, 512);
-    img.save_png(previewfilestr.c_str());
-    /* ImageMagick Way
     try
     {
+	cimg_library::CImg<> img(tmpfilestr.c_str());
+	img.resize(512, 512);
+	img.save_png(previewfilestr.c_str());
     }
-    catch(Magick::Exception &error)
+    catch(cimg_library::CImgException &error)
     {
-        // MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
-        //std::cout << "File: " << tmpfilestr << " magick error: " << error.what() << std::endl;
-        filecontents->append("File: " + tmpfilestr + " magick error: " + error.what());
+	std::cout << "File: " << tmpfilestr << " cimg error: " << error.what() << std::endl;
+        filecontents->append("File: " + tmpfilestr + " cimg error: " + error.what());
     }
-    */
 }
 
 void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)

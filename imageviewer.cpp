@@ -14,7 +14,7 @@ void ImageViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
     uint8_t* tmpbuf = NULL;
     FILE* tmpfile;
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid);
     if(!inmemory)
     {
 	std::ifstream file(tmpfilestr.c_str(), std::ios::binary | std::ios::ate);
@@ -23,10 +23,16 @@ void ImageViewer::LoadImage(ForImg* curforimg, FileItem* curfileitem)
 	tmpbuf = new uint8_t[size];
 	file.read((char*)tmpbuf, size);
     }
-    // ADD TRY CATCH LOGIC
-    cimg_library::CImg<> cimg(tmpfilestr.c_str());
     std::string tmpstr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".png";
-    cimg.save_png(tmpstr.c_str());
+    try
+    {
+	cimg_library::CImg<> cimg(tmpfilestr.c_str());
+	cimg.save_png(tmpstr.c_str());
+    }
+    catch(cimg_library::CImgException &error)
+    {
+	std::cout << "File: " << tmpfilestr << " cimg error: " << error.what() << std::endl;
+    }
 
     FXImage* img = new FXPNGImage(this->getApp(), NULL, IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     FXFileStream stream;
