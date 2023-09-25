@@ -563,26 +563,64 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 {
     bool inmemory = false;
     uint8_t* tmpbuf = NULL;
-    //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-    std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
-    thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
-    //std::cout << "tmpfilestr: " << tmpfilestr << " thumbfilestr: " << thumbfilestr << std::endl;
-    cimg_library::CImg<> imgexists;
-    bool thumbexists = std::filesystem::exists(thumbfilestr);
-    if(thumbexists)
-	imgexists.load(thumbfilestr.c_str());
     FILE* tmpfile;
     std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
+    thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
+    cimg_library::CImg<> imgexists;
+    bool thumbexists = std::filesystem::exists(thumbfilestr);
+    bool tmpfileexists = std::filesystem::exists(tmpfilestr);
+    bool validthumb = false;
+    if(thumbexists)
+    {
+	imgexists.load(thumbfilestr.c_str());
+	if(imgexists.width() == thumbsize || imgexists.height() == thumbsize)
+	    validthumb = true;
+    }
+    if(!validthumb) // not a valid thumbnail, regenerate
+    {
+	if(curfileitem->size > 0)
+	{
+	    if(!tmpfileexists)
+	    {
+		GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+		if(inmemory)
+		{
+		    tmpfile = fopen(tmpfilestr.c_str(), "w+");
+		    fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
+		    fclose(tmpfile);
+		}
+	    }
+	    try
+	    {
+		cimg_library::CImg<> inimage(tmpfilestr.c_str());
+		inimage.resize(thumbsize, thumbsize);
+		inimage.save_png(thumbfilestr.c_str());
+	    }
+	    catch(cimg_library::CImgException &error)
+	    {
+		cimg_library::CImg<> inimage("/tmp/wf/mt.png");
+		inimage.resize(thumbsize, thumbsize);
+		inimage.save_png(thumbfilestr.c_str());
+	    }
+	}
+	else
+	{
+	    cimg_library::CImg<> inimage("/tmp/wf/mt.png");
+	    inimage.resize(thumbsize, thumbsize);
+	    inimage.save_png(thumbfilestr.c_str());
+	}
+    }
+    /* REDO LOGIC
+    //std::cout << "tmpfilestr: " << tmpfilestr << " thumbfilestr: " << thumbfilestr << std::endl;
     if(!std::filesystem::exists(tmpfilestr))
 	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     // NEED TO IMPLEMENT TRY/CATCH TO CATCH ERRORS AND KEEP THE PROGRAM FROM CRASHING
     if(thumbexists)
     {
 	if(imgexists.width() == thumbsize || imgexists.height() == thumbsize)
-	{
 	    std::cout << "Thumbnail exists for " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << ". skipping." << std::endl;
-	}
 	else // thumbnail exists, but isn't the right size
 	{
 	    if(curfileitem->size > 0)
@@ -617,6 +655,7 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 	inimage.resize(thumbsize, thumbsize);
 	inimage.save_png(thumbfilestr.c_str());
     }
+    */
     /*
     Magick::Image imgexists;
     bool thumbexists = false;
