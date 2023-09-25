@@ -612,225 +612,41 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
 	    inimage.save_png(thumbfilestr.c_str());
 	}
     }
-    /* REDO LOGIC
-    //std::cout << "tmpfilestr: " << tmpfilestr << " thumbfilestr: " << thumbfilestr << std::endl;
-    if(!std::filesystem::exists(tmpfilestr))
-	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    // NEED TO IMPLEMENT TRY/CATCH TO CATCH ERRORS AND KEEP THE PROGRAM FROM CRASHING
-    if(thumbexists)
-    {
-	if(imgexists.width() == thumbsize || imgexists.height() == thumbsize)
-	    std::cout << "Thumbnail exists for " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << ". skipping." << std::endl;
-	else // thumbnail exists, but isn't the right size
-	{
-	    if(curfileitem->size > 0)
-	    {
-		if(inmemory)
-		{
-		    tmpfile = fopen(tmpfilestr.c_str(), "w+");
-		    fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
-		    fclose(tmpfile);
-		}
-		cimg_library::CImg<> inimage(tmpfilestr.c_str());
-		inimage.resize(thumbsize, thumbsize);
-		inimage.save_png(thumbfilestr.c_str());
-	    }
-	    else // file is zero
-	    {
-		cimg_library::CImg<> inimage("/tmp/wf/mt.png");
-		inimage.resize(thumbsize, thumbsize);
-		inimage.save_png(thumbfilestr.c_str());
-	    }
-	}
-    }
-    else
-    {
-	if(inmemory)
-	{
-	    tmpfile = fopen(tmpfilestr.c_str(), "w+");
-	    fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
-	    fclose(tmpfile);
-	}
-	cimg_library::CImg<> inimage(tmpfilestr.c_str());
-	inimage.resize(thumbsize, thumbsize);
-	inimage.save_png(thumbfilestr.c_str());
-    }
-    */
-    /*
-    Magick::Image imgexists;
-    bool thumbexists = false;
-    try // attempt to open existing thumbnail
-    {
-	imgexists.read(thumbfilestr.c_str());
-	thumbexists = true;
-    }
-    catch(Magick::Exception &error) // thumbnail doesn't exist
-    {
-	//std::cout << "Error: " << error.what() << std::endl;
-    }
-    //std::cout << "thumb file str: " << thumbfilestr << std::endl;
-    FILE* tmpfile;
-    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
-    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
-    if(!std::filesystem::exists(tmpfilestr))
-        GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    Magick::Geometry thumbgeometry(thumbsize, thumbsize);
-    if(thumbexists && (imgexists.size().width() == thumbsize || imgexists.size().height() == thumbsize))
-    {
-	// MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
-	std::cout << "Thumbnail exists for " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << ". skipping." << std::endl;
-    }
-    else
-    {
-	if(curfileitem->size > 0)
-	{
-	    try
-	    {
-		Magick::Blob inblob(tmpbuf, curfileitem->size);
-		Magick::Image master(inblob);
-		master.quiet(false);
-		master.resize(thumbgeometry);
-		master.magick("PNG");
-		master.write(thumbfilestr);
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		// MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
-		std::cout << "error encountered for: " << curfileitem->name + "-" + std::to_string(curfileitem->gid) << ": " << error.what() << std::endl;
-		try
-		{
-		    Magick::Image inimage("/tmp/wf/mt.png");
-		    inimage.quiet(false);
-		    inimage.resize(thumbgeometry);
-		    inimage.magick("PNG");
-		    inimage.write(thumbfilestr);
-		}
-		catch(Magick::Exception &error)
-		{
-		    // MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
-		    std::cout << "File: " << tmpfilestr << " magick error: " << error.what() << std::endl;
-		}
-	    }
-	}
-	else // file size is zero
-	{
-	    try
-	    {
-		Magick::Image inimage("/tmp/wf/mt.png");
-		inimage.quiet(false);
-		inimage.resize(thumbgeometry);
-		inimage.magick("PNG");
-		inimage.write(thumbfilestr);
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		// MOVE CATCH ERRORS TO THE LOGFILE AND MSGLOG DISPLAY
-		std::cout << "File: " << tmpfilestr << " magick error:" << error.what() << std::endl;
-	    }
-	}
-    }
-    */
 }
 
 void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int thumbcount, std::string tmppath)
 {
     bool inmemory = false;
     uint8_t* tmpbuf = NULL;
-    //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-    std::string thumbfilestr = tmppath + "vidthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
-    thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
-    //std::cout << "thumb file str: " << thumbfilestr << std::endl;
-    cimg_library::CImg<> imgexists;
-    bool thumbexists = std::filesystem::exists(thumbfilestr);
-    if(thumbexists)
-	imgexists.load(thumbfilestr.c_str());
     FILE* tmpfile;
     std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
-    if(!std::filesystem::exists(tmpfilestr))
-        GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
-    // NEED TO IMPLEMENT TRY/CATCH TO CATCH ERRORS AND KEEP THE PROGRAM FROM CRASHING
+    std::string thumbfilestr = tmppath + "vidthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
+    thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
+    cimg_library::CImg<> imgexists;
+    bool thumbexists = std::filesystem::exists(thumbfilestr);
+    bool tmpfileexists = std::filesystem::exists(tmpfilestr);
+    bool validthumb = false;
     if(thumbexists)
     {
-	if(imgexists.width() == thumbsize || imgexists.height() == thumbsize)
+	imgexists.load(thumbfilestr.c_str());
+	if(imgexists.width() == (thumbsize * (100 / thumbcount)) || imgexists.height() == thumbsize)
+	    validthumb = true;
+    }
+    if(!validthumb)
+    {
+	if(curfileitem->size > 0)
 	{
-	    std::cout << "Thumbnail exists for " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << ". skipping." << std::endl;
-	}
-	else // thumbnail exists but isn't right size
-	{
-	    if(curfileitem->size > 0)
+	    if(!tmpfileexists)
 	    {
-		std::vector<std::string> tlist;
-		tlist.clear();
-		try
-		{
-		    ffmpegthumbnailer::VideoThumbnailer videothumbnailer(0, true, true, 8, false);
-		    videothumbnailer.setThumbnailSize(thumbsize);
-		    std::unique_ptr<ffmpegthumbnailer::FilmStripFilter> filmstripfilter;
-		    filmstripfilter.reset(new ffmpegthumbnailer::FilmStripFilter());
-		    videothumbnailer.addFilter(filmstripfilter.get());
-		    videothumbnailer.setPreferEmbeddedMetadata(false);
-		    int vtcnt = 100 / thumbcount;
-		    std::cout << "vtcnt: " << vtcnt << std::endl;
-		    for(int i=0; i < vtcnt; i++)
-		    {
-			int seekpercentage = i * thumbcount;
-			if(seekpercentage == 0)
-			    seekpercentage = 5;
-			if(seekpercentage == 100)
-			    seekpercentage = 95;
-			std::cout << "seek percentage: " << seekpercentage << std::endl;
-			std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
-			tlist.push_back(tmpoutfile);
-			videothumbnailer.setSeekPercentage(seekpercentage);
-			videothumbnailer.generateThumbnail(tmpfilestr, Png, tmpoutfile);
-		    }
-		    try
-		    {
-			cimg_library::CImgList<> thumbimages;
-			for(int i=0; i < tlist.size(); i++)
-			{
-			    cimg_library::CImg<> tmpimg(tlist.at(i).c_str());
-			    thumbimages.push_back(tmpimg);
-			}
-			cimg_library::CImg<> thumbimage = thumbimages.get_append('x');
-			thumbimage.save_png(thumbfilestr.c_str());
-			//std::list<cimg_library::CImg<>> thumbimages;
-			//std::list<cimg_library::CImg<>> montage;
-		    }
-		    catch(cimg_library::CImgException &error)
-		    {
-			std::cout << "cimg error: " << error.what() << std::endl;
-		    }
-		}
-		catch(cimg_library::CImgException &error)
-		{
-			std::cout << "cimg error: " << error.what() << std::endl;
-		}
-		/*
+		GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
 		if(inmemory)
 		{
 		    tmpfile = fopen(tmpfilestr.c_str(), "w+");
 		    fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
 		    fclose(tmpfile);
 		}
-		cimg_library::CImg<> inimage(tmpfilestr.c_str());
-		inimage.resize(thumbsize, thumbsize);
-		inimage.save_png(thumbfilestr.c_str());
-		*/
 	    }
-	    else
-	    {
-		cimg_library::CImg<> inimage("/tmp/wf/ve.png");
-		inimage.resize(thumbsize, thumbsize);
-		inimage.save_png(thumbfilestr.c_str());
-	    }
-	}
-    }
-    else // thumbnail doesn't exist
-    {
-	if(curfileitem->size > 0)
-	{
 	    std::vector<std::string> tlist;
 	    tlist.clear();
 	    try
@@ -842,7 +658,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 		videothumbnailer.addFilter(filmstripfilter.get());
 		videothumbnailer.setPreferEmbeddedMetadata(false);
 		int vtcnt = 100 / thumbcount;
-		std::cout << "vtcnt: " << vtcnt << std::endl;
+		//std::cout << "vtcnt: " << vtcnt << std::endl;
 		for(int i=0; i < vtcnt; i++)
 		{
 		    int seekpercentage = i * thumbcount;
@@ -850,7 +666,7 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 			seekpercentage = 5;
 		    if(seekpercentage == 100)
 			seekpercentage = 95;
-		    std::cout << "seek percentage: " << seekpercentage << std::endl;
+		    //std::cout << "seek percentage: " << seekpercentage << std::endl;
 		    std::string tmpoutfile = "/tmp/wf/" + std::to_string(curfileitem->gid) + ".t" + std::to_string(seekpercentage) + ".png";
 		    tlist.push_back(tmpoutfile);
 		    videothumbnailer.setSeekPercentage(seekpercentage);
@@ -866,29 +682,22 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 		    }
 		    cimg_library::CImg<> thumbimage = thumbimages.get_append('x');
 		    thumbimage.save_png(thumbfilestr.c_str());
-		    //std::list<cimg_library::CImg<>> thumbimages;
-		    //std::list<cimg_library::CImg<>> montage;
 		}
 		catch(cimg_library::CImgException &error)
 		{
 		    std::cout << "cimg error: " << error.what() << std::endl;
+		    cimg_library::CImg<> inimage("/tmp/wf/ve.png");
+		    inimage.resize(thumbsize, thumbsize);
+		    inimage.save_png(thumbfilestr.c_str());
 		}
 	    }
-	    catch(cimg_library::CImgException &error)
+	    catch(std::exception &error)
 	    {
-		    std::cout << "cimg error: " << error.what() << std::endl;
+		std::cout << "cimg error: " << error.what() << std::endl;
+		cimg_library::CImg<> inimage("/tmp/wf/ve.png");
+		inimage.resize(thumbsize, thumbsize);
+		inimage.save_png(thumbfilestr.c_str());
 	    }
-	    /*
-	    if(inmemory)
-	    {
-		tmpfile = fopen(tmpfilestr.c_str(), "w+");
-		fwrite(tmpbuf, 1, curfileitem->size, tmpfile);
-		fclose(tmpfile);
-	    }
-	    cimg_library::CImg<> inimage(tmpfilestr.c_str());
-	    inimage.resize(thumbsize, thumbsize);
-	    inimage.save_png(thumbfilestr.c_str());
-	    */
 	}
 	else
 	{
@@ -897,96 +706,6 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
 	    inimage.save_png(thumbfilestr.c_str());
 	}
     }
-    /*
-		    try
-		    {
-			std::list<Magick::Image> thumbimages;
-			std::list<Magick::Image> montage;
-			Magick::Image image;
-			for(int i=0; i < tlist.size(); i++)
-			{
-			    image.read(tlist.at(i));
-			    thumbimages.push_back(image);
-			}
-			Magick::Montage montageoptions;
-			Magick::Color color("rgba(0,0,0,0)");
-			montageoptions.geometry(std::to_string(thumbsize) + "x" + std::to_string(thumbsize) + "+1+1");
-			montageoptions.tile(std::to_string(tlist.size()) + "x1");
-			montageoptions.backgroundColor(color);
-			montageoptions.fileName(thumbfilestr);
-			Magick::montageImages(&montage, thumbimages.begin(), thumbimages.end(), montageoptions);
-			if(montage.size() == 1)
-			{
-			    Magick::Image& montageimage = montage.front();
-			    montageimage.magick("png");
-			    montageimage.write(thumbfilestr);
-			}
-			else
-			{
-			    std::cout << curfileitem->name << "-" << std::to_string(curfileitem->gid) << "issue with montage" << montage.size() << ". Missing video thumbnail will be used.";
-			    try
-			    {
-				Magick::Image vimage("/tmp/wf/ve.png");
-				vimage.quiet(false);
-				vimage.resize(thumbgeometry);
-				vimage.magick("PNG");
-				vimage.write(thumbfilestr);
-			    }
-			    catch(Magick::Exception &error)
-			    {
-				std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
-			    }
-			}
-		    }
-		    catch(Magick::Exception &error)
-		    {
-			try
-			{
-			    Magick::Image vimage("/tmp/wf/ve.png");
-			    vimage.quiet(false);
-			    vimage.resize(thumbgeometry);
-			    vimage.magick("PNG");
-			    vimage.write(thumbfilestr);
-			}
-			catch(Magick::Exception &error)
-			{
-			    std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
-			}
-		    }
-		}
-		catch(std::exception &e)
-		{
-		    try
-		    {
-			Magick::Image vimage("/tmp/wf/ve.png");
-			vimage.quiet(false);
-			vimage.resize(thumbgeometry);
-			vimage.magick("PNG");
-			vimage.write(thumbfilestr);
-		    }
-		    catch(Magick::Exception &error)
-		    {
-			std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
-		    }
-		}
-        }
-        else
-        {
-	    try
-	    {
-		Magick::Image vimage("/tmp/wf/ve.png");
-		vimage.quiet(false);
-		vimage.resize(thumbgeometry);
-		vimage.magick("PNG");
-		vimage.write(thumbfilestr);
-	    }
-	    catch(Magick::Exception &error)
-	    {
-		std::cout << "File: " << curfileitem->name << "-" << std::to_string(curfileitem->gid) << " error: " << error.what() << std::endl;
-	    }
-        }
-    }
-    */
 }
 
 void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig)
