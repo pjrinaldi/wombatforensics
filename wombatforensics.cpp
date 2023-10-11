@@ -859,12 +859,10 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
 long WombatForensics::OpenHexViewer(FXObject*, FXSelector, void*)
 {
     FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
-    /*
     HexViewer* hexview = new HexViewer(this, fileitemstr);
     hexview->LoadHex(curforimg, &currentfileitem);
     hexview->create();
     hexview->show(PLACEMENT_CURSOR);
-    */
 
     return 1;
 }

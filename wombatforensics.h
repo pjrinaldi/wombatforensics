@@ -36,7 +36,7 @@
 #include "filterview.h"
 #include "digdeeper.h"
 #include "managehashlist.h"
-//#include "hexviewer.h"
+#include "hexviewer.h"
 #include "artifactparser.h"
 //#include "pdfviewer.h"
 #include "propviewer.h"

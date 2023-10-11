@@ -21,7 +21,9 @@ void HexViewer::LoadHex(ForImg* curforimg, FileItem* curfileitem)
     GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     if(!inmemory)
     {
-        std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
+	std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
+	tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+        //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
         std::ifstream file(tmpfilestr.c_str(),  std::ios::binary | std::ios::ate);
         std::streamsize size = file.tellg();
         file.seekg(0, std::ios::beg);
@@ -146,8 +148,8 @@ void HexViewer::LoadHex(ForImg* curforimg, FileItem* curfileitem)
     }
     //AddFileSlack(curforimg, curfileitem, slkbuf, &filecontents);
     textview->setText(filecontents);
-    if(!inmemory)
-	fclose(tmpfile);
+    //if(!inmemory)
+    //	fclose(tmpfile);
     delete[] tmpbuf;
     delete[] slkbuf;
 }
