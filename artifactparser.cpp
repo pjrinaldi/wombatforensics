@@ -30,7 +30,7 @@ void GetXmlText(rapidxml::xml_node<>* curnode, std::string* contents)
 
 void ParsePdf(FileItem* curfileitem, std::string* filecontents)
 {
-    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     poppler::document* pdfdoc;
     poppler::page* pdfpage;
@@ -40,8 +40,20 @@ void ParsePdf(FileItem* curfileitem, std::string* filecontents)
         *filecontents = pdfdoc->create_page(0)->text().to_latin1();
 }
 
-void ParseHtml(uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+//void ParseHtml(uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+void ParseHtml(FileItem* curfileitem, std::string* filecontents)
 {   
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    std::ifstream filebuffer(tmpfilestr, std::ios::in);
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.seekg(0, filebuffer.end);
+    uint64_t bufsize = filebuffer.tellg();
+    uint8_t* prebuf = new uint8_t[bufsize+1];
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.read((char*)prebuf, bufsize);
+    filebuffer.close();
+    prebuf[bufsize] = 0;
     lxb_status_t status;
     lxb_html_tokenizer_t* tkz;
     tkz = lxb_html_tokenizer_create();
@@ -53,8 +65,20 @@ void ParseHtml(uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
     lxb_html_tokenizer_destroy(tkz);
 }
 
-void ParseRecycler(FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+//void ParseRecycler(FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+void ParseRecycler(FileItem* curfileitem, std::string* filecontents)
 {
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    std::ifstream filebuffer(tmpfilestr, std::ios::in);
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.seekg(0, filebuffer.end);
+    uint64_t bufsize = filebuffer.tellg();
+    uint8_t* prebuf = new uint8_t[bufsize+1];
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.read((char*)prebuf, bufsize);
+    filebuffer.close();
+    prebuf[bufsize] = 0;
     std::string titlestring = "INFO2 File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
     filecontents->clear();
     filecontents->append(titlestring + "\n");
@@ -86,8 +110,20 @@ void ParseRecycler(FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std
     }
 }
 
-void ParseRecycleBin(FileItem* curfileitem, uint8_t* prebuf, std::string* filecontents)
+//void ParseRecycleBin(FileItem* curfileitem, uint8_t* prebuf, std::string* filecontents)
+void ParseRecycleBin(FileItem* curfileitem, std::string* filecontents)
 {
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    std::ifstream filebuffer(tmpfilestr, std::ios::in);
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.seekg(0, filebuffer.end);
+    uint64_t bufsize = filebuffer.tellg();
+    uint8_t* prebuf = new uint8_t[bufsize+1];
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.read((char*)prebuf, bufsize);
+    filebuffer.close();
+    prebuf[bufsize] = 0;
     std::string titlestring = "$I File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
     filecontents->clear();
     filecontents->append(titlestring + "\n");
@@ -192,8 +228,20 @@ void ParseDocx(FileItem* curfileitem, std::string* filecontents)
 }
 
 // CURRENTLY HAS AN ERROR IN THIS CODE WHEN IT GETS TO THE LIST OF FILES AT THE END...
-void ParsePrefetch(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecontents)
+//void ParsePrefetch(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecontents)
+void ParsePrefetch(FileItem* curfileitem, std::string* filecontents)
 {
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    std::ifstream filebuffer(tmpfilestr, std::ios::in);
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.seekg(0, filebuffer.end);
+    uint64_t bufsize = filebuffer.tellg();
+    uint8_t* prebuf = new uint8_t[bufsize+1];
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.read((char*)prebuf, bufsize);
+    filebuffer.close();
+    prebuf[bufsize] = 0;
     uint8_t* udata = NULL;
     std::string titlestring = "Prefetch File Analysis for " + curfileitem->name + " (" + std::to_string(curfileitem->gid) + ")";
     filecontents->clear();
@@ -202,22 +250,22 @@ void ParsePrefetch(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         filecontents->append("-");
     filecontents->append("\n\n");
     uint8_t* mamchar = new uint8_t[3];
-    mamchar = substr(tmpbuf, 0, 3);
+    mamchar = substr(prebuf, 0, 3);
     if(std::string((char*)mamchar).compare("MAM") == 0) // WIN10+ Prefetch
     {
         uint32_t datasize = 0;
-        ReadInteger(tmpbuf, 4, &datasize);
+        ReadInteger(prebuf, 4, &datasize);
         libfwnt_error_t* fwnterror = NULL;
         size_t compressedsize = curfileitem->size - 8;
         size_t usize = datasize;
         uint8_t* compresseddata = new uint8_t[compressedsize];
         udata = new uint8_t[usize];
-        compresseddata = substr(tmpbuf, 8, compressedsize);
+        compresseddata = substr(prebuf, 8, compressedsize);
         libfwnt_lzxpress_huffman_decompress(compresseddata, compressedsize, udata, &usize, &fwnterror);
         delete[] compresseddata;
     }
     else
-        udata = tmpbuf;
+        udata = prebuf;
     delete[] mamchar;
     // NOW WE HAVE THE CONTENT FROM EITHER TYPE AS REGULAR PREFETCH, RUN SIG CHECK AND PARSE
     uint8_t* sigchar = new uint8_t[4];
@@ -354,7 +402,8 @@ void ParsePrefetch(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     }
 }
 
-void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecontents)
+//void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecontents)
+void ParseShortcut(FileItem* curfileitem, std::string* filecontents)
 {
     /*
     if(!inmemory)
@@ -366,6 +415,17 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         file.read((char*)tmpbuf, size);
     }
     */
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
+    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    std::ifstream filebuffer(tmpfilestr, std::ios::in);
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.seekg(0, filebuffer.end);
+    uint64_t bufsize = filebuffer.tellg();
+    uint8_t* prebuf = new uint8_t[bufsize+1];
+    filebuffer.seekg(0, filebuffer.beg);
+    filebuffer.read((char*)prebuf, bufsize);
+    filebuffer.close();
+    prebuf[bufsize] = 0;
     uint32_t flags = 0;
     uint32_t attributes = 0;
     uint64_t created = 0;
@@ -398,11 +458,11 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         filecontents->append("-");
     filecontents->append("\n\n");
 
-    ReadInteger(tmpbuf, 20, &flags);
+    ReadInteger(prebuf, 20, &flags);
     //if(flags & 0x80)
     //    std::cout << "data strings are unicode rather than ascii." << std::endl;
     //std::cout << "flags: " << std::hex << flags << std::dec << std::endl;
-    ReadInteger(tmpbuf, 24, &attributes);
+    ReadInteger(prebuf, 24, &attributes);
     filecontents->append("File Attributes\t\t| ");
     if(attributes & 0x01)
         filecontents->append("Read Only,");
@@ -434,11 +494,11 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         filecontents->append("Virtual");
     filecontents->append("\n");
     //std::cout << "attributes: " << std::hex << attributes << std::dec << std::endl;
-    ReadInteger(tmpbuf, 28, &created);
+    ReadInteger(prebuf, 28, &created);
     //std::cout << "Created: " << ConvertWindowsTimeToUnixTimeUTC(created) << std::endl;
-    ReadInteger(tmpbuf, 36, &modified);
-    ReadInteger(tmpbuf, 44, &accessed);
-    ReadInteger(tmpbuf, 52, &filesize);
+    ReadInteger(prebuf, 36, &modified);
+    ReadInteger(prebuf, 44, &accessed);
+    ReadInteger(prebuf, 52, &filesize);
     filecontents->append("Created\t\t\t| " + ConvertWindowsTimeToUnixTimeUTC(created) + "\n");
     filecontents->append("Modified\t\t| " + ConvertWindowsTimeToUnixTimeUTC(modified) + "\n");
     filecontents->append("Accessed\t\t| " + ConvertWindowsTimeToUnixTimeUTC(accessed) + "\n");
@@ -446,12 +506,12 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     if(flags & 0x01) // SHELL ITEM ID LIST IS PRESENT
     {
         // PARSE SHELL ID LIST HERE
-        ReadInteger(tmpbuf, 76, &shellstructurelength);
+        ReadInteger(prebuf, 76, &shellstructurelength);
         libfwsi_item_list_t* itemlist = NULL;
         libfwsi_error_t* itemerror = NULL;
         int ret = libfwsi_item_list_initialize(&itemlist, &itemerror);
         uint8_t* itemstream = new uint8_t[shellstructurelength];
-        itemstream = substr(tmpbuf, 78, shellstructurelength);
+        itemstream = substr(prebuf, 78, shellstructurelength);
         ret = libfwsi_item_list_copy_from_byte_stream(itemlist, itemstream, shellstructurelength, LIBFWSI_CODEPAGE_ASCII, &itemerror);
         int itemlistcount = 0;
         ret = libfwsi_item_list_get_number_of_items(itemlist, &itemlistcount, &itemerror);
@@ -656,24 +716,24 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     if(flags & 0x02)
     {
         // GET structure offsets
-        ReadInteger(tmpbuf, curoffset, &totalstructurelength);
+        ReadInteger(prebuf, curoffset, &totalstructurelength);
         //std::cout << "total structure length: " << totalstructurelength << std::endl;
         uint32_t nextoffset = 0;
-        ReadInteger(tmpbuf, curoffset + 4, &nextoffset);
+        ReadInteger(prebuf, curoffset + 4, &nextoffset);
         //std::cout << "next offset after this: " << nextoffset << std::endl;
         uint32_t fileflags = 0;
-        ReadInteger(tmpbuf, curoffset + 8, &fileflags);
+        ReadInteger(prebuf, curoffset + 8, &fileflags);
         //std::cout << "file flags: " << fileflags << std::endl;
         std::bitset<8> volflagbits(fileflags);
         //std::cout  << "volflagbits: " << volflagbits << std::endl;
         if(volflagbits[0] == 1)
         {
-            ReadInteger(tmpbuf, curoffset + 12, &voloffset);
-            ReadInteger(tmpbuf, curoffset + 16, &basepathoffset);
+            ReadInteger(prebuf, curoffset + 12, &voloffset);
+            ReadInteger(prebuf, curoffset + 16, &basepathoffset);
             //std::cout << "voloffset: " << voloffset << std::endl;
             //std::cout << " basepathoffset: " << basepathoffset << std::endl;
-            ReadInteger(tmpbuf, curoffset + voloffset, &volstructurelength);
-            ReadInteger(tmpbuf, curoffset + voloffset + 4, &voltype);
+            ReadInteger(prebuf, curoffset + voloffset, &volstructurelength);
+            ReadInteger(prebuf, curoffset + voloffset + 4, &voltype);
             filecontents->append("Volume Type\t\t| ");
             if(voltype == 0)
                 filecontents->append("Unknown (0)");
@@ -691,16 +751,16 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
                 filecontents->append("RAM Drive (6)");
             filecontents->append("\n");
             //std::cout << "voltype: " << voltype << std::endl;
-            ReadInteger(tmpbuf, curoffset + voloffset + 8, &volserial);
+            ReadInteger(prebuf, curoffset + voloffset + 8, &volserial);
             std::stringstream serialstream;
             serialstream << std::hex << volserial;
             filecontents->append("Volume Serial Number\t| 0x" + serialstream.str() + "\n");
             //std::cout << "vol serial: 0x" << std::hex << volserial << std::dec << std::endl;
-            ReadInteger(tmpbuf, curoffset + voloffset + 12, &volnameoffset);
+            ReadInteger(prebuf, curoffset + voloffset + 12, &volnameoffset);
             //std::cout << "name length: " << volstructurelength << " " << volnameoffset << std::endl;
             //std::cout << "vol name length: " << volstructurelength - volnameoffset << std::endl;
             uint8_t* volname = new uint8_t[volstructurelength - volnameoffset +1];
-            volname = substr(tmpbuf, curoffset + voloffset + volnameoffset, volstructurelength - volnameoffset);
+            volname = substr(prebuf, curoffset + voloffset + volnameoffset, volstructurelength - volnameoffset);
             volname[volstructurelength - volnameoffset] = 0;
             //std::cout << "volname: " << (char*)volname << std::endl;
             volnamestr = std::string((char*)volname);
@@ -710,7 +770,7 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
             //std::cout << "next offset: " << curoffset + voloffset + volnameoffset + volstructurelength - volnameoffset + 1 << std::endl;
             //std::cout << "basepath length: " << totalstructurelength - basepathoffset - 1 << std::endl;
             uint8_t* basepathname = new uint8_t[totalstructurelength - basepathoffset];
-            basepathname = substr(tmpbuf, curoffset + basepathoffset, totalstructurelength - basepathoffset - 1);
+            basepathname = substr(prebuf, curoffset + basepathoffset, totalstructurelength - basepathoffset - 1);
             basepathname[totalstructurelength - basepathoffset] = 0;
             basepathstr = std::string((char*)basepathname);
             filecontents->append("Local Path\t\t| " + basepathstr + "\n");
@@ -719,11 +779,11 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         }
         if(volflagbits[1] == 1)
         {
-            ReadInteger(tmpbuf, curoffset + 20, &networkvoloffset);
+            ReadInteger(prebuf, curoffset + 20, &networkvoloffset);
             // PARSE NETWORK VOLUME STRUCTURE HERE
             //std::cout << "networkvoloffset: " << networkvoloffset << std::endl;
         }
-        ReadInteger(tmpbuf, curoffset + 24, &remainingpathoffset);
+        ReadInteger(prebuf, curoffset + 24, &remainingpathoffset);
         // PARSE REMAINING/FINAL PATH HERE
         //std::cout << "remainingpathoffset: " << remainingpathoffset << std::endl;
         //std::cout << "file or directory" << std::endl;
@@ -734,14 +794,14 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     {
         //std::cout << "has a descriptive string" << std::endl;
         uint16_t desclength = 0;
-        ReadInteger(tmpbuf, curoffset, &desclength);
+        ReadInteger(prebuf, curoffset, &desclength);
         //std::cout << "desclength: " << desclength << std::endl;
         if(flags & 0x80) // utf-16 unicode
         {
             for(int i=0; i < desclength; i++)
             {
                 uint16_t singleletter = 0;
-                ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                ReadInteger(prebuf, curoffset + 2 + i*2, &singleletter);
                 descstring += (char)singleletter;
             }
             curoffset = curoffset + desclength * 2 + 2;
@@ -749,7 +809,7 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         else // ascii
         {
             uint8_t* description = new uint8_t[desclength+1];
-            description = substr(tmpbuf, curoffset + 2, desclength);
+            description = substr(prebuf, curoffset + 2, desclength);
             description[desclength] = 0;
             descstring = std::string((char*)description);
             //std::cout << "description: " << (char*)description << std::endl;
@@ -763,14 +823,14 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     {
         //std::cout << "has a relative path string" << std::endl;
         uint16_t relpathlength = 0;
-        ReadInteger(tmpbuf, curoffset, &relpathlength);
+        ReadInteger(prebuf, curoffset, &relpathlength);
         //std::cout << "relpathlength: " << relpathlength << std::endl;
         if(flags & 0x80)
         {
             for(int i=0; i < relpathlength; i++)
             {
                 uint16_t singleletter = 0;
-                ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                ReadInteger(prebuf, curoffset + 2 + i*2, &singleletter);
                 relpathstr += (char)singleletter;
             }
             curoffset = curoffset + relpathlength * 2 + 2;
@@ -778,7 +838,7 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         else
         {
             uint8_t* relpath = new uint8_t[relpathlength+1];
-            relpath = substr(tmpbuf, curoffset + 2, relpathlength);
+            relpath = substr(prebuf, curoffset + 2, relpathlength);
             relpath[relpathlength] = 0;
             relpathstr = std::string((char*)relpath);
             //std::cout << "relpath: " << relpath << std::endl;
@@ -791,13 +851,13 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     {
         //std::cout << "has a working directory" << std::endl;
         uint16_t workdirlength = 0;
-        ReadInteger(tmpbuf, curoffset, &workdirlength);
+        ReadInteger(prebuf, curoffset, &workdirlength);
         if(flags & 0x80)
         {
             for(int i=0; i < workdirlength; i++)
             {
                 uint16_t singleletter = 0;
-                ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                ReadInteger(prebuf, curoffset + 2 + i*2, &singleletter);
                 workingdirectory += (char)singleletter;
             }
             curoffset = curoffset + workdirlength * 2 + 2;
@@ -805,7 +865,7 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         else
         {
             uint8_t* workdirchar = new uint8_t[workdirlength+1];
-            workdirchar = substr(tmpbuf, curoffset + 2, workdirlength);
+            workdirchar = substr(prebuf, curoffset + 2, workdirlength);
             workdirchar[workdirlength] = 0;
             workingdirectory = std::string((char*)workdirchar);
             delete[] workdirchar;
@@ -818,13 +878,13 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     {
         //std::cout << "has command line arguments" << std::endl;
         uint16_t cmdlength = 0;
-        ReadInteger(tmpbuf, curoffset, &cmdlength);
+        ReadInteger(prebuf, curoffset, &cmdlength);
         if(flags & 0x80) // UTF-16 UNICODE
         {
             for(int i=0; i < cmdlength; i++)
             {
                 uint16_t singleletter = 0;
-                ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                ReadInteger(prebuf, curoffset + 2 + i*2, &singleletter);
                 commandstring += (char)singleletter;
             }
             curoffset = curoffset + cmdlength * 2 + 2;
@@ -832,7 +892,7 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         else // ASCII
         {
             uint8_t* cmdchar = new uint8_t[cmdlength+1];
-            cmdchar = substr(tmpbuf, curoffset + 2, cmdlength);
+            cmdchar = substr(prebuf, curoffset + 2, cmdlength);
             cmdchar[cmdlength] = 0;
             commandstring = std::string((char*)cmdchar);
             delete[] cmdchar;
@@ -845,13 +905,13 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     {
         //std::cout << "has a custom icon" << std::endl;
         uint16_t iconlength = 0;
-        ReadInteger(tmpbuf, curoffset, &iconlength);
+        ReadInteger(prebuf, curoffset, &iconlength);
         if(flags & 0x80) // UTF-16 UNICODE
         {
             for(int i=0; i < iconlength; i++)
             {
                 uint16_t singleletter = 0;
-                ReadInteger(tmpbuf, curoffset + 2 + i*2, &singleletter);
+                ReadInteger(prebuf, curoffset + 2 + i*2, &singleletter);
                 iconstring += (char)singleletter;
             }
             curoffset = curoffset + iconlength * 2 + 2;
@@ -859,7 +919,7 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         else // ASCII
         {
             uint8_t* iconchar = new uint8_t[iconlength + 1];
-            iconchar = substr(tmpbuf, curoffset + 2, iconlength);
+            iconchar = substr(prebuf, curoffset + 2, iconlength);
             iconchar[iconlength] = 0;
             iconstring = std::string((char*)iconchar);
             delete[] iconchar;
@@ -877,17 +937,17 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
     while(curoffset < curfileitem->size)
     {
         uint32_t blksize = 0;
-        ReadInteger(tmpbuf, curoffset, &blksize);
+        ReadInteger(prebuf, curoffset, &blksize);
         if(blksize == 0)
             break;
         filecontents->append("Data Block\t\t| " + std::to_string(k) + "\n");
         uint32_t blksig = 0;
-        ReadInteger(tmpbuf, curoffset + 4, &blksig);
+        ReadInteger(prebuf, curoffset + 4, &blksig);
         if(blksig == 0xa0000001) // environment variables location (788 bytes)
         {
             filecontents->append("\tSignature\t| Environment Variables Location (0xa0000001)\n");
             uint8_t* evloc = new uint8_t[260];
-            evloc = substr(tmpbuf, curoffset + 8, 260);
+            evloc = substr(prebuf, curoffset + 8, 260);
             filecontents->append("\tENV VAR Location\t| " + std::string((char*)evloc) + "\n");
             delete[] evloc;
             k++;
@@ -903,23 +963,23 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         {
             filecontents->append("\tSignature\t| Distributed Link Tracker Properties (0xa0000003)\n");
             uint8_t* machineid = new uint8_t[16];
-            machineid = substr(tmpbuf, curoffset + 16, 16);
+            machineid = substr(prebuf, curoffset + 16, 16);
             filecontents->append("\tMachine ID\t| " + std::string((char*)machineid) + "\n");
             delete[] machineid;
             uint8_t* dvid = new uint8_t[16];
-            dvid = substr(tmpbuf, curoffset + 32, 16);
+            dvid = substr(prebuf, curoffset + 32, 16);
             filecontents->append("\tDroid Volume ID | " + ReturnFormattedGuid(dvid) + "\n");
             delete[] dvid;
             uint8_t* fid = new uint8_t[16];
-            fid = substr(tmpbuf, curoffset + 48, 16);
+            fid = substr(prebuf, curoffset + 48, 16);
             filecontents->append("\tDroid File ID\t| " + ReturnFormattedGuid(fid) + "\n");
             delete[] fid;
             uint8_t* bdvid = new uint8_t[16];
-            bdvid = substr(tmpbuf, curoffset + 64, 16);
+            bdvid = substr(prebuf, curoffset + 64, 16);
             filecontents->append("\tBirth Volume ID | " + ReturnFormattedGuid(bdvid) + "\n");
             delete[] bdvid;
             uint8_t* bfid = new uint8_t[16];
-            bfid = substr(tmpbuf, curoffset + 80, 16);
+            bfid = substr(prebuf, curoffset + 80, 16);
             filecontents->append("\tBirth File ID\t| " + ReturnFormattedGuid(bfid) + "\n");
             delete[] bfid;
             k++;
@@ -941,7 +1001,7 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         {
             filecontents->append("\tSignature\t| Darwin Properties (0xa0000006)\n");
             uint8_t* dp = new uint8_t[260];
-            dp = substr(tmpbuf, curoffset + 8, 260);
+            dp = substr(prebuf, curoffset + 8, 260);
             filecontents->append("\tApp ID\t| " + std::string((char*)dp) + "\n");
             delete[] dp;
             k++;
@@ -951,7 +1011,7 @@ void ParseShortcut(FileItem* curfileitem, uint8_t* tmpbuf, std::string* filecont
         {
             filecontents->append("\tSignature\t| Icon Location (0xa0000007)\n");
             uint8_t* dp = new uint8_t[260];
-            dp = substr(tmpbuf, curoffset + 8, 260);
+            dp = substr(prebuf, curoffset + 8, 260);
             filecontents->append("\tIcon Location\t| " + std::string((char*)dp) + "\n");
             delete[] dp;
             k++;
@@ -1004,7 +1064,8 @@ void ParseImage(FileItem* curfileitem, std::string* filecontents)
     }
 }
 
-void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+//void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, uint8_t* prebuf, uint64_t bufsize, std::string* filecontents)
+void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem, std::string* filecontents)
 {
     if(curfileitem->sig.compare("Pdf") == 0) // PDF file
     { 
@@ -1012,15 +1073,18 @@ void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem
     }
     else if(curfileitem->sig.compare("Html") == 0) // HTML file
     {
-        ParseHtml(prebuf, bufsize, filecontents);
+        ParseHtml(curfileitem, filecontents);
+        //ParseHtml(prebuf, bufsize, filecontents);
     }
     else if(curfileitem->sig.compare("Recycler") == 0) // INFO2 file
     {
-        ParseRecycler(curfileitem, prebuf, bufsize, filecontents);
+        ParseRecycler(curfileitem, filecontents);
+        //ParseRecycler(curfileitem, prebuf, bufsize, filecontents);
     }
     else if(curfileitem->sig.compare("Recycle.Bin") == 0) // $I file
     {
-        ParseRecycleBin(curfileitem, prebuf, filecontents);
+        ParseRecycleBin(curfileitem, filecontents);
+        //ParseRecycleBin(curfileitem, prebuf, filecontents);
     }
     else if(curfileitem->sig.compare("Directory") == 0) // directory listing
     {
@@ -1032,11 +1096,13 @@ void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem
     }
     else if(curfileitem->sig.compare("Prefetch") == 0) // PREFETCH file
     {
-        ParsePrefetch(curfileitem, prebuf, filecontents);
+        ParsePrefetch(curfileitem, filecontents);
+        //ParsePrefetch(curfileitem, prebuf, filecontents);
     }
     else if(curfileitem->sig.compare("Shortcut") == 0) // LNK file
     {
-        ParseShortcut(curfileitem, prebuf, filecontents);
+        ParseShortcut(curfileitem, filecontents);
+        //ParseShortcut(curfileitem, prebuf, filecontents);
     }
     else if(curfileitem->cat.compare("Image") == 0) // Image preview
     {
@@ -1064,7 +1130,7 @@ void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem
 	    filebuffer.read(fc, filesize);
 	    filebuffer.close();
 	    fc[filesize] = 0;
-	    std::cout << fc << std::endl;
+	    //std::cout << fc << std::endl;
 	    filecontents->append(fc);
 	}
     }

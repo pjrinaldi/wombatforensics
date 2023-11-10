@@ -2474,11 +2474,13 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(!std::filesystem::exists(tmpfilestr))
 	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
+    /*
     // Generate Preview Content
     uint8_t* prebuf = NULL;
     uint64_t bufsize = 524288;
     if(curfileitem->size < bufsize)
         bufsize = curfileitem->size;
+    */
     if(curfileitem->cat.compare("Image") == 0)
     {
         if(curfileitem->size > 0)
@@ -2970,8 +2972,9 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     {
         imgview->hide();
         plaintext->show();
-        GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
-        ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
+        //GetPreviewContent(curforimg, curfileitem, &prebuf, bufsize);
+        //ParsePreview(curforimg, &currentitem, curfileitem, prebuf, bufsize, &filecontents);
+        ParsePreview(curforimg, &currentitem, curfileitem, &filecontents);
         plaintext->setText(FXString(filecontents.c_str()));
     }
     /* // THREADING
