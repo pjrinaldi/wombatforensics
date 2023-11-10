@@ -1048,6 +1048,26 @@ void ParsePreview(ForImg* curforimg, CurrentItem* curitem, FileItem* curfileitem
             filecontents->append("Zero Image. No Content");
         }
     }
+    else if(curfileitem->cat.compare("Text") == 0) // Text preview
+    {
+	filecontents->clear();
+	if(curfileitem->size > 0)
+	{
+	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
+	    tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+	    std::ifstream filebuffer(tmpfilestr, std::ios::in);
+	    filebuffer.seekg(0, filebuffer.beg);
+	    filebuffer.seekg(0, filebuffer.end);
+	    uint64_t filesize = filebuffer.tellg();
+	    char* fc = new char[filesize+1];
+	    filebuffer.seekg(0, filebuffer.beg);
+	    filebuffer.read(fc, filesize);
+	    filebuffer.close();
+	    fc[filesize] = 0;
+	    std::cout << fc << std::endl;
+	    filecontents->append(fc);
+	}
+    }
     else // partial hex preview
     {
     }

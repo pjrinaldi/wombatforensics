@@ -468,6 +468,9 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
 
 void GetPreviewContent(ForImg* curforimg, FileItem* curfileitem, uint8_t** prebuf, uint64_t bufsize)
 {
+    // THIS IS READING BEGINNING OF THE CONTENTS WRONG SOMEWHERE... I CAN EITHER FIX THIS ISSUE
+    // OR SIMPLY READ THE FILECONTENTS INTO A BUFFER, SINCE I WRITE IT TO A FILE WHEN I PREVIEW IT
+    // ANYWAY...
     uint8_t* tmpbuf = new uint8_t[bufsize];
     uint64_t curlogicalsize = 0;
     uint64_t curpos = 0;
