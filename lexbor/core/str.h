@@ -11,9 +11,9 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/base.h"
-#include "lexbor/core/mraw.h"
-#include "lexbor/core/utils.h"
+#include "../../lexbor/core/base.h"
+#include "../../lexbor/core/mraw.h"
+#include "../../lexbor/core/utils.h"
 
 
 #define lexbor_str_get(str, attr) str->attr

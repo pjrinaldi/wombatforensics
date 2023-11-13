@@ -93,7 +93,7 @@ struct lxb_html_tokenizer {
 };
 
 
-#include "lexbor/html/tokenizer/error.h"
+#include "../lexbor/html/tokenizer/error.h"
 
 
 extern const lxb_char_t *lxb_html_tokenizer_eof;

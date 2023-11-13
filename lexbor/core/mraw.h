@@ -13,9 +13,9 @@ extern "C" {
 
 #include <string.h>
 
-#include "lexbor/core/base.h"
-#include "lexbor/core/mem.h"
-#include "lexbor/core/bst.h"
+#include "../../lexbor/core/base.h"
+#include "../../lexbor/core/mem.h"
+#include "../../lexbor/core/bst.h"
 
 
 #define lexbor_mraw_meta_size()                                                \

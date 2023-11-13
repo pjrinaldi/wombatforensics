@@ -13,7 +13,7 @@ extern "C" {
 
 #include <string.h>
 
-#include "lexbor/core/base.h"
+#include "../../lexbor/core/base.h"
 
 
 typedef struct lexbor_mem_chunk lexbor_mem_chunk_t;

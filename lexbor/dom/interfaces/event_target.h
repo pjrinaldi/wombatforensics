@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-#include "lexbor/dom/interface.h"
+#include "../../../lexbor/dom/interface.h"
 
 
 struct lxb_dom_event_target {

@@ -11,10 +11,10 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/base.h"
-#include "lexbor/core/array.h"
+#include "../../lexbor/core/base.h"
+#include "../../lexbor/core/array.h"
 
-#include "lexbor/dom/interface.h"
+#include "../../lexbor/dom/interface.h"
 
 
 typedef struct {

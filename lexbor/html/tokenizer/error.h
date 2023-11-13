@@ -11,10 +11,10 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/base.h"
-#include "lexbor/core/array_obj.h"
+#include "../../../lexbor/core/base.h"
+#include "../../../lexbor/core/array_obj.h"
 
-#include "lexbor/html/tokenizer.h"
+#include "../../../lexbor/html/tokenizer.h"
 
 
 typedef enum {

@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/base.h"
+#include "../../lexbor/core/base.h"
 
 
 #define LXB_HTML_VERSION_MAJOR 2

@@ -11,12 +11,12 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/hash.h"
-#include "lexbor/core/shs.h"
-#include "lexbor/core/dobject.h"
-#include "lexbor/core/str.h"
+#include "../../lexbor/core/hash.h"
+#include "../../lexbor/core/shs.h"
+#include "../../lexbor/core/dobject.h"
+#include "../../lexbor/core/str.h"
 
-#include "lexbor/tag/const.h"
+#include "../../lexbor/tag/const.h"
 
 
 typedef struct {

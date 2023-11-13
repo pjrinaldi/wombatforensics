@@ -11,12 +11,12 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/base.h"
+#include "../../lexbor/core/base.h"
 
-#include "lexbor/tag/const.h"
-#include "lexbor/ns/const.h"
+#include "../../lexbor/tag/const.h"
+#include "../../lexbor/ns/const.h"
 
-#include "lexbor/dom/exception.h"
+#include "../../lexbor/dom/exception.h"
 
 
 #define lxb_dom_interface_cdata_section(obj) ((lxb_dom_cdata_section_t *) (obj))

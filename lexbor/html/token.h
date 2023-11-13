@@ -11,12 +11,12 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/dobject.h"
-#include "lexbor/core/str.h"
+#include "../../lexbor/core/dobject.h"
+#include "../../lexbor/core/str.h"
 
-#include "lexbor/html/base.h"
-#include "lexbor/html/token_attr.h"
-#include "lexbor/tag/tag.h"
+#include "../../lexbor/html/base.h"
+#include "../../lexbor/html/token_attr.h"
+#include "../../lexbor/tag/tag.h"
 
 
 typedef int lxb_html_token_type_t;

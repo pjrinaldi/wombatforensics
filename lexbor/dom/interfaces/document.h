@@ -11,11 +11,11 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/mraw.h"
-#include "lexbor/core/hash.h"
+#include "../../../lexbor/core/mraw.h"
+#include "../../../lexbor/core/hash.h"
 
-#include "lexbor/dom/interface.h"
-#include "lexbor/dom/interfaces/node.h"
+#include "../../../lexbor/dom/interface.h"
+#include "../../../lexbor/dom/interfaces/node.h"
 
 
 typedef enum {

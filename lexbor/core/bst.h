@@ -13,8 +13,8 @@ extern "C" {
 
 #include <string.h>
 
-#include "lexbor/core/base.h"
-#include "lexbor/core/dobject.h"
+#include "../../lexbor/core/base.h"
+#include "../../lexbor/core/dobject.h"
 
 
 #define lexbor_bst_root(bst) (bst)->root

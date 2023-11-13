@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/def.h"
+#include "../../lexbor/core/def.h"
 
 typedef void *(*lexbor_memory_malloc_f)(size_t size);
 typedef void *(*lexbor_memory_realloc_f)(void *dst, size_t size);

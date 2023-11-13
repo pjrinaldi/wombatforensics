@@ -11,9 +11,9 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/base.h"
-#include "lexbor/core/mem.h"
-#include "lexbor/core/array.h"
+#include "../../lexbor/core/base.h"
+#include "../../lexbor/core/mem.h"
+#include "../../lexbor/core/array.h"
 
 
 typedef struct {

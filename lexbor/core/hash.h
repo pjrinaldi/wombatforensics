@@ -11,8 +11,8 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/dobject.h"
-#include "lexbor/core/mraw.h"
+#include "../../lexbor/core/dobject.h"
+#include "../../lexbor/core/mraw.h"
 
 
 #define LEXBOR_HASH_SHORT_SIZE     16

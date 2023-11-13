@@ -13,7 +13,7 @@ extern "C" {
 
 #include <string.h>
 
-#include "lexbor/core/base.h"
+#include "../../lexbor/core/base.h"
 
 
 typedef struct {

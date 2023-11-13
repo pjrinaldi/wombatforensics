@@ -11,9 +11,9 @@
 extern "C" {
 #endif
 
-#include "lexbor/dom/interface.h"
-#include "lexbor/dom/collection.h"
-#include "lexbor/dom/interfaces/event_target.h"
+#include "../../../lexbor/dom/interface.h"
+#include "../../../lexbor/dom/collection.h"
+#include "../../../lexbor/dom/interfaces/event_target.h"
 
 
 typedef lexbor_action_t

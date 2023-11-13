@@ -11,10 +11,10 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/hash.h"
-#include "lexbor/core/shs.h"
+#include "../../lexbor/core/hash.h"
+#include "../../lexbor/core/shs.h"
 
-#include "lexbor/ns/const.h"
+#include "../../lexbor/ns/const.h"
 
 
 typedef struct {

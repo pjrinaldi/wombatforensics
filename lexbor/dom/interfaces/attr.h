@@ -11,15 +11,15 @@
 extern "C" {
 #endif
 
-#include "lexbor/core/hash.h"
-#include "lexbor/core/str.h"
+#include "../../../lexbor/core/hash.h"
+#include "../../../lexbor/core/str.h"
 
-#include "lexbor/ns/ns.h"
+#include "../../../lexbor/ns/ns.h"
 
-#include "lexbor/dom/interface.h"
-#include "lexbor/dom/interfaces/node.h"
-#include "lexbor/dom/interfaces/attr_const.h"
-#include "lexbor/dom/interfaces/document.h"
+#include "../../../lexbor/dom/interface.h"
+#include "../../../lexbor/dom/interfaces/node.h"
+#include "../../../lexbor/dom/interfaces/attr_const.h"
+#include "../../../lexbor/dom/interfaces/document.h"
 
 
 typedef struct {
