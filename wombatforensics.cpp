@@ -9,9 +9,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
     //mainframe->setBackColor(FXRGB(224,224,224));
     //toolbar->setBackColor(FXRGB(224,224,224));
-    pathframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
+    //pathframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
+    pathmenubar = new FXMenuBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
+	new FXMenuCommand(pathmenubar, "initial test", NULL, this, ID_PARTITION);
     pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
-    //pathmenubar = new FXMenuBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     hsplitter = new FXSplitter(mainframe, SPLITTER_VERTICAL|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     tablelist = new FXTable(hsplitter, this, ID_TABLESELECT, TABLE_COL_SIZABLE|LAYOUT_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     tablelist->setTableSize(10, 14);
@@ -635,12 +636,14 @@ long WombatForensics::LoadForensicImages(FXObject*, FXSelector, void*)
     return 1;
 }
 
+/*
 void WombatForensics::UpdatePathFrame(void)
 {
-    burrowbutton2 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
+    burrowbutton2 = new FXButton(pathframe, "BURROW", NULL, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
     burrowbutton2->setIconPosition(ICON_BEFORE_TEXT);
     burrowbutton2->setTipText("Burrow");
 }
+*/
 
 void WombatForensics::UpdateForensicImages()
 {
@@ -3120,9 +3123,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     //std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1 && curforimg != NULL) // LOAD PARTITIONS
     {
+		new FXButton(pathtoolbar, "itemtext test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
         curbutton->setText(FXString(curforimg->ImageFileName().c_str()));
-	//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
-	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
+		//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
+		new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
+		pathmenubar->forceRefresh();
+		pathtoolbar->forceRefresh();
         currentfileitem.clear();
         volnames.clear();
         volsizes.clear();
@@ -3283,7 +3289,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         // need to implement path toolbar here for the burrow and the partition and 
         //std::cout << "need to load the root directory for the partition selected here." << std::endl;
         this->getApp()->endWaitCursor();
-        UpdatePathFrame();
+        //UpdatePathFrame();
     }
     else if(itemtype == 3) // LOAD FILE CHILDREN ??? OR IMPLEMENT FUNCTIONALITY WHEN 
     {
