@@ -279,11 +279,12 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
             curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
             if(strcmp(fattype, "FAT12") == 0)
             {
-                LoadFatDirectory(currentitem, filevector, curfileitem);
+                LoadFat12Directory(currentitem, filevector, curfileitem);
             }
             else if(strcmp(fattype, "FAT16") == 0)
             {
-                LoadFatDirectory(currentitem, filevector, curfileitem);
+				// NEED TO SWITCH TO FAT16
+                LoadFat12Directory(currentitem, filevector, curfileitem);
             }
             else
             {

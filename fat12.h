@@ -10,9 +10,10 @@
 #include <bitset>
 #include <algorithm>
 
-#include "common.h"
+#include "fatcommon.h"
 #include "forensicimage.h"
 
-void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
+// LOAD CURRENTLY SELECTED CONTENTS OF THE FAT DIRECTORY
+void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem);
 
 #endif // FAT12_H

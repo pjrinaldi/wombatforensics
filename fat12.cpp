@@ -1,6 +1,6 @@
 #include "fat12.h"
 
-void LoadFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
+void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
     //if(curfileitem != NULL)
     //    std::cout << "curfileitem name: " << curfileitem->name << std::endl;
