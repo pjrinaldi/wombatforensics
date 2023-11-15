@@ -24,9 +24,6 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
     uint16_t rootdirmaxfiles = 0;
     ReadForImgContent(currentitem->forimg, &rootdirmaxfiles, currentitem->voloffset + 17);
     //std::cout << "root dir max files: " << rootdirmaxfiles << std::endl;
-    //if(currentitem->itemtext.find("[FAT12]") != std::string::npos || currentitem->itemtext.find("[FAT16]") != std::string::npos)
-    //{
-	
 	// FAT SIZE
 	uint16_t fatsize = 0;
 	ReadForImgContent(currentitem->forimg, &fatsize, currentitem->voloffset + 22);
@@ -244,7 +241,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	}
 	if(curfileitem == NULL) // root directory - add virtual files
 	{
-	//curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
+		//curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
 		FileItem tmpitem;
 		tmpitem.size = bytespersector;
 		tmpitem.name = "$MBR";
@@ -267,10 +264,4 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			filevector->push_back(tmpitem);
 		}
 	}
-	/*
-    }
-    else // FAT32, EXFAT
-    {
-    }
-	*/
 }
