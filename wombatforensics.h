@@ -88,7 +88,7 @@ x,FXint y,FXint w,FXint h) const;
     virtual ~CheckTableItem(void) { delete check; }
 
     void setCheck(FXbool state=true, FXbool notify=false) {
-check->setCheck(state, notify); }
+	check->setCheck(state, notify); }
     FXbool getCheck() const { return check->getCheck(); }
 };
 
@@ -149,24 +149,24 @@ class WombatForensics : public FXMainWindow
         FXToolBar* toolbar;
         FXHorizontalFrame* pathframe;
         FXToolBar* pathtoolbar;
-		//FXMenuBar* pathmenubar;
+	//FXMenuBar* pathmenubar;
         FXSplitter* hsplitter;
         FXTable* tablelist;
         FXHeader* tableheader;
         FXStatusBar* statusbar;
         FXFont* plainfont;
         FXText* plaintext;
-		FXImageView* imgview;
+	FXImageView* imgview;
 
         FXIcon* newicon;
         FXButton* newbutton;
-		FXIcon* openicon;
+	FXIcon* openicon;
         FXButton* openbutton;
         FXIcon* saveicon;
         FXButton* savebutton;
 
-		FXIcon* evidmanicon;
-		FXButton* evidmanbutton;
+	FXIcon* evidmanicon;
+	FXButton* evidmanbutton;
 
         FXIcon* jumptohexicon;
         FXButton* jumptohexbutton;
@@ -197,36 +197,36 @@ class WombatForensics : public FXMainWindow
         FXIcon* exportwliicon;
         FXButton* exportwlibutton;
 
-		FXIcon* managetagsicon;
-		FXButton* managetagsbutton;
+	FXIcon* managetagsicon;
+	FXButton* managetagsbutton;
         FXIcon* managehashicon;
         FXButton* managehashbutton;
-		FXIcon* previewicon;
-		FXButton* previewbutton;
-		FXIcon* publishicon;
-		FXButton* publishbutton;
+	FXIcon* previewicon;
+	FXButton* previewbutton;
+	FXIcon* publishicon;
+	FXButton* publishbutton;
 
-		/*
-			FXIcon* createwfiicon;
-			FXButton* createwfibutton;
-			FXIcon* verifywfiicon;
-			FXButton* verifywfibutton;
-		*/
+	/*
+		FXIcon* createwfiicon;
+		FXButton* createwfibutton;
+		FXIcon* verifywfiicon;
+		FXButton* verifywfibutton;
+	*/
 
         FXIcon* xchompicon;
         FXButton* xchompbutton;
-		FXIcon* abouticon;
-		FXButton* aboutbutton;
+	FXIcon* abouticon;
+	FXButton* aboutbutton;
 
         FXIcon* burrowicon;
         FXButton* burrowbutton;
         FXButton* burrowbutton2;
-		FXIcon* backicon;
-		FXButton* backbutton;
-		FXIcon* frwdicon;
-		FXButton* frwdbutton;
-		FXIcon* curicon;
-		FXButton* curbutton;
+	FXIcon* backicon;
+	FXButton* backbutton;
+	FXIcon* frwdicon;
+	FXButton* frwdbutton;
+	FXIcon* curicon;
+	FXButton* curbutton;
 
         // ITEM TYPE ICONS
         FXIcon* forimgicon;
@@ -245,7 +245,7 @@ class WombatForensics : public FXMainWindow
         std::vector<std::string> whlfiles;
         FXArray<FXString> taggedlist;
         std::ifstream filebuffer;
-		std::ofstream filewriter;
+	std::ofstream filewriter;
         FXArray<FXString> fileuserdata;
         FXString evidencelist;
         FXString curfileuserdata;
@@ -254,8 +254,8 @@ class WombatForensics : public FXMainWindow
         FXString casename;
         FXString configpath;
         FXString currentsettings;
-		FXString currentcarvetypes;
-		FXString prevevidpath;
+	FXString currentcarvetypes;
+	FXString prevevidpath;
         FXString itemtext;
         FXString pathtext;
         FXString filetext;
@@ -265,26 +265,26 @@ class WombatForensics : public FXMainWindow
         FXFile tagsfile;
         FXFile logfile;
         FXFile settingfile;
-		FXFile carvetypesfile;
+	FXFile carvetypesfile;
         FXFile evidencefile;
         FXFile binariesfile;
         
         char dtbuf[35];
         bool iscaseopen;
-		bool isfrompath;
+	bool isfrompath;
         
         Viewer* viewer;
         ForImg* curforimg;
         std::vector<ForImg*> forimgvector;
         MessageLog* msglog;
-		ThumbViewer* imagethumbviewer;
+	ThumbViewer* imagethumbviewer;
         ThumbViewer* videothumbviewer;
 
         uint64_t globalid;
         uint64_t curid;
         uint64_t lastid;
 
-		CurrentItem currentitem;
+	CurrentItem currentitem;
         FileItem currentfileitem;
 
         int oldselectedrow = -1;
@@ -297,12 +297,12 @@ class WombatForensics : public FXMainWindow
         std::vector<uint64_t> volsizes;
         std::vector<uint64_t> voloffsets;
         std::vector<FileItem> fileitemvector;
-		std::vector<FXString> vidthumbpathlist;
-		std::vector<FXString> imgthumbpathlist;
+	std::vector<FXString> vidthumbpathlist;
+	std::vector<FXString> imgthumbpathlist;
 
     protected:
         WombatForensics() {}
-		~WombatForensics();
+	~WombatForensics();
 
     public:
         enum
@@ -311,7 +311,7 @@ class WombatForensics : public FXMainWindow
             ID_NEW = 99,
             ID_OPEN = 100,
             ID_SAVE = 98,
-			ID_EVIDMANAGE = 97,
+	    ID_EVIDMANAGE = 97,
             ID_SETTINGS = 95,
             ID_VIEWMANAGE = 94,
             ID_MSGLOG = 93,
@@ -329,11 +329,11 @@ class WombatForensics : public FXMainWindow
             ID_XCHOMP = 81,
             ID_MANAGECARVED = 80,
             ID_TREESELECT = 101,
-			ID_MANAGETAGS = 102,
-			ID_PREVIEW = 103,
-			ID_PUBLISH = 104,
-			ID_ABOUT = 105,
-			ID_TABLESELECT = 106,
+	    ID_MANAGETAGS = 102,
+	    ID_PREVIEW = 103,
+	    ID_PUBLISH = 104,
+	    ID_ABOUT = 105,
+	    ID_TABLESELECT = 106,
             ID_TAGMENU = 107,
             ID_NEWTAG = 108,
             ID_SETTAG = 109,
@@ -346,10 +346,10 @@ class WombatForensics : public FXMainWindow
             ID_ASCTEXT = 116,
             ID_SCROLLBAR = 117,
             ID_HOME = 118,
-			ID_PARTITION = 119,
-			ID_BACK = 120,
-			ID_FRWD = 121,
-			ID_CURRENT = 122,
+	    ID_PARTITION = 119,
+	    ID_BACK = 120,
+	    ID_FRWD = 121,
+	    ID_CURRENT = 122,
             ID_TABLEHEADER = 123,
             ID_BINARY = 124,
             ID_CONTENTS = 125,
@@ -365,9 +365,9 @@ class WombatForensics : public FXMainWindow
         long NewCase(FXObject*, FXSelector, void*);
         long OpenCase(FXObject*, FXSelector, void*);
         long SaveCase(FXObject*, FXSelector, void*);
-		long ManageEvidence(FXObject*, FXSelector, void*);
+	long ManageEvidence(FXObject*, FXSelector, void*);
         long OpenTagManager(FXObject*, FXSelector, void*);
-		long OpenAboutBox(FXObject*, FXSelector, void*);
+	long OpenAboutBox(FXObject*, FXSelector, void*);
         long PreviewReport(FXObject*, FXSelector, void*);
         long TagMenu(FXObject*, FXSelector, void*);
         long TableUpDown(FXObject*, FXSelector, void*);
@@ -381,20 +381,20 @@ class WombatForensics : public FXMainWindow
         long OpenManageCarved(FXObject*, FXSelector, void*);
         long OpenViewerManager(FXObject*, FXSelector, void*);
         long OpenMessageLog(FXObject*, FXSelector, void*);
-		long OpenDigDeeper(FXObject*, FXSelector, void*);
-		long OpenManageHashList(FXObject*, FXSelector, void*);
+	long OpenDigDeeper(FXObject*, FXSelector, void*);
+	long OpenManageHashList(FXObject*, FXSelector, void*);
         long OpenXChomp(FXObject*, FXSelector, void*);
         long SortColumn(FXObject* sender, FXSelector sel, void* colid);
         long FilterColumn(FXObject* sender, FXSelector sel, void* colid);
         long CheckSelected(FXObject* sender, FXSelector sel, void*);
         long OpenHexViewer(FXObject*, FXSelector, void*);
-		long OpenPropertyViewer(FXObject*, FXSelector, void*);
-		//long OpenThumbViewer(FXObject*, FXSelector, void*);
-		long OpenImageThumbViewer(FXObject*, FXSelector, void*);
-		long OpenVideoThumbViewer(FXObject*, FXSelector, void*);
+	long OpenPropertyViewer(FXObject*, FXSelector, void*);
+	//long OpenThumbViewer(FXObject*, FXSelector, void*);
+	long OpenImageThumbViewer(FXObject*, FXSelector, void*);
+	long OpenVideoThumbViewer(FXObject*, FXSelector, void*);
         /*
         long KeySelected(FXObject*, FXSelector, void*);
-		long ValueSelected(FXObject*, FXSelector, void*);
+	long ValueSelected(FXObject*, FXSelector, void*);
         long SetTag(FXObject* sender, FXSelector, void*);
         long CreateNewTag(FXObject*, FXSelector, void*);
         long RemoveTag(FXObject*, FXSelector, void*);
@@ -406,9 +406,9 @@ class WombatForensics : public FXMainWindow
         long TableUpDown(FXObject*, FXSelector, void*);
         long PageChanged(FXObject*, FXSelector, void*);
         long ScrollChanged(FXObject*, FXSelector, void*);
-		//void PopulateChildKeys(libregf_key_t* curkey, FXTreeItem* curitem, libregf_error_t* regerr);
-		void GetRootString(FXTreeItem* curitem, FXString* rootstring);
-		FXString ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
+	//void PopulateChildKeys(libregf_key_t* curkey, FXTreeItem* curitem, libregf_error_t* regerr);
+	void GetRootString(FXTreeItem* curitem, FXString* rootstring);
+	FXString ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
         FXString ConvertUnixTimeToString(uint32_t input);
         FXString DecryptRot13(FXString encstr);
         FXchar Rot13Char(FXchar curchar);
@@ -429,22 +429,22 @@ class WombatForensics : public FXMainWindow
         void AlignColumn(FXTable* curtable, int row, FXuint justify);
         void FitColumnContents(int col);
         FXString GetSettings(int setting);
-		void SaveCurrentCase(void);
+	void SaveCurrentCase(void);
         void CloseCurrentCase(void);
         void DeleteTmpFiles(void);
         void EnableCaseButtons(void);
         void LoadCaseState(void);
         void IncrementGlobalId(uint64_t* globalid, uint64_t* curid);
-		void SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex=1, int asc=1);
+	void SortFileTable(std::vector<FileItem>* fileitems, FXString filestr, FXint filecount, int itemindex=1, int asc=1);
         void PlainView(FileItem* curfileitem);
         //void ApplyFilter(int colindex, std::string filterstring);
         //void LoadPartitions(ForImg* curforimg);
         //void LoadGptPartitions(ForImg* curforimg);
         //FXString GetFileSystemName(ForImg* curforimg, uint64_t offset);
-		//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, FXArray<uint>* clusterlist);
-		//FXString ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset);
+	//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, FXArray<uint>* clusterlist);
+	//FXString ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset);
         void UpdatePathFrame(void);
-		void UpdateForensicImages(void);
+	void UpdateForensicImages(void);
         void InitializeThumbCache(void);
 
         void LogEntry(FXString logstring)
@@ -454,10 +454,10 @@ class WombatForensics : public FXMainWindow
             int wrerr = logfile->writeBlock(tmpstr.text(), tmpstr.length());
             logfile->close();
         };
-		void StatusUpdate(FXString tmptext)
-		{
-			statusbar->getStatusLine()->setNormalText(tmptext);
-		};
+	void StatusUpdate(FXString tmptext)
+	{
+	    statusbar->getStatusLine()->setNormalText(tmptext);
+	};
         virtual void create();
 
 };

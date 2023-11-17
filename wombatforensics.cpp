@@ -638,16 +638,16 @@ long WombatForensics::LoadForensicImages(FXObject*, FXSelector, void*)
 
 void WombatForensics::UpdatePathFrame(void)
 {
-	std::cout << "frame children count: " << pathframe->numChildren() << std::endl;
-	for(int i=0; i < pathframe->numChildren(); i++)
-		pathframe->childAtIndex(i)->destroy();
-		//delete pathframe->childAtIndex(i);
-	pathframe->layout();
-	pathframe->recalc();
+    //std::cout << "frame children count: " << pathframe->numChildren() << std::endl;
+    for(int i=0; i < pathframe->numChildren(); i++)
+	pathframe->childAtIndex(i)->destroy();
+	//delete pathframe->childAtIndex(i);
+    pathframe->layout();
+    pathframe->recalc();
     burrowbutton2 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
     burrowbutton2->setIconPosition(ICON_BEFORE_TEXT);
     burrowbutton2->setTipText("Burrow");
-	burrowbutton2->create();
+    burrowbutton2->create();
 }
 
 void WombatForensics::UpdateForensicImages()
@@ -2986,9 +2986,9 @@ void WombatForensics::PlainView(FileItem* curfileitem)
         plaintext->setText(FXString(filecontents.c_str()));
     }
     /* // THREADING
-	for(int i=0; i < filelist.size(); i++)
-	    std::thread tmp(HashFile, filelist.at(i).string(), whlstr);
-	    tmp.join();*/
+    for(int i=0; i < filelist.size(); i++)
+	std::thread tmp(HashFile, filelist.at(i).string(), whlstr);
+	tmp.join();*/
     this->getApp()->endWaitCursor();
     delete[] tmpbuf;
 }
@@ -3119,7 +3119,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	//tablelist->selectRow(currentitem.forimgindex, true);
     }
     //if(tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id() == 4194373) // is directory icon
-        //itemtype = 2;
+    //itemtype = 2;
     //std::cout << "name: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
     //std::cout << "icon id: " << tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id() << std::endl;
     //std::cout << "itemtype on doubleclick: " << itemtype << std::endl;
@@ -3128,12 +3128,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     //std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1 && curforimg != NULL) // LOAD PARTITIONS
     {
-		new FXButton(pathtoolbar, "itemtext test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
+	new FXButton(pathtoolbar, "itemtext test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
         curbutton->setText(FXString(curforimg->ImageFileName().c_str()));
-		//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
-		//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
-		//pathmenubar->forceRefresh();
-		pathtoolbar->forceRefresh();
+	//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
+	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
+	//pathmenubar->forceRefresh();
+	pathtoolbar->forceRefresh();
         currentfileitem.clear();
         volnames.clear();
         volsizes.clear();
@@ -3226,7 +3226,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             {
                 currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
                 if(currentfileitem.isdirectory)
-                    pathtext += FXString(currentfileitem.name.c_str()) + "/";
+                pathtext += FXString(currentfileitem.name.c_str()) + "/";
                 //std::cout << "pathtext: " << pathtext.text() << std::endl;
                 //std::cout << "curitem path: " << currentfileitem.path << std::endl;
                 //std::cout << "curitem name: " << currentfileitem.name << std::endl;
