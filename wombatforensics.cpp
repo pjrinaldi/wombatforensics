@@ -638,12 +638,15 @@ long WombatForensics::LoadForensicImages(FXObject*, FXSelector, void*)
 
 void WombatForensics::UpdatePathFrame(void)
 {
+	std::cout << "itemtype: " << itemtype << std::endl;
     //std::cout << "frame children count: " << pathframe->numChildren() << std::endl;
     for(int i=0; i < pathframe->numChildren(); i++)
-	pathframe->childAtIndex(i)->destroy();
-	//delete pathframe->childAtIndex(i);
-    pathframe->layout();
-    pathframe->recalc();
+	{
+		pathframe->childAtIndex(i)->destroy();
+		delete pathframe->childAtIndex(i);
+	}
+    //pathframe->layout();
+    //pathframe->recalc();
     burrowbutton2 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
     burrowbutton2->setIconPosition(ICON_BEFORE_TEXT);
     burrowbutton2->setTipText("Burrow");
@@ -3128,12 +3131,12 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     //std::cout << "item text: " << itemtext.text() << std::endl;
     if(itemtype == 1 && curforimg != NULL) // LOAD PARTITIONS
     {
-	new FXButton(pathtoolbar, "itemtext test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
+		new FXButton(pathtoolbar, "itemtext test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
         curbutton->setText(FXString(curforimg->ImageFileName().c_str()));
-	//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
-	//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
-	//pathmenubar->forceRefresh();
-	pathtoolbar->forceRefresh();
+		//new FXButton(pathtoolbar, itemtext + " test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
+		//new FXMenuCommand(pathmenubar, itemtext + " test", NULL, this, ID_PARTITION);
+		//pathmenubar->forceRefresh();
+		pathtoolbar->forceRefresh();
         currentfileitem.clear();
         volnames.clear();
         volsizes.clear();
@@ -3210,8 +3213,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         AlignColumn(tablelist, 2, FXTableItem::LEFT);
 
         backbutton->setText("/");
-
-
+		UpdatePathFrame();
         this->getApp()->endWaitCursor();
     }
     else if(itemtype == 2) // LOAD CURRENT DIRECTORY
@@ -3293,8 +3295,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
         // need to implement path toolbar here for the burrow and the partition and 
         //std::cout << "need to load the root directory for the partition selected here." << std::endl;
-        this->getApp()->endWaitCursor();
         UpdatePathFrame();
+        this->getApp()->endWaitCursor();
     }
     else if(itemtype == 3) // LOAD FILE CHILDREN ??? OR IMPLEMENT FUNCTIONALITY WHEN 
     {
@@ -3317,11 +3319,11 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
             //how to determine if it's a directory???, can read file content or get the fileitemvector
             //std::cout << "is dir: " << fileitemvector.at(tablelist->getCurrentRow()).isdirectory << std::endl;
             //FileItem curfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    //if(curfileitem
+			//if(curfileitem
 
-	    // THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
-	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name;
+			// THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
+			currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+			std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name;
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
             //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
             if(!std::filesystem::exists(tmpfilestr))
@@ -3337,10 +3339,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
             }
-	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF - SETTING 9
-	    {
-                std::string pdfpath = std::string(GetSettings(8).text()) + " ";
-		/*
+			if(currentfileitem.sig.compare("Pdf") == 0) // PDF - SETTING 9
+			{
+					std::string pdfpath = std::string(GetSettings(8).text()) + " ";
+			/*
                 bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
@@ -3353,21 +3355,21 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
-		*/
+			*/
                 pdfpath += tmpfilestr + " &";
                 //std::cout << "pdfpath: " << pdfpath << std::endl;
                 std::system(pdfpath.c_str());
                 /*
-		PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
-		pdfview->LoadPdf(curforimg, &currentfileitem);
-		pdfview->create();
-		pdfview->show(PLACEMENT_CURSOR);
+			PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
+			pdfview->LoadPdf(curforimg, &currentfileitem);
+			pdfview->create();
+			pdfview->show(PLACEMENT_CURSOR);
                 */
-	    }
-	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE - SETTING 8
-	    {
-                std::string imgpath = std::string(GetSettings(9).text()) + " ";
-		/*
+			}
+			else if(currentfileitem.cat.compare("Image") == 0) // IMAGE - SETTING 8
+			{
+					std::string imgpath = std::string(GetSettings(9).text()) + " ";
+			/*
                 bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
@@ -3381,17 +3383,17 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
                 delete[] tmpbuf;
-		*/
+			*/
                 imgpath += tmpfilestr + " &";
                 //std::cout << "imgpath: " << imgpath << std::endl;
                 std::system(imgpath.c_str());
                 /*
-		ImageViewer* imgview = new ImageViewer(this, "Image Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
-		imgview->LoadImage(curforimg, &currentfileitem);
-		imgview->create();
-		imgview->show(PLACEMENT_CURSOR);
+			ImageViewer* imgview = new ImageViewer(this, "Image Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
+			imgview->LoadImage(curforimg, &currentfileitem);
+			imgview->create();
+			imgview->show(PLACEMENT_CURSOR);
                 */
-	    }
+			}
             else if(currentfileitem.cat.compare("Video") == 0) // VIDEO - SETTING 6
             {
                 std::string vidpath = std::string(GetSettings(6).text()) + " ";
@@ -3434,14 +3436,14 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 htmlpath += tmpfilestr + " &";
                 std::system(htmlpath.c_str());
             }
-	    else // default should be hex viewer of the content
-	    {
+			else // default should be hex viewer of the content
+			{
                 std::string hexpath = std::string(GetSettings(10).text()) + " ";
 		/*
                 bool inmemory = false;
                 uint8_t* tmpbuf = NULL;
                 FILE* tmpfile = NULL;
-		std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
+				std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
                 //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
                 tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
                 GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
@@ -3457,13 +3459,14 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                 //std::cout << "hexpath: " << hexpath << std::endl;
                 std::system(hexpath.c_str());
                 /*
-		FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
-		HexViewer* hexview = new HexViewer(this, fileitemstr);
-                hexview->LoadHex(curforimg, &currentfileitem);
-		hexview->create();
-		hexview->show(PLACEMENT_CURSOR);
+				FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+				HexViewer* hexview = new HexViewer(this, fileitemstr);
+						hexview->LoadHex(curforimg, &currentfileitem);
+				hexview->create();
+				hexview->show(PLACEMENT_CURSOR);
                 */
-	    }
+			}
+			//UpdatePathFrame();
             this->getApp()->endWaitCursor();
         }
     }
@@ -3473,6 +3476,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
     // TEST FUNCTIONING OF WHETHER IT IS CHECKED...
     //bool iscurchecked = ((CheckTableItem*)tablelist->getItem(tablelist->getCurrentRow(), 0))->getCheck();
     //std::cout << "is current item checked: " << iscurchecked << std::endl;
+	
     return 1;
 }
 
