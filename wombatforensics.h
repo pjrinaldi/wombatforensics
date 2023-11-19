@@ -446,6 +446,7 @@ class WombatForensics : public FXMainWindow
 		//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, FXArray<uint>* clusterlist);
 		//FXString ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset);
         void UpdatePathFrame(int curiconid);
+		void UpdateRootDirectory(void);
 		void UpdatePartitions(void);
 		void UpdateForensicImages(void);
         void InitializeThumbCache(void);

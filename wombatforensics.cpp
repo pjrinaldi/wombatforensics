@@ -3227,6 +3227,67 @@ void WombatForensics::UpdatePartitions(void)
 	this->getApp()->endWaitCursor();
 }
 
+void WombatForensics::UpdateRootDirectory(void)
+{
+	currentfileitem.clear();
+	this->getApp()->beginWaitCursor();
+	fileitemvector.clear();
+	currentitem.forimg = curforimg;
+	currentitem.tmppath = tmppath.text();
+	int filecount = 0;
+	if(currentfileitem.gid == 0)
+		filecount = ReadDirectory(&currentitem, &fileitemvector, NULL);
+	else
+		filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+	//std::cout << "fileitem.gid after readdirectory: " << currentfileitem.name << " " << currentfileitem.gid << std::endl;
+	FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+	if(currentfileitem.gid > 0)
+		filefilestr += FXString::value(currentfileitem.gid) + ".";
+	//std::cout << "filefilestr after readdirectory: " << filefilestr.text() << std::endl;
+	// table initialization
+	tablelist->setTableSize(fileitemvector.size(), 14);
+	tablelist->setColumnText(0, "");
+	tablelist->setColumnText(1, "ID");
+	tablelist->setColumnText(2, "Name");
+	tablelist->setColumnText(3, "Path");
+	tablelist->setColumnText(4, "Size (bytes)");
+	tablelist->setColumnText(5, "Created (UTC)");
+	tablelist->setColumnText(6, "Accessed (UTC)");
+	tablelist->setColumnText(7, "Modified (UTC)");
+	tablelist->setColumnText(8, "Changed (UTC)");
+	tablelist->setColumnText(9, "Hash");
+	tablelist->setColumnText(10, "Category");
+	tablelist->setColumnText(11, "Signature");
+	tablelist->setColumnText(12, "Tagged");
+	tablelist->setColumnText(13, "Hash Match");
+	SortFileTable(&fileitemvector, filefilestr, filecount, sortindex, sortasc);
+	// table formatting
+	tablelist->fitColumnsToContents(0);
+	tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+	FitColumnContents(1);
+	FitColumnContents(2);
+	FitColumnContents(4);
+	FitColumnContents(10);
+	FitColumnContents(11);
+	AlignColumn(tablelist, 1, FXTableItem::LEFT);
+	AlignColumn(tablelist, 2, FXTableItem::LEFT);
+	AlignColumn(tablelist, 3, FXTableItem::LEFT);
+	AlignColumn(tablelist, 4, FXTableItem::LEFT);
+	AlignColumn(tablelist, 5, FXTableItem::LEFT);
+	AlignColumn(tablelist, 6, FXTableItem::LEFT);
+	AlignColumn(tablelist, 7, FXTableItem::LEFT);
+	AlignColumn(tablelist, 8, FXTableItem::LEFT);
+	AlignColumn(tablelist, 9, FXTableItem::LEFT);
+	AlignColumn(tablelist, 10, FXTableItem::LEFT);
+	AlignColumn(tablelist, 11, FXTableItem::LEFT);
+	if(sortindex == 1)
+		tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
+	// need to implement path toolbar here for the burrow and the partition and 
+	//std::cout << "need to load the root directory for the partition selected here." << std::endl;
+	//UpdatePathFrame();
+	this->getApp()->endWaitCursor();
+}
+
 long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 {
 	if(tablelist->getCurrentRow() > -1) // selection from table
@@ -3248,16 +3309,15 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 			currentitem.voloffset = *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4));
 			FXString* tmpstr = (FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0);
 			currentitem.itemtext = std::string(tmpstr->text());
-
 			// POPULATE THE PATH FRAME BUTTONS
 			UpdatePathFrame(curiconid);
+			// POPULATE THE ROOT DIRECTORY TO THE TABLELIST
+			UpdateRootDirectory();
+
 			/*
 			 *      
 		if(tablelist->getCurrentRow() > -1)
         {
-            currentitem.voloffset = *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4));
-            FXString* tmpstr = (FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0);
-            currentitem.itemtext = std::string(tmpstr->text());
             
             if(fileitemvector.size() > 0)
             {
