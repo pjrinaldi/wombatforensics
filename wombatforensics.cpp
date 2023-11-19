@@ -646,15 +646,12 @@ long WombatForensics::LoadForensicImages(FXObject*, FXSelector, void*)
 
 void WombatForensics::UpdatePathFrame(int iconid)
 {
-	//std::cout << "itemtype: " << itemtype << std::endl;
     std::cout << "frame children count: " << pathframe->numChildren() << std::endl;
     for(int i=pathframe->numChildren() - 1; i >= 0; i--)
 	{
 		pathframe->childAtIndex(i)->destroy();
 		delete pathframe->childAtIndex(i);
 	}
-	//pathframe->layout();
-	//pathframe->recalc();
 	if(iconid == forimgicon->id())
 	{
 		FXString forimgname = FXString(curforimg->ImageFileName().c_str());
@@ -663,6 +660,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
 		pf1->setIconPosition(ICON_BEFORE_TEXT);
 		pf1->setTipText("BURROW");
 		pf1->create();
+		// FORENSIC IMAGE BUTTON
 		FXButton* pf2 = new FXButton(pathframe, forimgname, curicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 		pf2->setIconPosition(ICON_BEFORE_TEXT);
 		pf2->setTipText(forimgname);
@@ -3129,6 +3127,85 @@ long WombatForensics::LoadCurrent(FXObject* sender, FXSelector, void*)
 }
 */
 
+void WombatForensics::UpdatePartitions(void)
+{
+	currentfileitem.clear();
+	volnames.clear();
+	volsizes.clear();
+	voloffsets.clear();
+	this->getApp()->beginWaitCursor();
+	LoadPartitions(curforimg, &volnames, &volsizes, &voloffsets);
+	// table initialization
+	tablelist->setTableSize(volnames.size(), 14);
+	tablelist->setColumnText(0, "");
+	tablelist->setColumnText(1, "ID");
+	tablelist->setColumnText(2, "Name");
+	tablelist->setColumnText(3, "Path");
+	tablelist->setColumnText(4, "Size (bytes)");
+	tablelist->setColumnText(5, "Created (UTC)");
+	tablelist->setColumnText(6, "Accessed (UTC)");
+	tablelist->setColumnText(7, "Modified (UTC)");
+	tablelist->setColumnText(8, "Changed (UTC)");
+	tablelist->setColumnText(9, "Hash");
+	tablelist->setColumnText(10, "Category");
+	tablelist->setColumnText(11, "Signature");
+	tablelist->setColumnText(12, "Tagged");
+	tablelist->setColumnText(13, "Hash Match");
+	// partiti/on information
+	for(int i=0; i < volnames.size(); i++)
+	{
+		FXFile volfile;
+		FXString volfilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(voloffsets.at(i));
+		bool isvolexist = volfile.open(volfilestr, FXIO::Reading, FXIO::OwnerReadWrite);
+		if(isvolexist == true)
+		{
+			char* gichar = new char[volfile.size()+1];
+			volfile.readBlock(gichar, volfile.size());
+			gichar[volfile.size()] = 0;
+			volfile.close();
+			globalid = FXString(gichar).toULong();
+			IncrementGlobalId(&globalid, &curid);
+			//std::cout << "global id when existing fs opened: " << globalid << std::endl;
+		}
+		else
+		{
+			IncrementGlobalId(&globalid, &curid);
+			//std::cout << "new vol globalid: " << globalid << " curid: " << curid << std::endl;
+			volfile.close();
+			FXFile::create(volfilestr, FXIO::OwnerReadWrite);
+			volfile.open(volfilestr, FXIO::Writing, FXIO::OwnerReadWrite);
+			FXString idval = FXString::value(globalid);
+			volfile.writeBlock(idval.text(), idval.length());
+			volfile.close();
+			//std::cout << "global id when not existing fs opened: " << globalid << std::endl;
+		}
+		//itemtype = 2;
+		pname = FXString(volnames.at(i).c_str());
+		//std::cout << "pname: " << pname.text() << std::endl;
+		tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
+		//tablelist->setItemData(i, 1, &itemtype);
+		tablelist->setItemText(i, 1, FXString::value(globalid));
+		globalid = curid;
+		tablelist->setItemData(i, 2, curforimg);
+		tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
+		tablelist->setItemIcon(i, 2, partitionicon);
+		tablelist->setItemData(i, 0, &pname);
+		tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
+		tablelist->setItemData(i, 4, &(voloffsets.at(i)));
+		tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
+		//std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
+	}
+	// table formatting
+	tablelist->fitColumnsToContents(0);
+	tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+	FitColumnContents(1);
+	FitColumnContents(2);
+	FitColumnContents(4);
+	AlignColumn(tablelist, 1, FXTableItem::LEFT);
+	AlignColumn(tablelist, 2, FXTableItem::LEFT);
+	this->getApp()->endWaitCursor();
+}
+
 long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 {
 	if(tablelist->getCurrentRow() > -1) // selection from table
@@ -3137,91 +3214,13 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
         curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
 		if(curiconid == forimgicon->id())
 		{
-			std::cout << "forensic image selected." << std::endl;
-			std::cout << "name: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
-			//curforimg = forimgvector.at(currentitem.forimgindex);
+			//std::cout << "forensic image selected." << std::endl;
+			//std::cout << "name: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
+			
 			// POPULATE THE PATH FRAME BUTTONS
 			UpdatePathFrame(curiconid);
 			// POPULATE THE PARTITIONS TO THE TABLELIST
-
-			//new FXButton(pathtoolbar, "itemtext test", NULL, this, ID_PARTITION, BUTTON_TOOLBAR|FRAME_RAISED);
-			//curbutton->setText(FXString(curforimg->ImageFileName().c_str()));
-			//pathtoolbar->forceRefresh();
-			currentfileitem.clear();
-			volnames.clear();
-			volsizes.clear();
-			voloffsets.clear();
-			this->getApp()->beginWaitCursor();
-			LoadPartitions(curforimg, &volnames, &volsizes, &voloffsets);
-			// table initialization
-			tablelist->setTableSize(volnames.size(), 14);
-			tablelist->setColumnText(0, "");
-			tablelist->setColumnText(1, "ID");
-			tablelist->setColumnText(2, "Name");
-			tablelist->setColumnText(3, "Path");
-			tablelist->setColumnText(4, "Size (bytes)");
-			tablelist->setColumnText(5, "Created (UTC)");
-			tablelist->setColumnText(6, "Accessed (UTC)");
-			tablelist->setColumnText(7, "Modified (UTC)");
-			tablelist->setColumnText(8, "Changed (UTC)");
-			tablelist->setColumnText(9, "Hash");
-			tablelist->setColumnText(10, "Category");
-			tablelist->setColumnText(11, "Signature");
-			tablelist->setColumnText(12, "Tagged");
-			tablelist->setColumnText(13, "Hash Match");
-			// partiti/on information
-			for(int i=0; i < volnames.size(); i++)
-			{
-				FXFile volfile;
-				FXString volfilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(voloffsets.at(i));
-				bool isvolexist = volfile.open(volfilestr, FXIO::Reading, FXIO::OwnerReadWrite);
-				if(isvolexist == true)
-				{
-					char* gichar = new char[volfile.size()+1];
-					volfile.readBlock(gichar, volfile.size());
-					gichar[volfile.size()] = 0;
-					volfile.close();
-					globalid = FXString(gichar).toULong();
-					IncrementGlobalId(&globalid, &curid);
-					//std::cout << "global id when existing fs opened: " << globalid << std::endl;
-				}
-				else
-				{
-					IncrementGlobalId(&globalid, &curid);
-					//std::cout << "new vol globalid: " << globalid << " curid: " << curid << std::endl;
-					volfile.close();
-					FXFile::create(volfilestr, FXIO::OwnerReadWrite);
-					volfile.open(volfilestr, FXIO::Writing, FXIO::OwnerReadWrite);
-					FXString idval = FXString::value(globalid);
-					volfile.writeBlock(idval.text(), idval.length());
-					volfile.close();
-					//std::cout << "global id when not existing fs opened: " << globalid << std::endl;
-				}
-				itemtype = 2;
-				pname = FXString(volnames.at(i).c_str());
-				//std::cout << "pname: " << pname.text() << std::endl;
-				tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
-				//tablelist->setItemData(i, 1, &itemtype);
-				tablelist->setItemText(i, 1, FXString::value(globalid));
-				globalid = curid;
-				tablelist->setItemData(i, 2, curforimg);
-				tablelist->setItemText(i, 2, FXString(volnames.at(i).c_str()));
-				tablelist->setItemIcon(i, 2, partitionicon);
-				tablelist->setItemData(i, 0, &pname);
-				tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
-				tablelist->setItemData(i, 4, &(voloffsets.at(i)));
-				tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
-				//std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
-			}
-			// table formatting
-			tablelist->fitColumnsToContents(0);
-			tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
-			FitColumnContents(1);
-			FitColumnContents(2);
-			FitColumnContents(4);
-			AlignColumn(tablelist, 1, FXTableItem::LEFT);
-			AlignColumn(tablelist, 2, FXTableItem::LEFT);
-			this->getApp()->endWaitCursor();
+			UpdatePartitions();
 		}
 	}
 	else // selection from path frame
