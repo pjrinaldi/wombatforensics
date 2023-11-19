@@ -645,12 +645,19 @@ void WombatForensics::UpdatePathFrame(void)
 		pathframe->childAtIndex(i)->destroy();
 		delete pathframe->childAtIndex(i);
 	}
-    //pathframe->layout();
-    //pathframe->recalc();
+    pathframe->layout();
+    pathframe->recalc();
     burrowbutton2 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
     burrowbutton2->setIconPosition(ICON_BEFORE_TEXT);
     burrowbutton2->setTipText("Burrow");
     burrowbutton2->create();
+	if(itemtype == 3)
+	{
+		FXButton* partbutton = new FXButton(pathframe, FXString(curforimg->ImageFileName().c_str()), curicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0,4,4,4,4);
+		partbutton->setIconPosition(ICON_BEFORE_TEXT);
+		partbutton->setTipText(FXString(curforimg->ImageFileName().c_str()));
+		partbutton->create();
+	}
 }
 
 void WombatForensics::UpdateForensicImages()
