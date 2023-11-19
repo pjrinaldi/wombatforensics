@@ -661,7 +661,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
 		pf1->setTipText("BURROW");
 		pf1->create();
 		// FORENSIC IMAGE BUTTON
-		FXButton* pf2 = new FXButton(pathframe, forimgname, curicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+		FXButton* pf2 = new FXButton(pathframe, forimgname, forimgicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 		pf2->setIconPosition(ICON_BEFORE_TEXT);
 		pf2->setTipText(forimgname);
 		pf2->create();
@@ -676,12 +676,16 @@ void WombatForensics::UpdatePathFrame(int iconid)
 		pf1->setTipText("BURROW");
 		pf1->create();
 		// FORENSIC IMAGE BUTTON
-		FXButton* pf2 = new FXButton(pathframe, forimgname, curicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+		FXButton* pf2 = new FXButton(pathframe, forimgname, forimgicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 		pf2->setIconPosition(ICON_BEFORE_TEXT);
 		pf2->setTipText(forimgname);
 		pf2->create();
 		// PARTITION BUTTON
-		FXButton* pf3 = new FXButton(pathframe, 
+		FXString partname = FXString(currentitem.itemtext.c_str());
+		FXButton* pf3 = new FXButton(pathframe, partname, curicon, this, ID_BACK, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+		pf3->setIconPosition(ICON_BEFORE_TEXT);
+		pf3->setTipText(partname);
+		pf3->create();
 	}
 	/*
     //pathframe->layout();
