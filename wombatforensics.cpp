@@ -666,6 +666,23 @@ void WombatForensics::UpdatePathFrame(int iconid)
 		pf2->setTipText(forimgname);
 		pf2->create();
 	}
+	else if(iconid == partitionicon->id()) // PARTITION SELECTED
+	{
+		std::cout << " add the burrow, forimg, and partition buttons." << std::endl;
+		FXString forimgname = FXString(curforimg->ImageFileName().c_str());
+		// BURROW BUTTON
+		FXButton* pf1 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+		pf1->setIconPosition(ICON_BEFORE_TEXT);
+		pf1->setTipText("BURROW");
+		pf1->create();
+		// FORENSIC IMAGE BUTTON
+		FXButton* pf2 = new FXButton(pathframe, forimgname, curicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+		pf2->setIconPosition(ICON_BEFORE_TEXT);
+		pf2->setTipText(forimgname);
+		pf2->create();
+		// PARTITION BUTTON
+		FXButton* pf3 = new FXButton(pathframe, 
+	}
 	/*
     //pathframe->layout();
     //pathframe->recalc();
@@ -3212,7 +3229,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	{
 		curiconid = tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id();
         curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
-		if(curiconid == forimgicon->id())
+		if(curiconid == forimgicon->id()) // FORENSIC IMAGE SELECTED
 		{
 			//std::cout << "forensic image selected." << std::endl;
 			//std::cout << "name: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
@@ -3221,6 +3238,97 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 			UpdatePathFrame(curiconid);
 			// POPULATE THE PARTITIONS TO THE TABLELIST
 			UpdatePartitions();
+		}
+		else if(curiconid == partitionicon->id()) // PARTITION SELECTED
+		{
+			currentitem.voloffset = *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4));
+			FXString* tmpstr = (FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0);
+			currentitem.itemtext = std::string(tmpstr->text());
+
+			// POPULATE THE PATH FRAME BUTTONS
+			UpdatePathFrame(curiconid);
+			/*
+			 *      
+		if(tablelist->getCurrentRow() > -1)
+        {
+            currentitem.voloffset = *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4));
+            FXString* tmpstr = (FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0);
+            currentitem.itemtext = std::string(tmpstr->text());
+            
+            if(fileitemvector.size() > 0)
+            {
+                currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+                if(currentfileitem.isdirectory)
+                pathtext += FXString(currentfileitem.name.c_str()) + "/";
+                //std::cout << "pathtext: " << pathtext.text() << std::endl;
+                //std::cout << "curitem path: " << currentfileitem.path << std::endl;
+                //std::cout << "curitem name: " << currentfileitem.name << std::endl;
+            }
+            else
+                currentfileitem.clear();
+        }
+        //std::cout << currentfileitem.name << " " << currentfileitem.gid << " " << pathtext.text() << std::endl;
+        // THIS WILL BE THE PATH TO WHATEVER FOLDER FILE WE ARE IN AS I BUILD IT.
+        //backbutton->setText(pathtext);
+        //backbutton->setData("globalid"); - someway to load the right directory - maybe the curfileitem pointer...
+        // will worry about this later...
+        this->getApp()->beginWaitCursor();
+        fileitemvector.clear();
+        currentitem.forimg = curforimg;
+        currentitem.tmppath = tmppath.text();
+        int filecount = 0;
+        if(currentfileitem.gid == 0)
+            filecount = ReadDirectory(&currentitem, &fileitemvector, NULL);
+        else
+            filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+        //std::cout << "fileitem.gid after readdirectory: " << currentfileitem.name << " " << currentfileitem.gid << std::endl;
+        FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
+        if(currentfileitem.gid > 0)
+            filefilestr += FXString::value(currentfileitem.gid) + ".";
+        //std::cout << "filefilestr after readdirectory: " << filefilestr.text() << std::endl;
+        // table initialization
+        tablelist->setTableSize(fileitemvector.size(), 14);
+        tablelist->setColumnText(0, "");
+        tablelist->setColumnText(1, "ID");
+        tablelist->setColumnText(2, "Name");
+        tablelist->setColumnText(3, "Path");
+        tablelist->setColumnText(4, "Size (bytes)");
+        tablelist->setColumnText(5, "Created (UTC)");
+        tablelist->setColumnText(6, "Accessed (UTC)");
+        tablelist->setColumnText(7, "Modified (UTC)");
+        tablelist->setColumnText(8, "Changed (UTC)");
+        tablelist->setColumnText(9, "Hash");
+        tablelist->setColumnText(10, "Category");
+        tablelist->setColumnText(11, "Signature");
+        tablelist->setColumnText(12, "Tagged");
+        tablelist->setColumnText(13, "Hash Match");
+        SortFileTable(&fileitemvector, filefilestr, filecount, sortindex, sortasc);
+        // table formatting
+        tablelist->fitColumnsToContents(0);
+        tablelist->setColumnWidth(0, tablelist->getColumnWidth(0) + 25);
+        FitColumnContents(1);
+        FitColumnContents(2);
+        FitColumnContents(4);
+        FitColumnContents(10);
+        FitColumnContents(11);
+        AlignColumn(tablelist, 1, FXTableItem::LEFT);
+        AlignColumn(tablelist, 2, FXTableItem::LEFT);
+        AlignColumn(tablelist, 3, FXTableItem::LEFT);
+        AlignColumn(tablelist, 4, FXTableItem::LEFT);
+        AlignColumn(tablelist, 5, FXTableItem::LEFT);
+        AlignColumn(tablelist, 6, FXTableItem::LEFT);
+        AlignColumn(tablelist, 7, FXTableItem::LEFT);
+        AlignColumn(tablelist, 8, FXTableItem::LEFT);
+        AlignColumn(tablelist, 9, FXTableItem::LEFT);
+        AlignColumn(tablelist, 10, FXTableItem::LEFT);
+        AlignColumn(tablelist, 11, FXTableItem::LEFT);
+        if(sortindex == 1)
+            tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
+        // need to implement path toolbar here for the burrow and the partition and 
+        //std::cout << "need to load the root directory for the partition selected here." << std::endl;
+        UpdatePathFrame();
+        this->getApp()->endWaitCursor();
+			 */ 
 		}
 	}
 	else // selection from path frame
