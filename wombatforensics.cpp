@@ -3395,8 +3395,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		    pathtext += FXString(currentfileitem.name.c_str()) + "/";
 	    }
 	    std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
-	    std::cout << "curitem path: " << currentfileitem.path << std::endl;
-	    std::cout << "curitem name: " << currentfileitem.name << std::endl;
+	    //std::cout << "curitem path: " << currentfileitem.path << std::endl;
+	    //std::cout << "curitem name: " << currentfileitem.name << std::endl;
 	    // POPULATE THE PATH FRAME BUTTONS
 	    UpdatePathFrame(curiconid);
 	    // POPULATE THE CHILD DIRECTORY TO THE TABLELIST
