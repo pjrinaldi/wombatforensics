@@ -329,11 +329,11 @@ class WombatForensics : public FXMainWindow
             ID_XCHOMP = 81,
             ID_MANAGECARVED = 80,
             ID_TREESELECT = 101,
-			ID_MANAGETAGS = 102,
-			ID_PREVIEW = 103,
-			ID_PUBLISH = 104,
-			ID_ABOUT = 105,
-			ID_TABLESELECT = 106,
+	    ID_MANAGETAGS = 102,
+	    ID_PREVIEW = 103,
+	    ID_PUBLISH = 104,
+	    ID_ABOUT = 105,
+	    ID_TABLESELECT = 106,
             ID_TAGMENU = 107,
             ID_NEWTAG = 108,
             ID_SETTAG = 109,
@@ -346,10 +346,10 @@ class WombatForensics : public FXMainWindow
             ID_ASCTEXT = 116,
             ID_SCROLLBAR = 117,
             ID_HOME = 118,
-			ID_PARTITION = 119,
-			ID_BACK = 120,
-			ID_FRWD = 121,
-			ID_CURRENT = 122,
+	    ID_PARTITION = 119,
+	    ID_BACK = 120,
+	    ID_FRWD = 121,
+	    ID_CURRENT = 122,
             ID_TABLEHEADER = 123,
             ID_BINARY = 124,
             ID_CONTENTS = 125,
@@ -446,9 +446,10 @@ class WombatForensics : public FXMainWindow
 		//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, FXArray<uint>* clusterlist);
 		//FXString ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset);
         void UpdatePathFrame(int curiconid);
-		void UpdateRootDirectory(void);
-		void UpdatePartitions(void);
-		void UpdateForensicImages(void);
+	void UpdateChildDirectory(void);
+	void UpdateRootDirectory(void);
+	void UpdatePartitions(void);
+	void UpdateForensicImages(void);
         void InitializeThumbCache(void);
 
         void LogEntry(FXString logstring)
