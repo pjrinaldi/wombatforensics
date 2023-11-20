@@ -152,7 +152,12 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 						if(extname.size() > 0)
 							tmpitem.name += "." + extname;
 					}
-					tmpitem.path = "/";
+					if(curfileitem == NULL)
+					    tmpitem.path = "/";
+					else
+					    tmpitem.path = curfileitem->path + curfileitem->name + "/";
+					//std::cout << "tmpitem.path: " << tmpitem.path << std::endl;
+					//tmpitem.path = "/";
 					//std::cout << "file name: " << filename << std::endl;
 					longnamestring = "";
 					// LOGICAL FILE SIZE

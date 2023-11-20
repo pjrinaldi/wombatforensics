@@ -3239,10 +3239,10 @@ void WombatForensics::UpdateRootDirectory(void)
     currentitem.forimg = curforimg;
     currentitem.tmppath = tmppath.text();
     int filecount = 0;
-    if(currentfileitem.gid == 0)
+    //if(currentfileitem.gid == 0)
 	filecount = ReadDirectory(&currentitem, &fileitemvector, NULL);
-    else
-	filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
+    //else
+	//filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
     //std::cout << "fileitem.gid after readdirectory: " << currentfileitem.name << " " << currentfileitem.gid << std::endl;
     FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
     if(currentfileitem.gid > 0)
@@ -3304,9 +3304,9 @@ void WombatForensics::UpdateChildDirectory(void)
     currentitem.forimg = curforimg;
     currentitem.tmppath = tmppath.text();
     int filecount = 0;
-    if(currentfileitem.gid == 0)
-	filecount = ReadDirectory(&currentitem, &fileitemvector, NULL);
-    else
+    //if(currentfileitem.gid == 0)
+	//filecount = ReadDirectory(&currentitem, &fileitemvector, NULL);
+    //else
 	filecount = ReadDirectory(&currentitem, &fileitemvector, &currentfileitem);
     //std::cout << "fileitem.gid after readdirectory: " << currentfileitem.name << " " << currentfileitem.gid << std::endl;
     FXString filefilestr = tmppath + "burrow/" + FXString(curforimg->ImageFileName().c_str()) + "." + FXString::value(currentitem.voloffset) + ".";
@@ -3395,6 +3395,45 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		    pathtext += FXString(currentfileitem.name.c_str()) + "/";
 	    }
 	    std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
+	    FXArray<FXint> posarray;
+	    int found = 0;
+	    posarray.append(-1);
+	    while(found > -1)
+	    {
+		found = pathtext.find("/", found+1);
+		if(found > -1)
+		    posarray.append(found);
+	    }
+	    posarray.append(pathtext.length());
+	    if(posarray.no() > 1)
+	    {
+		for(int i=0; i < posarray.no(); i++)
+		{
+		    std::cout << "posarray: " << posarray.at(i) << std::endl;
+		    //std::cout << "path part " << i << ": " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
+		}
+	    }
+	    /*
+		// INITIALIZE BINARIES VECTOR FOR "OPEN WITH" MENU
+		FXArray<FXint> posarray;
+		int found = 0;
+		posarray.append(-1);
+		while(found > -1)
+		{
+		    found = currentviewers.find("|", found+1);
+		    if(found > -1)
+			posarray.append(found);
+		}
+		posarray.append(currentviewers.length());
+		if(posarray.no() > 1)
+		{
+		    binaries.clear();
+		    for(int i=0; i < posarray.no() - 1; i++)
+			binaries.push_back(currentviewers.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text());
+		}
+		if(currentviewers.length() > 0 && posarray.no() == 1)
+		    binaries.push_back(currentviewers.text());
+	     */ 
 	    //std::cout << "curitem path: " << currentfileitem.path << std::endl;
 	    //std::cout << "curitem name: " << currentfileitem.name << std::endl;
 	    // POPULATE THE PATH FRAME BUTTONS
@@ -4104,6 +4143,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
     {
         if(filecount == 0)
         {
+	    //std::cout << "fileitem path: " << fileitems->at(i).path.c_str() << "/" << std::endl;
             IncrementGlobalId(&globalid, &curid);
             fileitems->at(i).gid = globalid;
             FXFile filefile;
@@ -4115,7 +4155,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             fileval += FXString::value(fileitems->at(i).isdirectory) + "|"; //  2
             fileval += FXString::value(fileitems->at(i).size) + "|"; //         3
             fileval += FXString(fileitems->at(i).name.c_str()) + "|"; //        4
-            fileval += FXString(fileitems->at(i).path.c_str()) + "|"; //        5
+            fileval += FXString(fileitems->at(i).path.c_str()) + "/|"; //        5
             fileval += FXString(fileitems->at(i).create.c_str()) + "|"; //      6
             fileval += FXString(fileitems->at(i).access.c_str()) + "|"; //      7
             fileval += FXString(fileitems->at(i).modify.c_str()) + "|"; //      8
@@ -4176,7 +4216,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             }
         }
         tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
-        tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()));
+        tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()) + "/");
         tablelist->setItemData(i, 3, &(fileitems->at(i).layout));
         tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(fileitems->at(i).size).c_str()));
         tablelist->setItemData(i, 4, &(currentitem.voloffset));
