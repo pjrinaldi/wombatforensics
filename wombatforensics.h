@@ -99,8 +99,7 @@ FXDEFMAP(CheckTableItem) CheckTableItemMap[] = {
   FXMAPFUNC(SEL_COMMAND, CheckTableItem::ID_CHECK, CheckTableItem::onCheck),
 };
 
-FXIMPLEMENT(CheckTableItem, FXTableItem, CheckTableItemMap,
-ARRAYNUMBER(CheckTableItemMap))
+FXIMPLEMENT(CheckTableItem, FXTableItem, CheckTableItemMap, ARRAYNUMBER(CheckTableItemMap))
 
 // Construct new table item
 CheckTableItem::CheckTableItem(FXTable *table, FXIcon *ic, void *ptr, FXString str):FXTableItem(str,ic,ptr)
@@ -258,6 +257,7 @@ class WombatForensics : public FXMainWindow
         FXString filetext;
         FXString currentviewers;
         FXString pname;
+	FXArray<FXString> childpaths;
         
         FXFile tagsfile;
         FXFile logfile;

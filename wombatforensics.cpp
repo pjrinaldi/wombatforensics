@@ -689,7 +689,33 @@ void WombatForensics::UpdatePathFrame(int iconid)
     }
     else if(iconid == defaultfoldericon->id()) // CHILD DIRECTORY SELECTED
     {
-	std::cout << "add the burrow, forimg, partition, and child directory path buttons" << std::endl;
+	//std::cout << "add the burrow, forimg, partition, and child directory path buttons" << std::endl;
+	FXString forimgname = FXString(curforimg->ImageFileName().c_str());
+	// BURROW BUTTON
+	FXButton* pf1 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	pf1->setIconPosition(ICON_BEFORE_TEXT);
+	pf1->setTipText("BURROW");
+	pf1->create();
+	// FORENSIC IMAGE BUTTON
+	FXButton* pf2 = new FXButton(pathframe, forimgname, forimgicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	pf2->setIconPosition(ICON_BEFORE_TEXT);
+	pf2->setTipText(forimgname);
+	pf2->create();
+	// PARTITION BUTTON
+	FXString partname = FXString(currentitem.itemtext.c_str());
+	FXButton* pf3 = new FXButton(pathframe, partname, curicon, this, ID_BACK, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	pf3->setIconPosition(ICON_BEFORE_TEXT);
+	pf3->setTipText(partname);
+	pf3->create();
+	// ADD RESPECTIVE PATH BUTTONS
+	for(int i=0; i < childpaths.no(); i++)
+	{
+	    FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), backicon, this, ID_FRWD, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	    tmppf->setIconPosition(ICON_BEFORE_TEXT);
+	    tmppf->setTipText(childpaths.at(i));
+	    tmppf->create();
+	    std::cout << "child paths " << i << ": " << childpaths.at(i).text() << std::endl;
+	}
     }
     /*
     //pathframe->layout();
@@ -3385,6 +3411,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	}
 	else if(curiconid == defaultfoldericon->id()) // FOLDER SELECTED
 	{
+	    std::cout << "pathtext once folder is selected: " << pathtext.text() << std::endl;
 	    currentitem.voloffset = *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4));
 	    FXString* tmpstr = (FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0);
 	    currentitem.itemtext = std::string(tmpstr->text());
@@ -3394,8 +3421,10 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		if(currentfileitem.isdirectory)
 		    pathtext += FXString(currentfileitem.name.c_str()) + "/";
 	    }
-	    std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
+	    //std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
+	    childpaths.clear();
 	    FXArray<FXint> posarray;
+	    posarray.clear();
 	    int found = 0;
 	    //posarray.append(-1);
 	    posarray.append(0);
@@ -3413,13 +3442,15 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		    if(i == 0)
 		    {
 			// ADD ROOT BUTTON HERE
+			childpaths.append("/");
 			//std::cout << "root path: " << "/" << std::endl;
 		    }
 		    else
 		    {
 			// ADD CHILD PATH PARENT DIRECTORIES HERE
-			std::cout << "posarray: " << posarray.at(i) << std::endl;
-			std::cout << "parent dir: " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
+			//std::cout << "posarray: " << posarray.at(i) << std::endl;
+			//std::cout << "parent dir: " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
+			childpaths.append(pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1));
 		    }
 		    //std::cout << "path part " << i << ": " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
 		}
