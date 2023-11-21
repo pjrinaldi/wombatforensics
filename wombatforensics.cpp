@@ -3397,17 +3397,18 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
 	    FXArray<FXint> posarray;
 	    int found = 0;
-	    posarray.append(-1);
+	    //posarray.append(-1);
+	    posarray.append(0);
 	    while(found > -1)
 	    {
 		found = pathtext.find("/", found+1);
 		if(found > -1)
 		    posarray.append(found);
 	    }
-	    posarray.append(pathtext.length());
+	    //posarray.append(pathtext.length());
 	    if(posarray.no() > 1)
 	    {
-		for(int i=0; i < posarray.no(); i++)
+		for(int i=0; i < posarray.no() - 1; i++)
 		{
 		    std::cout << "posarray: " << posarray.at(i) << std::endl;
 		    //std::cout << "path part " << i << ": " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
