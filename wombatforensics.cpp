@@ -3410,7 +3410,17 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    {
 		for(int i=0; i < posarray.no() - 1; i++)
 		{
-		    std::cout << "posarray: " << posarray.at(i) << std::endl;
+		    if(i == 0)
+		    {
+			// ADD ROOT BUTTON HERE
+			//std::cout << "root path: " << "/" << std::endl;
+		    }
+		    else
+		    {
+			// ADD CHILD PATH PARENT DIRECTORIES HERE
+			std::cout << "posarray: " << posarray.at(i) << std::endl;
+			std::cout << "parent dir: " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
+		    }
 		    //std::cout << "path part " << i << ": " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
 		}
 	    }
