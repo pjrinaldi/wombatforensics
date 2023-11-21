@@ -70,8 +70,7 @@ class CheckTableItem : public FXTableItem
 
     FXCheckButton   *check;
 
-    virtual void drawContent(const FXTable* table,FXDC& dc,FXint
-x,FXint y,FXint w,FXint h) const;
+    virtual void drawContent(const FXTable* table,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const;
 
   public:
 
@@ -104,8 +103,7 @@ FXIMPLEMENT(CheckTableItem, FXTableItem, CheckTableItemMap,
 ARRAYNUMBER(CheckTableItemMap))
 
 // Construct new table item
-CheckTableItem::CheckTableItem(FXTable *table, FXIcon *ic, void *ptr, FXString str):
-    FXTableItem(str,ic,ptr)
+CheckTableItem::CheckTableItem(FXTable *table, FXIcon *ic, void *ptr, FXString str):FXTableItem(str,ic,ptr)
 {
     Table = table;
     Target = table->getTarget();
@@ -118,8 +116,7 @@ CheckTableItem::CheckTableItem(FXTable *table, FXIcon *ic, void *ptr, FXString s
 //
 //	drawContent - override
 //
-void CheckTableItem::drawContent(const FXTable *table, FXDC &dc,
-    FXint x, FXint y, FXint w, FXint h) const
+void CheckTableItem::drawContent(const FXTable *table, FXDC &dc, FXint x, FXint y, FXint w, FXint h) const
 {
     check->position(x+1,y+1,w-2,h-2);
     return;
@@ -131,11 +128,11 @@ void CheckTableItem::drawContent(const FXTable *table, FXDC &dc,
 long CheckTableItem::onCheck(FXObject *, FXSelector, void *vp)
 {
     if (Target) {
-		FXTableRange tablerange;
-		tablerange.fm.row = tablerange.to.row = Table->rowAtY(check->getY());
-		tablerange.fm.col = tablerange.to.col = Table->colAtX(check->getX());
-		//fxmessage("[%d,%d] = %p\n", tablerange.fm.row, tablerange.fm.col, vp);
-		Target->handle(this, FXSEL(SEL_REPLACED,Selector), &tablerange);
+	FXTableRange tablerange;
+	tablerange.fm.row = tablerange.to.row = Table->rowAtY(check->getY());
+	tablerange.fm.col = tablerange.to.col = Table->colAtX(check->getX());
+	//fxmessage("[%d,%d] = %p\n", tablerange.fm.row, tablerange.fm.col, vp);
+	Target->handle(this, FXSEL(SEL_REPLACED,Selector), &tablerange);
     }
     return 1;
 }
@@ -461,7 +458,7 @@ class WombatForensics : public FXMainWindow
         };
 	void StatusUpdate(FXString tmptext)
 	{
-		statusbar->getStatusLine()->setNormalText(tmptext);
+	    statusbar->getStatusLine()->setNormalText(tmptext);
 	};
         virtual void create();
 
