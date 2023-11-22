@@ -715,7 +715,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	    tmppf->setIconPosition(ICON_BEFORE_TEXT);
 	    tmppf->setTipText(childpaths.at(i));
 	    tmppf->create();
-	    std::cout << "child paths " << i << ": " << childpaths.at(i).text() << std::endl;
+	    //std::cout << "child paths " << i << ": " << childpaths.at(i).text() << std::endl;
 	}
     }
     /*
@@ -3412,7 +3412,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	}
 	else if(curiconid == defaultfoldericon->id()) // FOLDER SELECTED
 	{
-	    std::cout << "pathtext once folder is selected: " << pathtext.text() << std::endl;
+	    //std::cout << "pathtext once folder is selected: " << pathtext.text() << std::endl;
 	    currentitem.voloffset = *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4));
 	    FXString* tmpstr = (FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 0);
 	    currentitem.itemtext = std::string(tmpstr->text());
@@ -3422,7 +3422,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		if(currentfileitem.isdirectory)
 		    pathtext += FXString(currentfileitem.name.c_str()) + "/";
 	    }
-	    std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
+	    //std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
 	    childpaths.clear();
 	    FXArray<FXint> posarray;
 	    posarray.clear();
@@ -3435,7 +3435,19 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		if(found > -1)
 		    posarray.append(found);
 	    }
+	    /*
+	    std::cout << "posarray: ";
+	    for(int i=0; i < posarray.no() - 1; i++)
+		std::cout << posarray.at(i) << ",";
+	    std::cout << std::endl;
+	    */
+	    std::cout << "path text progress" << std::endl;
+	    for(int i=0; i < posarray.no() - 2; i++)
+	    {
+		std::cout << pathtext.mid(posarray.at(i)+1, posarray.at(i+1)).text() << std::endl;
+	    }
 	    //posarray.append(pathtext.length());
+	    /*
 	    if(posarray.no() > 1)
 	    {
 		for(int i=0; i < posarray.no() - 1; i++)
@@ -3443,19 +3455,23 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		    if(i == 0)
 		    {
 			// ADD ROOT BUTTON HERE
+			std::cout << "posarray: " << posarray.at(i) << std::endl;
 			childpaths.append("/");
 			//std::cout << "root path: " << "/" << std::endl;
 		    }
 		    else
 		    {
 			// ADD CHILD PATH PARENT DIRECTORIES HERE
-			//std::cout << "posarray: " << posarray.at(i) << std::endl;
+			std::cout << "posarray: " << posarray.at(i) << std::endl;
 			//std::cout << "parent dir: " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
 			childpaths.append(pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1));
 		    }
+		    std::cout << "posarray: " << posarray.at(posarray.no() - 1) << std::endl;
 		    //std::cout << "path part " << i << ": " << pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text() << std::endl;
 		}
+		std::cout << "pathtext: " << pathtext.text() << std::endl;
 	    }
+	    */
 	    /*
 		// INITIALIZE BINARIES VECTOR FOR "OPEN WITH" MENU
 		FXArray<FXint> posarray;
