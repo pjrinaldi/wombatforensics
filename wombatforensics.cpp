@@ -654,6 +654,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
     }
     if(iconid == forimgicon->id())
     {
+	pathtext = "/";
 	FXString forimgname = FXString(curforimg->ImageFileName().c_str());
 	// BURROW BUTTON
 	FXButton* pf1 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
@@ -3421,7 +3422,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		if(currentfileitem.isdirectory)
 		    pathtext += FXString(currentfileitem.name.c_str()) + "/";
 	    }
-	    //std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
+	    std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
 	    childpaths.clear();
 	    FXArray<FXint> posarray;
 	    posarray.clear();
