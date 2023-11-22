@@ -3441,10 +3441,13 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 		std::cout << posarray.at(i) << ",";
 	    std::cout << std::endl;
 	    */
-	    std::cout << "path text progress" << std::endl;
+	    childpaths.append("/");
+	    //std::cout << "path text progress" << std::endl;
+	    //std::cout << "/" << std::endl;
 	    for(int i=0; i < posarray.no() - 2; i++)
 	    {
-		std::cout << pathtext.mid(posarray.at(i)+1, posarray.at(i+1)).text() << std::endl;
+		childpaths.append(pathtext.mid(posarray.at(i)+1, posarray.at(i+1)));
+		//std::cout << pathtext.mid(posarray.at(i)+1, posarray.at(i+1)).text() << std::endl;
 	    }
 	    //posarray.append(pathtext.length());
 	    /*
