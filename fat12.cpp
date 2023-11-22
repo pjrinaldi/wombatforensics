@@ -156,7 +156,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 					    tmpitem.path = "/";
 					else
 					    tmpitem.path = curfileitem->path + curfileitem->name + "/";
-					//std::cout << "tmpitem.path: " << tmpitem.path << std::endl;
+					std::cout << "tmpitem.path: " << tmpitem.path << std::endl;
 					//tmpitem.path = "/";
 					//std::cout << "file name: " << filename << std::endl;
 					longnamestring = "";

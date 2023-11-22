@@ -4205,7 +4205,22 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
     {
         if(filecount == 0)
         {
-	    //std::cout << "fileitem path: " << fileitems->at(i).path.c_str() << "/" << std::endl;
+	    std::cout << "fileitem path size: " << fileitems->at(i).path.size() << std::endl;
+	    std::cout << "fileitem path: " << fileitems->at(i).path << std::endl;
+	    char* tmpchar = new char[fileitems->at(i).path.size() + 1];
+	    std::cout << "char way: ";
+	    for(int j=0; j < fileitems->at(i).path.size(); j++)
+	    {
+		std::cout << fileitems->at(i).path.at(j);
+		tmpchar[j] = fileitems->at(i).path.at(j);
+	    }
+	    tmpchar[fileitems->at(i).path.size()] = '\0';
+	    // not sure why the std string isn't converting to c_str() properly..
+	    std::cout << std::endl;
+	    std::cout << "tmpchar: " << tmpchar << std::endl;
+
+	    //FXString testpath(fileitems->at(i).path.c_str());
+	    //std::cout << "fileitem path from fxstring: " << testpath.text() << std::endl;
             IncrementGlobalId(&globalid, &curid);
             fileitems->at(i).gid = globalid;
             FXFile filefile;
@@ -4217,12 +4232,12 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             fileval += FXString::value(fileitems->at(i).isdirectory) + "|"; //  2
             fileval += FXString::value(fileitems->at(i).size) + "|"; //         3
             fileval += FXString(fileitems->at(i).name.c_str()) + "|"; //        4
-            fileval += FXString(fileitems->at(i).path.c_str()) + "/|"; //        5
+            fileval += FXString(fileitems->at(i).path.c_str()) + "|"; //        5
             fileval += FXString(fileitems->at(i).create.c_str()) + "|"; //      6
             fileval += FXString(fileitems->at(i).access.c_str()) + "|"; //      7
             fileval += FXString(fileitems->at(i).modify.c_str()) + "|"; //      8
             fileval += FXString(fileitems->at(i).layout.c_str()) + "|"; //      9
-            fileval += FXString::value(fileitems->at(i).isvirtual) + "|"; //   10
+            fileval += FXString::value(fileitems->at(i).isvirtual) + "|"; //    10
             fileval += FXString(fileitems->at(i).cat.c_str()) + "|"; //         11
             fileval += FXString(fileitems->at(i).sig.c_str()) + "|"; //         12
             fileval += FXString(fileitems->at(i).hash.c_str()) + "|"; //        13
@@ -4278,7 +4293,8 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             }
         }
         tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
-        tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()) + "/");
+        tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()));
+        //tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()) + "/");
         tablelist->setItemData(i, 3, &(fileitems->at(i).layout));
         tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(fileitems->at(i).size).c_str()));
         tablelist->setItemData(i, 4, &(currentitem.voloffset));
