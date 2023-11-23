@@ -344,9 +344,11 @@ class WombatForensics : public FXMainWindow
             ID_SCROLLBAR = 117,
             ID_HOME = 118,
 	    ID_PARTITION = 119,
-	    ID_BACK = 120,
-	    ID_FRWD = 121,
-	    ID_CURRENT = 122,
+	    ID_ROOTDIRECTORY = 120,
+	    ID_CHILDDIRECTORY = 121,
+	    //ID_BACK = 120,
+	    //ID_FRWD = 121,
+	    //ID_CURRENT = 122,
             ID_TABLEHEADER = 123,
             ID_BINARY = 124,
             ID_CONTENTS = 125,
@@ -376,6 +378,8 @@ class WombatForensics : public FXMainWindow
         long LoadCurrentPath(FXObject*, FXSelector, void*);
         long LoadCurrentFile(FXObject*, FXSelector, void*);
 	*/
+	long DisplayPartitions(FXObject* sender, FXSelector, void*);
+	long DisplayRootDirectory(FXObject* sender, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
         long OpenViewerManager(FXObject*, FXSelector, void*);
@@ -477,6 +481,8 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_DIGDEEPER, WombatForensics::OpenDigDeeper),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MANAGEHASH, WombatForensics::OpenManageHashList),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HOME, WombatForensics::LoadForensicImages),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PARTITION, WombatForensics::DisplayPartitions),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ROOTDIRECTORY, WombatForensics::DisplayRootDirectory),
     //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CURRENT, WombatForensics::LoadCurrent),
     //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_BACK, WombatForensics::LoadCurrentPath),
     //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_FRWD, WombatForensics::LoadCurrentFile),

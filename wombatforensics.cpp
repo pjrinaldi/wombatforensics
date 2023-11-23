@@ -683,7 +683,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	pf2->create();
 	// PARTITION BUTTON
 	FXString partname = FXString(currentitem.itemtext.c_str());
-	FXButton* pf3 = new FXButton(pathframe, partname, curicon, this, ID_BACK, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	FXButton* pf3 = new FXButton(pathframe, partname, curicon, this, ID_ROOTDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 	pf3->setIconPosition(ICON_BEFORE_TEXT);
 	pf3->setTipText(partname);
 	pf3->create();
@@ -704,14 +704,14 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	pf2->create();
 	// PARTITION BUTTON
 	FXString partname = FXString(currentitem.itemtext.c_str());
-	FXButton* pf3 = new FXButton(pathframe, partname, curicon, this, ID_BACK, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	FXButton* pf3 = new FXButton(pathframe, partname, curicon, this, ID_ROOTDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 	pf3->setIconPosition(ICON_BEFORE_TEXT);
 	pf3->setTipText(partname);
 	pf3->create();
 	// ADD RESPECTIVE PATH BUTTONS
 	for(int i=0; i < childpaths.no(); i++)
 	{
-	    FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), backicon, this, ID_FRWD, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	    FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), backicon, this, ID_CHILDDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 	    tmppf->setIconPosition(ICON_BEFORE_TEXT);
 	    tmppf->setTipText(childpaths.at(i));
 	    tmppf->create();
@@ -3178,6 +3178,27 @@ long WombatForensics::LoadCurrent(FXObject* sender, FXSelector, void*)
     return 1;
 }
 */
+long WombatForensics::DisplayPartitions(FXObject* sender, FXSelector, void*)
+{
+    itemtext = ((FXButton*)sender)->getText();
+    //std::cout << "item text: " << itemtext.text() << std::endl;
+    fileitemvector.clear();
+    curiconid = forimgicon->id();
+    UpdatePathFrame(curiconid);
+    UpdatePartitions();
+    //long ret = LoadChildren(NULL, 0, NULL);
+    
+    return 1;
+}
+
+long WombatForensics::DisplayRootDirectory(FXObject* sender, FXSelector, void*)
+{
+    itemtext = ((FXButton*)sender)->getText();
+    curiconid = partitionicon->id();
+    UpdatePathFrame(curiconid);
+    UpdateRootDirectory();
+    return 1;
+}
 
 void WombatForensics::UpdatePartitions(void)
 {
@@ -4205,36 +4226,11 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
     {
         if(filecount == 0)
         {
+	    // REMOVE \0 TERMINATORS FROM THE FILE ITEM PATH STRING
 	    std::string tmpstring1 = fileitems->at(i).path;
 	    tmpstring1.erase(std::remove(tmpstring1.begin(), tmpstring1.end(), '\0'), tmpstring1.end());
 	    fileitems->at(i).path = tmpstring1;
-	    /*
-	    std::cout << "fileitem path size: " << fileitems->at(i).path.size() << std::endl;
-	    std::cout << "fileitem path: " << fileitems->at(i).path << std::endl;
-	    std::cout << "fileitem path without : " << tmpstring1 << std::endl;
-	    */
-	    //tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
-	    //char* tmpchar = new char[tmpstring1.size() + 1];
-	    //std::cout << "char way: ";
-	    //std::cout << tmpstring1.c_str() << std::endl;
-	    /*
-	    for(int j=0; j < tmpstring1; j++)
-	    {
-		if(tmpstring1.at(j) != '\0')
-		{
-		    //std::cout << " j: " << j << " is a string terminator" << std::endl;
-		    std::cout << tmpstring1.at(j);
-		    tmpchar[j] = fileitems->at(i).path.at(j);
-		}
-	    }
-	    tmpchar[fileitems->at(i).path.size()] = '\0';
-	    // not sure why the std string isn't converting to c_str() properly..
-	    std::cout << std::endl;
-	    std::cout << "tmpchar: " << tmpchar << std::endl;
-	    */
-
-	    //FXString testpath(fileitems->at(i).path.c_str());
-	    //std::cout << "fileitem path from fxstring: " << testpath.text() << std::endl;
+	    
             IncrementGlobalId(&globalid, &curid);
             fileitems->at(i).gid = globalid;
             FXFile filefile;
@@ -4246,8 +4242,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             fileval += FXString::value(fileitems->at(i).isdirectory) + "|"; //  2
             fileval += FXString::value(fileitems->at(i).size) + "|"; //         3
             fileval += FXString(fileitems->at(i).name.c_str()) + "|"; //        4
-            fileval += FXString(tmpstring1.c_str()) + "|"; //        5
-            //fileval += FXString(fileitems->at(i).path.c_str()) + "|"; //        5
+            fileval += FXString(fileitems->at(i).path.c_str()) + "|"; //        5
             fileval += FXString(fileitems->at(i).create.c_str()) + "|"; //      6
             fileval += FXString(fileitems->at(i).access.c_str()) + "|"; //      7
             fileval += FXString(fileitems->at(i).modify.c_str()) + "|"; //      8
@@ -4309,7 +4304,6 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         }
         tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
         tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()));
-        //tablelist->setItemText(i, 3, FXString(fileitems->at(i).path.c_str()) + "/");
         tablelist->setItemData(i, 3, &(fileitems->at(i).layout));
         tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(fileitems->at(i).size).c_str()));
         tablelist->setItemData(i, 4, &(currentitem.voloffset));
