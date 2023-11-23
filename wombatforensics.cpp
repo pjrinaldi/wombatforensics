@@ -4207,15 +4207,16 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         {
 	    std::string tmpstring1 = fileitems->at(i).path;
 	    tmpstring1.erase(std::remove(tmpstring1.begin(), tmpstring1.end(), '\0'), tmpstring1.end());
+	    fileitems->at(i).path = tmpstring1;
 	    /*
 	    std::cout << "fileitem path size: " << fileitems->at(i).path.size() << std::endl;
 	    std::cout << "fileitem path: " << fileitems->at(i).path << std::endl;
 	    std::cout << "fileitem path without : " << tmpstring1 << std::endl;
 	    */
 	    //tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
-	    char* tmpchar = new char[tmpstring1.size() + 1];
-	    std::cout << "char way: ";
-	    std::cout << tmpstring1.c_str() << std::endl;
+	    //char* tmpchar = new char[tmpstring1.size() + 1];
+	    //std::cout << "char way: ";
+	    //std::cout << tmpstring1.c_str() << std::endl;
 	    /*
 	    for(int j=0; j < tmpstring1; j++)
 	    {
