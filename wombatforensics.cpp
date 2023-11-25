@@ -3210,7 +3210,7 @@ long WombatForensics::DisplayChildDirectory(FXObject* sender, FXSelector, void*)
 {
     FXString tmptext = ((FXButton*)sender)->getText();
     std::cout << "button selected: " << tmptext.text() << std::endl;
-    //pathtext = 
+
     return 1;
 }
 
