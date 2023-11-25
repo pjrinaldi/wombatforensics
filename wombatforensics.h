@@ -380,6 +380,7 @@ class WombatForensics : public FXMainWindow
 	*/
 	long DisplayPartitions(FXObject* sender, FXSelector, void*);
 	long DisplayRootDirectory(FXObject* sender, FXSelector, void*);
+	long DisplayChildDirectory(FXObject* sender, FXSelector, void*);
         long OpenSettings(FXObject*, FXSelector, void*);
         long OpenManageCarved(FXObject*, FXSelector, void*);
         long OpenViewerManager(FXObject*, FXSelector, void*);
@@ -483,6 +484,7 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_HOME, WombatForensics::LoadForensicImages),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PARTITION, WombatForensics::DisplayPartitions),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ROOTDIRECTORY, WombatForensics::DisplayRootDirectory),
+    FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHILDDIRECTORY, WombatForensics::DisplayChildDirectory),
     //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CURRENT, WombatForensics::LoadCurrent),
     //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_BACK, WombatForensics::LoadCurrentPath),
     //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_FRWD, WombatForensics::LoadCurrentFile),

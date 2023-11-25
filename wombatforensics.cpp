@@ -3206,6 +3206,14 @@ long WombatForensics::DisplayRootDirectory(FXObject* sender, FXSelector, void*)
     return 1;
 }
 
+long WombatForensics::DisplayChildDirectory(FXObject* sender, FXSelector, void*)
+{
+    FXString tmptext = ((FXButton*)sender)->getText();
+    std::cout << "button selected: " << tmptext.text() << std::endl;
+    //pathtext = 
+    return 1;
+}
+
 void WombatForensics::UpdatePartitions(void)
 {
     currentfileitem.clear();
