@@ -711,11 +711,15 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	// ADD RESPECTIVE PATH BUTTONS
 	for(int i=0; i < childpaths.no(); i++)
 	{
-	    FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), backicon, this, ID_CHILDDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
-	    tmppf->setIconPosition(ICON_BEFORE_TEXT);
-	    tmppf->setTipText(childpaths.at(i));
-	    tmppf->create();
+	    if(FXString::compare(childpaths.at(i), "/") != 0)
+	    {
+		FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), backicon, this, ID_CHILDDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+		tmppf->setIconPosition(ICON_BEFORE_TEXT);
+		tmppf->setTipText(childpaths.at(i));
+		tmppf->create();
+	    }
 	    //std::cout << "child paths " << i << ": " << childpaths.at(i).text() << std::endl;
+	    //std::cout << FXString::compare(childpaths.at(i), "/") << std::endl;
 	}
     }
     /*
@@ -3183,6 +3187,7 @@ long WombatForensics::DisplayPartitions(FXObject* sender, FXSelector, void*)
     itemtext = ((FXButton*)sender)->getText();
     //std::cout << "item text: " << itemtext.text() << std::endl;
     fileitemvector.clear();
+    pathtext = "/";
     curiconid = forimgicon->id();
     UpdatePathFrame(curiconid);
     UpdatePartitions();
@@ -3193,6 +3198,7 @@ long WombatForensics::DisplayPartitions(FXObject* sender, FXSelector, void*)
 
 long WombatForensics::DisplayRootDirectory(FXObject* sender, FXSelector, void*)
 {
+    pathtext = "/";
     itemtext = ((FXButton*)sender)->getText();
     curiconid = partitionicon->id();
     UpdatePathFrame(curiconid);
