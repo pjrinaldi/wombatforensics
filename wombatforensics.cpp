@@ -3205,16 +3205,51 @@ long WombatForensics::DisplayRootDirectory(FXObject* sender, FXSelector, void*)
     childids.clear();
     UpdatePathFrame(curiconid);
     UpdateRootDirectory();
+
     return 1;
 }
 
 long WombatForensics::DisplayChildDirectory(FXObject* sender, FXSelector, void*)
 {
+    curiconid = defaultfoldericon->id();
     FXString tmptext = ((FXButton*)sender)->getText();
+    uint64_t tmpgid = *((int*)((FXButton*)sender)->getUserData());
+    for(int i=0; i < childids.no(); i++)
+	std::cout << "child id " << i << ": " << childids.at(i) << std::endl;
     std::cout << "button selected: " << tmptext.text() << std::endl;
     std::cout << "button gid: " << *((int*)((FXButton*)sender)->getUserData()) << std::endl;
-    //for(int i=0; i < childids.no(); i++)
-	//std::cout << "child id " << i << ": " << childids.at(i) << std::endl;
+    // NEED TO POPULATE THE CURRENTFILEITEM, AND THEN CALL UPDATECHILDDIRECTORY(), WHICH WILL USE THE CURFORIMG, CURRENTITEM, AND CURRENTFILEITEM
+    // WILL NEED TO ACCOUNT FOR PARENT CHILD GID'S SUCH AS 12.14 FOR THE FILE NAME OR 5.11, ETC
+
+    std::string tmpfilepath = tmppath.text() + std::string("burrow/") + curforimg->ImageFileName() + "." + std::to_string(currentitem.voloffset) + "." + std::to_string(tmpgid);
+    std::cout << tmpfilepath.c_str() << std::endl;
+    std::ifstream filestream;
+    filestream.open(tmpfilepath.c_str(), std::ios::in | std::ios::ate);
+    auto readsize = filestream.tellg();
+    std::string filecontent(readsize, '\0');
+    filestream.seekg(0);
+    filestream.read(&filecontent[0], readsize);
+    filestream.close();
+    currentfileitem.clear();
+    currentfileitem.gid = std::stoull(GetFileItem(&filecontent, 0).c_str());
+    currentfileitem.isdeleted = std::stoi(GetFileItem(&filecontent, 1).c_str());
+    currentfileitem.isdirectory = std::stoi(GetFileItem(&filecontent, 2).c_str());
+    currentfileitem.size = std::stoull(GetFileItem(&filecontent, 3).c_str());
+    currentfileitem.name = GetFileItem(&filecontent, 4);
+    currentfileitem.path = GetFileItem(&filecontent, 5);
+    currentfileitem.create = GetFileItem(&filecontent, 6);
+    currentfileitem.access = GetFileItem(&filecontent, 7);
+    currentfileitem.modify = GetFileItem(&filecontent, 8);
+    currentfileitem.layout = GetFileItem(&filecontent, 9);
+    currentfileitem.isvirtual = std::stoi(GetFileItem(&filecontent, 10).c_str());
+    currentfileitem.cat = GetFileItem(&filecontent, 11);
+    currentfileitem.sig = GetFileItem(&filecontent, 12);
+    currentfileitem.hash = GetFileItem(&filecontent, 13);
+    currentfileitem.tag = GetFileItem(&filecontent, 14);
+    currentfileitem.match = GetFileItem(&filecontent, 15);
+    currentfileitem.filename = GetFileItem(&filecontent, 16);
+    UpdatePathFrame(curiconid);
+    UpdateChildDirectory();
 
     return 1;
 }
