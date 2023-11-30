@@ -716,6 +716,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
 		FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), backicon, this, ID_CHILDDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 		tmppf->setIconPosition(ICON_BEFORE_TEXT);
 		tmppf->setTipText(childpaths.at(i));
+		tmppf->setUserData(&(childids.at(i-1)));
 		tmppf->create();
 	    }
 	    //std::cout << "child paths " << i << ": " << childpaths.at(i).text() << std::endl;
@@ -3201,6 +3202,7 @@ long WombatForensics::DisplayRootDirectory(FXObject* sender, FXSelector, void*)
     pathtext = "/";
     itemtext = ((FXButton*)sender)->getText();
     curiconid = partitionicon->id();
+    childids.clear();
     UpdatePathFrame(curiconid);
     UpdateRootDirectory();
     return 1;
@@ -3210,6 +3212,9 @@ long WombatForensics::DisplayChildDirectory(FXObject* sender, FXSelector, void*)
 {
     FXString tmptext = ((FXButton*)sender)->getText();
     std::cout << "button selected: " << tmptext.text() << std::endl;
+    std::cout << "button gid: " << *((int*)((FXButton*)sender)->getUserData()) << std::endl;
+    //for(int i=0; i < childids.no(); i++)
+	//std::cout << "child id " << i << ": " << childids.at(i) << std::endl;
 
     return 1;
 }
@@ -3444,6 +3449,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    UpdatePathFrame(curiconid);
 	    // POPULATE THE ROOT DIRECTORY TO THE TABLELIST
 	    UpdateRootDirectory();
+	    childids.clear();
 	}
 	else if(curiconid == defaultfoldericon->id()) // FOLDER SELECTED
 	{
@@ -3459,6 +3465,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    }
 	    //std::cout << "current path to load in toolbar: " << pathtext.text() << std::endl;
 	    childpaths.clear();
+	    //childids.clear();
 	    FXArray<FXint> posarray;
 	    posarray.clear();
 	    int found = 0;
@@ -3477,6 +3484,8 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    std::cout << std::endl;
 	    */
 	    childpaths.append("/");
+	    childids.append(currentfileitem.gid);
+	    //childids.append(0);
 	    //std::cout << "path text progress" << std::endl;
 	    //std::cout << "/" << std::endl;
 	    for(int i=0; i < posarray.no() - 2; i++)
