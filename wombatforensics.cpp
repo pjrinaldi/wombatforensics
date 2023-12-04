@@ -3214,15 +3214,27 @@ long WombatForensics::DisplayChildDirectory(FXObject* sender, FXSelector, void*)
     curiconid = defaultfoldericon->id();
     FXString tmptext = ((FXButton*)sender)->getText();
     uint64_t tmpgid = *((int*)((FXButton*)sender)->getUserData());
+    uint64_t pargid = 0;
+    int parenti = 0;
     for(int i=0; i < childids.no(); i++)
-	std::cout << "child id " << i << ": " << childids.at(i) << std::endl;
-    std::cout << "button selected: " << tmptext.text() << std::endl;
-    std::cout << "button gid: " << *((int*)((FXButton*)sender)->getUserData()) << std::endl;
+    {
+	if(childids.at(i) == tmpgid)
+	    parenti = i - 1;
+	//std::cout << "child id " << i << ": " << childids.at(i) << std::endl;
+    }
+    if(parenti >= 0)
+	pargid = childids.at(parenti);
+    //std::cout << "parent gid: " << pargid << std::endl;
+    //std::cout << "button selected: " << tmptext.text() << std::endl;
+    //std::cout << "button gid: " << *((int*)((FXButton*)sender)->getUserData()) << std::endl;
     // NEED TO POPULATE THE CURRENTFILEITEM, AND THEN CALL UPDATECHILDDIRECTORY(), WHICH WILL USE THE CURFORIMG, CURRENTITEM, AND CURRENTFILEITEM
     // WILL NEED TO ACCOUNT FOR PARENT CHILD GID'S SUCH AS 12.14 FOR THE FILE NAME OR 5.11, ETC
 
-    std::string tmpfilepath = tmppath.text() + std::string("burrow/") + curforimg->ImageFileName() + "." + std::to_string(currentitem.voloffset) + "." + std::to_string(tmpgid);
-    std::cout << tmpfilepath.c_str() << std::endl;
+    std::string tmpfilepath = tmppath.text() + std::string("burrow/") + curforimg->ImageFileName() + "." + std::to_string(currentitem.voloffset) + ".";
+    if(pargid != 0)
+	tmpfilepath += std::to_string(pargid) + ".";
+    tmpfilepath += std::to_string(tmpgid);
+    //std::cout << tmpfilepath.c_str() << std::endl;
     std::ifstream filestream;
     filestream.open(tmpfilepath.c_str(), std::ios::in | std::ios::ate);
     auto readsize = filestream.tellg();
