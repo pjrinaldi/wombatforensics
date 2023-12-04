@@ -3537,7 +3537,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    //std::cout << "/" << std::endl;
 	    for(int i=0; i < posarray.no() - 2; i++)
 	    {
-		childpaths.append(pathtext.mid(posarray.at(i)+1, posarray.at(i+1)));
+		childpaths.append(pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i)));
 		//std::cout << pathtext.mid(posarray.at(i)+1, posarray.at(i+1)).text() << std::endl;
 	    }
 	    //posarray.append(pathtext.length());
