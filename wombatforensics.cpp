@@ -9,7 +9,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
     //mainframe->setBackColor(FXRGB(224,224,224));
     //toolbar->setBackColor(FXRGB(224,224,224));
-    pathframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0);
+    pathframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     //pathmenubar = new FXMenuBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     //new FXMenuCommand(pathmenubar, "initial test", NULL, this, ID_PARTITION);
     //pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
