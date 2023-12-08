@@ -9,7 +9,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     toolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT);
     //mainframe->setBackColor(FXRGB(224,224,224));
     //toolbar->setBackColor(FXRGB(224,224,224));
-    pathframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
+    pathframe = new FXHorizontalFrame(mainframe, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X, 0,0,0,0, 0,0,0,0);
     //pathmenubar = new FXMenuBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
     //new FXMenuCommand(pathmenubar, "initial test", NULL, this, ID_PARTITION);
     //pathtoolbar = new FXToolBar(mainframe, this, LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_FILL_X);
@@ -637,8 +637,13 @@ long WombatForensics::ManageEvidence(FXObject*, FXSelector, void*)
     return 1;
 }
 
-long WombatForensics::LoadForensicImages(FXObject*, FXSelector, void*)
+long WombatForensics::LoadForensicImages(FXObject* sender, FXSelector, void*)
 {
+    // UNCHECK ALL EXISTING BUTTONS
+    for(int i=pathframe->numChildren() - 1; i >= 0; i--)
+	((FXButton*)pathframe->childAtIndex(i))->setState(0);
+    // CHECK THE BURROW BUTTON
+    ((FXButton*)sender)->setState(2);
     UpdateForensicImages();
     
     return 1;
@@ -657,14 +662,15 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	pathtext = "/";
 	FXString forimgname = FXString(curforimg->ImageFileName().c_str());
 	// BURROW BUTTON
-	FXButton* pf1 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	FXButton* pf1 = new FXButton(pathframe, "BURROW", burrowicon, this, ID_HOME, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 0,0,4,4);
 	pf1->setIconPosition(ICON_BEFORE_TEXT);
 	pf1->setTipText("BURROW");
 	pf1->create();
 	// FORENSIC IMAGE BUTTON
-	FXButton* pf2 = new FXButton(pathframe, forimgname, forimgicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+	FXButton* pf2 = new FXButton(pathframe, forimgname, forimgicon, this, ID_PARTITION, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 0,0,4,4);
 	pf2->setIconPosition(ICON_BEFORE_TEXT);
 	pf2->setTipText(forimgname);
+	pf2->setState(2);
 	pf2->create();
     }
     else if(iconid == partitionicon->id()) // PARTITION SELECTED
@@ -686,6 +692,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	FXButton* pf3 = new FXButton(pathframe, partname, curicon, this, ID_ROOTDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 	pf3->setIconPosition(ICON_BEFORE_TEXT);
 	pf3->setTipText(partname);
+	pf3->setState(3);
 	pf3->create();
     }
     else if(iconid == defaultfoldericon->id()) // CHILD DIRECTORY SELECTED
