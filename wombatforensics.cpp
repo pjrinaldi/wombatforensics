@@ -700,6 +700,8 @@ void WombatForensics::UpdatePathFrame(int iconid)
     }
     else if(iconid == defaultfoldericon->id()) // CHILD DIRECTORY SELECTED
     {
+	for(int i=pathframe->numChildren() - 1; i >= 0; i--)
+	    ((FXButton*)pathframe->childAtIndex(i))->setState(0);
 	//std::cout << "add the burrow, forimg, partition, and child directory path buttons" << std::endl;
 	FXString forimgname = FXString(curforimg->ImageFileName().c_str());
 	// BURROW BUTTON
@@ -3234,8 +3236,6 @@ long WombatForensics::DisplayRootDirectory(FXObject* sender, FXSelector, void*)
 
 long WombatForensics::DisplayChildDirectory(FXObject* sender, FXSelector, void*)
 {
-    for(int i=pathframe->numChildren() - 1; i >= 0; i--)
-	((FXButton*)pathframe->childAtIndex(i))->setState(0);
     curiconid = defaultfoldericon->id();
     selectedchilddirectory = ((FXButton*)sender)->getText();
     uint64_t tmpgid = *((int*)((FXButton*)sender)->getUserData());
@@ -3498,6 +3498,7 @@ void WombatForensics::UpdateChildDirectory(void)
 
 long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 {
+    selectedchilddirectory = "";
     if(tablelist->getCurrentRow() > -1) // selection from table
     {
 	curiconid = tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id();
