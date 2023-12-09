@@ -221,8 +221,10 @@ class WombatForensics : public FXMainWindow
 	//FXButton* backbutton;
 	FXIcon* frwdicon;
 	//FXButton* frwdbutton;
-	FXIcon* curicon;
+	//FXIcon* curicon;
+	FXIcon* partpathicon;
 	//FXButton* curbutton;
+	FXIcon* forimgpathicon;
 
         // ITEM TYPE ICONS
         FXIcon* forimgicon;
