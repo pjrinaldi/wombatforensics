@@ -259,6 +259,7 @@ class WombatForensics : public FXMainWindow
         FXString pathtext;
         FXString filetext;
         FXString currentviewers;
+	FXString selectedchilddirectory;
         FXString pname;
 	FXArray<FXString> childpaths;
 	FXArray<uint64_t> childids;

@@ -695,7 +695,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	FXButton* pf3 = new FXButton(pathframe, partname, partpathicon, this, ID_ROOTDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 	pf3->setIconPosition(ICON_BEFORE_TEXT);
 	pf3->setTipText(partname);
-	pf3->setState(3);
+	pf3->setState(2);
 	pf3->create();
     }
     else if(iconid == defaultfoldericon->id()) // CHILD DIRECTORY SELECTED
@@ -718,15 +718,28 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	pf3->setIconPosition(ICON_BEFORE_TEXT);
 	pf3->setTipText(partname);
 	pf3->create();
+	bool pathdirselected = false;
 	// ADD RESPECTIVE PATH BUTTONS
 	for(int i=0; i < childpaths.no(); i++)
 	{
+	    //std::cout << "child paths " << i << ": " << childpaths.at(i).text() << std::endl;
 	    if(FXString::compare(childpaths.at(i), "/") != 0)
 	    {
 		FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), folderpathicon, this, ID_CHILDDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 		tmppf->setIconPosition(ICON_BEFORE_TEXT);
 		tmppf->setTipText(childpaths.at(i));
 		tmppf->setUserData(&(childids.at(i-1)));
+		/*
+		if(i == childpaths.no() - 1)
+		    tmppf->setState(2);
+		*/
+		if(FXString::compare(selectedchilddirectory, childpaths.at(i)) == 0)
+		{
+		    tmppf->setState(2);
+		    pathdirselected = true;
+		}
+		if(pathdirselected == false && i == childpaths.no() - 1)
+		    tmppf->setState(2);
 		tmppf->create();
 	    }
 	    //std::cout << "child paths " << i << ": " << childpaths.at(i).text() << std::endl;
@@ -3221,8 +3234,10 @@ long WombatForensics::DisplayRootDirectory(FXObject* sender, FXSelector, void*)
 
 long WombatForensics::DisplayChildDirectory(FXObject* sender, FXSelector, void*)
 {
+    for(int i=pathframe->numChildren() - 1; i >= 0; i--)
+	((FXButton*)pathframe->childAtIndex(i))->setState(0);
     curiconid = defaultfoldericon->id();
-    FXString tmptext = ((FXButton*)sender)->getText();
+    selectedchilddirectory = ((FXButton*)sender)->getText();
     uint64_t tmpgid = *((int*)((FXButton*)sender)->getUserData());
     uint64_t pargid = 0;
     int parenti = 0;
@@ -3545,7 +3560,7 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	    //childids.append(0);
 	    //std::cout << "path text progress" << std::endl;
 	    //std::cout << "/" << std::endl;
-	    for(int i=0; i < posarray.no() - 2; i++)
+	    for(int i=0; i < posarray.no() - 1; i++)
 	    {
 		childpaths.append(pathtext.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i)));
 		//std::cout << pathtext.mid(posarray.at(i)+1, posarray.at(i+1)).text() << std::endl;
