@@ -169,14 +169,15 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     curbutton->setTipText("Current Partition");
 	*/
     // PATH TOOLBAR BACK ICON
-    backicon = new FXPNGIcon(this->getApp(), folderpath);
+    folderpathicon = new FXPNGIcon(this->getApp(), folderpath);
+    //backicon = new FXPNGIcon(this->getApp(), folderpath);
 	/*
     backbutton = new FXButton(pathtoolbar, "/", backicon, this, ID_BACK, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     backbutton->setIconPosition(ICON_BEFORE_TEXT);
     backbutton->setTipText("Current Folder");
 	*/
     // PATH TOOLBAR FORWARD ICON
-    frwdicon = new FXPNGIcon(this->getApp(), filepath);
+    //frwdicon = new FXPNGIcon(this->getApp(), filepath);
 	/*
     frwdbutton = new FXButton(pathtoolbar, "FILE", frwdicon, this, ID_FRWD, BUTTON_TOOLBAR|FRAME_RAISED, 0,0,0,0, 4,4,4,4);
     frwdbutton->setIconPosition(ICON_BEFORE_TEXT);
@@ -722,7 +723,7 @@ void WombatForensics::UpdatePathFrame(int iconid)
 	{
 	    if(FXString::compare(childpaths.at(i), "/") != 0)
 	    {
-		FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), backicon, this, ID_CHILDDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
+		FXButton* tmppf = new FXButton(pathframe, childpaths.at(i), folderpathicon, this, ID_CHILDDIRECTORY, FRAME_RAISED|FRAME_THICK, 0,0,0,0, 4,4,4,4);
 		tmppf->setIconPosition(ICON_BEFORE_TEXT);
 		tmppf->setTipText(childpaths.at(i));
 		tmppf->setUserData(&(childids.at(i-1)));
