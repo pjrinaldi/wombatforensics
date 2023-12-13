@@ -944,8 +944,10 @@ long WombatForensics::OpenHexViewer(FXObject*, FXSelector, void*)
 long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 {
     FXString fileitemstr = "Property Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+    //std::cout << "pname: " << pname.text() << std::endl;
+    //std::cout << "fstype: " << (uint)currentitem.fstype << std::endl;
     PropertyViewer* propview = new PropertyViewer(this, fileitemstr);
-    //propview->LoadProp();
+    propview->LoadProp(&configpath, &pname);
     propview->create();
     propview->show(PLACEMENT_CURSOR);
 

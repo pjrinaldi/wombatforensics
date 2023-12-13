@@ -26,6 +26,7 @@ class PropertyViewer : public FXDialogBox
 
     public:
         PropertyViewer(FXWindow* parent, const FXString& title);
+	void LoadProp(FXString* configpath, FXString* pname);
 };
 
 #endif // PROPVIEWER_H

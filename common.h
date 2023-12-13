@@ -40,6 +40,7 @@ struct CurrentItem
     uint64_t voloffset = 0;
     std::string itemtext = "";
     std::string tmppath = "";
+    //uint8_t fstype = 0;
 };
 
 struct FileItem

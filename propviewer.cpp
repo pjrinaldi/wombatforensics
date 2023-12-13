@@ -20,6 +20,35 @@ PropertyViewer::PropertyViewer(FXWindow* parent, const FXString& title):FXDialog
     textview->setEditable(false);
 }
 
+void PropertyViewer::LoadProp(FXString* configpath, FXString* pname)
+{
+    std::vector<char> ptbytes;
+    FXString ptpath = *configpath;
+    //std::cout << "config path: " << configpath->text() << std::endl;
+    //std::cout << "pname: " << pname->text() << std::endl;
+    if(pname->contains("FAT12") != 0)
+    {
+	ptpath += "fat12file.pt";
+	std::ifstream ptfile(ptpath.text(), std::ios::binary | std::ios::ate);
+	std::streamsize ptfilesize = ptfile.tellg();
+	ptbytes.resize(ptfilesize);
+	ptfile.seekg(0, std::ios::beg);
+	ptfile.read(ptbytes.data(), ptfilesize);
+	std::string ptfilestring(ptbytes.data(), ptfilesize);
+	std::vector<std::string> proplist;
+	proplist.clear();
+	std::istringstream properties(ptfilestring);
+	std::string propitem;
+	while(getline(properties, propitem, ';'))
+	    proplist.push_back(propitem);
+	for(int i=0; i < proplist.size(); i++)
+	    std::cout << "prop item " << i+1 << ": " << proplist.at(i) << std::endl;
+	//std::cout << "pt file string: " << ptfilestring << std::endl;
+    }
+    else
+	std::cout << "is not fat12" << std::endl;
+}
+
 /*
 void PropertyViewer::LoadHex(ForImg* curforimg, FileItem* curfileitem)
 {
