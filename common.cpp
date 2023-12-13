@@ -295,8 +295,8 @@ void GetFileContent(ForImg* curforimg, FileItem* curfileitem, bool* inmemory, ui
 
     //if(curfileitem->size < memlimit)
     //    *inmemory = true;
-    if((curfileitem->sig.compare("Shortcut") == 0 || curfileitem->sig.compare("Recycler") == 0 || curfileitem->sig.compare("Recycle.Bin") == 0 || curfileitem->sig.compare("Prefetch") == 0) && curfileitem->size < memlimit)
-        *inmemory = true;
+    //if((curfileitem->sig.compare("Shortcut") == 0 || curfileitem->sig.compare("Recycler") == 0 || curfileitem->sig.compare("Recycle.Bin") == 0 || curfileitem->sig.compare("Prefetch") == 0) && curfileitem->size < memlimit)
+    //    *inmemory = true;
     std::vector<std::string> layoutlist;
     layoutlist.clear();
     std::istringstream layoutstream(curfileitem->layout);

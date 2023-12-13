@@ -2542,6 +2542,7 @@ void WombatForensics::PlainView(FileItem* curfileitem)
     this->getApp()->beginWaitCursor();
     std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
+    //std::cout << "tmpfile string: " << tmpfilestr << std::endl;
     if(!std::filesystem::exists(tmpfilestr))
 	GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
     /*
