@@ -144,8 +144,6 @@ class WombatForensics : public FXMainWindow
         FXVerticalFrame* mainframe;
         FXToolBar* toolbar;
         FXHorizontalFrame* pathframe;
-        //FXToolBar* pathtoolbar;
-	//FXMenuBar* pathmenubar;
         FXSplitter* hsplitter;
         FXTable* tablelist;
         FXHeader* tableheader;
@@ -216,15 +214,8 @@ class WombatForensics : public FXMainWindow
 
         FXIcon* burrowicon;
         FXButton* burrowbutton;
-        //FXButton* burrowbutton2;
-	//FXIcon* backicon;
-	//FXButton* backbutton;
-	//FXIcon* frwdicon;
-	//FXButton* frwdbutton;
-	//FXIcon* curicon;
 	FXIcon* folderpathicon;
 	FXIcon* partpathicon;
-	//FXButton* curbutton;
 	FXIcon* forimgpathicon;
 
         // ITEM TYPE ICONS
@@ -351,9 +342,6 @@ class WombatForensics : public FXMainWindow
 	    ID_PARTITION = 119,
 	    ID_ROOTDIRECTORY = 120,
 	    ID_CHILDDIRECTORY = 121,
-	    //ID_BACK = 120,
-	    //ID_FRWD = 121,
-	    //ID_CURRENT = 122,
             ID_TABLEHEADER = 123,
             ID_BINARY = 124,
             ID_CONTENTS = 125,
@@ -378,11 +366,6 @@ class WombatForensics : public FXMainWindow
         long ContentSelected(FXObject*, FXSelector, void*);
         long LoadForensicImages(FXObject*, FXSelector, void*);
         long LoadChildren(FXObject*, FXSelector, void*);
-	/*
-        long LoadCurrent(FXObject*, FXSelector, void*);
-        long LoadCurrentPath(FXObject*, FXSelector, void*);
-        long LoadCurrentFile(FXObject*, FXSelector, void*);
-	*/
 	long DisplayPartitions(FXObject* sender, FXSelector, void*);
 	long DisplayRootDirectory(FXObject* sender, FXSelector, void*);
 	long DisplayChildDirectory(FXObject* sender, FXSelector, void*);
@@ -490,9 +473,6 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_PARTITION, WombatForensics::DisplayPartitions),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_ROOTDIRECTORY, WombatForensics::DisplayRootDirectory),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CHILDDIRECTORY, WombatForensics::DisplayChildDirectory),
-    //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_CURRENT, WombatForensics::LoadCurrent),
-    //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_BACK, WombatForensics::LoadCurrentPath),
-    //FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_FRWD, WombatForensics::LoadCurrentFile),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_VIEWMANAGE, WombatForensics::OpenViewerManager),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_MSGLOG, WombatForensics::OpenMessageLog),
     FXMAPFUNC(SEL_COMMAND, WombatForensics::ID_XCHOMP, WombatForensics::OpenXChomp),
@@ -528,4 +508,4 @@ FXDEFMAP(WombatForensics) WombatForensicsMap[]={
     FXMAPFUNC(SEL_CHANGED, WombatForensics::ID_SCROLLBAR, WombatForensics::ScrollChanged),
     */
 };
-#endif // WOMBATSQLITE_H
+#endif // WOMBATFORENSICS_H
