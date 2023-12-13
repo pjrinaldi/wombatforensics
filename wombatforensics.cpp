@@ -768,7 +768,7 @@ void WombatForensics::UpdateForensicImages()
             evidfile.writeBlock(idval.text(), idval.length());
             evidfile.close();
         }
-        itemtype = 1;
+        //itemtype = 1;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
         //tablelist->setItemData(i, 1, &itemtype);
         tablelist->setItemData(i, 2, forimgvector.at(i));
@@ -3833,10 +3833,10 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             //std::cout << "curid at start of writing file contents to file: " << curid << std::endl;
         }
         //std::cout << "name: " << fileitems->at(i).name << std::endl;
-        itemtype = 3;
+        //itemtype = 3;
         //std::cout << "sort name: " << fileitems->at(i).name << " isdirectory: " << fileitems->at(i).isdirectory << std::endl;
-        if(fileitems->at(i).isdirectory)
-            itemtype = 2;
+        //if(fileitems->at(i).isdirectory)
+        //    itemtype = 2;
         //std::cout << "sort itemtype: " << itemtype << std::endl;
         //std::cout << "currentitem.itemtext: " << currentitem.itemtext << std::endl;
         tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
