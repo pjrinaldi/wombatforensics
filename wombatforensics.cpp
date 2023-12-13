@@ -3103,6 +3103,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
     tablelist->ungrab();
     this->getApp()->beginWaitCursor();
     tablelist->selectRow(tablelist->getCurrentRow());
+    //std::cout << "oldselectedrow: " << oldselectedrow << " current row: " << tablelist->getCurrentRow() << std::endl;
     if(tablelist->getCurrentRow() > -1 && tablelist->getCurrentRow() != oldselectedrow)
     {
 	if(fileitemvector.size() > 0)
@@ -3333,6 +3334,7 @@ void WombatForensics::UpdateRootDirectory(void)
     if(sortindex == 1)
 	tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
     //std::cout << "need to load the root directory for the partition selected here." << std::endl;
+    oldselectedrow = -1;
     this->getApp()->endWaitCursor();
 }
 
@@ -3390,6 +3392,7 @@ void WombatForensics::UpdateChildDirectory(void)
     if(sortindex == 1)
 	tablelist->setColumnWidth(1, tablelist->getColumnWidth(sortindex) + 15);
     //std::cout << "need to load the root directory for the partition selected here." << std::endl;
+    oldselectedrow = -1;
     this->getApp()->endWaitCursor();
 }
 
