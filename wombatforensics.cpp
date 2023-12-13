@@ -281,6 +281,11 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
             binaries.push_back(currentviewers.text());
     }
     binariesfile.close();
+    FXFile fat12filept;
+    bool isfat12filept = fat12filept.open(configpath + "fat12file.pt", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isfat12filept == false)
+	FXFile::copy("./fat12file.pt", configpath + "fat12file.pt");
+
     forimgvector.clear();
 
     savebutton->disable();
