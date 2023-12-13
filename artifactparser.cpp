@@ -233,7 +233,7 @@ void ParsePrefetch(FileItem* curfileitem, std::string* filecontents)
 {
     std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
-    std::cout << "prefetch path: " << tmpfilestr << std::endl;
+    //std::cout << "prefetch path: " << tmpfilestr << std::endl;
     std::ifstream filebuffer(tmpfilestr, std::ios::in);
     filebuffer.seekg(0, filebuffer.beg);
     filebuffer.seekg(0, filebuffer.end);
