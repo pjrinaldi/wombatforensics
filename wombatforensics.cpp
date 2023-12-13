@@ -3482,54 +3482,9 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
 	}
 	else // EVERYTHING ELSE
 	{
-	    std::cout << "any file selected. need to open internal/external viewers for these here." << std::endl;
-	}
-    }
-    else // selection from path frame
-    {
-    }
-    /*
-    if(!isfrompath) // selection from table
-    {
-        if(tablelist->getCurrentRow() > -1)
-        {
-            curiconid = tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id();
-            if(curiconid == forimgicon->id())
-                itemtype = 1;
-            else if(curiconid == partitionicon->id() || curiconid == defaultfoldericon->id())
-                itemtype = 2;
-            else // everything else unless i get to a distinguishment i need later on
-                itemtype = 3;
-            //itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
-            curforimg = (ForImg*)tablelist->getItemData(tablelist->getCurrentRow(), 2);
-        }
-    }
-    else if(itemtype == 3) // LOAD FILE CHILDREN ??? OR IMPLEMENT FUNCTIONALITY WHEN 
-    {
-        if(tablelist->getCurrentRow() > -1)
-        {
-            //frwdbutton->setText("file name");
-            this->getApp()->beginWaitCursor();
-            // I CAN GET THE CURRENT LAYOUT AND VALUES..., THEN I CAN DETERMINE IF IT'S A DIRECTORY AND THEN PARSE OR DO SOMETHING
-            // AS A FILE... could determine if it's a directory or not by opening it's file, which would also get us the layout and path and file name to make the new path | this might be a better option, since i know it's been written to a file and can access it
-            //std::cout << "forimg file name: " << curforimg->ImageFileName() << std::endl;
-            //std::cout << "curitem.inode = cur global id: " << tablelist->getItemText(tablelist->getCurrentRow(), 1).toULong() << std::endl;
-            std::string curlayout = (*((FXString*)tablelist->getItemData(tablelist->getCurrentRow(), 3))).text();
-            //std::cout << "curitem.voloffset = vol offset: " << *((uint64_t*)tablelist->getItemData(tablelist->getCurrentRow(), 4)) << std::endl;
-            //std::cout << "curitem.itempath = cur path: " << tablelist->getItemText(tablelist->getCurrentRow(), 3).text() << std::endl;
-            //std::cout << "curitem.forimg: " << curforimg << std::endl;
-            //std::cout << "curitem.itemtext: " << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << std::endl;
-            //itemtype = *((int*)tablelist->getItemData(tablelist->getCurrentRow(), 1));
-            //std::cout << tablelist->getItemText(tablelist->getCurrentRow(), 2).text() << " cur layout: " << curlayout << std::endl;
-            //std::cout << "icon class name: " << tablelist->getItemIcon(tablelist->getCurrentRow(), 2)->getClassName() << std::endl;
-            //how to determine if it's a directory???, can read file content or get the fileitemvector
-            //std::cout << "is dir: " << fileitemvector.at(tablelist->getCurrentRow()).isdirectory << std::endl;
-            //FileItem curfileitem = fileitemvector.at(tablelist->getCurrentRow());
-			//if(curfileitem
-
-			// THIS SHOULD LAUNCH VIEWER WINDOW, IF ONE EXISTS, NOT PLAINVIEW
-			currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-			std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name;
+	    this->getApp()->beginWaitCursor();
+	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+	    std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name;
             tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
             //std::cout << "tmpfilestr: " << tmpfilestr << std::endl;
             if(!std::filesystem::exists(tmpfilestr))
@@ -3545,146 +3500,57 @@ long WombatForensics::LoadChildren(FXObject*, FXSelector sel, void*)
                     file.write((char*)tmpbuf, currentfileitem.size);
                 }
             }
-			if(currentfileitem.sig.compare("Pdf") == 0) // PDF - SETTING 9
-			{
-					std::string pdfpath = std::string(GetSettings(8).text()) + " ";
-*/
-			/*
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
-                if(inmemory)
-                {
-                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
-                    file.seekp(0, std::ios::beg);
-                    file.write((char*)tmpbuf, currentfileitem.size);
-                }
-                delete[] tmpbuf;
-			*/
-/*                pdfpath += tmpfilestr + " &";
+	    if(currentfileitem.sig.compare("Pdf") == 0) // PDF - SETTING 9
+	    {
+		std::string pdfpath = std::string(GetSettings(8).text()) + " ";
+                pdfpath += tmpfilestr + " &";
                 //std::cout << "pdfpath: " << pdfpath << std::endl;
                 std::system(pdfpath.c_str());
-                /*
-			PdfViewer* pdfview = new PdfViewer(this, "Pdf Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
-			pdfview->LoadPdf(curforimg, &currentfileitem);
-			pdfview->create();
-			pdfview->show(PLACEMENT_CURSOR);
-                */
-/*
-			}
-			else if(currentfileitem.cat.compare("Image") == 0) // IMAGE - SETTING 8
-			{
-					std::string imgpath = std::string(GetSettings(9).text()) + " ";
-			/*
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-		std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
-                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
-                if(inmemory)
-                {
-                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
-                    file.seekp(0, std::ios::beg);
-                    file.write((char*)tmpbuf, currentfileitem.size);
-                }
-                delete[] tmpbuf;
-			*/
-/*                imgpath += tmpfilestr + " &";
+	    }
+	    else if(currentfileitem.cat.compare("Image") == 0) // IMAGE - SETTING 8
+	    {
+		std::string imgpath = std::string(GetSettings(9).text()) + " ";
+                imgpath += tmpfilestr + " &";
                 //std::cout << "imgpath: " << imgpath << std::endl;
                 std::system(imgpath.c_str());
-                /*
-			ImageViewer* imgview = new ImageViewer(this, "Image Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2));
-			imgview->LoadImage(curforimg, &currentfileitem);
-			imgview->create();
-			imgview->show(PLACEMENT_CURSOR);
-                */
-/*			}
+	    }
             else if(currentfileitem.cat.compare("Video") == 0) // VIDEO - SETTING 6
             {
                 std::string vidpath = std::string(GetSettings(6).text()) + " ";
-		/*
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-		std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
-                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
-                if(inmemory)
-                {
-                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
-                    file.seekp(0, std::ios::beg);
-                    file.write((char*)tmpbuf, currentfileitem.size);
-                }
-                delete[] tmpbuf;
-		*/
-/*                vidpath += tmpfilestr + " &";
+                vidpath += tmpfilestr + " &";
                 std::system(vidpath.c_str());
             }
             else if(currentfileitem.sig.compare("Html") == 0) // HTML - SETTING 7
             {
                 std::string htmlpath = std::string(GetSettings(7).text()) + " ";
-		/*
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-		std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
-                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
-                if(inmemory)
-                {
-                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
-                    file.seekp(0, std::ios::beg);
-                    file.write((char*)tmpbuf, currentfileitem.size);
-                }
-                delete[] tmpbuf;
-		*/
-/*                htmlpath += tmpfilestr + " &";
+                htmlpath += tmpfilestr + " &";
                 std::system(htmlpath.c_str());
             }
-			else // default should be hex viewer of the content
-			{
-                std::string hexpath = std::string(GetSettings(10).text()) + " ";
+	    else // default should be hex viewer of the content
+	    {
 		/*
-                bool inmemory = false;
-                uint8_t* tmpbuf = NULL;
-                FILE* tmpfile = NULL;
-				std::string tmpfilestr = "/tmp/wf/" + std::to_string(currentfileitem.gid) + "-" + currentfileitem.name + ".tmp";
-                //std::string tmpfilestr = "/tmp/wf/" + currentfileitem.name + "-" + std::to_string(currentfileitem.gid) + ".tmp";
-                tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
-                GetFileContent(curforimg, &currentfileitem, &inmemory, &tmpbuf, tmpfile);
-                if(inmemory)
-                {
-                    std::ofstream file(tmpfilestr.c_str(), std::ios::binary);
-                    file.seekp(0, std::ios::beg);
-                    file.write((char*)tmpbuf, currentfileitem.size);
-                }
-                delete[] tmpbuf;
-		*/
-/*                hexpath += tmpfilestr + " &";
+                std::string hexpath = std::string(GetSettings(10).text()) + " ";
+                hexpath += tmpfilestr + " &";
                 //std::cout << "hexpath: " << hexpath << std::endl;
                 std::system(hexpath.c_str());
-                /*
-				FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
-				HexViewer* hexview = new HexViewer(this, fileitemstr);
-						hexview->LoadHex(curforimg, &currentfileitem);
-				hexview->create();
-				hexview->show(PLACEMENT_CURSOR);
-                */
-/*			}
-			//UpdatePathFrame();
+		*/
+		FXString fileitemstr = "Hex Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+		HexViewer* hexview = new HexViewer(this, fileitemstr);
+		hexview->LoadHex(curforimg, &currentfileitem);
+		hexview->create();
+		hexview->show(PLACEMENT_CURSOR);
+	    }
             this->getApp()->endWaitCursor();
-        }
+	}
     }
-    else
-        std::cout << "not a forensic image, so need to load something else here." << std::endl;
-
+    else // selection from path frame
+    {
+	// might not need this else anymore
+    }
     // TEST FUNCTIONING OF WHETHER IT IS CHECKED...
     //bool iscurchecked = ((CheckTableItem*)tablelist->getItem(tablelist->getCurrentRow(), 0))->getCheck();
     //std::cout << "is current item checked: " << iscurchecked << std::endl;
-*/	
+
     return 1;
 }
 
