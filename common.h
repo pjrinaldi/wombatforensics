@@ -63,6 +63,8 @@ struct FileItem
     std::string match = "";     // 15
     std::string change = "";    // 16
     std::string filename = "";  // 17
+    std::string properties = "" // 18
+
     void clear(void)
     {
         gid = 0;
@@ -83,6 +85,7 @@ struct FileItem
         match = "";
         change = "";
         filename = "";
+	properties = "";
     };
 };
 
