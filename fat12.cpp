@@ -267,6 +267,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
 			//std::cout << "cat/sig: " << tmpitem.cat << " " << tmpitem.sig << std::endl;
 		    }
+		    //std::cout << aliasname << ": " << tmpitem.properties << std::endl;
 		    //std::cout << "tmpitem layout: " << tmpitem.layout << std::endl;
 		    /*
 		    uint16_t hiclusternum = qFromLittleEndian<uint16_t>(curimg->ReadContent(rootdiroffset + j*32 + 20, 2)); // always zero for fat12/16

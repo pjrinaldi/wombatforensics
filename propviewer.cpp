@@ -20,7 +20,7 @@ PropertyViewer::PropertyViewer(FXWindow* parent, const FXString& title):FXDialog
     textview->setEditable(false);
 }
 
-void PropertyViewer::LoadProp(FXString* configpath, FXString* pname)
+void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string* propstr)
 {
     std::vector<char> ptbytes;
     FXString ptpath = *configpath;

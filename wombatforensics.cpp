@@ -946,8 +946,10 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
     FXString fileitemstr = "Property Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
     //std::cout << "pname: " << pname.text() << std::endl;
     //std::cout << "fstype: " << (uint)currentitem.fstype << std::endl;
+    //std::cout << "current properties: " << currentfileitem.properties << std::endl;
+    std::string propstr = currentfileitem.properties;
     PropertyViewer* propview = new PropertyViewer(this, fileitemstr);
-    propview->LoadProp(&configpath, &pname);
+    propview->LoadProp(&configpath, &pname, &propstr);
     propview->create();
     propview->show(PLACEMENT_CURSOR);
 
@@ -3116,7 +3118,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	if(fileitemvector.size() > 0)
 	{
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    std::cout << "properties: " << currentfileitem.properties << std::endl;
+	    std::cout << "sel props: " << currentfileitem.properties << std::endl;
 	    //std::cout << currentfileitem.name << " " << currentfileitem.gid << std::endl;
 	    PlainView(&currentfileitem);
 	}
@@ -3204,6 +3206,7 @@ long WombatForensics::DisplayChildDirectory(FXObject* sender, FXSelector, void*)
     currentfileitem.tag = GetFileItem(&filecontent, 14);
     currentfileitem.match = GetFileItem(&filecontent, 15);
     currentfileitem.filename = GetFileItem(&filecontent, 16);
+    currentfileitem.properties = GetFileItem(&filecontent, 17);
     UpdatePathFrame(curiconid);
     UpdateChildDirectory();
 
@@ -3805,13 +3808,23 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
     {
         if(filecount == 0)
         {
-	    // REMOVE \0 TERMINATORS FROM THE FILE ITEM PATH STRING
+	    // REMOVE \0 TERMINATORS FROM THE FILE ITEM PATH & PROPERTIES STRINGS
 	    std::string tmpstring1 = fileitems->at(i).path;
 	    tmpstring1.erase(std::remove(tmpstring1.begin(), tmpstring1.end(), '\0'), tmpstring1.end());
 	    fileitems->at(i).path = tmpstring1;
-	    
+	    std::string tmpstring2 = fileitems->at(i).properties;
+	    tmpstring2.erase(std::remove(tmpstring2.begin(), tmpstring2.end(), '\0'), tmpstring2.end());
+	    fileitems->at(i).properties = tmpstring2;
+
             IncrementGlobalId(&globalid, &curid);
             fileitems->at(i).gid = globalid;
+	    /*
+	    if(fileitems->at(i).gid == 3)
+	    {
+		std::cout << "str properties: " << fileitems->at(i).properties << std::endl;
+		std::cout << "cstr properties: " << fileitems->at(i).properties.c_str() << std::endl;
+	    }
+	    */
             FXFile filefile;
             FXFile::create(filestr + FXString::value(globalid), FXIO::OwnerReadWrite);
             filefile.open(filestr + FXString::value(globalid), FXIO::Writing, FXIO::OwnerReadWrite);
