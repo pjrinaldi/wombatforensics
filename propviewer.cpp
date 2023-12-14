@@ -22,6 +22,7 @@ PropertyViewer::PropertyViewer(FXWindow* parent, const FXString& title):FXDialog
 
 void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string* propstr)
 {
+    FXString propstring = "";
     std::vector<char> ptbytes;
     FXString ptpath = *configpath;
     //std::cout << "config path: " << configpath->text() << std::endl;
@@ -47,6 +48,16 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	std::string pval;
 	while(getline(pvalues, pval, '>'))
 	    propvalues.push_back(pval);
+	for(int i=0; i < proplist.size(); i++)
+	{
+	    std::string ptitle = "";
+	    std::string pdescr = "";
+	    std::size_t propsplit = proplist.at(i).find("|");
+	    ptitle = proplist.at(i).substr(0, propsplit);
+	    pdescr = proplist.at(i).substr(propsplit + 1);
+	    propstring += FXString(ptitle.c_str()) + "|" + FXString(propvalues.at(i).c_str()) + "|" + FXString(pdescr.c_str()) + "\n";
+	    //std::cout << ptitle << "|" << propvalues.at(i) << "|" << pdescr << std::endl; 
+	}
 	/*
 	for(int i=0; i < proplist.size(); i++)
 	    std::cout << "prop item " << i+1 << ": " << proplist.at(i) << std::endl;
@@ -57,27 +68,7 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
     }
     else
 	std::cout << "is not fat12" << std::endl;
-    /* WHILE LOOP TO SPLIT ON ';', THEN LOOPING OVER THOSE TO SPLIT ON ',' EXAMPLE
-    std::vector<std::string> dirlayoutlist;
-    dirlayoutlist.clear();
-    std::istringstream dirlayoutstream(curdirlayout);
-    std::string curlayout;
-    while(getline(dirlayoutstream, curlayout, ';'))
-	dirlayoutlist.push_back(curlayout);
-    for(int k=0; k < dirlayoutlist.size(); k++)
-    {
-	diroffset = 0;
-	dirsize = 0;
-	std::size_t layoutsplit = dirlayoutlist.at(k).find(",");
-	diroffset = std::stoull(dirlayoutlist.at(k).substr(0, layoutsplit));
-	dirsize = std::stoull(dirlayoutlist.at(k).substr(layoutsplit+1));
-	if(k == 0 && curfileitem != NULL) // first dirlayout entry and not root directory
-	{
-	    diroffset = diroffset + 64; // skip . and .. directories
-	    dirsize = dirsize - 64; // adjust read size for the 64 byte skip
-	}
-
-     */ 
+    textview->setText(propstring);
 }
 
 /*
