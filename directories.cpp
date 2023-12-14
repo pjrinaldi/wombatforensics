@@ -94,6 +94,7 @@ int ReadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, F
             tmpitem.tag = GetFileItem(&filecontent, 14);
             tmpitem.match = GetFileItem(&filecontent, 15);
             tmpitem.filename = GetFileItem(&filecontent, 16);
+	    tmpitem.properties = GetFileItem(&filecontent, 17);
             //std::cout << "File item Values: " << std::endl;
             //std::cout << "filecontent:" << filecontent << std::endl;
             //std::cout << tmpid << " " << tmpitem.isdeleted << " " << tmpitem.isdirectory << std::endl;

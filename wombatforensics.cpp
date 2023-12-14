@@ -3116,6 +3116,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	if(fileitemvector.size() > 0)
 	{
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
+	    std::cout << "properties: " << currentfileitem.properties << std::endl;
 	    //std::cout << currentfileitem.name << " " << currentfileitem.gid << std::endl;
 	    PlainView(&currentfileitem);
 	}
@@ -3831,7 +3832,8 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             fileval += FXString(fileitems->at(i).hash.c_str()) + "|"; //        13
             fileval += FXString(fileitems->at(i).tag.c_str()) + "|"; //         14
             fileval += FXString(fileitems->at(i).match.c_str()) + "|"; //       15
-            fileval += filestr + FXString::value(globalid) + "|"; //    16       
+            fileval += filestr + FXString::value(globalid) + "|"; //		16
+	    fileval += FXString(fileitems->at(i).properties.c_str()) + "|"; //	17
             fileitems->at(i).filename = std::string(filestr.text()) + std::to_string(globalid);
             filefile.writeBlock(fileval.text(), fileval.length());
             filefile.close();

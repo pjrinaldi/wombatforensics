@@ -119,16 +119,57 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    if((uint)firstchar == 0x05 || (uint)firstchar == 0xe5)
 			tmpitem.isdeleted = true; // deleted
 		    //std::cout << "is deleted: " << isdeleted << std::endl;
+		    // LONGNAME PROPERTY
+		    tmpitem.properties = longnamestring + ">";
+		    // FILE PROPERTIES
+		    if(fileattr & 0x01)
+			tmpitem.properties += "Read Only,";
+		    if(fileattr & 0x02)
+			tmpitem.properties += "Hidden File,";
+		    if(fileattr & 0x04)
+			tmpitem.properties += "System File,";
+		    if(fileattr & 0x08)
+			tmpitem.properties += "Volume ID,";
+		    if(fileattr & 0x10)
+			tmpitem.properties += "SubDirectory,";
+		    if(fileattr & 0x20)
+			tmpitem.properties += "Archive File,";
+		    tmpitem.properties += ">";
+		    // ALIAS FILENAME
+		    std::string aliasname = "";
+		    char* rname = new char[8];
+		    currentitem->forimg->ReadContent((uint8_t*)rname, diroffset + i*32 + 1, 7);
+		    rname[7] = 0;
+		    std::string restname(rname);
+		    char* ename = new char[4];
+		    currentitem->forimg->ReadContent((uint8_t*)ename, diroffset + i*32 + 8, 3);
+		    ename[3] = 0;
+		    std::string extname(ename);
+		    while(extname.size() > 0)
+		    {
+			std::size_t findempty = extname.find(" ", 0);
+			if(findempty != std::string::npos)
+			    extname.erase(findempty, 1);
+			else
+			    break;
+		    }
+		    restname.erase(std::remove_if(restname.begin(), restname.end(), isspace), restname.end());
+		    if(tmpitem.isdeleted)
+			aliasname = std::string(1, '_') + restname;
+		    else
+			aliasname = std::string(1, (char)firstchar) + restname;
+		    if(extname.size() > 0)
+			aliasname += "." + extname;
+		    tmpitem.properties += aliasname + ">";
 		    // FILENAME
-		    //std::string filename = "";
 		    if(!longnamestring.empty())
 		    {
 			tmpitem.name = longnamestring;
-			tmpitem.properties = longnamestring;
-			//filename = longnamestring;
 		    }
 		    else
 		    {
+			tmpitem.name = aliasname;
+			/*
 			char* rname = new char[8];
 			currentitem->forimg->ReadContent((uint8_t*)rname, diroffset + i*32 + 1, 7);
 			rname[7] = 0;
@@ -152,6 +193,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			    tmpitem.name = std::string(1, (char)firstchar) + restname;
 			if(extname.size() > 0)
 			    tmpitem.name += "." + extname;
+			*/
 		    }
 		    if(curfileitem == NULL)
 			tmpitem.path = "/";
@@ -201,8 +243,8 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			    GetNextCluster(currentitem->forimg, clusternum, 1, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
 			else if(currentitem->itemtext.find("[FAT16]") != std::string::npos)
 			    GetNextCluster(currentitem->forimg, clusternum, 2, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
-	//GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
-//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
+			//GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
+			//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
 			//QString::number((qulonglong)(curstartsector*512 + reservedareasize * bytespersector))
 			//currentitem->voloffset + reservedareasize * bytespersector
 		    }
@@ -210,8 +252,13 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    //    std::cout << "cluster " << i << ": " << clusterlist.at(i) << std::endl;
 		    if(clusterlist.size() > 0)
 			tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
+		    tmpitem.properties += tmpitem.layout + ">";
+		    uint64_t physicalsize = clusterlist.size() * sectorspercluster * bytespersector;
+		    tmpitem.properties += std::to_string(physicalsize) + ">";
+		    tmpitem.properties += std::to_string(logicalsize);
 		    if(tmpitem.isdirectory)
 		    {
+			tmpitem.size = physicalsize;
 			tmpitem.cat = "Directory";
 			tmpitem.sig = "Directory";
 		    }
