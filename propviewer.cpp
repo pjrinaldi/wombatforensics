@@ -41,8 +41,18 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	std::string propitem;
 	while(getline(properties, propitem, ';'))
 	    proplist.push_back(propitem);
+	std::vector<std::string> propvalues;
+	propvalues.clear();
+	std::istringstream pvalues(*propstr);
+	std::string pval;
+	while(getline(pvalues, pval, '>'))
+	    propvalues.push_back(pval);
+	/*
 	for(int i=0; i < proplist.size(); i++)
 	    std::cout << "prop item " << i+1 << ": " << proplist.at(i) << std::endl;
+	for(int i=0; i < propvalues.size(); i++)
+	    std::cout << "propvalue " << i+1 << ": " << propvalues.at(i) << std::endl;
+	*/
 	//std::cout << "pt file string: " << ptfilestring << std::endl;
     }
     else

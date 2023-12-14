@@ -3118,7 +3118,7 @@ long WombatForensics::ContentSelected(FXObject*, FXSelector, void*)
 	if(fileitemvector.size() > 0)
 	{
 	    currentfileitem = fileitemvector.at(tablelist->getCurrentRow());
-	    std::cout << "sel props: " << currentfileitem.properties << std::endl;
+	    //std::cout << "sel props: " << currentfileitem.properties << std::endl;
 	    //std::cout << currentfileitem.name << " " << currentfileitem.gid << std::endl;
 	    PlainView(&currentfileitem);
 	}
