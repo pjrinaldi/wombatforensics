@@ -124,6 +124,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    if(!longnamestring.empty())
 		    {
 			tmpitem.name = longnamestring;
+			tmpitem.properties = longnamestring;
 			//filename = longnamestring;
 		    }
 		    else

@@ -63,7 +63,7 @@ struct FileItem
     std::string match = "";     // 15
     std::string change = "";    // 16
     std::string filename = "";  // 17
-    std::string properties = "" // 18
+    std::string properties = "";// 18
 
     void clear(void)
     {

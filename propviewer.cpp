@@ -47,6 +47,27 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname)
     }
     else
 	std::cout << "is not fat12" << std::endl;
+    /* WHILE LOOP TO SPLIT ON ';', THEN LOOPING OVER THOSE TO SPLIT ON ',' EXAMPLE
+    std::vector<std::string> dirlayoutlist;
+    dirlayoutlist.clear();
+    std::istringstream dirlayoutstream(curdirlayout);
+    std::string curlayout;
+    while(getline(dirlayoutstream, curlayout, ';'))
+	dirlayoutlist.push_back(curlayout);
+    for(int k=0; k < dirlayoutlist.size(); k++)
+    {
+	diroffset = 0;
+	dirsize = 0;
+	std::size_t layoutsplit = dirlayoutlist.at(k).find(",");
+	diroffset = std::stoull(dirlayoutlist.at(k).substr(0, layoutsplit));
+	dirsize = std::stoull(dirlayoutlist.at(k).substr(layoutsplit+1));
+	if(k == 0 && curfileitem != NULL) // first dirlayout entry and not root directory
+	{
+	    diroffset = diroffset + 64; // skip . and .. directories
+	    dirsize = dirsize - 64; // adjust read size for the 64 byte skip
+	}
+
+     */ 
 }
 
 /*
