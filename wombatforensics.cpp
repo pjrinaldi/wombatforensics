@@ -281,10 +281,15 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
             binaries.push_back(currentviewers.text());
     }
     binariesfile.close();
+    
     FXFile fat12filept;
     bool isfat12filept = fat12filept.open(configpath + "fat12file.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isfat12filept == false)
 	FXFile::copy("./fat12file.pt", configpath + "fat12file.pt");
+    FXFile fat12pt;
+    bool isfat12pt = fat12pt.open(configpath + "fat12.pt", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isfat12pt == false)
+	FXFile::copy("./fat12.pt", configpath + "fat12file.pt");
 
     forimgvector.clear();
 
@@ -945,6 +950,7 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 {
     FXString fileitemstr = "Property Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
     std::string propstr = currentfileitem.properties;
+    std::cout << "propstr: " << propstr << std::endl;
     PropertyViewer* propview = new PropertyViewer(this, fileitemstr);
     propview->LoadProp(&configpath, &pname, &propstr);
     propview->create();

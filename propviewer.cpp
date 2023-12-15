@@ -48,15 +48,18 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	std::string pval;
 	while(getline(pvalues, pval, '>'))
 	    propvalues.push_back(pval);
-	for(int i=0; i < proplist.size(); i++)
+	if(propvalues.size() > 0)
 	{
-	    std::string ptitle = "";
-	    std::string pdescr = "";
-	    std::size_t propsplit = proplist.at(i).find("|");
-	    ptitle = proplist.at(i).substr(0, propsplit);
-	    pdescr = proplist.at(i).substr(propsplit + 1);
-	    propstring += FXString(ptitle.c_str()) + "|" + FXString(propvalues.at(i).c_str()) + "|" + FXString(pdescr.c_str()) + "\n";
-	    //std::cout << ptitle << "|" << propvalues.at(i) << "|" << pdescr << std::endl; 
+	    for(int i=0; i < proplist.size(); i++)
+	    {
+		std::string ptitle = "";
+		std::string pdescr = "";
+		std::size_t propsplit = proplist.at(i).find("|");
+		ptitle = proplist.at(i).substr(0, propsplit);
+		pdescr = proplist.at(i).substr(propsplit + 1);
+		propstring += FXString(ptitle.c_str()) + "|" + FXString(propvalues.at(i).c_str()) + "|" + FXString(pdescr.c_str()) + "\n";
+		//std::cout << ptitle << "|" << propvalues.at(i) << "|" << pdescr << std::endl; 
+	    }
 	}
 	/*
 	for(int i=0; i < proplist.size(); i++)
