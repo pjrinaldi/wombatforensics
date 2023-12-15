@@ -15,62 +15,118 @@ PropertyViewer::PropertyViewer(FXWindow* parent, const FXString& title):FXDialog
     proptable->setRowHeaderWidth(0);
     //proptable->setHeight(this->getHeight() / 2);
     */
+    plainfont2 = new FXFont(parent->getApp(), "monospace");
     textview = new FXText(vframe, NULL, 0, LAYOUT_LEFT|LAYOUT_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
     textview->setHeight(50);
+    textview->setFont(plainfont2);
     textview->setEditable(false);
 }
 
-void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string* propstr)
+void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string* propstr, uint8_t ptype)
 {
     FXString propstring = "";
     std::vector<char> ptbytes;
     FXString ptpath = *configpath;
     //std::cout << "config path: " << configpath->text() << std::endl;
     //std::cout << "pname: " << pname->text() << std::endl;
-    if(pname->contains("FAT12") != 0)
+    if(ptype == 0x00)
     {
-	ptpath += "fat12file.pt";
-	std::ifstream ptfile(ptpath.text(), std::ios::binary | std::ios::ate);
-	std::streamsize ptfilesize = ptfile.tellg();
-	ptbytes.resize(ptfilesize);
-	ptfile.seekg(0, std::ios::beg);
-	ptfile.read(ptbytes.data(), ptfilesize);
-	std::string ptfilestring(ptbytes.data(), ptfilesize);
-	std::vector<std::string> proplist;
-	proplist.clear();
-	std::istringstream properties(ptfilestring);
-	std::string propitem;
-	while(getline(properties, propitem, ';'))
-	    proplist.push_back(propitem);
-	std::vector<std::string> propvalues;
-	propvalues.clear();
-	std::istringstream pvalues(*propstr);
-	std::string pval;
-	while(getline(pvalues, pval, '>'))
-	    propvalues.push_back(pval);
-	if(propvalues.size() > 0)
-	{
-	    for(int i=0; i < proplist.size(); i++)
-	    {
-		std::string ptitle = "";
-		std::string pdescr = "";
-		std::size_t propsplit = proplist.at(i).find("|");
-		ptitle = proplist.at(i).substr(0, propsplit);
-		pdescr = proplist.at(i).substr(propsplit + 1);
-		propstring += FXString(ptitle.c_str()) + "|" + FXString(propvalues.at(i).c_str()) + "|" + FXString(pdescr.c_str()) + "\n";
-		//std::cout << ptitle << "|" << propvalues.at(i) << "|" << pdescr << std::endl; 
-	    }
-	}
-	/*
-	for(int i=0; i < proplist.size(); i++)
-	    std::cout << "prop item " << i+1 << ": " << proplist.at(i) << std::endl;
-	for(int i=0; i < propvalues.size(); i++)
-	    std::cout << "propvalue " << i+1 << ": " << propvalues.at(i) << std::endl;
-	*/
-	//std::cout << "pt file string: " << ptfilestring << std::endl;
+	// NEED TO DO MORE FOR FORENSIC IMG TYPES
+	ptpath += "forimg";
     }
-    else
-	std::cout << "is not fat12" << std::endl;
+    if(ptype & 0x01)
+    {
+	if(pname->contains("FAT12") != 0)
+	    ptpath += "fat12";
+	else if(pname->contains("FAT16") != 0)
+	    ptpath += "fat16";
+    }
+    if(ptype & 0x02)
+	ptpath += "file";
+    ptpath += ".pt";
+    //std::cout << "ptfile: " << ptpath.text() << std::endl;
+    std::ifstream ptfile(ptpath.text(), std::ios::binary | std::ios::ate);
+    std::streamsize ptfilesize = ptfile.tellg();
+    ptbytes.resize(ptfilesize);
+    ptfile.seekg(0, std::ios::beg);
+    ptfile.read(ptbytes.data(), ptfilesize);
+    std::string ptfilestring(ptbytes.data(), ptfilesize);
+    std::vector<std::string> proplist;
+    proplist.clear();
+    std::istringstream properties(ptfilestring);
+    std::string propitem;
+    while(getline(properties, propitem, ';'))
+	proplist.push_back(propitem);
+    std::vector<std::string> propvalues;
+    propvalues.clear();
+    std::istringstream pvalues(*propstr);
+    std::string pval;
+    while(getline(pvalues, pval, '>'))
+	propvalues.push_back(pval);
+    uint64_t maxpvaluelength = 0;
+    for(int i=0; i < propvalues.size(); i++)
+    {
+	if(maxpvaluelength < propvalues.at(i).size())
+	    maxpvaluelength = propvalues.at(i).size();
+    }
+    // GET PROPERTY LENGTH & DESCRIPTION LENGTH
+    uint64_t proplength = 0;
+    uint64_t desclength = 0;
+    for(int i=0; i < proplist.size(); i++)
+    {
+	std::size_t propsplit = proplist.at(i).find("|");
+	if(proplength < proplist.at(i).substr(0, propsplit).size())
+	    proplength = proplist.at(i).substr(0, propsplit).size();
+	if(desclength < proplist.at(i).substr(propsplit + 1).size())
+	    desclength = proplist.at(i).substr(propsplit + 1).size();
+    }
+    FXString pheader = "Property";
+    FXString vheader = "|Value";
+    FXString dheader = "|Description";
+    FXString hrule = "";
+    for(int i=pheader.length() - 1; i < proplength - 1; i++)
+	pheader += " ";
+    for(int i=vheader.length() - 1; i < maxpvaluelength; i++)
+	vheader += " ";
+    for(int i=0; i < proplength + maxpvaluelength + desclength + 2; i++)
+	hrule += "-";
+    propstring = hrule + "\n" + pheader + vheader + dheader + "\n" + hrule + "\n";
+
+
+    //std::cout << "max pvalue length: " << maxpvaluelength << std::endl;
+    if(propvalues.size() > 0)
+    {
+	for(int i=0; i < proplist.size(); i++)
+	{
+	    std::string ptitle = "";
+	    std::string pdescr = "";
+	    FXString pvalue = FXString(propvalues.at(i).c_str());
+	    //std::cout << "pvalue size: " << pvalue.length() << std::endl;
+	    //std::cout << "spaces to add: " << maxpvaluelength - pvalue.length() << std::endl;
+	    if(pvalue.length() < maxpvaluelength)
+	    {
+		for(int i=pvalue.length() - 1; i < maxpvaluelength - 1; i++)
+		    pvalue += " ";
+	    }
+	    //std::cout << "new pvalue size: " << pvalue.length() << std::endl;
+	    std::size_t propsplit = proplist.at(i).find("|");
+	    ptitle = proplist.at(i).substr(0, propsplit);
+	    pdescr = proplist.at(i).substr(propsplit + 1);
+	    propstring += FXString(ptitle.c_str()) + "|" + pvalue + "|" + FXString(pdescr.c_str()) + "\n";
+	    //std::cout << ptitle << "|" << propvalues.at(i) << "|" << pdescr << std::endl; 
+	}
+	propstring += hrule + "\n";
+    }
+    /*
+    for(int i=0; i < proplist.size(); i++)
+	std::cout << "prop item " << i+1 << ": " << proplist.at(i) << std::endl;
+    for(int i=0; i < propvalues.size(); i++)
+	std::cout << "propvalue " << i+1 << ": " << propvalues.at(i) << std::endl;
+    */
+    //std::cout << "pt file string: " << ptfilestring << std::endl;
+    //}
+    //else
+	//std::cout << "is not fat12" << std::endl;
     textview->setText(propstring);
 }
 

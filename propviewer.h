@@ -19,6 +19,7 @@ class PropertyViewer : public FXDialogBox
     private:
         FXVerticalFrame* vframe;
         //FXTable* proptable;
+        FXFont* plainfont2;
         FXText* textview;
 
     protected:
@@ -26,7 +27,7 @@ class PropertyViewer : public FXDialogBox
 
     public:
         PropertyViewer(FXWindow* parent, const FXString& title);
-	void LoadProp(FXString* configpath, FXString* pname, std::string* propstr);
+	void LoadProp(FXString* configpath, FXString* pname, std::string* propstr, uint8_t ptype);
 };
 
 #endif // PROPVIEWER_H

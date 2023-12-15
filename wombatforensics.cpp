@@ -289,7 +289,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     FXFile fat12pt;
     bool isfat12pt = fat12pt.open(configpath + "fat12.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isfat12pt == false)
-	FXFile::copy("./fat12.pt", configpath + "fat12file.pt");
+	FXFile::copy("./fat12.pt", configpath + "fat12.pt");
 
     forimgvector.clear();
 
@@ -897,6 +897,7 @@ long WombatForensics::TagMenu(FXObject*, FXSelector, void* ptr)
     FXEvent* event = (FXEvent*)ptr;
     if(tablelist->getCurrentRow() > -1 && !tablelist->getItemText(tablelist->getCurrentRow(), 1).empty())
     {
+	curiconid = tablelist->getItem(tablelist->getCurrentRow(), 2)->getIcon()->id();
         bool iscurchecked = ((CheckTableItem*)tablelist->getItem(tablelist->getCurrentRow(), 0))->getCheck();
         if(!event->moved)
         {
@@ -948,11 +949,21 @@ long WombatForensics::OpenHexViewer(FXObject*, FXSelector, void*)
 }
 long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 {
+    uint8_t ptype = 3;
     FXString fileitemstr = "Property Viewer - " + tablelist->getItemText(tablelist->getCurrentRow(), 1) + " " + tablelist->getItemText(tablelist->getCurrentRow(), 2);
     std::string propstr = currentfileitem.properties;
-    std::cout << "propstr: " << propstr << std::endl;
+    if(curiconid == forimgicon->id()) // FORENSIC IMAGE SELECTED
+    {
+	ptype = 0;
+    }
+    else if(curiconid == partitionicon->id()) // PARTITION SELECTED
+    {
+	ptype = 1;
+    }
+    //std::cout << "propstr: " << propstr << std::endl;
+    //std::cout << "ptype: " << std::hex << (uint)ptype << std::dec << std::endl;
     PropertyViewer* propview = new PropertyViewer(this, fileitemstr);
-    propview->LoadProp(&configpath, &pname, &propstr);
+    propview->LoadProp(&configpath, &pname, &propstr, ptype);
     propview->create();
     propview->show(PLACEMENT_CURSOR);
 
