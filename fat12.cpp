@@ -76,9 +76,6 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	for(uint i=0; i < direntrycount; i++)
 	{
 	    FileItem tmpitem;
-	    //std::string filename = "";
-	    //uint32_t clusternum = 0;
-	    //uint64_t physicalsize = 0;
 	    // FIRST CHARACTER
 	    uint8_t firstchar = 0;
 	    currentitem->forimg->ReadContent(&firstchar, diroffset + i*32, 1);
@@ -92,6 +89,13 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		//std::cout << "first char: " << std::hex << (uint)firstchar << std::endl;
 		if((uint)fileattr == 0x0f || (uint)fileattr == 0x3f) // long directory name
 		{
+		    if(firstchar & 0x40)
+		    {
+			if(!longnamestring.empty()) // ORPHAN LONG ENTRY
+			{
+			    std::cout << "orphan entry need to populate in orphans directory." << std::endl;
+			}
+		    }
 		    uint lsn = ((int)firstchar & 0x0f);
 		    if(lsn <= 20)
 		    {
@@ -106,6 +110,43 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			}
 			longnamestring.insert(0, longname);
 		    }
+	/*
+	 *  else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
+            {
+                if(firstchar & 0x40)
+                {
+                    if(!longnamestring.isEmpty()) // orphan long entry
+                    {
+			QHash<QString, QVariant> nodedata;
+			nodedata.clear();
+			nodedata.insert("name", QByteArray(longnamestring.toUtf8()).toBase64());
+                        nodedata.insert("path", QByteArray("/orphans/").toBase64());
+                        nodedata.insert("size", 0);
+                        nodedata.insert("create", "0");
+                        nodedata.insert("access", "0");
+                        nodedata.insert("modify", "0");
+                        nodedata.insert("status", "0");
+                        nodedata.insert("hash", "0");
+                        nodedata.insert("cat", "Empty");
+                        nodedata.insert("sig", "Empty File");
+                        nodedata.insert("tag", "0");
+                        nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
+			nodedata.insert("match", 0);
+			mutex.lock();
+			treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"), 4, 1);
+			mutex.unlock();
+			nodedata.clear();
+			inodecnt++;
+                        //qDebug() << "orphan:" << longnamestring;
+                        //orphaninfo.clear();
+                        //orphaninfo.insert("filename", QVariant(longnamestring));
+                        //orphanlist->append(orphaninfo);
+                        //orphanlist->append(longnamestring);
+                        longnamestring = "";
+                    }
+                }
+	 */ 
+
 		}
 		else
 		{
