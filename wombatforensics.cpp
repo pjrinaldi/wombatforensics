@@ -3262,6 +3262,7 @@ void WombatForensics::UpdatePartitions(void)
 	bool isvolexist = volfile.open(volfilestr, FXIO::Reading, FXIO::OwnerReadWrite);
 	if(isvolexist == true)
 	{
+	    // need to split string on the | to get the curid.
 	    char* gichar = new char[volfile.size()+1];
 	    volfile.readBlock(gichar, volfile.size());
 	    gichar[volfile.size()] = 0;
@@ -3277,7 +3278,8 @@ void WombatForensics::UpdatePartitions(void)
 	    volfile.close();
 	    FXFile::create(volfilestr, FXIO::OwnerReadWrite);
 	    volfile.open(volfilestr, FXIO::Writing, FXIO::OwnerReadWrite);
-	    FXString idval = FXString::value(globalid);
+	    // need to add volprops.at(i) to this with a split of |
+	    FXString idval = FXString::value(globalid) + "|" + FXString(volprops.at(i).c_str());
 	    volfile.writeBlock(idval.text(), idval.length());
 	    volfile.close();
 	    //std::cout << "global id when not existing fs opened: " << globalid << std::endl;
