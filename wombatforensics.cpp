@@ -958,6 +958,8 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
     }
     else if(curiconid == partitionicon->id()) // PARTITION SELECTED
     {
+	propstr = volprops.at(tablelist->getCurrentRow());
+	//std::cout << volprops.at(tablelist->getCurrentRow()) << std::endl;
 	ptype = 1;
     }
     //std::cout << "propstr: " << propstr << std::endl;
@@ -3236,8 +3238,8 @@ void WombatForensics::UpdatePartitions(void)
     voloffsets.clear();
     this->getApp()->beginWaitCursor();
     LoadPartitions(curforimg, &volnames, &volsizes, &voloffsets, &volprops);
-    if(volprops.size() > 0)
-	std::cout << volprops.at(0) << std::endl;
+    //if(volprops.size() > 0)
+	//std::cout << volprops.at(0) << std::endl;
     // table initialization
     tablelist->setTableSize(volnames.size(), 14);
     tablelist->setColumnText(0, "");
@@ -3267,7 +3269,13 @@ void WombatForensics::UpdatePartitions(void)
 	    volfile.readBlock(gichar, volfile.size());
 	    gichar[volfile.size()] = 0;
 	    volfile.close();
-	    globalid = FXString(gichar).toULong();
+	    FXString filestr = FXString(gichar);
+	    int splitoffset = filestr.find("|");
+	    globalid = filestr.mid(0, splitoffset).toULong();
+	    //std::cout << "globalid from fs file: [" << globalid << "]" << std::endl;
+	    //std::cout << "fs properties: [" << filestr.mid(splitoffset + 1, filestr.length() - splitoffset).text() << "]" << std::endl;
+	    // old method prior to adding properties to the fs burrow file
+	    //globalid = FXString(gichar).toULong();
 	    IncrementGlobalId(&globalid, &curid);
 	    //std::cout << "global id when existing fs opened: " << globalid << std::endl;
 	}
