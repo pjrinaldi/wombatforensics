@@ -3231,10 +3231,11 @@ void WombatForensics::UpdatePartitions(void)
 {
     currentfileitem.clear();
     volnames.clear();
+    volprops.clear();
     volsizes.clear();
     voloffsets.clear();
     this->getApp()->beginWaitCursor();
-    LoadPartitions(curforimg, &volnames, &volsizes, &voloffsets);
+    LoadPartitions(curforimg, &volnames, &volsizes, &voloffsets, &volprops);
     // table initialization
     tablelist->setTableSize(volnames.size(), 14);
     tablelist->setColumnText(0, "");

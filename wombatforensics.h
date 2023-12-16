@@ -287,6 +287,7 @@ class WombatForensics : public FXMainWindow
         int itemtype = 0;
         int curiconid = 0;
         std::vector<std::string> volnames;
+	std::vector<std::string> volprops;
         std::vector<uint64_t> volsizes;
         std::vector<uint64_t> voloffsets;
         std::vector<FileItem> fileitemvector;

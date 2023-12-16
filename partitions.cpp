@@ -2,7 +2,7 @@
 
 
 
-void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets)
+void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets, std::vector<std::string>* volprops)
 {
     uint16_t mbrsig = 0;
     uint16_t applesig  = 0;
@@ -23,7 +23,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
             ReadForImgContent(curforimg, &gptsig, 512, 8);
             if(gptsig == 0x4546492050415254) // GUID PARTITION TABLE
             {
-                LoadGptPartitions(curforimg, volnames, volsizes, voloffsets);
+                LoadGptPartitions(curforimg, volnames, volsizes, voloffsets, volprops);
             }
         }
         else // MBR DISK
@@ -138,7 +138,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     }
     else if(gptsig == 0x4546492050415254) // GPT PARTITION
     {
-        LoadGptPartitions(curforimg, volnames, volsizes, voloffsets);
+        LoadGptPartitions(curforimg, volnames, volsizes, voloffsets, volprops);
     }
     else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
     {
@@ -148,7 +148,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     }
 }
 
-void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets)
+void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets, std::vector<std::string>* volprops)
 {
     uint64_t parttablestart = 0;
     uint32_t partentrycount = 0;
