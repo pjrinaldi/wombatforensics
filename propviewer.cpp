@@ -47,85 +47,89 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
     //std::cout << "ptfile: " << ptpath.text() << std::endl;
     std::ifstream ptfile(ptpath.text(), std::ios::binary | std::ios::ate);
     std::streamsize ptfilesize = ptfile.tellg();
-    ptbytes.resize(ptfilesize);
-    ptfile.seekg(0, std::ios::beg);
-    ptfile.read(ptbytes.data(), ptfilesize);
-    std::string ptfilestring(ptbytes.data(), ptfilesize);
-    std::vector<std::string> proplist;
-    proplist.clear();
-    std::istringstream properties(ptfilestring);
-    std::string propitem;
-    while(getline(properties, propitem, ';'))
-	proplist.push_back(propitem);
-    std::vector<std::string> propvalues;
-    propvalues.clear();
-    std::istringstream pvalues(*propstr);
-    std::string pval;
-    while(getline(pvalues, pval, '>'))
-	propvalues.push_back(pval);
-    uint64_t maxpvaluelength = 0;
-    for(int i=0; i < propvalues.size(); i++)
+    //std::cout << "ptfile size: " << ptfilesize << std::endl;
+    if(ptfilesize > 0)
     {
-	if(maxpvaluelength < propvalues.at(i).size())
-	    maxpvaluelength = propvalues.at(i).size();
-    }
-    // GET PROPERTY LENGTH & DESCRIPTION LENGTH
-    uint64_t proplength = 0;
-    uint64_t desclength = 0;
-    for(int i=0; i < proplist.size(); i++)
-    {
-	std::size_t propsplit = proplist.at(i).find("|");
-	if(proplength < proplist.at(i).substr(0, propsplit).size())
-	    proplength = proplist.at(i).substr(0, propsplit).size();
-	if(desclength < proplist.at(i).substr(propsplit + 1).size())
-	    desclength = proplist.at(i).substr(propsplit + 1).size();
-    }
-    FXString pheader = "Property";
-    FXString vheader = "|Value";
-    FXString dheader = "|Description";
-    FXString hrule = "";
-    for(int i=pheader.length() - 1; i < proplength - 1; i++)
-	pheader += " ";
-    for(int i=vheader.length() - 1; i < maxpvaluelength; i++)
-	vheader += " ";
-    for(int i=0; i < proplength + maxpvaluelength + desclength + 2; i++)
-	hrule += "-";
-    propstring = hrule + "\n" + pheader + vheader + dheader + "\n" + hrule + "\n";
-
-    //std::cout << "max pvalue length: " << maxpvaluelength << std::endl;
-    if(propvalues.size() > 0)
-    {
+	ptbytes.resize(ptfilesize);
+	ptfile.seekg(0, std::ios::beg);
+	ptfile.read(ptbytes.data(), ptfilesize);
+	std::string ptfilestring(ptbytes.data(), ptfilesize);
+	std::vector<std::string> proplist;
+	proplist.clear();
+	std::istringstream properties(ptfilestring);
+	std::string propitem;
+	while(getline(properties, propitem, ';'))
+	    proplist.push_back(propitem);
+	std::vector<std::string> propvalues;
+	propvalues.clear();
+	std::istringstream pvalues(*propstr);
+	std::string pval;
+	while(getline(pvalues, pval, '>'))
+	    propvalues.push_back(pval);
+	uint64_t maxpvaluelength = 0;
+	for(int i=0; i < propvalues.size(); i++)
+	{
+	    if(maxpvaluelength < propvalues.at(i).size())
+		maxpvaluelength = propvalues.at(i).size();
+	}
+	// GET PROPERTY LENGTH & DESCRIPTION LENGTH
+	uint64_t proplength = 0;
+	uint64_t desclength = 0;
 	for(int i=0; i < proplist.size(); i++)
 	{
-	    std::string ptitle = "";
-	    std::string pdescr = "";
-	    FXString pvalue = FXString(propvalues.at(i).c_str());
-	    //std::cout << "pvalue size: " << pvalue.length() << std::endl;
-	    //std::cout << "spaces to add: " << maxpvaluelength - pvalue.length() << std::endl;
-	    if(pvalue.length() < maxpvaluelength)
-	    {
-		//for(int i=pvalue.length() - 1; i < maxpvaluelength - 1; i++)
-		for(int i=pvalue.length(); i < maxpvaluelength; i++)
-		    pvalue += " ";
-	    }
-	    //std::cout << "new pvalue size: " << pvalue.length() << std::endl;
 	    std::size_t propsplit = proplist.at(i).find("|");
-	    ptitle = proplist.at(i).substr(0, propsplit);
-	    if(ptitle.length() < proplength)
-	    {
-		for(int i=ptitle.length() - 1; i < proplength - 1; i++)
-		    ptitle += " ";
-	    }
-	    pdescr = proplist.at(i).substr(propsplit + 1);
-	    if(pdescr.length() < desclength)
-	    {
-		for(int i=pdescr.length() - 1; i < desclength - 1; i++)
-		    pdescr += " ";
-	    }
-	    propstring += FXString(ptitle.c_str()) + "|" + pvalue + "|" + FXString(pdescr.c_str()) + "\n";
-	    //std::cout << ptitle << "|" << propvalues.at(i) << "|" << pdescr << std::endl; 
+	    if(proplength < proplist.at(i).substr(0, propsplit).size())
+		proplength = proplist.at(i).substr(0, propsplit).size();
+	    if(desclength < proplist.at(i).substr(propsplit + 1).size())
+		desclength = proplist.at(i).substr(propsplit + 1).size();
 	}
-	propstring += hrule + "\n";
+	FXString pheader = "Property";
+	FXString vheader = "|Value";
+	FXString dheader = "|Description";
+	FXString hrule = "";
+	for(int i=pheader.length() - 1; i < proplength - 1; i++)
+	    pheader += " ";
+	for(int i=vheader.length() - 1; i < maxpvaluelength; i++)
+	    vheader += " ";
+	for(int i=0; i < proplength + maxpvaluelength + desclength + 2; i++)
+	    hrule += "-";
+	propstring = hrule + "\n" + pheader + vheader + dheader + "\n" + hrule + "\n";
+
+	//std::cout << "max pvalue length: " << maxpvaluelength << std::endl;
+	if(propvalues.size() > 0)
+	{
+	    for(int i=0; i < proplist.size(); i++)
+	    {
+		std::string ptitle = "";
+		std::string pdescr = "";
+		FXString pvalue = FXString(propvalues.at(i).c_str());
+		//std::cout << "pvalue size: " << pvalue.length() << std::endl;
+		//std::cout << "spaces to add: " << maxpvaluelength - pvalue.length() << std::endl;
+		if(pvalue.length() < maxpvaluelength)
+		{
+		    //for(int i=pvalue.length() - 1; i < maxpvaluelength - 1; i++)
+		    for(int i=pvalue.length(); i < maxpvaluelength; i++)
+			pvalue += " ";
+		}
+		//std::cout << "new pvalue size: " << pvalue.length() << std::endl;
+		std::size_t propsplit = proplist.at(i).find("|");
+		ptitle = proplist.at(i).substr(0, propsplit);
+		if(ptitle.length() < proplength)
+		{
+		    for(int i=ptitle.length() - 1; i < proplength - 1; i++)
+			ptitle += " ";
+		}
+		pdescr = proplist.at(i).substr(propsplit + 1);
+		if(pdescr.length() < desclength)
+		{
+		    for(int i=pdescr.length() - 1; i < desclength - 1; i++)
+			pdescr += " ";
+		}
+		propstring += FXString(ptitle.c_str()) + "|" + pvalue + "|" + FXString(pdescr.c_str()) + "\n";
+		//std::cout << ptitle << "|" << propvalues.at(i) << "|" << pdescr << std::endl; 
+	    }
+	    propstring += hrule + "\n";
+	}
     }
     /*
     for(int i=0; i < proplist.size(); i++)

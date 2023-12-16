@@ -281,7 +281,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
             binaries.push_back(currentviewers.text());
     }
     binariesfile.close();
-    
+    // COPY PROPERTY FILES INTO CONFIG DIRECTORY
     FXFile fat12filept;
     bool isfat12filept = fat12filept.open(configpath + "fat12file.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isfat12filept == false)
@@ -290,6 +290,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     bool isfat12pt = fat12pt.open(configpath + "fat12.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isfat12pt == false)
 	FXFile::copy("./fat12.pt", configpath + "fat12.pt");
+    FXFile forimgpt;
+    bool isforimgpt = forimgpt.open(configpath + "forimg.pt", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isforimgpt == false)
+	FXFile::copy("./forimg.pt", configpath + "forimg.pt");
 
     forimgvector.clear();
 
