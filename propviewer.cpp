@@ -92,7 +92,6 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	hrule += "-";
     propstring = hrule + "\n" + pheader + vheader + dheader + "\n" + hrule + "\n";
 
-
     //std::cout << "max pvalue length: " << maxpvaluelength << std::endl;
     if(propvalues.size() > 0)
     {
@@ -105,13 +104,24 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    //std::cout << "spaces to add: " << maxpvaluelength - pvalue.length() << std::endl;
 	    if(pvalue.length() < maxpvaluelength)
 	    {
-		for(int i=pvalue.length() - 1; i < maxpvaluelength - 1; i++)
+		//for(int i=pvalue.length() - 1; i < maxpvaluelength - 1; i++)
+		for(int i=pvalue.length(); i < maxpvaluelength; i++)
 		    pvalue += " ";
 	    }
 	    //std::cout << "new pvalue size: " << pvalue.length() << std::endl;
 	    std::size_t propsplit = proplist.at(i).find("|");
 	    ptitle = proplist.at(i).substr(0, propsplit);
+	    if(ptitle.length() < proplength)
+	    {
+		for(int i=ptitle.length() - 1; i < proplength - 1; i++)
+		    ptitle += " ";
+	    }
 	    pdescr = proplist.at(i).substr(propsplit + 1);
+	    if(pdescr.length() < desclength)
+	    {
+		for(int i=pdescr.length() - 1; i < desclength - 1; i++)
+		    pdescr += " ";
+	    }
 	    propstring += FXString(ptitle.c_str()) + "|" + pvalue + "|" + FXString(pdescr.c_str()) + "\n";
 	    //std::cout << ptitle << "|" << propvalues.at(i) << "|" << pdescr << std::endl; 
 	}
