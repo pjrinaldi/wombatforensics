@@ -329,6 +329,35 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		uint8_t sectorspercluster = 0;
 		curforimg->ReadContent(&sectorspercluster, offset + 13, 1);
 		properties += std::to_string(sectorspercluster) + ">";
+		// RESERVED AREA SIZE
+		uint16_t reservedareasize = 0;
+		ReadForImgContent(curforimg, &reservedareasize, offset + 14);
+		properties += std::to_string(reservedareasize) + ">";
+		// ROOT DIRECTORY MAX FILES
+		uint16_t rootdirmaxfiles = 0;
+		ReadForImgContent(curforimg, &rootdirmaxfiles, offset + 17);
+		properties += std::to_string(rootdirmaxfiles) + ">";
+		// FAT SIZE
+		uint16_t fatsize = 0;
+		ReadForImgContent(curforimg, &fatsize, offset + 22);
+		properties += std::to_string(fatsize) + ">";
+		// CLUSTER AREA START
+		uint64_t clusterareastart = reservedareasize + fatcount * fatsize + ((rootdirmaxfiles * 32) + (bytespersector - 1)) / bytespersector;
+		properties += std::to_string(clusterareastart) + ">";
+		// DIRECTORY OFFSET
+		uint64_t diroffset = (reservedareasize + fatcount * fatsize) * bytespersector;
+		properties += std::to_string(diroffset) + ">";
+		// DIRECTORY SIZE
+		uint64_t dirsize = rootdirmaxfiles * 32 + bytespersector - 1;
+		properties += std::to_string(dirsize) + ">";
+		// ROOT DIRECTORY LAYOUT
+		std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
+		properties += rootdirlayout + ">";
+		/*
+                out << "Volume Serial Number|0x" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 39, 4)), 16) << "|Serial number for the volume." << Qt::endl;
+                partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 43, 11).toStdString());
+                out << "Volume Label|" << partitionname << "|Label for the file system volume." << Qt::endl;
+		*/
 	    }
             else if(strcmp(fattype, "FAT16") == 0)
             {
