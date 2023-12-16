@@ -3236,6 +3236,8 @@ void WombatForensics::UpdatePartitions(void)
     voloffsets.clear();
     this->getApp()->beginWaitCursor();
     LoadPartitions(curforimg, &volnames, &volsizes, &voloffsets, &volprops);
+    if(volprops.size() > 0)
+	std::cout << volprops.at(0) << std::endl;
     // table initialization
     tablelist->setTableSize(volnames.size(), 14);
     tablelist->setColumnText(0, "");
