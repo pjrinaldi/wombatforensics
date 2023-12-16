@@ -142,6 +142,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     }
     else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
     {
+	GetVolumeProperties(curforimg, 0, volprops);
         volnames->push_back(GetFileSystemName(curforimg, 0));
         volsizes->push_back(curforimg->Size());
         voloffsets->push_back(0);
@@ -353,7 +354,15 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		// ROOT DIRECTORY LAYOUT
 		std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
 		properties += rootdirlayout + ">";
+		uint32_t volserial = 0;
+		ReadForImgContent(curforimg, &volserial, offset + 39);
+		std::stringstream serialstream;
+		serialstream << "0x" << std::setfill('0') << std::setw(sizeof(uint8_t)*2) << std::hex << volserial;
+		std::cout << serialstream.str() << std::endl;
 		/*
+		char* fattype = new char[6];
+		curforimg->ReadContent((uint8_t*)fattype, offset + 3, 5);
+		fattype[5] = 0;
                 out << "Volume Serial Number|0x" << QString::number(qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector*512 + 39, 4)), 16) << "|Serial number for the volume." << Qt::endl;
                 partitionname += QString::fromStdString(curimg->ReadContent(curstartsector*512 + 43, 11).toStdString());
                 out << "Volume Label|" << partitionname << "|Label for the file system volume." << Qt::endl;
