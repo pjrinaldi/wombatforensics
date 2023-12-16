@@ -289,7 +289,61 @@ void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsiz
     }
 }
 
-
+void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::string>* volprops)
+{
+    std::string properties = "";
+    uint16_t sig16 = 0;
+    uint32_t sig32 = 0;
+    uint64_t sig64 = 0;
+    ReadForImgContent(curforimg, &sig32, offset + 544);
+    ReadForImgContent(curforimg, &sig16, offset + 510);
+    if(sig32 == 0x42465331) // BFS1 - BeFS
+    {
+    }
+    if(sig16 == 0xaa55) // FAT12, FAT16, FAT3, EXFAT, or NTFS
+    {
+	char* fattype = new char[6];
+	curforimg->ReadContent((uint8_t*)fattype, offset + 3, 5);
+	fattype[5] = 0;
+	if(strcmp(fattype, "EXFAT") == 0)
+	{
+	}
+        else if(std::string(fattype).find("NTFS") != std::string::npos)
+	{
+	}
+        else
+	{
+            char* pname = new char[12];
+            curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
+            if(strcmp(fattype, "FAT12") == 0)
+	    {
+		// BYTES PER SECTOR
+		uint16_t bytespersector = 0;
+		ReadForImgContent(curforimg, &bytespersector, offset + 11);
+		properties += std::to_string(bytespersector) + ">";
+		// FAT COUNT
+		uint8_t fatcount = 0;
+		curforimg->ReadContent(&fatcount, offset + 16, 1);
+		properties += std::to_string(fatcount) + ">";
+		// SECTORS PER CLUSTER
+		uint8_t sectorspercluster = 0;
+		curforimg->ReadContent(&sectorspercluster, offset + 13, 1);
+		properties += std::to_string(sectorspercluster) + ">";
+	    }
+            else if(strcmp(fattype, "FAT16") == 0)
+            {
+	    }
+	    else
+	    {
+                curforimg->ReadContent((uint8_t*)fattype, offset + 82, 5);
+                fattype[5] = 0;
+                if(strcmp(fattype, "FAT32") == 0)
+                {
+		}
+	    }
+	}
+    }
+}
 
 std::string GetFileSystemName(ForImg* curforimg, uint64_t offset)
 {
