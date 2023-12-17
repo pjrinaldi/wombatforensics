@@ -294,6 +294,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     bool isforimgpt = forimgpt.open(configpath + "forimg.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isforimgpt == false)
 	FXFile::copy("./forimg.pt", configpath + "forimg.pt");
+    FXFile ewfimgpt;
+    bool isewfimgpt = ewfimgpt.open(configpath + "ewfimg.pt", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isewfimgpt == false)
+	FXFile::copy("./ewfimg.pt", configpath + "ewfimg.pt");
 
     forimgvector.clear();
 
@@ -959,6 +963,7 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
     if(curiconid == forimgicon->id()) // FORENSIC IMAGE SELECTED
     {
 	ptype = 0;
+	pname = tablelist->getItemText(tablelist->getCurrentRow(), 2);
     }
     else if(curiconid == partitionicon->id()) // PARTITION SELECTED
     {
