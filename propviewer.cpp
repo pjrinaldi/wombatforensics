@@ -31,19 +31,16 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
     //std::cout << "pname: " << pname->text() << std::endl;
     if(ptype == 0x00)
     {
+	libewf_error_t* ewferr = NULL;
 	// NEED TO DO MORE FOR FORENSIC IMG TYPES
 	if(pname->contains(".dd") == true || pname->contains(".DD") == true || pname->contains(".raw") == true || pname->contains(".RAW") == true || pname->contains(".000") == true || pname->contains("001") == true)
 	{
 	    std::cout << "raw img, no properties." << std::endl;
 	    ptpath += "forimg";
 	}
-	else if(pname->contains(".e01") == true || pname->contains(".E01") == true)
+	else if(pname->contains(".e01") == true || pname->contains(".E01") == true || libewf_check_file_signature(pname->text(), &ewferr) == 1)
 	    ptpath += "ewfimg";
 	/*
-	if(imgext.compare("dd") == 0 || imgext.compare("DD") == 0) // RAW
-	    imgtype = 1;
-	else if(libewf_check_file_signature(imgfile.c_str(), &ewferr) == 1 || imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
-	    imgtype = 2;
 	else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
 	    imgtype = 3;
 	else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW

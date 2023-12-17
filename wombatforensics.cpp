@@ -962,8 +962,12 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
     std::string propstr = currentfileitem.properties;
     if(curiconid == forimgicon->id()) // FORENSIC IMAGE SELECTED
     {
+        //tablelist->setItemText(i, 3, FXString(forimgvector.at(i)->ImagePath().c_str()));
+        //tablelist->setItemText(i, 2, FXString(forimgvector.at(i)->ImageFileName().c_str()));
+	//std::cout << "img path: " << curforimg->ImageFullPath() << std::endl;
 	ptype = 0;
-	pname = tablelist->getItemText(tablelist->getCurrentRow(), 2);
+	pname = tablelist->getItemText(tablelist->getCurrentRow(), 3) + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+	//std::cout << tablelist->getItemText(tablelist->getCurrentRow(), 3).text() << std::endl; 
     }
     else if(curiconid == partitionicon->id()) // PARTITION SELECTED
     {
@@ -971,7 +975,6 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 	//std::cout << volprops.at(tablelist->getCurrentRow()) << std::endl;
 	ptype = 1;
     }
-    std::cout << "img path: " << curforimg->ImageFullPath() << std::endl;
     //std::cout << "propstr: " << propstr << std::endl;
     //std::cout << "ptype: " << std::hex << (uint)ptype << std::dec << std::endl;
     PropertyViewer* propview = new PropertyViewer(this, fileitemstr);
