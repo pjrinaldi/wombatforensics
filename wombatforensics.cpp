@@ -971,6 +971,7 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 	//std::cout << volprops.at(tablelist->getCurrentRow()) << std::endl;
 	ptype = 1;
     }
+    std::cout << "img path: " << curforimg->ImageFullPath() << std::endl;
     //std::cout << "propstr: " << propstr << std::endl;
     //std::cout << "ptype: " << std::hex << (uint)ptype << std::dec << std::endl;
     PropertyViewer* propview = new PropertyViewer(this, fileitemstr);

@@ -12,6 +12,8 @@
 
 #include "fox-1.7/fx.h"
 
+#include "libewf.h"
+
 class PropertyViewer : public FXDialogBox
 {
     FXDECLARE(PropertyViewer)
