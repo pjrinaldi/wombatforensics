@@ -616,25 +616,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
 	/* GET EWF PROPERTIES */
-	uint32_t headervaluecount = 0;
-	retopen = libewf_handle_get_number_of_header_values(ewfhandle, &headervaluecount, &ewferror);
-	/*
-	for(uint32_t i=0; i < headervaluecount; i++)
-	{
-	    size_t curheaderidsize = 0;
-	    retopen = libewf_handle_get_header_value_identifier_size(ewfhandle, i, &curheaderidsize, &ewferror);
-	    uint8_t* curheaderidvalue = new uint8_t[curheaderidsize];
-	    retopen = libewf_handle_get_header_value_identifier(ewfhandle, i, curheaderidvalue, curheaderidsize, &ewferror);
-	    size_t curheadervalsize = 0;
-	    retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, curheaderidvalue, curheaderidsize, &curheadervalsize, &ewferror);
-	    std::cout << "header value size: " << curheadervalsize << std::endl;
-	    uint8_t* curheadervalue = new uint8_t[curheadervalsize];
-	    retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)curheaderidvalue, curheaderidsize, curheadervalue, curheadervalsize, &ewferror);
-	    if(retopen == -1)
-		libewf_error_fprint(ewferror, stdout);
-	    std::cout << "curid " << i << ": " << (char*)curheaderidvalue << " | " << (char*)curheadervalue << std::endl;
-	}
-	*/
 	// CASE NUMBER
 	size_t casenumbersize = 0;
 	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"case_number", 11, &casenumbersize, &ewferror);
@@ -695,14 +676,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	uint8_t* passvalue = new uint8_t[passwordsize];
 	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"password", 8, passvalue, passwordsize, &ewferror);
 	std::string password = (char*)passvalue;
-	/*
-	// COMPRESSION LEVEL
-	size_t compressionlevelsize = 0;
-	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"compression_level", 17, &compressionlevelsize, &ewferror);
-	uint8_t* clevel = new uint8_t[compressionlevelsize];
-	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"compression_level", 17, clevel, compressionlevelsize, &ewferror);
-	std::string compressionlevel = (char*)clevel;
-	*/
 	// MODEL
 	size_t modelsize = 0;
 	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"model", 5, &modelsize, &ewferror);
@@ -743,15 +716,20 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	uint64_t sectorcount = 0;
 	retopen = libewf_handle_get_number_of_sectors(ewfhandle, &sectorcount, &ewferror);
 	// HASH
-	uint8_t* hash = new uint8_t[32];
+	uint8_t* hash = new uint8_t[16];
 	retopen = libewf_handle_get_md5_hash(ewfhandle, hash, 32, &ewferror);
 	// CLEAN UP LIBEWF VARIABLES
         libewf_handle_close(ewfhandle, &ewferror);
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
 	libewf_error_free(&ewferror);
+	std::stringstream ss;
+	ss << std::hex << std::setfill('0');
+	printf("hash: ");
+	for(int i=0; i < 16; i++)
+	    ss << std::setw(2) << (uint)hash[i];
 
-	*propstr = casenumber + ">" + description + ">" + examinername + ">" + evidencenumber + ">" + notes + ">" + acquirydate + ">" + systemdate + ">" + acquiryoperatingsystem + ">" + acquirysoftwareversion + ">" + std::to_string(format) + ">" + std::to_string(sectorsperchunk) + ">" + std::to_string(compressionmethod) + ">" + std::to_string(clevel) + ">" + std::to_string(mediatype) + ">" + std::to_string(bytespersector) + ">" + std::to_string(sectorcount) + ">" + std::to_string(imgsize) + ">" + std::string((char*)hash);
+	*propstr = casenumber + ">" + description + ">" + examinername + ">" + evidencenumber + ">" + notes + ">" + acquirydate + ">" + systemdate + ">" + acquiryoperatingsystem + ">" + acquirysoftwareversion + ">" + std::to_string(format) + ">" + std::to_string(sectorsperchunk) + ">" + std::to_string(compressionmethod) + ">" + std::to_string(clevel) + ">" + std::to_string(mediatype) + ">" + std::to_string(bytespersector) + ">" + std::to_string(sectorcount) + ">" + std::to_string(imgsize) + ">" + ss.str();
     }
 
     /*
@@ -780,7 +758,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	imgtype = 10;
     else // ANY OLD FILE
         imgtype = 0;
-    libewf_error_free(&ewferr);
     libvhdi_error_free(&vhderr);
     libqcow_error_free(&qcowerr);
     libvmdk_error_free(&vmdkerr);
@@ -793,60 +770,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
         imagebuffer.seekg(0, imagebuffer.end);
         imgsize = imagebuffer.tellg();
         imagebuffer.close();
-        //std::cout << imgfile << " size: " << imgsize << std::endl;
-    }
-    else if(imgtype == 2) // EWF
-    {
-        libewf_handle_t* ewfhandle = NULL;
-        libewf_error_t* ewferror = NULL;
-        char** globfiles = NULL;
-        int globfilecnt = 0;
-	int found = imgpath.rfind(".E");
-	if(found == -1)
-	    found = imgpath.rfind(".e");
-	std::string imgprematch = imgpath.substr(0, found+2);
-	std::filesystem::path imagepath(imgpath);
-	imagepath.remove_filename();
-	//std::cout << "Image Path: " << imgpath << std::endl;
-	//std::cout << "Image Pre Match: " << imgprematch << std::endl;
-	//std::cout << "imagepath: " << imagepath.string() << std::endl;
-	for(const auto &file : std::filesystem::directory_iterator(imagepath))
-	{
-	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
-		globfilecnt++;
-		//std::cout << "match: " << file.path().string() <<std::endl;
-	}
-	char* filenames[globfilecnt] = {NULL};
-	filenames[0] = (char*)imgpath.c_str();
-	int i = 1;
-	for(const auto &file : std::filesystem::directory_iterator(imagepath))
-	{
-	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
-	    {
-		if(file.path().string().compare(imgpath) != 0)
-		{
-		    filenames[i] = (char*)file.path().string().c_str();
-		    i++;
-		}
-	    }
-	}
-        int retopen = 0;
-        retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
-        retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
-        retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
-        libewf_handle_get_media_size(ewfhandle, &imgsize, &ewferror);
-        if(retopen == -1)
-            libewf_error_fprint(ewferror, stdout);
-        libewf_handle_close(ewfhandle, &ewferror);
-        libewf_handle_free(&ewfhandle, &ewferror);
-        libewf_glob_free(globfiles, globfilecnt, &ewferror);
-	libewf_error_free(&ewferror);
         //std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     else if(imgtype == 3) // AFF4
