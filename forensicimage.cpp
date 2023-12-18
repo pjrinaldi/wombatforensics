@@ -572,7 +572,6 @@ void ForImg::SetMountPath(QString mountpath)
 
 void GetForImgProperties(std::string* imgpath, std::string* propstr)
 {
-    size64_t imgsize = 0;
     libewf_error_t* ewferror = NULL;
     int rfound = imgpath->rfind(".");
     std::string imgext = imgpath->substr(rfound+1);
@@ -639,11 +638,17 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	// CASE NUMBER
 	size_t casenumbersize = 0;
 	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"case_number", 11, &casenumbersize, &ewferror);
-	//std::cout << "case number size: " << casenumbersize << std::endl;
 	uint8_t* casenumbervalue = new uint8_t[casenumbersize];
 	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"case_number", 11, casenumbervalue, casenumbersize, &ewferror);
-	std::cout << "case number: " << (char*)casenumbervalue << std::endl;
+	std::string casenumber = (char*)casenumbervalue;
+	// EXAMINER NAME
+	size_t examinernamesize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"examiner_name", 13, &examinernamesize, &ewferror);
+	uint8_t* examinernamevalue = new uint8_t[examinernamesize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"examiner_name", 13, examinernamevalue, examinernamesize, &ewferror);
+	std::string examinername = (char*)examinernamevalue;
 	// GET MEDIA SIZE
+	size64_t imgsize = 0;
         libewf_handle_get_media_size(ewfhandle, &imgsize, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
