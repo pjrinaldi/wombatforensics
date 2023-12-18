@@ -647,15 +647,111 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	uint8_t* examinernamevalue = new uint8_t[examinernamesize];
 	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"examiner_name", 13, examinernamevalue, examinernamesize, &ewferror);
 	std::string examinername = (char*)examinernamevalue;
+	// DESCRIPTION
+	size_t descriptionsize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"description", 11, &descriptionsize, &ewferror);
+	uint8_t* descriptionvalue = new uint8_t[descriptionsize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"description", 11, descriptionvalue, descriptionsize, &ewferror);
+	std::string description = (char*)descriptionvalue;
+	// EVIDENCE NUMBER
+	size_t evidencenumbersize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"evidence_number", 15, &evidencenumbersize, &ewferror);
+	uint8_t* evidencenumbervalue = new uint8_t[evidencenumbersize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"evidence_number", 15, evidencenumbervalue, evidencenumbersize, &ewferror);
+	std::string evidencenumber = (char*)evidencenumbervalue;
+	// NOTES
+	size_t notessize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"notes", 5, &notessize, &ewferror);
+	uint8_t* notesvalue = new uint8_t[notessize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"notes", 5, notesvalue, notessize, &ewferror);
+	std::string notes = (char*)notesvalue;
+	// ACQUIRY DATE
+	size_t acquirydatesize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"acquiry_date", 12, &acquirydatesize, &ewferror);
+	uint8_t* acquirydatevalue = new uint8_t[acquirydatesize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"acquiry_date", 12, acquirydatevalue, acquirydatesize, &ewferror);
+	std::string acquirydate = (char*)acquirydatevalue;
+	// SYSTEM DATE
+	size_t systemdatesize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"system_date", 11, &systemdatesize, &ewferror);
+	uint8_t* systemdatevalue = new uint8_t[systemdatesize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"system_date", 11, systemdatevalue, systemdatesize, &ewferror);
+	std::string systemdate = (char*)systemdatevalue;
+	// ACQUISITION OPERATING SYSTEM
+	size_t acquiryoperatingsystemsize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"acquiry_operating_system", 24, &acquiryoperatingsystemsize, &ewferror);
+	uint8_t* acquiryopsysvalue = new uint8_t[acquiryoperatingsystemsize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"acquiry_operating_system", 24, acquiryopsysvalue, acquiryoperatingsystemsize, &ewferror);
+	std::string acquiryoperatingsystem = (char*)acquiryopsysvalue;
+	// ACQUISITION SOFTWARE VERSION
+	size_t acquirysoftwareversionsize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"acquiry_software_version", 24, &acquirysoftwareversionsize, &ewferror);
+	uint8_t* acquirysoftvervalue = new uint8_t[acquirysoftwareversionsize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"acquiry_software_version", 24, acquirysoftvervalue, acquirysoftwareversionsize, &ewferror);
+	std::string acquirysoftwareversion = (char*)acquirysoftvervalue;
+	// PASSWORD
+	size_t passwordsize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"password", 8, &passwordsize, &ewferror);
+	uint8_t* passvalue = new uint8_t[passwordsize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"password", 8, passvalue, passwordsize, &ewferror);
+	std::string password = (char*)passvalue;
+	/*
+	// COMPRESSION LEVEL
+	size_t compressionlevelsize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"compression_level", 17, &compressionlevelsize, &ewferror);
+	uint8_t* clevel = new uint8_t[compressionlevelsize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"compression_level", 17, clevel, compressionlevelsize, &ewferror);
+	std::string compressionlevel = (char*)clevel;
+	*/
+	// MODEL
+	size_t modelsize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"model", 5, &modelsize, &ewferror);
+	uint8_t* mvalue = new uint8_t[modelsize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"model", 5, mvalue, modelsize, &ewferror);
+	std::string model = (char*)mvalue;
+	// SERIAL NUMBER
+	size_t serialnumbersize = 0;
+	retopen = libewf_handle_get_utf8_header_value_size(ewfhandle, (uint8_t*)"serial_number", 13, &serialnumbersize, &ewferror);
+	uint8_t* snum = new uint8_t[serialnumbersize];
+	retopen = libewf_handle_get_utf8_header_value(ewfhandle, (uint8_t*)"serial_number", 13, snum, serialnumbersize, &ewferror);
+	std::string serialnumber = (char*)snum;
 	// GET MEDIA SIZE
 	size64_t imgsize = 0;
         libewf_handle_get_media_size(ewfhandle, &imgsize, &ewferror);
         if(retopen == -1)
             libewf_error_fprint(ewferror, stdout);
+	uint8_t format = 0;
+	// FORMAT
+	retopen = libewf_handle_get_format(ewfhandle, &format, &ewferror);
+	// SECTORS PER CHUNK
+	uint32_t sectorsperchunk = 0;
+	retopen = libewf_handle_get_sectors_per_chunk(ewfhandle, &sectorsperchunk, &ewferror);
+	// COMPRESSION METHOD
+	uint16_t compressionmethod = 0;
+	retopen = libewf_handle_get_compression_method(ewfhandle, &compressionmethod, &ewferror);
+	// COMPRESSION LEVEL
+	int8_t clevel = 0;
+	uint8_t cflags = 0;
+	retopen = libewf_handle_get_compression_values(ewfhandle, &clevel, &cflags, &ewferror);
+	// MEDIA TYPE
+	uint8_t mediatype = 0;
+	retopen = libewf_handle_get_media_type(ewfhandle, &mediatype, &ewferror);
+	// BYTES PER SECTOR
+	uint32_t bytespersector = 0;
+	retopen = libewf_handle_get_bytes_per_sector(ewfhandle, &bytespersector, &ewferror);
+	// SECTOR COUNT
+	uint64_t sectorcount = 0;
+	retopen = libewf_handle_get_number_of_sectors(ewfhandle, &sectorcount, &ewferror);
+	// HASH
+	uint8_t* hash = new uint8_t[32];
+	retopen = libewf_handle_get_md5_hash(ewfhandle, hash, 32, &ewferror);
+	// CLEAN UP LIBEWF VARIABLES
         libewf_handle_close(ewfhandle, &ewferror);
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
 	libewf_error_free(&ewferror);
+
+	*propstr = casenumber + ">" + description + ">" + examinername + ">" + evidencenumber + ">" + notes + ">" + acquirydate + ">" + systemdate + ">" + acquiryoperatingsystem + ">" + acquirysoftwareversion + ">" + std::to_string(format) + ">" + std::to_string(sectorsperchunk) + ">" + std::to_string(compressionmethod) + ">" + std::to_string(clevel) + ">" + std::to_string(mediatype) + ">" + std::to_string(bytespersector) + ">" + std::to_string(sectorcount) + ">" + std::to_string(imgsize) + ">" + std::string((char*)hash);
     }
 
     /*
