@@ -59,4 +59,6 @@ class ForImg
 	wfi_metadata wfimd;
 };
 
+void GetForImgProperties(std::string* imgpath, std::string* propstr);
+
 #endif

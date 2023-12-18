@@ -569,3 +569,267 @@ void ForImg::SetMountPath(QString mountpath)
     mntpath.chop(1);
 }
 */
+
+void GetForImgProperties(std::string* imgpath, std::string* propstr)
+{
+    libewf_error_t* ewferr = NULL;
+    int rfound = imgpath->rfind(".");
+    std::string imgext = imgpath->substr(rfound+1);
+    if(libewf_check_file_signature(imgpath->c_str(), &ewferr) == 1 || imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
+    {
+    }
+
+    /*
+    libvhdi_error_t* vhderr = NULL;
+    libqcow_error_t* qcowerr = NULL;
+    libvmdk_error_t* vmdkerr = NULL;
+    libphdi_error_t* phderr = NULL;
+    // SET IMGTYPE - DETERMINES HOW READ THE RAW CONTENT
+    if(imgext.compare("dd") == 0 || imgext.compare("DD") == 0) // RAW
+        imgtype = 1;
+    else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
+        imgtype = 3;
+    else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW
+        imgtype = 4;
+    else if(imgext.compare("wfi") == 0) // WFI
+        imgtype = 5;
+    else if(imgext.compare("wli") == 0) // WLI
+        imgtype = 6;
+    else if(libvhdi_check_file_signature(imgfile.c_str(), &vhderr) == 1 || imgext.compare("vhd") == 0 || imgext.compare("vhdx") == 0 || imgext.compare("VHD") == 0 || imgext.compare("VHDX") == 0) // VHD/VHDX
+        imgtype = 7;
+    else if(libqcow_check_file_signature(imgfile.c_str(), &qcowerr) == 1 || imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
+	imgtype = 8;
+    else if(libvmdk_check_file_signature(imgfile.c_str(), &vmdkerr) == 1 || imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
+	imgtype = 9;
+    else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
+	imgtype = 10;
+    else // ANY OLD FILE
+        imgtype = 0;
+    libewf_error_free(&ewferr);
+    libvhdi_error_free(&vhderr);
+    libqcow_error_free(&qcowerr);
+    libvmdk_error_free(&vmdkerr);
+    libphdi_error_free(&phderr);
+    // SET IMGSIZE - GET THE SIZE OF THE RAW CONTENT
+    if(imgtype == 1) // RAW
+    {
+        imagebuffer.open(imgfile.c_str(), std::ios::in|std::ios::binary);
+        imagebuffer.seekg(0, imagebuffer.beg);
+        imagebuffer.seekg(0, imagebuffer.end);
+        imgsize = imagebuffer.tellg();
+        imagebuffer.close();
+        //std::cout << imgfile << " size: " << imgsize << std::endl;
+    }
+    else if(imgtype == 2) // EWF
+    {
+        libewf_handle_t* ewfhandle = NULL;
+        libewf_error_t* ewferror = NULL;
+        char** globfiles = NULL;
+        int globfilecnt = 0;
+	int found = imgpath.rfind(".E");
+	if(found == -1)
+	    found = imgpath.rfind(".e");
+	std::string imgprematch = imgpath.substr(0, found+2);
+	std::filesystem::path imagepath(imgpath);
+	imagepath.remove_filename();
+	//std::cout << "Image Path: " << imgpath << std::endl;
+	//std::cout << "Image Pre Match: " << imgprematch << std::endl;
+	//std::cout << "imagepath: " << imagepath.string() << std::endl;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+		globfilecnt++;
+		//std::cout << "match: " << file.path().string() <<std::endl;
+	}
+	char* filenames[globfilecnt] = {NULL};
+	filenames[0] = (char*)imgpath.c_str();
+	int i = 1;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+	    {
+		if(file.path().string().compare(imgpath) != 0)
+		{
+		    filenames[i] = (char*)file.path().string().c_str();
+		    i++;
+		}
+	    }
+	}
+        int retopen = 0;
+        retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        libewf_handle_get_media_size(ewfhandle, &imgsize, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        libewf_handle_close(ewfhandle, &ewferror);
+        libewf_handle_free(&ewfhandle, &ewferror);
+        libewf_glob_free(globfiles, globfilecnt, &ewferror);
+	libewf_error_free(&ewferror);
+        //std::cout << imgfile << " size: " << imgsize << std::endl;
+    }
+    else if(imgtype == 3) // AFF4
+    {
+        AFF4_init();
+        int aff4handle = AFF4_open(imgpath.c_str());
+        imgsize = AFF4_object_size(aff4handle);
+        AFF4_close(aff4handle);
+	//std::cout << imgfile << " size: " << imgsize << std::endl;
+    }
+    else if(imgtype == 4) // SPLIT RAW
+    {
+	libsmraw_handle_t* smhandle = NULL;
+	libsmraw_error_t* smerror = NULL;
+	char** globfiles = NULL;
+	int globfilecnt = 0;
+	int found = imgpath.rfind(".0");
+	if(found == -1)
+	    found = imgpath.rfind(".a");
+	std::string imgprematch = imgpath.substr(0, found+2);
+	std::filesystem::path imagepath(imgpath);
+	imagepath.remove_filename();
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+		globfilecnt++;
+	}
+	char* filenames[globfilecnt] = {NULL};
+	filenames[0] = (char*)imgpath.c_str();
+	int i = 1;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+	    {
+		if(file.path().string().compare(imgpath) != 0)
+		{
+		    filenames[i] = (char*)file.path().string().c_str();
+		    i++;
+		}
+	    }
+	}
+	int retopen = 0;
+	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	retopen = libsmraw_handle_initialize(&smhandle, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	retopen = libsmraw_handle_open(smhandle, globfiles, globfilecnt, LIBSMRAW_OPEN_READ, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	libsmraw_handle_get_media_size(smhandle, &imgsize, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	libsmraw_handle_close(smhandle, &smerror);
+	libsmraw_handle_free(&smhandle, &smerror);
+	libsmraw_glob_free(globfiles, globfilecnt, &smerror);
+	libsmraw_error_free(&smerror);
+        //std::cout << imgfile << " size: " << imgsize << std::endl;
+    }
+    else if(imgtype == 5) // WFI
+    {
+	FILE* wfifile = NULL;
+	wfifile = fopen(imgpath.c_str(), "rb");
+	fseek(wfifile, 0, SEEK_END);
+	fseek(wfifile, -264, SEEK_CUR);
+	fread(&wfimd, sizeof(struct wfi_metadata), 1, wfifile);
+	fclose(wfifile);
+        imgsize = wfimd.totalbytes;
+	//std::cout << imgpath << " size: " << wfimd.totalbytes << std::endl;
+	/*
+	printf("\nwombatinfo v0.1\n\n");
+	printf("Raw Media Size: %llu bytes\n", wfimd.totalbytes);
+	printf("Case Number:\t %s\n", wfimd.casenumber);
+	printf("Examiner:\t %s\n", wfimd.examiner);
+	printf("Evidence Number: %s\n", wfimd.evidencenumber);
+	printf("Description:\t %s\n", wfimd.description);
+	printf("BLAKE3 Hash:\t ");
+	for(size_t i=0; i < 32; i++)
+	    printf("%02x", wfimd.devhash[i]);
+	printf("\n");
+	 */ 
+/*    }
+    else if(imgtype == 6) // WLI
+    {
+    }
+    else if(imgtype == 7) // VHD/VHDX
+    {
+        libvhdi_error_t* vhderror = NULL;
+        libvhdi_file_t* vhdfile = NULL;
+        int retopen = 0;
+        retopen = libvhdi_file_initialize(&vhdfile, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        retopen = libvhdi_file_open(vhdfile, imgpath.c_str(), LIBVHDI_OPEN_READ, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        libvhdi_file_get_media_size(vhdfile, &imgsize, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        libvhdi_file_close(vhdfile, &vhderror);
+        libvhdi_file_free(&vhdfile, &vhderror);
+        libvhdi_error_free(&vhderror);
+    }
+    else if(imgtype == 8) // QCOW/QCOW2
+    {
+	libqcow_error_t* qcowerror = NULL;
+	libqcow_file_t* qcowfile = NULL;
+	int ret = 0;
+	ret = libqcow_file_initialize(&qcowfile, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	ret = libqcow_file_open(qcowfile, imgpath.c_str(), LIBQCOW_OPEN_READ, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	ret = libqcow_file_get_media_size(qcowfile, &imgsize, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	libqcow_file_close(qcowfile, &qcowerror);
+	libqcow_file_free(&qcowfile, &qcowerror);
+	libqcow_error_free(&qcowerror);
+    }
+    else if(imgtype == 9) // VMDK
+    {
+	libvmdk_error_t* vmdkerror = NULL;
+	libvmdk_handle_t* vmdkfile = NULL;
+	int ret = 0;
+	ret = libvmdk_handle_initialize(&vmdkfile, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	ret = libvmdk_handle_open(vmdkfile, imgpath.c_str(), LIBVMDK_OPEN_READ, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	ret = libvmdk_handle_get_media_size(vmdkfile, &imgsize, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	libvmdk_handle_close(vmdkfile, &vmdkerror);
+	libvmdk_handle_free(&vmdkfile, &vmdkerror);
+	libvmdk_error_free(&vmdkerror);
+    }
+    else if(imgtype == 10) // PHD
+    {
+	libphdi_error_t* phdierror = NULL;
+	libphdi_handle_t* phdifile = NULL;
+	int ret = 0;
+	ret = libphdi_handle_initialize(&phdierror, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	ret = libphdi_handle_open(phdifile, imgpath.c_str(), LIBPHDI_OPEN_READ, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	ret = libphdi_handle_get_media_size(phdifile, &imgsize, &phdierror);
+	if(ret == -1)
+	    libphdi_error_fprint(phdierror, stdout);
+	libphdi_handle_close(phdifile, &phdierror);
+	libphdi_handle_free(&phdifile, &phdierror);
+	libphdi_error_free(&phdierror);
+    }
+     */ 
+}
+

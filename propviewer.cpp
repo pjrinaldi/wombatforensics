@@ -35,7 +35,7 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	// NEED TO DO MORE FOR FORENSIC IMG TYPES
 	if(pname->contains(".dd") == true || pname->contains(".DD") == true || pname->contains(".raw") == true || pname->contains(".RAW") == true || pname->contains(".000") == true || pname->contains("001") == true)
 	{
-	    std::cout << "raw img, no properties." << std::endl;
+	    //std::cout << "raw img, no properties." << std::endl;
 	    ptpath += "forimg";
 	}
 	else if(pname->contains(".e01") == true || pname->contains(".E01") == true || libewf_check_file_signature(pname->text(), &ewferr) == 1)

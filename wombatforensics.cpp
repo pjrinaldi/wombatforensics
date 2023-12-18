@@ -746,6 +746,8 @@ void WombatForensics::UpdateForensicImages()
     for(int i=0; i < posarray.no() - 1; i++)
 	forimgvector.push_back(new ForImg(evidencelist.mid(posarray.at(i)+1, posarray.at(i+1) - posarray.at(i) - 1).text()));
 
+    forimgpropvalues.clear();
+
     tablelist->setTableSize(forimgvector.size(), 14);
     tablelist->setColumnText(0, "");
     tablelist->setColumnText(1, "ID");
@@ -763,6 +765,8 @@ void WombatForensics::UpdateForensicImages()
     tablelist->setColumnText(13, "Hash Match");
     for(int i=0; i < forimgvector.size(); i++)
     {
+	// NEED TO CALL GET FORIMGPROPERTIES() AND FIGURE OUT WHAT TO PASS.
+	//std::cout << "variable test: " << forimgvector.at(i)->ImageFullPath() << std::endl;
         FXFile evidfile;
         bool isevidexist = evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Reading, FXIO::OwnerReadWrite);
         if(isevidexist == true)
@@ -771,18 +775,27 @@ void WombatForensics::UpdateForensicImages()
             evidfile.readBlock(gichar, evidfile.size());
             gichar[evidfile.size()] = 0;
             evidfile.close();
-            globalid = FXString(gichar).toULong();
+            //globalid = FXString(gichar).toULong();
+	    FXString filestr = FXString(gichar);
+	    int splitoffset = filestr.find("|");
+	    globalid = filestr.mid(0, splitoffset).toULong();
+	    forimgpropvalues.push_back(std::string(filestr.mid(splitoffset+1, filestr.length() - splitoffset).text()));
             IncrementGlobalId(&globalid, &curid);
             //std::cout << "globalid when existing evidence added: " << globalid << std::endl;
         }
         else
         {
+	    std::string forimgfullpath = forimgvector.at(i)->ImageFullPath();
+	    std::string forimgpropstr = "";
+	    GetForImgProperties(&forimgfullpath, &forimgpropstr);
+	    forimgpropvalues.push_back(forimgpropstr);
             IncrementGlobalId(&globalid, &curid);
             //std::cout << "global id when new evidence added: " << globalid << std::endl;
             evidfile.close();
             FXFile::create(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::OwnerReadWrite);
             evidfile.open(tmppath + "burrow/" + FXString(forimgvector.at(i)->ImageFileName().c_str()), FXIO::Writing, FXIO::OwnerReadWrite);
-            FXString idval = FXString::value(globalid);
+	    FXString idval = FXString::value(globalid) + "|" + FXString(forimgpropstr.c_str());
+            //FXString idval = FXString::value(globalid);
             evidfile.writeBlock(idval.text(), idval.length());
             evidfile.close();
         }
@@ -967,6 +980,7 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 	//std::cout << "img path: " << curforimg->ImageFullPath() << std::endl;
 	ptype = 0;
 	pname = tablelist->getItemText(tablelist->getCurrentRow(), 3) + tablelist->getItemText(tablelist->getCurrentRow(), 2);
+	propstr = forimgpropvalues.at(tablelist->getCurrentRow());
 	//std::cout << tablelist->getItemText(tablelist->getCurrentRow(), 3).text() << std::endl; 
     }
     else if(curiconid == partitionicon->id()) // PARTITION SELECTED
