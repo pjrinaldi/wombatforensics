@@ -572,11 +572,64 @@ void ForImg::SetMountPath(QString mountpath)
 
 void GetForImgProperties(std::string* imgpath, std::string* propstr)
 {
-    libewf_error_t* ewferr = NULL;
+    size64_t imgsize = 0;
+    libewf_error_t* ewferror = NULL;
     int rfound = imgpath->rfind(".");
     std::string imgext = imgpath->substr(rfound+1);
-    if(libewf_check_file_signature(imgpath->c_str(), &ewferr) == 1 || imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
+    if(libewf_check_file_signature(imgpath->c_str(), &ewferror) == 1 || imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
     {
+        libewf_handle_t* ewfhandle = NULL;
+        //libewf_error_t* ewferror = NULL;
+        char** globfiles = NULL;
+        int globfilecnt = 0;
+	int found = imgpath->rfind(".E");
+	if(found == -1)
+	    found = imgpath->rfind(".e");
+	std::string imgprematch = imgpath->substr(0, found+2);
+	std::filesystem::path imagepath(*imgpath);
+	imagepath.remove_filename();
+	//std::cout << "Image Path: " << imgpath << std::endl;
+	//std::cout << "Image Pre Match: " << imgprematch << std::endl;
+	//std::cout << "imagepath: " << imagepath.string() << std::endl;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+		globfilecnt++;
+		//std::cout << "match: " << file.path().string() <<std::endl;
+	}
+	char* filenames[globfilecnt] = {NULL};
+	filenames[0] = (char*)imgpath->c_str();
+	int i = 1;
+	for(const auto &file : std::filesystem::directory_iterator(imagepath))
+	{
+	    if(file.path().string().compare(0, found+2, imgprematch) == 0)
+	    {
+		if(file.path().string().compare(*imgpath) != 0)
+		{
+		    filenames[i] = (char*)file.path().string().c_str();
+		    i++;
+		}
+	    }
+	}
+        int retopen = 0;
+        retopen = libewf_glob(filenames[0], strlen(filenames[0]), LIBEWF_FORMAT_UNKNOWN, &globfiles, &globfilecnt, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        retopen = libewf_handle_initialize(&ewfhandle, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        retopen = libewf_handle_open(ewfhandle, globfiles, globfilecnt, LIBEWF_OPEN_READ, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+        libewf_handle_get_media_size(ewfhandle, &imgsize, &ewferror);
+        if(retopen == -1)
+            libewf_error_fprint(ewferror, stdout);
+	std::cout << "img size: " << imgsize << std::endl;
+        libewf_handle_close(ewfhandle, &ewferror);
+        libewf_handle_free(&ewfhandle, &ewferror);
+        libewf_glob_free(globfiles, globfilecnt, &ewferror);
+	libewf_error_free(&ewferror);
+        //std::cout << imgfile << " size: " << imgsize << std::endl;
     }
 
     /*
