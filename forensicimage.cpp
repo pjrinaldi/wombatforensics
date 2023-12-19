@@ -575,6 +575,7 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
     libewf_error_t* ewferror = NULL;
     libvhdi_error_t* vhderror = NULL;
     libqcow_error_t* qcowerror = NULL;
+    libvmdk_error_t* vmdkerror = NULL;
     int rfound = imgpath->rfind(".");
     std::string imgext = imgpath->substr(rfound+1);
     if(libewf_check_file_signature(imgpath->c_str(), &ewferror) == 1 || imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
@@ -819,6 +820,44 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 
 	*propstr = std::to_string(formatversion) + ">" + std::to_string(imgsize) + ">" + std::to_string(encryptionmethod) + ">" + std::to_string(snapshotcount);
     }
+    else if(libvmdk_check_file_signature(imgpath->c_str(), &vmdkerror) == 1 || imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
+    {
+	libvmdk_handle_t* vmdkfile = NULL;
+	int ret = 0;
+	ret = libvmdk_handle_initialize(&vmdkfile, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	ret = libvmdk_handle_open(vmdkfile, imgpath->c_str(), LIBVMDK_OPEN_READ, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	// DISK TYPE
+	int disktype = 0;
+	ret = libvmdk_handle_get_disk_type(vmdkfile, &disktype, &vmdkerror);
+	// MEDIA SIZE
+	size64_t imgsize = 0;
+	ret = libvmdk_handle_get_media_size(vmdkfile, &imgsize, &vmdkerror);
+	if(ret == -1)
+	    libvmdk_error_fprint(vmdkerror, stdout);
+	// CONTENT IDENTIFIER
+	uint32_t contentid = 0;
+	ret = libvmdk_handle_get_content_identifier(vmdkfile, &contentid, &vmdkerror);
+	std::stringstream cid;
+	cid << "0x" << std::hex << std::setfill('0') << contentid;
+	//std::cout << "content id: " << cid.str() << std::endl;
+	/*
+	// PARENT CONTENT IDENDITIFER
+	uint32_t parconid = 0;
+	ret = libvmdk_handle_get_parent_content_identifier(vmdkfile, &parconid, &vmdkerror);
+	*/
+	// NUMBER OF EXTENTS
+	int extentcount = 0;
+	ret = libvmdk_handle_get_number_of_extents(vmdkfile, &extentcount, &vmdkerror);
+	libvmdk_handle_close(vmdkfile, &vmdkerror);
+	libvmdk_handle_free(&vmdkfile, &vmdkerror);
+	libvmdk_error_free(&vmdkerror);
+
+	*propstr = std::to_string(disktype) + ">" + std::to_string(imgsize) + ">" + cid.str() + ">" + std::to_string(extentcount);
+    }
     else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
     {
         AFF4_init();
@@ -862,7 +901,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
     else if(imgext.compare("wli") == 0) // WLI
         imgtype = 6;
 	imgtype = 8;
-    else if(libvmdk_check_file_signature(imgfile.c_str(), &vmdkerr) == 1 || imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
 	imgtype = 9;
     else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
 	imgtype = 10;

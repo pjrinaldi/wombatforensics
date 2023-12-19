@@ -34,6 +34,7 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	libewf_error_t* ewferr = NULL;
 	libvhdi_error_t* vhderror = NULL;
 	libqcow_error_t* qcowerr = NULL;
+	libvmdk_error_t* vmdkerr = NULL;
 	// NEED TO DO MORE FOR FORENSIC IMG TYPES
 	if(pname->contains(".dd") == true || pname->contains(".DD") == true || pname->contains(".raw") == true || pname->contains(".RAW") == true || pname->contains(".000") == true || pname->contains("001") == true)
 	{
@@ -42,12 +43,14 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	}
 	else if(pname->contains(".e01") == true || pname->contains(".E01") == true || libewf_check_file_signature(pname->text(), &ewferr) == 1)
 	    ptpath += "ewfimg";
-	else if(libvhdi_check_file_signature(pname->text(), &vhderror) == 1 || pname->contains("vhd") == 0 || pname->contains("vhdx") == 0 || pname->contains("VHD") == 0 || pname->contains("VHDX") == 0) // VHD/VHDX
-	    ptpath += "vhdimg";
-	else if(pname->contains("aff4") == 0 || pname->contains("AFF4") == 0) // AFF4
-	    ptpath += "aff4img";
 	else if(libqcow_check_file_signature(pname->text(), &qcowerr) == 1 || pname->contains("qcow") == 0 || pname->contains("qcow2") == 0 || pname->contains("QCOW") == 0 || pname->contains("QCOW2") == 0) // QCOW/QCOW2
 	    ptpath += "qcowimg";
+	else if(libvhdi_check_file_signature(pname->text(), &vhderror) == 1 || pname->contains("vhd") == 0 || pname->contains("vhdx") == 0 || pname->contains("VHD") == 0 || pname->contains("VHDX") == 0) // VHD/VHDX
+	    ptpath += "vhdimg";
+	else if(libvmdk_check_file_signature(pname->text(), &vmdkerr) == 1 || pname->contains("vmdk") == 0 || pname->contains("VMDK") == 0) // VMDK
+	    ptpath += "vmdkimg";
+	else if(pname->contains("aff4") == 0 || pname->contains("AFF4") == 0) // AFF4
+	    ptpath += "aff4img";
 	/*
 	else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW
 	    imgtype = 4;
@@ -55,8 +58,6 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    imgtype = 5;
 	else if(imgext.compare("wli") == 0) // WLI
 	    imgtype = 6;
-	else if(libvmdk_check_file_signature(imgfile.c_str(), &vmdkerr) == 1 || imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
-	    imgtype = 9;
 	else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
 	    imgtype = 10;
 	*/ 
@@ -102,6 +103,13 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    if(maxpvaluelength < propvalues.at(i).size())
 		maxpvaluelength = propvalues.at(i).size();
 	}
+	/*
+	std::cout << "propvalues: " << propvalues.size() << " proplist: " << proplist.size() << std::endl;
+	for(int i=0; i < proplist.size(); i++)
+	{
+	    std::cout << "proplist: " << proplist.at(i) << std::endl;
+	}
+	*/
 	// GET PROPERTY LENGTH & DESCRIPTION LENGTH
 	uint64_t proplength = 0;
 	uint64_t desclength = 0;
