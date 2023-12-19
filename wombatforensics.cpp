@@ -302,6 +302,10 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     bool isvhdimgpt = vhdimgpt.open(configpath + "vhdimg.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isvhdimgpt == false)
 	FXFile::copy("./vhdimg.pt", configpath + "vhdimg.pt");
+    FXFile qcowimgpt;
+    bool isqcowimgpt = qcowimgpt.open(configpath + "qcowimg.pt", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isqcowimgpt == false)
+	FXFile::copy("./qcowimg.pt", configpath + "qcowimg.pt");
 
     forimgvector.clear();
 

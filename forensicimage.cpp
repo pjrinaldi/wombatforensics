@@ -574,6 +574,7 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 {
     libewf_error_t* ewferror = NULL;
     libvhdi_error_t* vhderror = NULL;
+    libqcow_error_t* qcowerror = NULL;
     int rfound = imgpath->rfind(".");
     std::string imgext = imgpath->substr(rfound+1);
     if(libewf_check_file_signature(imgpath->c_str(), &ewferror) == 1 || imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
@@ -787,6 +788,37 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	// PROPERTIES STRING
 	*propstr = std::to_string(filetype) + ">" + std::to_string(majorversion) + "." + std::to_string(minorversion) + ">" + std::to_string(disktype) + ">" + std::to_string(imgsize) + ">" + std::to_string(bytespersector) + ">" + ss.str();
     }
+    else if(libqcow_check_file_signature(imgpath->c_str(), &qcowerror) == 1 || imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
+    {
+	libqcow_error_t* qcowerror = NULL;
+	libqcow_file_t* qcowfile = NULL;
+	int ret = 0;
+	ret = libqcow_file_initialize(&qcowfile, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	ret = libqcow_file_open(qcowfile, imgpath->c_str(), LIBQCOW_OPEN_READ, &qcowerror);
+	// FORMAT VERSION
+	uint32_t formatversion = 0;
+	ret = libqcow_file_get_format_version(qcowfile, &formatversion, &qcowerror);
+	// MEDIA SIZE
+	size64_t imgsize = 0;
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	ret = libqcow_file_get_media_size(qcowfile, &imgsize, &qcowerror);
+	if(ret == -1)
+	    libqcow_error_fprint(qcowerror, stdout);
+	// ENCRYPTION METHOD
+	uint32_t encryptionmethod = 0;
+	ret = libqcow_file_get_encryption_method(qcowfile, &encryptionmethod, &qcowerror);
+	// SNAPSHOT COUNT
+	int snapshotcount = 0;
+	ret = libqcow_file_get_number_of_snapshots(qcowfile, &snapshotcount, &qcowerror);
+	libqcow_file_close(qcowfile, &qcowerror);
+	libqcow_file_free(&qcowfile, &qcowerror);
+	libqcow_error_free(&qcowerror);
+
+	*propstr = std::to_string(formatversion) + ">" + std::to_string(imgsize) + ">" + std::to_string(encryptionmethod) + ">" + std::to_string(snapshotcount);
+    }
     else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
     {
         AFF4_init();
@@ -805,6 +837,7 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	for(int i=0; i < imglist.size(); i++)
 	{
 	    std::map<aff4::Lexicon, std::vector<aff4::rdf::RDFValue>> aff4properties = imglist.at(i)->getProperties();
+	    std::cout << "aff4 property count: " << aff4properties.size() << std::endl;
 	    for(int j=0; j < aff4properties.size(); j++)
 	    {
 	    }
@@ -828,7 +861,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
         imgtype = 5;
     else if(imgext.compare("wli") == 0) // WLI
         imgtype = 6;
-    else if(libqcow_check_file_signature(imgfile.c_str(), &qcowerr) == 1 || imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
 	imgtype = 8;
     else if(libvmdk_check_file_signature(imgfile.c_str(), &vmdkerr) == 1 || imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
 	imgtype = 9;

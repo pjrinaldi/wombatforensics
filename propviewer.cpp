@@ -33,6 +33,7 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
     {
 	libewf_error_t* ewferr = NULL;
 	libvhdi_error_t* vhderror = NULL;
+	libqcow_error_t* qcowerr = NULL;
 	// NEED TO DO MORE FOR FORENSIC IMG TYPES
 	if(pname->contains(".dd") == true || pname->contains(".DD") == true || pname->contains(".raw") == true || pname->contains(".RAW") == true || pname->contains(".000") == true || pname->contains("001") == true)
 	{
@@ -45,6 +46,8 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    ptpath += "vhdimg";
 	else if(pname->contains("aff4") == 0 || pname->contains("AFF4") == 0) // AFF4
 	    ptpath += "aff4img";
+	else if(libqcow_check_file_signature(pname->text(), &qcowerr) == 1 || pname->contains("qcow") == 0 || pname->contains("qcow2") == 0 || pname->contains("QCOW") == 0 || pname->contains("QCOW2") == 0) // QCOW/QCOW2
+	    ptpath += "qcowimg";
 	/*
 	else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW
 	    imgtype = 4;
@@ -52,10 +55,6 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    imgtype = 5;
 	else if(imgext.compare("wli") == 0) // WLI
 	    imgtype = 6;
-	else if(libvhdi_check_file_signature(imgfile.c_str(), &vhderr) == 1 || imgext.compare("vhd") == 0 || imgext.compare("vhdx") == 0 || imgext.compare("VHD") == 0 || imgext.compare("VHDX") == 0) // VHD/VHDX
-	    imgtype = 7;
-	else if(libqcow_check_file_signature(imgfile.c_str(), &qcowerr) == 1 || imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
-	    imgtype = 8;
 	else if(libvmdk_check_file_signature(imgfile.c_str(), &vmdkerr) == 1 || imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
 	    imgtype = 9;
 	else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
@@ -63,6 +62,7 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	*/ 
 	libewf_error_free(&ewferr);
         libvhdi_error_free(&vhderror);
+	libqcow_error_free(&qcowerr);
     }
     if(ptype & 0x01)
     {
