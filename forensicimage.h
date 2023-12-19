@@ -14,6 +14,7 @@
 #include "libewf.h"
 #include "libsmraw.h"
 #include "aff4/aff4-c.h"
+#include "aff4/AFF4Containers.h"
 #include "libvhdi.h"
 #include "libqcow.h"
 #include "libvmdk.h"

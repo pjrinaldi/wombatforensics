@@ -794,6 +794,25 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	size64_t imgsize = 0;
         imgsize = AFF4_object_size(aff4handle);
         AFF4_close(aff4handle);
+	//std::cout << "image size: " << imgsize << std::endl;
+	int64_t blocksize = AFF4_object_blocksize(aff4handle);
+	//std::cout << "block size: " << blocksize << std::endl;
+	std::string resourceid = aff4::container::getResourceID(*imgpath);
+	std::cout << "resource id: " << resourceid << std::endl;
+	aff4::IAFF4Resolver* aff4resolver = aff4::container::createResolver(*imgpath);
+	std::shared_ptr<aff4::IAFF4Container> aff4container = aff4::container::openAFF4Container(*imgpath, aff4resolver);
+	std::vector<std::shared_ptr<aff4::IAFF4Image>> imglist = aff4container->getImages();
+	for(int i=0; i < imglist.size(); i++)
+	{
+	    std::map<aff4::Lexicon, std::vector<aff4::rdf::RDFValue>> aff4properties = imglist.at(i)->getProperties();
+	    for(int j=0; j < aff4properties.size(); j++)
+	    {
+	    }
+	    //std::shared_ptr<aff4::IAFF4Map> aff4map = imglist.at(i)->getMap();
+	    //std::cout << "img size: " << aff4map->size() << std::endl;
+	    //std::shared_ptr<aff4::IAFF4Stream> aff4stream = aff4map->getStream();
+	    //std::cout << "img size: " << aff4stream->size() << std::endl;
+	}
 	//std::cout << imgfile << " size: " << imgsize << std::endl;
     }
     /*
