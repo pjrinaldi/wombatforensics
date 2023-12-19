@@ -43,9 +43,9 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    ptpath += "ewfimg";
 	else if(libvhdi_check_file_signature(pname->text(), &vhderror) == 1 || pname->contains("vhd") == 0 || pname->contains("vhdx") == 0 || pname->contains("VHD") == 0 || pname->contains("VHDX") == 0) // VHD/VHDX
 	    ptpath += "vhdimg";
+	else if(pname->contains("aff4") == 0 || pname->contains("AFF4") == 0) // AFF4
+	    ptpath += "aff4img";
 	/*
-	else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
-	    imgtype = 3;
 	else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW
 	    imgtype = 4;
 	else if(imgext.compare("wfi") == 0) // WFI

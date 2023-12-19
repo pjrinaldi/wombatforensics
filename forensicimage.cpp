@@ -787,6 +787,15 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	// PROPERTIES STRING
 	*propstr = std::to_string(filetype) + ">" + std::to_string(majorversion) + "." + std::to_string(minorversion) + ">" + std::to_string(disktype) + ">" + std::to_string(imgsize) + ">" + std::to_string(bytespersector) + ">" + ss.str();
     }
+    else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
+    {
+        AFF4_init();
+        int aff4handle = AFF4_open(imgpath->c_str());
+	size64_t imgsize = 0;
+        imgsize = AFF4_object_size(aff4handle);
+        AFF4_close(aff4handle);
+	//std::cout << imgfile << " size: " << imgsize << std::endl;
+    }
     /*
     libqcow_error_t* qcowerr = NULL;
     libvmdk_error_t* vmdkerr = NULL;
@@ -794,8 +803,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
     // SET IMGTYPE - DETERMINES HOW READ THE RAW CONTENT
     if(imgext.compare("dd") == 0 || imgext.compare("DD") == 0) // RAW
         imgtype = 1;
-    else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
-        imgtype = 3;
     else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW
         imgtype = 4;
     else if(imgext.compare("wfi") == 0) // WFI
