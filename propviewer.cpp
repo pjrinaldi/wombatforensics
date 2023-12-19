@@ -32,6 +32,7 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
     if(ptype == 0x00)
     {
 	libewf_error_t* ewferr = NULL;
+	libvhdi_error_t* vhderror = NULL;
 	// NEED TO DO MORE FOR FORENSIC IMG TYPES
 	if(pname->contains(".dd") == true || pname->contains(".DD") == true || pname->contains(".raw") == true || pname->contains(".RAW") == true || pname->contains(".000") == true || pname->contains("001") == true)
 	{
@@ -40,6 +41,8 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	}
 	else if(pname->contains(".e01") == true || pname->contains(".E01") == true || libewf_check_file_signature(pname->text(), &ewferr) == 1)
 	    ptpath += "ewfimg";
+	else if(libvhdi_check_file_signature(pname->text(), &vhderror) == 1 || pname->contains("vhd") == 0 || pname->contains("vhdx") == 0 || pname->contains("VHD") == 0 || pname->contains("VHDX") == 0) // VHD/VHDX
+	    ptpath += "vhdimg";
 	/*
 	else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
 	    imgtype = 3;
@@ -58,6 +61,8 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
 	    imgtype = 10;
 	*/ 
+	libewf_error_free(&ewferr);
+        libvhdi_error_free(&vhderror);
     }
     if(ptype & 0x01)
     {

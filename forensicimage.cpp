@@ -573,6 +573,7 @@ void ForImg::SetMountPath(QString mountpath)
 void GetForImgProperties(std::string* imgpath, std::string* propstr)
 {
     libewf_error_t* ewferror = NULL;
+    libvhdi_error_t* vhderror = NULL;
     int rfound = imgpath->rfind(".");
     std::string imgext = imgpath->substr(rfound+1);
     if(libewf_check_file_signature(imgpath->c_str(), &ewferror) == 1 || imgext.compare("e01") == 0 || imgext.compare("E01") == 0) // EWF
@@ -723,17 +724,70 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
         libewf_handle_free(&ewfhandle, &ewferror);
         libewf_glob_free(globfiles, globfilecnt, &ewferror);
 	libewf_error_free(&ewferror);
+	// FORMAT HASH
 	std::stringstream ss;
 	ss << std::hex << std::setfill('0');
-	printf("hash: ");
 	for(int i=0; i < 16; i++)
 	    ss << std::setw(2) << (uint)hash[i];
 
+	// POPULATE PROPERTIES
 	*propstr = casenumber + ">" + description + ">" + examinername + ">" + evidencenumber + ">" + notes + ">" + acquirydate + ">" + systemdate + ">" + acquiryoperatingsystem + ">" + acquirysoftwareversion + ">" + std::to_string(format) + ">" + std::to_string(sectorsperchunk) + ">" + std::to_string(compressionmethod) + ">" + std::to_string(clevel) + ">" + std::to_string(mediatype) + ">" + std::to_string(bytespersector) + ">" + std::to_string(sectorcount) + ">" + std::to_string(imgsize) + ">" + ss.str();
     }
+    else if(libvhdi_check_file_signature(imgpath->c_str(), &vhderror) == 1 || imgext.compare("vhd") == 0 || imgext.compare("vhdx") == 0 || imgext.compare("VHD") == 0 || imgext.compare("VHDX") == 0) // VHD/VHDX
+    {
+        libvhdi_file_t* vhdfile = NULL;
+        int retopen = 0;
+        retopen = libvhdi_file_initialize(&vhdfile, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+        retopen = libvhdi_file_open(vhdfile, imgpath->c_str(), LIBVHDI_OPEN_READ, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+	// FILE TYPE
+	int filetype = 0;
+	retopen = libvhdi_file_get_file_type(vhdfile, &filetype, &vhderror);
+	// FORMAT VERSION
+	uint16_t majorversion = 0;
+	uint16_t minorversion = 0;
+	retopen = libvhdi_file_get_format_version(vhdfile, &majorversion, &minorversion, &vhderror);
+	// DISK TYPE
+	uint32_t disktype = 0;
+	retopen = libvhdi_file_get_disk_type(vhdfile, &disktype, &vhderror);
+	// BYTES PER SECTOR
+	uint32_t bytespersector = 0;
+	retopen = libvhdi_file_get_bytes_per_sector(vhdfile, &bytespersector, &vhderror);
+	// IDENTIFIER
+	uint8_t* guiddata = new uint8_t[16];
+	retopen = libvhdi_file_get_identifier(vhdfile, guiddata, 16, &vhderror);
+	// FORMAT IDENTIFIER
+	std::stringstream ss;
+	ss << std::hex << std::setfill('0');
+	for(int i=0; i < 16; i++)
+	{
+	    ss << std::setw(2) << (uint)guiddata[i];
+	    if(i == 3)
+		ss << "-";
+	    else if(i == 5)
+		ss << "-";
+	    else if(i == 7)
+		ss << "-";
+	    else if(i == 9)
+		ss << "-";
+	}
+	// MEDIA SIZE
+	size64_t imgsize = 0;
+        libvhdi_file_get_media_size(vhdfile, &imgsize, &vhderror);
+        if(retopen == -1)
+            libvhdi_error_fprint(vhderror, stdout);
+	// VHDI CLEANUP
+        libvhdi_file_close(vhdfile, &vhderror);
+        libvhdi_file_free(&vhdfile, &vhderror);
+        libvhdi_error_free(&vhderror);
 
+	// PROPERTIES STRING
+	*propstr = std::to_string(filetype) + ">" + std::to_string(majorversion) + "." + std::to_string(minorversion) + ">" + std::to_string(disktype) + ">" + std::to_string(imgsize) + ">" + std::to_string(bytespersector) + ">" + ss.str();
+    }
     /*
-    libvhdi_error_t* vhderr = NULL;
     libqcow_error_t* qcowerr = NULL;
     libvmdk_error_t* vmdkerr = NULL;
     libphdi_error_t* phderr = NULL;
@@ -748,8 +802,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
         imgtype = 5;
     else if(imgext.compare("wli") == 0) // WLI
         imgtype = 6;
-    else if(libvhdi_check_file_signature(imgfile.c_str(), &vhderr) == 1 || imgext.compare("vhd") == 0 || imgext.compare("vhdx") == 0 || imgext.compare("VHD") == 0 || imgext.compare("VHDX") == 0) // VHD/VHDX
-        imgtype = 7;
     else if(libqcow_check_file_signature(imgfile.c_str(), &qcowerr) == 1 || imgext.compare("qcow") == 0 || imgext.compare("qcow2") == 0 || imgext.compare("QCOW") == 0 || imgext.compare("QCOW2") == 0) // QCOW/QCOW2
 	imgtype = 8;
     else if(libvmdk_check_file_signature(imgfile.c_str(), &vmdkerr) == 1 || imgext.compare("vmdk") == 0 || imgext.compare("VMDK") == 0) // VMDK
@@ -758,7 +810,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 	imgtype = 10;
     else // ANY OLD FILE
         imgtype = 0;
-    libvhdi_error_free(&vhderr);
     libqcow_error_free(&qcowerr);
     libvmdk_error_free(&vmdkerr);
     libphdi_error_free(&phderr);
@@ -855,24 +906,6 @@ void GetForImgProperties(std::string* imgpath, std::string* propstr)
 /*    }
     else if(imgtype == 6) // WLI
     {
-    }
-    else if(imgtype == 7) // VHD/VHDX
-    {
-        libvhdi_error_t* vhderror = NULL;
-        libvhdi_file_t* vhdfile = NULL;
-        int retopen = 0;
-        retopen = libvhdi_file_initialize(&vhdfile, &vhderror);
-        if(retopen == -1)
-            libvhdi_error_fprint(vhderror, stdout);
-        retopen = libvhdi_file_open(vhdfile, imgpath.c_str(), LIBVHDI_OPEN_READ, &vhderror);
-        if(retopen == -1)
-            libvhdi_error_fprint(vhderror, stdout);
-        libvhdi_file_get_media_size(vhdfile, &imgsize, &vhderror);
-        if(retopen == -1)
-            libvhdi_error_fprint(vhderror, stdout);
-        libvhdi_file_close(vhdfile, &vhderror);
-        libvhdi_file_free(&vhdfile, &vhderror);
-        libvhdi_error_free(&vhderror);
     }
     else if(imgtype == 8) // QCOW/QCOW2
     {
