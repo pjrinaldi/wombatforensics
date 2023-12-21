@@ -10,7 +10,7 @@ ThumbViewer::ThumbViewer(FXWindow* parent, const FXString& title):FXDialogBox(pa
 
 void ThumbViewer::LoadIcon(FXString iconpath)
 {
-    std::cout << "iconpath: " << iconpath.text() << std::endl;
+    //std::cout << "iconpath: " << iconpath.text() << std::endl;
     FXIcon* tmpicon = new FXPNGIcon(this->getApp());
     FXFileStream stream;
     stream.open(iconpath, FXStreamLoad);

@@ -14,6 +14,11 @@
 // FILE CATEGORY/SIGNATURE
 #include <magic.h>
 // CIMG THUMBNAILER
+#define cimg_os 1
+#define cimg_use_png 1
+#define cimg_use_jpeg 1
+#define cimg_use_tiff 1
+#define cimg_use_heic 1
 #include "cimg/CImg.h"
 // LIBFFMPEG THUMBNAILER HEADERS
 #include <libffmpegthumbnailer/filmstripfilter.h>

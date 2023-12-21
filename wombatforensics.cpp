@@ -1015,10 +1015,10 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 long WombatForensics::OpenImageThumbViewer(FXObject*, FXSelector, void*)
 {
     imagethumbviewer->Clear();
-    std::cout << "img thumb path list size: " << imgthumbpathlist.size() << std::endl;
+    //std::cout << "img thumb path list size: " << imgthumbpathlist.size() << std::endl;
     for(int i=0; i < imgthumbpathlist.size(); i++)
     {
-	std::cout << "img path to load: " << imgthumbpathlist.at(i).text() << std::endl;
+	//std::cout << "img path to load: " << imgthumbpathlist.at(i).text() << std::endl;
 	imagethumbviewer->LoadIcon(imgthumbpathlist.at(i));
     }
     imagethumbviewer->SetItemSpace(GetSettings(0).toInt());

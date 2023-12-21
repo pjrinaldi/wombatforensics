@@ -464,7 +464,12 @@ void ThumbnailImage(ForImg* curforimg, FileItem* curfileitem, int thumbsize, std
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     std::string thumbfilestr = tmppath + "imgthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
-    std::cout << "thumbfilestr: " << thumbfilestr << std::endl;
+    //std::cout << "thumbfilestr: " << thumbfilestr << std::endl;
+    //std::cout << "thumbfilestr cstr: " << thumbfilestr.c_str() << std::endl;
+    std::string tmpstring1 = thumbfilestr;
+    tmpstring1.erase(std::remove(tmpstring1.begin(), tmpstring1.end(), '\0'), tmpstring1.end());
+    thumbfilestr = tmpstring1;
+    //std::cout << "thumbfilestr cstr af: " << thumbfilestr.c_str() << std::endl;
     cimg_library::CImg<> imgexists;
     bool thumbexists = std::filesystem::exists(thumbfilestr);
     bool tmpfileexists = std::filesystem::exists(tmpfilestr);

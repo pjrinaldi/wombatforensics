@@ -461,8 +461,6 @@ enum {FALSE_WIN = 0};
 #endif
 #endif
 
-#define cimg_use_png
-
 // Configure LibPNG support.
 // (http://www.libpng.org)
 //
@@ -470,11 +468,11 @@ enum {FALSE_WIN = 0};
 //
 // PNG library may be used to get a native support of '.png' files.
 // (see methods 'CImg<T>::{load,save}_png()'.
-//#ifdef cimg_use_png
+#ifdef cimg_use_png
 extern "C" {
 #include "png.h"
 }
-//#endif
+#endif
 
 // Configure LibJPEG support.
 // (http://en.wikipedia.org/wiki/Libjpeg)
