@@ -511,6 +511,7 @@ void WombatForensics::InitializeThumbCache()
     std::filesystem::path imagepath(imgpath);
     for(auto const& direntry : std::filesystem::directory_iterator(imagepath))
 	imgthumbpathlist.push_back(FXString(direntry.path().string().c_str()));
+    std::cout << "img thumb path list size: " << imgthumbpathlist.size() << std::endl;
     vidthumbpathlist.clear();
     std::string vidpath = std::string(tmppath.text()) + "vidthumbs/";
     std::filesystem::path videopath(vidpath);
@@ -1014,10 +1015,15 @@ long WombatForensics::OpenPropertyViewer(FXObject*, FXSelector, void*)
 long WombatForensics::OpenImageThumbViewer(FXObject*, FXSelector, void*)
 {
     imagethumbviewer->Clear();
+    std::cout << "img thumb path list size: " << imgthumbpathlist.size() << std::endl;
     for(int i=0; i < imgthumbpathlist.size(); i++)
+    {
+	std::cout << "img path to load: " << imgthumbpathlist.at(i).text() << std::endl;
 	imagethumbviewer->LoadIcon(imgthumbpathlist.at(i));
+    }
     imagethumbviewer->SetItemSpace(GetSettings(0).toInt());
     imagethumbviewer->show(PLACEMENT_OWNER);
+
     return 1;
 }
 
@@ -1028,6 +1034,7 @@ long WombatForensics::OpenVideoThumbViewer(FXObject*, FXSelector, void*)
 	videothumbviewer->LoadIcon(vidthumbpathlist.at(i));
     videothumbviewer->SetItemSpace(GetSettings(0).toInt() * (100 / GetSettings(1).toInt()));
     videothumbviewer->show(PLACEMENT_OWNER);
+
     return 1;
 }
 
@@ -1607,9 +1614,9 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
 		    //std::cout << "thumbsize: " << thumbsize << std::endl;
 		    if(digfilelist.at(i).cat == "Image")
 		    {
-			//std::cout << digfilelist.at(i).name << " " << digfilelist.at(i).gid << std::endl;
+			std::cout << digfilelist.at(i).name << " " << digfilelist.at(i).gid << std::endl;
 			ThumbnailImage(curforimg, &(digfilelist.at(i)), thumbsize, tmppath.text());
-			imgthumbpathlist.push_back(FXString(tmppath + "imgthumbs/" + FXString::value(digfilelist.at(i).gid) + "-" + digfilelist.at(i).name.c_str()));
+			imgthumbpathlist.push_back(FXString(tmppath + "imgthumbs/" + FXString::value(digfilelist.at(i).gid) + "-" + digfilelist.at(i).name.c_str() + ".png"));
 		    }
 		}
 	    }
@@ -1623,7 +1630,7 @@ long WombatForensics::OpenDigDeeper(FXObject*, FXSelector, void*)
                     if(digfilelist.at(i).cat == "Video")
                     {
                         ThumbnailVideo(curforimg, &(digfilelist.at(i)), thumbsize, GetSettings(1).toInt(), tmppath.text());
-			vidthumbpathlist.push_back(FXString(tmppath + "vidthumbs/" + FXString::value(digfilelist.at(i).gid) + "-" + digfilelist.at(i).name.c_str()));
+			vidthumbpathlist.push_back(FXString(tmppath + "vidthumbs/" + FXString::value(digfilelist.at(i).gid) + "-" + digfilelist.at(i).name.c_str()) + ".png");
                         //thumblist.push_back(std::string(tmppath.text()) + "thumbs/" + digfilelist.at(i).name + "-" + std::to_string(digfilelist.at(i).gid) + ".png");
                         //thumbcache->insert((std::string(tmppath.text()) + "thumbs/" + digfilelist.at(i).name + "-" + std::to_string(digfilelist.at(i).gid) + ".png").c_str());
                     }
