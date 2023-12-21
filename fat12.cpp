@@ -93,7 +93,20 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    {
 			if(!longnamestring.empty()) // ORPHAN LONG ENTRY
 			{
-			    std::cout << "orphan entry need to populate in orphans directory." << std::endl;
+			    tmpitem.name = longnamestring;
+			    if(curfileitem == NULL)
+				tmpitem.path = "/";
+			    else
+				tmpitem.path = curfileitem->path + curfileitem->name + "/";
+			    tmpitem.isdeleted = true;
+			    tmpitem.cat = "Orphan";
+			    tmpitem.sig = "Orphan File";
+			    filevector->push_back(tmpitem);
+			    tmpitem.clear();
+			    // orphan entry need to populate in orphans directory.
+			    // maybe i don't want an orphan directory, since i don't know the orphan dir's globalid
+			    // i can just place them in the directory they fall and just list them as orphan
+			    // for their cat/sig
 			}
 		    }
 		    uint lsn = ((int)firstchar & 0x0f);
@@ -337,6 +350,8 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
     if(curfileitem == NULL) // root directory - add virtual files
     {
 	//curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
+	// ADD VIRTUAL FILE SYSTEMS FILES
+	// ADD $MBR
 	FileItem tmpitem;
 	tmpitem.size = bytespersector;
 	tmpitem.name = "$MBR";
@@ -346,6 +361,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	tmpitem.cat = "System File";
 	tmpitem.sig = "Master Boot Record";
 	filevector->push_back(tmpitem);
+	// ADD $FAT(s)
 	for(int i=0; i < fatcount; i++)
 	{
 	    tmpitem.clear();
@@ -358,5 +374,17 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    tmpitem.sig = "File Allocation Table";
 	    filevector->push_back(tmpitem);
 	}
+	/*
+	// ADD ORPHANS VIRTUAL DIRECTORY
+	tmpitem.clear();
+	tmpitem.size = 0;
+	tmpitem.name = "orphans";
+	tmpitem.path = "/";
+	tmpitem.isvirtual = true;
+	tmpitem.isdirectory = true;
+	tmpitem.cat = "Directory";
+	tmpitem.sig = "Virtual Directory";
+	filevector->push_back(tmpitem);
+	*/
     }
 }
