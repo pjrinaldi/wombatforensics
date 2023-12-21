@@ -286,10 +286,18 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     bool isfat12filept = fat12filept.open(configpath + "fat12file.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isfat12filept == false)
 	FXFile::copy("./fat12file.pt", configpath + "fat12file.pt");
+    FXFile fat16filept;
+    bool isfat16filept = fat16filept.open(configpath + "fat16file.pt", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isfat16filept == false)
+	FXFile::copy("./fat16file.pt", configpath + "fat16file.pt");
     FXFile fat12pt;
     bool isfat12pt = fat12pt.open(configpath + "fat12.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isfat12pt == false)
 	FXFile::copy("./fat12.pt", configpath + "fat12.pt");
+    FXFile fat16pt;
+    bool isfat16pt = fat16pt.open(configpath + "fat16.pt", FXIO::Reading, FXIO::OwnerReadWrite);
+    if(isfat16pt == false)
+	FXFile::copy("./fat16.pt", configpath + "fat16.pt");
     FXFile forimgpt;
     bool isforimgpt = forimgpt.open(configpath + "forimg.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isforimgpt == false)

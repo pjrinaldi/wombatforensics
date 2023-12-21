@@ -1,6 +1,6 @@
-#include "fat12.h"
+#include "fat16.h"
 
-void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
+void LoadFat16Directory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
     //if(curfileitem != NULL)
     //    std::cout << "curfileitem name: " << curfileitem->name << std::endl;
@@ -294,9 +294,9 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			//std::cout << "currentitem itemtext: " << currentitem->itemtext << std::endl;
 			clusterlist.push_back(clusternum);
 			//if(currentitem->itemtext.find("[FAT12]") != std::string::npos)
-			    GetNextCluster(currentitem->forimg, clusternum, 1, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
+			//    GetNextCluster(currentitem->forimg, clusternum, 1, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
 			//else if(currentitem->itemtext.find("[FAT16]") != std::string::npos)
-			//    GetNextCluster(currentitem->forimg, clusternum, 2, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
+			    GetNextCluster(currentitem->forimg, clusternum, 2, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
 			//GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
 			//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
 			//QString::number((qulonglong)(curstartsector*512 + reservedareasize * bytespersector))
