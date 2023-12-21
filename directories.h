@@ -13,6 +13,7 @@
 #include "common.h"
 #include "forensicimage.h"
 #include "fat12.h"
+#include "fat16.h"
 
 std::string GetFileItem(std::string*, int item);
 std::string SetFileItem(std::string* filecontents, int item, std::string value);

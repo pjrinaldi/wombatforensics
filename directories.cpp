@@ -286,7 +286,7 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
             else if(strcmp(fattype, "FAT16") == 0)
             {
 		// NEED TO SWITCH TO FAT16
-                LoadFat12Directory(currentitem, filevector, curfileitem);
+                LoadFat16Directory(currentitem, filevector, curfileitem);
             }
             else
             {
