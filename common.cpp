@@ -525,6 +525,9 @@ void ThumbnailVideo(ForImg* curforimg, FileItem* curfileitem, int thumbsize, int
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     std::string thumbfilestr = tmppath + "vidthumbs/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".png";
     thumbfilestr.erase(std::remove(thumbfilestr.begin(), thumbfilestr.end(), '$'), thumbfilestr.end());
+    std::string tmpstring1 = thumbfilestr;
+    tmpstring1.erase(std::remove(tmpstring1.begin(), tmpstring1.end(), '\0'), tmpstring1.end());
+    thumbfilestr = tmpstring1;
     cimg_library::CImg<> imgexists;
     bool thumbexists = std::filesystem::exists(thumbfilestr);
     bool tmpfileexists = std::filesystem::exists(tmpfilestr);
