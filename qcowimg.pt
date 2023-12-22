@@ -1,1 +1,0 @@
-Format Version|Version number for the qcow format.;Media Size|Size of the qcow image in bytes.;Encryption Method|Encryption method used.;Number of Snapshots|Number of snapshots taken in the qcow image.

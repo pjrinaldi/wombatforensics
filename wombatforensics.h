@@ -20,6 +20,7 @@
 #include "fox-1.7/fx.h"
 // PROJECT INCLUDES
 #include "icons.h"
+#include "propertytemplates.h"
 #include "managetags.h"
 #include "aboutbox.h"
 #include "viewer.h"

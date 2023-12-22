@@ -281,6 +281,18 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
             binaries.push_back(currentviewers.text());
     }
     binariesfile.close();
+    // INITIALIZE PROPERTY TEMPLATE FILES IN THE CONFIG DIRECTORY
+    for(const auto& [key, value] : propertytemplates)
+    {
+	if(std::filesystem::exists(configpath.text() + key) == false)
+	{
+	    std::ofstream tmpptfile;
+	    tmpptfile.open(configpath.text() + key);
+	    tmpptfile << value;
+	    tmpptfile.close();
+	}
+    }
+    /*
     // COPY PROPERTY FILES INTO CONFIG DIRECTORY
     FXFile fat12filept;
     bool isfat12filept = fat12filept.open(configpath + "fat12file.pt", FXIO::Reading, FXIO::OwnerReadWrite);
@@ -318,7 +330,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     bool isvmdimgpt = vmdkimgpt.open(configpath + "vmdkimg.pt", FXIO::Reading, FXIO::OwnerReadWrite);
     if(isvmdimgpt == false)
 	FXFile::copy("./vmdkimg.pt", configpath + "vmdkimg.pt");
-
+    */
     forimgvector.clear();
 
     savebutton->disable();
