@@ -280,26 +280,20 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
             curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
             if(strcmp(fattype, "FAT12") == 0)
             {
-		//currentitem->fstype = 1;
                 LoadFat12Directory(currentitem, filevector, curfileitem);
             }
             else if(strcmp(fattype, "FAT16") == 0)
             {
-		// NEED TO SWITCH TO FAT16
                 LoadFat16Directory(currentitem, filevector, curfileitem);
             }
             else
             {
-                /*
                 curforimg->ReadContent((uint8_t*)fattype, offset + 82, 5);
                 fattype[5] = 0;
                 if(strcmp(fattype, "FAT32") == 0)
                 {
-                    curforimg->ReadContent((uint8_t*)pname, offset + 71, 11);
-                    pname[11] = 0;
-                    partitionname = std::string(pname) + " [FAT32]";
+		    LoadFat32Directory(currentitem, filevector, curfileitem);
                 }
-                */
             }
         }
     }
