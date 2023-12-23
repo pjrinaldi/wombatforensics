@@ -531,7 +531,6 @@ void WombatForensics::InitializeThumbCache()
     std::filesystem::path imagepath(imgpath);
     for(auto const& direntry : std::filesystem::directory_iterator(imagepath))
 	imgthumbpathlist.push_back(FXString(direntry.path().string().c_str()));
-    std::cout << "img thumb path list size: " << imgthumbpathlist.size() << std::endl;
     vidthumbpathlist.clear();
     std::string vidpath = std::string(tmppath.text()) + "vidthumbs/";
     std::filesystem::path videopath(vidpath);
@@ -3322,7 +3321,7 @@ void WombatForensics::UpdatePartitions(void)
     tablelist->setColumnText(11, "Signature");
     tablelist->setColumnText(12, "Tagged");
     tablelist->setColumnText(13, "Hash Match");
-    // partiti/on information
+    // partition information
     for(int i=0; i < volnames.size(); i++)
     {
 	FXFile volfile;

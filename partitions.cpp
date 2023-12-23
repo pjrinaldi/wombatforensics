@@ -43,7 +43,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
             char* bfstype = new char[5];
             curforimg->ReadContent((uint8_t*)bfstype, 544, 4);
             bfstype[4] = 0;
-            if(strcmp(exfattype, "EXFAT") == 0 || strcmp(fattype, "FAT12") == 0 || strcmp(fattype, "FAT16") == 0 || strcmp(fattype, "FAT32") == 0 || strcmp(ntfstype, "NTFS") == 0 || strcmp(bfstype, "1SFB") == 0) // EXFAT | FAT12 | FAT16 | FAT32 | NTFS | BFS W/O PARTITION TABLE
+            if(strcmp(exfattype, "EXFAT") == 0 || strcmp(fattype, "FAT12") == 0 || strcmp(fattype, "FAT16") == 0 || strcmp(fat32type, "FAT32") == 0 || strcmp(ntfstype, "NTFS") == 0 || strcmp(bfstype, "1SFB") == 0) // EXFAT | FAT12 | FAT16 | FAT32 | NTFS | BFS W/O PARTITION TABLE
             {
 		GetVolumeProperties(curforimg, 0, volprops);
                 volnames->push_back(GetFileSystemName(curforimg, 0));
