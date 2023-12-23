@@ -431,9 +431,11 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    // RESERVED AREA SIZE
 		    uint16_t reservedareasize = 0;
 		    ReadForImgContent(curforimg, &reservedareasize, offset + 14);
+		    /*
 		    // ROOT DIRECTORY MAX FILES
 		    uint16_t rootdirmaxfiles = 0;
 		    ReadForImgContent(curforimg, &rootdirmaxfiles, offset + 17);
+		    */
 		    // FAT SIZE
 		    uint32_t fatsize = 0;
 		    ReadForImgContent(curforimg, &fatsize, offset + 36);
@@ -441,13 +443,17 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    uint64_t clusterareastart = (offset/ bytespersector) + reservedareasize + fatcount * fatsize;
 		    // DIRECTORY OFFSET
 		    uint64_t diroffset = offset + (reservedareasize + fatcount * fatsize) * bytespersector;
+		    /*
 		    // DIRECTORY SIZE
 		    uint64_t dirsize = rootdirmaxfiles * 32 + bytespersector - 1;
+		    */
 		    // ROOT DIRECTORY CLUSTER
 		    uint32_t rootdircluster = 0;
 		    ReadForImgContent(curforimg, &rootdircluster, offset + 44);
+		    /*
 		    // DIRECTORY SECTORS
 		    uint64_t dirsectors = dirsize / bytespersector;
+		    */
 		    // FAT OFFSET
 		    uint64_t fatoffset = offset + reservedareasize * bytespersector;
 		    // ROOT DIRECTORY LAYOUT
@@ -461,8 +467,8 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    }
 		    std::string rootdirlayout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, diroffset);
 		    // FILE SYSTEM SECTOR COUNT
-		    uint16_t filesystemsectorcount = 0;
-		    ReadForImgContent(curforimg, &filesystemsectorcount, offset + 19);
+		    uint32_t filesystemsectorcount = 0;
+		    ReadForImgContent(curforimg, &filesystemsectorcount, offset + 32);
 		    // FILE SYSTEM SERIAL NUMBER
 		    uint32_t volserial = 0;
 		    ReadForImgContent(curforimg, &volserial, offset + 67);
@@ -474,7 +480,7 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    curforimg->ReadContent((uint8_t*)vollabel, offset + 71, 11);
 		    vollabel[11] = 0;
 
-		    properties = std::to_string(reservedareasize) + ">" + std::to_string(rootdirmaxfiles) + ">" + std::to_string(fatcount) + ">" + std::to_string(bytespersector) + ">" + std::to_string(sectorspercluster) + ">" + std::to_string(filesystemsectorcount) + ">" + std::to_string(fatsize) + ">" + serialstream.str() + ">" + std::string(vollabel) + ">" + std::to_string(fatoffset) + ">" + std::to_string(diroffset) + ">" + std::to_string(rootdircluster) + ">" + std::to_string(dirsectors) + ">" + std::to_string(dirsize) + ">" + std::to_string(clusterareastart) + ">" + rootdirlayout;
+		    properties = std::to_string(reservedareasize) + ">" + std::to_string(fatcount) + ">" + std::to_string(bytespersector) + ">" + std::to_string(sectorspercluster) + ">" + std::to_string(filesystemsectorcount) + ">" + std::to_string(fatsize) + ">" + serialstream.str() + ">" + std::string(vollabel) + ">" + std::to_string(fatoffset) + ">" + std::to_string(diroffset) + ">" + std::to_string(rootdircluster) + ">" + std::to_string(clusterareastart) + ">" + rootdirlayout;
 		    volprops->push_back(properties);
 		}
 	    }

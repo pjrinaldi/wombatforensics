@@ -71,6 +71,8 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    ptpath += "fat12";
 	else if(pname->contains("FAT16") != 0)
 	    ptpath += "fat16";
+	else if(pname->contains("FAT32") != 0)
+	    ptpath += "fat32";
     }
     if(ptype & 0x02)
 	ptpath += "file";
