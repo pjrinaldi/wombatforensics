@@ -123,43 +123,6 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			}
 			longnamestring.insert(0, longname);
 		    }
-	/*
-	 *  else if(fileattr == 0x0f || 0x3f) // long directory entry for succeeding short entry...
-            {
-                if(firstchar & 0x40)
-                {
-                    if(!longnamestring.isEmpty()) // orphan long entry
-                    {
-			QHash<QString, QVariant> nodedata;
-			nodedata.clear();
-			nodedata.insert("name", QByteArray(longnamestring.toUtf8()).toBase64());
-                        nodedata.insert("path", QByteArray("/orphans/").toBase64());
-                        nodedata.insert("size", 0);
-                        nodedata.insert("create", "0");
-                        nodedata.insert("access", "0");
-                        nodedata.insert("modify", "0");
-                        nodedata.insert("status", "0");
-                        nodedata.insert("hash", "0");
-                        nodedata.insert("cat", "Empty");
-                        nodedata.insert("sig", "Empty File");
-                        nodedata.insert("tag", "0");
-                        nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
-			nodedata.insert("match", 0);
-			mutex.lock();
-			treenodemodel->AddNode(nodedata, QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-o"), 4, 1);
-			mutex.unlock();
-			nodedata.clear();
-			inodecnt++;
-                        //qDebug() << "orphan:" << longnamestring;
-                        //orphaninfo.clear();
-                        //orphaninfo.insert("filename", QVariant(longnamestring));
-                        //orphanlist->append(orphaninfo);
-                        //orphanlist->append(longnamestring);
-                        longnamestring = "";
-                    }
-                }
-	 */ 
-
 		}
 		else
 		{
@@ -223,31 +186,6 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    else
 		    {
 			tmpitem.name = aliasname;
-			/*
-			char* rname = new char[8];
-			currentitem->forimg->ReadContent((uint8_t*)rname, diroffset + i*32 + 1, 7);
-			rname[7] = 0;
-			std::string restname(rname);
-			char* ename = new char[4];
-			currentitem->forimg->ReadContent((uint8_t*)ename, diroffset + i*32 + 8, 3);
-			ename[3] = 0;
-			std::string extname(ename);
-			while(extname.size() > 0)
-			{
-			    std::size_t findempty = extname.find(" ", 0);
-			    if(findempty != std::string::npos)
-				extname.erase(findempty, 1);
-			    else
-				break;
-			}
-			restname.erase(std::remove_if(restname.begin(), restname.end(), isspace), restname.end());
-			if(tmpitem.isdeleted)
-			    tmpitem.name = std::string(1, '_') + restname;
-			else
-			    tmpitem.name = std::string(1, (char)firstchar) + restname;
-			if(extname.size() > 0)
-			    tmpitem.name += "." + extname;
-			*/
 		    }
 		    if(curfileitem == NULL)
 			tmpitem.path = "/";

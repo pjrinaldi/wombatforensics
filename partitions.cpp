@@ -431,11 +431,6 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    // RESERVED AREA SIZE
 		    uint16_t reservedareasize = 0;
 		    ReadForImgContent(curforimg, &reservedareasize, offset + 14);
-		    /*
-		    // ROOT DIRECTORY MAX FILES
-		    uint16_t rootdirmaxfiles = 0;
-		    ReadForImgContent(curforimg, &rootdirmaxfiles, offset + 17);
-		    */
 		    // FAT SIZE
 		    uint32_t fatsize = 0;
 		    ReadForImgContent(curforimg, &fatsize, offset + 36);
@@ -443,17 +438,9 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    uint64_t clusterareastart = (offset/ bytespersector) + reservedareasize + fatcount * fatsize;
 		    // DIRECTORY OFFSET
 		    uint64_t diroffset = offset + (reservedareasize + fatcount * fatsize) * bytespersector;
-		    /*
-		    // DIRECTORY SIZE
-		    uint64_t dirsize = rootdirmaxfiles * 32 + bytespersector - 1;
-		    */
 		    // ROOT DIRECTORY CLUSTER
 		    uint32_t rootdircluster = 0;
 		    ReadForImgContent(curforimg, &rootdircluster, offset + 44);
-		    /*
-		    // DIRECTORY SECTORS
-		    uint64_t dirsectors = dirsize / bytespersector;
-		    */
 		    // FAT OFFSET
 		    uint64_t fatoffset = offset + reservedareasize * bytespersector;
 		    // ROOT DIRECTORY LAYOUT
@@ -821,130 +808,3 @@ std::string GetFileSystemName(ForImg* curforimg, uint64_t offset)
     
     return partitionname;
 }
-
-
-/*
-FXString WombatForensics::ConvertBlocksToExtents(FXArray<uint> blocklist, uint blocksize, uint64_t rootdiroffset)
-{
-    // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
-    //QString rootdirlayout = QString::number(rootdiroffset + ((rootdircluster - 2) * sectorspercluster * bytespersector)) + "," + QString::number(sectorspercluster * bytespersector) + ";";
-    FXString extentstring = "";
-    int blkcnt = 1;
-    uint startvalue = blocklist.at(0);
-    for(int i=1; i < blocklist.no(); i++)
-    {
-        uint oldvalue = blocklist.at(i-1);
-        uint newvalue = blocklist.at(i);
-        if(newvalue - oldvalue == 1)
-            blkcnt++;
-        else
-        {
-            if(rootdiroffset > 0)
-	    {
-                //extentstring += QString::number(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + QString::number(blkcnt * blocksize) + ";";
-                extentstring += FXString::value(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + FXString::value(blkcnt * blocksize) + ";";
-	    }
-            else
-	    {
-                extentstring += FXString::value(startvalue * blocksize) + "," + FXString::value(blkcnt * blocksize) + ";";
-	    }
-            startvalue = blocklist.at(i);
-            blkcnt = 1;
-        }
-        if(i == blocklist.no() - 1)
-        {
-            if(rootdiroffset > 0)
-	    {
-                extentstring += FXString::value(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + FXString::value(blkcnt * blocksize) + ";";
-	    }
-            else
-	    {
-                extentstring += FXString::value(startvalue * blocksize) + "," + FXString::value(blkcnt * blocksize) + ";";
-	    }
-            startvalue = blocklist.at(i);
-            blkcnt = 1;
-        }
-    }
-    if(blocklist.no() == 1)
-    {
-        if(rootdiroffset > 0)
-	{
-            extentstring += FXString::value(rootdiroffset + ((startvalue - 2) * blocksize)) + "," + FXString::value(blkcnt * blocksize) + ";";
-	}
-        else
-	{
-            extentstring += FXString::value(startvalue * blocksize) + "," + FXString::value(blkcnt * blocksize) + ";";
-	}
-    }
-    return extentstring;
-}
-*/
-
-/*
-void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist)
-{
-    uint32_t curcluster32 = 0;
-    uint16_t curcluster16 = 0;
-    int fatbyte1 = 0;
-    if((uint)fstype == 1) // FAT12
-    {
-        fatbyte1 = clusternum + (clusternum / 2);
-        if(clusternum & 0x0001) // ODD
-	{
-	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
-	    curcluster16 = curcluster16 >> 4;
-	}
-        else // EVEN
-	{
-	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
-	    curcluster16 = curcluster16 & 0x0FFF;
-	}
-        if(curcluster16 < 0x0FF7 && curcluster16 >= 2)
-        {
-            clusterlist->push_back(curcluster16);
-            GetNextCluster(curimg, curcluster16, fstype, fatoffset, clusterlist);
-        }
-    }
-    else if((uint)fstype == 2) // FAT16
-    {
-        if(clusternum >= 2)
-        {
-            fatbyte1 = clusternum * 2;
-	    ReadForImgContent(curimg, &curcluster16, fatoffset + fatbyte1);
-	    
-            if(curcluster16 < 0xFFF7 && curcluster16 >= 2)
-            {
-                clusterlist->push_back(curcluster16);
-                GetNextCluster(curimg, curcluster16, fstype, fatoffset, clusterlist);
-            }
-        }
-    }
-    else if((uint)fstype == 3) // FAT32
-    {
-        if(clusternum >= 2)
-        {
-            fatbyte1 = clusternum * 4;
-	    ReadForImgContent(curimg, &curcluster32, fatoffset + fatbyte1);
-	    curcluster32 = curcluster32 & 0x0FFFFFFF;
-	    if(curcluster32 < 0x0FFFFFF7 && curcluster32 >= 2)
-            {
-                clusterlist->push_back(curcluster32);
-		GetNextCluster(curimg, curcluster32, fstype, fatoffset, clusterlist);
-            }
-        }
-    }
-    else if((uint)fstype == 4) // EXFAT
-    {
-        if(clusternum >= 2)
-        {
-            fatbyte1 = clusternum * 4;
-	    ReadForImgContent(curimg, &curcluster32, fatoffset + fatbyte1);
-	    if(curcluster32 < 0xFFFFFFF7 && curcluster32 >= 2)
-            {
-                clusterlist->push_back(curcluster32);
-		GetNextCluster(curimg, curcluster32, fstype, fatoffset, clusterlist);
-            }
-        }
-    }
-}
-*/

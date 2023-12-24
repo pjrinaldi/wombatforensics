@@ -21,27 +21,45 @@ void LoadFat32Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
     ReadForImgContent(currentitem->forimg, &reservedareasize, currentitem->voloffset + 14);
     //std::cout << "reserved area size: " << reservedareasize << std::endl;
     // ROOT DIRECTORY MAX FILES
-    uint16_t rootdirmaxfiles = 0;
-    ReadForImgContent(currentitem->forimg, &rootdirmaxfiles, currentitem->voloffset + 17);
+    //uint16_t rootdirmaxfiles = 0;
+    //ReadForImgContent(currentitem->forimg, &rootdirmaxfiles, currentitem->voloffset + 17);
     //std::cout << "root dir max files: " << rootdirmaxfiles << std::endl;
     // FAT SIZE
     uint16_t fatsize = 0;
-    ReadForImgContent(currentitem->forimg, &fatsize, currentitem->voloffset + 22);
+    ReadForImgContent(currentitem->forimg, &fatsize, currentitem->voloffset + 36);
     //std::cout << "fat size: " << fatsize << std::endl;
     // CLUSTER AREA START
-    uint64_t clusterareastart = reservedareasize + fatcount * fatsize + ((rootdirmaxfiles * 32) + (bytespersector - 1)) / bytespersector;
+    uint64_t clusterareastart = (currentitem->voloffset/ bytespersector) + reservedareasize + fatcount * fatsize;
     //std::cout << "Cluster area start: " << clusterareastart << std::endl;
     // DIRECTORY OFFSET
-    uint64_t diroffset = (reservedareasize + fatcount * fatsize) * bytespersector;
+    uint64_t diroffset = currentitem->voloffset + (reservedareasize + fatcount * fatsize) * bytespersector;
+    // ROOT DIRECTORY CLUSTER
+    uint32_t rootdircluster = 0;
+    ReadForImgContent(currentitem->forimg, &rootdircluster, currentitem->voloffset + 44);
+    // FAT OFFSET
+    uint64_t fatoffset = currentitem->voloffset + reservedareasize * bytespersector;
+    // ROOT DIRECTORY LAYOUT
+    std::vector<uint> clusterlist;
+    clusterlist.clear();
+    // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
+    if(rootdircluster >= 2)
+    {
+	clusterlist.push_back(rootdircluster);
+	GetNextCluster(currentitem->forimg, rootdircluster, 3, fatoffset, &clusterlist);
+    }
+    std::string rootdirlayout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, diroffset);
+
     //std::cout << "dir offset: " << diroffset << std::endl;
     // DIRECTORY SIZE
-    uint64_t dirsize = rootdirmaxfiles * 32 + bytespersector - 1;
+    //uint64_t dirsize = rootdirmaxfiles * 32 + bytespersector - 1;
     //std::cout << "dir size: " << dirsize << std::endl;
-    std::string curdirlayout = "";
     // ROOT DIRECTORY LAYOUT
-    std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
+    //std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
     //std::cout << "root dir layout: " << rootdirlayout << std::endl;
     //if(curinode == 0) // root directory
+    
+    uint64_t dirsize = 0;
+    std::string curdirlayout = "";
     if(curfileitem == NULL) // root directory
     {
 	curdirlayout = rootdirlayout;
@@ -296,7 +314,8 @@ void LoadFat32Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			//if(currentitem->itemtext.find("[FAT12]") != std::string::npos)
 			//    GetNextCluster(currentitem->forimg, clusternum, 1, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
 			//else if(currentitem->itemtext.find("[FAT16]") != std::string::npos)
-			    GetNextCluster(currentitem->forimg, clusternum, 2, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
+			GetNextCluster(currentitem->forimg, clusternum, 3, fatoffset, &clusterlist);
+			//clusterareastart = (qulonglong)(curstartsector + reservedareasize + (fatcount * fatsize));
 			//GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
 			//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
 			//QString::number((qulonglong)(curstartsector*512 + reservedareasize * bytespersector))
@@ -304,6 +323,7 @@ void LoadFat32Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    }
 		    //for(int i=0; i < clusterlist.size(); i++)
 		    //    std::cout << "cluster " << i << ": " << clusterlist.at(i) << std::endl;
+		    //uint64_t diroffset = offset + (reservedareasize + fatcount * fatsize) * bytespersector;
 		    if(clusterlist.size() > 0)
 			tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
 		    tmpitem.properties += tmpitem.layout + ">";
