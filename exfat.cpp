@@ -2,110 +2,78 @@
 
 void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
-    /*
-    if(line.startsWith("Bytes Per Sector|"))
-	bytespersector = line.split("|").at(1).toUInt();
-    else if(line.startsWith("Sectors Per Cluster|"))
-	sectorspercluster = line.split("|").at(1).toUInt();
-    else if(line.startsWith("Root Directory Layout|"))
-	rootdirlayout = line.split("|").at(1);
-    else if(line.startsWith("FAT Offset|"))
-	fatoffset = line.split("|").at(1).toULongLong();
-    //else if(line.startsWith("FAT Size|"))
-	//fatsize = line.split("|").at(1).toUInt();
-    else if(line.startsWith("Cluster Area Start|"))
-	clusterareastart = line.split("|").at(1).toULongLong();
-    */ 
     //if(curfileitem != NULL)
     //    std::cout << "curfileitem name: " << curfileitem->name << std::endl;
-    /*
+
+    std::string dirlayout = "";
     // BYTES PER SECTOR
-    uint16_t bytespersector = 0;
-    ReadForImgContent(currentitem->forimg, &bytespersector, currentitem->voloffset + 11);
-    //std::cout << "bytes per sector: " << bytespersector << std::endl;
-    // FAT COUNT
-    uint8_t fatcount = 0;
-    currentitem->forimg->ReadContent(&fatcount, currentitem->voloffset + 16, 1);
-    //std::cout << "fat count: " << (uint)fatcount << std::endl;
+    uint8_t bps = 0;
+    currentitem->forimg->ReadContent(&bps, currentitem->voloffset + 108, 1);
+    uint16_t bytespersector = pow(2, (uint)bps);
     // SECTORS PER CLUSTER
-    uint8_t sectorspercluster = 0;
-    currentitem->forimg->ReadContent(&sectorspercluster, currentitem->voloffset + 13, 1);
-    //std::cout << "sectors per cluster: " << (uint) sectorspercluster << std::endl;
-    // RESERVED AREA SIZE
-    uint16_t reservedareasize = 0;
-    ReadForImgContent(currentitem->forimg, &reservedareasize, currentitem->voloffset + 14);
-    //std::cout << "reserved area size: " << reservedareasize << std::endl;
-    // ROOT DIRECTORY MAX FILES
-    //uint16_t rootdirmaxfiles = 0;
-    //ReadForImgContent(currentitem->forimg, &rootdirmaxfiles, currentitem->voloffset + 17);
-    //std::cout << "root dir max files: " << rootdirmaxfiles << std::endl;
-    // FAT SIZE
-    uint16_t fatsize = 0;
-    ReadForImgContent(currentitem->forimg, &fatsize, currentitem->voloffset + 36);
-    //std::cout << "fat size: " << fatsize << std::endl;
-    // CLUSTER AREA START
-    uint64_t clusterareastart = (currentitem->voloffset/ bytespersector) + reservedareasize + fatcount * fatsize;
-    //std::cout << "Cluster area start: " << clusterareastart << std::endl;
-    // DIRECTORY OFFSET
-    uint64_t diroffset = currentitem->voloffset + (reservedareasize + fatcount * fatsize) * bytespersector;
-    // ROOT DIRECTORY CLUSTER
-    uint32_t rootdircluster = 0;
-    ReadForImgContent(currentitem->forimg, &rootdircluster, currentitem->voloffset + 44);
+    uint8_t spc = 0;
+    currentitem->forimg->ReadContent(&spc, currentitem->voloffset + 109, 1);
+    uint16_t sectorspercluster = pow(2, (uint)spc);
     // FAT OFFSET
-    uint64_t fatoffset = currentitem->voloffset + reservedareasize * bytespersector;
-    // ROOT DIRECTORY LAYOUT
+    uint32_t fatoff = 0;
+    ReadForImgContent(currentitem->forimg, &fatoff, currentitem->voloffset + 80);
+    uint64_t fatoffset = fatoff + currentitem->voloffset;
+    // FAT SIZE
+    uint32_t fatsize = 0;
+    ReadForImgContent(currentitem->forimg, &fatsize, currentitem->voloffset + 84);
+    // CLUSTER AREA START
+    uint32_t clusterstart = 0;
+    ReadForImgContent(currentitem->forimg, &clusterstart, currentitem->voloffset + 88);
+    // ROOT DIR CLUSTER
+    uint32_t rootdircluster = 0;
+    ReadForImgContent(currentitem->forimg, &rootdircluster, currentitem->voloffset + 96);
     std::vector<uint> clusterlist;
     clusterlist.clear();
-    // FirstSectorOfCluster = ((N-2) * sectorspercluster) + firstdatasector [rootdirstart];
     if(rootdircluster >= 2)
     {
 	clusterlist.push_back(rootdircluster);
-	GetNextCluster(currentitem->forimg, rootdircluster, 3, fatoffset, &clusterlist);
+	GetNextCluster(currentitem->forimg, rootdircluster, 4, fatoffset, &clusterlist);
     }
-    std::string rootdirlayout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, diroffset);
-
-    //std::cout << "dir offset: " << diroffset << std::endl;
-    // DIRECTORY SIZE
-    //uint64_t dirsize = rootdirmaxfiles * 32 + bytespersector - 1;
-    //std::cout << "dir size: " << dirsize << std::endl;
-    // ROOT DIRECTORY LAYOUT
-    //std::string rootdirlayout = std::to_string(diroffset) + "," + std::to_string(dirsize) + ";";
-    //std::cout << "root dir layout: " << rootdirlayout << std::endl;
-    //if(curinode == 0) // root directory
-    
-    uint64_t dirsize = 0;
-    std::string curdirlayout = "";
+    std::string rootdirlayout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
     if(curfileitem == NULL) // root directory
-    {
-	curdirlayout = rootdirlayout;
-    }
+	dirlayout = rootdirlayout;
     else // sub directory
-    {
-	curdirlayout = curfileitem->layout;
-    }
-    //std::cout << "cur dir layout: " << curdirlayout << std::endl;
+	dirlayout = curfileitem->layout;
+    uint64_t diroffset = 0;
+    uint64_t dirsize = 0;
     std::vector<std::string> dirlayoutlist;
     dirlayoutlist.clear();
-    std::istringstream dirlayoutstream(curdirlayout);
+    std::istringstream dirlayoutstream(dirlayout);
     std::string curlayout;
     while(getline(dirlayoutstream, curlayout, ';'))
 	dirlayoutlist.push_back(curlayout);
-    for(int k=0; k < dirlayoutlist.size(); k++)
+    for(int i=0; i < dirlayoutlist.size(); i++)
     {
 	diroffset = 0;
 	dirsize = 0;
-	std::size_t layoutsplit = dirlayoutlist.at(k).find(",");
-	diroffset = std::stoull(dirlayoutlist.at(k).substr(0, layoutsplit));
-	dirsize = std::stoull(dirlayoutlist.at(k).substr(layoutsplit+1));
-	if(k == 0 && curfileitem != NULL) // first dirlayout entry and not root directory
+	std::size_t layoutsplit = dirlayoutlist.at(i).find(",");
+	diroffset = std::stoull(dirlayoutlist.at(i).substr(0, layoutsplit));
+	dirsize = std::stoull(dirlayoutlist.at(i).substr(layoutsplit+1));
+	if(i == 0 && curfileitem != NULL) // first dirlayout entry and not root directory
 	{
 	    diroffset = diroffset + 64; // skip . and .. directories
 	    dirsize = dirsize - 64; // adjust read size for the 64 byte skip
 	}
 	uint direntrycount = dirsize / 32;
-	//std::cout << "dir entry count: " << direntrycount << std::endl;
+	for(uint j=0; j < direntrycount; j++)
+	{
+	    uint8_t entrytype = 0;
+	    currentitem->forimg->ReadContent(&entrytype, diroffset + i*32, 1);
+	    //uint8_t entrytype = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32, 1));
+	}
 	// PARSE DIRECTORY ENTRIES
-	std::string longnamestring = "";
+    }
+
+    /* FAT32 CONTENT
+
+    for(int k=0; k < dirlayoutlist.size(); k++)
+    {
+	// PARSE DIRECTORY ENTRIES
 	for(uint i=0; i < direntrycount; i++)
 	{
 	    FileItem tmpitem;
@@ -432,40 +400,6 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 */
 }
 /*
-    qulonglong inodecnt = 0;
-    //uint32_t fatsize = 0;
-    qulonglong fatoffset = 0;
-    uint16_t bytespersector = 0;
-    uint8_t sectorspercluster = 0;
-    qulonglong clusterareastart = 0;
-    QString rootdirlayout = "";
-    QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
-    if(!propfile.isOpen())
-	propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(propfile.isOpen())
-    {
-        while(!propfile.atEnd())
-        {
-            QString line = propfile.readLine();
-            if(line.startsWith("Bytes Per Sector|"))
-                bytespersector = line.split("|").at(1).toUInt();
-            else if(line.startsWith("Sectors Per Cluster|"))
-                sectorspercluster = line.split("|").at(1).toUInt();
-            else if(line.startsWith("Root Directory Layout|"))
-                rootdirlayout = line.split("|").at(1);
-            else if(line.startsWith("FAT Offset|"))
-                fatoffset = line.split("|").at(1).toULongLong();
-            //else if(line.startsWith("FAT Size|"))
-                //fatsize = line.split("|").at(1).toUInt();
-            else if(line.startsWith("Cluster Area Start|"))
-                clusterareastart = line.split("|").at(1).toULongLong();
-        }
-        propfile.close();
-    }
-    if(!dirlayout.isEmpty())
-	rootdirlayout = dirlayout;
-    //qDebug() << "parinode:" << parinode << "parfilename:" << parfilename << "dirlayout:" << rootdirlayout;
-    //qDebug() << "bps:" << bytespersector << "spc:" << sectorspercluster << "rdl:" << rootdirlayout << "fatoffset:" << fatoffset << "cas:" << clusterareastart;
     for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
 	qulonglong rootdiroffset = 0;
