@@ -15,7 +15,7 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	//fatsize = line.split("|").at(1).toUInt();
     else if(line.startsWith("Cluster Area Start|"))
 	clusterareastart = line.split("|").at(1).toULongLong();
-     */ 
+    */ 
     //if(curfileitem != NULL)
     //    std::cout << "curfileitem name: " << curfileitem->name << std::endl;
     /*
