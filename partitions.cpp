@@ -309,6 +309,89 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 	fattype[5] = 0;
 	if(strcmp(fattype, "EXFAT") == 0)
 	{
+	    // BYTES PER SECTOR
+	    uint8_t bps = 0;
+	    curforimg->ReadContent(&bps, offset + 108, 1);
+	    uint16_t bytespersector = pow(2, (uint)bps);
+	    // FAT COUNT
+	    uint8_t fatcount = 0;
+	    curforimg->ReadContent(&fatcount, offset + 110, 1);
+	    // SECTORS PER CLUSTER
+	    uint8_t spc = 0;
+	    curforimg->ReadContent(&spc, offset + 109, 1);
+	    uint16_t sectorspercluster = pow(2, (uint)spc);
+	    // RESERVED AREA SIZE
+	    uint16_t reservedareasize = 0;
+	    ReadForImgContent(curforimg, &reservedareasize, offset + 14);
+	    // ROOT DIRECTORY MAX FILES
+	    uint16_t rootdirmaxfiles = 0;
+	    ReadForImgContent(curforimg, &rootdirmaxfiles, offset + 17);
+	    // FAT SIZE
+	    uint32_t fatsize = 0;
+	    ReadForImgContent(curforimg, &fatsize, offset + 84);
+	    // FAT OFFSET
+	    uint32_t fatoff = 0;
+	    ReadForImgContent(curforimg, &fatoff, offset + 80);
+	    uint64_t fatoffset = fatoff + offset;
+	    // ROOT DIR CLUSTER
+	    uint32_t rootdircluster = 0;
+	    ReadForImgContent(curforimg, &rootdircluster, offset + 96);
+	    // CLUSTER AREA START
+	    uint32_t clusterstart = 0;
+	    ReadForImgContent(curforimg, &clusterstart, offset + 88);
+	    //std::cout << "cluster start: " << clusterstart << std::endl;
+	    // ROOT DIRECTORY OFFSET
+	    uint64_t rootdiroffset = (uint64_t)(offset + (((rootdircluster - 2) * sectorspercluster) + clusterstart) * bytespersector);
+	    //std::cout << "root dir offset: " << rootdiroffset << std::endl;
+	    // ROOT DIRECTORY SIZE
+	    uint64_t rootdirsize = (rootdirmaxfiles * 32) + (bytespersector - 1);
+            std::vector<uint> clusterlist;
+	    clusterlist.clear();
+	    if(rootdircluster >= 2)
+	    {
+		clusterlist.push_back(rootdircluster);
+		GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
+	    }
+	    std::string rootdirlayout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
+	    //std::cout << "rootdirlayout: " << rootdirlayout << std::endl;
+	    std::string partitionname = "";
+	    for(int i=0; i < clusterlist.size(); i++)
+	    {
+		//std::cout << "cluster: " << i << " | " << clusterlist.at(i) << std::endl;
+		uint64_t clustersize = sectorspercluster * bytespersector;
+		//std::cout << "clustersize: " << clustersize << std::endl;
+		uint curoffset = 0;
+		while(curoffset < clustersize)
+		{
+		    uint64_t clusteroffset = (((clusterlist.at(i) - 2) * sectorspercluster) + clusterstart) * bytespersector;
+		    //std::cout << "clusteroffset: " << clusteroffset << std::endl;
+		    uint8_t firstbyte = 0;
+		    curforimg->ReadContent(&firstbyte, rootdiroffset + curoffset, 1);
+		    //std::cout  << "firstbyte: " << std::hex << (uint)firstbyte << std::endl;
+		    if((uint)firstbyte == 0x83)
+			break;
+		    curoffset += 32;
+		}
+		//std::cout << "curoffset: " << curoffset << std::endl;
+		if(curoffset < clustersize)
+		{
+		    uint8_t secondbyte = 0;
+		    curforimg->ReadContent(&secondbyte, rootdiroffset + curoffset + 1, 1);
+		    //std::cout << "second byte: " << (uint)secondbyte << std::endl;
+		    if((uint)secondbyte > 0)
+		    {
+			for(uint j=0; j < (uint)secondbyte; j++)
+			{
+			    uint16_t singleletter = 0;
+			    ReadForImgContent(curforimg, &singleletter, rootdiroffset + curoffset + 2 + j*2);
+			    partitionname += (char)singleletter;
+			    //std::cout << "singleletter: " << (char)singleletter << std::endl;
+			}
+		    }
+		}
+	    }
+	    properties = std::to_string(reservedareasize) + ">" + std::to_string(rootdirmaxfiles) + ">" + std::to_string(fatsize) + ">" + partitionname + ">" + std::to_string(bytespersector) + ">" + std::to_string(sectorspercluster) + ">" + std::to_string(fatcount) + ">" + std::to_string(fatoffset) + ">" + std::to_string(clusterstart) + ">" + std::to_string(rootdiroffset) + ">" + std::to_string(rootdirsize) + ">" + rootdirlayout;
+	    volprops->push_back(properties);
 	}
         else if(std::string(fattype).find("NTFS") != std::string::npos)
 	{

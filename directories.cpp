@@ -138,74 +138,7 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
         fattype[5] = 0;
         if(strcmp(fattype, "EXFAT") == 0)
         {
-            /*
-	    uint32_t fatsize = 0;
-	    ReadForImgContent(curforimg, &fatsize, offset + 84);
-	    uint8_t tmp8 = 0;
-	    curforimg->ReadContent(&tmp8, offset + 108, 1);
-	    uint16_t bytespersector = pow(2, (uint)tmp8);
-	    curforimg->ReadContent(&tmp8, offset + 109, 1);
-	    uint16_t sectorspercluster = pow(2, (uint)tmp8);
-	    uint8_t fatcount = 0;
-	    curforimg->ReadContent(&fatcount, offset + 110, 1);
-	    uint32_t fatoff = 0;
-	    ReadForImgContent(curforimg, &fatoff, offset + 80);
-	    uint64_t fatoffset = fatoff + offset;
-	    uint32_t rootdircluster = 0;
-	    ReadForImgContent(curforimg, &rootdircluster, offset + 96);
-	    uint32_t clusterstart = 0;
-	    ReadForImgContent(curforimg, &clusterstart, offset + 88);
-	    //std::cout << "cluster start: " << clusterstart << std::endl;
-	    uint64_t rootdiroffset = (uint64_t)(offset + (((rootdircluster - 2) * sectorspercluster) + clusterstart) * bytespersector);
-	    //std::cout << "root dir offset: " << rootdiroffset << std::endl;
-            std::vector<uint> clusterlist;
-	    clusterlist.clear();
-	    if(rootdircluster >= 2)
-	    {
-		clusterlist.push_back(rootdircluster);
-		GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
-	    }
-            //std::cout << "it's exfat..." << std::endl;
-	    //FXString rootdirlayout = ConvertBlocksToExtents(clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
-	    //std::cout << "rootdirlayout: " << rootdirlayout.text() << std::endl;
-	    for(int i=0; i < clusterlist.size(); i++)
-	    {
-		//std::cout << "cluster: " << i << " | " << clusterlist.at(i) << std::endl;
-		uint64_t clustersize = sectorspercluster * bytespersector;
-		//std::cout << "clustersize: " << clustersize << std::endl;
-		uint curoffset = 0;
-		while(curoffset < clustersize)
-		{
-		    uint64_t clusteroffset = (((clusterlist.at(i) - 2) * sectorspercluster) + clusterstart) * bytespersector;
-		    //std::cout << "clusteroffset: " << clusteroffset << std::endl;
-		    uint8_t firstbyte = 0;
-		    curforimg->ReadContent(&firstbyte, rootdiroffset + curoffset, 1);
-		    //std::cout  << "firstbyte: " << std::hex << (uint)firstbyte << std::endl;
-		    if((uint)firstbyte == 0x83)
-			break;
-		    curoffset += 32;
-		}
-		//std::cout << "curoffset: " << curoffset << std::endl;
-		if(curoffset < clustersize)
-		{
-		    uint8_t secondbyte = 0;
-		    curforimg->ReadContent(&secondbyte, rootdiroffset + curoffset + 1, 1);
-		    //std::cout << "second byte: " << (uint)secondbyte << std::endl;
-		    if((uint)secondbyte > 0)
-		    {
-			for(uint j=0; j < (uint)secondbyte; j++)
-			{
-			    uint16_t singleletter = 0;
-			    ReadForImgContent(curforimg, &singleletter, rootdiroffset + curoffset + 2 + j*2);
-			    partitionname += (char)singleletter;
-			    //std::cout << "singleletter: " << (char)singleletter << std::endl;
-			}
-		    }
-		}
-	    }
-            */
-	    //partitionname += " [EXFAT]";
-	    //std::cout << "part name: " << partitionname.text() << std::endl;
+            LoadExFatDirectory(currentitem, filevector, curfileitem);
         }
         else if(std::string(fattype).find("NTFS") != std::string::npos)
         {
