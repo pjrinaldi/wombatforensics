@@ -338,7 +338,13 @@ void LoadFat32Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    }
 		    else
 		    {
-			GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+			if(logicalsize > 0)
+			    GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+			else
+			{
+			    tmpitem.cat = "Empty";
+			    tmpitem.sig = "Empty File";
+			}
 			//std::cout << "cat/sig: " << tmpitem.cat << " " << tmpitem.sig << std::endl;
 		    }
 		    //std::cout << aliasname << ": " << tmpitem.properties << std::endl;

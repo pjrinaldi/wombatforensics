@@ -190,6 +190,7 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		clusterlist.clear();
 		GetNextCluster(currentitem->forimg, clusternum, 4, fatoffset, &clusterlist);
 		tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
+		physicalsize = clusterlist.size() * bytespersector * sectorspercluster;
 		clusterlist.clear();
 	    }
 	    else if(fatchain == 1)
@@ -199,22 +200,23 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    }
 	    if(entrytype == 0x85 || entrytype == 0x05 || entrytype == 0x81 || entrytype == 0x82)
 	    {
-		if(logicalsize > 0)
+		if(tmpitem.isdirectory)
 		{
-		    if(tmpitem.isdirectory)
-		    {
-			tmpitem.cat = "Directory";
-			tmpitem.sig = "Directory";
-		    }
-		    else
-			GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+		    tmpitem.size = physicalsize;
+		    tmpitem.cat = "Directory";
+		    tmpitem.sig = "Directory";
 		}
 		else
 		{
-		    tmpitem.cat = "Empty";
-		    tmpitem.sig = "Empty File";
+		    if(logicalsize > 0)
+			GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+		    else
+		    {
+			tmpitem.cat = "Empty";
+			tmpitem.sig = "Empty File";
+		    }
 		}
-		tmpitem.properties = " >" + tmpitem.layout + ">" + " >" + std::to_string(logicalsize);
+		tmpitem.properties = "attr>" + tmpitem.layout + ">" + std::to_string(physicalsize) + ">" + std::to_string(logicalsize);
 		if(!tmpitem.layout.empty())
 		    filevector->push_back(tmpitem);
 	    }
