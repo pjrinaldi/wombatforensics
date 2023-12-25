@@ -69,78 +69,68 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    uint64_t physicalsize = 0;
 	    // FAT CHAIN TYPE
 	    int fatchain = 0;
+	    // FILE ATTRIBUTE STRING
+	    std::string attributes = "";
+	    // FILE ATTRIBUTE INT
+	    uint8_t fileattr = 0;
 	    // ENTRY TYPE
 	    uint8_t entrytype = 0;
 	    currentitem->forimg->ReadContent(&entrytype, diroffset + j*32, 1);
 	    // CLUSTER NUMBER
 	    uint32_t clusternum = 0;
-	    ReadForImgContent(currentitem->forimg, &clusternum, diroffset + j*32 + 20);
-	    if(entrytype == 0x00) // cur dir entry is free and all remaining are free
+	    if((uint)entrytype == 0x00) // cur dir entry is free and all remaining are free
 		break;
-	    else if(entrytype == 0x81) // $ALLOC_BITMAP file
+	    else if((uint)entrytype == 0x81) // $ALLOC_BITMAP file
 	    {
+		//std::cout << "cluster num offset: " << diroffset + j*32 + 20 << std::endl;
+		ReadForImgContent(currentitem->forimg, &clusternum, diroffset + j*32 + 20);
+		//std::cout << "clusternum: " << clusternum << std::endl;
 		tmpitem.name = "$ALLOC_BITMAP";
 		ReadForImgContent(currentitem->forimg, &logicalsize, diroffset + j*32 + 24); 
 		tmpitem.size = logicalsize;
 		tmpitem.path = "/";
+		attributes = "Allocation Bitmap,";
 	    }
-	    else if(entrytype == 0x82) // $UPCASE_TABLE file
+	    else if((uint)entrytype == 0x82) // $UPCASE_TABLE file
 	    {
+		ReadForImgContent(currentitem->forimg, &clusternum, diroffset + j*32 + 20);
 		tmpitem.name = "$UPCASE_TABLE";
 		ReadForImgContent(currentitem->forimg, &logicalsize, diroffset + j*32 + 24);
 		tmpitem.size = logicalsize;
 		tmpitem.path = "/";
+		attributes = "Up-Case Table,";
 	    }
-	    else if(entrytype == 0x83) // VOLUME_LABEL (already handles so skip)
+	    else if((uint)entrytype == 0x83) // VOLUME_LABEL (already handles so skip)
 	    {
 	    }
-	    else if(entrytype == 0x03) // Deleted VOLUME_LABEL
+	    else if((uint)entrytype == 0x03) // Deleted VOLUME_LABEL
 	    {
 		// skip for now
 	    }
-	    else if(entrytype == 0x85 || entrytype == 0x05) // File/Dir Directory Entry
+	    else if((uint)entrytype == 0x85 || (uint)entrytype == 0x05) // File/Dir Directory Entry
 	    {
-		/*
-		uint8_t secondarycount = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 1, 1));
-		fileattr = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 4, 1));
-                out << "File Attributes|";
+		std::cout << "cluster num offset: " << diroffset + j*32 + 20 << std::endl;
+		ReadForImgContent(currentitem->forimg, &clusternum, diroffset + j*32 + 20);
+		std::cout << "clusternum: " << clusternum << std::endl;
+		uint8_t secondarycount = 0;
+		currentitem->forimg->ReadContent(&secondarycount, diroffset + j*32 + 1, 1);
+		currentitem->forimg->ReadContent(&fileattr, diroffset + j*32 + 4, 1);
 		if(fileattr & 0x01)
-		    out << "Read Only,";
+		    attributes += "Read Only,";
 		if(fileattr & 0x02)
-		    out << "Hidden File,";
+		    attributes += "Hidden File,";
 		if(fileattr & 0x04)
-		    out << "System File,";
+		    attributes += "System File,";
 		if(fileattr & 0x10)
-		    out << "Sub Directory,";
+		    attributes += "Sub Directory,";
 		if(fileattr & 0x20)
-		    out << "Archive File,";
-                out << "|File attributes." << Qt::endl;
+		    attributes += "Archive File,";
 		if(fileattr & 0x10)
-		{
-		    if(entrytype == 0x85)
-		    {
-			isdeleted = 0;
-			itemtype = 3;
-		    }
-		    else if(entrytype == 0x05)
-		    {
-			isdeleted = 1;
-			itemtype = 2;
-		    }
-		}
-		else
-		{
-		    if(entrytype == 0x85)
-		    {
-			isdeleted = 0;
-			itemtype = 5;
-		    }
-		    else if(entrytype == 0x05)
-		    {
-			isdeleted = 1;
-			itemtype = 4;
-		    }
-		}
+		    tmpitem.isdirectory = true;
+		if((uint)entrytype == 0x05)
+		    tmpitem.isdeleted = true;
+
+		/*
 		createdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 9, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 8, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 11, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 10, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 22, 1)));
 		modifydate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 13, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 12, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 15, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 14, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 23, 1)));
 		accessdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 17, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 16, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 19, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 18, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 24, 1)));
@@ -184,22 +174,23 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 
 		*/
 	    }
-	    if(fatchain == 0 && clusternum > 1)
-	    {
-		std::vector<uint32_t> clusterlist;
-		clusterlist.clear();
-		GetNextCluster(currentitem->forimg, clusternum, 4, fatoffset, &clusterlist);
-		tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
-		physicalsize = clusterlist.size() * bytespersector * sectorspercluster;
-		clusterlist.clear();
-	    }
-	    else if(fatchain == 1)
-	    {
-		uint clustercount = (uint)ceil((float)physicalsize / (bytespersector * sectorspercluster));
-		tmpitem.layout = std::to_string(clusterstart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + std::to_string(clustercount * bytespersector * sectorspercluster) + ";";
-	    }
 	    if(entrytype == 0x85 || entrytype == 0x05 || entrytype == 0x81 || entrytype == 0x82)
 	    {
+		if(fatchain == 0 && clusternum > 1)
+		{
+		    std::vector<uint32_t> clusterlist;
+		    clusterlist.clear();
+		    clusterlist.push_back(clusternum);
+		    GetNextCluster(currentitem->forimg, clusternum, 4, fatoffset, &clusterlist);
+		    tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
+		    physicalsize = clusterlist.size() * bytespersector * sectorspercluster;
+		    clusterlist.clear();
+		}
+		else if(fatchain == 1)
+		{
+		    uint clustercount = (uint)ceil((float)physicalsize / (bytespersector * sectorspercluster));
+		    tmpitem.layout = std::to_string(clusterstart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + std::to_string(clustercount * bytespersector * sectorspercluster) + ";";
+		}
 		if(tmpitem.isdirectory)
 		{
 		    tmpitem.size = physicalsize;
@@ -216,7 +207,7 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			tmpitem.sig = "Empty File";
 		    }
 		}
-		tmpitem.properties = "attr>" + tmpitem.layout + ">" + std::to_string(physicalsize) + ">" + std::to_string(logicalsize);
+		tmpitem.properties = attributes + ">" + tmpitem.layout + ">" + std::to_string(physicalsize) + ">" + std::to_string(logicalsize);
 		if(!tmpitem.layout.empty())
 		    filevector->push_back(tmpitem);
 	    }

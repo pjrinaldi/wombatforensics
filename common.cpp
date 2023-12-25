@@ -18,6 +18,73 @@ std::string ConvertUnixTimeToHuman(uint32_t unixtime)
     return std::string(hchar);
 }
 */
+
+/*
+std::string ConvertExFatTimeToHuman(uint16_t* dosdate, uint16_t* dostime, uint8_t* timezone)
+{
+    std::string humanstring = ConvertDosTimeToHuman(dosdate, dostime);
+    std::bitset<8> zonebits{*timezone};
+    if(zonebits[0] == 1) // apply utc offset
+    {
+        // CALCULATE OFFSET AND REPLACE (UTC) IN STRING WITH HOW TO WRITE TIME ZONE OFFSET PIECE
+        // OR INSERT HUMANSTRING.END()-1, IF(<0) - ELSE +, OFFSETSECS/3600 float = (OFFSETSECS%3600)/3600) (HOUR::MIN)
+        // IF FLOAT = 0, THEN 00 = 0.25, THEN 15, = 0.50, THEN 30, =0.75 THEN 45
+        zonebits.set(0, 0); // set switch bit to zero so i can get the offset without that value
+        int offsetsecs = (int)zonebits.to_ulong() * 15 * 60;
+        std::cout << "offset secs:" << std::hex << offsetsecs << std::endl;
+        int offhour = offsetsecs / 3600;
+        float offmin = (abs(offsetsecs) % 3600 ) / 3600;
+        std::string offstring = std::to_string(offhour) + ":";
+        if(offmin == 0.00)
+            offstring += "00";
+        else if(offmin == 0.25)
+            offstring += "15";
+        else if(offmin == 0.50)
+            offstring += "30";
+        else if(offmin == 0.75)
+            offstring += "45";
+        else
+            offstring += "00";
+        std::cout << "offset secs: " << offstring << std::endl;
+    }
+
+    return humanstring;
+}
+*/
+
+/*
+qint64 ConvertExfatTimeToUnixTime(uint8_t t1, uint8_t t2, uint8_t d1, uint8_t d2, uint8_t utc)
+{
+    int year = 0;
+    int month = 0;
+    int day = 0;
+    int hour = 0;
+    int min = 0;
+    int sec = 0;
+    int offsetsecs = 0;
+    QString tmpdate = QString("%1%2").arg(d1, 8, 2, QChar('0')).arg(d2, 8, 2, QChar('0'));
+    QString tmptime = QString("%1%2").arg(t1, 8, 2, QChar('0')).arg(t2, 8, 2, QChar('0'));
+    QString utcstr = QString("%1").arg(utc, 8, 2, QChar('0'));
+    year = tmpdate.left(7).toInt(nullptr, 2) + 1980;
+    month = tmpdate.mid(7, 4).toInt(nullptr, 2);
+    day = tmpdate.right(5).toInt(nullptr, 2);
+    hour = tmptime.left(5).toInt(nullptr, 2);
+    min = tmptime.mid(5, 6).toInt(nullptr, 2);
+    sec = tmptime.right(5).toInt(nullptr, 2) * 2;
+    //qDebug() << "utcstr:" << utcstr << utcstr.toInt(nullptr, 2) << "utcstr right:" << utcstr.right(1) << utcstr.right(1).toInt(nullptr, 2) << "utcstr left:" << utcstr.left(7) << utcstr.left(7).toInt(nullptr, 2);
+    if(utcstr.right(1).toInt(nullptr, 2) == 1) // apply utc offset
+    {
+        offsetsecs = utcstr.left(7).toInt(nullptr, 2) * 15 * 60; // signed decimal value * 15 to get the number of 15 minute increments * 60 to put it in seconds.
+        //qDebug() << "offset seconds:" << offsetsecs;
+    }
+    QString datetimestring = QString("%1-%2-%3 %4:%5:%6").arg(year, 4, 10, QChar('0')).arg(month, 2, 10, QChar('0')).arg(day, 2, 10, QChar('0')).arg(hour, 2, 10, QChar('0')).arg(min, 2, 10, QChar('0')).arg(sec, 2, 10, QChar('0'));
+    QDateTime tmpdatetime = QDateTime::fromString(datetimestring, "yyyy-MM-dd hh:mm:ss");
+    tmpdatetime.setOffsetFromUtc(-offsetsecs);
+
+    return tmpdatetime.toSecsSinceEpoch();
+}
+*/
+
 std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime)
 {
     std::string humanstring = "";
