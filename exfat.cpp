@@ -80,33 +80,16 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    else if(entrytype == 0x81) // $ALLOC_BITMAP file
 	    {
 		tmpitem.name = "$ALLOC_BITMAP";
-		ReadForImgContent(currentitem->forimg, &logicalsize, diroffset + j*32 + 24, 8); 
+		ReadForImgContent(currentitem->forimg, &logicalsize, diroffset + j*32 + 24); 
 		tmpitem.size = logicalsize;
 		tmpitem.path = "/";
-		GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
-		/*
-		if(fatchain == 0 && clusternum > 1)
-		{
-		    std::vector<uint32_t> clusterlist;
-		    clusterlist.clear();
-		    GetNextCluster(currentitem->forimg, clusternum, 4, fatoffset, &clusterlist);
-		    tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
-		    clusterlist.clear();
-		}
-		tmpitem.properties = " >" + tmpitem.layout + ">" + " >" + std::to_string(logicalsize);
-		if(!tmpitem.layout.empty())
-		    filevector->push_back(tmpitem);
-		*/
 	    }
 	    else if(entrytype == 0x82) // $UPCASE_TABLE file
 	    {
-		/*
-		filename = "$UPCASE_TABLE";
-		logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(rootdiroffset + j*32 + 24, 8));
-		isdeleted = 0;
-		itemtype = 10;
-		filepath = "/";
-		*/
+		tmpitem.name = "$UPCASE_TABLE";
+		ReadForImgContent(currentitem->forimg, &logicalsize, diroffset + j*32 + 24);
+		tmpitem.size = logicalsize;
+		tmpitem.path = "/";
 	    }
 	    else if(entrytype == 0x83) // VOLUME_LABEL (already handles so skip)
 	    {
@@ -211,15 +194,30 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    }
 	    else if(fatchain == 1)
 	    {
-		/*
 		uint clustercount = (uint)ceil((float)physicalsize / (bytespersector * sectorspercluster));
-		layout = QString::number(clusterareastart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + QString::number(clustercount * bytespersector * sectorspercluster) + ";";
-		//qDebug() << "clustercount:" << clustercount;
-		*/
+		tmpitem.layout = std::to_string(clusterstart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + std::to_string(clustercount * bytespersector * sectorspercluster) + ";";
 	    }
-	    tmpitem.properties = " >" + tmpitem.layout + ">" + " >" + std::to_string(logicalsize);
-	    if(!tmpitem.layout.empty())
-		filevector->push_back(tmpitem);
+	    if(entrytype == 0x85 || entrytype == 0x05 || entrytype == 0x81 || entrytype == 0x82)
+	    {
+		if(logicalsize > 0)
+		{
+		    if(tmpitem.isdirectory)
+		    {
+			tmpitem.cat = "Directory";
+			tmpitem.sig = "Directory";
+		    }
+		    else
+			GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+		}
+		else
+		{
+		    tmpitem.cat = "Empty";
+		    tmpitem.sig = "Empty File";
+		}
+		tmpitem.properties = " >" + tmpitem.layout + ">" + " >" + std::to_string(logicalsize);
+		if(!tmpitem.layout.empty())
+		    filevector->push_back(tmpitem);
+	    }
 	}
     }
 
