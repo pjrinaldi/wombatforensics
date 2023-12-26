@@ -11,10 +11,16 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
     uint8_t spc = 0;
     currentitem->forimg->ReadContent(&spc, currentitem->voloffset + 109, 1);
     uint16_t sectorspercluster = pow(2, (uint)spc);
+    // RESERVED AREA SIZE
+    uint16_t reservedareasize = 0;
+    ReadForImgContent(currentitem->forimg, &reservedareasize, currentitem->voloffset + 14);
     // FAT OFFSET
     uint32_t fatoff = 0;
     ReadForImgContent(currentitem->forimg, &fatoff, currentitem->voloffset + 80);
     uint64_t fatoffset = fatoff + currentitem->voloffset;
+    // FAT COUNT
+    uint8_t fatcount = 0;
+    currentitem->forimg->ReadContent(&fatcount, currentitem->voloffset + 110, 1);
     // FAT SIZE
     uint32_t fatsize = 0;
     ReadForImgContent(currentitem->forimg, &fatsize, currentitem->voloffset + 84);
@@ -248,6 +254,47 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		filevector->push_back(tmpitem);
 	    }
 	}
+    }
+    if(curfileitem == NULL) // root directory - add virtual files
+    {
+	//curinode = AddVirtualFileSystemFiles(curimg, ptreecnt, fatcount, fatsize * bytespersector, curinode);
+	// ADD VIRTUAL FILE SYSTEMS FILES
+	// ADD $MBR
+	FileItem tmpitem;
+	tmpitem.size = bytespersector;
+	tmpitem.name = "$MBR";
+	tmpitem.path = "/";
+	tmpitem.layout = std::to_string(currentitem->voloffset) + "," + std::to_string(bytespersector) + ";";
+	tmpitem.isvirtual = true;
+	tmpitem.cat = "System File";
+	tmpitem.sig = "Master Boot Record";
+	filevector->push_back(tmpitem);
+	// ADD $FAT(s)
+	for(int i=0; i < fatcount; i++)
+	{
+	    tmpitem.clear();
+	    tmpitem.size = fatsize * bytespersector;
+	    tmpitem.name = "$FAT" + std::to_string(i+1);
+	    tmpitem.path = "/";
+	    tmpitem.layout = std::to_string(currentitem->voloffset + fatoffset * bytespersector + fatsize * i * bytespersector) + "," + std::to_string(fatsize * bytespersector) + ";";
+	    //tmpitem.layout = std::to_string(currentitem->voloffset + reservedareasize * bytespersector + fatsize * i * bytespersector) + "," + std::to_string(fatsize * bytespersector) + ";";
+	    tmpitem.isvirtual = true;
+	    tmpitem.cat = "System File";
+	    tmpitem.sig = "File Allocation Table";
+	    filevector->push_back(tmpitem);
+	}
+	/*
+	// ADD ORPHANS VIRTUAL DIRECTORY
+	tmpitem.clear();
+	tmpitem.size = 0;
+	tmpitem.name = "orphans";
+	tmpitem.path = "/";
+	tmpitem.isvirtual = true;
+	tmpitem.isdirectory = true;
+	tmpitem.cat = "Directory";
+	tmpitem.sig = "Virtual Directory";
+	filevector->push_back(tmpitem);
+	*/
     }
 }
 /*
