@@ -75,9 +75,9 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    currentitem->forimg->ReadContent(&entrytype, diroffset + j*32, 1);
 	    // CLUSTER NUMBER
 	    uint32_t clusternum = 0;
-	    if((uint)entrytype == 0x00) // cur dir entry is free and all remaining are free
+	    if(entrytype == 0x00) // cur dir entry is free and all remaining are free
 		break;
-	    else if((uint)entrytype == 0x81) // $ALLOC_BITMAP file
+	    else if(entrytype == 0x81) // $ALLOC_BITMAP file
 	    {
 		ReadForImgContent(currentitem->forimg, &clusternum, diroffset + j*32 + 20);
 		tmpitem.name = "$ALLOC_BITMAP";
@@ -88,7 +88,7 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		tmpitem.sig = "Allocation Bitmap";
 		attributes = "Allocation Bitmap,";
 	    }
-	    else if((uint)entrytype == 0x82) // $UPCASE_TABLE file
+	    else if(entrytype == 0x82) // $UPCASE_TABLE file
 	    {
 		ReadForImgContent(currentitem->forimg, &clusternum, diroffset + j*32 + 20);
 		tmpitem.name = "$UPCASE_TABLE";
@@ -99,14 +99,14 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		tmpitem.sig = "Up-Case Table";
 		attributes = "Up-Case Table,";
 	    }
-	    else if((uint)entrytype == 0x83) // VOLUME_LABEL (already handles so skip)
+	    else if(entrytype == 0x83) // VOLUME_LABEL (already handles so skip)
 	    {
 	    }
-	    else if((uint)entrytype == 0x03) // Deleted VOLUME_LABEL
+	    else if(entrytype == 0x03) // Deleted VOLUME_LABEL
 	    {
 		// skip for now
 	    }
-	    else if((uint)entrytype == 0x85 || (uint)entrytype == 0x05) // File/Dir Directory Entry
+	    else if(entrytype == 0x85 || entrytype == 0x05) // File/Dir Directory Entry
 	    {
 		ReadForImgContent(currentitem->forimg, &clusternum, diroffset + j*32 + 20);
 		uint8_t secondarycount = 0;
@@ -124,7 +124,7 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    attributes += "Archive File,";
 		if(fileattr & 0x10)
 		    tmpitem.isdirectory = true;
-		if((uint)entrytype == 0x05)
+		if(entrytype == 0x05)
 		    tmpitem.isdeleted = true;
 
 		// CREATE DATETIME
@@ -244,8 +244,8 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    }
 		}
 		tmpitem.properties = attributes + ">" + tmpitem.layout + ">" + std::to_string(physicalsize) + ">" + std::to_string(logicalsize);
-		if(!tmpitem.layout.empty())
-		    filevector->push_back(tmpitem);
+		//if(!tmpitem.layout.empty())
+		filevector->push_back(tmpitem);
 	    }
 	}
     }
