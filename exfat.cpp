@@ -131,7 +131,6 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		uint8_t createzone = 0;
 		currentitem->forimg->ReadContent(&createzone, diroffset + j*32 + 22, 1);
 		tmpitem.create = ConvertExFatTimeToHuman(&createdate, &createtime, &createzone);
-		std::cout << "Create Date|" << ConvertExFatTimeToHuman(&createdate, &createtime, &createzone) << "|" << std::endl;
 		// MODIFY DATETIME
 		uint16_t modifydate = 0;
 		ReadForImgContent(currentitem->forimg, &modifydate, diroffset + j*32 + 14);
