@@ -549,7 +549,10 @@ void GetFileSlack(ForImg* curforimg, FileItem* curfileitem, uint8_t** tmpbuf, ui
 	lastoffset = curoffset + cursize;
 	physicalsize += cursize;
     }
-    *slacksize = physicalsize - curfileitem->size;
+    if(physicalsize < curfileitem->size)
+	*slacksize = curfileitem->size - physicalsize;
+    else
+	*slacksize = physicalsize - curfileitem->size;
     uint64_t slackoffset = lastoffset - *slacksize;
     *tmpbuf = new uint8_t[*slacksize];
     curforimg->ReadContent(*tmpbuf, slackoffset, *slacksize);
@@ -569,7 +572,7 @@ void HashFile(FileItem* curfileitem, ForImg* curforimg)
     uint8_t* tmpbuf = NULL;
     FILE* tmpfile = NULL;
     //std::string tmpfilestr = "/tmp/wf/" + curfileitem->name + "-" + std::to_string(curfileitem->gid) + ".tmp";
-    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name + ".tmp";
+    std::string tmpfilestr = "/tmp/wf/" + std::to_string(curfileitem->gid) + "-" + curfileitem->name;
     tmpfilestr.erase(std::remove(tmpfilestr.begin(), tmpfilestr.end(), '$'), tmpfilestr.end());
     if(!std::filesystem::exists(tmpfilestr))
         GetFileContent(curforimg, curfileitem, &inmemory, &tmpbuf, tmpfile);
