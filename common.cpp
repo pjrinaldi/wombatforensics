@@ -19,7 +19,7 @@ std::string ConvertUnixTimeToHuman(uint32_t unixtime)
 }
 */
 
-/*
+
 std::string ConvertExFatTimeToHuman(uint16_t* dosdate, uint16_t* dostime, uint8_t* timezone)
 {
     std::string humanstring = ConvertDosTimeToHuman(dosdate, dostime);
@@ -50,7 +50,6 @@ std::string ConvertExFatTimeToHuman(uint16_t* dosdate, uint16_t* dostime, uint8_
 
     return humanstring;
 }
-*/
 
 /*
 fatfs_dos_2_unix_time(uint16_t date, uint16_t time, uint8_t timetens)

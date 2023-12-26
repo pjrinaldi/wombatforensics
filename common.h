@@ -100,6 +100,7 @@ struct FileItem
 char* GetDateTime(char *buff);
 std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime);
 std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input);
+std::string ConvertExFatTimeToHuman(uint16_t* dosdate, uint16_t* dostime, uint8_t* timezone);
 uint8_t* substr(uint8_t* arr, int begin, int len);
 
 std::string ReturnFormattingSize(uint size);

@@ -130,19 +130,84 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		if((uint)entrytype == 0x05)
 		    tmpitem.isdeleted = true;
 
-		/*
-		createdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 9, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 8, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 11, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 10, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 22, 1)));
-		modifydate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 13, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 12, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 15, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 14, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 23, 1)));
-		accessdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 17, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 16, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 19, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 18, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + 24, 1)));
+		// CREATE DATETIME
+		uint16_t createdate = 0;
+		ReadForImgContent(currentitem->forimg, &createdate, diroffset + j*32 + 10);
+		uint16_t createtime = 0;
+		ReadForImgContent(currentitem->forimg, &createtime, diroffset + j*32 + 8);
+		uint8_t createzone = 0;
+		currentitem->forimg->ReadContent(&createzone, diroffset + j*32 + 22, 1);
+		tmpitem.create = ConvertExFatTimeToHuman(&createdate, &createtime, &createzone);
+		std::cout << "Create Date|" << ConvertExFatTimeToHuman(&createdate, &createtime, &createzone) << "|" << std::endl;
+		// MODIFY DATETIME
+		uint16_t modifydate = 0;
+		ReadForImgContent(currentitem->forimg, &modifydate, diroffset + j*32 + 14);
+		uint16_t modifytime = 0;
+		ReadForImgContent(currentitem->forimg, &modifytime, diroffset + j*32 + 12);
+		uint8_t modifyzone = 0;
+		currentitem->forimg->ReadContent(&modifyzone, diroffset + j*32 + 23, 1);
+		tmpitem.modify = ConvertExFatTimeToHuman(&modifydate, &modifytime, &modifyzone);
+		// ACCESS DATETIME
+		uint16_t accessdate = 0;
+		ReadForImgContent(currentitem->forimg, &accessdate, diroffset + j*32 + 18);
+		uint16_t accesstime = 0;
+		ReadForImgContent(currentitem->forimg, &accesstime, diroffset + j*32 + 16);
+		uint8_t accesszone = 0;
+		currentitem->forimg->ReadContent(&accesszone, diroffset + j*32 + 24, 1);
+		tmpitem.access = ConvertExFatTimeToHuman(&accessdate, &accesstime, &accesszone);
+		
 		uint8_t namelength = 0;
 		uint8_t curlength = 0;
 		for(uint8_t k=1; k <= secondarycount; k++)
 		{
-		    uint8_t subentrytype = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + j*32 + k*32, 1));
-		    //qDebug() << "subentrytype:" << QString::number(subentrytype, 16);
+		    uint8_t subentrytype = 0;
+		    currentitem->forimg->ReadContent(&subentrytype, diroffset + (j + k)*32, 1);
+		    if((uint)subentrytype == 0xc0 || (uint)subentrytype == 0x40) // Stream Extention DirEntry
+		    {
+			currentitem->forimg->ReadContent(&namelength, diroffset + (j + k)*32 + 3, 1);
+			// FLAGS
+			uint8_t flags = 0;
+			currentitem->forimg->ReadContent(&flags, diroffset + (j+k)*32 + 1, 1);
+			std::bitset<8> flagbits(flags);
+			// FATCHAIN
+			fatchain = flagbits[1];
+			// LOGICAL SIZE
+			ReadForImgContent(currentitem->forimg, &logicalsize, diroffset + (j+k)*32 + 8);
+			// CLUSTER NUMBER
+			ReadForImgContent(currentitem->forimg, &clusternum, diroffset + (j+k)*32 + 20);
+			// PHYSICAL SIZE
+			ReadForImgContent(currentitem->forimg, &physicalsize, diroffset + (j+k)*32 + 24);
+		    }
+		    else if((uint)subentrytype == 0xc1 || (uint)subentrytype == 0x41) // File Name Dir Entry
+		    {
+			curlength += 15;
+			if(curlength <= namelength)
+			{
+			    for(int m=1; m < 16; m++)
+			    {
+				uint16_t singleletter = 0;
+				ReadForImgContent(currentitem->forimg, &singleletter, diroffset + (j+k)*32 + m*2);
+				tmpitem.name += (char)singleletter;
+			    }
+			}
+			else
+			{
+			    int remaining = namelength + 16 - curlength;
+			    for(int m=1; m < 16; m++)
+			    {
+				uint16_t singleletter = 0;
+				ReadForImgContent(currentitem->forimg, &singleletter, diroffset + (j+k)*32 + m*2);
+				tmpitem.name += (char)singleletter;
+			    }
+			}
+			std::cout << "file name: " << tmpitem.name << std::endl;
+		    }
+		}
+		/*
+		for(uint8_t k=1; k <= secondarycount; k++)
+		{
 		    if(subentrytype == 0xc0 || subentrytype == 0x40) // Stream Extension Directory Entry
 		    {
-			namelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + (j + k)*32 + 3, 1));
 			QString flagstr = QString("%1").arg(qFromLittleEndian<uint8_t>(curimg->ReadContent(rootdiroffset + (j+k)*32 + 1, 1)), 8, 2, QChar('0'));
 			fatchain = flagstr.mid(7, 1).toInt(nullptr, 2);
 			logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(rootdiroffset + (j+k)*32 + 8, 8));
