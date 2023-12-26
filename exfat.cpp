@@ -84,6 +84,8 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		ReadForImgContent(currentitem->forimg, &logicalsize, diroffset + j*32 + 24); 
 		tmpitem.size = logicalsize;
 		tmpitem.path = "/";
+		tmpitem.cat = "System File";
+		tmpitem.sig = "Allocation Bitmap";
 		attributes = "Allocation Bitmap,";
 	    }
 	    else if((uint)entrytype == 0x82) // $UPCASE_TABLE file
@@ -93,6 +95,8 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		ReadForImgContent(currentitem->forimg, &logicalsize, diroffset + j*32 + 24);
 		tmpitem.size = logicalsize;
 		tmpitem.path = "/";
+		tmpitem.cat = "System File";
+		tmpitem.sig = "Up-Case Table";
 		attributes = "Up-Case Table,";
 	    }
 	    else if((uint)entrytype == 0x83) // VOLUME_LABEL (already handles so skip)
@@ -224,6 +228,10 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    tmpitem.size = physicalsize;
 		    tmpitem.cat = "Directory";
 		    tmpitem.sig = "Directory";
+		}
+		else if(tmpitem.name.compare("$ALLOC_BITMAP") == 0 || tmpitem.name.compare("$UPCASE_TABLE") == 0)
+		{
+		    // cat/sig already set so skip here.
 		}
 		else
 		{
