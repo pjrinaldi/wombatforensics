@@ -97,7 +97,7 @@ void LoadFat32Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    // FIRST CHARACTER
 	    uint8_t firstchar = 0;
 	    currentitem->forimg->ReadContent(&firstchar, diroffset + i*32, 1);
-	    if((uint)firstchar == 0x00) // entry is free and all remaining are free
+	    if(firstchar == 0x00) // entry is free and all remaining are free
 		break;
 	    else
 	    {
@@ -105,7 +105,7 @@ void LoadFat32Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		currentitem->forimg->ReadContent(&fileattr, diroffset + i*32 + 11, 1);
 		//std::cout << "file attr: " << std::hex << (uint)fileattr << std::endl;
 		//std::cout << "first char: " << std::hex << (uint)firstchar << std::endl;
-		if((uint)fileattr == 0x0f || (uint)fileattr == 0x3f) // long directory name
+		if(fileattr == 0x0f || fileattr == 0x3f || fileattr == 0x00) // long directory name
 		{
 		    if(firstchar & 0x40)
 		    {
@@ -338,7 +338,7 @@ void LoadFat32Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    }
 		    else
 		    {
-			if(logicalsize > 0)
+			if(logicalsize > 0 && !tmpitem.layout.empty())
 			    GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
 			else
 			{
@@ -367,8 +367,8 @@ void LoadFat32Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
 		    out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
 		     */ 
-		    if(!tmpitem.layout.empty())
-			filevector->push_back(tmpitem);
+		    //if(!tmpitem.layout.empty())
+		    filevector->push_back(tmpitem);
 		}
 	    }
 	}

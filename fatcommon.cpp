@@ -106,4 +106,3 @@ std::string ConvertBlocksToExtents(std::vector<uint>* blocklist, uint32_t blocks
 
     return layout;
 }
-

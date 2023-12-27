@@ -57,6 +57,7 @@ void LoadFat16Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
     std::string curlayout;
     while(getline(dirlayoutstream, curlayout, ';'))
 	dirlayoutlist.push_back(curlayout);
+    //std::cout << "dirlyaoutlist size: " << dirlayoutlist.size() << std::endl;
     for(int k=0; k < dirlayoutlist.size(); k++)
     {
 	diroffset = 0;
@@ -79,7 +80,7 @@ void LoadFat16Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    // FIRST CHARACTER
 	    uint8_t firstchar = 0;
 	    currentitem->forimg->ReadContent(&firstchar, diroffset + i*32, 1);
-	    if((uint)firstchar == 0x00) // entry is free and all remaining are free
+	    if(firstchar == 0x00) // entry is free and all remaining are free
 		break;
 	    else
 	    {
@@ -87,7 +88,7 @@ void LoadFat16Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		currentitem->forimg->ReadContent(&fileattr, diroffset + i*32 + 11, 1);
 		//std::cout << "file attr: " << std::hex << (uint)fileattr << std::endl;
 		//std::cout << "first char: " << std::hex << (uint)firstchar << std::endl;
-		if((uint)fileattr == 0x0f || (uint)fileattr == 0x3f) // long directory name
+		if(fileattr == 0x0f || fileattr == 0x3f || fileattr == 0x00) // long directory name
 		{
 		    if(firstchar & 0x40)
 		    {
@@ -234,7 +235,7 @@ void LoadFat16Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 			//if(currentitem->itemtext.find("[FAT12]") != std::string::npos)
 			//    GetNextCluster(currentitem->forimg, clusternum, 1, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
 			//else if(currentitem->itemtext.find("[FAT16]") != std::string::npos)
-			    GetNextCluster(currentitem->forimg, clusternum, 2, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
+			GetNextCluster(currentitem->forimg, clusternum, 2, currentitem->voloffset + reservedareasize * bytespersector, &clusterlist);
 			//GetNextCluster(curforimg, rootdircluster, 4, fatoffset, &clusterlist);
 			//void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist);
 			//QString::number((qulonglong)(curstartsector*512 + reservedareasize * bytespersector))
@@ -244,6 +245,7 @@ void LoadFat16Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    //    std::cout << "cluster " << i << ": " << clusterlist.at(i) << std::endl;
 		    if(clusterlist.size() > 0)
 			tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterareastart * bytespersector);
+		    //std::cout << tmpitem.name << " layout: " << tmpitem.layout << std::endl;
 		    tmpitem.properties += tmpitem.layout + ">";
 		    uint64_t physicalsize = clusterlist.size() * sectorspercluster * bytespersector;
 		    tmpitem.properties += std::to_string(physicalsize) + ">";
@@ -256,7 +258,7 @@ void LoadFat16Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    }
 		    else
 		    {
-			if(logicalsize > 0)
+			if(logicalsize > 0 && !tmpitem.layout.empty())
 			    GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
 			else
 			{
@@ -285,8 +287,8 @@ void LoadFat16Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    qulonglong physicalsize = clusterlist.count() * sectorspercluster * bytespersector;
 		    out << "Physical Size|" << QString::number(physicalsize) << "|Sector Size in Bytes for the file." << Qt::endl;
 		     */ 
-		    if(!tmpitem.layout.empty())
-			filevector->push_back(tmpitem);
+		    //if(!tmpitem.layout.empty())
+		    filevector->push_back(tmpitem);
 		}
 	    }
 	}

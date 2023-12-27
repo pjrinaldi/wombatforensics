@@ -241,7 +241,7 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		}
 		else
 		{
-		    if(logicalsize > 0)
+		    if(logicalsize > 0 && !tmpitem.layout.empty())
 			GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
 		    else
 		    {
