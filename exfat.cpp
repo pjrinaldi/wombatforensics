@@ -57,6 +57,11 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	std::size_t layoutsplit = dirlayoutlist.at(i).find(",");
 	diroffset = std::stoull(dirlayoutlist.at(i).substr(0, layoutsplit));
 	dirsize = std::stoull(dirlayoutlist.at(i).substr(layoutsplit+1));
+	if(curfileitem == NULL)
+	{
+	    orphanoffsets->push_back(diroffset);
+	    orphanoffsets->push_back(dirsize);
+	}
 	if(i == 0 && curfileitem != NULL) // first dirlayout entry and not root directory
 	{
 	    diroffset = diroffset + 64; // skip . and .. directories
@@ -223,11 +228,25 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		    tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
 		    physicalsize = clusterlist.size() * bytespersector * sectorspercluster;
 		    clusterlist.clear();
+		    std::vector<std::string> layoutlist;
+		    layoutlist.clear();
+		    std::istringstream layoutstrm(tmpitem.layout);
+		    std::string tmplayout;
+		    while(getline(layoutstrm, tmplayout, ';'))
+			layoutlist.push_back(tmplayout);
+		    for(int l=0; l < layoutlist.size(); l++)
+		    {
+			std::size_t laysplit = layoutlist.at(l).find(",");
+			orphanoffsets->push_back(std::stoull(layoutlist.at(l).substr(0, laysplit)));
+			orphanoffsets->push_back(std::stoull(layoutlist.at(l).substr(laysplit+1)));
+		    }
 		}
 		else if(fatchain == 1)
 		{
 		    uint clustercount = (uint)ceil((float)physicalsize / (bytespersector * sectorspercluster));
 		    tmpitem.layout = std::to_string(clusterstart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + std::to_string(clustercount * bytespersector * sectorspercluster) + ";";
+		    orphanoffsets->push_back(clusterstart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster));
+		    orphanoffsets->push_back(clustercount * bytespersector * sectorspercluster);
 		}
 		if(tmpitem.isdirectory)
 		{
@@ -299,33 +318,12 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	*/
     }
 }
-/*
-    for(int i=0; i < rootdirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
-    {
-	qulonglong rootdiroffset = 0;
-	qulonglong rootdirsize = 0;
-	rootdiroffset = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
-	rootdirsize = rootdirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
-	if(dirlayout.isEmpty())
-	{
-	    orphanoffsets->append(rootdiroffset);
-	    orphanoffsets->append(rootdirsize);
-	}
-	else
-	{
-	    if(entrytype == 0x85 || entrytype == 0x05 || entrytype == 0x81 || entrytype == 0x82)
-	    {
-		for(int c=0; c < layout.split(";", Qt::SkipEmptyParts).count(); c++)
-		{
-		    orphanoffsets->append(layout.split(";", Qt::SkipEmptyParts).at(c).split(",").at(0).toULongLong());
-		    orphanoffsets->append(layout.split(";", Qt::SkipEmptyParts).at(c).split(",").at(1).toULongLong());
-		}
-	    }
-	}
-    }
-    //qDebug() << "orphanoffsets:" << orphanoffsets;
+
+void ParseExFatOrphans(CurrentItem* currentitem, std::vector<FileItem>* filevector, std::vector<uint64_t>* orphanoffsets)
+{
 }
 
+/*
 void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QList<qulonglong>* orphanoffsets)
 {
     //qDebug() << "start orphan processing with curinode:" << curinode;
