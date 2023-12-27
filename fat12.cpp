@@ -304,6 +304,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	tmpitem.isvirtual = true;
 	tmpitem.cat = "System File";
 	tmpitem.sig = "Master Boot Record";
+	tmpitem.properties = "System File,>" + tmpitem.layout + ">" + std::to_string(bytespersector) + ">" + std::to_string(bytespersector);
 	filevector->push_back(tmpitem);
 	// ADD $FAT(s)
 	for(int i=0; i < fatcount; i++)
@@ -316,6 +317,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 	    tmpitem.isvirtual = true;
 	    tmpitem.cat = "System File";
 	    tmpitem.sig = "File Allocation Table";
+	    tmpitem.properties = "System File,>" + tmpitem.layout + ">" + std::to_string(fatsize * bytespersector) + ">" + std::to_string(fatsize * bytespersector);
 	    filevector->push_back(tmpitem);
 	}
 	/*
