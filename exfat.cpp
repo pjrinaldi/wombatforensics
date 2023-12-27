@@ -321,6 +321,12 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 
 void ParseExFatOrphans(CurrentItem* currentitem, std::vector<FileItem>* filevector, std::vector<uint64_t>* orphanoffsets)
 {
+    /*
+    for(int i=0; i < orphanoffsets->size() / 2; i++)
+    {
+	std::cout << "offset i: " << orphanoffsets->at(i) << " offset i + 1 (size): " << orphanoffsets->at(i+1) << std::endl;
+    }
+    */
 }
 
 /*
