@@ -138,7 +138,9 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
         fattype[5] = 0;
         if(strcmp(fattype, "EXFAT") == 0)
         {
-            LoadExFatDirectory(currentitem, filevector, curfileitem);
+	    std::vector<uint64_t> orphanoffsets;
+	    orphanoffsets.clear();
+            LoadExFatDirectory(currentitem, filevector, curfileitem, &orphanoffsets);
         }
         else if(std::string(fattype).find("NTFS") != std::string::npos)
         {

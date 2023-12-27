@@ -1,6 +1,6 @@
 #include "exfat.h"
 
-void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
+void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem, std::vector<uint64_t>* orphanoffsets)
 {
     std::string dirlayout = "";
     // BYTES PER SECTOR
