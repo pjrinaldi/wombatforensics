@@ -562,7 +562,6 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
     ReadForImgContent(curforimg, &sig16, offset + 1080); // EXT2/3/4
     if(sig16 == 0xef53) // EXT2/3/4
     {
-	std::cout << "populate ext volume properties here." << std::endl;
 	/*
 	char* volname = new char[17];
 	curforimg->ReadContent((uint8_t*)volname, offset + 1144, 16);
