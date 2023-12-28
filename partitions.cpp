@@ -562,10 +562,31 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
     ReadForImgContent(curforimg, &sig16, offset + 1080); // EXT2/3/4
     if(sig16 == 0xef53) // EXT2/3/4
     {
-	/*
+	// VOLUME LABEL
 	char* volname = new char[17];
 	curforimg->ReadContent((uint8_t*)volname, offset + 1144, 16);
 	volname[16] = 0;
+	// CREATED DATETIME
+	uint32_t createdtime = 0;
+	ReadForImgContent(curforimg, &createdtime, offset + 1288);
+	// MOUNTED DATETIME
+	uint32_t mounttime = 0;
+	ReadForImgContent(curforimg, &mounttime, offset + 1068);
+	// WRITE DATETIME
+	uint32_t writetime = 0;
+	ReadForImgContent(curforimg, &writetime, offset + 1072);
+	// LAST CHECKED DATETIME
+	uint32_t checktime = 0;
+	ReadForImgContent(curforimg, &checktime, offset + 1088);
+	// CURRENT STATE
+	uint16_t curstate = 0;
+	std::string currentstate = "";
+	ReadForImgContent(curforimg, &currentstate, offset + 1082);
+	if(curstate == 0x01)
+	    currentstate = "Cleanly unmounted";
+	else
+	    currentstate = "Errors detected";
+	/*
 	uint32_t compatflags = 0;
 	uint32_t incompatflags = 0;
 	uint32_t readonlyflags = 0;

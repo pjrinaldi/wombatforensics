@@ -7,7 +7,6 @@
 #define NANOSVGRAST_IMPLEMENTATION
 #include "nanosvgrast.h"
 
-/*
 std::string ConvertUnixTimeToHuman(uint32_t unixtime)
 {
     time_t timet = (time_t)unixtime;
@@ -17,7 +16,6 @@ std::string ConvertUnixTimeToHuman(uint32_t unixtime)
     
     return std::string(hchar);
 }
-*/
 
 std::string ConvertExFatTimeToHuman(uint16_t* dosdate, uint16_t* dostime, uint8_t* timezone)
 {

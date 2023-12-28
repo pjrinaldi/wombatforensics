@@ -95,7 +95,7 @@ struct FileItem
     };
 };
 
-//std::string ConvertUnixTimeToHuman(uint32_t unixtime);
+std::string ConvertUnixTimeToHuman(uint32_t unixtime);
 
 char* GetDateTime(char *buff);
 std::string ConvertDosTimeToHuman(uint16_t* dosdate, uint16_t* dostime);
