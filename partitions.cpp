@@ -586,21 +586,177 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 	    currentstate = "Cleanly unmounted";
 	else
 	    currentstate = "Errors detected";
-	/*
+	// COMPATIBILITY FLAGS
 	uint32_t compatflags = 0;
-	uint32_t incompatflags = 0;
-	uint32_t readonlyflags = 0;
+	std::string compatibilityflags = "";
 	ReadForImgContent(curforimg, &compatflags, offset + 1116);
+	if(compatflags & 0x200)
+	    compatibilityflags += "Sparse Super Block,";
+	if(compatflags & 0x100)
+	    compatibilityflags += "Exlude Bitmap,";
+	if(compatflags & 0x80)
+	    compatibilityflags += "Exlude Inodes,";
+	if(compatflags & 0x40)
+	    compatibilityflags += "Lazy Block Groups,";
+	if(compatflags & 0x20)
+	    compatibilityflags += "Indexed Directories,";
+	if(compatflags & 0x10)
+	    compatibilityflags += "Reserved GDT,";
+	if(compatflags & 0x08)
+	    compatibilityflags += "Extended Attributes,";
+	if(compatflags & 0x04)
+	    compatibilityflags += "Journal,";
+	if(compatflags & 0x02)
+	    compatibilityflags += "Imagic Inodes,";
+	if(compatflags & 0x01)
+	    compatibilityflags += "Directory pre-allocation,";
+	// INCOMPATIBLE FLAGS
+	uint32_t incompatflags = 0;
+	std::string incompatibleflags = "";
 	ReadForImgContent(curforimg, &incompatflags, offset + 1120);
-	ReadForImgContent(curforimg, &readonlyflags, offset + 1124);
+	if(incompatflags & 0x10000)
+	    incompatibleflags += "Encrypted inodes,";
+	if(incompatflags & 0x8000)
+	    incompatibleflags += "Data in inode,";
+	if(incompatflags & 0x4000)
+	    incompatibleflags += "Large Directory greater than 2GB or 3-level htree,";
+	if(incompatflags & 0x2000)
+	    incompatibleflags += "Metadata checksum seed in superblock,";
+	if(incompatflags & 0x1000)
+	    incompatibleflags += "Data in Directory Entry,";
+	if(incompatflags & 0x400)
+	    incompatibleflags += "Inodes can store large extended attributes,";
+	if(incompatflags & 0x200)
+	    incompatibleflags += "Flexible block groups,";
+	if(incompatflags & 0x100)
+	    incompatibleflags += "Multiple mount protection,";
+	if(incompatflags & 0x80)
+	    incompatibleflags += "FS size over 2^32 blocks,";
+	if(incompatflags & 0x40)
+	    incompatibleflags += "Files use Extents,";
+	if(incompatflags & 0x10)
+	    incompatibleflags += "Meta block groups,";
+	if(incompatflags & 0x08)
+	    incompatibleflags += "Separate Journal device,";
+	if(incompatflags & 0x04)
+	    incompatibleflags += "FS needs journal recovery,";
+	if(incompatflags & 0x02)
+	    incompatibleflags += "Directory entries record file type,";
+	if(incompatflags & 0x01)
+	    incompatibleflags += "Compression,";
+	// READ ONLY FLAGS
+	uint32_t roflags = 0;
+	std::string readonlyflags = "";
+	ReadForImgContent(curforimg, &roflags, offset + 1124);
+	if(roflags & 0x2000)
+	    readonlyflags += "Tracks project quotas,";
+	if(roflags & 0x1000)
+	    readonlyflags += "Read only FS,";
+	if(roflags & 0x800)
+	    readonlyflags += "Replica support,";
+	if(roflags & 0x400)
+	    readonlyflags += "Metadata checksumming support,";
+	if(roflags & 0x200)
+	    readonlyflags += "Bigalloc support,";
+	if(roflags & 0x100)
+	    readonlyflags += "Quota is handled transactionally with journal,";
+	if(roflags & 0x80)
+	    readonlyflags += "Snapshot,";
+	if(roflags & 0x40)
+	    readonlyflags += "Large Inodes exist,";
+	if(roflags & 0x20)
+	    readonlyflags += "EXT3 32k subdir limit does not exist,";
+	if(roflags & 0x10)
+	    readonlyflags += "Group descriptors have checksums,";
+	if(roflags & 0x08)
+	    readonlyflags += "Space usage stored in i_blocks in units of fs_blocks, not 512-byte sectors,";
+	if(roflags & 0x04)
+	    readonlyflags += "Was intended for use with htree directories,";
+	if(roflags & 0x02)
+	    readonlyflags += "Allow storing files larger than 2GB,";
+	if(roflags & 0x01)
+	    readonlyflags += "Sparse superblocks,";
+	// FILE SYSTEM FORMAT VERSION
 	std::string format = " [EXT2]";
-        if(((compatflags & 0x00000200UL) != 0) || ((incompatflags & 0x0001f7c0UL) != 0) || ((readonlyflags & 0x00000378UL) != 0))
+        if(((compatflags & 0x00000200UL) != 0) || ((incompatflags & 0x0001f7c0UL) != 0) || ((roflags & 0x00000378UL) != 0))
 	    format = " [EXT4]";
         else if(((compatflags & 0x00000004UL) != 0) || ((incompatflags & 0x0000000cUL) != 0))
 	    format = " [EXT3]";
-	std::cout << std::string(volname) << format << std::endl;
-	//partitionname = std::string(volname) + format;
-	*/
+	// GROUP DESCRIPTOR SIZE
+	uint16_t grpdescsize = 32;
+	if(incompatflags & 0x80)
+	    ReadForImgContent(curforimg, &grpdescsize, offset + 1278);
+	// FILE SYSTEM INODE COUNT
+	uint32_t fsinodecnt = 0;
+	ReadForImgContent(curforimg, &fsinodecnt, offset + 1024);
+	// FILE SYSTEM BLOCK COUNT
+	uint32_t fsblockcnt = 0;
+	ReadForImgContent(curforimg, &fsblockcnt, offset + 1028);
+	// BLOCK GROUP BLOCK COUNT
+	uint32_t blockgroupblockcount = 0;
+	ReadForImgContent(curforimg, &blockgroupblockcount, offset + 1056);
+	// BLOCK SIZE
+	uint32_t blksize = 0;
+	ReadForImgContent(curforimg, &blksize, offset + 1048);
+	uint32_t blocksize = 1024 * pow(2, blksize);
+	// BLOCK GROUP 0 START BLOCK
+	uint32_t blockgroup0startblock = 0;
+	ReadForImgContent(curforimg, &blockgroup0startblock, offset + 1044);
+	// FRAGMENT SIZE
+	uint32_t fragsize = 0;
+	ReadForImgContent(curforimg, &fragsize, offset + 1052);
+	uint32_t fragmentsize = 1024 * pow(2, fragsize);
+	// BLOCK GROUP FRAGMENT COUNT
+	uint32_t blockgroupfragmentcount = 0;
+	ReadForImgContent(curforimg, &blockgroupfragmentcount, offset + 1060);
+	// BLOCK GROUP INODE COUNT
+	uint32_t blockgroupinodecount = 0;
+	ReadForImgContent(curforimg, &blockgroupinodecount, offset + 1064);
+	// CREATOR OS
+	uint32_t createos = 0;
+	std::string creatoros = "";
+	ReadForImgContent(curforimg, &createos, offset + 1096);
+	if(createos == 0x00)
+	    creatoros = "Linux";
+	else if(createos == 0x03)
+	    creatoros = "FreeBSD";
+	// INODE SIZE
+	uint16_t inodesize = 0;
+	ReadForImgContent(curforimg, &inodesize, offset + 1112);
+	// LAST MOUNTED PATH
+	char* lastmountedpath = new char[65];
+	curforimg->ReadContent((uint8_t*)lastmountedpath, offset + 1160, 64);
+	lastmountedpath[64] = 0;
+	// INODE ADDRESS TABLE
+	uint32_t blockgroupcount = fsblockcnt / blockgroupblockcount;
+	uint blkgrpcntrem = fsblockcnt % blockgroupblockcount;
+	if(blkgrpcntrem > 0)
+	    blockgroupcount++;
+	if(blockgroupcount == 0)
+	    blockgroupcount = 1;
+	std::string inodeaddresstable = "";
+	for(uint i=0; i < blockgroupcount; i++)
+	{
+	    uint32_t iat = 0;
+	    if(blocksize == 1024)
+		ReadForImgContent(curforimg, &iat, offset + 2*blocksize + i * grpdescsize + 8);
+	    else
+		ReadForImgContent(curforimg, &iat, offset + blocksize + i * grpdescsize + 8);
+	    inodeaddresstable += std::to_string(iat);
+	}
+	// ROOT INODE TABLE ADDRESS
+	uint32_t rootinodetableaddress = 0;
+	if(blockgroupinodecount > 2)
+	    ReadForImgContent(curforimg, &rootinodetableaddress, offset + 2056);
+	else
+	    ReadForImgContent(curforimg, &rootinodetableaddress, offset + 2088);
+	// REVISION LEVEL
+	uint32_t revmaj = 0;
+	ReadForImgContent(curforimg, &revmaj, offset + 1100);
+	uint16_t revmin = 0;
+	ReadForImgContent(curforimg, &revmin, offset + 1086);
+	properties = std::string(volname) + ">" + ConvertUnixTimeToHuman(createdtime) + ">" + ConvertUnixTimeToHuman(mounttime) + ">" + ConvertUnixTimeToHuman(writetime) + ">" + ConvertUnixTimeToHuman(checktime) + ">" + currentstate + ">" + compatibilityflags + ">" + incompatibleflags + ">" + readonlyflags + ">" + format + ">" + std::to_string(grpdescsize) + ">" + std::to_string(fsinodecnt) + ">" + std::to_string(fsblockcnt) + ">" + std::to_string(blockgroup0blockcount) + ">" + std::to_string(blocksize) + ">" + std::to_string(fragmentsize) + ">" + std::to_string(blockgroupblockcount) + ">" + std::to_string(blockgroupfragmentcount) + ">" + std::to_string(blockgroupinodecount) + ">" + creatoros + ">" + std::to_string(inodesize) + ">" + std::string(lastmountedpath) + ">" + inodeaddresstable + ">" + std::to_string(rootinodetableaddress) + ">" + std::to_string(revmaj) + "." + std::to_string(revmin);
+	volprops->push_back(properties);
     }
 }
 
