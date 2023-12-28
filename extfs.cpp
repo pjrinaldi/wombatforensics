@@ -1,5 +1,9 @@
 #include "extfs.h"
 
+void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
+{
+}
+
 /*
 void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {

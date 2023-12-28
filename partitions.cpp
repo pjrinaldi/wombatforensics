@@ -89,7 +89,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                 }
                 if((uint)curparttype == 0x05) // extended partition
                 {
-                    LoadExtendedPartitions(curforimg, curoffset * 512, cursize * 512, volnames, volsizes, voloffsets);
+                    LoadExtendedPartitions(curforimg, curoffset * 512, cursize * 512, volnames, volsizes, voloffsets, volprops);
                     // ptreecnt = Parse Extended Partition(curforimg, curoffset, cursize, ptreecnt);
                 }
                 else if((uint)curparttype == 0x00)
@@ -109,6 +109,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                     if(cursize > 0)
                     {
                         // Parse Partition(curforimg, curoffset, cursize, ptreecnt, 1);
+			GetVolumeProperties(curforimg, 0, volprops);
                         volnames->push_back(GetFileSystemName(curforimg, curoffset*512));
                         volsizes->push_back(cursize*512);
                         voloffsets->push_back(curoffset*512);
@@ -201,6 +202,7 @@ void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, st
                 // LOAD UNALLOCATED PARTITON sectorcheck, curstartsector, 0
             }
             // LOAD ALLOCATED PARTITION READ FROM TABLE curstartsector, (curendsector - curstartsector + 1), 1)
+	    GetVolumeProperties(curforimg, 0, volprops);
             volnames->push_back(GetFileSystemName(curforimg, curstartsector*512));
             volsizes->push_back((curendsector - curstartsector + 1)*512);
             voloffsets->push_back(curstartsector*512);
@@ -218,7 +220,7 @@ void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, st
     }
 }
 
-void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsize, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets)
+void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsize, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets, std::vector<std::string>* volprops)
 {
     int pcount = 0;
     for(int i=0; i < 4; i++)
@@ -257,7 +259,7 @@ void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsiz
         }
         if((uint)curparttype == 0x05) // extended partition
         {
-            LoadExtendedPartitions(curforimg, epoffset + curoffset * 512, cursize * 512, volnames, volsizes, voloffsets);
+            LoadExtendedPartitions(curforimg, epoffset + curoffset * 512, cursize * 512, volnames, volsizes, voloffsets, volprops);
         }
         else if((uint)curparttype == 0x00)
         {
@@ -276,6 +278,7 @@ void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsiz
             if(cursize > 0)
             {
                 // Parse Partition(curforimg, curoffset, cursize, ptreecnt, 1);
+		GetVolumeProperties(curforimg, 0, volprops);
                 volnames->push_back(GetFileSystemName(curforimg, epoffset + curoffset*512));
                 volsizes->push_back(cursize*512);
                 voloffsets->push_back(epoffset + curoffset*512);
@@ -555,6 +558,29 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		}
 	    }
 	}
+    }
+    ReadForImgContent(curforimg, &sig16, offset + 1080); // EXT2/3/4
+    if(sig16 == 0xef53) // EXT2/3/4
+    {
+	std::cout << "populate ext volume properties here." << std::endl;
+	/*
+	char* volname = new char[17];
+	curforimg->ReadContent((uint8_t*)volname, offset + 1144, 16);
+	volname[16] = 0;
+	uint32_t compatflags = 0;
+	uint32_t incompatflags = 0;
+	uint32_t readonlyflags = 0;
+	ReadForImgContent(curforimg, &compatflags, offset + 1116);
+	ReadForImgContent(curforimg, &incompatflags, offset + 1120);
+	ReadForImgContent(curforimg, &readonlyflags, offset + 1124);
+	std::string format = " [EXT2]";
+        if(((compatflags & 0x00000200UL) != 0) || ((incompatflags & 0x0001f7c0UL) != 0) || ((readonlyflags & 0x00000378UL) != 0))
+	    format = " [EXT4]";
+        else if(((compatflags & 0x00000004UL) != 0) || ((incompatflags & 0x0000000cUL) != 0))
+	    format = " [EXT3]";
+	std::cout << std::string(volname) << format << std::endl;
+	//partitionname = std::string(volname) + format;
+	*/
     }
 }
 

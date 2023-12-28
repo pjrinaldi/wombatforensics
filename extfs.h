@@ -10,6 +10,7 @@
 #include <bitset>
 #include <algorithm>
 
+#include "common.h"
 #include "forensicimage.h"
 
 // LOAD CURRENTLY SELECTED CONTENTS OF THE EXTFS DIRECTORY
