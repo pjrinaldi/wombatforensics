@@ -581,7 +581,7 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 	// CURRENT STATE
 	uint16_t curstate = 0;
 	std::string currentstate = "";
-	ReadForImgContent(curforimg, &currentstate, offset + 1082);
+	ReadForImgContent(curforimg, &curstate, offset + 1082);
 	if(curstate == 0x01)
 	    currentstate = "Cleanly unmounted";
 	else
@@ -755,7 +755,7 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 	ReadForImgContent(curforimg, &revmaj, offset + 1100);
 	uint16_t revmin = 0;
 	ReadForImgContent(curforimg, &revmin, offset + 1086);
-	properties = std::string(volname) + ">" + ConvertUnixTimeToHuman(createdtime) + ">" + ConvertUnixTimeToHuman(mounttime) + ">" + ConvertUnixTimeToHuman(writetime) + ">" + ConvertUnixTimeToHuman(checktime) + ">" + currentstate + ">" + compatibilityflags + ">" + incompatibleflags + ">" + readonlyflags + ">" + format + ">" + std::to_string(grpdescsize) + ">" + std::to_string(fsinodecnt) + ">" + std::to_string(fsblockcnt) + ">" + std::to_string(blockgroup0blockcount) + ">" + std::to_string(blocksize) + ">" + std::to_string(fragmentsize) + ">" + std::to_string(blockgroupblockcount) + ">" + std::to_string(blockgroupfragmentcount) + ">" + std::to_string(blockgroupinodecount) + ">" + creatoros + ">" + std::to_string(inodesize) + ">" + std::string(lastmountedpath) + ">" + inodeaddresstable + ">" + std::to_string(rootinodetableaddress) + ">" + std::to_string(revmaj) + "." + std::to_string(revmin);
+	properties = std::string(volname) + ">" + ConvertUnixTimeToHuman(createdtime) + ">" + ConvertUnixTimeToHuman(mounttime) + ">" + ConvertUnixTimeToHuman(writetime) + ">" + ConvertUnixTimeToHuman(checktime) + ">" + currentstate + ">" + compatibilityflags + ">" + incompatibleflags + ">" + readonlyflags + ">" + format + ">" + std::to_string(grpdescsize) + ">" + std::to_string(fsinodecnt) + ">" + std::to_string(fsblockcnt) + ">" + std::to_string(blockgroup0startblock) + ">" + std::to_string(blocksize) + ">" + std::to_string(fragmentsize) + ">" + std::to_string(blockgroupblockcount) + ">" + std::to_string(blockgroupfragmentcount) + ">" + std::to_string(blockgroupinodecount) + ">" + creatoros + ">" + std::to_string(inodesize) + ">" + std::string(lastmountedpath) + ">" + inodeaddresstable + ">" + std::to_string(rootinodetableaddress) + ">" + std::to_string(revmaj) + "." + std::to_string(revmin);
 	volprops->push_back(properties);
     }
 }
