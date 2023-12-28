@@ -240,6 +240,7 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
     ReadForImgContent(curforimg, &sig16, offset + 1080); // EXT2/3/4
     if(sig16 == 0xef53) // EXT2/3/4
     {
+	LoadExtDirectory(currentitem, filevector, curfileitem);
         /*
 	char* volname = new char[17];
 	curforimg->ReadContent((uint8_t*)volname, offset + 1144, 16);
