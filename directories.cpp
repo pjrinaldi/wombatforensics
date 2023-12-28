@@ -141,7 +141,10 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
 	    std::vector<uint64_t> orphanoffsets;
 	    orphanoffsets.clear();
             LoadExFatDirectory(currentitem, filevector, curfileitem, &orphanoffsets);
-	    ParseExFatOrphans(currentitem, filevector, &orphanoffsets);
+	    /*
+	    if(curfileitem == NULL)
+		ParseExFatOrphans(currentitem, filevector, &orphanoffsets);
+	    */
 	    orphanoffsets.clear();
         }
         else if(std::string(fattype).find("NTFS") != std::string::npos)

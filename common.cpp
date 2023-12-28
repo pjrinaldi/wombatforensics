@@ -19,7 +19,6 @@ std::string ConvertUnixTimeToHuman(uint32_t unixtime)
 }
 */
 
-
 std::string ConvertExFatTimeToHuman(uint16_t* dosdate, uint16_t* dostime, uint8_t* timezone)
 {
     std::string humanstring = ConvertDosTimeToHuman(dosdate, dostime);
@@ -31,7 +30,7 @@ std::string ConvertExFatTimeToHuman(uint16_t* dosdate, uint16_t* dostime, uint8_
         // IF FLOAT = 0, THEN 00 = 0.25, THEN 15, = 0.50, THEN 30, =0.75 THEN 45
         zonebits.set(0, 0); // set switch bit to zero so i can get the offset without that value
         int offsetsecs = (int)zonebits.to_ulong() * 15 * 60;
-        std::cout << "offset secs:" << std::hex << offsetsecs << std::endl;
+        //std::cout << "offset secs:" << std::hex << offsetsecs << std::endl;
         int offhour = offsetsecs / 3600;
         float offmin = (abs(offsetsecs) % 3600 ) / 3600;
         std::string offstring = std::to_string(offhour) + ":";
@@ -45,7 +44,7 @@ std::string ConvertExFatTimeToHuman(uint16_t* dosdate, uint16_t* dostime, uint8_
             offstring += "45";
         else
             offstring += "00";
-        std::cout << "offset secs: " << offstring << std::endl;
+        //std::cout << "offset secs: " << offstring << std::endl;
     }
 
     return humanstring;

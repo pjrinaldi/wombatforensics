@@ -97,6 +97,7 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		tmpitem.path = "/";
 		tmpitem.cat = "System File";
 		tmpitem.sig = "Allocation Bitmap";
+		tmpitem.isvirtual = true;
 		attributes = "Allocation Bitmap,";
 	    }
 	    else if(entrytype == 0x82) // $UPCASE_TABLE file
@@ -108,6 +109,7 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		tmpitem.path = "/";
 		tmpitem.cat = "System File";
 		tmpitem.sig = "Up-Case Table";
+		tmpitem.isvirtual = true;
 		attributes = "Up-Case Table,";
 	    }
 	    else if(entrytype == 0x83) // VOLUME_LABEL (already handles so skip)
@@ -321,73 +323,227 @@ void LoadExFatDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 
 void ParseExFatOrphans(CurrentItem* currentitem, std::vector<FileItem>* filevector, std::vector<uint64_t>* orphanoffsets)
 {
+    // BYTES PER SECTOR
+    uint8_t bps = 0;
+    currentitem->forimg->ReadContent(&bps, currentitem->voloffset + 108, 1);
+    uint16_t bytespersector = pow(2, (uint)bps);
+    // SECTORS PER CLUSTER
+    uint8_t spc = 0;
+    currentitem->forimg->ReadContent(&spc, currentitem->voloffset + 109, 1);
+    uint16_t sectorspercluster = pow(2, (uint)spc);
+    // RESERVED AREA SIZE
+    uint16_t reservedareasize = 0;
+    ReadForImgContent(currentitem->forimg, &reservedareasize, currentitem->voloffset + 14);
+    // FAT OFFSET
+    uint32_t fatoff = 0;
+    ReadForImgContent(currentitem->forimg, &fatoff, currentitem->voloffset + 80);
+    uint64_t fatoffset = fatoff + currentitem->voloffset;
+    // FAT COUNT
+    uint8_t fatcount = 0;
+    currentitem->forimg->ReadContent(&fatcount, currentitem->voloffset + 110, 1);
+    // FAT SIZE
+    uint32_t fatsize = 0;
+    ReadForImgContent(currentitem->forimg, &fatsize, currentitem->voloffset + 84);
+    // CLUSTER AREA START
+    uint32_t clusterstart = 0;
+    ReadForImgContent(currentitem->forimg, &clusterstart, currentitem->voloffset + 88);
     /*
-    for(int i=0; i < orphanoffsets->size() / 2; i++)
+    // ROOT DIR CLUSTER
+    uint32_t rootdircluster = 0;
+    ReadForImgContent(currentitem->forimg, &rootdircluster, currentitem->voloffset + 96);
+    std::vector<uint> clusterlist;
+    clusterlist.clear();
+    if(rootdircluster >= 2)
     {
-	std::cout << "offset i: " << orphanoffsets->at(i) << " offset i + 1 (size): " << orphanoffsets->at(i+1) << std::endl;
+	clusterlist.push_back(rootdircluster);
+	GetNextCluster(currentitem->forimg, rootdircluster, 4, fatoffset, &clusterlist);
     }
+    std::string rootdirlayout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
     */
+    uint64_t curoffset = 0;
+    while(curoffset < currentitem->forimg->Size())
+    {
+	// ENTRY TYPE
+	uint8_t entrytype = 0;
+	currentitem->forimg->ReadContent(&entrytype, curoffset, 1);
+	if(entrytype == 0x05)
+	{
+	    FileItem tmpitem;
+	    // CLUSTER NUMBER
+	    uint32_t clusternum = 0;
+	    // SECONDARY COUNT
+	    uint8_t secondarycount = 0;
+	    currentitem->forimg->ReadContent(&secondarycount, curoffset + 1, 1);
+	    // LOGICAL SIZE
+	    uint64_t logicalsize = 0;
+	    // PHYSICAL SIZE
+	    uint64_t physicalsize = 0;
+	    // FAT CHAIN TYPE
+	    int fatchain = 0;
+	    // FILE ATTRIBUTE STRING
+	    std::string attributes = "";
+	    // FILE ATTRIBUTE INT
+	    uint8_t fileattr = 0;
+	    currentitem->forimg->ReadContent(&fileattr, curoffset + 4, 1);
+	    if(fileattr & 0x01)
+		attributes += "Read Only,";
+	    if(fileattr & 0x02)
+		attributes += "Hidden File,";
+	    if(fileattr & 0x04)
+		attributes += "System File,";
+	    if(fileattr & 0x10)
+		attributes += "Sub Directory,";
+	    if(fileattr & 0x20)
+		attributes += "Archive File,";
+	    if(fileattr & 0x10)
+		tmpitem.isdirectory = true;
+	    tmpitem.isdeleted = true;
+	    // CREATE DATETIME
+	    uint16_t createdate = 0;
+	    ReadForImgContent(currentitem->forimg, &createdate, curoffset + 10);
+	    uint16_t createtime = 0;
+	    ReadForImgContent(currentitem->forimg, &createtime, curoffset + 8);
+	    uint8_t createzone = 0;
+	    currentitem->forimg->ReadContent(&createzone, curoffset + 22, 1);
+	    tmpitem.create = ConvertExFatTimeToHuman(&createdate, &createtime, &createzone);
+	    // MODIFY DATETIME
+	    uint16_t modifydate = 0;
+	    ReadForImgContent(currentitem->forimg, &modifydate, curoffset + 14);
+	    uint16_t modifytime = 0;
+	    ReadForImgContent(currentitem->forimg, &modifytime, curoffset + 12);
+	    uint8_t modifyzone = 0;
+	    currentitem->forimg->ReadContent(&modifyzone, curoffset + 23, 1);
+	    tmpitem.modify = ConvertExFatTimeToHuman(&modifydate, &modifytime, &modifyzone);
+	    // ACCESS DATETIME
+	    uint16_t accessdate = 0;
+	    ReadForImgContent(currentitem->forimg, &accessdate, curoffset + 18);
+	    uint16_t accesstime = 0;
+	    ReadForImgContent(currentitem->forimg, &accesstime, curoffset + 16);
+	    uint8_t accesszone = 0;
+	    currentitem->forimg->ReadContent(&accesszone, curoffset + 24, 1);
+	    tmpitem.access = ConvertExFatTimeToHuman(&accessdate, &accesstime, &accesszone);
+	    uint8_t namelength = 0;
+	    uint8_t curlength = 0;
+	    for(uint8_t k=1; k <= secondarycount; k++)
+	    {
+		uint8_t subentrytype = 0;
+		currentitem->forimg->ReadContent(&subentrytype, curoffset + k*32, 1);
+		if(subentrytype == 0x40) // Stream Extention DirEntry
+		{
+		    currentitem->forimg->ReadContent(&namelength, curoffset + k*32 + 3, 1);
+		    // FLAGS
+		    uint8_t flags = 0;
+		    currentitem->forimg->ReadContent(&flags, curoffset + k*32 + 1, 1);
+		    std::bitset<8> flagbits(flags);
+		    // FATCHAIN
+		    fatchain = flagbits[1];
+		    // LOGICAL SIZE
+		    ReadForImgContent(currentitem->forimg, &logicalsize, curoffset + k*32 + 8);
+		    tmpitem.size = logicalsize;
+		    // CLUSTER NUMBER
+		    ReadForImgContent(currentitem->forimg, &clusternum, curoffset + k*32 + 20);
+		    // PHYSICAL SIZE
+		    ReadForImgContent(currentitem->forimg, &physicalsize, curoffset + k*32 + 24);
+		}
+		else if(subentrytype == 0x41) // File Name Dir Entry
+		{
+		    curlength += 15;
+		    if(curlength <= namelength)
+		    {
+			for(int m=1; m < 16; m++)
+			{
+			    uint16_t singleletter = 0;
+			    ReadForImgContent(currentitem->forimg, &singleletter, curoffset +k*32 + m*2);
+			    tmpitem.name += (char)singleletter;
+			}
+		    }
+		    else
+		    {
+			int remaining = namelength + 16 - curlength;
+			for(int m=1; m < 16; m++)
+			{
+			    uint16_t singleletter = 0;
+			    ReadForImgContent(currentitem->forimg, &singleletter, curoffset +k*32 + m*2);
+			    tmpitem.name += (char)singleletter;
+			}
+		    }
+		}
+	    }
+	    if(fatchain == 0 && clusternum > 1)
+	    {
+		std::vector<uint32_t> clusterlist;
+		clusterlist.clear();
+		clusterlist.push_back(clusternum);
+		GetNextCluster(currentitem->forimg, clusternum, 4, fatoffset, &clusterlist);
+		tmpitem.layout = ConvertBlocksToExtents(&clusterlist, sectorspercluster * bytespersector, clusterstart * bytespersector);
+		physicalsize = clusterlist.size() * bytespersector * sectorspercluster;
+		/*
+		clusterlist.clear();
+		std::vector<std::string> layoutlist;
+		layoutlist.clear();
+		std::istringstream layoutstrm(tmpitem.layout);
+		std::string tmplayout;
+		while(getline(layoutstrm, tmplayout, ';'))
+		    layoutlist.push_back(tmplayout);
+		for(int l=0; l < layoutlist.size(); l++)
+		{
+		    std::size_t laysplit = layoutlist.at(l).find(",");
+		    orphanoffsets->push_back(std::stoull(layoutlist.at(l).substr(0, laysplit)));
+		    orphanoffsets->push_back(std::stoull(layoutlist.at(l).substr(laysplit+1)));
+		}
+		*/
+	    }
+	    else if(fatchain == 1)
+	    {
+		uint clustercount = (uint)ceil((float)physicalsize / (bytespersector * sectorspercluster));
+		tmpitem.layout = std::to_string(clusterstart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster)) + "," + std::to_string(clustercount * bytespersector * sectorspercluster) + ";";
+		/*
+		orphanoffsets->push_back(clusterstart * bytespersector + ((clusternum - 2) * bytespersector * sectorspercluster));
+		orphanoffsets->push_back(clustercount * bytespersector * sectorspercluster);
+		*/
+	    }
+	    if(tmpitem.isdirectory)
+	    {
+		tmpitem.size = physicalsize;
+		tmpitem.cat = "Directory";
+		tmpitem.sig = "Directory";
+	    }
+	    else if(tmpitem.name.compare("$ALLOC_BITMAP") == 0 || tmpitem.name.compare("$UPCASE_TABLE") == 0)
+	    {
+		// cat/sig already set so skip here.
+	    }
+	    else
+	    {
+		if(logicalsize > 0 && !tmpitem.layout.empty())
+		    GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+		else
+		{
+		    tmpitem.cat = "Empty";
+		    tmpitem.sig = "Empty File";
+		}
+	    }
+	    tmpitem.properties = attributes + ">" + tmpitem.layout + ">" + std::to_string(physicalsize) + ">" + std::to_string(logicalsize);
+	    //if(!tmpitem.layout.empty())
+	    filevector->push_back(tmpitem);
+	}
+	curoffset += 32;
+	std::cout << "curoffset before fix: " << curoffset << std::endl;
+	for(int i=0; i < orphanoffsets->size() / 2; i++)
+	{
+	    if(curoffset == orphanoffsets->at(2*i))
+		curoffset += orphanoffsets->at(2*i+1);
+	}
+	std::cout << "curoffset after fix: " << curoffset << std::endl;
+    }
 }
 
 /*
 void ParseExfatOrphans(ForImg* curimg, uint8_t ptreecnt, qulonglong curinode, QList<qulonglong>* orphanoffsets)
 {
-    //qDebug() << "start orphan processing with curinode:" << curinode;
-    uint16_t bytespersector = 0;
-    uint8_t sectorspercluster = 0;
-    qulonglong fatoffset = 0;
-    qulonglong clusterareastart = 0;
-    //QString rootdirlayout = "";
-    QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
-    if(!propfile.isOpen())
-	propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(propfile.isOpen())
-    {
-        while(!propfile.atEnd())
-        {
-            QString line = propfile.readLine();
-            if(line.startsWith("Bytes Per Sector|"))
-                bytespersector = line.split("|").at(1).toUInt();
-            else if(line.startsWith("Sectors Per Cluster|"))
-                sectorspercluster = line.split("|").at(1).toUInt();
-            else if(line.startsWith("FAT Offset|"))
-                fatoffset = line.split("|").at(1).toULongLong();
-            //else if(line.startsWith("Root Directory Layout|"))
-            //    rootdirlayout = line.split("|").at(1);
-            else if(line.startsWith("Cluster Area Start|"))
-                clusterareastart = line.split("|").at(1).toULongLong();
-        }
-        propfile.close();
-    }
-    //qDebug() << "orphanoffsets:" << *orphanoffsets;
-    qulonglong curoffset = 0;
     while(curoffset < curimg->Size())
     {
-	uint8_t entrytype = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset, 1));
 	if(entrytype == 0x05)
 	{
-	    //qDebug() << "coffset:" << curoffset << "possible orphan.";
-	    uint8_t itemtype = 4;
-	    uint8_t secondarycount = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 1, 1));
-	    uint8_t fileattr = qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 4, 1));
-	    // out information to property file
-	    QString attrstr = "";
-	    if(fileattr & 0x01) // Read Only
-		attrstr += "Read Only,";
-	    if(fileattr & 0x02) // Hidden File
-		attrstr += "Hidden File,";
-	    if(fileattr & 0x04) // System File
-		attrstr += "System File,";
-	    if(fileattr & 0x10) // Sub Directory
-	    {
-		attrstr += "Sub Directory,";
-		itemtype = 2;
-	    }
-	    if(fileattr & 0x20) // Archive File
-		attrstr += "Archive File,";
-	    qint64 createdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 9, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 8, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 11, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 10, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 22, 1)));
-	    qint64 modifydate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 13, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 12, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 15, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 14, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 23, 1)));
-	    qint64 accessdate = ConvertExfatTimeToUnixTime(qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 17, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 16, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 19, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 18, 1)), qFromLittleEndian<uint8_t>(curimg->ReadContent(curoffset + 24, 1)));
 	    QString filename = "";
 	    uint8_t namelength = 0;
 	    uint8_t curlength = 0;
