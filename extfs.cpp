@@ -2,6 +2,60 @@
 
 void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
 {
+    // COMPATIBILITY FLAGS
+    uint32_t compatflags = 0;
+    std::string compatibilityflags = "";
+    ReadForImgContent(curforimg, &compatflags, offset + 1116);
+    // INCOMPATIBLE FLAGS
+    uint32_t incompatflags = 0;
+    std::string incompatibleflags = "";
+    ReadForImgContent(curforimg, &incompatflags, offset + 1120);
+    // READ ONLY FLAGS
+    uint32_t roflags = 0;
+    std::string readonlyflags = "";
+    ReadForImgContent(curforimg, &roflags, offset + 1124);
+    // BLOCK SIZE
+    uint32_t blksize = 0;
+    ReadForImgContent(curforimg, &blksize, offset + 1048);
+    uint32_t blocksize = 1024 * pow(2, blksize);
+    // INODE SIZE
+    uint16_t inodesize = 0;
+    ReadForImgContent(curforimg, &inodesize, offset + 1112);
+    // BLOCK GROUP INODE COUNT
+    uint32_t blockgroupinodecount = 0;
+    ReadForImgContent(curforimg, &blockgroupinodecount, offset + 1064);
+    // INODE ADDRESS TABLE
+    uint32_t blockgroupcount = fsblockcnt / blockgroupblockcount;
+    uint blkgrpcntrem = fsblockcnt % blockgroupblockcount;
+    if(blkgrpcntrem > 0)
+	blockgroupcount++;
+    if(blockgroupcount == 0)
+	blockgroupcount = 1;
+    std::string inodeaddresstable = "";
+    for(uint i=0; i < blockgroupcount; i++)
+    {
+	uint32_t iat = 0;
+	if(blocksize == 1024)
+	    ReadForImgContent(curforimg, &iat, offset + 2*blocksize + i * grpdescsize + 8);
+	else
+	    ReadForImgContent(curforimg, &iat, offset + blocksize + i * grpdescsize + 8);
+	inodeaddresstable += std::to_string(iat);
+    }
+    // ROOT INODE TABLE ADDRESS
+    uint32_t rootinodetableaddress = 0;
+    if(blockgroupinodecount > 2)
+	ReadForImgContent(curforimg, &rootinodetableaddress, offset + 2056);
+    else
+	ReadForImgContent(curforimg, &rootinodetableaddress, offset + 2088);
+    // REVISION LEVEL
+    uint32_t revmaj = 0;
+    ReadForImgContent(curforimg, &revmaj, offset + 1100);
+    uint16_t revmin = 0;
+    ReadForImgContent(curforimg, &revmin, offset + 1086);
+
+    if(curfileitem == NULL)
+	currentinode = 2;
+
 }
 
 /*
