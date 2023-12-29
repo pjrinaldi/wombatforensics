@@ -103,22 +103,37 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
     // INODE FLAGS
     uint32_t inodeflags = 0;
     ReadForImgContent(currentitem->forimg, &inodeflags, currentoffset + 32);
-
+    // GET THE DIRECTORY CONTENT OFFSETS/LENGTHS AND THEN LOOP OVER THEM
+    std::vector<std::string>layoutlist;
+    layoutlist.clear();
+    std::istringstream ll(layoutlist);
+    std::string ls;
+    while(getline(ll, ls, ';'))
+	layoutlist.push_back(ls);
+    for(int i=0; i < layoutlist.size(); i++)
+    {
+	std::size_t layoutsplit = layoutlist.at(i).find(",");
+	uint64_t curoffset = std::stoull(layoutlist.at(i).substr(0, layoutsplit));
+	uint64_t curlength = std::stoull(layoutlist.at(i).substr(layoutsplit+1));
+	uint64_t curoff = currentitem->voloffset + curoffset + 24; // SKIP . AND .. ENTRIES WHICH ARE ALWAYS 1ST 2 AND 12 BYTES EACH
+	if(inodeflags & 0x1000) // hash trees in use
+	{
+	    curoff = currentitem->voloffset + curoffset + 40; // THIS SHOULD ACCOUNT FOR HASH TREE DEPTH OF 0, NEED TO TEST FOR 1 - 3
+	}
+	bool nextisdeleted = false;
+	while(curoff < curoffset + curlength - 8)
+	{
+	    uint16_t entrylength = 0;
+	}
+    }
+    /*
+     */ 
 }
 /*
     //qDebug() << "blocklist:" << blocklist;
     //qDebug() << "dirlayout:" << dirlayout;
     for(int i=0; i < dirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
-        quint64 curdiroffset = dirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(0).toULongLong();
-        quint64 curdirlength = dirlayout.split(";", Qt::SkipEmptyParts).at(i).split(",").at(1).toULongLong();
-        quint64 coffset = curstartsector * 512 + curdiroffset + 24; // SKIP THE . AND .. ENTRIES WHICH ARE ALWAYS THE 1ST TWO ENTRIES AND ARE 12 BYTES LONG EACH
-	//qDebug() << "initial coffset:" << coffset;
-        if(inodeflags & 0x1000) // hash trees in use
-        {
-            coffset = curstartsector * 512 + curdiroffset + 40; // THIS SHOULD ACCOUNT FOR HASH TREE DEPTH OF 0, NEED TO TEST FOR 1 - 3
-            qDebug() << "cur directory inode uses hashed btree rather than linear direntry reading";
-        }
         bool nextisdeleted = false;
         while(coffset < curdiroffset + curdirlength - 8)
         {
@@ -587,12 +602,34 @@ void GetContentBlocks(CurrentItem* currentitem, uint32_t blocksize, uint64_t cur
     }
 }
 
-/*
-*/ 
-
 std::string ConvertBlocksToExtents(std::vector<uint32_t>* blocklist, uint32_t blocksize)
 {
     std::string layout = "";
+    int blockcount = 1;
+    unsigned int startvalue = blocklist->at(0);
+    for(int i=1; i < blocklist->size(); i++)
+    {
+	unsigned int oldvalue = blocklist->at(i-1);
+	unsigned int newvalue = blocklist->at(i);
+	if(newvalue - oldvalue == 1)
+	    blockcount++;
+	else
+	{
+	    layout += std::to_string(startvalue * blocksize) + "," + std::to_string(blockcount * blocksize) + ";";
+	    startvalue = blocklist->at(i);
+	    blockcount = 1;
+	}
+	if(i == blocklist->size() - 1)
+	{
+	    layout += std::to_string(startvalue * blocksize) + "," + std::to_string(blockcount * blocksize) + ";";
+	    startvalue = blocklist->at(i);
+	    blockcount = 1;
+	}
+    }
+    if(blocklist->size() == 1)
+    {
+	layout += std::to_string(startvalue * blocksize) + "," + std::to_string(blockcount * blocksize) + ";";
+    }
 
     return layout;
 }
