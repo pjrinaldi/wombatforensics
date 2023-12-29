@@ -100,48 +100,12 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 	GetContentBlocks(currentitem, blocksize, currentoffset, incompatflags, &blocklist);
 	currentlayout = ConvertBlocksToExtents(&blocklist, blocksize);
     }
+    // INODE FLAGS
+    uint32_t inodeflags = 0;
+    ReadForImgContent(currentitem->forimg, &inodeflags, currentoffset + 32);
 
 }
 /*
-    QString fstype = "";
-    QString layout = "";
-    float revision = 0.0;
-            QString line = propfile.readLine();
-	    else if(line.startsWith("File System Type|"))
-		fstype = line.split("|").at(1);
-	    else if(line.startsWith("Layout|"))
-		layout = line.split("|").at(1);
-	    else if(line.startsWith("Revision Level|"))
-		revision = line.split("|").at(1).toFloat();
-	    if(curextinode == 2)
-	    {
-		if(line.startsWith("Root Inode Table Address|"))
-		    rootinodetableaddress = line.split("|").at(1).toUInt();
-	    }
-    //qDebug() << "block size:" << blocksize << "inode size:" << inodesize << "block group inode count:" << blkgrpinodecnt;
-    //qDebug() << "block groups:" << inodeaddresstable;
-    //qDebug() << "inode table starting block:" << inodestartingblock << "bgnumber:" << bgnumber;
-    //qDebug() << "root inode table address:" << rootinodetableaddress;
-    //qDebug() << "layout:" << layout;
-    //qDebug() << "incompatflags:" << incompatflags;
-    // NEED TO GET THE BLOCK LIST FOR THE CURRENT INODE SO I CAN GET IT'S CONTENTS AND PARSE THE DIRECTORY ENTRY
-    // ON SUB DIRECTORIES SINCE I HAVE THE INODE'S LAYOUT, I CAN JUST READ THE LAYOUT CONTENT DIRECTLY
-    else // NEED TO PARSE THE INODE TABLE FOR THE CURRENT BLOCK GROUP
-    {
-        QList<uint32_t> blocklist;
-        blocklist.clear();
-        GetContentBlocks(curimg, curstartsector, blocksize, curoffset, &incompatflags, &blocklist);
-        dirlayout = ConvertBlocksToExtents(blocklist, blocksize);
-        blocklist.clear();
-    }
-    //qDebug() << "dirlayout:" << dirlayout;
-    //if(incompatflags & 0x80)
-    //    out << "FS size over 2^32 blocks,";
-    //if(incompatflags & 0x40)
-    //    out << "Files use Extents,";
-    
-    uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 32, 4));
-    
     //qDebug() << "blocklist:" << blocklist;
     //qDebug() << "dirlayout:" << dirlayout;
     for(int i=0; i < dirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
@@ -479,7 +443,152 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 */
 void GetContentBlocks(CurrentItem* currentitem, uint32_t blocksize, uint64_t currentoffset, uint32_t incompatflags, std::vector<uint32_t>* blocklist)
 {
+    uint32_t inodeflags = 0;
+    ReadForImgContent(currentitem->forimg, &inodeflags, currentoffset + 32);
+    if(incompatflags & 0x40 && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
+    {
+	uint16_t extententries = 0;
+	ReadForImgContent(currentitem->forimg, &extententries, currentoffset + 42);
+	uint16_t extentdepth = 0;
+	ReadForImgContent(currentitem->forimg, &extentdepth, currentoffset + 46);
+	if(extentdepth == 0) // use ext4_extent
+	{
+	    for(uint16_t i=0; i < extententries; i++)
+	    {
+		uint16_t blocklength = 0;
+		ReadForImgContent(currentitem->forimg, &blocklength, currentoffset + 56 + i*12);
+		uint16_t starthi = 0;
+		ReadForImgContent(currentitem->forimg, &starthi, currentoffset + 58 + i*12);
+		uint32_t startlo = 0;
+		ReadForImgContent(currentitem->forimg, &startlo, currentoffset + 60 + i*12);
+		uint64_t startblock = (((uint64_t)starthi >> 32) + startlo); // block #, not bytes
+		blocklist->push_back(startblock);
+	    }
+	}
+	else // use ext4_extent_idx
+	{
+	    std::vector<uint32_t> leafnodes;
+	    leafnodes.clear();
+	    for(uint16_t i=0; i < extententries; i++)
+	    {
+		uint32_t leafnode = 0;
+		ReadForImgContent(currentitem->forimg, &leafnode, currentoffset + 56 + i*12);
+		leafnodes.push_back(leafnode);
+	    }
+	    for(int i=0; i < leafnodes.size(); i++)
+	    {
+		uint16_t lextententries = 0;
+		ReadForImgContent(currentitem->forimg, &lextententries, currentoffset + leafnodes.at(i) * blocksize + 2);
+		uint16_t lextentdepth = 0;
+		ReadForImgContent(currentitem->forimg, &lextentdepth, currentoffset + leafnodes.at(i) * blocksize + 6);
+		if(lextentdepth == 0) // use ext4_extent
+		{
+		    for(uint16_t j=0; j < lextententries; j++)
+		    {
+			uint16_t blocklength = 0;
+			ReadForImgContent(currentitem->forimg, &blocklength, currentoffset + leafnodes.at(i) * blocksize + 16 + j*12);
+			uint16_t starthi = 0;
+			ReadForImgContent(currentitem->forimg, &starthi, currentoffset + leafnodes.at(i) * blocksize + 18 + j*12);
+			uint32_t startlo = 0;
+			ReadForImgContent(currentitem->forimg, &startlo, currentoffset + leafnodes.at(i) * blocksize + 20 + j*12);
+			uint64_t startblock = (((uint64_t)starthi >> 32) + startlo);
+			blocklist->push_back(startblock);
+		    }
+		}
+		else // use ext4_extent_idx
+		{
+		    std::cout << "repeat leafnode exercise here...";
+		}
+	    }
+	}
+    }
+    else // direct and indirect blocks
+    {
+	for(int i=0; i < 12; i++)
+	{
+	    uint32_t curdirectblock = 0;
+	    ReadForImgContent(currentitem->forimg, &curdirectblock, currentoffset + 40 + i*4);
+	    if(curdirectblock > 0)
+		blocklist->push_back(curdirectblock);
+	}
+	uint32_t singleindirect = 0;
+	ReadForImgContent(currentitem->forimg, &singleindirect, currentoffset + 88);
+	uint32_t doubleindirect = 0;
+	ReadForImgContent(currentitem->forimg, &doubleindirect, currentoffset + 92);
+	uint32_t tripleindirect = 0;
+	ReadForImgContent(currentitem->forimg, &tripleindirect, currentoffset + 96);
+	if(singleindirect > 0)
+	{
+	    for(uint i=0; i < blocksize / 4; i++)
+	    {
+		uint32_t cursingledirect = 0;
+		ReadForImgContent(currentitem->forimg, &cursingledirect, currentoffset + singleindirect * blocksize + i*4);
+		if(cursingledirect > 0)
+		    blocklist->push_back(cursingledirect);
+	    }
+	}
+	if(doubleindirect > 0)
+	{
+	    std::vector<uint32_t> sinlist;
+	    sinlist.clear();
+	    for(uint i=0; i < blocksize / 4; i++)
+	    {
+		uint32_t sindirect = 0;
+		ReadForImgContent(currentitem->forimg, &sindirect, currentoffset + doubleindirect * blocksize + i*4);
+		if(sindirect > 0)
+		    sinlist.push_back(sindirect);
+	    }
+	    for(int i=0; i < sinlist.size(); i++)
+	    {
+		for(uint j=0; j < blocksize / 4; j++)
+		{
+		    uint32_t sdirect = 0;
+		    ReadForImgContent(currentitem->forimg, &sdirect, currentoffset + sinlist.at(i) * blocksize + j*4);
+		    if(sdirect > 0)
+			blocklist->push_back(sdirect);
+		}
+	    }
+	    sinlist.clear();
+	}
+	if(tripleindirect > 0)
+	{
+	    std::vector<uint32_t> dinlist;
+	    std::vector<uint32_t> sinlist;
+	    dinlist.clear();
+	    sinlist.clear();
+	    for(uint i=0; i < blocksize / 4; i++)
+	    {
+		uint32_t dindirect = 0;
+		ReadForImgContent(currentitem->forimg, &dindirect, currentoffset + tripleindirect * blocksize + i*4);
+		if(dindirect > 0)
+		    dinlist.push_back(dindirect);
+	    }
+	    for(int i=0; i < dinlist.size(); i++)
+	    {
+		for(uint j=0; j < blocksize / 4; j++)
+		{
+		    uint32_t sindirect = 0;
+		    ReadForImgContent(currentitem->forimg, &sindirect, currentoffset + dinlist.at(i) * blocksize + j*4);
+		    if(sindirect > 0)
+			sinlist.push_back(sindirect);
+		}
+		for(int j=0; j < sinlist.size(); j++)
+		{
+		    for(uint k=0; k < blocksize / 4; k++)
+		    {
+			uint32_t sdirect = 0;
+			ReadForImgContent(currentitem->forimg, &sdirect, currentoffset + sinlist.at(j) * blocksize + k*4);
+			if(sdirect > 0)
+			    blocklist->push_back(sdirect);
+		    }
+		}
+	    }
+	}
+    }
 }
+
+/*
+*/ 
 
 std::string ConvertBlocksToExtents(std::vector<uint32_t>* blocklist, uint32_t blocksize)
 {
@@ -487,141 +596,3 @@ std::string ConvertBlocksToExtents(std::vector<uint32_t>* blocklist, uint32_t bl
 
     return layout;
 }
-/*
-void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, quint64 curoffset, QString* incompatflags, QList<uint32_t>* blocklist)
-{
-    uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 32, 4));
-    if(incompatflags->contains("Files use Extents,") && inodeflags & 0x80000) // FS USES EXTENTS AND INODE USES EXTENTS
-    {
-        uint16_t extententries = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 42, 2));
-        uint16_t extentdepth = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 46, 2));
-        //qDebug() << "extententries:" << extententries << "extentdepth:" << extentdepth;
-        if(extentdepth == 0) // use ext4_extent
-        {
-            for(uint16_t i=0; i < extententries; i++)
-            {
-                uint16_t blocklength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 56 + i*12, 2));
-                uint16_t starthi = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 58 + i*12, 2));
-                uint32_t startlo = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 60 + i*12, 4));
-                quint64 startblock = (((uint64_t)starthi >> 32) + startlo); // block #, not bytes
-                blocklist->append(startblock);
-            }
-        }
-        else // use ext4_extent_idx
-        {
-	    QList<uint32_t> leafnodes;
-	    leafnodes.clear();
-	    for(uint16_t i=0; i < extententries; i++)
-		leafnodes.append(qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 56 + i*12, 4)));
-	    for(int i=0; i < leafnodes.count(); i++)
-	    {
-		uint16_t lextententries = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 2, 2));
-		uint16_t lextentdepth = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 6, 2));
-		if(extentdepth == 0) // use ext4_extent
-		{
-		    for(uint16_t j=0; j < lextententries; j++)
-		    {
-			uint16_t blocklength = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 16 + j*12, 2));
-			uint16_t starthi = qFromLittleEndian<uint16_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 18 + j*12, 2));
-			uint32_t startlo = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + leafnodes.at(i) * blocksize + 20 + j*12, 4));
-			quint64 startblock = (((uint64_t)starthi >> 32) + startlo); // block #, not bytes
-			blocklist->append(startblock);
-		    }
-		}
-		else // use ext4_extent_idx
-		{
-		    qDebug() << "repeat leafnode exercise here...";
-		}
-		//qDebug() << "leaf header:" << QString::number(qFromLittleEndian<uint16_t>(leafnode.mid(0, 2)), 16);
-		//qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(2, 2));
-		//qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(leafnode.mid(4, 2));
-		//qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(leafnode.mid(6, 2));
-	    }
-	    //qDebug() << "extent header:" << QString::number(qFromLittleEndian<uint16_t>(curinodebuf.mid(40, 2)), 16);
-	    //qDebug() << "extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(42, 2));
-	    //qDebug() << "max extent entries:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(44, 2));
-	    //qDebug() << "extent depth:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(46, 2));
-	    
-	    //qDebug() << "ei_block:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(52, 4));
-	    //qDebug() << "ei_leaf_lo:" << qFromLittleEndian<uint32_t>(curinodebuf.mid(56, 4));
-	    //qDebug() << "ei_leaf_hi:" << qFromLittleEndian<uint16_t>(curinodebuf.mid(60, 2));
-	    //qDebug() << "use extent idx";
-        }
-    }
-    else // direct and indirect blocks
-    {
-	for(int i=0; i < 12; i++)
-	{
-	    uint32_t curdirectblock = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 40 + i*4, 4));
-	    if(curdirectblock > 0)
-		blocklist->append(curdirectblock);
-	}
-	//qDebug() << "blocklist before indirects:" << *blocklist;
-	uint32_t singleindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 88, 4));
-	uint32_t doubleindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 92, 4));
-	uint32_t tripleindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 96, 4));
-        if(singleindirect > 0)
-        {
-            for(uint i=0; i < blocksize / 4; i++)
-            {
-                uint32_t cursingledirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + singleindirect * blocksize + i*4, 4));
-                if(cursingledirect > 0)
-                    blocklist->append(cursingledirect);
-            }
-        }
-        if(doubleindirect > 0)
-        {
-            QList<uint32_t> sinlist;
-            sinlist.clear();
-            for(uint i=0; i < blocksize / 4; i++)
-            {
-                uint32_t sindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + doubleindirect * blocksize + i*4, 4));
-                if(sindirect > 0)
-                    sinlist.append(sindirect);
-            }
-            for(int i=0; i < sinlist.count(); i++)
-            {
-                for(uint j=0; j < blocksize / 4; j++)
-                {
-                    uint32_t sdirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + sinlist.at(i) * blocksize + j*4, 4));
-                    if(sdirect > 0)
-                        blocklist->append(sdirect);
-                }
-            }
-            sinlist.clear();
-        }
-        if(tripleindirect > 0)
-        {
-            QList<uint32_t> dinlist;
-            QList<uint32_t> sinlist;
-            dinlist.clear();
-            sinlist.clear();
-            for(uint i=0; i < blocksize / 4; i++)
-            {
-                uint32_t dindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + tripleindirect * blocksize + i*4, 4));
-                if(dindirect > 0)
-                    dinlist.append(dindirect);
-            }
-            for(int i=0; i < dinlist.count(); i++)
-            {
-                for(uint j=0; j < blocksize / 4; j++)
-                {
-                    uint32_t sindirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + dinlist.at(i) * blocksize + j*4, 4));
-                    if(sindirect > 0)
-                        sinlist.append(sindirect);
-                }
-                for(int j=0; j < sinlist.count(); j++)
-                {
-                    for(uint k=0; k < blocksize / 4; k++)
-                    {
-                        uint32_t sdirect = qFromLittleEndian<uint32_t>(curimg->ReadContent(curstartsector * 512 + sinlist.at(j) * blocksize + k*4, 4));
-                        if(sdirect > 0)
-                            blocklist->append(sdirect);
-                    }
-                }
-            }
-        }
-    }
-}
-
- */ 
