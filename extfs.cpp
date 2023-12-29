@@ -106,7 +106,7 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
     // GET THE DIRECTORY CONTENT OFFSETS/LENGTHS AND THEN LOOP OVER THEM
     std::vector<std::string>layoutlist;
     layoutlist.clear();
-    std::istringstream ll(layoutlist);
+    std::istringstream ll(currentlayout);
     std::string ls;
     while(getline(ll, ls, ';'))
 	layoutlist.push_back(ls);
@@ -124,6 +124,20 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 	while(curoff < curoffset + curlength - 8)
 	{
 	    uint16_t entrylength = 0;
+	    uint8_t curlen = 0;
+	    currentitem->forimg->ReadContent(&curlen, curoff + 6, 1);
+	    int lengthdiv = (8 + curlen) / 4;
+	    int lengthrem = (8 + curlen) % 4;
+	    int newlength = 0;
+	    if(lengthrem = 0)
+		newlength = lengthdiv * 4;
+	    else
+		newlength = lengthdiv * 4 + 4;
+	    int32_t extinode = 0;
+	    ReadForImgContent(currentitem->forimg, &extinode, curoff);
+	    if(extinode > 0)
+	    {
+	    }
 	}
     }
     /*
