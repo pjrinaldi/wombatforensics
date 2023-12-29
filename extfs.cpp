@@ -134,7 +134,7 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 	    else
 		newlength = lengthdiv * 4 + 4;
 	    int32_t extinode = 0;
-	    ReadForImgContent(currentitem->forimg, &extinode, curoff);
+	    //ReadForImgContent(currentitem->forimg, &extinode, curoff);
 	    if(extinode > 0)
 	    {
 	    }
