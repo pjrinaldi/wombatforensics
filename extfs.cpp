@@ -5,25 +5,35 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
     // COMPATIBILITY FLAGS
     uint32_t compatflags = 0;
     std::string compatibilityflags = "";
-    ReadForImgContent(curforimg, &compatflags, offset + 1116);
+    ReadForImgContent(currentitem->forimg, &compatflags, currentitem->voloffset + 1116);
     // INCOMPATIBLE FLAGS
     uint32_t incompatflags = 0;
     std::string incompatibleflags = "";
-    ReadForImgContent(curforimg, &incompatflags, offset + 1120);
+    ReadForImgContent(currentitem->forimg, &incompatflags, currentitem->voloffset + 1120);
     // READ ONLY FLAGS
     uint32_t roflags = 0;
     std::string readonlyflags = "";
-    ReadForImgContent(curforimg, &roflags, offset + 1124);
+    ReadForImgContent(currentitem->forimg, &roflags, currentitem->voloffset + 1124);
+    // GROUP DESCRIPTOR SIZE
+    uint16_t grpdescsize = 32;
+    if(incompatflags & 0x80)
+	ReadForImgContent(currentitem->forimg, &grpdescsize, currentitem->voloffset + 1278);
+    // FILE SYSTEM BLOCK COUNT
+    uint32_t fsblockcnt = 0;
+    ReadForImgContent(currentitem->forimg, &fsblockcnt, currentitem->voloffset + 1028);
+    // BLOCK GROUP BLOCK COUNT
+    uint32_t blockgroupblockcount = 0;
+    ReadForImgContent(currentitem->forimg, &blockgroupblockcount, currentitem->voloffset + 1056);
     // BLOCK SIZE
     uint32_t blksize = 0;
-    ReadForImgContent(curforimg, &blksize, offset + 1048);
+    ReadForImgContent(currentitem->forimg, &blksize, currentitem->voloffset + 1048);
     uint32_t blocksize = 1024 * pow(2, blksize);
     // INODE SIZE
     uint16_t inodesize = 0;
-    ReadForImgContent(curforimg, &inodesize, offset + 1112);
+    ReadForImgContent(currentitem->forimg, &inodesize, currentitem->voloffset + 1112);
     // BLOCK GROUP INODE COUNT
     uint32_t blockgroupinodecount = 0;
-    ReadForImgContent(curforimg, &blockgroupinodecount, offset + 1064);
+    ReadForImgContent(currentitem->forimg, &blockgroupinodecount, currentitem->voloffset + 1064);
     // INODE ADDRESS TABLE
     uint32_t blockgroupcount = fsblockcnt / blockgroupblockcount;
     uint blkgrpcntrem = fsblockcnt % blockgroupblockcount;
@@ -31,83 +41,74 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 	blockgroupcount++;
     if(blockgroupcount == 0)
 	blockgroupcount = 1;
-    std::string inodeaddresstable = "";
+    //std::string inodeaddresstable = "";
+    std::vector<uint32_t> inodeaddresstable;
+    inodeaddresstable.clear();
     for(uint i=0; i < blockgroupcount; i++)
     {
 	uint32_t iat = 0;
 	if(blocksize == 1024)
-	    ReadForImgContent(curforimg, &iat, offset + 2*blocksize + i * grpdescsize + 8);
+	    ReadForImgContent(currentitem->forimg, &iat, currentitem->voloffset + 2*blocksize + i * grpdescsize + 8);
 	else
-	    ReadForImgContent(curforimg, &iat, offset + blocksize + i * grpdescsize + 8);
-	inodeaddresstable += std::to_string(iat);
+	    ReadForImgContent(currentitem->forimg, &iat, currentitem->voloffset + blocksize + i * grpdescsize + 8);
+	inodeaddresstable.push_back(iat);
+	//inodeaddresstable += std::to_string(iat);
     }
     // ROOT INODE TABLE ADDRESS
     uint32_t rootinodetableaddress = 0;
     if(blockgroupinodecount > 2)
-	ReadForImgContent(curforimg, &rootinodetableaddress, offset + 2056);
+	ReadForImgContent(currentitem->forimg, &rootinodetableaddress, currentitem->voloffset + 2056);
     else
-	ReadForImgContent(curforimg, &rootinodetableaddress, offset + 2088);
+	ReadForImgContent(currentitem->forimg, &rootinodetableaddress, currentitem->voloffset + 2088);
     // REVISION LEVEL
     uint32_t revmaj = 0;
-    ReadForImgContent(curforimg, &revmaj, offset + 1100);
+    ReadForImgContent(currentitem->forimg, &revmaj, currentitem->voloffset + 1100);
     uint16_t revmin = 0;
-    ReadForImgContent(curforimg, &revmin, offset + 1086);
+    ReadForImgContent(currentitem->forimg, &revmin, currentitem->voloffset + 1086);
 
-    if(curfileitem == NULL)
-	currentinode = 2;
+    // CURRENT INODE
+    uint64_t currentinode = 2;
+    //if(curfileitem == NULL)
+	//currentinode = 2;
+    //else
+    if(curfileitem != NULL)
+    {
+	std::size_t extinodesplit = curfileitem->properties.find(">");
+	std::cout << "cur item ext inode: " << std::stoull(curfileitem->properties.substr(0, extinodesplit)) << std::endl;
+	currentinode = std::stoull(curfileitem->properties.substr(0, extinodesplit));
+    }
+    uint64_t inodestartingblock = 0;
+    uint8_t blockgroupnumber = 0;
+    for(int i=1; i <= inodeaddresstable.size(); i++)
+    {
+	if(currentinode < i*blockgroupinodecount)
+	{
+	    inodestartingblock = inodeaddresstable.at(i-1);
+	    blockgroupnumber = i - 1;
+	    break;
+	}
+    }
+    uint64_t relativecurrentinode = currentinode - 1 - (blockgroupnumber * blockgroupinodecount);
+    uint64_t currentoffset = currentitem->voloffset + inodestartingblock * blocksize + inodesize * relativecurrentinode;
+    std::string currentlayout = "";
+    if(curfileitem != NULL)
+	currentlayout = curfileitem->layout;
+    else
+    {
+	std::vector<uint32_t> blocklist;
+	blocklist.clear();
+	GetContentBlocks(currentitem, blocksize, currentoffset, incompatflags, &blocklist);
+	currentlayout = ConvertBlocksToExtents(&blocklist, blocksize);
+    }
 
 }
-
 /*
-void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevector, FileItem* curfileitem)
-{
-    //if(curfileitem != NULL)
-    //    std::cout << "curfileitem name: " << curfileitem->name << std::endl;
-    // BYTES PER SECTOR
-    uint16_t bytespersector = 0;
-    ReadForImgContent(currentitem->forimg, &bytespersector, currentitem->voloffset + 11);
-    //std::cout << "bytes per sector: " << bytespersector << std::endl;
-    // FAT COUNT
-    uint8_t fatcount = 0;
-    currentitem->forimg->ReadContent(&fatcount, currentitem->voloffset + 16, 1);
-    //std::cout << "fat count: " << (uint)fatcount << std::endl;
-}
-*/
-
-/*
-    uint32_t blocksize = 0;
-    uint16_t inodesize = 0;
-    uint32_t blkgrpinodecnt = 0;
-    uint32_t rootinodetableaddress = 0;
-    QString incompatflags = "";
-    QString readonlyflags = "";
-    QString inodeaddresstable = "";
     QString fstype = "";
     QString layout = "";
     float revision = 0.0;
-
-    QFile propfile(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/prop");
-    if(!propfile.isOpen())
-	propfile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(propfile.isOpen())
-    {
-        while(!propfile.atEnd())
-        {
             QString line = propfile.readLine();
-	    if(line.startsWith("Block Size|"))
-		blocksize = line.split("|").at(1).toUInt();
-	    else if(line.startsWith("Inode Address Table|"))
-		inodeaddresstable = line.split("|").at(1);
-	    else if(line.startsWith("Inode Size|"))
-		inodesize = line.split("|").at(1).toUInt();
-	    else if(line.startsWith("Block Group Inode Count|"))
-		blkgrpinodecnt = line.split("|").at(1).toUInt();
 	    else if(line.startsWith("File System Type|"))
 		fstype = line.split("|").at(1);
-	    else if(line.startsWith("Read Only Compatible Features|"))
-		readonlyflags = line.split("|").at(1);
-	    else if(line.startsWith("Incompatible Features|"))
-		incompatflags = line.split("|").at(1);
 	    else if(line.startsWith("Layout|"))
 		layout = line.split("|").at(1);
 	    else if(line.startsWith("Revision Level|"))
@@ -117,24 +118,7 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
 		if(line.startsWith("Root Inode Table Address|"))
 		    rootinodetableaddress = line.split("|").at(1).toUInt();
 	    }
-        }
-        propfile.close();
-    }
     //qDebug() << "block size:" << blocksize << "inode size:" << inodesize << "block group inode count:" << blkgrpinodecnt;
-    quint64 inodecnt = 0;
-    uint8_t bgnumber = 0;
-    quint64 inodestartingblock = 0;
-    if(!parfilename.isEmpty())
-	inodecnt = parinode + 1;
-    for(int i=1; i <= inodeaddresstable.split(",", Qt::SkipEmptyParts).count(); i++)
-    {
-	if(curextinode < i*blkgrpinodecnt)
-	{
-	    inodestartingblock = inodeaddresstable.split(",", Qt::SkipEmptyParts).at(i-1).toULongLong();
-	    bgnumber = i - 1;
-	    break;
-	}
-    }
     //qDebug() << "block groups:" << inodeaddresstable;
     //qDebug() << "inode table starting block:" << inodestartingblock << "bgnumber:" << bgnumber;
     //qDebug() << "root inode table address:" << rootinodetableaddress;
@@ -142,15 +126,6 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
     //qDebug() << "incompatflags:" << incompatflags;
     // NEED TO GET THE BLOCK LIST FOR THE CURRENT INODE SO I CAN GET IT'S CONTENTS AND PARSE THE DIRECTORY ENTRY
     // ON SUB DIRECTORIES SINCE I HAVE THE INODE'S LAYOUT, I CAN JUST READ THE LAYOUT CONTENT DIRECTLY
-    quint64 relcurinode = curextinode - 1 - (bgnumber * blkgrpinodecnt);
-    quint64 curoffset = curstartsector * 512 + inodestartingblock * blocksize + inodesize * relcurinode;
-    QString dirlayout = "";
-    
-    if(parinode > 0)
-    {
-        dirlayout = parlayout;
-        // loop over layout variable to parse the content....
-    }
     else // NEED TO PARSE THE INODE TABLE FOR THE CURRENT BLOCK GROUP
     {
         QList<uint32_t> blocklist;
@@ -501,7 +476,18 @@ void LoadFat12Directory(CurrentItem* currentitem, std::vector<FileItem>* filevec
     }
     return inodecnt;
 }
+*/
+void GetContentBlocks(CurrentItem* currentitem, uint32_t blocksize, uint64_t currentoffset, uint32_t incompatflags, std::vector<uint32_t>* blocklist)
+{
+}
 
+std::string ConvertBlocksToExtents(std::vector<uint32_t>* blocklist, uint32_t blocksize)
+{
+    std::string layout = "";
+
+    return layout;
+}
+/*
 void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, quint64 curoffset, QString* incompatflags, QList<uint32_t>* blocklist)
 {
     uint32_t inodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curoffset + 32, 4));
