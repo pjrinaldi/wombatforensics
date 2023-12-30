@@ -12,7 +12,7 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
     ReadForImgContent(currentitem->forimg, &incompatflags, currentitem->voloffset + 1120);
     // READ ONLY FLAGS
     uint32_t roflags = 0;
-    std::string readonlyflags = "";
+    //std::string readonlyflags = "";
     ReadForImgContent(currentitem->forimg, &roflags, currentitem->voloffset + 1124);
     // GROUP DESCRIPTOR SIZE
     uint16_t grpdescsize = 32;
@@ -139,9 +139,9 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 	    else
 		newlength = lengthdiv * 4 + 4;
 	    int32_t extinode = 0;
-	    uint8_t* einode = uint8_t[4];
-	    currentitem->forimg->ReadContent(&einode, curoff, 4);
-	    int32_t extinode = (int32_t)einode[0] | (int32_t)einode[1] << 8 | (int32_t)einode[2] << 16 | (int32_t)einode[3] << 24;
+	    uint8_t* einode = new uint8_t[4];
+	    currentitem->forimg->ReadContent(einode, curoff, 4);
+	    extinode = (int32_t)einode[0] | (int32_t)einode[1] << 8 | (int32_t)einode[2] << 16 | (int32_t)einode[3] << 24;
 	    if(extinode > 0)
 	    {
 		FileItem tmpitem;
@@ -150,317 +150,213 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 		else
 		    tmpitem.path = curfileitem->path + curfileitem->name + "/";
 		uint16_t namelength = 0;
+		int filetype = -1;
 		ReadForImgContent(currentitem->forimg, &entrylength, curoff + 4);
 		if(incompatflags & 0x02 || revision > 0.4)
 		{
+		    uint8_t nl = 0;
+		    currentitem->forimg->ReadContent(&nl, curoff + 6, 1);
+		    namelength = (uint16_t)nl;
+		    uint8_t ft = 0;
+		    currentitem->forimg->ReadContent(&ft, curoff + 7, 1);
+		    filetype = (int)ft;
+		}
+		else
+		    ReadForImgContent(currentitem->forimg, &namelength, curoff + 6);
+		char* filename = new char[namelength + 1];
+		currentitem->forimg->ReadContent((uint8_t*)filename, curoff + 8, namelength);
+		filename[namelength] = 0;
+		tmpitem.name = std::string(filename);
+		if(nextisdeleted)
+		    tmpitem.isdeleted = true;
+		if(newlength < entrylength)
+		    nextisdeleted = true;
+		else
+		    nextisdeleted = false;
+		if(filetype == 2) // IS DIRECTORY
+		    tmpitem.isdirectory = true;
+		uint64_t currentinodetablestartblock = 0;
+		uint8_t blockgroupnumber = 0;
+		for(int j=1; j <= inodeaddresstable.size(); j++)
+		{
+		    if(extinode < j * blockgroupinodecount)
+		    {
+			currentinodetablestartblock = inodeaddresstable.at(j - 1);
+			blockgroupnumber = j - 1;
+			break;
+		    }
+		}
+		uint64_t logicalsize = 0;
+		uint64_t currentinodeoffset = currentitem->voloffset + currentinodetablestartblock * blocksize + inodesize * (extinode - 1 - blockgroupnumber * blockgroupinodecount);
+		uint16_t filemode = 0;
+		ReadForImgContent(currentitem->forimg, &filemode, currentinodeoffset);
+		std::string filemodestring = "---------";
+		if(filemode & 0xc000) // unix socket
+		    filemodestring.replace(0, 1, "s");
+		if(filemode & 0xa000) // symbolic link
+		    filemodestring.replace(0, 1, "l");
+		if(filemode & 0x6000) // block device
+		    filemodestring.replace(0, 1, "b");
+		if(filemode & 0x2000) // char device
+		    filemodestring.replace(0, 1, "c");
+		if(filemode & 0x1000) // FIFO (pipe)
+		    filemodestring.replace(0, 1, "p");
+		if(filemode & 0x8000) // regular file
+		{
+		    filemodestring.replace(0, 1, "-");
+		    if(roflags & 0x02)
+		    {
+			uint32_t lowersize = 0;
+			ReadForImgContent(currentitem->forimg, &lowersize, currentinodeoffset + 4);
+			uint32_t uppersize = 0;
+			ReadForImgContent(currentitem->forimg, &uppersize, currentinodeoffset + 108);
+			logicalsize = ((uint64_t)uppersize >> 32) + lowersize;
+		    }
+		    else
+			ReadForImgContent(currentitem->forimg, &logicalsize, currentinodeoffset + 4);
+		}
+		if(filemode & 0x4000) // directory
+		{
+		    ReadForImgContent(currentitem->forimg, &logicalsize, currentinodeoffset + 4);
+		    filemodestring.replace(0, 1, "d");
+		}
+		if(filemode & 0x100) // user read
+		    filemodestring.replace(1, 1, "r");
+		if(filemode & 0x080) // user write
+		    filemodestring.replace(2, 1, "w");
+		if(filemode & 0x040) // user execute
+		    filemodestring.replace(3, 1, "x");
+		if(filemode & 0x020) // group read
+		    filemodestring.replace(4, 1, "r");
+		if(filemode & 0x010) // group write
+		    filemodestring.replace(5, 1, "w");
+		if(filemode & 0x008) // group execute
+		    filemodestring.replace(6, 1, "x");
+		if(filemode & 0x004) // other read
+		    filemodestring.replace(7, 1, "r");
+		if(filemode & 0x002) // other write
+		    filemodestring.replace(8, 1, "w");
+		if(filemode & 0x001) // other execute
+		    filemodestring.replace(9, 1, "x");
+		uint16_t lowergroupid = 0;
+		ReadForImgContent(currentitem->forimg, &lowergroupid, currentinodeoffset + 24);
+		uint16_t uppergroupid = 0;
+		ReadForImgContent(currentitem->forimg, &uppergroupid, currentinodeoffset + 122);
+		uint32_t groupid = ((uint32_t)uppergroupid >> 16) + lowergroupid;
+		uint16_t loweruserid = 0;
+		ReadForImgContent(currentitem->forimg, &loweruserid, currentinodeoffset + 2);
+		uint16_t upperuserid = 0;
+		ReadForImgContent(currentitem->forimg, &upperuserid, currentinodeoffset + 120);
+		uint32_t userid = ((uint32_t)upperuserid >> 16) + loweruserid;
+		uint32_t accessdate = 0;
+		ReadForImgContent(currentitem->forimg, &accessdate, currentinodeoffset + 8);
+		tmpitem.access = ConvertUnixTimeToHuman(accessdate);
+		uint32_t statusdate = 0;
+		ReadForImgContent(currentitem->forimg, &statusdate, currentinodeoffset + 12);
+		tmpitem.change = ConvertUnixTimeToHuman(statusdate);
+		uint32_t modifydate = 0;
+		ReadForImgContent(currentitem->forimg, &modifydate, currentinodeoffset + 16);
+		tmpitem.modify = ConvertUnixTimeToHuman(modifydate);
+		uint32_t deletedate = 0;
+		ReadForImgContent(currentitem->forimg, &deletedate, currentinodeoffset + 20);
+		uint16_t linkcount = 0;
+		ReadForImgContent(currentitem->forimg, &linkcount, currentinodeoffset + 26);
+		uint32_t createdate = 0;
+		if(((compatflags & 0x00000200UL) != 0) || ((incompatflags & 0x0001f7c0UL) != 0) || ((roflags & 0x00000378UL) != 0)) // EXT4
+		    ReadForImgContent(currentitem->forimg, &createdate, currentinodeoffset + 144);
+		if(createdate > 0)
+		    tmpitem.create = ConvertUnixTimeToHuman(createdate);
+		uint32_t curinodeflags = 0;
+		ReadForImgContent(currentitem->forimg, &curinodeflags, currentinodeoffset + 32);
+		std::string fileattributes = "";
+		if(inodeflags & 0x200000)
+		    fileattributes += "Stores a Large Extended Attribute,";
+		if(inodeflags & 0x80000)
+		    fileattributes += "Uses Extents,";
+		if(inodeflags & 0x40000)
+		    fileattributes += "Huge File,";
+		if(inodeflags & 0x20000)
+		    fileattributes += "Top of Directory,";
+		if(inodeflags & 0x10000)
+		    fileattributes += "Synchronous Data Write,";
+		if(inodeflags & 0x8000)
+		    fileattributes += "File Tail not Merged,";
+		if(inodeflags & 0x4000)
+		    fileattributes += "File Data Written through Journal,";
+		if(inodeflags & 0x2000)
+		    fileattributes += "AFS Magic Directory,";
+		if(inodeflags & 0x1000)
+		    fileattributes += "Hashed Indexed Directory,";
+		if(inodeflags & 0x800)
+		    fileattributes += "Encrypted,";
+		if(inodeflags & 0x400)
+		    fileattributes += "No Compression,";
+		if(inodeflags & 0x200)
+		    fileattributes += "Has Compression in 1 or more blocks,";
+		if(inodeflags & 0x100)
+		    fileattributes += "Dirty Compression,";
+		if(inodeflags & 0x80)
+		    fileattributes += "No Update ATIME,";
+		if(inodeflags & 0x40)
+		    fileattributes += "dump utility ignores file,";
+		if(inodeflags & 0x20)
+		    fileattributes += "Append Only,";
+		if(inodeflags & 0x10)
+		    fileattributes += "Immutable,";
+		if(inodeflags & 0x08)
+		    fileattributes += "Synchronous Writes,";
+		if(inodeflags & 0x04)
+		    fileattributes += "Compressed,";
+		if(inodeflags & 0x02)
+		    fileattributes += "Preserved for un-deletion,";
+		if(inodeflags & 0x01)
+		    fileattributes += "Requires Secure Deletion,";
+		if(inodeflags == 0x00)
+		    fileattributes = "No attributes";
+		std::vector<uint32_t> curblocklist;
+		curblocklist.clear();
+		GetContentBlocks(currentitem, blocksize, currentinodeoffset, incompatflags, &curblocklist);
+		if(curblocklist.size() > 0)
+		    tmpitem.layout = ConvertBlocksToExtents(&curblocklist, blocksize);
+		uint64_t physicalsize = 0;
+		std::vector<std::string> laylist;
+		laylist.clear();
+		std::istringstream laystream(tmpitem.layout);
+		std::string laystring;
+		while(getline(laystream, laystring, ';'))
+		    laylist.push_back(laystring);
+		for(int j=0; j < laylist.size(); j++)
+		{
+		    std::size_t layoutsplit = laylist.at(i).find(",");
+		    physicalsize += std::stoull(laylist.at(i).substr(layoutsplit+1));
+		}
+		int phyremcnt = physicalsize % blocksize;
+		if(phyremcnt > 0)
+		    physicalsize += blocksize;
+		curblocklist.clear();
+		tmpitem.size = logicalsize;
+		tmpitem.properties = std::to_string(extinode) + ">" + filemodestring + ">" + std::to_string(userid) + " / " + std::to_string(groupid) + ">" + ConvertUnixTimeToHuman(deletedate) + ">" + std::to_string(linkcount) + ">" + fileattributes + ">" + tmpitem.layout + ">" + std::to_string(physicalsize) + ">" + std::to_string(logicalsize);
+		if(tmpitem.isdirectory)
+		{
+		    tmpitem.size = physicalsize;
+		    tmpitem.cat = "Directory";
+		    tmpitem.sig = "Directory";
+		}
+		else
+		{
+		    if(logicalsize > 0 && !tmpitem.layout.empty())
+			GenerateCategorySignature(currentitem, &tmpitem.name, &(tmpitem.layout), &(tmpitem.cat), &(tmpitem.sig));
+		    else
+		    {
+			tmpitem.cat = "Empty";
+			tmpitem.sig = "Empty File";
+		    }
 		}
 	    }
 	}
     }
-    /*
-     */ 
 }
-/*
-    for(int i=0; i < dirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
-    {
-        bool nextisdeleted = false;
-        while(coffset < curdiroffset + curdirlength - 8)
-        {
-            if(extinode > 0)
-            {
-		out << "EXTFS Inode|" << QString::number(extinode) << "|EXTFS inode value to locate file in the filesystem." << Qt::endl;
-                uint16_t namelength = 0;
-                int filetype =  -1;
-                entrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(coffset + 4, 2));
-                if(incompatflags.contains("Directory Entries record file type,") || revision > 0.4)
-                {
-                    namelength = qFromLittleEndian<uint8_t>(curimg->ReadContent(coffset + 6, 1));
-                    filetype = qFromLittleEndian<uint8_t>(curimg->ReadContent(coffset + 7, 1));
-                }
-                else
-                {
-                    namelength = qFromLittleEndian<uint16_t>(curimg->ReadContent(coffset + 6, 2));
-                }
-		//qDebug() << "namelength:" << namelength;
-		//qDebug() << "newlength:" << newlength << "entrylength:" << entrylength << "namelength:" << QString::number(namelength, 16);
-                QString filename = QString::fromStdString(curimg->ReadContent(coffset + 8, namelength).toStdString()).toLatin1();
-                //qDebug() << "filename:" << filename;
-                uint8_t isdeleted = 0;
-                if(nextisdeleted)
-                    isdeleted = 1;
-                if(newlength < entrylength)
-                    nextisdeleted = true;
-                else
-                    nextisdeleted = false;
-                //itemtype = itemnode->itemtype; // node type 5=file, 3=dir, 4-del file, 10=vir file, 11=vir dir, -1=not file (evid image, vol, part, fs), 15=carved file
-                uint8_t itemtype = 0;
-                if(filetype == 0) // unknown type
-                    itemtype = 0;
-                else if(filetype == 1) // FILE
-                {
-                    itemtype = 5;
-                    if(isdeleted == 1)
-                        itemtype = 4;
-                }
-                else if(filetype == 2) // DIR
-                {
-                    itemtype = 3;
-                    if(isdeleted == 1)
-                        itemtype = 2;
-                }
-                else if(filetype == 3) // CHARACTER
-                    itemtype = 6;
-                else if(filetype == 4) // BLOCK
-                    itemtype = 7;
-                else if(filetype == 5) // FIFO
-                    itemtype = 8;
-                else if(filetype == 6) // UNIX SOCKET
-                    itemtype = 9;
-                else if(filetype == 7) // SYMBOLIC LINK
-                    itemtype = 12;
-		//qDebug() << "itemtype:" << itemtype;
-                // DETERMINE WHICH BLOCK GROUP # THE CURINODE IS IN SO I CAN READ IT'S INODE'S CONTENTS AND GET THE NECCESARY METADATA
-                quint64 curinodetablestartblock = 0;
-                uint8_t blockgroupnumber = 0;
-		//qDebug() << "inodeaddresstable:" << inodeaddresstable;
-                for(int j=1; j <= inodeaddresstable.split(",", Qt::SkipEmptyParts).count(); j++)
-                {
-                    if(extinode < j * blkgrpinodecnt)
-                    {
-                        curinodetablestartblock = inodeaddresstable.split(",", Qt::SkipEmptyParts).at(j-1).toULongLong();
-                        blockgroupnumber = j - 1;
-                        break;
-                    }
-                }
-                //qDebug() << "extinode:" << extinode << "block group number:" << blockgroupnumber << "curinodetablestartblock:" << curinodetablestartblock;
-                quint64 logicalsize = 0;
-                quint64 curinodeoffset = curstartsector * 512 + curinodetablestartblock * blocksize + inodesize * (extinode - 1 - blockgroupnumber * blkgrpinodecnt);
-                uint16_t filemode = qFromLittleEndian<uint16_t>(curimg->ReadContent(curinodeoffset, 2));
-                QString filemodestr = "---------";
-                if(filemode & 0xc000) // unix socket
-		{
-                    filemodestr.replace(0, 1, "s");
-		    itemtype = 9;
-		}
-                if(filemode & 0xa000) // symbolic link
-		{
-                    filemodestr.replace(0, 1, "l");
-		    itemtype = 12;
-		}
-                if(filemode & 0x6000) // block device
-		{
-                    filemodestr.replace(0, 1, "b");
-		    itemtype = 7;
-		}
-                if(filemode & 0x2000) // char device
-		{
-                    filemodestr.replace(0, 1, "c");
-		    itemtype = 6;
-		}
-                if(filemode & 0x1000) // FIFO (pipe)
-		{
-                    filemodestr.replace(0, 1, "p");
-		    itemtype = 8;
-		}
-                if(filemode & 0x8000) // regular file
-                {
-                    if(readonlyflags.contains("Allow storing files larger than 2GB,")) // LARGE FILE SUPPORT
-                    {
-                        uint32_t lowersize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
-                        uint32_t uppersize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 108, 4));
-                        logicalsize = ((quint64)uppersize >> 32) + lowersize;
-                    }
-                    else
-                    {
-                        logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
-                    }
-                    filemodestr.replace(0, 1, "-");
-		    itemtype = 5;
-		    if(isdeleted == 1)
-			itemtype = 4;
-                }
-                else if(filemode & 0x4000) // directory
-                {
-                    logicalsize = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 4, 4));
-                    filemodestr.replace(0, 1, "d");
-		    itemtype = 3;
-		    if(isdeleted == 1)
-			itemtype = 2;
-                }
-                if(filemode & 0x100) // user read
-                    filemodestr.replace(1, 1, "r");
-                if(filemode & 0x080) // user write
-                    filemodestr.replace(2, 1, "w");
-                if(filemode & 0x040) // user execute
-                    filemodestr.replace(3, 1, "x");
-                if(filemode & 0x020) // group read
-                    filemodestr.replace(4, 1, "r");
-                if(filemode & 0x010) // group write
-                    filemodestr.replace(5, 1, "w");
-                if(filemode & 0x008) // group execute
-                    filemodestr.replace(6, 1, "x");
-                if(filemode & 0x004) // other read
-                    filemodestr.replace(7, 1, "r");
-                if(filemode & 0x002) // other write
-                    filemodestr.replace(8, 1, "w");
-                if(filemode & 0x001) // other execute
-                    filemodestr.replace(9, 1, "x");
-                //qDebug() << "filemodestr:" << filemodestr;
-		out << "Mode|" << filemodestr << "|Unix Style Permissions. r - file, d - directory, l - symbolic link, c - character device, b - block device, p - named pipe, v - virtual file created by the forensic tool; r - read, w - write, x - execute, s - set id and executable, S - set id, t - sticky bit executable, T - sticky bit. format is type/user/group/other - [rdlcbpv]/rw[sSx]/rw[sSx]/rw[tTx]." << Qt::endl;
-		//qDebug() << "itemtype attempt 2:" << itemtype;
 
-                // STILL NEED TO DO FILE ATTRIBUTES, EXTENDED ATTRIBUTE BLOCK
-                uint16_t lowergroupid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curinodeoffset + 24, 2));
-                uint16_t uppergroupid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curinodeoffset + 122, 2));
-                uint32_t groupid = ((uint32_t)uppergroupid >> 16) + lowergroupid;
-                uint16_t loweruserid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curinodeoffset + 2, 2));
-                uint16_t upperuserid = qFromLittleEndian<uint16_t>(curimg->ReadContent(curinodeoffset + 120, 2));
-                uint32_t userid = ((uint32_t)upperuserid >> 16) + loweruserid;
-		out << "uid / gid|" << QString(QString::number(userid) + " / " + QString::number(groupid)) << "|User ID and Group ID." << Qt::endl;
-                uint32_t accessdate = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 8, 4));
-                uint32_t statusdate = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 12, 4));
-                uint32_t modifydate = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 16, 4));
-                uint32_t deletedate = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 20, 4));
-		if(deletedate > 0)
-		    out << "Deleted Time|" << QDateTime::fromSecsSinceEpoch(deletedate, QTimeZone::utc()).toString("MM/dd/yyyy hh:mm:ss AP") << "|Deleted time for the file." << Qt::endl;
-                uint16_t linkcount = qFromLittleEndian<uint16_t>(curimg->ReadContent(curinodeoffset + 26, 2));
-		out << "Link Count|" << QString::number(linkcount) << "|Number of files pointing to this file." << Qt::endl;
-                uint32_t createdate = 0;
-                if(fstype.startsWith("EXT4"))
-                    uint32_t createdate = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 144, 4));
-                uint32_t curinodeflags = qFromLittleEndian<uint32_t>(curimg->ReadContent(curinodeoffset + 32, 4));
-		//qDebug() << "curinodeflags:" << QString::number(curinodeflags, 16);
-                QString attrstr = "";
-                if(curinodeflags & 0x200000)
-                    attrstr += "Stores a Large Extended Attribute,";
-                if(curinodeflags & 0x80000)
-                    attrstr += "Uses Extents,";
-                if(curinodeflags & 0x40000)
-                    attrstr += "Huge File,";
-                if(curinodeflags & 0x20000)
-                    attrstr += "Top of Directory,";
-                if(curinodeflags & 0x10000)
-                    attrstr += "Synchronous Data Write,";
-                if(curinodeflags & 0x8000)
-                    attrstr += "File Tail not Merged,";
-                if(curinodeflags & 0x4000)
-                    attrstr += "File Data Written through Journal,";
-                if(curinodeflags & 0x2000)
-                    attrstr += "AFS Magic Directory,";
-                if(curinodeflags & 0x1000)
-                    attrstr += "Hashed Indexed Directory,";
-                if(curinodeflags & 0x800)
-                    attrstr += "Encrypted,";
-                if(curinodeflags & 0x400)
-                    attrstr += "No Compression,";
-                if(curinodeflags & 0x200)
-                    attrstr += "Has Compression in 1 or more blocks,";
-                if(curinodeflags & 0x100)
-                    attrstr += "Dirty Compression,";
-                if(curinodeflags & 0x80)
-                    attrstr += "No Update ATIME,";
-                if(curinodeflags & 0x40)
-                    attrstr += "dump utility ignores file,";
-                if(curinodeflags & 0x20)
-                    attrstr += "Append Only,";
-                if(curinodeflags & 0x10)
-                    attrstr += "Immutable,";
-                if(curinodeflags & 0x08)
-                    attrstr += "Synchronous Writes,";
-                if(curinodeflags & 0x04)
-                    attrstr += "Compressed,";
-                if(curinodeflags & 0x02)
-                    attrstr += "Preserved for un-deletion,";
-                if(curinodeflags & 0x01)
-                    attrstr += "Requires Secure Deletion";
-		//if(curinodeflags == 0x00)
-		//    attrstr = "No attributes";
-		if(!attrstr.isEmpty())
-		    out << "File Attributes|" << attrstr << "|Attributes list for the file." << Qt::endl;
-
-                QList<uint32_t> curblklist;
-                curblklist.clear();
-                GetContentBlocks(curimg, curstartsector, blocksize, curinodeoffset, &incompatflags, &curblklist);
-                //qDebug() << "curblklist:" << curblklist;
-                QString curlayout = "";
-                if(curblklist.count() > 0)
-                    curlayout = ConvertBlocksToExtents(curblklist, blocksize);
-		out << "Layout|" << curlayout << "|File layout in offset,size; format." << Qt::endl;
-                //qDebug() << "Curlayout:" << curlayout;
-                quint64 physicalsize = 0;
-                for(int j=0; j < curlayout.split(";", Qt::SkipEmptyParts).count(); j++)
-                {
-                    physicalsize += curlayout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
-                }
-                //int phyblkcnt = physicalsize / blocksize;
-                int phyremcnt = physicalsize % blocksize;
-                if(phyremcnt > 0)
-                    physicalsize += blocksize;
-		out << "Physical Size|" << QString::number(physicalsize) << "|Size of the blocks the file takes up in bytes." << Qt::endl;
-		out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
-
-		//qDebug() << "curlayout:" << curlayout;
-                curblklist.clear();
-		QHash<QString, QVariant> nodedata;
-		nodedata.clear();
-		nodedata.insert("name", QByteArray(filename.toUtf8()).toBase64());
-                nodedata.insert("path", QByteArray(filepath.toUtf8()).toBase64());
-                nodedata.insert("size", logicalsize);
-                nodedata.insert("create", createdate);
-                nodedata.insert("access", accessdate);
-                nodedata.insert("modify", modifydate);
-                //nodedata.insert("status", "0");
-                //nodedata.insert("hash", "0");
-		if(logicalsize > 0) // Get Category/Signature
-		{
-		    if(itemtype == 3 && isdeleted == 0)
-                    {
-			nodedata.insert("cat", "Directory");
-                        nodedata.insert("sig", "Directory");
-                    }
-		    else
-		    {
-			QString catsig = GenerateCategorySignature(curimg, filename, curlayout.split(";").at(0).split(",").at(0).toULongLong());
-			nodedata.insert("cat", catsig.split("/").first());
-                        nodedata.insert("sig", catsig.split("/").last());
-		    }
-		}
-		else
-                {
-		    nodedata.insert("cat", "Empty");
-                    nodedata.insert("sig", "Zero File");
-                }
-		//nodedata.insert("tag", "0");
-                nodedata.insert("id", QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt) + "-f" + QString::number(inodecnt)));
-		//nodedata.insert("match", 0);
-		QString parentstr = QString("e" + curimg->MountPath().split("/").last().split("-e").last() + "-p" + QString::number(ptreecnt));
-		if(parinode > 0)
-		    parentstr += QString("-f" + QString::number(parinode));
-		mutex.lock();
-		treenodemodel->AddNode(nodedata, parentstr, itemtype, isdeleted);
-		mutex.unlock();
-		if(nodedata.value("id").toString().split("-").count() == 3)
-		{
-		    listeditems.append(nodedata.value("id").toString());
-		    filesfound++;
-		    isignals->ProgUpd();
-		}
-		inodecnt++;
-		nodedata.clear();
-		out.flush();
-		fileprop.close();
-                if(filemode & 0x4000) // directory, so recurse
-		{
-		    //qDebug() << "sub dir, should recurse...";
-                    inodecnt = ParseExtDirectory(curimg, curstartsector, ptreecnt, extinode, inodecnt - 1, QString(filepath + filename + "/"), curlayout);
-		}
-            }
-            coffset += newlength;
-        }
-    }
-    return inodecnt;
-}
-*/
 void GetContentBlocks(CurrentItem* currentitem, uint32_t blocksize, uint64_t currentoffset, uint32_t incompatflags, std::vector<uint32_t>* blocklist)
 {
     uint32_t inodeflags = 0;
