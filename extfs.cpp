@@ -65,6 +65,11 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
     ReadForImgContent(currentitem->forimg, &revmaj, currentitem->voloffset + 1100);
     uint16_t revmin = 0;
     ReadForImgContent(currentitem->forimg, &revmin, currentitem->voloffset + 1086);
+    std::string revstr = "";
+    revstr.append(std::to_string(revmaj));
+    revstr.append(".");
+    revstr.append(std::to_string(revmin));
+    float revision = std::stof(revstr);
 
     // CURRENT INODE
     uint64_t currentinode = 2;
@@ -134,9 +139,21 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 	    else
 		newlength = lengthdiv * 4 + 4;
 	    int32_t extinode = 0;
-	    //ReadForImgContent(currentitem->forimg, &extinode, curoff);
+	    uint8_t* einode = uint8_t[4];
+	    currentitem->forimg->ReadContent(&einode, curoff, 4);
+	    int32_t extinode = (int32_t)einode[0] | (int32_t)einode[1] << 8 | (int32_t)einode[2] << 16 | (int32_t)einode[3] << 24;
 	    if(extinode > 0)
 	    {
+		FileItem tmpitem;
+		if(curfileitem == NULL)
+		    tmpitem.path = "/";
+		else
+		    tmpitem.path = curfileitem->path + curfileitem->name + "/";
+		uint16_t namelength = 0;
+		ReadForImgContent(currentitem->forimg, &entrylength, curoff + 4);
+		if(incompatflags & 0x02 || revision > 0.4)
+		{
+		}
 	    }
 	}
     }
@@ -144,40 +161,14 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
      */ 
 }
 /*
-    //qDebug() << "blocklist:" << blocklist;
-    //qDebug() << "dirlayout:" << dirlayout;
     for(int i=0; i < dirlayout.split(";", Qt::SkipEmptyParts).count(); i++)
     {
         bool nextisdeleted = false;
         while(coffset < curdiroffset + curdirlength - 8)
         {
-            uint16_t entrylength = 0;
-            int lengthdiv = (8 + qFromLittleEndian<uint8_t>(curimg->ReadContent(coffset + 6, 1))) / 4;
-            int lengthrem = (8 + qFromLittleEndian<uint8_t>(curimg->ReadContent(coffset + 6, 1))) % 4;
-            int newlength = 0;
-            if(lengthrem == 0)
-                newlength = lengthdiv * 4;
-            else
-                newlength = lengthdiv * 4 + 4;
-            int32_t extinode = qFromLittleEndian<int32_t>(curimg->ReadContent(coffset, 4));
             if(extinode > 0)
             {
-		//qDebug() << "cur coffset:" << coffset;
-		//qDebug() << "extinode:" << extinode;
-                QTextStream out;
-                QFile fileprop(curimg->MountPath() + "/p" + QString::number(ptreecnt) + "/f" + QString::number(inodecnt) + ".prop");
-                if(!fileprop.isOpen())
-                    fileprop.open(QIODevice::Append | QIODevice::Text);
-                out.setDevice(&fileprop);
-
 		out << "EXTFS Inode|" << QString::number(extinode) << "|EXTFS inode value to locate file in the filesystem." << Qt::endl;
-                QString filepath = "/";
-                //quint64 parentinode = 0;
-                if(!parfilename.isEmpty())
-                {
-                    filepath = parfilename;
-                    //parentinode = parinode;
-                }
                 uint16_t namelength = 0;
                 int filetype =  -1;
                 entrylength = qFromLittleEndian<uint16_t>(curimg->ReadContent(coffset + 4, 2));

@@ -19,9 +19,4 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 void GetContentBlocks(CurrentItem* currentitem, uint32_t blocksize, uint64_t currentoffset, uint32_t incompatflags, std::vector<uint32_t>* blocklist);
 std::string ConvertBlocksToExtents(std::vector<uint32_t>* blocklist, uint32_t blocksize);
 
-//void GetContentBlocks(std::ifstream* devicebuffer, uint32_t blocksize, uint64_t curoffset, uint32_t incompatflags, std::vector<uint32_t>* blocklist)
-//std::string ConvertBlocksToExtents(std::vector<uint32_t>* blocklist, uint32_t blocksize)
-
-//void GetContentBlocks(ForImg* curimg, uint32_t curstartsector, uint32_t blocksize, quint64 curoffset, QString* incompatflags, QList<uint32_t>* blocklist)
-
 #endif // EXTFS_H
