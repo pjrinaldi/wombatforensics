@@ -41,7 +41,6 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 	blockgroupcount++;
     if(blockgroupcount == 0)
 	blockgroupcount = 1;
-    //std::string inodeaddresstable = "";
     std::vector<uint32_t> inodeaddresstable;
     inodeaddresstable.clear();
     for(uint i=0; i < blockgroupcount; i++)
@@ -52,7 +51,6 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 	else
 	    ReadForImgContent(currentitem->forimg, &iat, currentitem->voloffset + blocksize + i * grpdescsize + 8);
 	inodeaddresstable.push_back(iat);
-	//inodeaddresstable += std::to_string(iat);
     }
     // ROOT INODE TABLE ADDRESS
     uint32_t rootinodetableaddress = 0;
@@ -73,9 +71,6 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 
     // CURRENT INODE
     uint64_t currentinode = 2;
-    //if(curfileitem == NULL)
-	//currentinode = 2;
-    //else
     if(curfileitem != NULL)
     {
 	std::size_t extinodesplit = curfileitem->properties.find(">");
@@ -187,6 +182,7 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 		    }
 		}
 		uint64_t logicalsize = 0;
+		uint32_t logicsize = 0;
 		uint64_t currentinodeoffset = currentitem->voloffset + currentinodetablestartblock * blocksize + inodesize * (extinode - 1 - blockgroupnumber * blockgroupinodecount);
 		uint16_t filemode = 0;
 		ReadForImgContent(currentitem->forimg, &filemode, currentinodeoffset);
@@ -213,11 +209,15 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 			logicalsize = ((uint64_t)uppersize >> 32) + lowersize;
 		    }
 		    else
-			ReadForImgContent(currentitem->forimg, &logicalsize, currentinodeoffset + 4);
+		    {
+			ReadForImgContent(currentitem->forimg, &logicsize, currentinodeoffset + 4);
+			logicalsize = logicsize;
+		    }
 		}
 		if(filemode & 0x4000) // directory
 		{
-		    ReadForImgContent(currentitem->forimg, &logicalsize, currentinodeoffset + 4);
+		    ReadForImgContent(currentitem->forimg, &logicsize, currentinodeoffset + 4);
+		    logicalsize = logicsize;
 		    filemodestring.replace(0, 1, "d");
 		}
 		if(filemode & 0x100) // user read
@@ -335,10 +335,13 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 		    physicalsize += blocksize;
 		curblocklist.clear();
 		tmpitem.size = logicalsize;
-		tmpitem.properties = std::to_string(extinode) + ">" + filemodestring + ">" + std::to_string(userid) + " / " + std::to_string(groupid) + ">" + ConvertUnixTimeToHuman(deletedate) + ">" + std::to_string(linkcount) + ">" + fileattributes + ">" + tmpitem.layout + ">" + std::to_string(physicalsize) + ">" + std::to_string(logicalsize);
+		std::string deletestr = "";
+		if(deletedate > 0)
+		    deletestr = ConvertUnixTimeToHuman(deletedate);
+		tmpitem.properties = std::to_string(extinode) + ">" + filemodestring + ">" + std::to_string(userid) + " / " + std::to_string(groupid) + ">" + deletestr + ">" + std::to_string(linkcount) + ">" + fileattributes + ">" + tmpitem.layout + ">" + std::to_string(physicalsize) + ">" + std::to_string(logicalsize);
 		if(tmpitem.isdirectory)
 		{
-		    tmpitem.size = physicalsize;
+		    //tmpitem.size = physicalsize;
 		    tmpitem.cat = "Directory";
 		    tmpitem.sig = "Directory";
 		}
@@ -352,7 +355,9 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 			tmpitem.sig = "Empty File";
 		    }
 		}
+		filevector->push_back(tmpitem);
 	    }
+	    curoff += newlength;
 	}
     }
 }

@@ -3939,6 +3939,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
             fileval += FXString(fileitems->at(i).match.c_str()) + "|"; //       15
             fileval += filestr + FXString::value(globalid) + "|"; //		16
 	    fileval += FXString(fileitems->at(i).properties.c_str()) + "|"; //	17
+	    fileval += FXString(fileitems->at(i).change.c_str()) + "|"; //	18
             fileitems->at(i).filename = std::string(filestr.text()) + std::to_string(globalid);
             filefile.writeBlock(fileval.text(), fileval.length());
             filefile.close();
@@ -3995,6 +3996,7 @@ void WombatForensics::SortFileTable(std::vector<FileItem>* fileitems, FXString f
         tablelist->setItemText(i, 5, FXString(fileitems->at(i).create.c_str()));
         tablelist->setItemText(i, 6, FXString(fileitems->at(i).access.c_str()));
         tablelist->setItemText(i, 7, FXString(fileitems->at(i).modify.c_str()));
+	tablelist->setItemText(i, 8, FXString(fileitems->at(i).change.c_str()));
         tablelist->setItemText(i, 9, FXString(fileitems->at(i).hash.c_str()));
         tablelist->setItemText(i, 10, FXString(fileitems->at(i).cat.c_str()));
         tablelist->setItemText(i, 11, FXString(fileitems->at(i).sig.c_str()));
