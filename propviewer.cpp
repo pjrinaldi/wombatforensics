@@ -77,6 +77,8 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    ptpath += "exfat";
 	else if(pname->contains("EXT2") != 0 || pname->contains("EXT3") != 0 || pname->contains("EXT4") != 0)
 	    ptpath += "extfs";
+	else if(pname->contains("NTFS") != 0)
+	    ptpath += "ntfs";
     }
     if(ptype & 0x02)
 	ptpath += "file";

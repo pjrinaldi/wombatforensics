@@ -408,17 +408,25 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 	    uint64_t totalsectors = 0;
 	    ReadForImgContent(curforimg, &totalsectors, offset + 40);
 	    // BYTES PER CLUSTER
-	    uint32_t bytespercluster = bytespersector * sectorspercluster;
+	    uint32_t bytespercluster = bytespersector * (uint)sectorspercluster;
 	    // MFT STARTING CLUSTER
 	    uint64_t mftstartingcluster = 0;
 	    ReadForImgContent(curforimg, &mftstartingcluster, offset + 48);
 	    // MFT STARTING OFFSET
 	    uint64_t mftstartingoffset = offset + mftstartingcluster * bytespercluster;
 	    // MFT ENTRY SIZE
-	    uint8_t mftentrysize = 0;
-	    curforimg->ReadContent(&mftentrysize, offset + 64, 1);
+	    int8_t mftentrysize = 0;
+	    uint8_t mes = 0;
+	    curforimg->ReadContent(&mes, offset + 64, 1);
+	    mftentrysize = (int8_t)mes;
+	    std::cout << "mft entry size: " << (int)mftentrysize << std::endl;
 	    // MFT ENTRY BYTES
-	    uint32_t mftentrybytes = (uint)mftentrysize * bytespercluster;
+	    uint64_t mftentrybytes = 0;
+	    if((int)mftentrysize == -10)
+		mftentrybytes = pow(2, abs((int)mftentrysize));
+	    else
+		mftentrybytes = (uint)mftentrysize * bytespercluster;
+	    std::cout << "mft entry bytes: " << mftentrybytes << std::endl;
 	    // VOLUME SERIAL
 	    uint64_t volserial = 0;
 	    ReadForImgContent(curforimg, &volserial, offset + 72);
@@ -555,9 +563,9 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 			break;
 		}
 	    }
-	    uint64_t mftmaxentries = mftsize / mftentrysize;
+	    uint64_t mftmaxentries = mftsize / mftentrybytes;
 	    // $VOLUME_NAME
-	    uint64_t volnameoffset = mftstartingoffset + (3 * mftentrysize);
+	    uint64_t volnameoffset = mftstartingoffset + (3 * mftentrybytes);
 	    mftentrysignature = NULL;
 	    curforimg->ReadContent((uint8_t*)mftentrysignature, volnameoffset, 4);
 	    mftentrysignature[4] = 0;
@@ -582,6 +590,8 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    ReadForImgContent(curforimg, &attributelength, volnameoffset + curoffset + 4);
 		    if(attributetype == 0x60)
 			break;
+		    if(attributelength == 0 || attributetype == 0xffffffff)
+			break;
 		    curoffset += attributelength;
 		}
 		// VOLUME LABEL LENGTH
@@ -597,7 +607,7 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    volumelabel += (char)singleletter;
 		}
 	    }
-	    properties = std::to_string(bytespersector) + ">" + std::to_string(sectorspercluster) + ">" + std::to_string(totalsectors) + ">" + std::to_string(bytespercluster) + ">" + std::to_string(mftstartingcluster) + ">" + std::to_string(mftstartingoffset) + ">" + std::to_string(mftentrysize) + ">" + std::to_string(mftentrybytes) + ">" + serialstream.str() + ">" + std::to_string(indexrecordsize) + ">" + mftlayout + ">" + std::to_string(mftmaxentries) + ">" + volumelabel;
+	    properties = std::to_string(bytespersector) + ">" + std::to_string((uint)sectorspercluster) + ">" + std::to_string(totalsectors) + ">" + std::to_string(bytespercluster) + ">" + std::to_string(mftstartingcluster) + ">" + std::to_string(mftstartingoffset) + ">" + std::to_string((int)mftentrysize) + ">" + std::to_string(mftentrybytes) + ">" + serialstream.str() + ">" + std::to_string(indexrecordsize) + ">" + mftlayout + ">" + std::to_string(mftmaxentries) + ">" + volumelabel;
 	    volprops->push_back(properties);
 	}
         else
