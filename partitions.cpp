@@ -1,7 +1,5 @@
 #include "partitions.h"
 
-
-
 void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets, std::vector<std::string>* volprops)
 {
     uint16_t mbrsig = 0;
@@ -16,6 +14,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     ReadForImgContent(curforimg, &gptsig, 0);
     if(mbrsig == 0xaa55) // possibly MBR or GPT
     {
+	//std::cout << "possibly mbr or gpt" << std::endl;
         uint8_t gptdif = 0x00;
         curforimg->ReadContent(&gptdif, 450, 1);
         if((uint)gptdif == 0xee) // GPT DISK
@@ -28,6 +27,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
         }
         else // MBR DISK
         {
+	    //std::cout << "mbr disk" << std::endl;
             char* exfattype = new char[6];
             curforimg->ReadContent((uint8_t*)exfattype, 3, 5);
             exfattype[5] = 0;
@@ -43,21 +43,23 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
             char* bfstype = new char[5];
             curforimg->ReadContent((uint8_t*)bfstype, 544, 4);
             bfstype[4] = 0;
-            if(strcmp(exfattype, "EXFAT") == 0 || strcmp(fattype, "FAT12") == 0 || strcmp(fattype, "FAT16") == 0 || strcmp(fat32type, "FAT32") == 0 || strcmp(ntfstype, "NTFS") == 0 || strcmp(bfstype, "1SFB") == 0) // EXFAT | FAT12 | FAT16 | FAT32 | NTFS | BFS W/O PARTITION TABLE
-            {
-		GetVolumeProperties(curforimg, 0, volprops);
-                volnames->push_back(GetFileSystemName(curforimg, 0));
-                volsizes->push_back(curforimg->Size());
-                voloffsets->push_back(0);
-            }
-            //uint8_t ptreecnt = 0;
             int pcount = 0;
             for(int i=0; i < 4; i++)
             {
                 uint32_t partsize = 0;
                 ReadForImgContent(curforimg, &partsize, 458 + i*16);
-                if(partsize > 0)
+                if(partsize > 0 && partsize <= curforimg->Size())
                     pcount++;
+            }
+	    //std::cout << "pcount: " << pcount << std::endl;
+            if(strcmp(exfattype, "EXFAT") == 0 || strcmp(fattype, "FAT12") == 0 || strcmp(fattype, "FAT16") == 0 || strcmp(fat32type, "FAT32") == 0 || strcmp(ntfstype, "NTFS") == 0 || strcmp(bfstype, "1SFB") == 0) // EXFAT | FAT12 | FAT16 | FAT32 | NTFS | BFS W/O PARTITION TABLE
+            {
+		pcount = 0;
+		//std::cout << "ntfs from mbr" << std::endl;
+		GetVolumeProperties(curforimg, 0, volprops);
+                volnames->push_back(GetFileSystemName(curforimg, 0));
+                volsizes->push_back(curforimg->Size());
+                voloffsets->push_back(0);
             }
             for(int i=0; i < pcount; i++)
             {
@@ -108,6 +110,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                 {
                     if(cursize > 0)
                     {
+			//std::cout << "ntfs from mbr partition" << std::endl;
                         // Parse Partition(curforimg, curoffset, cursize, ptreecnt, 1);
 			GetVolumeProperties(curforimg, 0, volprops);
                         volnames->push_back(GetFileSystemName(curforimg, curoffset*512));
@@ -140,10 +143,12 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     }
     else if(gptsig == 0x4546492050415254) // GPT PARTITION
     {
+	//std::cout << "ntfs from gpt partitions" << std::endl;
         LoadGptPartitions(curforimg, volnames, volsizes, voloffsets, volprops);
     }
     else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
     {
+	//std::cout << "ntfs from no partitions" << std::endl;
 	GetVolumeProperties(curforimg, 0, volprops);
         volnames->push_back(GetFileSystemName(curforimg, 0));
         volsizes->push_back(curforimg->Size());
@@ -419,14 +424,12 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 	    uint8_t mes = 0;
 	    curforimg->ReadContent(&mes, offset + 64, 1);
 	    mftentrysize = (int8_t)mes;
-	    std::cout << "mft entry size: " << (int)mftentrysize << std::endl;
 	    // MFT ENTRY BYTES
 	    uint64_t mftentrybytes = 0;
 	    if((int)mftentrysize == -10)
 		mftentrybytes = pow(2, abs((int)mftentrysize));
 	    else
 		mftentrybytes = (uint)mftentrysize * bytespercluster;
-	    std::cout << "mft entry bytes: " << mftentrybytes << std::endl;
 	    // VOLUME SERIAL
 	    uint64_t volserial = 0;
 	    ReadForImgContent(curforimg, &volserial, offset + 72);
@@ -483,7 +486,7 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 				    curforimg->ReadContent(&runinfo, currentrunoffset, 1);
 				    if(runinfo > 0)
 				    {
-					std::bitset<8> runbits(runinfo);
+					std::bitset<8> runbits((uint)runinfo);
 					std::bitset<4> runlengthbits;
 					std::bitset<4> runoffsetbits;
 					for(int j=0; j < 4; j++)
@@ -545,7 +548,7 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 				runoffsets.clear();
 				runlengths.clear();
 			    }
-			    else // RESIDENT
+			    else if(isnonresident == 0) // RESIDENT
 			    {
 				// CONTENT SIZE
 				uint32_t contentsize = 0;
@@ -558,19 +561,22 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 			    }
 			}
 		    }
-		    curoffset += attributelength;
 		    if(attributelength == 0 || attributetype == 0xffffffff)
 			break;
+		    curoffset += attributelength;
 		}
 	    }
+	    //std::cout << "mft layout: " << mftlayout << std::endl;
+	    //std::cout << "mft size: " << mftsize << std::endl;
 	    uint64_t mftmaxentries = mftsize / mftentrybytes;
+	    //std::cout << "mft max entries: " << mftmaxentries << std::endl;
 	    // $VOLUME_NAME
 	    uint64_t volnameoffset = mftstartingoffset + (3 * mftentrybytes);
-	    mftentrysignature = NULL;
-	    curforimg->ReadContent((uint8_t*)mftentrysignature, volnameoffset, 4);
-	    mftentrysignature[4] = 0;
+	    char* mftentrysignature2 = new char[5];
+	    curforimg->ReadContent((uint8_t*)mftentrysignature2, volnameoffset, 4);
+	    mftentrysignature2[4] = 0;
 	    std::string volumelabel = "";
-	    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+	    if(strcmp(mftentrysignature2, "FILE") == 0) // A PROPER MFT ENTRY
 	    {
 		// FIRST ATTRIBUTE OFFSET
 		uint16_t firstattributeoffset = 0;
@@ -607,7 +613,8 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 		    volumelabel += (char)singleletter;
 		}
 	    }
-	    properties = std::to_string(bytespersector) + ">" + std::to_string((uint)sectorspercluster) + ">" + std::to_string(totalsectors) + ">" + std::to_string(bytespercluster) + ">" + std::to_string(mftstartingcluster) + ">" + std::to_string(mftstartingoffset) + ">" + std::to_string((int)mftentrysize) + ">" + std::to_string(mftentrybytes) + ">" + serialstream.str() + ">" + std::to_string(indexrecordsize) + ">" + mftlayout + ">" + std::to_string(mftmaxentries) + ">" + volumelabel;
+	    //std::cout << "volume label: " << volumelabel << std::endl;
+	    properties = std::to_string(bytespersector) + ">" + std::to_string((uint)sectorspercluster) + ">" + std::to_string(totalsectors) + ">" + std::to_string(bytespercluster) + ">" + std::to_string(mftstartingcluster) + ">" + std::to_string(mftstartingoffset) + ">" + std::to_string((int)mftentrysize) + ">" + std::to_string(mftentrybytes) + ">" + serialstream.str() + ">" + std::to_string((uint)indexrecordsize) + ">" + mftlayout + ">" + std::to_string(mftmaxentries) + ">" + volumelabel;
 	    volprops->push_back(properties);
 	}
         else
