@@ -17,6 +17,7 @@
 #include "fat32.h"
 #include "exfat.h"
 #include "extfs.h"
+#include "ntfs.h"
 
 std::string GetFileItem(std::string*, int item);
 std::string SetFileItem(std::string* filecontents, int item, std::string value);

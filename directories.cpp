@@ -149,6 +149,7 @@ void LoadDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevector, 
         }
         else if(std::string(fattype).find("NTFS") != std::string::npos)
         {
+	    LoadNtfsDirectory(currentitem, filevector, curfileitem);
             /*
 	    uint16_t bytespersector = 0;
 	    ReadForImgContent(curforimg, &bytespersector, offset + 11);
