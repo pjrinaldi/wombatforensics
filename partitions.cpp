@@ -398,10 +398,211 @@ void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::st
 	}
         else if(std::string(fattype).find("NTFS") != std::string::npos)
 	{
+	    // BYTES PER SECTOR
+	    uint16_t bytespersector = 0;
+	    ReadForImgContent(curforimg, &bytespersector, offset + 11);
+	    // SECTORS PER CLUSTER
+	    uint8_t sectorspercluster = 0;
+	    curforimg->ReadContent(&sectorspercluster, offset + 13, 1);
+	    // TOTAL SETORS
+	    uint64_t totalsectors = 0;
+	    ReadForImgContent(curforimg, &totalsectors, offset + 40);
+	    // BYTES PER CLUSTER
+	    uint32_t bytespercluster = bytespersector * sectorspercluster;
+	    // MFT STARTING CLUSTER
+	    uint64_t mftstartingcluster = 0;
+	    ReadForImgContent(curforimg, &mftstartingcluster, offset + 48);
+	    // MFT STARTING OFFSET
+	    uint64_t mftstartingoffset = offset + mftstartingcluster * bytespercluster;
+	    // MFT ENTRY SIZE
+	    uint8_t mftentrysize = 0;
+	    curforimg->ReadContent(&mftentrysize, offset + 64, 1);
+	    // MFT ENTRY BYTES
+	    uint32_t mftentrybytes = (uint)mftentrysize * bytespercluster;
+	    // VOLUME SERIAL
+	    uint64_t volserial = 0;
+	    ReadForImgContent(curforimg, &volserial, offset + 72);
+	    std::stringstream serialstream;
+	    serialstream << "0x" << std::setfill('0') << std::setw(sizeof(uint8_t)*2) << std::hex << volserial;
+	    uint8_t indexrecordsize = 0;
+	    curforimg->ReadContent(&indexrecordsize, offset + 68, 1);
+	    // MFT LAYOUT
+	    char* mftentrysignature = new char[5];
+	    curforimg->ReadContent((uint8_t*)mftentrysignature, mftstartingoffset, 4);
+	    mftentrysignature[4] = 0;
+	    std::string mftlayout = "";
+	    uint64_t mftsize = 0;
+	    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+	    {
+		// FIRST ATTRIBUTE OFFSET
+		uint16_t firstattributeoffset = 0;
+		ReadForImgContent(curforimg, &firstattributeoffset, mftstartingoffset + 20);
+		uint16_t curoffset = firstattributeoffset;
+		// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+		while(curoffset < mftentrybytes)
+		{
+		    // IS RESIDENT/NON-RESIDENT
+		    uint8_t isnonresident = 0; // 0 - Resident | 1 - Non-Resident
+		    curforimg->ReadContent(&isnonresident, mftstartingoffset + curoffset + 8, 1);
+		    // ATTRIBUTE LENGTH
+		    uint32_t attributelength = 0;
+		    ReadForImgContent(curforimg, &attributelength, mftstartingoffset + curoffset + 4);
+		    // ATTRIBUTE TYPE
+		    uint32_t attributetype = 0;
+		    ReadForImgContent(curforimg, &attributetype, mftstartingoffset + curoffset);
+		    if(attributetype == 0x80) // DATA ATTRIBUTE
+		    {
+			// ATTRIBUTE NAME LENGTH
+			uint8_t attributenamelength = 0;
+			curforimg->ReadContent(&attributenamelength, mftstartingoffset + curoffset + 9, 1);
+			if(attributenamelength == 0) // DEFAULT DATA ENTRY
+			{
+			    if(isnonresident == 1) // NON-RESIDENT
+			    {
+				// RUN LIST OFFSET
+				uint16_t runlistoffset = 0;
+				ReadForImgContent(curforimg, &runlistoffset, mftstartingoffset + curoffset + 32);
+				uint currentrunoffset = mftstartingoffset + curoffset + runlistoffset;
+				std::vector<uint64_t> runoffsets;
+				std::vector<uint64_t> runlengths;
+				runoffsets.clear();
+				runlengths.clear();
+				int i = 0;
+				while(currentrunoffset < mftstartingoffset + curoffset + attributelength)
+				{
+				    // RUN INFO
+				    uint8_t runinfo = 0;
+				    curforimg->ReadContent(&runinfo, currentrunoffset, 1);
+				    if(runinfo > 0)
+				    {
+					std::bitset<8> runbits(runinfo);
+					std::bitset<4> runlengthbits;
+					std::bitset<4> runoffsetbits;
+					for(int j=0; j < 4; j++)
+					{
+					    runlengthbits.set(j, runbits[j]);
+					    runoffsetbits.set(j, runbits[j+4]);
+					}
+					uint runlengthbytes = runlengthbits.to_ulong();
+					uint runoffsetbytes = runoffsetbits.to_ulong();
+					if(runlengthbytes == 0 && runoffsetbytes == 0)
+					    break;
+					currentrunoffset++;
+					uint64_t runlength = 0;
+					uint64_t runoffset = 0;
+					if(runlengthbytes == 1)
+					{
+					    uint8_t rl = 0;
+					    curforimg->ReadContent(&rl, currentrunoffset, 1);
+					    runlength = (uint)rl;
+					}
+					else
+					{
+					    uint8_t* rl = new uint8_t[runlengthbytes];
+					    curforimg->ReadContent(rl, currentrunoffset, runlengthbytes);
+					    ReturnUint(&runlength, rl, runlengthbytes);
+					}
+					runlengths.push_back(runlength);
+					if(runoffsetbytes == 1)
+					{
+					    uint8_t ro = 0;
+					    curforimg->ReadContent(&ro, currentrunoffset + runlengthbytes, 1);
+					    runoffset = (uint)ro;
+					}
+					else
+					{
+					    uint8_t* ro = new uint8_t[runoffsetbytes];
+					    curforimg->ReadContent(ro, currentrunoffset + runlengthbytes, runoffsetbytes);
+					    ReturnUint(&runoffset, ro, runoffsetbytes);
+					}
+					if(i > 0)
+					{
+					    std::bitset<8> runoffsetbits(runoffset);
+					    if(i > 1 && runoffsetbits[0] == 1)
+						runoffset = runoffset - 0xffffffff - 1;
+					    runoffset = runoffset + runoffsets.at(i-1);
+					}
+					runoffsets.push_back(runoffset);
+					i++;
+					currentrunoffset += runlengthbytes + runoffsetbytes;
+				    }
+				    else
+					break;
+				}
+				for(int i=0; i < runoffsets.size(); i++)
+				{
+				    mftlayout += std::to_string(runoffsets.at(i) * bytespercluster) + "," + std::to_string(runlengths.at(i) * bytespercluster) + ";";
+				    mftsize += runlengths.at(i) * bytespercluster;
+				}
+				runoffsets.clear();
+				runlengths.clear();
+			    }
+			    else // RESIDENT
+			    {
+				// CONTENT SIZE
+				uint32_t contentsize = 0;
+				ReadForImgContent(curforimg, &contentsize, mftstartingoffset + curoffset + 16);
+				// CONTENT OFFSET
+				uint16_t contentoffset = 0;
+				ReadForImgContent(curforimg, &contentoffset, mftstartingoffset + curoffset + 20);
+				mftlayout = std::to_string(mftstartingoffset + curoffset + contentoffset) + "," + std::to_string(contentsize) + ";";
+				mftsize = contentsize;
+			    }
+			}
+		    }
+		    curoffset += attributelength;
+		    if(attributelength == 0 || attributetype == 0xffffffff)
+			break;
+		}
+	    }
+	    uint64_t mftmaxentries = mftsize / mftentrysize;
+	    // $VOLUME_NAME
+	    uint64_t volnameoffset = mftstartingoffset + (3 * mftentrysize);
+	    mftentrysignature = NULL;
+	    curforimg->ReadContent((uint8_t*)mftentrysignature, volnameoffset, 4);
+	    mftentrysignature[4] = 0;
+	    std::string volumelabel = "";
+	    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+	    {
+		// FIRST ATTRIBUTE OFFSET
+		uint16_t firstattributeoffset = 0;
+		ReadForImgContent(curforimg, &firstattributeoffset, volnameoffset + 20);
+		uint16_t curoffset = firstattributeoffset;
+		// ATTRIBUTE COUNT
+		uint16_t attributecount = 0;
+		ReadForImgContent(curforimg, &attributecount, volnameoffset + 40);
+		// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+		for(int i=0; i < attributecount; i++)
+		{
+		    // ATTRIBUTE TYPE
+		    uint32_t attributetype = 0;
+		    ReadForImgContent(curforimg, &attributetype, volnameoffset + curoffset);
+		    // ATTRIBUTE LENGTH
+		    uint32_t attributelength = 0;
+		    ReadForImgContent(curforimg, &attributelength, volnameoffset + curoffset + 4);
+		    if(attributetype == 0x60)
+			break;
+		    curoffset += attributelength;
+		}
+		// VOLUME LABEL LENGTH
+		uint32_t vollabellength = 0;
+		ReadForImgContent(curforimg, &vollabellength, volnameoffset + curoffset + 16);
+		// VOLUME LABEL OFFSET
+		uint16_t vollabeloffset = 0;
+		ReadForImgContent(curforimg, &vollabeloffset, volnameoffset + curoffset + 20);
+		for(uint k=0; k < vollabellength/2; k++)
+		{
+		    uint16_t singleletter = 0;
+		    ReadForImgContent(curforimg, &singleletter, volnameoffset + curoffset + vollabeloffset + k*2);
+		    volumelabel += (char)singleletter;
+		}
+	    }
+	    properties = std::to_string(bytespersector) + ">" + std::to_string(sectorspercluster) + ">" + std::to_string(totalsectors) + ">" + std::to_string(bytespercluster) + ">" + std::to_string(mftstartingcluster) + ">" + std::to_string(mftstartingoffset) + ">" + std::to_string(mftentrysize) + ">" + std::to_string(mftentrybytes) + ">" + serialstream.str() + ">" + std::to_string(indexrecordsize) + ">" + mftlayout + ">" + std::to_string(mftmaxentries) + ">" + volumelabel;
+	    volprops->push_back(properties);
 	}
         else
 	{
-            char* pname = new char[12];
+            //char* pname = new char[12];
             curforimg->ReadContent((uint8_t*)fattype, offset + 54, 5);
             if(strcmp(fattype, "FAT12") == 0)
 	    {

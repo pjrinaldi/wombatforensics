@@ -125,7 +125,7 @@ void ReadInteger(uint8_t* arr, int begin, uint16_t* val, bool isbigendian=false)
 void ReadInteger(uint8_t* arr, int begin, uint32_t* val, bool isbigendian=false);
 void ReadInteger(uint8_t* arr, int begin, uint64_t* val, bool isbigendian=false);
 
-//void ReturnUint(uint64_t* tmp, uint8_t* tmp8, unsigned int length);
+void ReturnUint(uint64_t* tmp, uint8_t* tmp8, unsigned int length);
 //void ReturnInt(int64_t* tmp, int8_t* tmp8, unsigned int length);
 
 void GenerateCategorySignature(CurrentItem* currentitem, std::string* filename, std::string* layout, std::string* cat, std::string* sig);
