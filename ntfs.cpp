@@ -30,7 +30,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
     std::string mftlayout = "";
     uint64_t mftsize = 0;
     GetDataAttributeLayout(currentitem->forimg, bytespercluster, mftentrybytes, mftstartingoffset, &mftlayout); 
-    std::cout << "mft layout: " << mftlayout << std::endl;
+    //std::cout << "mft layout: " << mftlayout << std::endl;
     // CURRENT INODE
     uint64_t currentinode = 5;
     if(curfileitem != NULL)
@@ -56,9 +56,9 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 	std::size_t layoutsplit = mftlayoutlist.at(i).find(",");
 	mftsize += std::stoull(mftlayoutlist.at(i).substr(layoutsplit+1));
     }
-    std::cout << "MFT Size: " << mftsize << std::endl;
+    //std::cout << "MFT Size: " << mftsize << std::endl;
     uint64_t maxmftentrycount = mftsize / mftentrybytes;
-    std::cout << "Max MFT Entry Count: " << maxmftentrycount << std::endl;
+    //std::cout << "Max MFT Entry Count: " << maxmftentrycount << std::endl;
     for(int i=0; i < mftlayoutlist.size(); i++)
     {
         std::size_t layoutsplit = mftlayoutlist.at(i).find(",");
@@ -72,11 +72,11 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
     }
     // DIRECTORIES MFT ENTRY OFFSET TO THE CONTENT
     mftentryoffset = mftoffset + relativentinode * mftentrysize * bytespercluster;
-    std::cout << "relativentinode: " << relativentinode << std::endl;
-    std::cout << "mftentryoffset: " << mftentryoffset << std::endl;
+    //std::cout << "relativentinode: " << relativentinode << std::endl;
+    //std::cout << "mftentryoffset: " << mftentryoffset << std::endl;
     std::string indexlayout = "";
     GetIndexAttributeLayout(currentitem->forimg, bytespercluster, mftentrybytes, mftentryoffset, &indexlayout); 
-    std::cout << "index layout: " << indexlayout << std::endl;
+    //std::cout << "index layout: " << indexlayout << std::endl;
     // PARSE INDEX ROOT AND ALLOCATION TO DETERMINE THE DIR/FILE NAME/INODE AND SEE IF THEY MATCH
     std::vector<std::string> indexlayoutlist;
     indexlayoutlist.clear();
@@ -94,7 +94,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 	{
 	    // INDEX RECORD SIZE
 	    ReadForImgContent(currentitem->forimg, &indexrecordsize, indexoffset + 8);
-	    std::cout << "Index Record Size: " << indexrecordsize << std::endl;
+	    //std::cout << "Index Record Size: " << indexrecordsize << std::endl;
 	    // STARTING OFFSET
 	    uint32_t startingoffset = 0;
 	    ReadForImgContent(currentitem->forimg, &startingoffset, indexoffset + 16);
@@ -125,7 +125,8 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 		    break;
 		else
 		{
-		    if(indexentrylength > 0 && filenamelength > 66 && filenamelength < indexentrylength)
+		    //if(indexentrylength > 0 && filenamelength > 66 && filenamelength < indexentrylength)
+		    if(indexentrylength > 0 && filenamelength > 66 && filenamelength < indexentrylength && indexentrylength % 4 == 0)
 		    {
 			// I30 SEQUENCE ID
 			uint16_t i30sequenceid = 0;
@@ -161,15 +162,58 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    filename += (char)singleletter;
 				}
 				std::cout << "File Name: " << filename << std::endl;
-				/*
-                                if(filename.compare(childpath) == 0)
-                                    return childntinode;
-				*/
+				if(filename.compare(".") != 0 && filename.compare("..") != 0 && !filename.empty())
+				{
+				    //std::cout << "indexroot valid file, parse what i need from it." << std::endl;
+				    uint8_t* pnti = new uint8_t[6];
+				    uint64_t parentntinode = 0;
+				    currentitem->forimg->ReadContent(pnti, indexoffset + 16 + curpos, 6);
+				    ReturnUint(&parentntinode, pnti, 6);
+				    delete[] pnti;
+				    parentntinode = parentntinode & 0x00ffffffffffffff;
+				    std::cout << "Parent NT Inode: " << parentntinode << std::endl;
+				    uint16_t i30parentsequenceid = 0;
+				    ReadForImgContent(currentitem->forimg, &i30parentsequenceid, indexoffset + 16 + curpos + 6);
+				    std::cout << "i30 parent sequence id: " << i30parentsequenceid << std::endl;
+				    // I30 CREATE DATE TIME
+				    uint64_t i30create = 0;
+				    ReadForImgContent(currentitem->forimg, &i30create, indexoffset + 16 + curpos + 8);
+				    std::cout << "i30 create: " << ConvertWindowsTimeToUnixTimeUTC(i30create) << std::endl; 
+				    // I30 MODIFY DATE TIME
+				    uint64_t i30modify = 0;
+				    ReadForImgContent(currentitem->forimg, &i30modify, indexoffset + 16 + curpos + 16);
+				    std::cout << "i30 modify: " << ConvertWindowsTimeToUnixTimeUTC(i30modify) << std::endl;
+				    // I30 STATUS DATE TIME
+				    uint64_t i30status = 0;
+				    ReadForImgContent(currentitem->forimg, &i30status, indexoffset + 16 + curpos + 24);
+				    std::cout << "i30 status: " << ConvertWindowsTimeToUnixTimeUTC(i30status) << std::endl;
+				    // I30 ACCESS DATE TIME
+				    uint64_t i30access = 0;
+				    ReadForImgContent(currentitem->forimg, &i30access, indexoffset + 16 + curpos + 32);
+				    std::cout << "i30 access: " << ConvertWindowsTimeToUnixTimeUTC(i30access) << std::endl;
+				    if(parentntinode <= maxmftentrycount)
+				    {
+					std::cout << "Get MFT Entry Content for current file";
+				    }
+				}
+		/*
+		    if(parntinode <= maxmftentries)
+		    {
+			if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+			{
+			    //qDebug() << "indxroot: do nothing because ntinode already parsed and sequence id is equal.";
+			}
+			else
+			    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parseqid, i30create, i30modify, i30status, i30access, curpos, indxrootoffset + 16 + startoffset + endoffset, dirntinodehash, ntinodehash);
+		    }
+		*/
 			    }
 			}
+			curpos += indexentrylength - 16;
 		    }
+		    else
+			curpos = curpos + 4;
 		}
-		curpos += indexentrylength;
 	    }
 	}
 	else // $INDEX_ALLOCATION
@@ -189,7 +233,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 		ReadForImgContent(currentitem->forimg, &endoffset, curpos + 28);
                 //std::cout << "End Offset: " << endoffset << std::endl;
                 curpos = curpos + 24 + startoffset + j*indexrecordsize;
-		std::cout << "before while loop - curpos: " << curpos << " indexsize: " << indexoffset + j*indexrecordsize + indexrecordsize << std::endl;
+		//std::cout << "before while loop - curpos: " << curpos << " indexsize: " << indexoffset + j*indexrecordsize + indexrecordsize << std::endl;
                 while(curpos < indexoffset + j*indexrecordsize + indexrecordsize)
                 {
 		    //std::cout << "Cur Pos: " << curpos << std::endl;
@@ -201,7 +245,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 		    uint16_t filenamelength = 0;
 		    ReadForImgContent(currentitem->forimg, &filenamelength, curpos + 10);
 		    //std::cout << "File Name Attribute Length: " << filenamelength << std::endl;
-		    if(indexentrylength > 0 && filenamelength > 66 && filenamelength < indexentrylength)
+		    if(indexentrylength > 0 && filenamelength > 66 && filenamelength < indexentrylength && indexentrylength % 4 == 0)
 		    {
 			// I30 SEQUENCE ID
 			uint16_t i30sequenceid = 0;
@@ -213,8 +257,9 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 			currentitem->forimg->ReadContent(cni, curpos, 6);
 			ReturnUint(&childntinode, cni, 6);
 			delete[] cni;
+			std::cout << "child nt inode: " << childntinode << std::endl;
 			childntinode = childntinode & 0x00ffffffffffffff;
-			//std::cout << "Child NT Inode: " << childntinode << std::endl;
+			std::cout << "Child NT Inode: " << childntinode << std::endl;
 			if(childntinode <= maxmftentrycount)
 			{
                             curpos = curpos + 16; // STARTING ON FILE_NAME ATTRIBUTE
@@ -237,10 +282,58 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    filename += (char)singleletter;
 				}
                                 std::cout << "File Name: " << filename << std::endl;
+				if(filename.compare(".") != 0 && filename.compare("..") != 0 && !filename.empty())
+				{
+				    uint8_t* pnti = new uint8_t[6];
+				    uint64_t parentntinode = 0;
+				    currentitem->forimg->ReadContent(pnti, curpos + 16, 6);
+				    ReturnUint(&parentntinode, pnti, 6);
+				    delete[] pnti;
+				    std::cout << "parent nt inode: " << parentntinode << std::endl;
+				    parentntinode = parentntinode & 0x00ffffffffffffff;
+				    std::cout << "Parent NT Inode: " << parentntinode << std::endl;
+				    uint16_t i30parentsequenceid = 0;
+				    ReadForImgContent(currentitem->forimg, &i30parentsequenceid, curpos + 16 + 6);
+				    std::cout << "i30 parent sequence id: " << i30parentsequenceid << std::endl;
+				    // I30 CREATE DATE TIME
+				    uint64_t i30create = 0;
+				    ReadForImgContent(currentitem->forimg, &i30create, curpos + 16 + 8);
+				    std::cout << "i30 create: " << ConvertWindowsTimeToUnixTimeUTC(i30create) << std::endl; 
+				    // I30 MODIFY DATE TIME
+				    uint64_t i30modify = 0;
+				    ReadForImgContent(currentitem->forimg, &i30modify, curpos + 16 + 16);
+				    std::cout << "i30 modify: " << ConvertWindowsTimeToUnixTimeUTC(i30modify) << std::endl;
+				    // I30 STATUS DATE TIME
+				    uint64_t i30status = 0;
+				    ReadForImgContent(currentitem->forimg, &i30status, curpos + 16 + 24);
+				    std::cout << "i30 status: " << ConvertWindowsTimeToUnixTimeUTC(i30status) << std::endl;
+				    // I30 ACCESS DATE TIME
+				    uint64_t i30access = 0;
+				    ReadForImgContent(currentitem->forimg, &i30access, curpos + 16 + 32);
+				    std::cout << "i30 access: " << ConvertWindowsTimeToUnixTimeUTC(i30access) << std::endl;
+				    if(parentntinode <= maxmftentrycount)
+				    {
+					std::cout << "Get MFT Entry Content for current file";
+				    }
+				}
+		/*              
+    if(parntinode <= maxmftentries)
+    {
+	if(ntinodehash->contains(ntinode) && ntinodehash->value(ntinode) == i30seqid)
+	{
+	    //if(parentntinode == 7797)
+		//qDebug() << "indxalloc: do nothing because ntinode already parsed and sequence is equal.";
+	}
+	else
+	    inodecnt = GetMftEntryContent(curimg, curstartsector, ptreecnt, ntinode, parentntinode, parntinode, mftlayout, mftentrybytes, bytespercluster, inodecnt, filename, parinode, parfilename, i30seqid, i30parentsequenceid, i30create, i30modify, i30change, i30access, curpos, indxallocoffset.at(i) * bytespercluster + 24 + startoffset + j*indxrecordsize + endoffset, dirntinodehash, ntinodehash);
+    }
+		*/
 			    }
 			}
+			curpos += indexentrylength - 16;
 		    }
-		    curpos += indexentrylength - 16;
+		    else
+			curpos = curpos + 4;
 		}
 	    }
 	}
