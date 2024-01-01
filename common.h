@@ -31,6 +31,7 @@
 #include "blake3/blake3.h"
 #include "forensicimage.h"
 #include "fatcommon.h"
+#include "ntfscommon.h"
 
 #define DTTMFMT "%F %T %z"
 #define DTTMSZ 35
