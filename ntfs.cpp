@@ -286,30 +286,30 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				{
 				    uint8_t* pnti = new uint8_t[6];
 				    uint64_t parentntinode = 0;
-				    currentitem->forimg->ReadContent(pnti, curpos + 16, 6);
+				    currentitem->forimg->ReadContent(pnti, curpos, 6);
 				    ReturnUint(&parentntinode, pnti, 6);
 				    delete[] pnti;
 				    std::cout << "parent nt inode: " << parentntinode << std::endl;
 				    parentntinode = parentntinode & 0x00ffffffffffffff;
 				    std::cout << "Parent NT Inode: " << parentntinode << std::endl;
 				    uint16_t i30parentsequenceid = 0;
-				    ReadForImgContent(currentitem->forimg, &i30parentsequenceid, curpos + 16 + 6);
+				    ReadForImgContent(currentitem->forimg, &i30parentsequenceid, curpos + 6);
 				    std::cout << "i30 parent sequence id: " << i30parentsequenceid << std::endl;
 				    // I30 CREATE DATE TIME
 				    uint64_t i30create = 0;
-				    ReadForImgContent(currentitem->forimg, &i30create, curpos + 16 + 8);
+				    ReadForImgContent(currentitem->forimg, &i30create, curpos + 8);
 				    std::cout << "i30 create: " << ConvertWindowsTimeToUnixTimeUTC(i30create) << std::endl; 
 				    // I30 MODIFY DATE TIME
 				    uint64_t i30modify = 0;
-				    ReadForImgContent(currentitem->forimg, &i30modify, curpos + 16 + 16);
+				    ReadForImgContent(currentitem->forimg, &i30modify, curpos + 16);
 				    std::cout << "i30 modify: " << ConvertWindowsTimeToUnixTimeUTC(i30modify) << std::endl;
 				    // I30 STATUS DATE TIME
 				    uint64_t i30status = 0;
-				    ReadForImgContent(currentitem->forimg, &i30status, curpos + 16 + 24);
+				    ReadForImgContent(currentitem->forimg, &i30status, curpos + 24);
 				    std::cout << "i30 status: " << ConvertWindowsTimeToUnixTimeUTC(i30status) << std::endl;
 				    // I30 ACCESS DATE TIME
 				    uint64_t i30access = 0;
-				    ReadForImgContent(currentitem->forimg, &i30access, curpos + 16 + 32);
+				    ReadForImgContent(currentitem->forimg, &i30access, curpos + 32);
 				    std::cout << "i30 access: " << ConvertWindowsTimeToUnixTimeUTC(i30access) << std::endl;
 				    if(parentntinode <= maxmftentrycount)
 				    {
