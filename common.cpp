@@ -194,6 +194,20 @@ std::string ConvertWindowsTimeToUnixTimeUTC(uint64_t input)
     return timestr;
 }
 
+/*
+std::string ConvertNtfsTimeToHuman(uint64_t ntfstime)
+{
+    uint64_t tmp = ntfstime / 10000000; // convert from 100ns intervals to seconds
+    tmp = tmp - 11644473600LL; // subtract number of seconds between epochs
+    time_t timet = (time_t)((uint32_t)tmp);
+    struct tm* tmtime = gmtime(&timet);
+    char hchar[100];
+    strftime(hchar, 100, "%m/%d/%Y %I:%M:%S %p UTC", tmtime);
+    
+    return std::string(hchar);
+}
+*/
+
 bool ConvertHeifToPng(std::string* heifstr)
 {
     try

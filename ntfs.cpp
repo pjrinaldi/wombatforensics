@@ -38,6 +38,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 	currentinode = std::stoull(curfileitem->properties.substr(0, ntinodesplit));
     }
     std::cout << "curitem nt inode: " << currentinode << std::endl;
+    // GET DIRECTORIES MFT ENTRY
     std::vector<std::string> mftlayoutlist;
     mftlayoutlist.clear();
     std::istringstream mll(mftlayout);
@@ -60,5 +61,9 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
             relativentinode = relativentinode - curmaxntinode;
     }
     mftentryoffset = mftoffset + relativentinode * mftentrysize * bytespercluster;
+    std::cout << "relativentinode: " << relativentinode << std::endl;
     std::cout << "mftentryoffset: " << mftentryoffset << std::endl;
+    std::string indexlayout = "";
+    GetIndexAttributeLayout(currentitem->forimg, bytespercluster, mftentrybytes, mftentryoffset, &indexlayout); 
+    //std::string indexlayout = GetIndexAttributesLayout(rawcontent, curnt, mftentryoffset);
 }
