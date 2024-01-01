@@ -1,57 +1,51 @@
 #include "ntfscommon.h"
 
-//std::string GetDataAttributeLayout(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t mftoffset)
-void GetDataAttributeLayout(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, std::string* layout) 
+void GetDataAttributeLayout(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, std::string* layout) 
 {
-
-    /*
-    // MFT LAYOUT
     char* mftentrysignature = new char[5];
-    curforimg->ReadContent((uint8_t*)mftentrysignature, mftstartingoffset, 4);
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
     mftentrysignature[4] = 0;
-    std::string mftlayout = "";
-    uint64_t mftsize = 0;
     if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
     {
 	// FIRST ATTRIBUTE OFFSET
 	uint16_t firstattributeoffset = 0;
-	ReadForImgContent(curforimg, &firstattributeoffset, mftstartingoffset + 20);
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
 	uint16_t curoffset = firstattributeoffset;
 	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
 	while(curoffset < mftentrybytes)
 	{
 	    // IS RESIDENT/NON-RESIDENT
 	    uint8_t isnonresident = 0; // 0 - Resident | 1 - Non-Resident
-	    curforimg->ReadContent(&isnonresident, mftstartingoffset + curoffset + 8, 1);
+	    curimg->ReadContent(&isnonresident, offset + curoffset + 8, 1);
 	    // ATTRIBUTE LENGTH
 	    uint32_t attributelength = 0;
-	    ReadForImgContent(curforimg, &attributelength, mftstartingoffset + curoffset + 4);
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
 	    // ATTRIBUTE TYPE
 	    uint32_t attributetype = 0;
-	    ReadForImgContent(curforimg, &attributetype, mftstartingoffset + curoffset);
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
 	    if(attributetype == 0x80) // DATA ATTRIBUTE
 	    {
 		// ATTRIBUTE NAME LENGTH
 		uint8_t attributenamelength = 0;
-		curforimg->ReadContent(&attributenamelength, mftstartingoffset + curoffset + 9, 1);
+		curimg->ReadContent(&attributenamelength, offset + curoffset + 9, 1);
 		if(attributenamelength == 0) // DEFAULT DATA ENTRY
 		{
 		    if(isnonresident == 1) // NON-RESIDENT
 		    {
 			// RUN LIST OFFSET
 			uint16_t runlistoffset = 0;
-			ReadForImgContent(curforimg, &runlistoffset, mftstartingoffset + curoffset + 32);
-			uint currentrunoffset = mftstartingoffset + curoffset + runlistoffset;
+			ReadForImgContent(curimg, &runlistoffset, offset + curoffset + 32);
+			uint currentrunoffset = offset + curoffset + runlistoffset;
 			std::vector<uint64_t> runoffsets;
 			std::vector<uint64_t> runlengths;
 			runoffsets.clear();
 			runlengths.clear();
 			int i = 0;
-			while(currentrunoffset < mftstartingoffset + curoffset + attributelength)
+			while(currentrunoffset < offset + curoffset + attributelength)
 			{
 			    // RUN INFO
 			    uint8_t runinfo = 0;
-			    curforimg->ReadContent(&runinfo, currentrunoffset, 1);
+			    curimg->ReadContent(&runinfo, currentrunoffset, 1);
 			    if(runinfo > 0)
 			    {
 				std::bitset<8> runbits((uint)runinfo);
@@ -72,26 +66,26 @@ void GetDataAttributeLayout(ForImg* curimg, uint64_t mftentrybytes, uint64_t off
 				if(runlengthbytes == 1)
 				{
 				    uint8_t rl = 0;
-				    curforimg->ReadContent(&rl, currentrunoffset, 1);
+				    curimg->ReadContent(&rl, currentrunoffset, 1);
 				    runlength = (uint)rl;
 				}
 				else
 				{
 				    uint8_t* rl = new uint8_t[runlengthbytes];
-				    curforimg->ReadContent(rl, currentrunoffset, runlengthbytes);
+				    curimg->ReadContent(rl, currentrunoffset, runlengthbytes);
 				    ReturnUint(&runlength, rl, runlengthbytes);
 				}
 				runlengths.push_back(runlength);
 				if(runoffsetbytes == 1)
 				{
 				    uint8_t ro = 0;
-				    curforimg->ReadContent(&ro, currentrunoffset + runlengthbytes, 1);
+				    curimg->ReadContent(&ro, currentrunoffset + runlengthbytes, 1);
 				    runoffset = (uint)ro;
 				}
 				else
 				{
 				    uint8_t* ro = new uint8_t[runoffsetbytes];
-				    curforimg->ReadContent(ro, currentrunoffset + runlengthbytes, runoffsetbytes);
+				    curimg->ReadContent(ro, currentrunoffset + runlengthbytes, runoffsetbytes);
 				    ReturnUint(&runoffset, ro, runoffsetbytes);
 				}
 				if(i > 0)
@@ -110,8 +104,8 @@ void GetDataAttributeLayout(ForImg* curimg, uint64_t mftentrybytes, uint64_t off
 			}
 			for(int i=0; i < runoffsets.size(); i++)
 			{
-			    mftlayout += std::to_string(runoffsets.at(i) * bytespercluster) + "," + std::to_string(runlengths.at(i) * bytespercluster) + ";";
-			    mftsize += runlengths.at(i) * bytespercluster;
+			    *layout += std::to_string(runoffsets.at(i) * bytespercluster) + "," + std::to_string(runlengths.at(i) * bytespercluster) + ";";
+			    //mftsize += runlengths.at(i) * bytespercluster;
 			}
 			runoffsets.clear();
 			runlengths.clear();
@@ -120,12 +114,12 @@ void GetDataAttributeLayout(ForImg* curimg, uint64_t mftentrybytes, uint64_t off
 		    {
 			// CONTENT SIZE
 			uint32_t contentsize = 0;
-			ReadForImgContent(curforimg, &contentsize, mftstartingoffset + curoffset + 16);
+			ReadForImgContent(curimg, &contentsize, offset + curoffset + 16);
 			// CONTENT OFFSET
 			uint16_t contentoffset = 0;
-			ReadForImgContent(curforimg, &contentoffset, mftstartingoffset + curoffset + 20);
-			mftlayout = std::to_string(mftstartingoffset + curoffset + contentoffset) + "," + std::to_string(contentsize) + ";";
-			mftsize = contentsize;
+			ReadForImgContent(curimg, &contentoffset, offset + curoffset + 20);
+			*layout = std::to_string(offset + curoffset + contentoffset) + "," + std::to_string(contentsize) + ";";
+			//mftsize = contentsize;
 		    }
 		}
 	    }
@@ -134,8 +128,6 @@ void GetDataAttributeLayout(ForImg* curimg, uint64_t mftentrybytes, uint64_t off
 	    curoffset += attributelength;
 	}
     }
-    std::cout << "mft layout: " << mftlayout << std::endl;
-    uint64_t mftmaxentries = mftsize / mftentrybytes;
-
-     */ 
+    //std::cout << "layout: " << *layout << std::endl;
+    //uint64_t mftmaxentries = mftsize / mftentrybytes;
 }
