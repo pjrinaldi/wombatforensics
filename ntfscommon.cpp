@@ -32,84 +32,7 @@ void GetDataAttributeLayout(ForImg* curimg, uint32_t bytespercluster, uint64_t m
 		{
 		    if(isnonresident == 1) // NON-RESIDENT
 		    {
-			// RUN LIST OFFSET
-                        //GetRunListLayout(rawcontent, curnt, mftoffset + curoffset, attributelength, &runliststr);
-			uint16_t runlistoffset = 0;
-			ReadForImgContent(curimg, &runlistoffset, offset + curoffset + 32);
-			uint currentrunoffset = offset + curoffset + runlistoffset;
-			std::vector<uint64_t> runoffsets;
-			std::vector<uint64_t> runlengths;
-			runoffsets.clear();
-			runlengths.clear();
-			int i = 0;
-			while(currentrunoffset < offset + curoffset + attributelength)
-			{
-			    // RUN INFO
-			    uint8_t runinfo = 0;
-			    curimg->ReadContent(&runinfo, currentrunoffset, 1);
-			    if(runinfo > 0)
-			    {
-				std::bitset<8> runbits((uint)runinfo);
-				std::bitset<4> runlengthbits;
-				std::bitset<4> runoffsetbits;
-				for(int j=0; j < 4; j++)
-				{
-				    runlengthbits.set(j, runbits[j]);
-				    runoffsetbits.set(j, runbits[j+4]);
-				}
-				uint runlengthbytes = runlengthbits.to_ulong();
-				uint runoffsetbytes = runoffsetbits.to_ulong();
-				if(runlengthbytes == 0 && runoffsetbytes == 0)
-				    break;
-				currentrunoffset++;
-				uint64_t runlength = 0;
-				uint64_t runoffset = 0;
-				if(runlengthbytes == 1)
-				{
-				    uint8_t rl = 0;
-				    curimg->ReadContent(&rl, currentrunoffset, 1);
-				    runlength = (uint)rl;
-				}
-				else
-				{
-				    uint8_t* rl = new uint8_t[runlengthbytes];
-				    curimg->ReadContent(rl, currentrunoffset, runlengthbytes);
-				    ReturnUint(&runlength, rl, runlengthbytes);
-				}
-				runlengths.push_back(runlength);
-				if(runoffsetbytes == 1)
-				{
-				    uint8_t ro = 0;
-				    curimg->ReadContent(&ro, currentrunoffset + runlengthbytes, 1);
-				    runoffset = (uint)ro;
-				}
-				else
-				{
-				    uint8_t* ro = new uint8_t[runoffsetbytes];
-				    curimg->ReadContent(ro, currentrunoffset + runlengthbytes, runoffsetbytes);
-				    ReturnUint(&runoffset, ro, runoffsetbytes);
-				}
-				if(i > 0)
-				{
-				    std::bitset<8> runoffsetbits(runoffset);
-				    if(i > 1 && runoffsetbits[0] == 1)
-					runoffset = runoffset - 0xffffffff - 1;
-				    runoffset = runoffset + runoffsets.at(i-1);
-				}
-				runoffsets.push_back(runoffset);
-				i++;
-				currentrunoffset += runlengthbytes + runoffsetbytes;
-			    }
-			    else
-				break;
-			}
-			for(int i=0; i < runoffsets.size(); i++)
-			{
-			    *layout += std::to_string(runoffsets.at(i) * bytespercluster) + "," + std::to_string(runlengths.at(i) * bytespercluster) + ";";
-			    //mftsize += runlengths.at(i) * bytespercluster;
-			}
-			runoffsets.clear();
-			runlengths.clear();
+			GetRunListLayout(curimg, offset + curoffset, bytespercluster, attributelength, layout);
 		    }
 		    else if(isnonresident == 0) // RESIDENT
 		    {
@@ -120,7 +43,6 @@ void GetDataAttributeLayout(ForImg* curimg, uint32_t bytespercluster, uint64_t m
 			uint16_t contentoffset = 0;
 			ReadForImgContent(curimg, &contentoffset, offset + curoffset + 20);
 			*layout = std::to_string(offset + curoffset + contentoffset) + "," + std::to_string(contentsize) + ";";
-			//mftsize = contentsize;
 		    }
 		}
 	    }
@@ -129,194 +51,134 @@ void GetDataAttributeLayout(ForImg* curimg, uint32_t bytespercluster, uint64_t m
 	    curoffset += attributelength;
 	}
     }
-    //std::cout << "layout: " << *layout << std::endl;
-    //uint64_t mftmaxentries = mftsize / mftentrybytes;
 }
 
 void GetIndexAttributeLayout(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, std::string* indexlayout)
 {
-}
-
-/*
-std::string GetIndexAttributesLayout(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t mftentryoffset)
-{
-    std::string indexlayout = "";
-    uint8_t* mes = new uint8_t[5];
-    ReadContent(rawcontent, mes, mftentryoffset, 4);
-    mes[4] = '\0';
-    std::string mestr((char*)mes);
-    delete[] mes;
-    //std::cout << "MFT Entry 0 Signature: " << me0str << std::endl;
-    if(mestr.compare("FILE") == 0) // A PROPER MFT ENTRY
+    char* mftentrysignature = new char[5];
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
+    mftentrysignature[4] = 0;
+    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
     {
-        // OFFSET TO THE FIRST ATTRIBUTE
-        uint8_t* fao = new uint8_t[2];
-        uint16_t firstattributeoffset = 0;
-        ReadContent(rawcontent, fao, mftentryoffset + 20, 2);
-        ReturnUint16(&firstattributeoffset, fao);
-        delete[] fao;
-        //std::cout << "First Attribute Offset: " << firstattributeoffset << std::endl;
-        uint64_t indexrootoffset = 0;
-        uint32_t indexrootlength = 0;
-        std::string indexallocationlayout = "";
-        // LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
-        uint16_t curoffset = firstattributeoffset;
-        while(curoffset < curnt->mftentrysize * curnt->sectorspercluster * curnt->bytespersector)
-        {
-            //std::cout << "Current Offset: " << curoffset << std::endl;
-            // ATTRIBUTE LENGTH
-            uint8_t* al = new uint8_t[4];
-            uint32_t attributelength = 0;
-            ReadContent(rawcontent, al, mftentryoffset + curoffset + 4, 4);
-            ReturnUint32(&attributelength, al);
-            delete[] al;
-            //std::cout << "Attribute Length: " << attributelength << std::endl;
-            // ATTRIBUTE TYPE
-            uint8_t* at = new uint8_t[4];
-            uint32_t attributetype = 0;
-            ReadContent(rawcontent, at, mftentryoffset + curoffset, 4);
-            ReturnUint32(&attributetype, at);
-            delete[] at;
-            //std::cout << "Attribute Type: 0x" << std::hex << attributetype << std::dec << std::endl;
-            if(attributetype == 0x90) // $INDEX_ROOT - ALWAYS RESIDENT
-            {
-                // ATTRIBUTE CONTENT LENGTH
-                uint8_t* cl = new uint8_t[4];
-                uint32_t contentlength = 0;
-                ReadContent(rawcontent, cl, mftentryoffset + curoffset + 16, 4);
-                ReturnUint32(&contentlength, cl);
-                delete[] cl;
-                indexrootlength = contentlength;
-                // ATTRIBUTE CONTENT OFFSET
-                uint8_t* co = new uint8_t[2];
-                uint16_t contentoffset = 0;
-                ReadContent(rawcontent, co, mftentryoffset + curoffset + 20, 2);
-                ReturnUint16(&contentoffset, co);
-                delete[] co;
-                indexrootoffset = mftentryoffset + curoffset + contentoffset;
-            }
-            else if(attributetype == 0xa0) // $INDEX_ALLOCATION - ALWAYS NON-RESIDENT
-            {
-                 GetRunListLayout(rawcontent, curnt, mftentryoffset + curoffset, attributelength, &indexallocationlayout);
-            }
-            curoffset += attributelength;
-            if(attributelength == 0 || attributetype == 0xffffffff)
-                break;
-        }
-        indexlayout = std::to_string(indexrootoffset) + "," + std::to_string(indexrootlength) + ";";
-        if(!indexallocationlayout.empty())
-            indexlayout += indexallocationlayout;
-
-        //std::cout << "Index Root Offset: " << indexrootoffset << " Length: " << indexrootlength << std::endl;
-        //std::cout << "Index Allocation Layout: " << indexallocationlayout << std::endl;
-
-        return indexlayout;
+	// FIRST ATTRIBUTE OFFSET
+	uint16_t firstattributeoffset = 0;
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
+	uint64_t indexrootoffset = 0;
+	uint32_t indexrootlength = 0;
+	std::string indexallocationlayout = "";
+	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+	uint16_t curoffset = firstattributeoffset;
+	while(curoffset < mftentrybytes)
+	{
+	    // ATTRIBUTE LENGTH
+	    uint32_t attributelength = 0;
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
+	    // ATTRIBUTE TYPE
+	    uint32_t attributetype = 0;
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
+	    if(attributetype == 0x90) // $INDEX_ROOT - ALWAYS RESIDENT
+	    {
+		// CONTENT SIZE
+		uint32_t contentsize = 0;
+		ReadForImgContent(curimg, &contentsize, offset + curoffset + 16);
+		indexrootlength = contentsize;
+		// CONTENT OFFSET
+		uint16_t contentoffset = 0;
+		ReadForImgContent(curimg, &contentoffset, offset + curoffset + 20);
+		indexrootoffset = offset + curoffset + contentoffset;
+	    }
+	    else if(attributetype == 0xa0) // $INDEX_ALLOCATION - ALWAYS NON-RESIDENT
+		GetRunListLayout(curimg, offset + curoffset, bytespercluster, attributelength, &indexallocationlayout);
+	    if(attributelength == 0 || attributetype == 0xffffffff)
+		break;
+	    curoffset += attributelength;
+	}
+	*indexlayout = std::to_string(indexrootoffset) + "," + std::to_string(indexrootlength) + ";";
+	if(!indexallocationlayout.empty())
+	    *indexlayout += indexallocationlayout;
     }
-
-    return "";
-
 }
-*/
 
-/*
-void GetRunListLayout(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t curoffset, uint32_t attributelength, std::string* runliststr)
+void GetRunListLayout(ForImg* curimg, uint64_t offset, uint32_t bytespercluster, uint32_t attributelength, std::string* layout)
 {
     // RUN LIST OFFSET
-    uint8_t* rlo = new uint8_t[2];
     uint16_t runlistoffset = 0;
-    ReadContent(rawcontent, rlo, curoffset + 32, 2);
-    ReturnUint16(&runlistoffset, rlo);
-    delete[] rlo;
-    //std::cout << "Run List Offset: " << runlistoffset << std::endl;
-    unsigned int currunoffset = curoffset + runlistoffset;
-    std::vector<uint64_t> runofflist;
-    std::vector<uint64_t> runlenlist;
-    runofflist.clear();
-    runlenlist.clear();
-    //std::vector<std::string> runlist;
-    //runlist.clear();
+    ReadForImgContent(curimg, &runlistoffset, offset + 32);
+    uint currentrunoffset = offset + runlistoffset;
+    std::vector<uint64_t> runoffsets;
+    std::vector<uint64_t> runlengths;
+    runoffsets.clear();
+    runlengths.clear();
     int i = 0;
-    while(currunoffset < curoffset + attributelength)
+    while(currentrunoffset < offset + attributelength)
     {
-        // RUN INFO
-        uint8_t* ri = new uint8_t[1];
-        uint8_t runinfo = 0;
-        ReadContent(rawcontent, ri, currunoffset, 1);
-        runinfo = (uint8_t)ri[0];
-        delete[] ri;
-        if(runinfo > 0)
-        {
-            std::bitset<8> runbits{runinfo};
-            //std::cout << "run bits: " << runbits << std::endl;
-            std::bitset<4> runlengthbits;
-            std::bitset<4> runoffsetbits;
-            for(int j=0; j < 4; j++)
-            {
-                runlengthbits.set(j, runbits[j]);
-                runoffsetbits.set(j, runbits[j+4]);
-            }
-            //std::cout << "run length bits: " << runlengthbits << std::endl;
-            //std::cout << "run offset bits: " << runoffsetbits << std::endl;
-            unsigned int runlengthbytes = runlengthbits.to_ulong();
-            unsigned int runoffsetbytes = runoffsetbits.to_ulong();
-            //std::cout << "run length: " << runlengthbytes << std::endl;
-            //std::cout << "run offset: " << runoffsetbytes << std::endl;
-            if(runlengthbytes == 0 && runoffsetbytes == 0)
-                break;
-            currunoffset++;
-            //std::cout << "current run offset: " << currunoffset << std::endl;
-            //std::cout << "local attribute current run offset: " << currunoffset - curoffset << std::endl;
-            uint64_t runlength = 0;
-            uint64_t runoffset = 0;
-            if(runlengthbytes == 1)
-            {
-                uint8_t* rl = new uint8_t[1];
-                ReadContent(rawcontent, rl, currunoffset, 1);
-                runlength = (uint8_t)rl[0];
-                delete[] rl;
-            }
-            else
-            {
-                uint8_t* rl = new uint8_t[runlengthbytes];
-                ReadContent(rawcontent, rl, currunoffset, runlengthbytes);
-                ReturnUint(&runlength, rl, runlengthbytes);
-            }
-            //std::cout << "data run length: " << runlength << std::endl;
-            runlenlist.push_back(runlength);
-            if(runoffsetbits.to_ulong() == 1)
-            {
-                uint8_t* ro = new uint8_t[1];
-                ReadContent(rawcontent, ro, currunoffset + runlengthbytes, 1);
-                runoffset = (uint8_t)ro[0];
-                delete[] ro;
-            }
-            else
-            {
-                uint8_t* ro = new uint8_t[runoffsetbytes];
-                ReadContent(rawcontent, ro, currunoffset + runlengthbytes, runoffsetbytes);
-                ReturnUint(&runoffset, ro, runoffsetbytes);
-            }
-            if(i > 0)
-            {
-                std::bitset<8> runoffsetbits{runoffset};
-                if(i > 1 && runoffsetbits[0] == 1)
-                    runoffset = runoffset - 0xffffffff - 1;
-                runoffset = runoffset + runofflist.at(i-1);
-            }
-            //std::cout << "data run offset: " << runoffset << std::endl;
-            runofflist.push_back(runoffset);
-            i++;
-            currunoffset += runlengthbytes + runoffsetbytes;
-        }
-        else
-            break;
+	// RUN INFO
+	uint8_t runinfo = 0;
+	curimg->ReadContent(&runinfo, currentrunoffset, 1);
+	if(runinfo > 0)
+	{
+	    std::bitset<8> runbits((uint)runinfo);
+	    std::bitset<4> runlengthbits;
+	    std::bitset<4> runoffsetbits;
+	    for(int j=0; j < 4; j++)
+	    {
+		runlengthbits.set(j, runbits[j]);
+		runoffsetbits.set(j, runbits[j+4]);
+	    }
+	    uint runlengthbytes = runlengthbits.to_ulong();
+	    uint runoffsetbytes = runoffsetbits.to_ulong();
+	    if(runlengthbytes == 0 && runoffsetbytes == 0)
+		break;
+	    currentrunoffset++;
+	    uint64_t runlength = 0;
+	    uint64_t runoffset = 0;
+	    if(runlengthbytes == 1)
+	    {
+		uint8_t rl = 0;
+		curimg->ReadContent(&rl, currentrunoffset, 1);
+		runlength = (uint)rl;
+	    }
+	    else
+	    {
+		uint8_t* rl = new uint8_t[runlengthbytes];
+		curimg->ReadContent(rl, currentrunoffset, runlengthbytes);
+		ReturnUint(&runlength, rl, runlengthbytes);
+	    }
+	    runlengths.push_back(runlength);
+	    if(runoffsetbytes == 1)
+	    {
+		uint8_t ro = 0;
+		curimg->ReadContent(&ro, currentrunoffset + runlengthbytes, 1);
+		runoffset = (uint)ro;
+	    }
+	    else
+	    {
+		uint8_t* ro = new uint8_t[runoffsetbytes];
+		curimg->ReadContent(ro, currentrunoffset + runlengthbytes, runoffsetbytes);
+		ReturnUint(&runoffset, ro, runoffsetbytes);
+	    }
+	    if(i > 0)
+	    {
+		std::bitset<8> runoffsetbits(runoffset);
+		if(i > 1 && runoffsetbits[0] == 1)
+		    runoffset = runoffset - 0xffffffff - 1;
+		runoffset = runoffset + runoffsets.at(i-1);
+	    }
+	    runoffsets.push_back(runoffset);
+	    i++;
+	    currentrunoffset += runlengthbytes + runoffsetbytes;
+	}
+	else
+	    break;
     }
-    for(int i=0; i < runofflist.size(); i++)
-        *runliststr += std::to_string(runofflist.at(i) * curnt->sectorspercluster * curnt->bytespersector) + "," + std::to_string(runlenlist.at(i) * curnt->sectorspercluster * curnt->bytespersector) + ";";
-    runofflist.clear();
-    runlenlist.clear();
+    for(int i=0; i < runoffsets.size(); i++)
+    {
+	*layout += std::to_string(runoffsets.at(i) * bytespercluster) + "," + std::to_string(runlengths.at(i) * bytespercluster) + ";";
+    }
+    runoffsets.clear();
+    runlengths.clear();
+
 }
-*/
 
 /*
 std::string GetStandardInformationAttribute(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t mftentryoffset)

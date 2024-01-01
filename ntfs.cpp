@@ -26,6 +26,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 	mftentrybytes = pow(2, abs((int)mftentrysize));
     else
 	mftentrybytes = (uint)mftentrysize * bytespercluster;
+    // GET MFT LAYOUT TO THEN GET THE DIRECTORY CONTENTS TO PARSE
     std::string mftlayout = "";
     uint64_t mftsize = 0;
     GetDataAttributeLayout(currentitem->forimg, bytespercluster, mftentrybytes, mftstartingoffset, &mftlayout); 
@@ -38,7 +39,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 	currentinode = std::stoull(curfileitem->properties.substr(0, ntinodesplit));
     }
     std::cout << "curitem nt inode: " << currentinode << std::endl;
-    // GET DIRECTORIES MFT ENTRY
+    // GET DIRECTORY'S MFT ENTRY
     std::vector<std::string> mftlayoutlist;
     mftlayoutlist.clear();
     std::istringstream mll(mftlayout);
@@ -60,10 +61,11 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
         else
             relativentinode = relativentinode - curmaxntinode;
     }
+    // DIRECTORIES MFT ENTRY OFFSET TO THE CONTENT
     mftentryoffset = mftoffset + relativentinode * mftentrysize * bytespercluster;
     std::cout << "relativentinode: " << relativentinode << std::endl;
     std::cout << "mftentryoffset: " << mftentryoffset << std::endl;
     std::string indexlayout = "";
     GetIndexAttributeLayout(currentitem->forimg, bytespercluster, mftentrybytes, mftentryoffset, &indexlayout); 
-    //std::string indexlayout = GetIndexAttributesLayout(rawcontent, curnt, mftentryoffset);
+    std::cout << "index layout: " << indexlayout << std::endl;
 }
