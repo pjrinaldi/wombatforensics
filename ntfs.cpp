@@ -31,24 +31,6 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
     uint64_t mftsize = 0;
     GetDataAttributeLayout(currentitem->forimg, bytespercluster, mftentrybytes, mftstartingoffset, &mftlayout); 
     std::cout << "mft layout: " << mftlayout << std::endl;
-    /*
-    std::vector<std::string> mftlayoutlist;
-    mftlayoutlist.clear();
-    std::istringstream mll(mftlayout);
-    std::string mls;
-    uint64_t mftsize = 0;
-    while(getline(mll, mls, ';'))
-        mftlayoutlist.push_back(mls);
-    for(int i=0; i < mftlayoutlist.size(); i++)
-    {
-        std::size_t layoutsplit = mftlayoutlist.at(i).find(",");
-        mftsize += std::stoull(mftlayoutlist.at(i).substr(layoutsplit+1));
-    }
-    //std::cout << "MFT Size: " << mftsize << std::endl;
-    uint64_t maxmftentrycount = mftsize / (curnt->mftentrysize * curnt->sectorspercluster * curnt->bytespersector);
-    curnt->maxmftentrycount = maxmftentrycount;
-    //std::cout << "Max MFT Entry Count: " << maxmftentrycount << std::endl;
-     */ 
     // CURRENT INODE
     uint64_t currentinode = 5;
     if(curfileitem != NULL)
@@ -111,7 +93,6 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 	if(i == 0) // $INDEX_ROOT
 	{
 	    // INDEX RECORD SIZE
-	    uint32_t indexrecordsize = 0;
 	    ReadForImgContent(currentitem->forimg, &indexrecordsize, indexoffset + 8);
 	    std::cout << "Index Record Size: " << indexrecordsize << std::endl;
 	    // STARTING OFFSET
@@ -131,16 +112,16 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 		// INDEX ENTRY LENGTH
 		uint16_t indexentrylength = 0;
 		ReadForImgContent(currentitem->forimg, &indexentrylength, indexoffset + 16 + curpos + 8);
-                std::cout << "Index Entry Length: " << indexentrylength << std::endl;
+                //std::cout << "Index Entry Length: " << indexentrylength << std::endl;
 		// FILE NAME ATTRIBUTE LENGTH
 		uint16_t filenamelength = 0;
 		ReadForImgContent(currentitem->forimg, &filenamelength, indexoffset + 16 + curpos + 10);
-                std::cout << "File Name Attribute Length: " << filenamelength << std::endl;
+                //std::cout << "File Name Attribute Length: " << filenamelength << std::endl;
 		// INDEX ENTRY FLAGS
 		uint32_t indexentryflags = 0;
 		ReadForImgContent(currentitem->forimg, &indexentryflags, indexoffset + 16 + curpos + 12);
-                std::cout << "Index Entry Flags: 0x" << std::hex << indexentryflags << std::dec << std::endl;
-		if(indexentryflags * 0x02)
+                //std::cout << "Index Entry Flags: 0x" << std::hex << indexentryflags << std::dec << std::endl;
+		if(indexentryflags & 0x02)
 		    break;
 		else
 		{
@@ -148,25 +129,42 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 		    {
 			// I30 SEQUENCE ID
 			uint16_t i30sequenceid = 0;
-			ReadForImgContent(currentitem->forimg, &i30seqid, indexoffset + 16 + curpos + 6);
-                        std::cout << "I30 Sequence ID: " << i30seqid << std::endl;
+			ReadForImgContent(currentitem->forimg, &i30sequenceid, indexoffset + 16 + curpos + 6);
+                        //std::cout << "I30 Sequence ID: " << i30sequenceid << std::endl;
 			// CHILD NT INODE
-			uint8_t cni = new uint8_t[6];
+			uint8_t* cni = new uint8_t[6];
 			uint64_t childntinode = 0;
-			currentitem->forimg->ReadContent(&cni, indexoffset + 16 + curpos, 6);
+			currentitem->forimg->ReadContent(cni, indexoffset + 16 + curpos, 6);
 			ReturnUint(&childntinode, cni, 6); 
 			delete[] cni;
 			childntinode = childntinode & 0x00ffffffffffffff;
-			std::cout << "Child NT Inode: " << childntinode << std::endl;
+			//std::cout << "Child NT Inode: " << childntinode << std::endl;
 			if(childntinode <= maxmftentrycount)
 			{
 			    curpos = curpos + 16; // STARTING ON FILE_NAME ATTRIBUTE
 			    // FILE NAME TYPE
 			    uint8_t fntype = 0;
 			    currentitem->forimg->ReadContent(&fntype, indexoffset + 16 + curpos + 65, 1);
-			    std::cout << "File name type: " << (uint)fntype << std::endl;
+			    //std::cout << "File name type: " << (uint)fntype << std::endl;
 			    if(fntype != 0x02)
 			    {
+				// FILE NAME LENGTH
+				uint8_t namelength = 0;
+				currentitem->forimg->ReadContent(&namelength, indexoffset + 16 + curpos + 64, 1);
+                                //std::cout << "name length: " << (int)namelength << std::endl;
+				// FILE NAME
+				std::string filename = "";
+				for(int j=0; j < namelength; j++)
+				{
+				    uint16_t singleletter = 0;
+				    ReadForImgContent(currentitem->forimg, &singleletter, indexoffset + 16 + curpos + 66 + j*2);
+				    filename += (char)singleletter;
+				}
+				std::cout << "File Name: " << filename << std::endl;
+				/*
+                                if(filename.compare(childpath) == 0)
+                                    return childntinode;
+				*/
 			    }
 			}
 		    }
@@ -174,142 +172,77 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 		curpos += indexentrylength;
 	    }
 	}
-    }
-	/*
-            while(curpos < endoffset)
+	else // $INDEX_ALLOCATION
+	{
+	    std::cout << "Index Record Size: " << indexrecordsize << std::endl;
+	    uint32_t indexrecordcount = indexlength / indexrecordsize;
+            std::cout << "Index Record Count: " << indexrecordcount << std::endl;
+	    uint64_t curpos = indexoffset;
+	    for(uint32_t j=0; j < indexrecordcount; j++)
 	    {
-                else
-		{
-                    if(indexentrylength > 0 && filenamelength > 66 && filenamelength < indexentrylength)
-		    {
-                        if(childntinode <= curnt->maxmftentrycount)
-                        {
-                            if(fntype != 0x02)
-                            {
-                                // FILE NAME LENGTH
-                                uint8_t* nl = new uint8_t[1];
-                                uint8_t namelength = 0;
-                                ReadContent(rawcontent, nl, indexoffset + 16 + curpos + 64, 1);
-                                namelength = (uint8_t)nl[0];
-                                delete[] nl;
-                                //std::cout << "name length: " << (int)namelength << std::endl;
-                                // FILE NAME
-                                std::string filename = "";
-                                for(uint8_t j=0; j < namelength; j++)
-                                {
-                                    uint8_t* sl = new uint8_t[2];
-                                    uint16_t singleletter = 0;
-                                    ReadContent(rawcontent, sl, indexoffset + 16 + curpos + 66 + j*2, 2);
-                                    ReturnUint16(&singleletter, sl);
-                                    delete[] sl;
-                                    filename += (char)singleletter;
-                                }
-                                //std::cout << "File Name to compare to child name: " << filename << " " << childpath << std::endl;
-                                if(filename.compare(childpath) == 0)
-                                    return childntinode;
-                            }
-                        }
-                    }
-                }
-                curpos += indexentrylength;
-            }
-        }
-        else // $INDEX_ALLOCATION
-        {
-            uint32_t indexrecordcount = indexlength / indexrecordsize;
-            //std::cout << "Index Record Count: " << indexrecordcount << std::endl;
-            uint64_t curpos = indexoffset;
-            for(uint32_t j=0; j < indexrecordcount; j++)
-            {
                 // START OFFSET
-                uint8_t* so = new uint8_t[4];
-                uint32_t startoffset = 0;
-                ReadContent(rawcontent, so, curpos + 24, 4);
-                ReturnUint32(&startoffset, so);
-                delete[] so;
+		uint32_t startoffset = 0;
+		ReadForImgContent(currentitem->forimg, &startoffset, curpos + 24);
                 //std::cout << "Start Offset: " << startoffset << std::endl;
                 // END OFFSET
-                uint8_t* eo = new uint8_t[4];
                 uint32_t endoffset = 0;
-                ReadContent(rawcontent, eo, curpos + 28, 4);
-                ReturnUint32(&endoffset, eo);
-                delete[] eo;
+		ReadForImgContent(currentitem->forimg, &endoffset, curpos + 28);
                 //std::cout << "End Offset: " << endoffset << std::endl;
                 curpos = curpos + 24 + startoffset + j*indexrecordsize;
-		//std::cout << "before while loop - curpos: " << curpos << " indexsize: " << indexoffset + j*indexrecordsize + indexrecordsize << std::endl;
+		std::cout << "before while loop - curpos: " << curpos << " indexsize: " << indexoffset + j*indexrecordsize + indexrecordsize << std::endl;
                 while(curpos < indexoffset + j*indexrecordsize + indexrecordsize)
                 {
+		    //std::cout << "Cur Pos: " << curpos << std::endl;
 		    // INDEX ENTRY LENGTH
-		    uint8_t* iel = new uint8_t[2];
 		    uint16_t indexentrylength = 0;
-		    ReadContent(rawcontent, iel, curpos + 8, 2);
-		    ReturnUint16(&indexentrylength, iel);
-		    delete[] iel;
+		    ReadForImgContent(currentitem->forimg, &indexentrylength, curpos + 8);
 		    //std::cout << "Index Entry Length: " << indexentrylength << std::endl;
 		    // FILE NAME ATTRIBUTE LENGTH
-		    uint8_t* fnl = new uint8_t[2];
 		    uint16_t filenamelength = 0;
-		    ReadContent(rawcontent, fnl, curpos + 10, 2);
-		    ReturnUint16(&filenamelength, fnl);
-		    delete[] fnl;
+		    ReadForImgContent(currentitem->forimg, &filenamelength, curpos + 10);
 		    //std::cout << "File Name Attribute Length: " << filenamelength << std::endl;
-		    uint8_t* ief = new uint8_t[4];
 		    if(indexentrylength > 0 && filenamelength > 66 && filenamelength < indexentrylength)
 		    {
 			// I30 SEQUENCE ID
-			uint8_t* i3si = new uint8_t[2];
-			uint16_t i30seqid = 0;
-			ReadContent(rawcontent, i3si, curpos + 6, 2);
-			ReturnUint16(&i30seqid, i3si);
-			delete[] i3si;
-			//std::cout << "I30 Sequence ID: " << i30seqid << std::endl;
+			uint16_t i30sequenceid = 0;
+			ReadForImgContent(currentitem->forimg, &i30sequenceid, curpos + 6);
+			//std::cout << "I30 Sequence ID: " << i30sequenceid << std::endl;
 			// CHILD NT INODE
 			uint8_t* cni = new uint8_t[6];
 			uint64_t childntinode = 0;
-			ReadContent(rawcontent, cni, curpos, 6);
+			currentitem->forimg->ReadContent(cni, curpos, 6);
 			ReturnUint(&childntinode, cni, 6);
 			delete[] cni;
 			childntinode = childntinode & 0x00ffffffffffffff;
 			//std::cout << "Child NT Inode: " << childntinode << std::endl;
-			if(childntinode <= curnt->maxmftentrycount)
+			if(childntinode <= maxmftentrycount)
 			{
                             curpos = curpos + 16; // STARTING ON FILE_NAME ATTRIBUTE
                             // FILE NAME TYPE
-                            uint8_t* fnt = new uint8_t[1];
                             uint8_t fntype = 0;
-                            ReadContent(rawcontent, fnt, curpos + 65, 1);
-                            fntype = (uint8_t)fnt[0];
-                            delete[] fnt;
-                            //std::cout << "file name type: " << (int)fntype << std::endl;
+			    currentitem->forimg->ReadContent(&fntype, curpos + 65, 1);
+                            //std::cout << "file name type: " << (uint)fntype << std::endl;
                             if(fntype != 0x02)
                             {
                                 // FILE NAME LENGTH
-                                uint8_t* nl = new uint8_t[1];
                                 uint8_t namelength = 0;
-                                ReadContent(rawcontent, nl, curpos + 64, 1);
-                                namelength = (uint8_t)nl[0];
-                                delete[] nl;
+				currentitem->forimg->ReadContent(&namelength, curpos + 64, 1);
                                 //std::cout << "name length: " << (int)namelength << std::endl;
                                 // FILE NAME
                                 std::string filename = "";
                                 for(uint8_t k=0; k < namelength; k++)
                                 {
-                                    uint8_t* sl = new uint8_t[2];
                                     uint16_t singleletter = 0;
-                                    ReadContent(rawcontent, sl, curpos + 66 + k*2, 2);
-                                    ReturnUint16(&singleletter, sl);
-                                    delete[] sl;
-                                    filename += (char)singleletter;
-                                }
-                                //std::cout << "File Name to compare to child name: " << filename << " " << childpath << std::endl;
-                                if(filename.compare(childpath) == 0)
-                                    return childntinode;
-                            }
+				    ReadForImgContent(currentitem->forimg, &singleletter, curpos + 66 + k*2);
+				    filename += (char)singleletter;
+				}
+                                std::cout << "File Name: " << filename << std::endl;
+			    }
 			}
 		    }
 		    curpos += indexentrylength - 16;
-                }
-            }
-        }
-	 */ 
+		}
+	    }
+	}
+    }
 }
