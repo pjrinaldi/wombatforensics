@@ -180,158 +180,100 @@ void GetRunListLayout(ForImg* curimg, uint64_t offset, uint32_t bytespercluster,
 
 }
 
-void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* filevector, std::string* properties)
+void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
 {
-}
-
-/*
-std::string GetStandardInformationAttribute(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t mftentryoffset)
-{
-    std::string siforensics = "";
-    uint8_t* mes = new uint8_t[5];
-    ReadContent(rawcontent, mes, mftentryoffset, 4);
-    mes[4] = '\0';
-    std::string mesigstr((char*)mes);
-    delete[] mes;
-    //std::cout << "MFT Entry Signature: " << mesigstr << std::endl;
-    if(mesigstr.compare("FILE") == 0) // A PROPER MFT ENTRY
+    char* mftentrysignature = new char[5];
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
+    mftentrysignature[4] = 0;
+    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
     {
-        // OFFSET TO THE FIRST ATTRIBUTE
-        uint8_t* fao = new uint8_t[2];
-        uint16_t firstattributeoffset = 0;
-        ReadContent(rawcontent, fao, mftentryoffset + 20, 2);
-        ReturnUint16(&firstattributeoffset, fao);
-        delete[] fao;
-        //std::cout << "First Attribute Offset: " << firstattributeoffset << std::endl;
-        // LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
-        uint16_t curoffset = firstattributeoffset;
-        while(curoffset < curnt->mftentrysize * curnt->sectorspercluster * curnt->bytespersector)
-        {
-            //std::cout << "Current Offset: " << curoffset << std::endl;
-            /*
-            // IS RESIDENT/NON-RESIDENT
-            uint8_t* rf = new uint8_t[1];
-            uint8_t isnonresident = 0; // 0 - Resident | 1 - Non-Resident
-            ReadContent(rawcontent, rf, mftentryoffset + curoffset + 8, 1);
-            isnonresident = (uint8_t)rf[0];
-            delete[] rf;
-            //std::cout << "Is None Resident: " << (int)isnonresident << std::endl;
-            */
-/*            // ATTRIBUTE LENGTH
-            uint8_t* al = new uint8_t[4];
-            uint32_t attributelength = 0;
-            ReadContent(rawcontent, al, mftentryoffset + curoffset + 4, 4);
-            ReturnUint32(&attributelength, al);
-            delete[] al;
-            //std::cout << "Attribute Length: " << attributelength << std::endl;
-            // ATTRIBUTE TYPE
-            uint8_t* at = new uint8_t[4];
-            uint32_t attributetype = 0;
-            ReadContent(rawcontent, at, mftentryoffset + curoffset, 4);
-            ReturnUint32(&attributetype, at);
-            delete[] at;
-            //std::cout << "Attribute Type: 0x" << std::hex << attributetype << std::dec << std::endl;
+	// FIRST ATTRIBUTE OFFSET
+	uint16_t firstattributeoffset = 0;
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
+	uint64_t indexrootoffset = 0;
+	uint32_t indexrootlength = 0;
+	std::string indexallocationlayout = "";
+	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+	uint16_t curoffset = firstattributeoffset;
+	while(curoffset < mftentrybytes)
+	{
+	    // ATTRIBUTE LENGTH
+	    uint32_t attributelength = 0;
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
+	    // ATTRIBUTE TYPE
+	    uint32_t attributetype = 0;
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
 	    if(attributetype == 0x10) // STANDARD_INFORMATION ATTRIBUTE - always resident
 	    {
-                // CONTENT SIZE
-		uint8_t* cs = new uint8_t[4];
+		// CONTENT SIZE
 		uint32_t contentsize = 0;
-		ReadContent(rawcontent, cs, mftentryoffset + curoffset + 16, 4);
-		ReturnUint32(&contentsize, cs);
-		delete[] cs;
-                // CONTENT OFFSET
-		uint8_t* co = new uint8_t[2];
+		ReadForImgContent(curimg, &contentsize, offset + curoffset + 16);
+		// CONTENT OFFSET
 		uint16_t contentoffset = 0;
-		ReadContent(rawcontent, co, mftentryoffset + curoffset + 20, 2);
-		ReturnUint16(&contentoffset, co);
-		delete[] co;
-                // CREATE DATE
-                uint8_t* cd = new uint8_t[8];
+		ReadForImgContent(curimg, &contentoffset, offset + curoffset + 20);
+		// $STANDARD_INFORMATION CREATE DATE
 		uint64_t createdate = 0;
-		ReadContent(rawcontent, cd, mftentryoffset + curoffset + contentoffset, 8);
-		ReturnUint64(&createdate, cd);
-		delete[] cd;
-		siforensics += "Create Date|" + ConvertNtfsTimeToHuman(createdate) + "\n";
-                // MODIFY DATE
-		uint8_t* md = new uint8_t[8];
+		ReadForImgContent(curimg, &createdate, offset + curoffset + contentoffset);
+		tmpitem->create = ConvertWindowsTimeToUnixTimeUTC(createdate);
+		//std::cout << "Create Date: " << ConvertWindowsTimeToUnixTimeUTC(createdate) << std::endl;
+		// $STANDARD_INFORMATION MODIFY DATE
 		uint64_t modifydate = 0;
-		ReadContent(rawcontent, md, mftentryoffset + curoffset + contentoffset + 8, 8);
-		ReturnUint64(&modifydate, md);
-		delete[] md;
-		siforensics += "Modify Date|" + ConvertNtfsTimeToHuman(modifydate) + "\n";
-                // STATUS DATE
-                uint8_t* sd = new uint8_t[8];
-                uint64_t statusdate = 0;
-                ReadContent(rawcontent, sd, mftentryoffset + curoffset + contentoffset + 16, 8);
-                ReturnUint64(&statusdate, sd);
-                delete[] sd;
-                siforensics += "Status Date|" + ConvertNtfsTimeToHuman(statusdate) + "\n";
-                // ACCESS DATE
-                uint8_t* ad = new uint8_t[8];
-                uint64_t accessdate = 0;
-                ReadContent(rawcontent, ad, mftentryoffset + curoffset + contentoffset + 24, 8);
-                ReturnUint64(&accessdate, ad);
-                delete[] ad;
-                siforensics += "Access Date|" + ConvertNtfsTimeToHuman(accessdate) + "\n";
-                // OWNER ID
-                uint8_t* oi = new uint8_t[4];
-                uint32_t ownerid = 0;
-                ReadContent(rawcontent, oi, mftentryoffset + curoffset + contentoffset + 48, 4);
-                ReturnUint32(&ownerid, oi);
-                delete[] oi;
-                siforensics += "Owner ID|" + std::to_string(ownerid) + "\n";
-                // SECURITY ID
-                uint8_t* si = new uint8_t[4];
-                uint32_t securityid = 0;
-                ReadContent(rawcontent, si, mftentryoffset + curoffset + contentoffset + 52, 4);
-                ReturnUint32(&securityid, si);
-                delete[] si;
-                siforensics += "Security ID|" + std::to_string(securityid) + "\n";
-                // ACCESS FLAGS
-                uint8_t* af = new uint8_t[4];
-                uint32_t accessflags = 0;
-                ReadContent(rawcontent, af, mftentryoffset + curoffset + contentoffset + 32, 4);
-                ReturnUint32(&accessflags, af);
-                delete[] af;
-                siforensics += "Attributes|";
-                if(accessflags & 0x01)
-                    siforensics += "Read Only,";
-                if(accessflags & 0x02)
-                    siforensics += "Hidden,";
-                if(accessflags & 0x04)
-                    siforensics += "System,";
-                if(accessflags & 0x20)
-                    siforensics += "Archive,";
-                if(accessflags & 0x40)
-                    siforensics += "Device,";
-                if(accessflags & 0x80)
-                    siforensics += "Normal,";
-                if(accessflags & 0x100)
-                    siforensics += "Temporary,";
-                if(accessflags & 0x200)
-                    siforensics += "Sparse File,";
-                if(accessflags & 0x400)
-                    siforensics += "Reparse Point,";
-                if(accessflags & 0x800)
-                    siforensics += "Compressed,";
-                if(accessflags & 0x1000)
-                    siforensics += "Offline,";
-                if(accessflags & 0x2000)
-                    siforensics += "Not Indexed,";
-                if(accessflags & 0x4000)
-                    siforensics += "Encrypted,";
-                siforensics += "\n";
-
-		return siforensics;
+		ReadForImgContent(curimg, &modifydate, offset + curoffset + contentoffset + 8);
+		tmpitem->modify = ConvertWindowsTimeToUnixTimeUTC(modifydate);
+		// $STANDARD_INFORMATION STATUS CHANGE DATE
+		uint64_t statusdate = 0;
+		ReadForImgContent(curimg, &statusdate, offset + curoffset + contentoffset + 16);
+		tmpitem->change = ConvertWindowsTimeToUnixTimeUTC(statusdate);
+		uint64_t accessdate = 0;
+		ReadForImgContent(curimg, &accessdate, offset + curoffset + contentoffset + 24);
+		tmpitem->access = ConvertWindowsTimeToUnixTimeUTC(accessdate);
+		// OWNER ID
+		uint32_t ownerid = 0;
+		ReadForImgContent(curimg, &ownerid, offset + curoffset + contentoffset + 48);
+		// SECURITY ID
+		uint32_t securityid = 0;
+		ReadForImgContent(curimg, &securityid, offset + curoffset + contentoffset + 52);
+		// ACCESS FLAGS
+		uint32_t accessflags = 0;
+		ReadForImgContent(curimg, &accessflags, offset + curoffset + contentoffset + 32);
+		std::string attributes = "";
+		if(accessflags & 0x01)
+		    attributes += "Read Only,";
+		if(accessflags & 0x02)
+		    attributes += "Hidden,";
+		if(accessflags & 0x04)
+		    attributes += "System,";
+		if(accessflags & 0x20)
+		    attributes += "Archive,";
+		if(accessflags & 0x40)
+		    attributes += "Device,";
+		if(accessflags & 0x80)
+		    attributes += "Normal,";
+		if(accessflags & 0x100)
+		    attributes += "Temporary,";
+		if(accessflags & 0x200)
+		    attributes += "Sparse File,";
+		if(accessflags & 0x400)
+		    attributes += "Reparse Point,";
+		if(accessflags & 0x800)
+		    attributes += "Compressed,";
+		if(accessflags & 0x1000)
+		    attributes += "Offline,";
+		if(accessflags & 0x2000)
+		    attributes += "Not Indexed,";
+		if(accessflags & 0x4000)
+		    attributes += "Encrypted,";
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
                 break;
 	    curoffset += attributelength;
 	}
     }
-
-    return siforensics;
 }
+
+/*
+    siforensics += "Owner ID|" + std::to_string(ownerid) + "\n";
+    siforensics += "Security ID|" + std::to_string(securityid) + "\n";
 */
 
 void GetFileNameAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* filevector, std::string* properties)
