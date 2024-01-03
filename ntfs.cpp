@@ -139,7 +139,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 			ReturnUint(&childntinode, cni, 6); 
 			delete[] cni;
 			childntinode = childntinode & 0x00ffffffffffffff;
-			std::cout << "Child NT Inode: " << childntinode << std::endl;
+			//std::cout << "Child NT Inode: " << childntinode << std::endl;
 			if(childntinode <= maxmftentrycount)
 			{
 			    curpos = curpos + 16; // STARTING ON FILE_NAME ATTRIBUTE
@@ -161,7 +161,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    ReadForImgContent(currentitem->forimg, &singleletter, indexoffset + 16 + curpos + 66 + j*2);
 				    filename += (char)singleletter;
 				}
-				std::cout << "File Name: " << filename << std::endl;
+				//std::cout << "File Name: " << filename << std::endl;
 				if(filename.compare(".") != 0 && filename.compare("..") != 0 && !filename.empty())
 				{
 				    FileItem tmpitem;
@@ -197,6 +197,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    if(parentntinode <= maxmftentrycount)
 				    {
 					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
+					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					//void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
 					//mftentryoffset = mftoffset + relativentinode * mftentrysize * bytespercluster;
 					//Get
@@ -266,7 +267,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 			delete[] cni;
 			//std::cout << "child nt inode: " << childntinode << std::endl;
 			childntinode = childntinode & 0x00ffffffffffffff;
-			std::cout << "Child NT Inode: " << childntinode << std::endl;
+			//std::cout << "Child NT Inode: " << childntinode << std::endl;
 			if(childntinode <= maxmftentrycount)
 			{
                             curpos = curpos + 16; // STARTING ON FILE_NAME ATTRIBUTE
@@ -288,7 +289,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    ReadForImgContent(currentitem->forimg, &singleletter, curpos + 66 + k*2);
 				    filename += (char)singleletter;
 				}
-                                std::cout << "File Name: " << filename << std::endl;
+                                //std::cout << "File Name: " << filename << std::endl;
 				if(filename.compare(".") != 0 && filename.compare("..") != 0 && !filename.empty())
 				{
 				    uint8_t* pnti = new uint8_t[6];
@@ -324,6 +325,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    if(parentntinode <= maxmftentrycount)
 				    {
 					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
+					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					//std::cout << "Get MFT Entry Content for current file";
 				    }
 				}
