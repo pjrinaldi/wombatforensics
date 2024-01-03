@@ -190,9 +190,6 @@ void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, u
 	// FIRST ATTRIBUTE OFFSET
 	uint16_t firstattributeoffset = 0;
 	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
-	uint64_t indexrootoffset = 0;
-	uint32_t indexrootlength = 0;
-	std::string indexallocationlayout = "";
 	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
 	uint16_t curoffset = firstattributeoffset;
 	while(curoffset < mftentrybytes)
@@ -203,7 +200,7 @@ void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, u
 	    // ATTRIBUTE TYPE
 	    uint32_t attributetype = 0;
 	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
-	    if(attributetype == 0x10) // STANDARD_INFORMATION ATTRIBUTE - always resident
+	    if(attributetype == 0x10) // $STANDARD_INFORMATION ATTRIBUTE - always resident
 	    {
 		// CONTENT SIZE
 		uint32_t contentsize = 0;
@@ -276,71 +273,48 @@ void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, u
     siforensics += "Security ID|" + std::to_string(securityid) + "\n";
 */
 
-void GetFileNameAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* filevector, std::string* properties)
+void GetFileNameAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
 {
+    char* mftentrysignature = new char[5];
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
+    mftentrysignature[4] = 0;
+    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+    {
+	// FIRST ATTRIBUTE OFFSET
+	uint16_t firstattributeoffset = 0;
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
+	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+	uint16_t curoffset = firstattributeoffset;
+	while(curoffset < mftentrybytes)
+	{
+	    // ATTRIBUTE LENGTH
+	    uint32_t attributelength = 0;
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
+	    // ATTRIBUTE TYPE
+	    uint32_t attributetype = 0;
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
+	    if(attributetype == 0x30) // $FILE_NAME ATTRIBUTE - always resident
+	    {
+		// CONTENT SIZE
+		uint32_t contentsize = 0;
+		ReadForImgContent(curimg, &contentsize, offset + curoffset + 16);
+		// CONTENT OFFSET
+		uint16_t contentoffset = 0;
+		ReadForImgContent(curimg, &contentoffset, offset + curoffset + 20);
+		// $FILE_NAME CREATE DATE
+	    }
+            if(attributelength == 0 || attributetype == 0xffffffff)
+                break;
+	    curoffset += attributelength;
+	}
 }
 
 /*
 std::string GetFileNameAttribute(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t mftentryoffset)
 {
-    std::string fnforensics = "";
-    uint8_t* mes = new uint8_t[5];
-    ReadContent(rawcontent, mes, mftentryoffset, 4);
-    mes[4] = '\0';
-    std::string mesigstr((char*)mes);
-    delete[] mes;
-    //std::cout << "MFT Entry Signature: " << mesigstr << std::endl;
-    if(mesigstr.compare("FILE") == 0) // A PROPER MFT ENTRY
-    {
-        // OFFSET TO THE FIRST ATTRIBUTE
-        uint8_t* fao = new uint8_t[2];
-        uint16_t firstattributeoffset = 0;
-        ReadContent(rawcontent, fao, mftentryoffset + 20, 2);
-        ReturnUint16(&firstattributeoffset, fao);
-        delete[] fao;
-        //std::cout << "First Attribute Offset: " << firstattributeoffset << std::endl;
-        // LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
-        uint16_t curoffset = firstattributeoffset;
-        while(curoffset < curnt->mftentrysize * curnt->sectorspercluster * curnt->bytespersector)
         {
-            //std::cout << "Current Offset: " << curoffset << std::endl;
-            /*
-            // IS RESIDENT/NON-RESIDENT
-            uint8_t* rf = new uint8_t[1];
-            uint8_t isnonresident = 0; // 0 - Resident | 1 - Non-Resident
-            ReadContent(rawcontent, rf, mftentryoffset + curoffset + 8, 1);
-            isnonresident = (uint8_t)rf[0];
-            delete[] rf;
-            //std::cout << "Is None Resident: " << (int)isnonresident << std::endl;
-            */
-            // ATTRIBUTE LENGTH
-/*            uint8_t* al = new uint8_t[4];
-            uint32_t attributelength = 0;
-            ReadContent(rawcontent, al, mftentryoffset + curoffset + 4, 4);
-            ReturnUint32(&attributelength, al);
-            delete[] al;
-            //std::cout << "Attribute Length: " << attributelength << std::endl;
-            // ATTRIBUTE TYPE
-            uint8_t* at = new uint8_t[4];
-            uint32_t attributetype = 0;
-            ReadContent(rawcontent, at, mftentryoffset + curoffset, 4);
-            ReturnUint32(&attributetype, at);
-            delete[] at;
-            //std::cout << "Attribute Type: 0x" << std::hex << attributetype << std::dec << std::endl;
 	    if(attributetype == 0x30) // FILE_NAME ATTRIBUTE - always resident
 	    {
-                // CONTENT SIZE
-		uint8_t* cs = new uint8_t[4];
-		uint32_t contentsize = 0;
-		ReadContent(rawcontent, cs, mftentryoffset + curoffset + 16, 4);
-		ReturnUint32(&contentsize, cs);
-		delete[] cs;
-                // CONTENT OFFSET
-		uint8_t* co = new uint8_t[2];
-		uint16_t contentoffset = 0;
-		ReadContent(rawcontent, co, mftentryoffset + curoffset + 20, 2);
-		ReturnUint16(&contentoffset, co);
-		delete[] co;
                 // CREATE DATE
                 uint8_t* cd = new uint8_t[8];
 		uint64_t createdate = 0;
