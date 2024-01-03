@@ -364,6 +364,24 @@ void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentr
 	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
 	    if(attributetype == 0x80) // $DATA ATTRIBUTE
 	    {
+		std::string layout = "";
+		if(isnonresident == 1) // NON-RESIDENT
+		{
+		    // GET RUN LIST AND RETURN LAYOUT
+		    GetRunListLayout(curimg, offset + curoffset, bytespercluster, attributelength, &layout);
+
+		}
+		else // RESIDENT
+		{
+		    // CONTENT SIZE
+		    uint32_t contentsize = 0;
+		    ReadForImgContent(curimg, &contentsize, offset + curoffset + 16);
+		    // CONTENT OFFSET
+		    uint16_t contentoffset = 0;
+		    ReadForImgContent(curimg, &contentoffset, offset + curoffset + 20);
+		    layout = std::to_string(offset + curoffset + contentoffset) + "," + std::to_string(contentsize) + ";";
+		}
+		std::cout << "data layout: " << layout << std::endl;
 		// ATTRIBUTE NAME LENGTH
 		uint8_t attributenamelength = 0;
 		curimg->ReadContent(&attributenamelength, offset + curoffset + 9, 1);
@@ -372,6 +390,16 @@ void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentr
 		}
 		else // ALTERNATE DATA STREAM
 		{
+		    std::string adsname = "";
+		    uint16_t nameoffset = 0;
+		    ReadForImgContent(curimg, &nameoffset, offset + curoffset + 10);
+		    for(int j=0; j < attributenamelength; j++)
+		    {
+			uint16_t singleletter = 0;
+			ReadForImgContent(curimg, &singleletter, offset + curoffset + nameoffset + j*2);
+			adsname += (char)singleletter;
+		    }
+		    std::cout << "ads name: " << adsname << std::endl;
 		}
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
@@ -380,56 +408,3 @@ void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentr
 	}
     }
 }
-
-/*
-    std::string runliststr = "";
-                if(attributenamelength == 0) // DEFAULT DATA ENTRY
-                {
-                    dataforensics += "Default||Layout|";
-                }
-                else // Alternate data stream
-                {
-                    std::string adsname = "";
-                    uint8_t* no = new uint8_t[2];
-                    uint16_t nameoffset = 0;
-                    ReadContent(rawcontent, no, mftentryoffset + curoffset + 10, 2);
-                    ReturnUint16(&nameoffset, no);
-                    delete[] no;
-                    for(int j=0; j < attributenamelength; j++)
-                    {
-                        uint8_t* sl = new uint8_t[2];
-                        uint16_t singleletter = 0;
-                        ReadContent(rawcontent, sl, mftentryoffset + curoffset + nameoffset + j*2, 2);
-                        ReturnUint16(&singleletter, sl);
-                        delete[] sl;
-                        adsname += (char)singleletter;
-                    }
-                    dataforensics += "Alternate||Name|" + adsname + "||Layout|";
-                }
-                    if(isnonresident == 1)
-                    {
-                        // GET RUN LIST AND RETURN LAYOUT
-                        uint64_t totalmftsize = 0;
-                        GetRunListLayout(rawcontent, curnt, mftentryoffset + curoffset, attributelength, &runliststr);
-                        dataforensics += runliststr + "\n";
-                        //std::cout << "Run List Layout: " << runliststr << std::endl;
-                        break;
-                    }
-                    else // is resident 0
-                    {
-                        // CONTENT SIZE
-                        uint8_t* cs = new uint8_t[4];
-                        uint32_t contentsize = 0;
-                        ReadContent(rawcontent, cs, mftentryoffset + curoffset + 16, 4);
-                        ReturnUint32(&contentsize, cs);
-                        delete[] cs;
-                        // CONTENT OFFSET
-                        uint8_t* co = new uint8_t[2];
-                        uint16_t contentoffset = 0;
-                        ReadContent(rawcontent, co, mftentryoffset + curoffset + 20, 2);
-                        ReturnUint16(&contentoffset, co);
-                        delete[] co;
-                        dataforensics += std::to_string(mftentryoffset + curoffset + contentoffset) + "," + std::to_string(contentsize) + ";" + "\n";
-                    }
-            }
-*/

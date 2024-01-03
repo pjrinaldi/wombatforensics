@@ -326,6 +326,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    {
 					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
+					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, filevector, &properties);
 					//std::cout << "Get MFT Entry Content for current file";
 				    }
 				}
