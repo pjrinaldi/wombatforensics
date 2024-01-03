@@ -180,6 +180,10 @@ void GetRunListLayout(ForImg* curimg, uint64_t offset, uint32_t bytespercluster,
 
 }
 
+void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* filevector, std::string* properties)
+{
+}
+
 /*
 std::string GetStandardInformationAttribute(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t mftentryoffset)
 {
@@ -328,7 +332,13 @@ std::string GetStandardInformationAttribute(std::ifstream* rawcontent, ntfsinfo*
 
     return siforensics;
 }
+*/
 
+void GetFileNameAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* filevector, std::string* properties)
+{
+}
+
+/*
 std::string GetFileNameAttribute(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t mftentryoffset)
 {
     std::string fnforensics = "";
@@ -453,7 +463,13 @@ std::string GetFileNameAttribute(std::ifstream* rawcontent, ntfsinfo* curnt, uin
     
     return fnforensics;
 }
+*/
 
+void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* filevector, std::string* properties)
+{
+}
+
+/*
 std::string GetDataAttribute(std::ifstream* rawcontent, ntfsinfo* curnt, uint64_t mftentryoffset)
 {
     std::string dataforensics = "";

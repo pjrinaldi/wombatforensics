@@ -2,6 +2,7 @@
 
 void GetNextCluster(ForImg* curimg, uint32_t clusternum, uint8_t fstype, uint64_t fatoffset, std::vector<uint>* clusterlist)
 {
+
     uint32_t curcluster32 = 0;
     uint16_t curcluster16 = 0;
     int fatbyte1 = 0;

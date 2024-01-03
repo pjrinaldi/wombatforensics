@@ -164,6 +164,8 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				std::cout << "File Name: " << filename << std::endl;
 				if(filename.compare(".") != 0 && filename.compare("..") != 0 && !filename.empty())
 				{
+				    FileItem tmpitem;
+				    tmpitem.clear();
 				    //std::cout << "indexroot valid file, parse what i need from it." << std::endl;
 				    uint8_t* pnti = new uint8_t[6];
 				    uint64_t parentntinode = 0;
@@ -193,6 +195,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    std::cout << "i30 access: " << ConvertWindowsTimeToUnixTimeUTC(i30access) << std::endl;
 				    if(parentntinode <= maxmftentrycount)
 				    {
+					//Get
 					std::cout << "Get MFT Entry Content for current file";
 				    }
 				}
