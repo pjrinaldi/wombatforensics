@@ -190,7 +190,13 @@ void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, u
 	// FIRST ATTRIBUTE OFFSET
 	uint16_t firstattributeoffset = 0;
 	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
-	//uint16_t attrflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(offset + 22, 2)); // attribute flags
+	// ATTRIBUTE FLAGS
+	uint16_t attributeflags = 0;
+	ReadForImgContent(curimg, &attributeflags, offset + 22);
+	if(attributeflags == 0x00 || attributeflags == 0x02)
+	    tmpitem->isdeleted = true;
+	if(attributeflags == 0x02 || attributeflags == 0x03)
+	    tmpitem->isdirectory = true;
 	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
 	uint16_t curoffset = firstattributeoffset;
 	while(curoffset < mftentrybytes)
@@ -233,47 +239,14 @@ void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, u
 		ReadForImgContent(curimg, &securityid, offset + curoffset + contentoffset + 52);
 		// ACCESS FLAGS
 		uint32_t accessflags = 0;
-		//accessflags = qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + 56, 4));
-		/*		
-		    attrstr = "";
-		    if(attrflags == 0x00) // unallocated file
-			attrstr += "Not Allocated,";
-		    else if(attrflags == 0x01) // allocated file
-			attrstr += "Allocated,";
-		    else if(attrflags == 0x02) // unallocated directory
-			attrstr += "Not Allocated,";
-		    else if(attrflags == 0x03) // allocated directory
-			attrstr += "Allocated,";
-		    if(accessflags & 0x01) // READ ONLY
-			attrstr += "Read Only,";
-		    if(accessflags & 0x02) // Hidden
-			attrstr += "Hidden,";
-		    if(accessflags & 0x04) // System
-			attrstr += "System,";
-		    if(accessflags & 0x20) // Archive
-			attrstr += "Archive,";
-		    if(accessflags & 0x40) // Device
-			attrstr += "Device,";
-		    if(accessflags & 0x80) // Normal
-			attrstr += "Normal,";
-		    if(accessflags & 0x100) // Temporary
-			attrstr += "Temporary,";
-		    if(accessflags & 0x200) // Sparse File
-			attrstr += "Sparse File,";
-		    if(accessflags & 0x400) // Reparse Point
-			attrstr += "Reparse Point,";
-		    if(accessflags & 0x800) // Compressed
-			attrstr += "Compressed,";
-		    if(accessflags & 0x1000) // Offline
-			attrstr += "Offline,";
-		    if(accessflags & 0x2000) // Not Indexed
-			attrstr += "Not Indexed,";
-		    if(accessflags & 0x4000) // Encrypted
-			attrstr += "Encrypted,";
-
-		 */ 
 		ReadForImgContent(curimg, &accessflags, offset + curoffset + contentoffset + 32);
 		std::string attributes = "";
+		if(attributeflags == 0x00 || attributeflags == 0x02)
+		    attributes += "Not Allocated,";
+		else if(attributeflags == 0x01 || attributeflags == 0x03)
+		    attributes += "Allocated,";
+		if(attributeflags == 0x02 || attributeflags == 0x03)
+		    attributes += "Directory,";
 		if(accessflags & 0x01)
 		    attributes += "Read Only,";
 		if(accessflags & 0x02)
