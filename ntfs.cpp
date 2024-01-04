@@ -322,6 +322,23 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    FileItem tmpitem;
 				    tmpitem.clear();
 				    std::vector<FileItem> adsvector;
+				    // FILEITEM PROPERTIES ORDER
+				    //  1 - NT Inode
+				    //  2 - Parent NT Inode
+				    //  3 - MFT Entry Layout
+				    //  4 - $I30 Sequence ID
+				    //  5 - $I30 Create
+				    //  6 - $I30 Modify
+				    //  7 - $I30 Status
+				    //  8 - $I30 Access
+				    //  9 - File Attributes List String
+				    // 10 - $FILE_NAME Create
+				    // 11 - $FILE_NAME Modify
+				    // 12 - $FILE_NAME Status
+				    // 13 - $FILE_NAME Access
+				    // 14 - Physical Size
+				    // 15 - Logical Size
+				    // 16 - Layout
 				    std::string properties = "";
 				    if(parentntinode <= maxmftentrycount)
 				    {
