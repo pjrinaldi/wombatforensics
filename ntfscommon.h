@@ -18,5 +18,7 @@ void GetRunListLayout(ForImg* curimg, uint64_t offset, uint32_t bytespercluster,
 void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties);
 void GetFileNameAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties);
 void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* filevector, std::string* properties);
+//void GetIndexRootAttribute();
+//void GetIndexAllocationAttribute();
 
 #endif // NTFSCOMMON_H
