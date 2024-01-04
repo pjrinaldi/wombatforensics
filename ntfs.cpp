@@ -321,12 +321,13 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    //std::cout << "i30 access: " << ConvertWindowsTimeToUnixTimeUTC(i30access) << std::endl;
 				    FileItem tmpitem;
 				    tmpitem.clear();
+				    std::vector<FileItem> adsvector;
 				    std::string properties = "";
 				    if(parentntinode <= maxmftentrycount)
 				    {
 					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
-					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, filevector, &properties);
+					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					//std::cout << "Get MFT Entry Content for current file";
 				    }
 				}
