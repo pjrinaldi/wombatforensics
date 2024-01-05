@@ -396,7 +396,7 @@ void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentr
 		    ReadForImgContent(curimg, &contentoffset, offset + curoffset + 20);
 		    layout = std::to_string(offset + curoffset + contentoffset) + "," + std::to_string(contentsize) + ";";
 		}
-		std::cout << "data layout: " << layout << std::endl;
+		//std::cout << "data layout: " << layout << std::endl;
 		// ATTRIBUTE NAME LENGTH
 		uint8_t attributenamelength = 0;
 		curimg->ReadContent(&attributenamelength, offset + curoffset + 9, 1);
@@ -414,7 +414,7 @@ void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentr
 			ReadForImgContent(curimg, &singleletter, offset + curoffset + nameoffset + j*2);
 			adsname += (char)singleletter;
 		    }
-		    std::cout << "ads name: " << adsname << std::endl;
+		    //std::cout << "ads name: " << adsname << std::endl;
 		}
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
@@ -756,47 +756,85 @@ quint64 GetMftEntryContent(ForImg* curimg, uint32_t curstartsector, uint8_t ptre
 			// NEED TO DO SOMETHING WITH THE ADS PROPERTIES AS WELL AS THE FILE PROPERTIES...
 		    }
                 }
-                else if(attrtype == 0x90) // $INDEX_ROOT - always resident
-                {
-		    if(attrflags == 0x02 || attrflags == 0x03 || (accessflags & 0x02 && accessflags & 0x04))
+*/
+
+void GetIndexRootAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* adsvector, std::string* properties)
+{
+    char* mftentrysignature = new char[5];
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
+    mftentrysignature[4] = 0;
+    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+    {
+	// FIRST ATTRIBUTE OFFSET
+	uint16_t firstattributeoffset = 0;
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
+	// ATTRIBUTE FLAGS
+	uint16_t attributeflags = 0;
+	ReadForImgContent(curimg, &attributeflags, offset + 22);
+	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+	uint16_t curoffset = firstattributeoffset;
+	while(curoffset < mftentrybytes)
+	{
+	    // ATTRIBUTE LENGTH
+	    uint32_t attributelength = 0;
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
+	    // ATTRIBUTE TYPE
+	    uint32_t attributetype = 0;
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
+	    if(attributetype == 0x90) // $INDEX_ROOT ATTRIBUTE - ALWAYS RESIDENT
+	    {
+		// ATTRIBUTE NAME LENGTH
+		uint8_t attributenamelength = 0;
+		curimg->ReadContent(&attributenamelength, offset + curoffset + 9, 1);
+		// ATTRIBUTE NAME OFFSET
+		uint16_t attributenameoffset = 0;
+		// ATTRIBUTE CONTENT LENGTH
+		uint32_t attributecontentlength = 0;
+		ReadForImgContent(curimg, &attributecontentlength, offset + curoffset + 16);
+		// ATTRIBUTE CONTENT OFFSET
+		uint16_t attributecontentoffset = 0;
+		ReadForImgContent(curimg, &attributecontentoffset, offset + curoffset + 20);
+		// ACCESS FLAGS
+		uint32_t accessflags = 0;
+		ReadForImgContent(curimg, &accessflags, offset + curoffset + attributecontentoffset + 32);
+		if(attributeflags == 0x02 || attributeflags == 0x03 || (accessflags & 0x02 && accessflags & 0x04))
+		{
+		    std::string attributename = "";
+		    uint64_t physicalsize = 0;
+		    uint64_t logicalsize = 0;
+		    std::string layout = "";
+		    if(attributenamelength > 0)
 		    {
-			attrname = "";
-			quint64 physicalsize = 0;
-			layout = "";
-			dirlayout = "";
-			if(namelength > 0) // get $I30 default dir attribute
+			for(int j=0; j < attributenamelength; j++)
 			{
-			    for(int j=0; j < namelength; j++)
-				attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + j*2, 2))));
-			    if(attrname.startsWith("$I30"))
-			    {
-				logicalsize = contentlength;
-				physicalsize = contentlength;
-				dirlayout = QString(QString::number(curoffset + contentoffset) + "," + QString::number(contentlength) + ";");
-                                out << "Physical Size|" << QString::number(physicalsize) << "|Physical size for the file in bytes." << Qt::endl;
-				out << "Logical Size|" << QString::number(logicalsize) << "|Size in Bytes for the file." << Qt::endl;
-                                out << "Layout|" << dirlayout << "|File layout in bytes as offset,size;." << Qt::endl;
-                                // RETURN APPROPRIATE LOGICALSIZE,PHYSICALSIZE,LAYOUT FOR THE NODEDATA AND PROPERTIES FILE
-			    }
-			    else // alternate stream
-			    {
-				//qDebug() << "ads:" << QString("$INDEX_ROOT:" + attrname);
-                                QList<QVariant> tmpnode;
-                                QList<QString> tmpprop;
-                                tmpnode.clear();
-                                tmpprop.clear();
-                                tmpnode << QString("$INDEX_ROOT:" + attrname) << contentlength;
-                                tmpprop.append(QString("Physical Size|" + QString::number(contentlength) + "|Physical size for the file in bytes."));
-				tmpprop.append(QString("Logical Size|" + QString::number(contentlength) + "|Logical size for the file in bytes."));
-                                tmpprop.append(QString("Layout|" + QString(QString::number(curoffset + contentoffset) + ",") + QString::number(contentlength) + ";" + "|File layout in bytes as offset,size;."));
-                                adsnodelist.append(tmpnode);
-                                adsproplist.append(tmpprop);
-                                tmpnode.clear();
-                                tmpprop.clear();
-			    }
+			    uint16_t singleletter = 0;
+			    ReadForImgContent(curimg, &singleletter, offset + curoffset + attributenameoffset + j*2);
+			    attributename += (char)singleletter;
+			}
+			if(attributename.compare("$I30") == 0) // default directory content
+			{
+			    logicalsize = attributecontentlength;
+			    physicalsize = attributecontentlength;
+			    layout = std::to_string(offset + curoffset + attributecontentoffset) + "," + std::to_string(attributecontentlength) + ";";
+			}
+			else
+			{
+			    std::cout << "ads name: " << "$INDEX_ROOT:" + attributename << std::endl;
+			    logicalsize = attributecontentlength;
+			    physicalsize = attributecontentlength;
+			    layout = std::to_string(offset + curoffset + attributecontentoffset) + "," + std::to_string(attributecontentlength) + ";";
 			}
 		    }
-                }
+		}
+	    }
+            if(attributelength == 0 || attributetype == 0xffffffff)
+                break;
+            curoffset += attributelength;
+	}
+    }
+}
+
+/*
                 else if(attrtype == 0xa0) // INDEX_ALLOCATION - always non-resident
                 {
 		    attrname = "";

@@ -194,10 +194,13 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    uint64_t i30access = 0;
 				    ReadForImgContent(currentitem->forimg, &i30access, indexoffset + 16 + curpos + 32);
 				    //std::cout << "i30 access: " << ConvertWindowsTimeToUnixTimeUTC(i30access) << std::endl;
+				    std::vector<FileItem> adsvector;
 				    if(parentntinode <= maxmftentrycount)
 				    {
 					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
+					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
+					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					//void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
 					//mftentryoffset = mftoffset + relativentinode * mftentrysize * bytespercluster;
 					//Get
@@ -345,6 +348,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
+					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					//std::cout << "Get MFT Entry Content for current file";
 				    }
 				}
