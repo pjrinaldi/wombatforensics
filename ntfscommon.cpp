@@ -788,6 +788,7 @@ void GetIndexRootAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offs
 		curimg->ReadContent(&attributenamelength, offset + curoffset + 9, 1);
 		// ATTRIBUTE NAME OFFSET
 		uint16_t attributenameoffset = 0;
+		ReadForImgContent(curimg, &attributenamelength, offset + curoffset + 10);
 		// ATTRIBUTE CONTENT LENGTH
 		uint32_t attributecontentlength = 0;
 		ReadForImgContent(curimg, &attributecontentlength, offset + curoffset + 16);
@@ -825,6 +826,59 @@ void GetIndexRootAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offs
 			    layout = std::to_string(offset + curoffset + attributecontentoffset) + "," + std::to_string(attributecontentlength) + ";";
 			}
 		    }
+		}
+	    }
+            if(attributelength == 0 || attributetype == 0xffffffff)
+                break;
+            curoffset += attributelength;
+	}
+    }
+}
+
+void GetIndexAllocationAttribute(ForImg* curimg, uint64_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* adsvector, std::string* properties)
+{
+    char* mftentrysignature = new char[5];
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
+    mftentrysignature[4] = 0;
+    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+    {
+	// FIRST ATTRIBUTE OFFSET
+	uint16_t firstattributeoffset = 0;
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
+	// ATTRIBUTE FLAGS
+	uint16_t attributeflags = 0;
+	ReadForImgContent(curimg, &attributeflags, offset + 22);
+	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+	uint16_t curoffset = firstattributeoffset;
+	while(curoffset < mftentrybytes)
+	{
+	    // ATTRIBUTE LENGTH
+	    uint32_t attributelength = 0;
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
+	    // ATTRIBUTE TYPE
+	    uint32_t attributetype = 0;
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
+	    if(attributetype == 0xa0) // $INDEX_ALLOCATION ATTRIBUTE - ALWAYS NON-RESIDENT
+	    {
+		// ATTRIBUTE NAME LENGTH
+		uint8_t attributenamelength = 0;
+		curimg->ReadContent(&attributenamelength, offset + curoffset + 9, 1);
+		// ATTRIBUTE NAME OFFSET
+		uint16_t attributenameoffset = 0;
+		ReadForImgContent(curimg, &attributenamelength, offset + curoffset + 10);
+		if(attributenamelength > 0)
+		{
+		    for(int j=0; j < attributenamelength; j++)
+		    {
+			uint16_t singleletter = 0;
+			ReadForImgContent(curimg, &singleletter, offset + curoffset + attributenameoffset + j*2);
+			attributename += (char)singleletter;
+		    }
+		    uint64_t physicalsize = 0;
+		    uint64_t logicalsize = 0;
+		    ReadForImgContent(curimg, &logicalsize, offset + curoffset + 48);
+		    std::string layout = "";
+		    GetRunListLayout(curimg, offset + curoffset, bytespercluster, attributelength, &layout);
 		}
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
