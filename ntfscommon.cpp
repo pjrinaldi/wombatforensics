@@ -894,8 +894,6 @@ void GetIndexAllocationAttribute(ForImg* curimg, uint64_t bytespercluster, uint6
 		    attrname = "";
 		    if(namelength > 0)
 		    {
-			for(int j=0; j < namelength; j++)
-			    attrname += QString(QChar(qFromLittleEndian<uint16_t>(curimg->ReadContent(curoffset + nameoffset + j*2, 2))));
 			if(!attrname.startsWith("$I30")) // alternate data stream
 			{
 			    quint64 logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
