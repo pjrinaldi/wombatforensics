@@ -814,17 +814,16 @@ void GetIndexRootAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offs
 			}
 			if(attributename.compare("$I30") == 0) // default directory content
 			{
-			    logicalsize = attributecontentlength;
-			    physicalsize = attributecontentlength;
-			    layout = std::to_string(offset + curoffset + attributecontentoffset) + "," + std::to_string(attributecontentlength) + ";";
+			    // DIRECTORY, DO NOTHING FOR PROPERTIES OR ADS
+			    //std::cout << "attr name: " << attributename << std::endl;
 			}
 			else
 			{
 			    std::cout << "ads name: " << "$INDEX_ROOT:" + attributename << std::endl;
-			    logicalsize = attributecontentlength;
-			    physicalsize = attributecontentlength;
-			    layout = std::to_string(offset + curoffset + attributecontentoffset) + "," + std::to_string(attributecontentlength) + ";";
 			}
+			logicalsize = attributecontentlength;
+			physicalsize = attributecontentlength;
+			layout = std::to_string(offset + curoffset + attributecontentoffset) + "," + std::to_string(attributecontentlength) + ";";
 		    }
 		}
 	    }
@@ -875,11 +874,34 @@ void GetIndexAllocationAttribute(ForImg* curimg, uint64_t bytespercluster, uint6
 			ReadForImgContent(curimg, &singleletter, offset + curoffset + attributenameoffset + j*2);
 			attributename += (char)singleletter;
 		    }
+		    if(attributename.compare("$I30") == 0) // default directory content
+		    {
+			// DIRECTORY, DO NOTHING FOR PROPERTIES OR ADS
+			//std::cout << "attr name: " << attributename << std::endl;
+		    }
+		    else
+		    {
+			std::cout << "ads name: " << "$INDEX_ALLOCATION:" + attributename << std::endl;
+		    }
 		    uint64_t physicalsize = 0;
 		    uint64_t logicalsize = 0;
 		    ReadForImgContent(curimg, &logicalsize, offset + curoffset + 48);
+		    std::cout << "logical size: " << logicalsize << std::endl;
 		    std::string layout = "";
 		    GetRunListLayout(curimg, offset + curoffset, bytespercluster, attributelength, &layout);
+		    std::vector<std::string> tmplayoutlist;
+		    tmplayoutlist.clear();
+		    std::istringstream tmpstream(layout);
+		    std::string tmpstring;
+		    while(getline(tmpstream, tmpstring, ';'))
+			tmplayoutlist.push_back(tmpstring);
+		    for(int j=0; j < tmplayoutlist.size(); j++)
+		    {
+			std::size_t tmpsplit = tmplayoutlist.at(j).find(",");
+			physicalsize += std::stoull(tmplayoutlist.at(j).substr(tmpsplit+1));
+		    }
+		    std::cout << "physical size: " << physicalsize << std::endl;
+		    std::cout << "layout: " << layout << std::endl;
 		}
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
@@ -889,18 +911,15 @@ void GetIndexAllocationAttribute(ForImg* curimg, uint64_t bytespercluster, uint6
     }
 }
 
+void GetAttributeListAttribute(ForImg* curimg, uint64_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
+{
+}
+
 /*
                 else if(attrtype == 0xa0) // INDEX_ALLOCATION - always non-resident
                 {
-		    attrname = "";
-		    if(namelength > 0)
-		    {
 			if(!attrname.startsWith("$I30")) // alternate data stream
 			{
-			    quint64 logicalsize = qFromLittleEndian<uint64_t>(curimg->ReadContent(curoffset + 48, 8));
-			    quint64 physicalsize = 0;
-			    layout = "";
-			    GetRunListLayout(curimg, curstartsector, bytespercluster, mftentrybytes, curoffset, &layout);
 			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
 				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
 			    //qDebug() << "ads:" << QString("$INDEX_ALLOCATION" + attrname);
