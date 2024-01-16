@@ -202,6 +202,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexAllocationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
+					GetObjectIdAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
 					//void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
 					//mftentryoffset = mftoffset + relativentinode * mftentrysize * bytespercluster;
 					//Get

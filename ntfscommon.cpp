@@ -970,10 +970,6 @@ void GetObjectIdAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offse
 	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
 	    if(attributetype == 0x40) // $OBJECT_ID ATTRIBUTE - ALWAYS RESIDENT
 	    {
-		/*
-		std::stringstream serialstream;
-		serialstream << "0x" << std::setfill('0') << std::setw(sizeof(uint8_t)*2) << std::hex << volserial;
-		 */ 
 		uint8_t* objectid = new uint8_t[16];
 		curimg->ReadContent(objectid, offset + curoffset, 16);
 		std::stringstream oidstream;
@@ -981,7 +977,6 @@ void GetObjectIdAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offse
 		for(int i=0; i < 16; i++)
 		    oidstream << objectid[i];
 		std::cout << "Object ID: " << oidstream.str() << std::endl;
-
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
                 break;

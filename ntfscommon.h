@@ -24,7 +24,6 @@ void GetAttributeListAttribute(ForImg* curimg, uint64_t bytespercluster, uint64_
 void GetObjectIdAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, std::string* properties); // 0x40
 void GetReparsePointAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, std::string* properties); // 0xc0
 
-//void GetReparsePointAttribute(); // 0xc0
 //void GetBitmapAttribute(); // 0xb0
 //void GetSecurityDescriptorAttribute(); // 0x50
 //void GetLoggedUtilityStreamAttribute(); // 0x100
