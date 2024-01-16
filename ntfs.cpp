@@ -343,6 +343,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    // 14 - Physical Size
 				    // 15 - Logical Size
 				    // 16 - Layout
+				    // 17 - Object ID
 				    std::string properties = "";
 				    if(parentntinode <= maxmftentrycount)
 				    {

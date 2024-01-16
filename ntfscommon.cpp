@@ -913,38 +913,84 @@ void GetIndexAllocationAttribute(ForImg* curimg, uint64_t bytespercluster, uint6
 
 void GetAttributeListAttribute(ForImg* curimg, uint64_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
 {
+    // CONTAINS INFORMATION TO SHOW WHERE THE REST OF THE ATTRIBUTES RESIDE, SINCE THEY DON'T FIT IN THE MFT ENTRY
+    char* mftentrysignature = new char[5];
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
+    mftentrysignature[4] = 0;
+    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+    {
+	// FIRST ATTRIBUTE OFFSET
+	uint16_t firstattributeoffset = 0;
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
+	// ATTRIBUTE FLAGS
+	uint16_t attributeflags = 0;
+	ReadForImgContent(curimg, &attributeflags, offset + 22);
+	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+	uint16_t curoffset = firstattributeoffset;
+	while(curoffset < mftentrybytes)
+	{
+	    // ATTRIBUTE LENGTH
+	    uint32_t attributelength = 0;
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
+	    // ATTRIBUTE TYPE
+	    uint32_t attributetype = 0;
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
+	    if(attributetype == 0x20) // $ATTRIBUTE_LIST ATTRIBUTE - ALWAYS RESIDENT
+	    {
+	    }
+            if(attributelength == 0 || attributetype == 0xffffffff)
+                break;
+            curoffset += attributelength;
+	}
+    }
+}
+
+void GetObjectIdAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, std::string* properties)
+{
+    char* mftentrysignature = new char[5];
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
+    mftentrysignature[4] = 0;
+    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+    {
+	// FIRST ATTRIBUTE OFFSET
+	uint16_t firstattributeoffset = 0;
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
+	// ATTRIBUTE FLAGS
+	uint16_t attributeflags = 0;
+	ReadForImgContent(curimg, &attributeflags, offset + 22);
+	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+	uint16_t curoffset = firstattributeoffset;
+	while(curoffset < mftentrybytes)
+	{
+	    // ATTRIBUTE LENGTH
+	    uint32_t attributelength = 0;
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
+	    // ATTRIBUTE TYPE
+	    uint32_t attributetype = 0;
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
+	    if(attributetype == 0x40) // $OBJECT_ID ATTRIBUTE - ALWAYS RESIDENT
+	    {
+		/*
+		std::stringstream serialstream;
+		serialstream << "0x" << std::setfill('0') << std::setw(sizeof(uint8_t)*2) << std::hex << volserial;
+		 */ 
+		uint8_t* objectid = new uint8_t[16];
+		curimg->ReadContent(objectid, offset, 16);
+		std::stringstream oidstream;
+		oidstream << "0x" << std::setfill('0') << std::setw(sizeof(uint8_t)*2) << std::hex;
+		for(int i=0; i < 16; i++)
+		    oidstream << objectid[i];
+		std::cout << "Object ID: " << oidstream.str() << std::endl;
+
+	    }
+            if(attributelength == 0 || attributetype == 0xffffffff)
+                break;
+            curoffset += attributelength;
+	}
+    }
 }
 
 /*
-                else if(attrtype == 0xa0) // INDEX_ALLOCATION - always non-resident
-                {
-			if(!attrname.startsWith("$I30")) // alternate data stream
-			{
-			    for(int j=0; j < layout.split(";", Qt::SkipEmptyParts).count(); j++)
-				physicalsize += layout.split(";", Qt::SkipEmptyParts).at(j).split(",").at(1).toULongLong();
-			    //qDebug() << "ads:" << QString("$INDEX_ALLOCATION" + attrname);
-                            QList<QVariant> tmpnode;
-                            QList<QString> tmpprop;
-                            tmpnode.clear();
-                            tmpprop.clear();
-                            tmpnode << QString("$INDEX_ALLOCATION:" + attrname) << logicalsize;
-                            tmpprop.append(QString("Physical Size|" + QString::number(physicalsize) + "|Physical size for the file in bytes."));
-			    tmpprop.append(QString("Logical Size|" + QString::number(logicalsize) + "|Logical size for the file in bytes."));
-                            tmpprop.append(QString("Layout|" + layout + "|File layout in bytes as offset,size;."));
-                            adsnodelist.append(tmpnode);
-                            adsproplist.append(tmpprop);
-                            tmpnode.clear();
-                            tmpprop.clear();
-                            // RETURN THE VALUES FOR THE ADS APPROPRIATELY...
-			}
-		    }
-                }
-                else if(attrtype == 0xffffffff)
-                    break;
-                curoffset += attrlength;
-            }
-        }
-    }
     else if(QString::fromStdString(curimg->ReadContent(curoffset, 4).toStdString()) == "BAAD") // probably orphan
     {
         qDebug() << "BAAD ENTRY... Do something with it.";
@@ -1070,5 +1116,4 @@ void GetAttributeListAttribute(ForImg* curimg, uint64_t bytespercluster, uint64_
     //qDebug() << "inodecnt before getmft return:" << inodecnt;
 /*    return inodecnt;
 }
-
  */ 
