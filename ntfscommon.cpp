@@ -975,13 +975,58 @@ void GetObjectIdAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offse
 		serialstream << "0x" << std::setfill('0') << std::setw(sizeof(uint8_t)*2) << std::hex << volserial;
 		 */ 
 		uint8_t* objectid = new uint8_t[16];
-		curimg->ReadContent(objectid, offset, 16);
+		curimg->ReadContent(objectid, offset + curoffset, 16);
 		std::stringstream oidstream;
 		oidstream << "0x" << std::setfill('0') << std::setw(sizeof(uint8_t)*2) << std::hex;
 		for(int i=0; i < 16; i++)
 		    oidstream << objectid[i];
 		std::cout << "Object ID: " << oidstream.str() << std::endl;
 
+	    }
+            if(attributelength == 0 || attributetype == 0xffffffff)
+                break;
+            curoffset += attributelength;
+	}
+    }
+}
+
+void GetReparsePointAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, std::string* properties)
+{
+    char* mftentrysignature = new char[5];
+    curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
+    mftentrysignature[4] = 0;
+    if(strcmp(mftentrysignature, "FILE") == 0) // A PROPER MFT ENTRY
+    {
+	// FIRST ATTRIBUTE OFFSET
+	uint16_t firstattributeoffset = 0;
+	ReadForImgContent(curimg, &firstattributeoffset, offset + 20);
+	// ATTRIBUTE FLAGS
+	uint16_t attributeflags = 0;
+	ReadForImgContent(curimg, &attributeflags, offset + 22);
+	// LOOP OVER ATTRIBUTES TO FIND DATA ATTRIBUTE
+	uint16_t curoffset = firstattributeoffset;
+	while(curoffset < mftentrybytes)
+	{
+	    // ATTRIBUTE LENGTH
+	    uint32_t attributelength = 0;
+	    ReadForImgContent(curimg, &attributelength, offset + curoffset + 4);
+	    // ATTRIBUTE TYPE
+	    uint32_t attributetype = 0;
+	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
+	    if(attributetype == 0xc0) // $REPARSE_POINT ATTRIBUTE - ALWAYS RESIDENT
+	    {
+		uint32_t typeflags = 0;
+		ReadForImgContent(curimg, &typeflags, offset + curoffset + 8);
+		std::cout << "type flags: " << std::hex << typeflags << std::dec << std::endl;
+		/*
+		uint8_t* objectid = new uint8_t[16];
+		curimg->ReadContent(objectid, offset, 16);
+		std::stringstream oidstream;
+		oidstream << "0x" << std::setfill('0') << std::setw(sizeof(uint8_t)*2) << std::hex;
+		for(int i=0; i < 16; i++)
+		    oidstream << objectid[i];
+		std::cout << "Object ID: " << oidstream.str() << std::endl;
+		 */ 
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
                 break;

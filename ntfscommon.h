@@ -22,6 +22,7 @@ void GetIndexRootAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offs
 void GetIndexAllocationAttribute(ForImg* curimg, uint64_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* adsvector, std::string* properties); // 0xa0
 void GetAttributeListAttribute(ForImg* curimg, uint64_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties); // 0x20
 void GetObjectIdAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, std::string* properties); // 0x40
+void GetReparsePointAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offset, std::string* properties); // 0xc0
 
 //void GetReparsePointAttribute(); // 0xc0
 //void GetBitmapAttribute(); // 0xb0
