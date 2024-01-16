@@ -788,7 +788,7 @@ void GetIndexRootAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offs
 		curimg->ReadContent(&attributenamelength, offset + curoffset + 9, 1);
 		// ATTRIBUTE NAME OFFSET
 		uint16_t attributenameoffset = 0;
-		ReadForImgContent(curimg, &attributenamelength, offset + curoffset + 10);
+		ReadForImgContent(curimg, &attributenameoffset, offset + curoffset + 10);
 		// ATTRIBUTE CONTENT LENGTH
 		uint32_t attributecontentlength = 0;
 		ReadForImgContent(curimg, &attributecontentlength, offset + curoffset + 16);
@@ -860,12 +860,13 @@ void GetIndexAllocationAttribute(ForImg* curimg, uint64_t bytespercluster, uint6
 	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
 	    if(attributetype == 0xa0) // $INDEX_ALLOCATION ATTRIBUTE - ALWAYS NON-RESIDENT
 	    {
+		std::string attributename = "";
 		// ATTRIBUTE NAME LENGTH
 		uint8_t attributenamelength = 0;
 		curimg->ReadContent(&attributenamelength, offset + curoffset + 9, 1);
 		// ATTRIBUTE NAME OFFSET
 		uint16_t attributenameoffset = 0;
-		ReadForImgContent(curimg, &attributenamelength, offset + curoffset + 10);
+		ReadForImgContent(curimg, &attributenameoffset, offset + curoffset + 10);
 		if(attributenamelength > 0)
 		{
 		    for(int j=0; j < attributenamelength; j++)
