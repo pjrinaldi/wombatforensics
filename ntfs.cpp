@@ -198,6 +198,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    if(parentntinode <= maxmftentrycount)
 				    {
 					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
+					//std::cout << "si properties: " << properties << std::endl;
 					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
@@ -349,9 +350,12 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    if(parentntinode <= maxmftentrycount)
 				    {
 					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
+					//std::cout << "si properties: " << properties << std::endl;
 					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
 					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
+					GetIndexAllocationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
+					GetObjectIdAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
 					//std::cout << "Get MFT Entry Content for current file";
 				    }
 				}
