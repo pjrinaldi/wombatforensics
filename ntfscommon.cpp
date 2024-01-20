@@ -1012,8 +1012,21 @@ void GetReparsePointAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t o
 	    if(attributetype == 0xc0) // $REPARSE_POINT ATTRIBUTE - ALWAYS RESIDENT
 	    {
 		uint32_t typeflags = 0;
-		ReadForImgContent(curimg, &typeflags, offset + curoffset + 8);
+		ReadForImgContent(curimg, &typeflags, offset + curoffset + 22);
 		std::cout << "type flags: " << std::hex << typeflags << std::dec << std::endl;
+		uint16_t reparsedatasize = 0;
+		ReadForImgContent(curimg, &reparsedatasize, offset + curoffset + 26);
+		std::cout << "reparse data size: " << reparsedatasize << std::endl;
+		uint16_t targetnameoffset = 0;
+		ReadForImgContent(curimg, &targetnameoffset, offset + curoffset + 28);
+		uint16_t targetnamelength = 0;
+		ReadForImgContent(curimg, &targetnamelength, offset + curoffset + 30);
+		std::cout << "target name offset: " << targetnameoffset << " length: " << targetnamelength << std::endl;
+		uint16_t printnameoffset = 0;
+		ReadForImgContent(curimg, &printnameoffset, offset + curoffset + 32);
+		uint16_t printnamelength = 0;
+		ReadForImgContent(curimg, &printnamelength, offset + curoffset + 34);
+		std::cout << "print name offset: " << printnameoffset << " length: " << printnamelength << std::endl;
 		/*
 		uint8_t* objectid = new uint8_t[16];
 		curimg->ReadContent(objectid, offset, 16);

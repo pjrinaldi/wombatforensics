@@ -204,9 +204,8 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexAllocationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetObjectIdAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
-					//void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
+					GetReparsePointAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
 					//mftentryoffset = mftoffset + relativentinode * mftentrysize * bytespercluster;
-					//Get
 					//std::cout << "Get MFT Entry Content for current file";
 				    }
 				}
@@ -356,6 +355,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexAllocationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetObjectIdAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
+					GetReparsePointAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
 					//std::cout << "Get MFT Entry Content for current file";
 				    }
 				}
