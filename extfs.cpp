@@ -327,8 +327,8 @@ void LoadExtDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevecto
 		    laylist.push_back(laystring);
 		for(int j=0; j < laylist.size(); j++)
 		{
-		    std::size_t layoutsplit = laylist.at(i).find(",");
-		    physicalsize += std::stoull(laylist.at(i).substr(layoutsplit+1));
+		    std::size_t layoutsplit = laylist.at(j).find(",");
+		    physicalsize += std::stoull(laylist.at(j).substr(layoutsplit+1));
 		}
 		int phyremcnt = physicalsize % blocksize;
 		if(phyremcnt > 0)

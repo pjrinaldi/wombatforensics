@@ -195,12 +195,13 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    ReadForImgContent(currentitem->forimg, &i30access, indexoffset + 16 + curpos + 32);
 				    //std::cout << "i30 access: " << ConvertWindowsTimeToUnixTimeUTC(i30access) << std::endl;
 				    std::vector<FileItem> adsvector;
+				    uint32_t securityid = 0;
 				    if(parentntinode <= maxmftentrycount)
 				    {
-					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
+					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties, &securityid);
 					//std::cout << "si properties: " << properties << std::endl;
 					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
-					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
+					GetDataAttribute(currentitem, currentitem->forimg, bytespersector, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexAllocationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetObjectIdAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
@@ -347,17 +348,26 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    // 17 - Object ID
 				    // 18 - Security ID
 				    std::string properties = "";
+				    properties += std::to_string(childntinode) + ">" + std::to_string(parentntinode) + ">" + mftlayout + ">" + std::to_string(i30parentsequenceid) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30create) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30modify) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30status) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30access) + ">";
+				    std::string daprop = "";
+				    std::string irprop = "";
+				    std::string iaprop = "";
+				    std::string oiprop = "";
+				    uint32_t securityid = 0;
 				    if(parentntinode <= maxmftentrycount)
 				    {
-					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
+					GetStandardInformationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties, &securityid);
 					//std::cout << "si properties: " << properties << std::endl;
 					GetFileNameAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &properties);
-					GetDataAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
+					GetDataAttribute(currentitem, currentitem->forimg, bytespersector, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexRootAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetIndexAllocationAttribute(currentitem->forimg, bytespercluster, mftentrybytes, mftoffset + childntinode * mftentrybytes, &tmpitem, &adsvector, &properties);
 					GetObjectIdAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
 					GetReparsePointAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
+					properties += std::to_string(securityid);
+					tmpitem.properties = properties;
 					//std::cout << "Get MFT Entry Content for current file";
+					filevector->push_back(tmpitem);
 				    }
 				}
 		/*              

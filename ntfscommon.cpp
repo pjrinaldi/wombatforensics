@@ -180,7 +180,7 @@ void GetRunListLayout(ForImg* curimg, uint64_t offset, uint32_t bytespercluster,
 
 }
 
-void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties)
+void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::string* properties, uint32_t* secid)
 {
     char* mftentrysignature = new char[5];
     curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
@@ -237,16 +237,23 @@ void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, u
 		// SECURITY ID
 		uint32_t securityid = 0;
 		ReadForImgContent(curimg, &securityid, offset + curoffset + contentoffset + 52);
+		*secid = securityid;
 		// ACCESS FLAGS
 		uint32_t accessflags = 0;
 		ReadForImgContent(curimg, &accessflags, offset + curoffset + contentoffset + 32);
 		std::string attributes = "";
 		if(attributeflags == 0x00 || attributeflags == 0x02)
+		{
 		    attributes += "Not Allocated,";
+		    tmpitem->isdeleted = true;
+		}
 		else if(attributeflags == 0x01 || attributeflags == 0x03)
 		    attributes += "Allocated,";
 		if(attributeflags == 0x02 || attributeflags == 0x03)
+		{
 		    attributes += "Directory,";
+		    tmpitem->isdirectory = true;
+		}
 		if(accessflags & 0x01)
 		    attributes += "Read Only,";
 		if(accessflags & 0x02)
@@ -273,6 +280,8 @@ void GetStandardInformationAttribute(ForImg* curimg, uint32_t bytespercluster, u
 		    attributes += "Not Indexed,";
 		if(accessflags & 0x4000)
 		    attributes += "Encrypted,";
+		properties->append(attributes);
+		properties->append(">");
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
                 break;
@@ -318,15 +327,23 @@ void GetFileNameAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offse
 		// $FILE_NAME CREATE DATE
 		uint64_t createdate = 0;
 		ReadForImgContent(curimg, &createdate, offset + curoffset + 8);
+		properties->append(ConvertWindowsTimeToUnixTimeUTC(createdate));
+		properties->append(">");
 		// $FILE_NAME MODIFY DATE
 		uint64_t modifydate = 0;
 		ReadForImgContent(curimg, &modifydate, offset + curoffset + 16);
+		properties->append(ConvertWindowsTimeToUnixTimeUTC(modifydate));
+		properties->append(">");
 		// $FILE_NAME STATUS CHANGED DATE
 		uint64_t statusdate = 0;
 		ReadForImgContent(curimg, &statusdate, offset + curoffset + 24);
+		properties->append(ConvertWindowsTimeToUnixTimeUTC(statusdate));
+		properties->append(">");
 		// $FILE_NAME ACCESS DATE
 		uint64_t accessdate = 0;
 		ReadForImgContent(curimg, &accessdate, offset + curoffset + 32);
+		properties->append(ConvertWindowsTimeToUnixTimeUTC(accessdate));
+		properties->append(">");
 		// $FILE_NAME FILE NAMESPACE
 		uint8_t filenamespace = 0;
 		curimg->ReadContent(&filenamespace, offset + curoffset + contentoffset + 65, 1);
@@ -344,6 +361,7 @@ void GetFileNameAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offse
 			filename += (char)singleletter;
 		    }
 		    //std::cout << "File name: " << filename << std::endl;
+		    tmpitem->name = filename;
 		}
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
@@ -353,7 +371,7 @@ void GetFileNameAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offse
     }
 }
 
-void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* adsvector, std::string* properties)
+void GetDataAttribute(CurrentItem* currentitem, ForImg* curimg, uint16_t bytespersector, uint32_t bytespercluster, uint64_t mftentrybytes, uint64_t offset, FileItem* tmpitem, std::vector<FileItem>* adsvector, std::string* properties)
 {
     char* mftentrysignature = new char[5];
     curimg->ReadContent((uint8_t*)mftentrysignature, offset, 4);
@@ -383,8 +401,34 @@ void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentr
 		if(isnonresident == 1) // NON-RESIDENT
 		{
 		    // GET RUN LIST AND RETURN LAYOUT
+		    uint64_t logicalsize = 0;
+		    ReadForImgContent(curimg, &logicalsize, offset + curoffset + 48);
+		    //std::cout << "logical size: " << logicalsize << std::endl;
 		    GetRunListLayout(curimg, offset + curoffset, bytespercluster, attributelength, &layout);
-
+		    //std::cout << "layout: " << layout << std::endl;
+		    tmpitem->size = logicalsize;
+		    tmpitem->layout = layout;
+		    uint64_t physicalsize = 0;
+		    std::vector<std::string> laylist;
+		    laylist.clear();
+		    std::istringstream laystream(layout);
+		    std::string laystring;
+		    while(getline(laystream, laystring, ';'))
+			laylist.push_back(laystring);
+		    for(int j=0; j < laylist.size(); j++)
+		    {
+			std::size_t layoutsplit = laylist.at(j).find(",");
+			physicalsize += std::stoull(laylist.at(j).substr(layoutsplit+1));
+		    }
+		    int phyremcnt = physicalsize % bytespersector;
+		    if(phyremcnt > 0)
+			physicalsize += bytespersector;
+		    properties->append(std::to_string(physicalsize));
+		    properties->append(">");
+		    properties->append(std::to_string(logicalsize));
+		    properties->append(">");
+		    properties->append(layout);
+		    properties->append(">");
 		}
 		else // RESIDENT
 		{
@@ -395,6 +439,29 @@ void GetDataAttribute(ForImg* curimg, uint32_t bytespercluster, uint64_t mftentr
 		    uint16_t contentoffset = 0;
 		    ReadForImgContent(curimg, &contentoffset, offset + curoffset + 20);
 		    layout = std::to_string(offset + curoffset + contentoffset) + "," + std::to_string(contentsize) + ";";
+		    tmpitem->size = contentsize;
+		    tmpitem->layout = layout;
+		    properties->append(std::to_string(contentsize));
+		    properties->append(">");
+		    properties->append(std::to_string(contentsize));
+		    properties->append(">");
+		    properties->append(layout);
+		    properties->append(">");
+		}
+		if(tmpitem->isdirectory)
+		{
+		    tmpitem->cat = "Directory";
+		    tmpitem->sig = "Directory";
+		}
+		else
+		{
+		    if(tmpitem->size > 0 && !tmpitem->layout.empty())
+			GenerateCategorySignature(currentitem, &tmpitem->name, &tmpitem->layout, &tmpitem->cat, &tmpitem->sig);
+		    else
+		    {
+			tmpitem->cat = "Empty";
+			tmpitem->sig = "Empty File";
+		    }
 		}
 		//std::cout << "data layout: " << layout << std::endl;
 		// ATTRIBUTE NAME LENGTH
@@ -973,7 +1040,9 @@ void GetObjectIdAttribute(ForImg* curimg, uint64_t mftentrybytes, uint64_t offse
 		uint8_t* objectid = new uint8_t[16];
 		curimg->ReadContent(objectid, offset + curoffset + 24, 16);
 		std::string objectidguid = ReturnFormattedGuid(objectid);
-		std::cout << "Object ID: " << objectidguid << std::endl;
+		properties->append(objectidguid);
+		properties->append(">");
+		//std::cout << "Object ID: " << objectidguid << std::endl;
 	    }
             if(attributelength == 0 || attributetype == 0xffffffff)
                 break;
