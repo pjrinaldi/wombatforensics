@@ -397,6 +397,8 @@ void GetDataAttribute(CurrentItem* currentitem, ForImg* curimg, uint16_t bytespe
 	    ReadForImgContent(curimg, &attributetype, offset + curoffset);
 	    if(attributetype == 0x80) // $DATA ATTRIBUTE
 	    {
+		// THIS DOESN'T ACCOUNT FOR POPULATING TMPITEM FOR THE MAIN FILE OR THE ADS, SO IT
+		// SHOULD BE OVERWRITING ITSELF AS IT READS THE PROPERTIES.
 		std::string layout = "";
 		if(isnonresident == 1) // NON-RESIDENT
 		{

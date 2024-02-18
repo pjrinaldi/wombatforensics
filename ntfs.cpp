@@ -332,6 +332,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    //  1 - NT Inode
 				    //  2 - Parent NT Inode
 				    //  3 - MFT Entry Layout
+				    //  4 - MFT Sequence ID
 				    //  4 - $I30 Sequence ID
 				    //  5 - $I30 Create
 				    //  6 - $I30 Modify
@@ -348,7 +349,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 				    // 17 - Object ID
 				    // 18 - Security ID
 				    std::string properties = "";
-				    properties += std::to_string(childntinode) + ">" + std::to_string(parentntinode) + ">" + mftlayout + ">" + std::to_string(i30parentsequenceid) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30create) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30modify) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30status) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30access) + ">";
+				    properties += std::to_string(childntinode) + ">" + std::to_string(parentntinode) + ">" + mftlayout + ">" + std::to_string(i30sequenceid) + ">" + std::to_string(i30sequenceid) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30create) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30modify) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30status) + ">" + ConvertWindowsTimeToUnixTimeUTC(i30access) + ">";
 				    std::string daprop = "";
 				    std::string irprop = "";
 				    std::string iaprop = "";
@@ -365,6 +366,7 @@ void LoadNtfsDirectory(CurrentItem* currentitem, std::vector<FileItem>* filevect
 					GetObjectIdAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
 					GetReparsePointAttribute(currentitem->forimg, mftentrybytes, mftoffset + childntinode * mftentrybytes, &properties);
 					properties += std::to_string(securityid);
+					std::cout << "properties: " << properties << std::endl;
 					tmpitem.properties = properties;
 					//std::cout << "Get MFT Entry Content for current file";
 					filevector->push_back(tmpitem);
