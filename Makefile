@@ -14,6 +14,6 @@ blake3:
 # Link it all together
 # If i don't pull text from pdf's or html i can get rid of poppler and liblexbor_static
 wombatforensics: $(OBJECTS)
-	g++ -O3 -o wombatforensics $(OBJECTS) -lX11 -lXext -lXft -lfontconfig -lfreetype -lXcursor -lXrender -lXrandr -lXfixes -lXi -lGLU -lGL -ldl -lpthread -ljpeg -lrt -lpng -ltiff -lheif -lz -lbz2 -ltar -lzstd -lmagic -lzip -lpoppler-cpp -lsnappy -lraptor2 -llz4 -lcrypto -lffmpegthumbnailer libfwsi.a libfwnt.a libhmac.a libewf.a libaff4.a libsmraw.a libvhdi.a libqcow.a libvmdk.a libphdi.a liblexbor_static.a blake3/libblake3.a libFOX-1.7.a
+	g++ -O3 -o wombatforensics $(OBJECTS) -lX11 -lXext -lXft -lfontconfig -lfreetype -lXcursor -lXrender -lXrandr -lXfixes -lXi -lGLU -lGL -ldl -lpthread -ljpeg -lrt -lpng -ltiff -lheif -lz -lbz2 -ltar -lmagic -lzip -lpoppler-cpp -lsnappy -lraptor2 -llz4 -lcrypto -lffmpegthumbnailer libfwsi.a libfwnt.a libhmac.a libewf.a libaff4.a libsmraw.a libvhdi.a libqcow.a libvmdk.a libphdi.a liblexbor_static.a blake3/libblake3.a zstd/libzstd.a libFOX-1.7.a
 
 wombatforensics.o: wombatforensics.cpp icons.cpp managetags.cpp aboutbox.cpp viewer.cpp common.cpp settings.cpp managecarving.cpp evidencemanager.cpp forensicimage.cpp partitions.cpp directories.cpp manageviewer.cpp messagelog.cpp filters.cpp filterview.cpp digdeeper.cpp managehashlist.cpp hexviewer.cpp artifactparser.cpp pdfviewer.cpp propviewer.cpp imageviewer.cpp fat12.cpp fatcommon.cpp thumbviewer.cpp nanosvg.h nanosvgrast.h stb_image_write.h cimg/CImg.h fat16.cpp fat32.cpp exfat.cpp extfs.cpp ntfs.cpp ntfscommon.cpp
