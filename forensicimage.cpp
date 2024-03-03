@@ -385,6 +385,41 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 5) // WFI
     {
+	/*
+static void decompressFile_orDie(const char* fname, off_t startOffset, off_t endOffset)
+{
+    FILE* const fin  = fopen_orDie(fname, "rb");
+    FILE* const fout = stdout;
+    size_t const buffOutSize = ZSTD_DStreamOutSize();  // Guarantee to successfully flush at least one complete compressed block in all circumstances.
+    void*  const buffOut = malloc_orDie(buffOutSize);
+
+    ZSTD_seekable* const seekable = ZSTD_seekable_create();
+    if (seekable==NULL) { fprintf(stderr, "ZSTD_seekable_create() error \n"); exit(10); }
+
+    size_t const initResult = ZSTD_seekable_initFile(seekable, fin);
+    if (ZSTD_isError(initResult)) { fprintf(stderr, "ZSTD_seekable_init() error : %s \n", ZSTD_getErrorName(initResult)); exit(11); }
+
+    while (startOffset < endOffset) {
+        size_t const result = ZSTD_seekable_decompress(seekable, buffOut, MIN(endOffset - startOffset, buffOutSize), startOffset);
+        if (!result) {
+            break;
+        }
+
+        if (ZSTD_isError(result)) {
+            fprintf(stderr, "ZSTD_seekable_decompress() error : %s \n",
+                    ZSTD_getErrorName(result));
+            exit(12);
+        }
+        fwrite_orDie(buffOut, result, fout);
+        startOffset += result;
+    }
+
+    ZSTD_seekable_free(seekable);
+    fclose_orDie(fin);
+    fclose_orDie(fout);
+    free(buffOut);
+}
+	*/ 
         FILE* fout = NULL;
         fout = fopen(imgpath.c_str(), "rb");
         size_t bufinsize = ZSTD_DStreamInSize();
