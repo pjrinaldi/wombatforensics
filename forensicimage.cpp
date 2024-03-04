@@ -163,10 +163,12 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 5) // WFI
     {
+	std::string mdpath = imgpath + ".md";
+	std::cout << "mdpath: " << mdpath.c_str() << std::endl;
 	FILE* wfifile = NULL;
-	wfifile = fopen(imgpath.c_str(), "rb");
-	fseek(wfifile, 0, SEEK_END);
-	fseek(wfifile, -264, SEEK_CUR);
+	wfifile = fopen(mdpath.c_str(), "rb");
+	//fseek(wfifile, 0, SEEK_END);
+	//fseek(wfifile, -264, SEEK_CUR);
 	fread(&wfimd, sizeof(struct wfi_metadata), 1, wfifile);
 	fclose(wfifile);
         imgsize = wfimd.totalbytes;
