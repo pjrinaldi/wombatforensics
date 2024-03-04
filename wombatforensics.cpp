@@ -3337,7 +3337,7 @@ void WombatForensics::UpdatePartitions(void)
 	    FXString filestr = FXString(gichar);
 	    int splitoffset = filestr.find("|");
 	    globalid = filestr.mid(0, splitoffset).toULong();
-	    //std::cout << "globalid from fs file: [" << globalid << "]" << std::endl;
+	    std::cout << "globalid from fs file: [" << globalid << "]" << std::endl;
 	    //std::cout << "fs properties: [" << filestr.mid(splitoffset + 1, filestr.length() - splitoffset).text() << "]" << std::endl;
 	    // old method prior to adding properties to the fs burrow file
 	    //globalid = FXString(gichar).toULong();
@@ -3346,8 +3346,9 @@ void WombatForensics::UpdatePartitions(void)
 	}
 	else
 	{
+	    std::cout << "volprops size: " << volprops.size() << std::endl;
 	    IncrementGlobalId(&globalid, &curid);
-	    //std::cout << "new vol globalid: " << globalid << " curid: " << curid << std::endl;
+	    std::cout << "new vol globalid: " << globalid << " curid: " << curid << std::endl;
 	    volfile.close();
 	    FXFile::create(volfilestr, FXIO::OwnerReadWrite);
 	    volfile.open(volfilestr, FXIO::Writing, FXIO::OwnerReadWrite);
@@ -3357,9 +3358,9 @@ void WombatForensics::UpdatePartitions(void)
 	    volfile.close();
 	    //std::cout << "global id when not existing fs opened: " << globalid << std::endl;
 	}
-	//itemtype = 2;
+	//itemtype = 2lmagic -lzip -lpoppler-cpp -lsnappy -lraptor2 -llz4 -lcrypto -lffmpegthumbnailer libfwsi.;
 	pname = FXString(volnames.at(i).c_str());
-	//std::cout << "pname: " << pname.text() << std::endl;
+	std::cout << "pname: " << pname.text() << std::endl;
 	tablelist->setItem(i, 0, new CheckTableItem(tablelist, NULL, NULL, ""));
 	//tablelist->setItemData(i, 1, &itemtype);
 	tablelist->setItemText(i, 1, FXString::value(globalid));
@@ -3371,7 +3372,7 @@ void WombatForensics::UpdatePartitions(void)
 	tablelist->setItemIconPosition(i, 2, FXTableItem::BEFORE);
 	tablelist->setItemData(i, 4, &(voloffsets.at(i)));
 	tablelist->setItemText(i, 4, FXString(ReturnFormattingSize(volsizes.at(i)).c_str()));
-	//std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
+	std::cout << volnames.at(i) << " " << volsizes.at(i) << " " << voloffsets.at(i) << std::endl;
     }
     // table formatting
     tablelist->fitColumnsToContents(0);

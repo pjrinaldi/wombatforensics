@@ -79,6 +79,8 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    ptpath += "extfs";
 	else if(pname->contains("NTFS") != 0)
 	    ptpath += "ntfs";
+	else if(pname->contains("UNALLOCATED") != 0)
+	    ptpath += "unalloc";
     }
     if(ptype & 0x02)
 	ptpath += "file";

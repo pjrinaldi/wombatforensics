@@ -10,6 +10,7 @@
 #include <bitset>
 
 #include "common.h"
+#include "fatcommon.h"
 #include "forensicimage.h"
 
 void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets, std::vector<std::string>* volprops);
