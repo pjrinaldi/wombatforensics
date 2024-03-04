@@ -10,6 +10,7 @@
 #include <vector>
 #include <filesystem>
 #include <locale>
+#include <sys/param.h>
 // SHARED LIBRARIES
 #include "libewf.h"
 #include "libsmraw.h"
@@ -19,7 +20,8 @@
 #include "libqcow.h"
 #include "libvmdk.h"
 #include "libphdi.h"
-#include <zstd.h>
+#include "zstd/zstdcommon.h"
+#include "zstd/zstd_seekable.h"
 
 struct wfi_metadata
 {

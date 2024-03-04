@@ -385,6 +385,44 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 5) // WFI
     {
+	std::cout << "pos: " << pos << " size: " << size << std::endl;
+	FILE* const fin = fopen_orDie(imgpath.c_str(), "rb");
+	ZSTD_seekable* const seekable = ZSTD_seekable_create();
+	if (seekable==NULL) { fprintf(stderr, "ZSTD_seekable_create() error \n"); }
+
+	size_t initresult = ZSTD_seekable_initFile(seekable, fin); 
+	if (ZSTD_isError(initresult)) { fprintf(stderr, "ZSTD_seekable_init() error : %s \n", ZSTD_getErrorName(initresult)); }
+	std::cout << "init result: " << (int)initresult << std::endl;
+	size_t result = ZSTD_seekable_decompress(seekable, (void*)buf, size, pos);
+        if (ZSTD_isError(result)) {
+            fprintf(stderr, "ZSTD_seekable_decompress() error : %s \n", ZSTD_getErrorName(result));
+        }
+	std::cout << "result: " << (int)result << std::endl;
+	ZSTD_seekable_free(seekable);
+	fclose_orDie(fin);
+	/*
+	FILE* const fin = fopen_orDie(imgpath.c_str(), "rb");
+	size_t const bufoutsize = ZSTD_DStreamOutSize();
+	void* const bufout = malloc_orDie(bufoutsize);
+	ZSTD_seekable* const seekable = ZSTD_seekable_create();
+	size_t const initresult = ZSTD_seekable_initFile(seekable, fin);
+	off_t curoffset = 0;
+	char* tmpbuf = (char*)malloc_orDie(size);
+	while(curoffset < size)
+	{
+	    size_t const result = ZSTD_seekable_decompress(seekable, bufout, MIN(size, bufoutsize), pos + curoffset);
+	    if(!result)
+		break;
+	    memcpy(tmpbuf+(curoffset*bufoutsize), bufout, MIN(size, bufoutsize));
+	    curoffset += result;
+	}
+	memcpy(buf, tmpbuf, size);
+
+	ZSTD_seekable_free(seekable);
+	fclose_orDie(fin);
+	free(bufout);
+	free(tmpbuf);
+	*/
 	/*
 static void decompressFile_orDie(const char* fname, off_t startOffset, off_t endOffset)
 {
@@ -392,23 +430,12 @@ static void decompressFile_orDie(const char* fname, off_t startOffset, off_t end
     FILE* const fout = stdout;
     size_t const buffOutSize = ZSTD_DStreamOutSize();  // Guarantee to successfully flush at least one complete compressed block in all circumstances.
     void*  const buffOut = malloc_orDie(buffOutSize);
-
     ZSTD_seekable* const seekable = ZSTD_seekable_create();
-    if (seekable==NULL) { fprintf(stderr, "ZSTD_seekable_create() error \n"); exit(10); }
-
     size_t const initResult = ZSTD_seekable_initFile(seekable, fin);
-    if (ZSTD_isError(initResult)) { fprintf(stderr, "ZSTD_seekable_init() error : %s \n", ZSTD_getErrorName(initResult)); exit(11); }
-
     while (startOffset < endOffset) {
         size_t const result = ZSTD_seekable_decompress(seekable, buffOut, MIN(endOffset - startOffset, buffOutSize), startOffset);
         if (!result) {
             break;
-        }
-
-        if (ZSTD_isError(result)) {
-            fprintf(stderr, "ZSTD_seekable_decompress() error : %s \n",
-                    ZSTD_getErrorName(result));
-            exit(12);
         }
         fwrite_orDie(buffOut, result, fout);
         startOffset += result;
@@ -420,6 +447,7 @@ static void decompressFile_orDie(const char* fname, off_t startOffset, off_t end
     free(buffOut);
 }
 	*/ 
+    /*
         FILE* fout = NULL;
         fout = fopen(imgpath.c_str(), "rb");
         size_t bufinsize = ZSTD_DStreamInSize();
@@ -466,6 +494,7 @@ static void decompressFile_orDie(const char* fname, off_t startOffset, off_t end
             }
         }
         memcpy(buf, tmpbuffer+relpos, size);
+	*/
     }
     else if(imgtype == 6) // WLI
     {
