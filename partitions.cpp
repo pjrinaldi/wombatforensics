@@ -51,7 +51,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                 if(partsize > 0 && partsize <= curforimg->Size())
                     pcount++;
             }
-	    std::cout << "pcount: " << pcount << std::endl;
+	    //std::cout << "pcount: " << pcount << std::endl;
             if(strcmp(exfattype, "EXFAT") == 0 || strcmp(fattype, "FAT12") == 0 || strcmp(fattype, "FAT16") == 0 || strcmp(fat32type, "FAT32") == 0 || strcmp(ntfstype, "NTFS") == 0 || strcmp(bfstype, "1SFB") == 0) // EXFAT | FAT12 | FAT16 | FAT32 | NTFS | BFS W/O PARTITION TABLE
             {
 		pcount = 0;
@@ -61,7 +61,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                 volsizes->push_back(curforimg->Size());
                 voloffsets->push_back(0);
             }
-	    std::cout << "pcount loop: " << pcount << std::endl;
+	    //std::cout << "pcount loop: " << pcount << std::endl;
             for(int i=0; i < pcount; i++)
             {
                 uint8_t curparttype = 0;
@@ -85,7 +85,7 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                     sectorcheck = curforimg->Size() / 512;
                 if(curoffset > sectorcheck) // add unallocated partition
                 {
-		    std::cout << "i: " << i << " add unallocated" << std::endl;
+		    //std::cout << "i: " << i << " add unallocated" << std::endl;
                     // Parse Partition(curforimg, sectorcheck, curoffset, ptreecnt, 0);
                     volnames->push_back("UNALLOCATED");
                     volsizes->push_back(curoffset*512);
@@ -116,10 +116,10 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
                 {
                     if(cursize > 0)
                     {
-			std::cout << "i: " << i << " add allocated partition" << std::endl;
+			//std::cout << "i: " << i << " add allocated partition" << std::endl;
 			//std::cout << "ntfs from mbr partition" << std::endl;
                         // Parse Partition(curforimg, curoffset, cursize, ptreecnt, 1);
-			std::cout << "curoffset: " << curoffset*512 << " cursector: " << curoffset << std::endl;
+			//std::cout << "curoffset: " << curoffset*512 << " cursector: " << curoffset << std::endl;
 			GetVolumeProperties(curforimg, curoffset*512, volprops);
                         volnames->push_back(GetFileSystemName(curforimg, curoffset*512));
                         volsizes->push_back(cursize*512);
@@ -158,15 +158,15 @@ void LoadPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::
     }
     else // NO PARTITION MAP, JUST A FS AT ROOT OF IMAGE
     {
-	std::cout << "ntfs from no partitions" << std::endl;
+	//std::cout << "ntfs from no partitions" << std::endl;
 	GetVolumeProperties(curforimg, 0, volprops);
         volnames->push_back(GetFileSystemName(curforimg, 0));
         volsizes->push_back(curforimg->Size());
         voloffsets->push_back(0);
     }
-    std::cout << "volnames size: " << volnames->size() << std::endl;
-    std::cout << "volsizes size: " << volsizes->size() << std::endl;
-    std::cout << "voloffsets size: " << voloffsets->size() << std::endl;
+    //std::cout << "volnames size: " << volnames->size() << std::endl;
+    //std::cout << "volsizes size: " << volsizes->size() << std::endl;
+    //std::cout << "voloffsets size: " << voloffsets->size() << std::endl;
 }
 
 void LoadGptPartitions(ForImg* curforimg, std::vector<std::string>* volnames, std::vector<uint64_t>* volsizes, std::vector<uint64_t>* voloffsets, std::vector<std::string>* volprops)
@@ -322,7 +322,7 @@ void LoadExtendedPartitions(ForImg* curforimg, uint64_t epoffset, uint64_t epsiz
 
 void GetVolumeProperties(ForImg* curforimg, uint64_t offset, std::vector<std::string>* volprops)
 {
-    std::cout << "offset: " << offset << std::endl;
+    //std::cout << "offset: " << offset << std::endl;
     std::string properties = "";
     uint16_t sig16 = 0;
     uint32_t sig32 = 0;

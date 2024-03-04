@@ -387,7 +387,7 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 5) // WFI
     {
-	std::cout << "pos: " << pos << " size: " << size << std::endl;
+	//std::cout << "pos: " << pos << " size: " << size << std::endl;
 	FILE* const fin = fopen_orDie(imgpath.c_str(), "rb");
 	size_t const bufoutsize = ZSTD_DStreamOutSize();
 	void* const bufout = malloc_orDie(bufoutsize);
@@ -397,21 +397,27 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
 	size_t initresult = ZSTD_seekable_initFile(seekable, fin); 
 	size_t curoff = pos;
 	if (ZSTD_isError(initresult)) { fprintf(stderr, "ZSTD_seekable_init() error : %s \n", ZSTD_getErrorName(initresult)); }
-	std::cout << "init result: " << (int)initresult << std::endl;
+	//std::cout << "init result: " << (int)initresult << std::endl;
+	size_t result = ZSTD_seekable_decompress(seekable, (void*)buf, size, pos);
+	if (ZSTD_isError(result)) { fprintf(stderr, "ZSTD_seekable_decompress() error : %s \n", ZSTD_getErrorName(result)); }
+	/*
 	while(curoff < pos + size)
 	{
 	    size_t result = ZSTD_seekable_decompress(seekable, (void*)buf, minsize, curoff);
 	    if (ZSTD_isError(result)) { fprintf(stderr, "ZSTD_seekable_decompress() error : %s \n", ZSTD_getErrorName(result)); }
-	    std::cout << "result: " << (int)result << std::endl;
+	    //std::cout << "result: " << (int)result << std::endl;
 	    if(!result)
 		break;
 	    memcpy(buf+(curoff*minsize), bufout, minsize);
 	    curoff += result;
 	}
+	*/
+	/*
 	std::cout << "buf: \"";
 	for(int i = 0; i < sizeof(buf); i++)
 	    std::cout << (char)buf[i];
 	std::cout << "\"\n" << std::endl;
+	*/
 	ZSTD_seekable_free(seekable);
 	fclose_orDie(fin);
 	free(bufout);
