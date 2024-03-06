@@ -18,7 +18,7 @@ ForImg::ForImg(std::string imgfile)
         imgtype = 2;
     else if(imgext.compare("aff4") == 0 || imgext.compare("AFF4") == 0) // AFF4
         imgtype = 3;
-    else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW
+    else if(imgext.compare("000") == 0 || imgext.compare("00") == 0 || imgext.compare("001") == 0) // SPLIT RAW
         imgtype = 4;
     else if(imgext.compare("wfi") == 0) // WFI
         imgtype = 5;
@@ -276,7 +276,9 @@ ForImg::ForImg(std::string imgfile)
 	libsmraw_error_t* smerror = NULL;
 	char** globfiles = NULL;
 	int globfilecnt = 0;
-	std::filesystem::path imgdir = std::filesystem::path("/tmp/sfsmnt/");
+	std::filesystem::path imgdir = "/tmp/sfsmnt/";
+	std::vector<std::filesystem::path> filevector;
+	filevector.clear();
 	for(auto const& dir_entry : std::filesystem::recursive_directory_iterator(imgdir))
 	{
 	    if(std::filesystem::is_regular_file(dir_entry))
@@ -284,24 +286,36 @@ ForImg::ForImg(std::string imgfile)
 		if(dir_entry.path().string().find(".log") == std::string::npos)
 		{
 		    globfilecnt++;
-		    //filevector.push_back(dir_entry);
+		    filevector.push_back(dir_entry);
 		}
 	    }
 	}
+	std::cout << "globfilecnt: " << globfilecnt << std::endl;
 	char* filenames[globfilecnt] = {NULL};
-	int i=0;
+	filenames[0] = (char*)filevector.at(0).string().c_str();
+	std::cout << "0 " << filevector.at(0).string().c_str() << std::endl;
+	int i=1;
+	for(int i=1; i < globfilecnt; i++)
+	{
+	    filenames[i] = (char*)filevector.at(i).string().c_str();
+	    std::cout << i << " " << filevector.at(i).string().c_str() << std::endl;
+	}
+	/*
 	for(auto const& dir_entry : std::filesystem::recursive_directory_iterator(imgdir))
 	{
 	    if(std::filesystem::is_regular_file(dir_entry))
 	    {
-		if(dir_entry.path().string().find(".log") == std::string::npos)
+		if(dir_entry.path().string().find(".log") == std::string::npos && dir_entry.path().string().find(filevector.at(0).string()) == std::string::npos)
 		{
 		    filenames[i] = (char*)dir_entry.path().string().c_str();
+		    std::cout << "dir entry: " << dir_entry.path().string().c_str() << std::endl;
 		    i++;
 		    //filevector.push_back(dir_entry);
+		    //filenames[i] = (char*)file.path().string().c_str();
 		}
 	    }
 	}
+	*/
 	int retopen = 0;
 	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
 	if(retopen == -1)
