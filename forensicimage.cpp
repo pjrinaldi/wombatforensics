@@ -32,6 +32,8 @@ ForImg::ForImg(std::string imgfile)
 	imgtype = 9;
     else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
 	imgtype = 10;
+    else if(imgext.compare("sfs") == 0) // SFS
+	imgtype = 11;
     else // ANY OLD FILE
         imgtype = 0;
     libewf_error_free(&ewferr);
@@ -261,6 +263,71 @@ ForImg::ForImg(std::string imgfile)
 	libphdi_handle_free(&phdifile, &phdierror);
 	libphdi_error_free(&phdierror);
     }
+    else if(imgtype == 11) // SFS
+    {
+	// lazy man method
+	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
+	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
+	//std::cout << sqfusepath << std::endl;
+	// MOUNT SQUASH FS IMAGE
+	std::system(sqfusepath.c_str());
+	
+	libsmraw_handle_t* smhandle = NULL;
+	libsmraw_error_t* smerror = NULL;
+	char** globfiles = NULL;
+	int globfilecnt = 0;
+	std::filesystem::path imgdir = std::filesystem::path("/tmp/sfsmnt/");
+	for(auto const& dir_entry : std::filesystem::recursive_directory_iterator(imgdir))
+	{
+	    if(std::filesystem::is_regular_file(dir_entry))
+	    {
+		if(dir_entry.path().string().find(".log") == std::string::npos)
+		{
+		    globfilecnt++;
+		    //filevector.push_back(dir_entry);
+		}
+	    }
+	}
+	char* filenames[globfilecnt] = {NULL};
+	int i=0;
+	for(auto const& dir_entry : std::filesystem::recursive_directory_iterator(imgdir))
+	{
+	    if(std::filesystem::is_regular_file(dir_entry))
+	    {
+		if(dir_entry.path().string().find(".log") == std::string::npos)
+		{
+		    filenames[i] = (char*)dir_entry.path().string().c_str();
+		    i++;
+		    //filevector.push_back(dir_entry);
+		}
+	    }
+	}
+	int retopen = 0;
+	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	retopen = libsmraw_handle_initialize(&smhandle, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	retopen = libsmraw_handle_open(smhandle, globfiles, globfilecnt, LIBSMRAW_OPEN_READ, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	libsmraw_handle_get_media_size(smhandle, &imgsize, &smerror);
+	if(retopen == -1)
+	    libsmraw_error_fprint(smerror, stdout);
+	libsmraw_handle_close(smhandle, &smerror);
+	libsmraw_handle_free(&smhandle, &smerror);
+	libsmraw_glob_free(globfiles, globfilecnt, &smerror);
+	libsmraw_error_free(&smerror);
+
+	// UNMOUNT SQUASH FS IMAGE
+	std::system(squfusepath.c_str());
+	// need to access the squash fs directory and then access all the .## files
+	// use libsmraw to access the .## files
+	//sqfs* tmpsfs = NULL;
+	//int sqvfd = squash_open(tmpsfs, imgpath.c_str());
+	// attempting to use libsquashfs.a
+    }
     else // everything else
     {
 	std::filesystem::path imagepath(imgpath);
@@ -397,125 +464,11 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
 	size_t initresult = ZSTD_seekable_initFile(seekable, fin); 
 	size_t curoff = pos;
 	if (ZSTD_isError(initresult)) { fprintf(stderr, "ZSTD_seekable_init() error : %s \n", ZSTD_getErrorName(initresult)); }
-	//std::cout << "init result: " << (int)initresult << std::endl;
 	size_t result = ZSTD_seekable_decompress(seekable, (void*)buf, size, pos);
 	if (ZSTD_isError(result)) { fprintf(stderr, "ZSTD_seekable_decompress() error : %s \n", ZSTD_getErrorName(result)); }
-	/*
-	while(curoff < pos + size)
-	{
-	    size_t result = ZSTD_seekable_decompress(seekable, (void*)buf, minsize, curoff);
-	    if (ZSTD_isError(result)) { fprintf(stderr, "ZSTD_seekable_decompress() error : %s \n", ZSTD_getErrorName(result)); }
-	    //std::cout << "result: " << (int)result << std::endl;
-	    if(!result)
-		break;
-	    memcpy(buf+(curoff*minsize), bufout, minsize);
-	    curoff += result;
-	}
-	*/
-	/*
-	std::cout << "buf: \"";
-	for(int i = 0; i < sizeof(buf); i++)
-	    std::cout << (char)buf[i];
-	std::cout << "\"\n" << std::endl;
-	*/
 	ZSTD_seekable_free(seekable);
 	fclose_orDie(fin);
 	free(bufout);
-	/*
-	FILE* const fin = fopen_orDie(imgpath.c_str(), "rb");
-	size_t const bufoutsize = ZSTD_DStreamOutSize();
-	void* const bufout = malloc_orDie(bufoutsize);
-	ZSTD_seekable* const seekable = ZSTD_seekable_create();
-	size_t const initresult = ZSTD_seekable_initFile(seekable, fin);
-	off_t curoffset = 0;
-	char* tmpbuf = (char*)malloc_orDie(size);
-	while(curoffset < size)
-	{
-	    size_t const result = ZSTD_seekable_decompress(seekable, bufout, MIN(size, bufoutsize), pos + curoffset);
-	    if(!result)
-		break;
-	    memcpy(tmpbuf+(curoffset*bufoutsize), bufout, MIN(size, bufoutsize));
-	    curoffset += result;
-	}
-	memcpy(buf, tmpbuf, size);
-
-	ZSTD_seekable_free(seekable);
-	free(bufout);
-	fclose_orDie(fin);
-	free(tmpbuf);
-	*/
-	/*
-static void decompressFile_orDie(const char* fname, off_t startOffset, off_t endOffset)
-{
-    FILE* const fin  = fopen_orDie(fname, "rb");
-    FILE* const fout = stdout;
-    size_t const buffOutSize = ZSTD_DStreamOutSize();  // Guarantee to successfully flush at least one complete compressed block in all circumstances.
-    void*  const buffOut = malloc_orDie(buffOutSize);
-    ZSTD_seekable* const seekable = ZSTD_seekable_create();
-    size_t const initResult = ZSTD_seekable_initFile(seekable, fin);
-    while (startOffset < endOffset) {
-        size_t const result = ZSTD_seekable_decompress(seekable, buffOut, MIN(endOffset - startOffset, buffOutSize), startOffset);
-        if (!result) {
-            break;
-        }
-        fwrite_orDie(buffOut, result, fout);
-        startOffset += result;
-    }
-
-    ZSTD_seekable_free(seekable);
-    fclose_orDie(fin);
-    fclose_orDie(fout);
-    free(buffOut);
-}
-	*/ 
-    /*
-        FILE* fout = NULL;
-        fout = fopen(imgpath.c_str(), "rb");
-        size_t bufinsize = ZSTD_DStreamInSize();
-        void* bufin = malloc(bufinsize);
-        size_t bufoutsize = ZSTD_DStreamOutSize();
-        void* bufout = malloc(bufoutsize);
-        ZSTD_DCtx* dctx = ZSTD_createDCtx();
-        size_t toread = bufinsize;
-        size_t read;
-        size_t lastret = 0;
-        int isempty = 1;
-        uint64_t indxstart = pos / bufoutsize;
-        uint64_t relpos = pos - (indxstart * bufoutsize);
-        uint64_t startingblock = pos / bufoutsize;
-        uint64_t endingblock = (pos + size) / bufoutsize;
-        int posodd = (pos + size) % bufoutsize;
-        if(posodd > 0)
-            endingblock++;
-        size_t tmpbufsize = bufoutsize * (endingblock - startingblock + 1);
-        char* tmpbuffer = (char*)malloc(tmpbufsize);
-        int blkcnt = 0;
-        int bufblkoff = 0;
-        size_t readcount = 0;
-        size_t outcount = 0;
-        while( (read = fread(bufin, 1, toread, fout)) )
-        {
-            readcount = readcount + read;
-            isempty = 0;
-
-            ZSTD_inBuffer input = { bufin, read, 0 };
-            while(input.pos < input.size)
-            {
-                ZSTD_outBuffer output = { bufout, bufoutsize, 0 };
-                size_t ret = ZSTD_decompressStream(dctx, &output, &input);
-                if(blkcnt >= startingblock && blkcnt <= endingblock)
-                {
-                    memcpy(tmpbuffer+(bufblkoff*bufoutsize), bufout, bufoutsize);
-                    bufblkoff++;
-                }
-                outcount = outcount + output.pos;
-                blkcnt++;
-
-                lastret = ret;
-            }
-        }
-        memcpy(buf, tmpbuffer+relpos, size);
-	*/
     }
     else if(imgtype == 6) // WLI
     {
@@ -599,6 +552,9 @@ static void decompressFile_orDie(const char* fname, off_t startOffset, off_t end
 	libphdi_handle_close(phdifile, &phdierror);
 	libphdi_handle_free(&phdifile, &phdierror);
 	libphdi_error_free(&phdierror);
+    }
+    else if(imgtype == 11) // SFS
+    {
     }
     else // EVERYTHING ELSE
     {

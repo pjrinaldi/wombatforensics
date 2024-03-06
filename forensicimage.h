@@ -20,6 +20,7 @@
 #include "libqcow.h"
 #include "libvmdk.h"
 #include "libphdi.h"
+
 #include "zstd/zstdcommon.h"
 #include "zstd/zstd_seekable.h"
 
