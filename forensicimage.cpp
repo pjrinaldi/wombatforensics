@@ -34,6 +34,8 @@ ForImg::ForImg(std::string imgfile)
 	imgtype = 10;
     else if(imgext.compare("sfs") == 0) // SFS
 	imgtype = 11;
+    else if(imgext.compare("wltg") == 0) // WALAFUS
+	imgtype = 12;
     else // ANY OLD FILE
         imgtype = 0;
     libewf_error_free(&ewferr);
@@ -362,6 +364,36 @@ ForImg::ForImg(std::string imgfile)
 	//sqfs* tmpsfs = NULL;
 	//int sqvfd = squash_open(tmpsfs, imgpath.c_str());
 	// attempting to use libsquashfs.a
+    }
+    else if(imgtype == 12) // WALAFUS
+    {
+	std::filesystem::path tmppath = std::filesystem::canonical(imgpath);
+	std::string imgfilename = tmppath.filename().string();
+	int efound = imgfilename.rfind(".");
+	std::string vdirname = imgfilename.substr(0, efound);
+	vdirname = "/" + vdirname;
+	Filesystem filesystem;
+	WltgReader pack_wltg(imgpath.c_str(), "");
+	filesystem.add_source(&pack_wltg);
+	std::vector<WltgReaderFileSystemNode*> childnodes;
+	childnodes.clear();
+	WltgReaderFileSystemNode* rootnode = pack_wltg.lookup_path(vdirname);
+	std::cout << rootnode->name << std::endl;
+	// HAVE TO MAKE RECURSIVE, BUT WHAT DOES THAT GET ME, A LIST OF FILES, WHICH I THEN HAVE TO MANUALLY
+	// GET INTO TO READ FROM...
+	for(auto& [key, value]: rootnode->children)
+	{
+	    childnodes.push_back(value);
+	    std::cout << key << std::endl;
+	}
+	for(int i=0; i < childnodes.size(); i++)
+	{
+	    for(auto& [key, value]: childnodes.at(i)->children)
+	    {
+		childnodes.push_back(value);
+		std::cout << key << std::endl;
+	    }
+	}
     }
     else // everything else
     {

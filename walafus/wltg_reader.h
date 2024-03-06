@@ -5,8 +5,8 @@
 #include <iostream>
 #include <memory>
 #include "filesystem.h"
-#include "../../wltg/wltg_internal_readers.h"
-#include "../../wltg/wltg_structure.h"
+#include "wltg_internal_readers.h"
+#include "wltg_structure.h"
 
 
 #define WLTG_MAX_INODE_CNT 10'000'000

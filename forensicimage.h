@@ -22,6 +22,8 @@
 #include "libphdi.h"
 
 #include "walafus/filesystem.h"
+#include "walafus/wltg_reader.h"
+#include "walafus/wltg_packer.h"
 
 #include "zstd/zstdcommon.h"
 #include "zstd/zstd_seekable.h"

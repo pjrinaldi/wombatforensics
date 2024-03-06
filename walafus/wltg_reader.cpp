@@ -1,6 +1,6 @@
 #include <stack>
-#include "../include/walafus/wltg_reader.h"
-#include "../include/walafus/errors.h"
+#include "wltg_reader.h"
+#include "errors.h"
 
 
 #define CHECK_READ_ERROR(condition, description, ...) \
