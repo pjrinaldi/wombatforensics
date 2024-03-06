@@ -201,6 +201,7 @@ WombatForensics::WombatForensics(FXApp* a):FXMainWindow(a, "Wombat Forensics", n
     FXDir::create("/tmp/wf/");
     FXDir::create(configpath);
     FXDir::create("/tmp/sfsmnt/");
+    FXDir::create("/tmp/sfsraw/");
 
     FXPNGImage* thumbmissingimage = new FXPNGImage(this->getApp(), thumbmissing);
     FXFileStream tmpstr;

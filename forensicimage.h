@@ -21,6 +21,8 @@
 #include "libvmdk.h"
 #include "libphdi.h"
 
+#include "walafus/filesystem.h"
+
 #include "zstd/zstdcommon.h"
 #include "zstd/zstd_seekable.h"
 

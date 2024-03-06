@@ -267,11 +267,44 @@ ForImg::ForImg(std::string imgfile)
     {
 	// lazy man method
 	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
-	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
 	//std::cout << sqfusepath << std::endl;
+	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
+
 	// MOUNT SQUASH FS IMAGE
 	std::system(sqfusepath.c_str());
-	
+
+	// GET THE RAW FUSE PATH
+	std::string rawfusepath = "smrawmount "; 
+
+	std::filesystem::path imgdir = "/tmp/sfsmnt/";
+	for(auto const& dir_entry : std::filesystem::recursive_directory_iterator(imgdir))
+	{
+	    if(std::filesystem::is_regular_file(dir_entry))
+	    {
+		if(dir_entry.path().string().find(".log") == std::string::npos)
+		{
+		    rawfusepath += dir_entry.path().string();
+		    break;
+		}
+	    }
+	}
+	std::cout << rawfusepath << std::endl;
+	rawfusepath += " /tmp/sfsraw/";
+	std::cout << "rawfusepath: " << rawfusepath << std::endl;
+
+	std::string rawufusepath = "fusermount -u /tmp/sfsraw/";
+
+	// MOUNT SMRAW SFS IMAGE
+	std::system(rawfusepath.c_str());
+
+	// GET SINGLE RAW IMAGE SIZE
+	imagebuffer.open("/tmp/sfsraw/smraw1", std::ios::in|std::ios::binary);
+	imagebuffer.seekg(0, imagebuffer.beg);
+	imagebuffer.seekg(0, imagebuffer.end);
+	imgsize = imagebuffer.tellg();
+	imagebuffer.close();
+
+	/*
 	libsmraw_handle_t* smhandle = NULL;
 	libsmraw_error_t* smerror = NULL;
 	char** globfiles = NULL;
@@ -300,22 +333,6 @@ ForImg::ForImg(std::string imgfile)
 	    filenames[i] = (char*)filevector.at(i).string().c_str();
 	    std::cout << i << " " << filevector.at(i).string().c_str() << std::endl;
 	}
-	/*
-	for(auto const& dir_entry : std::filesystem::recursive_directory_iterator(imgdir))
-	{
-	    if(std::filesystem::is_regular_file(dir_entry))
-	    {
-		if(dir_entry.path().string().find(".log") == std::string::npos && dir_entry.path().string().find(filevector.at(0).string()) == std::string::npos)
-		{
-		    filenames[i] = (char*)dir_entry.path().string().c_str();
-		    std::cout << "dir entry: " << dir_entry.path().string().c_str() << std::endl;
-		    i++;
-		    //filevector.push_back(dir_entry);
-		    //filenames[i] = (char*)file.path().string().c_str();
-		}
-	    }
-	}
-	*/
 	int retopen = 0;
 	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
 	if(retopen == -1)
@@ -333,6 +350,10 @@ ForImg::ForImg(std::string imgfile)
 	libsmraw_handle_free(&smhandle, &smerror);
 	libsmraw_glob_free(globfiles, globfilecnt, &smerror);
 	libsmraw_error_free(&smerror);
+	*/
+
+	// UNMOUNT SMRAW SFS IMAGE
+	std::system(rawufusepath.c_str());
 
 	// UNMOUNT SQUASH FS IMAGE
 	std::system(squfusepath.c_str());
