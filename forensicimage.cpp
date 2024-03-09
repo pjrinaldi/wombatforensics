@@ -370,30 +370,36 @@ ForImg::ForImg(std::string imgfile)
 	std::filesystem::path tmppath = std::filesystem::canonical(imgpath);
 	std::string imgfilename = tmppath.filename().string();
 	int efound = imgfilename.rfind(".");
-	std::string vdirname = imgfilename.substr(0, efound);
-	vdirname = "/" + vdirname;
+	std::string vdirname = "/" + imgfilename.substr(0, efound) + "/" + imgfilename.substr(0, efound) + ".dd";
+
 	Filesystem filesystem;
-	WltgReader pack_wltg(imgpath.c_str(), "");
+	WltgReader pack_wltg(imgpath.c_str());
 	filesystem.add_source(&pack_wltg);
-	std::vector<WltgReaderFileSystemNode*> childnodes;
-	childnodes.clear();
-	WltgReaderFileSystemNode* rootnode = pack_wltg.lookup_path(vdirname);
-	std::cout << rootnode->name << std::endl;
-	// HAVE TO MAKE RECURSIVE, BUT WHAT DOES THAT GET ME, A LIST OF FILES, WHICH I THEN HAVE TO MANUALLY
-	// GET INTO TO READ FROM...
-	for(auto& [key, value]: rootnode->children)
+	std::unique_ptr<BaseFileStream> handle = filesystem.open_file_read(vdirname.c_str());
+	if(!handle)
 	{
-	    childnodes.push_back(value);
-	    std::cout << key << std::endl;
+	    std::cout << "failed to open file" << std::endl;
 	}
-	for(int i=0; i < childnodes.size(); i++)
-	{
-	    for(auto& [key, value]: childnodes.at(i)->children)
-	    {
-		childnodes.push_back(value);
-		std::cout << key << std::endl;
-	    }
-	}
+	imgsize = handle->size();
+	//char buf[131072];
+	//handle->seek(curoffset);
+	//uint64_t bytesread = handle->read_into(buf, 131072);
+	/*
+    std::string wltgimg = std::filesystem::path(argv[1]).filename().string();
+    size_t found = wltgimg.rfind(".");
+    std::string wltgrawimg = wltgimg.substr(0, found) + ".dd";
+    std::string virtpath = "/" + wltgimg.substr(0, found) + "/" + wltgrawimg;
+    std::unique_ptr<BaseFileStream> handle = wltgfilesystem.open_file_read(virtpath.c_str());
+    if(!handle)
+    {
+	std::cout << "failed to open file" << std::endl;
+	return 1;
+    }
+    char buf[131072];
+    handle->seek(curoffset);
+    uint64_t bytesread = handle->read_into(buf, 131072);
+
+	 */ 
     }
     else // everything else
     {
@@ -622,6 +628,25 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 11) // SFS
     {
+    }
+    else if(imgtype == 12) // WALAFUS
+    {
+	std::filesystem::path tmppath = std::filesystem::canonical(imgpath);
+	std::string imgfilename = tmppath.filename().string();
+	int efound = imgfilename.rfind(".");
+	std::string vdirname = "/" + imgfilename.substr(0, efound) + "/" + imgfilename.substr(0, efound) + ".dd";
+
+	Filesystem filesystem;
+	WltgReader pack_wltg(imgpath.c_str());
+	filesystem.add_source(&pack_wltg);
+	std::unique_ptr<BaseFileStream> handle = filesystem.open_file_read(vdirname.c_str());
+	if(!handle)
+	{
+	    std::cout << "failed to open file" << std::endl;
+	}
+	handle->seek(pos);
+	uint64_t bytesread = handle->read_into(buf, size);
+
     }
     else // EVERYTHING ELSE
     {
