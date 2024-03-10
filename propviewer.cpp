@@ -51,11 +51,13 @@ void PropertyViewer::LoadProp(FXString* configpath, FXString* pname, std::string
 	    ptpath += "vmdkimg";
 	else if(pname->contains("aff4") == 0 || pname->contains("AFF4") == 0) // AFF4
 	    ptpath += "aff4img";
+	else if(pname->contains("wfi") == 0) // WFI
+	    ptpath += "wfiimg";
+	else if(pname->contains("sfs") == 0 || pname->contains("SFS") == 0) // SFS
+	    ptpath += "sfsimg";
 	/*
 	else if(imgext.compare("000") == 0 || imgext.compare("001") == 0) // SPLIT RAW
 	    imgtype = 4;
-	else if(imgext.compare("wfi") == 0) // WFI
-	    imgtype = 5;
 	else if(imgext.compare("wli") == 0) // WLI
 	    imgtype = 6;
 	else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD

@@ -34,8 +34,6 @@ ForImg::ForImg(std::string imgfile)
 	imgtype = 10;
     else if(imgext.compare("sfs") == 0) // SFS
 	imgtype = 11;
-    else if(imgext.compare("wltg") == 0) // WALAFUS
-	imgtype = 12;
     else // ANY OLD FILE
         imgtype = 0;
     libewf_error_free(&ewferr);
@@ -167,28 +165,20 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 5) // WFI
     {
-	std::string mdpath = imgpath + ".md";
-	std::cout << "mdpath: " << mdpath.c_str() << std::endl;
-	FILE* wfifile = NULL;
-	wfifile = fopen(mdpath.c_str(), "rb");
-	//fseek(wfifile, 0, SEEK_END);
-	//fseek(wfifile, -264, SEEK_CUR);
-	fread(&wfimd, sizeof(struct wfi_metadata), 1, wfifile);
-	fclose(wfifile);
-        imgsize = wfimd.totalbytes;
-	//std::cout << imgpath << " size: " << wfimd.totalbytes << std::endl;
-	/*
-	printf("\nwombatinfo v0.1\n\n");
-	printf("Raw Media Size: %llu bytes\n", wfimd.totalbytes);
-	printf("Case Number:\t %s\n", wfimd.casenumber);
-	printf("Examiner:\t %s\n", wfimd.examiner);
-	printf("Evidence Number: %s\n", wfimd.evidencenumber);
-	printf("Description:\t %s\n", wfimd.description);
-	printf("BLAKE3 Hash:\t ");
-	for(size_t i=0; i < 32; i++)
-	    printf("%02x", wfimd.devhash[i]);
-	printf("\n");
-	 */ 
+	std::filesystem::path tmppath = std::filesystem::canonical(imgpath);
+	std::string imgfilename = tmppath.filename().string();
+	int efound = imgfilename.rfind(".");
+	std::string vdirname = "/" + imgfilename.substr(0, efound) + "/" + imgfilename.substr(0, efound) + ".dd";
+
+	Filesystem filesystem;
+	WltgReader pack_wltg(imgpath.c_str());
+	filesystem.add_source(&pack_wltg);
+	std::unique_ptr<BaseFileStream> handle = filesystem.open_file_read(vdirname.c_str());
+	if(!handle)
+	{
+	    std::cout << "failed to open file" << std::endl;
+	}
+	imgsize = handle->size();
     }
     else if(imgtype == 6) // WLI
     {
@@ -269,137 +259,20 @@ ForImg::ForImg(std::string imgfile)
     {
 	// lazy man method
 	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
-	//std::cout << sqfusepath << std::endl;
 	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
 
 	// MOUNT SQUASH FS IMAGE
 	std::system(sqfusepath.c_str());
 
-	// GET THE RAW FUSE PATH
-	std::string rawfusepath = "smrawmount "; 
-
-	std::filesystem::path imgdir = "/tmp/sfsmnt/";
-	for(auto const& dir_entry : std::filesystem::recursive_directory_iterator(imgdir))
-	{
-	    if(std::filesystem::is_regular_file(dir_entry))
-	    {
-		if(dir_entry.path().string().find(".log") == std::string::npos)
-		{
-		    rawfusepath += dir_entry.path().string();
-		    break;
-		}
-	    }
-	}
-	std::cout << rawfusepath << std::endl;
-	rawfusepath += " /tmp/sfsraw/";
-	std::cout << "rawfusepath: " << rawfusepath << std::endl;
-
-	std::string rawufusepath = "fusermount -u /tmp/sfsraw/";
-
-	// MOUNT SMRAW SFS IMAGE
-	std::system(rawfusepath.c_str());
-
 	// GET SINGLE RAW IMAGE SIZE
-	imagebuffer.open("/tmp/sfsraw/smraw1", std::ios::in|std::ios::binary);
+	imagebuffer.open("/tmp/sfsmnt/image.raw", std::ios::in|std::ios::binary);
 	imagebuffer.seekg(0, imagebuffer.beg);
 	imagebuffer.seekg(0, imagebuffer.end);
 	imgsize = imagebuffer.tellg();
 	imagebuffer.close();
 
-	/*
-	libsmraw_handle_t* smhandle = NULL;
-	libsmraw_error_t* smerror = NULL;
-	char** globfiles = NULL;
-	int globfilecnt = 0;
-	std::filesystem::path imgdir = "/tmp/sfsmnt/";
-	std::vector<std::filesystem::path> filevector;
-	filevector.clear();
-	for(auto const& dir_entry : std::filesystem::recursive_directory_iterator(imgdir))
-	{
-	    if(std::filesystem::is_regular_file(dir_entry))
-	    {
-		if(dir_entry.path().string().find(".log") == std::string::npos)
-		{
-		    globfilecnt++;
-		    filevector.push_back(dir_entry);
-		}
-	    }
-	}
-	std::cout << "globfilecnt: " << globfilecnt << std::endl;
-	char* filenames[globfilecnt] = {NULL};
-	filenames[0] = (char*)filevector.at(0).string().c_str();
-	std::cout << "0 " << filevector.at(0).string().c_str() << std::endl;
-	int i=1;
-	for(int i=1; i < globfilecnt; i++)
-	{
-	    filenames[i] = (char*)filevector.at(i).string().c_str();
-	    std::cout << i << " " << filevector.at(i).string().c_str() << std::endl;
-	}
-	int retopen = 0;
-	retopen = libsmraw_glob(filenames[0], strlen(filenames[0]), &globfiles, &globfilecnt, &smerror);
-	if(retopen == -1)
-	    libsmraw_error_fprint(smerror, stdout);
-	retopen = libsmraw_handle_initialize(&smhandle, &smerror);
-	if(retopen == -1)
-	    libsmraw_error_fprint(smerror, stdout);
-	retopen = libsmraw_handle_open(smhandle, globfiles, globfilecnt, LIBSMRAW_OPEN_READ, &smerror);
-	if(retopen == -1)
-	    libsmraw_error_fprint(smerror, stdout);
-	libsmraw_handle_get_media_size(smhandle, &imgsize, &smerror);
-	if(retopen == -1)
-	    libsmraw_error_fprint(smerror, stdout);
-	libsmraw_handle_close(smhandle, &smerror);
-	libsmraw_handle_free(&smhandle, &smerror);
-	libsmraw_glob_free(globfiles, globfilecnt, &smerror);
-	libsmraw_error_free(&smerror);
-	*/
-
-	// UNMOUNT SMRAW SFS IMAGE
-	std::system(rawufusepath.c_str());
-
 	// UNMOUNT SQUASH FS IMAGE
 	std::system(squfusepath.c_str());
-	// need to access the squash fs directory and then access all the .## files
-	// use libsmraw to access the .## files
-	//sqfs* tmpsfs = NULL;
-	//int sqvfd = squash_open(tmpsfs, imgpath.c_str());
-	// attempting to use libsquashfs.a
-    }
-    else if(imgtype == 12) // WALAFUS
-    {
-	std::filesystem::path tmppath = std::filesystem::canonical(imgpath);
-	std::string imgfilename = tmppath.filename().string();
-	int efound = imgfilename.rfind(".");
-	std::string vdirname = "/" + imgfilename.substr(0, efound) + "/" + imgfilename.substr(0, efound) + ".dd";
-
-	Filesystem filesystem;
-	WltgReader pack_wltg(imgpath.c_str());
-	filesystem.add_source(&pack_wltg);
-	std::unique_ptr<BaseFileStream> handle = filesystem.open_file_read(vdirname.c_str());
-	if(!handle)
-	{
-	    std::cout << "failed to open file" << std::endl;
-	}
-	imgsize = handle->size();
-	//char buf[131072];
-	//handle->seek(curoffset);
-	//uint64_t bytesread = handle->read_into(buf, 131072);
-	/*
-    std::string wltgimg = std::filesystem::path(argv[1]).filename().string();
-    size_t found = wltgimg.rfind(".");
-    std::string wltgrawimg = wltgimg.substr(0, found) + ".dd";
-    std::string virtpath = "/" + wltgimg.substr(0, found) + "/" + wltgrawimg;
-    std::unique_ptr<BaseFileStream> handle = wltgfilesystem.open_file_read(virtpath.c_str());
-    if(!handle)
-    {
-	std::cout << "failed to open file" << std::endl;
-	return 1;
-    }
-    char buf[131072];
-    handle->seek(curoffset);
-    uint64_t bytesread = handle->read_into(buf, 131072);
-
-	 */ 
     }
     else // everything else
     {
@@ -527,21 +400,21 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 5) // WFI
     {
-	//std::cout << "pos: " << pos << " size: " << size << std::endl;
-	FILE* const fin = fopen_orDie(imgpath.c_str(), "rb");
-	size_t const bufoutsize = ZSTD_DStreamOutSize();
-	void* const bufout = malloc_orDie(bufoutsize);
-	size_t minsize = MIN(size, bufoutsize);
-	ZSTD_seekable* const seekable = ZSTD_seekable_create();
-	if (seekable==NULL) { fprintf(stderr, "ZSTD_seekable_create() error \n"); }
-	size_t initresult = ZSTD_seekable_initFile(seekable, fin); 
-	size_t curoff = pos;
-	if (ZSTD_isError(initresult)) { fprintf(stderr, "ZSTD_seekable_init() error : %s \n", ZSTD_getErrorName(initresult)); }
-	size_t result = ZSTD_seekable_decompress(seekable, (void*)buf, size, pos);
-	if (ZSTD_isError(result)) { fprintf(stderr, "ZSTD_seekable_decompress() error : %s \n", ZSTD_getErrorName(result)); }
-	ZSTD_seekable_free(seekable);
-	fclose_orDie(fin);
-	free(bufout);
+	std::filesystem::path tmppath = std::filesystem::canonical(imgpath);
+	std::string imgfilename = tmppath.filename().string();
+	int efound = imgfilename.rfind(".");
+	std::string vdirname = "/" + imgfilename.substr(0, efound) + "/" + imgfilename.substr(0, efound) + ".dd";
+
+	Filesystem filesystem;
+	WltgReader pack_wltg(imgpath.c_str());
+	filesystem.add_source(&pack_wltg);
+	std::unique_ptr<BaseFileStream> handle = filesystem.open_file_read(vdirname.c_str());
+	if(!handle)
+	{
+	    std::cout << "failed to open file" << std::endl;
+	}
+	handle->seek(pos);
+	uint64_t bytesread = handle->read_into(buf, size);
     }
     else if(imgtype == 6) // WLI
     {
@@ -628,25 +501,20 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 11) // SFS
     {
-    }
-    else if(imgtype == 12) // WALAFUS
-    {
-	std::filesystem::path tmppath = std::filesystem::canonical(imgpath);
-	std::string imgfilename = tmppath.filename().string();
-	int efound = imgfilename.rfind(".");
-	std::string vdirname = "/" + imgfilename.substr(0, efound) + "/" + imgfilename.substr(0, efound) + ".dd";
+    	// lazy man method using SQUASHFUSE COMMAND LINE TOOL
+	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
+	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
 
-	Filesystem filesystem;
-	WltgReader pack_wltg(imgpath.c_str());
-	filesystem.add_source(&pack_wltg);
-	std::unique_ptr<BaseFileStream> handle = filesystem.open_file_read(vdirname.c_str());
-	if(!handle)
-	{
-	    std::cout << "failed to open file" << std::endl;
-	}
-	handle->seek(pos);
-	uint64_t bytesread = handle->read_into(buf, size);
+	// MOUNT SQUASH FS IMAGE
+	std::system(sqfusepath.c_str());
 
+	imagebuffer.open("/tmp/sfsmnt/image.raw", std::ios::in|std::ios::binary);
+        imagebuffer.seekg(pos);
+        imagebuffer.read((char*)buf, size);
+        imagebuffer.close();
+
+	// UNMOUNT SQUASH FS IMAGE
+	std::system(squfusepath.c_str());
     }
     else // EVERYTHING ELSE
     {
