@@ -32,7 +32,7 @@ ForImg::ForImg(std::string imgfile)
 	imgtype = 9;
     else if(libphdi_check_file_signature(imgfile.c_str(), &phderr) == 1 || imgext.compare("phd") == 0 || imgext.compare("PHD") == 0) // PHD
 	imgtype = 10;
-    else if(imgext.compare("sfs") == 0) // SFS
+    else if(imgext.compare("sfs") == 0 || imgext.compare("squashfs") == 0) // SFS
 	imgtype = 11;
     else // ANY OLD FILE
         imgtype = 0;
@@ -257,6 +257,33 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 11) // SFS
     {
+	/*
+	std::cout << "get squash file size" << std::endl;
+	//squash_start();
+	sqfs squashfs;
+	sqfs_fd_t fd;
+	//memset(&squashfs, 0, sizeof(sqfs));
+	std::cout << "open squash file:" << std::endl;
+	std::cout << imgpath << std::endl;
+	sqfs_err sqerr = sqfs_fd_open((uint8_t*)imgpath.c_str(), &fd);
+	std::cout << "fd open error: " << sqerr << std::endl;
+	sqerr = sqfs_init(&squashfs, fd, 0);
+	std::cout << "sqfs init error: " << sqerr << std::endl;
+	//sqfs_open_image(&squashfs, (uint8_t*)imgpath.c_str(), 0);
+	//std::cout << "open squash file" << std::endl;
+	//int vfd = squash_open(&squashfs, "/image.raw");
+	//int vfd = squash_open(squashfs, imgpath.c_str());
+	//int vfd = squash_open(&squashfs, "
+	//std::cout << "vfd: " << vfd << std::endl;
+	struct stat buf;
+	//std::cout << "start stat for squash file" << std::endl;
+	//int sqerror = squash_stat(&squashfs, "/image.raw", &buf);
+	//int sqerror = squash_stat(squashfs, imgpath.c_str(), &buf);
+	//int sqerror = squash_stat(squashfs, "/squashfs-root/image.raw", &buf);
+	//std::cout << "buf.size: " << buf.st_size << std::endl;
+	//squash_close(vfd);
+	sqfs_destroy(&squashfs);
+	*/
 	// lazy man method
 	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
 	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");

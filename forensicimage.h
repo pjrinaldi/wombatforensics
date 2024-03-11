@@ -25,6 +25,8 @@
 #include "walafus/wltg_reader.h"
 #include "walafus/wltg_packer.h"
 
+#include "squash.h"
+
 struct wfi_metadata
 {
     uint32_t skipframeheader; // skippable frame header
