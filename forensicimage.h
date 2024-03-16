@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <locale>
 #include <sys/param.h>
+#include <sys/stat.h>
 // SHARED LIBRARIES
 #include "libewf.h"
 #include "libsmraw.h"
@@ -28,11 +29,14 @@
 
 // SQUASHFS LIBRARY HEADERS
 #include "sqfs/compressor.h"
+#include "sqfs/xattr_reader.h"
+#include "sqfs/data_reader.h"
 #include "sqfs/dir_reader.h"
 #include "sqfs/id_table.h"
 #include "sqfs/inode.h"
 #include "sqfs/super.h"
 #include "sqfs/io.h"
+#include "sqfs/error.h"
 
 /*
 struct wfi_metadata

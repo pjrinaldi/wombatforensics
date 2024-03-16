@@ -257,32 +257,69 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 11) // SFS
     {
-	sqfs_file_t* sqfsfile;
+	sqfs_file_t* sqfsfile = NULL;
+	sqfs_compressor_t* sqfscmp = NULL;
+	sqfs_xattr_reader_t* sqfsxattr = NULL;
+	sqfs_data_reader_t* sqfsdata = NULL;
+	sqfs_dir_reader_t* sqfsdirrd = NULL;
+	sqfs_id_table_t* sqfsidtbl = NULL;
+	sqfs_tree_node_t* sqfsnode = NULL;
+	sqfs_u8* p = NULL;
+	sqfs_u8* output = NULL;
+	sqfs_compressor_config_t sqfscmpcfg;
+	sqfs_super_t sqfssuper;
+	sqfs_u64 sqfsfilesize;
+
 	sqfsfile = sqfs_open_file(imgpath.c_str(), SQFS_FILE_OPEN_READ_ONLY);
 	if(sqfsfile == NULL)
 	    std::cout << "squash file system file open failed." << std::endl;
-	else
-	    std::cout << "squash fs opened properly. next step is open the file." << std::endl;
+	int ret = sqfs_super_read(&sqfssuper, sqfsfile);
+	if(ret)
+	    std::cout << "error opening super block." << std::endl;
+	sqfs_compressor_config_init(&sqfscmpcfg, (SQFS_COMPRESSOR)sqfssuper.compression_id, sqfssuper.block_size, SQFS_COMP_FLAG_UNCOMPRESS);
+	ret = sqfs_compressor_create(&sqfscmpcfg, &sqfscmp);
+	if(ret != 0)
+	    std::cout << "compressor creation failed " << ret << std::endl;
+	if(!(sqfssuper.flags & SQFS_FLAG_NO_XATTRS))
+	{
+	    sqfsxattr = sqfs_xattr_reader_create(0);
+	    if(sqfsxattr == NULL)
+		std::cout << "error creating xattr reader: " << SQFS_ERROR_ALLOC << std::endl;
+	    ret = sqfs_xattr_reader_load(sqfsxattr, &sqfssuper, sqfsfile, sqfscmp);
+	    if(ret)
+		std::cout << "error loading xattr reader " << ret << std::endl;
+	}
+	sqfsidtbl = sqfs_id_table_create(0);
+	if(sqfsidtbl == NULL)
+	    std::cout << "error creating id table: " << SQFS_ERROR_ALLOC << std::endl;
+	ret = sqfs_id_table_read(sqfsidtbl, sqfsfile, &sqfssuper, sqfscmp);
+	if(ret)
+	    std::cout << "error reading id table: " << ret << std::endl;
+	sqfsdirrd = sqfs_dir_reader_create(&sqfssuper, sqfscmp, sqfsfile, 0);
+	if(sqfsdirrd == NULL)
+	    std::cout << "error creating dir reader: " << SQFS_ERROR_ALLOC << std::endl;
+	sqfsdata = sqfs_data_reader_create(sqfsfile, sqfssuper.block_size, sqfscmp, 0);
+	if(sqfsdata == NULL)
+	    std::cout << "error creating data reader: " << SQFS_ERROR_ALLOC << std::endl;
+	ret = sqfs_data_reader_load_fragment_table(sqfsdata, &sqfssuper);
+	if(ret)
+	    std::cout << "error loading fragment table: " << ret << std::endl;
+	std::string virtpath = "/image.raw";
+	ret = sqfs_dir_reader_get_full_hierarchy(sqfsdirrd, sqfsidtbl, "/image.raw", 0, &sqfsnode);
+	if(ret)
+	    std::cout << "error reading filesystem hierarchy: " << ret << std::endl;
+	if(!S_ISREG(sqfsnode->inode->base.mode))
+	    std::cout << "/image.raw is not a file" << std::endl;
+	sqfs_inode_get_file_size(sqfsnode->inode, &sqfsfilesize);
+	imgsize = sqfsfilesize;
+
+	sqfs_dir_tree_destroy(sqfsnode);
+	sqfs_destroy(sqfsdata);
+	sqfs_destroy(sqfsdirrd);
+	sqfs_destroy(sqfsidtbl);
+	sqfs_destroy(sqfsxattr);
+	sqfs_destroy(sqfscmp);
 	sqfs_destroy(sqfsfile);
-
-	/*
-	// lazy man method
-	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
-	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
-
-	// MOUNT SQUASH FS IMAGE
-	std::system(sqfusepath.c_str());
-
-	// GET SINGLE RAW IMAGE SIZE
-	imagebuffer.open("/tmp/sfsmnt/image.raw", std::ios::in|std::ios::binary);
-	imagebuffer.seekg(0, imagebuffer.beg);
-	imagebuffer.seekg(0, imagebuffer.end);
-	imgsize = imagebuffer.tellg();
-	imagebuffer.close();
-
-	// UNMOUNT SQUASH FS IMAGE
-	std::system(squfusepath.c_str());
-	*/
     }
     else // everything else
     {
@@ -511,6 +548,108 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 11) // SFS
     {
+	sqfs_file_t* sqfsfile = NULL;
+	sqfs_compressor_t* sqfscmp = NULL;
+	sqfs_xattr_reader_t* sqfsxattr = NULL;
+	sqfs_data_reader_t* sqfsdata = NULL;
+	sqfs_dir_reader_t* sqfsdirrd = NULL;
+	sqfs_id_table_t* sqfsidtbl = NULL;
+	sqfs_tree_node_t* sqfsnode = NULL;
+	sqfs_u8* p = NULL;
+	sqfs_u8* output = NULL;
+	sqfs_compressor_config_t sqfscmpcfg;
+	sqfs_super_t sqfssuper;
+	sqfs_u64 sqfsfilesize;
+
+	sqfsfile = sqfs_open_file(imgpath.c_str(), SQFS_FILE_OPEN_READ_ONLY);
+	if(sqfsfile == NULL)
+	    std::cout << "squash file system file open failed." << std::endl;
+	int ret = sqfs_super_read(&sqfssuper, sqfsfile);
+	if(ret)
+	    std::cout << "error opening super block." << std::endl;
+	sqfs_compressor_config_init(&sqfscmpcfg, (SQFS_COMPRESSOR)sqfssuper.compression_id, sqfssuper.block_size, SQFS_COMP_FLAG_UNCOMPRESS);
+	ret = sqfs_compressor_create(&sqfscmpcfg, &sqfscmp);
+	if(ret != 0)
+	    std::cout << "compressor creation failed " << ret << std::endl;
+	if(!(sqfssuper.flags & SQFS_FLAG_NO_XATTRS))
+	{
+	    sqfsxattr = sqfs_xattr_reader_create(0);
+	    if(sqfsxattr == NULL)
+		std::cout << "error creating xattr reader: " << SQFS_ERROR_ALLOC << std::endl;
+	    ret = sqfs_xattr_reader_load(sqfsxattr, &sqfssuper, sqfsfile, sqfscmp);
+	    if(ret)
+		std::cout << "error loading xattr reader " << ret << std::endl;
+	}
+	sqfsidtbl = sqfs_id_table_create(0);
+	if(sqfsidtbl == NULL)
+	    std::cout << "error creating id table: " << SQFS_ERROR_ALLOC << std::endl;
+	ret = sqfs_id_table_read(sqfsidtbl, sqfsfile, &sqfssuper, sqfscmp);
+	if(ret)
+	    std::cout << "error reading id table: " << ret << std::endl;
+	sqfsdirrd = sqfs_dir_reader_create(&sqfssuper, sqfscmp, sqfsfile, 0);
+	if(sqfsdirrd == NULL)
+	    std::cout << "error creating dir reader: " << SQFS_ERROR_ALLOC << std::endl;
+	sqfsdata = sqfs_data_reader_create(sqfsfile, sqfssuper.block_size, sqfscmp, 0);
+	if(sqfsdata == NULL)
+	    std::cout << "error creating data reader: " << SQFS_ERROR_ALLOC << std::endl;
+	ret = sqfs_data_reader_load_fragment_table(sqfsdata, &sqfssuper);
+	if(ret)
+	    std::cout << "error loading fragment table: " << ret << std::endl;
+	std::string virtpath = "/image.raw";
+	ret = sqfs_dir_reader_get_full_hierarchy(sqfsdirrd, sqfsidtbl, "/image.raw", 0, &sqfsnode);
+	if(ret)
+	    std::cout << "error reading filesystem hierarchy: " << ret << std::endl;
+	if(!S_ISREG(sqfsnode->inode->base.mode))
+	    std::cout << "/image.raw is not a file" << std::endl;
+	sqfs_inode_get_file_size(sqfsnode->inode, &sqfsfilesize);
+	/*
+	output = p = malloc(file_size);
+	if (output == NULL) {
+		fprintf(stderr, "malloc failed: %d\n", errno);
+		goto out;
+	}
+
+	for (size_t i = 0; i < sqfs_inode_get_file_block_count(n->inode); ++i) {
+		size_t chunk_size, read = (file_size < super.block_size) ? file_size : super.block_size;
+		sqfs_u8 *chunk;
+
+		ret = sqfs_data_reader_get_block(data, n->inode, i, &chunk_size, &chunk);
+		if (ret) {
+			fprintf(stderr, "reading data block: %d\n", ret);
+			goto out;
+		}
+
+		memcpy(p, chunk, chunk_size);
+		p += chunk_size;
+		free(chunk);
+
+		file_size -= read;
+	}
+
+	if (file_size > 0) {
+		size_t chunk_size;
+		sqfs_u8 *chunk;
+
+		ret = sqfs_data_reader_get_fragment(data, n->inode, &chunk_size, &chunk);
+		if (ret) {
+			fprintf(stderr, "reading fragment block: %d\n", ret);
+			goto out;
+		}
+
+		memcpy(p, chunk, chunk_size);
+		free(chunk);
+	}
+
+	// for example simplicity, assume this is a text file
+	fprintf(stdout, "%s\n", (char *)output);
+	*/ 
+	sqfs_dir_tree_destroy(sqfsnode);
+	sqfs_destroy(sqfsdata);
+	sqfs_destroy(sqfsdirrd);
+	sqfs_destroy(sqfsidtbl);
+	sqfs_destroy(sqfsxattr);
+	sqfs_destroy(sqfscmp);
+	sqfs_destroy(sqfsfile);
 	/*
     	// lazy man method using SQUASHFUSE COMMAND LINE TOOL
 	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
