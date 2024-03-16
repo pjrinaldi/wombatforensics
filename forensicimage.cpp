@@ -264,8 +264,6 @@ ForImg::ForImg(std::string imgfile)
 	sqfs_dir_reader_t* sqfsdirrd = NULL;
 	sqfs_id_table_t* sqfsidtbl = NULL;
 	sqfs_tree_node_t* sqfsnode = NULL;
-	sqfs_u8* p = NULL;
-	sqfs_u8* output = NULL;
 	sqfs_compressor_config_t sqfscmpcfg;
 	sqfs_super_t sqfssuper;
 	sqfs_u64 sqfsfilesize;
@@ -555,8 +553,6 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
 	sqfs_dir_reader_t* sqfsdirrd = NULL;
 	sqfs_id_table_t* sqfsidtbl = NULL;
 	sqfs_tree_node_t* sqfsnode = NULL;
-	sqfs_u8* p = NULL;
-	sqfs_u8* output = NULL;
 	sqfs_compressor_config_t sqfscmpcfg;
 	sqfs_super_t sqfssuper;
 	sqfs_u64 sqfsfilesize;
@@ -601,48 +597,47 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
 	    std::cout << "error reading filesystem hierarchy: " << ret << std::endl;
 	if(!S_ISREG(sqfsnode->inode->base.mode))
 	    std::cout << "/image.raw is not a file" << std::endl;
+	//std::cout << "block size: " << sqfssuper.block_size << std::endl;
 	sqfs_inode_get_file_size(sqfsnode->inode, &sqfsfilesize);
-	/*
-	output = p = malloc(file_size);
-	if (output == NULL) {
-		fprintf(stderr, "malloc failed: %d\n", errno);
-		goto out;
+	//std::cout << "file size: " << sqfsfilesize << std::endl;
+	size_t sqfsfileblockcount = sqfs_inode_get_file_block_count(sqfsnode->inode);
+	//std::cout << "block count: " << sqfsfileblockcount << std::endl;
+	//std::cout << "offset to start read: " << pos << " size to read: " << size << std::endl;
+	size_t blockstoread = size / sqfssuper.block_size;
+	if(blockstoread == 0)
+	    blockstoread = 1;
+	size_t whichblock = pos / sqfssuper.block_size;
+	//std::cout << "blocks to read for requested size: " << blockstoread << " which block to read from: " << whichblock << std::endl;
+	size_t sizeleft = size;
+	for(size_t i = whichblock; i < blockstoread; ++i)
+	{
+	    //std::cout << "i: " << i << std::endl;
+	    size_t chunksize, read = (size < sqfssuper.block_size) ? size : sqfssuper.block_size;
+	    sqfs_u8* chunk;
+	    ret = sqfs_data_reader_get_block(sqfsdata, sqfsnode->inode, i, &chunksize, &chunk);
+	    //std::cout << "chunksize: " << chunksize << std::endl;
+	    if(ret)
+		std::cout << "error reading data block: " << ret << std::endl;
+	    for(int j=0; j < size; j++)
+	    {
+		//printf("byte at %d: %x\n", pos+j, chunk[pos+j]);
+		buf[i*chunksize + j] = chunk[pos + j];
+	    }
+	    sizeleft -= read;
+	    free(chunk);
+	}
+	if(sizeleft > 0)
+	{
+	    size_t chunksize;
+	    sqfs_u8* chunk;
+	    ret = sqfs_data_reader_get_fragment(sqfsdata, sqfsnode->inode, &chunksize, &chunk);
+	    if(ret)
+		std::cout << "reading fragment block error: " << ret << std::endl;
+	    for(int j=(size-sizeleft); j < size; j++)
+		buf[j] = chunk[j];
+	    free(chunk);
 	}
 
-	for (size_t i = 0; i < sqfs_inode_get_file_block_count(n->inode); ++i) {
-		size_t chunk_size, read = (file_size < super.block_size) ? file_size : super.block_size;
-		sqfs_u8 *chunk;
-
-		ret = sqfs_data_reader_get_block(data, n->inode, i, &chunk_size, &chunk);
-		if (ret) {
-			fprintf(stderr, "reading data block: %d\n", ret);
-			goto out;
-		}
-
-		memcpy(p, chunk, chunk_size);
-		p += chunk_size;
-		free(chunk);
-
-		file_size -= read;
-	}
-
-	if (file_size > 0) {
-		size_t chunk_size;
-		sqfs_u8 *chunk;
-
-		ret = sqfs_data_reader_get_fragment(data, n->inode, &chunk_size, &chunk);
-		if (ret) {
-			fprintf(stderr, "reading fragment block: %d\n", ret);
-			goto out;
-		}
-
-		memcpy(p, chunk, chunk_size);
-		free(chunk);
-	}
-
-	// for example simplicity, assume this is a text file
-	fprintf(stdout, "%s\n", (char *)output);
-	*/ 
 	sqfs_dir_tree_destroy(sqfsnode);
 	sqfs_destroy(sqfsdata);
 	sqfs_destroy(sqfsdirrd);
@@ -650,22 +645,6 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
 	sqfs_destroy(sqfsxattr);
 	sqfs_destroy(sqfscmp);
 	sqfs_destroy(sqfsfile);
-	/*
-    	// lazy man method using SQUASHFUSE COMMAND LINE TOOL
-	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
-	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
-
-	// MOUNT SQUASH FS IMAGE
-	std::system(sqfusepath.c_str());
-
-	imagebuffer.open("/tmp/sfsmnt/image.raw", std::ios::in|std::ios::binary);
-        imagebuffer.seekg(pos);
-        imagebuffer.read((char*)buf, size);
-        imagebuffer.close();
-
-	// UNMOUNT SQUASH FS IMAGE
-	std::system(squfusepath.c_str());
-	*/
     }
     else // EVERYTHING ELSE
     {
