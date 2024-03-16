@@ -21,12 +21,20 @@
 #include "libvmdk.h"
 #include "libphdi.h"
 
+// WALAFUS HEADERS FOR WOMBAT FORENSIC IMAGE
 #include "walafus/filesystem.h"
 #include "walafus/wltg_reader.h"
 #include "walafus/wltg_packer.h"
 
-#include "squash.h"
+// SQUASHFS LIBRARY HEADERS
+#include "sqfs/compressor.h"
+#include "sqfs/dir_reader.h"
+#include "sqfs/id_table.h"
+#include "sqfs/inode.h"
+#include "sqfs/super.h"
+#include "sqfs/io.h"
 
+/*
 struct wfi_metadata
 {
     uint32_t skipframeheader; // skippable frame header
@@ -40,6 +48,7 @@ struct wfi_metadata
     char description[128]; // 128 character string
     uint8_t devhash[32]; // blake3 source hash
 };
+*/
 
 class ForImg 
 {
@@ -63,7 +72,7 @@ class ForImg
         std::string imgpath = "";
         //std::string mntpath = "";
         int8_t imgtype = -1;
-	wfi_metadata wfimd;
+	//wfi_metadata wfimd;
 };
 
 void GetForImgProperties(std::string* imgpath, std::string* propstr);

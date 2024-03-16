@@ -257,33 +257,15 @@ ForImg::ForImg(std::string imgfile)
     }
     else if(imgtype == 11) // SFS
     {
+	sqfs_file_t* sqfsfile;
+	sqfsfile = sqfs_open_file(imgpath.c_str(), SQFS_FILE_OPEN_READ_ONLY);
+	if(sqfsfile == NULL)
+	    std::cout << "squash file system file open failed." << std::endl;
+	else
+	    std::cout << "squash fs opened properly. next step is open the file." << std::endl;
+	sqfs_destroy(sqfsfile);
+
 	/*
-	std::cout << "get squash file size" << std::endl;
-	//squash_start();
-	sqfs squashfs;
-	sqfs_fd_t fd;
-	//memset(&squashfs, 0, sizeof(sqfs));
-	std::cout << "open squash file:" << std::endl;
-	std::cout << imgpath << std::endl;
-	sqfs_err sqerr = sqfs_fd_open((uint8_t*)imgpath.c_str(), &fd);
-	std::cout << "fd open error: " << sqerr << std::endl;
-	sqerr = sqfs_init(&squashfs, fd, 0);
-	std::cout << "sqfs init error: " << sqerr << std::endl;
-	//sqfs_open_image(&squashfs, (uint8_t*)imgpath.c_str(), 0);
-	//std::cout << "open squash file" << std::endl;
-	//int vfd = squash_open(&squashfs, "/image.raw");
-	//int vfd = squash_open(squashfs, imgpath.c_str());
-	//int vfd = squash_open(&squashfs, "
-	//std::cout << "vfd: " << vfd << std::endl;
-	struct stat buf;
-	//std::cout << "start stat for squash file" << std::endl;
-	//int sqerror = squash_stat(&squashfs, "/image.raw", &buf);
-	//int sqerror = squash_stat(squashfs, imgpath.c_str(), &buf);
-	//int sqerror = squash_stat(squashfs, "/squashfs-root/image.raw", &buf);
-	//std::cout << "buf.size: " << buf.st_size << std::endl;
-	//squash_close(vfd);
-	sqfs_destroy(&squashfs);
-	*/
 	// lazy man method
 	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
 	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
@@ -300,6 +282,7 @@ ForImg::ForImg(std::string imgfile)
 
 	// UNMOUNT SQUASH FS IMAGE
 	std::system(squfusepath.c_str());
+	*/
     }
     else // everything else
     {
@@ -528,6 +511,7 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
     }
     else if(imgtype == 11) // SFS
     {
+	/*
     	// lazy man method using SQUASHFUSE COMMAND LINE TOOL
 	std::string sqfusepath = std::string("squashfuse " + imgpath + " " + "/tmp/sfsmnt/");
 	std::string squfusepath = std::string("fusermount -u /tmp/sfsmnt/");
@@ -542,6 +526,7 @@ void ForImg::ReadContent(uint8_t* buf, uint64_t pos, uint64_t size)
 
 	// UNMOUNT SQUASH FS IMAGE
 	std::system(squfusepath.c_str());
+	*/
     }
     else // EVERYTHING ELSE
     {
