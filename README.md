@@ -4,11 +4,11 @@ Wombat Forensics is a new Forensic Analysis tool built entirely in C and C++. Th
 
 ## Repository Change
 * I am no longer building code on github. I have moved my code to the website www.wombatforensics.com and am hosting my repositories on a vps using fossil for the repositories rather than git. I decided to stop using github due to all the AI crap and scraping code. My code isn't fancy or great, and it is free, but I just don't like the idea of scraping without my ok and since github is free, that is part of the price for free access. So I am leaving the historical bits of my repositories, but moving them all to fossil repositories. Feel free to check them out, they aren't as fancy or featureful as github, but it fits my needs.
-* I can read/parse squashfs forensic images, as well as my custom wombat forensic image, which i changed the format and am using walafus code to implement.
 
 In the Works Features
 ----------------------
 * I currently building mobile extraction support. It will load a zip or ufd/ufdx and display the root directory and let you navigate the directories. It is very rudimentary and more features will come. There is no waiting hours to navigate the directory of a phone extraction. That is the design behind it same as a forensic image.
+* I can read/parse squashfs forensic images, as well as my custom wombat forensic image, which i changed the format and am using walafus code to implement.
 
 Current Features
 -----------------
