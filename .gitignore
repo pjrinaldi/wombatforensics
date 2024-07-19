@@ -18,3 +18,4 @@ Makefile.Release
 Makefile.*
 wombatforensics
 reference
+fossil/
